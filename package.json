@@ -1,0 +1,20 @@
+{
+  "name": "moron",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive --bail tests"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.24",
+    "knex": "^0.8.3",
+    "lodash": "^3.6.0",
+    "node-uuid": "^1.4.3",
+    "tv4": "^1.1.9",
+    "tv4-formats": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.4",
+    "expect.js": "^0.3.1"
+  }
+}
