@@ -511,6 +511,20 @@ describe('MoronQueryBuilder', function () {
     console.log('TODO');
   });
 
+  it('resolve should replace the database query with the given value', function (done) {
+    MoronQueryBuilder
+      .forClass(Model)
+      .resolve([{b: '100'}])
+      .where('test', 100)
+      .orderBy('order')
+      .then(function (res) {
+        expect(executedQueries).to.have.length(0);
+        expect(res).to.eql([{b: '100'}]);
+        done();
+      })
+      .catch(done);
+  });
+
   /*
   it.only('performance', function () {
     mockKnexQueryResult = [{a: 1}, {a: 2}, {a: 3}, {a: 4}, {a: 5}];
