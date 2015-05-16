@@ -50,8 +50,8 @@ describe('MoronHasManyRelation', function () {
 
   describe('find', function () {
 
-    it.only('should generate a find query', function () {
-      var expectedResult = [{a: 1}, {a: 2}];
+    it('should generate a find query', function () {
+      var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}];
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({id: 666});
 
@@ -69,21 +69,12 @@ describe('MoronHasManyRelation', function () {
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          /*
-          expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\')'
-          ].join(' '));
-          */
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "ownerId" in (\'666\')');
         });
     });
 
     it('should find for multiple owners', function () {
-      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}, {a: 3, _join_: 667}, {a: 4, _join_: 667}];
+      var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}, {a: 3, ownerId: 667}, {a: 4, ownerId: 667}];
       mockKnexQueryResults = [expectedResult];
       var owners = [OwnerModel.fromJson({id: 666}), OwnerModel.fromJson({id: 667})];
 
@@ -96,27 +87,20 @@ describe('MoronHasManyRelation', function () {
         })
         .then(function (result) {
           expect(result).to.have.length(4);
-          expect(result).to.eql(_.omit(expectedResult, '_join_'));
-          expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
-          expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
+          expect(result).to.eql(expectedResult);
+          expect(owners[0].nameOfOurRelation).to.eql([{a: 1, ownerId: 666}, {a: 2, ownerId: 666}]);
+          expect(owners[1].nameOfOurRelation).to.eql([{a: 3, ownerId: 667}, {a: 4, ownerId: 667}]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(result[2]).to.be.a(RelatedModel);
           expect(result[3]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\', \'667\')'
-          ].join(' '));
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "ownerId" in (\'666\', \'667\')');
         });
     });
 
     it('explicit selects should override the RelatedModel.*', function () {
-      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
+      var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}];
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({id: 666});
 
@@ -130,19 +114,12 @@ describe('MoronHasManyRelation', function () {
         })
         .then(function (result) {
           expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, '_join_'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, '_join_'));
+          expect(result).to.eql(expectedResult);
+          expect(owner.nameOfOurRelation).to.eql(expectedResult);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal([
-            'select "name", "JoinTable"."ownerId" as "_join_"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\')'
-          ].join(' '));
+          expect(executedQueries[0]).to.equal('select "name" from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "ownerId" in (\'666\')');
         });
     });
 
@@ -163,12 +140,12 @@ describe('MoronHasManyRelation', function () {
         })
         .insert(related)
         .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\'), (\'str2\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\'), (\'666\', \'2\')');
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "id"');
+          expect(owner.nameOfOurRelation).to.eql(result);
           expect(result).to.eql([
-            {a: 'str1', id: 1},
-            {a: 'str2', id: 2}
+            {a: 'str1', id: 1, ownerId: 666},
+            {a: 'str2', id: 2, ownerId: 666}
           ]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
@@ -188,12 +165,11 @@ describe('MoronHasManyRelation', function () {
         })
         .insert(related)
         .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\'), (\'str2\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\'), (\'666\', \'2\')');
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "id"');
           expect(result).to.eql([
-            {a: 'str1', id: 1},
-            {a: 'str2', id: 2}
+            {a: 'str1', id: 1, ownerId: 666},
+            {a: 'str2', id: 2, ownerId: 666}
           ]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
@@ -213,10 +189,9 @@ describe('MoronHasManyRelation', function () {
         })
         .insert(related)
         .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\')');
-          expect(result).to.eql({a: 'str1', id: 1});
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "id"');
+          expect(result).to.eql({a: 'str1', id: 1, ownerId: 666});
           expect(result).to.be.a(RelatedModel);
         });
     });
@@ -234,10 +209,9 @@ describe('MoronHasManyRelation', function () {
         })
         .insert(related)
         .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\')');
-          expect(result).to.eql({a: 'str1', id: 1});
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "id"');
+          expect(result).to.eql({a: 'str1', id: 1, ownerId: 666});
           expect(result).to.be.a(RelatedModel);
         });
     });
@@ -263,15 +237,7 @@ describe('MoronHasManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "ownerId" in (\'666\')');
         });
     });
 
@@ -292,15 +258,7 @@ describe('MoronHasManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "ownerId" in (\'666\')');
         });
     });
 
@@ -316,13 +274,7 @@ describe('MoronHasManyRelation', function () {
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" + 1',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"ownerId\" in ('666')");
         });
     });
 
@@ -338,13 +290,7 @@ describe('MoronHasManyRelation', function () {
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" - 10',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"ownerId\" in ('666')");
         });
     });
 
@@ -369,15 +315,7 @@ describe('MoronHasManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "ownerId" in (\'666\')');
         });
     });
 
@@ -407,15 +345,7 @@ describe('MoronHasManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "ownerId" in (\'666\')');
         });
     });
 
@@ -431,13 +361,7 @@ describe('MoronHasManyRelation', function () {
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" + 1',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"ownerId\" in ('666')");
         });
     });
 
@@ -453,13 +377,7 @@ describe('MoronHasManyRelation', function () {
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" - 10',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"ownerId\" in ('666')");
         });
     });
 
@@ -480,26 +398,9 @@ describe('MoronHasManyRelation', function () {
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
         .then(function (result) {
-          expect(executedQueries).to.have.length(2);
+          expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql([
-            'delete from "JoinTable"',
-            'where "JoinTable"."relatedId" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
-          expect(executedQueries[1]).to.eql([
-            'delete from "RelatedModel"',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "ownerId" in (\'666\')');
         });
     });
 
@@ -519,12 +420,8 @@ describe('MoronHasManyRelation', function () {
         .relate([10, 20, 30])
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql([
-            { ownerId: 666, relatedId: 10, id: 5 },
-            { ownerId: 666, relatedId: 20, id: 6 },
-            { ownerId: 666, relatedId: 30, id: 7 }
-          ]);
-          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\') returning "id"');
+          expect(result).to.eql([10, 20, 30]);
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "id" in (\'10\', \'20\', \'30\')');
         });
     });
 
@@ -540,8 +437,8 @@ describe('MoronHasManyRelation', function () {
         .relate(11)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({ ownerId: 666, relatedId: 11, id: 5 });
-          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'11\') returning "id"');
+          expect(result).to.eql(11);
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "id" in (\'11\')');
         });
     });
 
@@ -562,14 +459,7 @@ describe('MoronHasManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql([
-            'delete from "JoinTable"',
-            'where "JoinTable"."relatedId" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "code" in (\'55\', \'66\', \'77\')',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = NULL where "code" in (\'55\', \'66\', \'77\') and "ownerId" = \'666\'');
         });
     });
 

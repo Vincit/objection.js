@@ -156,6 +156,7 @@ describe('MoronManyToManyRelation', function () {
       mockKnexQueryResults = [[1, 2]];
 
       var owner = OwnerModel.fromJson({id: 666});
+      owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0'})];
       var related = [RelatedModel.fromJson({a: 'str1'}), RelatedModel.fromJson({a: 'str2'})];
 
       return MoronQueryBuilder
@@ -168,6 +169,7 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries).to.have.length(2);
           expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\'), (\'str2\') returning "id"');
           expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\'), (\'666\', \'2\')');
+          expect(owner.nameOfOurRelation).to.eql([{a: 'str0'}, {a: 'str1', id: 1}, {a: 'str2', id: 2}]);
           expect(result).to.eql([
             {a: 'str1', id: 1},
             {a: 'str2', id: 2}
