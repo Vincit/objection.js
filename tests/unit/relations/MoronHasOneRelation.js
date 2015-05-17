@@ -2,9 +2,9 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , MoronModel = require('../../lib/MoronModel')
-  , MoronQueryBuilder = require('../../lib/MoronQueryBuilder')
-  , MoronHasOneRelation = require('../../lib/relations/MoronHasOneRelation');
+  , MoronModel = require('../../../lib/MoronModel')
+  , MoronQueryBuilder = require('../../../lib/MoronQueryBuilder')
+  , MoronHasOneRelation = require('../../../lib/relations/MoronHasOneRelation');
 
 describe('MoronHasOneRelation', function () {
   var mockKnexQueryResults = [];

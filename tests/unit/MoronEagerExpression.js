@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-  , MoronEagerExpression = require('../lib/MoronEagerExpression')
+  , MoronEagerExpression = require('../../lib/MoronEagerExpression')
   , EagerType = MoronEagerExpression.EagerType;
 
 describe('MoronEagerExpression', function () {
