@@ -16,6 +16,7 @@ describe('MoronManyToManyRelation', function () {
 
   before(function () {
     mockKnex = knex({client: 'pg'});
+    console.log('TODO', 'replace this with inheritance!');
     mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
       executedQueries.push(this.toString());
       return Promise.resolve(mockKnexQueryResults.shift() || []).then(cb, ecb);

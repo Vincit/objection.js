@@ -10,12 +10,19 @@ describe('MoronEagerExpression', function () {
       testParse('', {});
     });
 
-    it('null', function () {
+    it('non-string', function () {
       testParse(null, {});
+      testParse(false, {});
+      testParse(true, {});
+      testParse(1, {});
+      testParse({}, {});
+      testParse([], {});
     });
 
     it('single relation', function () {
       testParse('a', {a: EagerType.None});
+      testParse('[a]', {a: EagerType.None});
+      testParse('[[[a]]]', {a: EagerType.None});
     });
 
     it('nested relations', function () {
@@ -75,6 +82,25 @@ describe('MoronEagerExpression', function () {
           }
         }
       });
+    });
+
+    it('should fail gracefully on invalid input', function () {
+      testParseFail('.');
+      testParseFail('..');
+      testParseFail('a.');
+      testParseFail('.a');
+      testParseFail('[');
+      testParseFail(']');
+      testParseFail('[]');
+      testParseFail('[[]]');
+      testParseFail('[a');
+      testParseFail('a]');
+      testParseFail('[a.]');
+      testParseFail('a.[b]]');
+      testParseFail('a.[.]');
+      testParseFail('a.[.b]');
+      testParseFail('[a,,b]');
+      testParseFail('[a,b,]');
     });
 
   });
@@ -184,6 +210,12 @@ describe('MoronEagerExpression', function () {
   function testParse(str, parsed) {
     expect(new MoronEagerExpression(str).obj).to.eql(parsed);
     expect(MoronEagerExpression.parse(str).obj).to.eql(parsed);
+  }
+
+  function testParseFail(str) {
+    expect(function () {
+      MoronEagerExpression.parse(str);
+    }).to.throwException();
   }
 
   function testSubExpression(str, subStr) {
