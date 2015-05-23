@@ -3,19 +3,19 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests"
+    "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail"
   },
   "dependencies": {
     "bluebird": "^2.9.24",
     "knex": "^0.8.3",
-    "lodash": "^3.6.0",
+    "lodash": "^3.9.0",
     "node-uuid": "^1.4.3",
     "tv4": "^1.1.9",
     "tv4-formats": "^1.0.0"
   },
   "devDependencies": {
-    "mocha": "^2.2.4",
     "expect.js": "^0.3.1",
+    "mocha": "^2.2.4",
     "sqlite3": "^3.0.8"
   }
 }

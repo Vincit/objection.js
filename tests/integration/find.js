@@ -118,6 +118,25 @@ describe('MoronModel find queries', function () {
 
   });
 
+  describe('.$query()', function () {
+
+    it('should find the model itself', function () {
+      return Model1
+        .query()
+        .then(function (models) {
+          expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
+          models[0].model1Prop1 = 'blaa';
+          return models[0].$query();
+        })
+        .then(function (models) {
+          expect(models).to.have.length(1);
+          expect(models[0]).to.be.a(Model1);
+          expect(models[0].model1Prop1).to.equal('hello 1');
+        });
+    });
+
+  });
+
   describe('.relatedQuery()', function () {
 
     describe('has one relation', function () {

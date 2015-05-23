@@ -29,12 +29,18 @@ module.exports.initialize = function (opt) {
     model1Relation1: {
       relation: MoronModel.HasOneRelation,
       modelClass: Model1,
-      joinColumn: 'model1Id'
+      join: {
+        from: 'Model1.model1Id',
+        to: 'Model1.id'
+      }
     },
     model1Relation2: {
       relation: MoronModel.HasManyRelation,
       modelClass: Model2,
-      joinColumn: 'model1Id'
+      join: {
+        from: 'Model1.id',
+        to: 'Model2.model1Id'
+      }
     }
   };
 
@@ -44,9 +50,12 @@ module.exports.initialize = function (opt) {
       relation: MoronModel.ManyToManyRelation,
       modelClass: Model1,
       join: {
-        table: 'Model1Model2',
-        ownerIdColumn: 'model2Id',
-        relatedIdColumn: 'model1Id'
+        from: 'Model2.id',
+        through: {
+          from: 'Model1Model2.model2Id',
+          to: 'Model1Model2.model1Id'
+        },
+        to: 'Model1.id'
       }
     }
   };
@@ -112,9 +121,9 @@ module.exports.populate = function (session, data) {
     return session.knex(table).delete().then(function () {
       return session.knex(table).insert(rows).returning('id');
     }).then(function () {
-      var maxId = _.max(_.pluck(rows, 'id')) + 1;
+      var maxId = _.max(_.pluck(rows, 'id'));
       if (maxId && _.isFinite(maxId)) {
-        return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + (maxId + 1) + ' WHERE name = "' + table + '"');
+        return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
       }
     });
   })).then(function () {
@@ -135,13 +144,13 @@ function createRows(model, ModelClass, rows) {
 
     if (relation instanceof MoronModel.HasOneRelation) {
 
-      model[relation.relatedJoinColumn] = model[relationName][relation.relatedModelClass.idProperty];
+      model[relation.ownerProp] = model[relationName][relation.relatedModelClass.idProperty];
       createRows(model[relationName], relation.relatedModelClass, rows);
 
     } else if (relation instanceof MoronModel.HasManyRelation) {
 
       _.each(model[relationName], function (relatedModel) {
-        relatedModel[relation.ownerJoinColumn] = model[ModelClass.idProperty];
+        relatedModel[relation.relatedProp] = model[ModelClass.idProperty];
         createRows(relatedModel, relation.relatedModelClass, rows);
       });
 
@@ -151,8 +160,8 @@ function createRows(model, ModelClass, rows) {
       _.each(model[relationName], function (relatedModel) {
         var joinRow = {};
 
-        joinRow[relation.relatedJoinColumn] = relatedModel[relation.relatedModelClass.idProperty];
-        joinRow[relation.ownerJoinColumn] = model[ModelClass.idProperty];
+        joinRow[relation.joinTableRelatedCol.split('.')[1]] = relatedModel[relation.relatedModelClass.idProperty];
+        joinRow[relation.joinTableOwnerCol.split('.')[1]] = model[ModelClass.idProperty];
 
         rows[joinTable] = rows[joinTable] || [];
         rows[joinTable].push(joinRow);

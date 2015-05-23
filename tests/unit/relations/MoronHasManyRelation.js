@@ -6,7 +6,10 @@ var _ = require('lodash')
   , MoronQueryBuilder = require('../../../lib/MoronQueryBuilder')
   , MoronHasManyRelation = require('../../../lib/relations/MoronHasManyRelation');
 
+Promise.longStackTraces();
+
 describe('MoronHasManyRelation', function () {
+  var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];
   var executedQueries = [];
   var mockKnex = null;
@@ -16,11 +19,15 @@ describe('MoronHasManyRelation', function () {
 
   before(function () {
     mockKnex = knex({client: 'pg'});
-    console.log('TODO', 'replace this with inheritance!');
+    originalKnexQueryBuilderThen = mockKnex.client.QueryBuilder.prototype.then;
     mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
       executedQueries.push(this.toString());
       return Promise.resolve(mockKnexQueryResults.shift() || []).then(cb, ecb);
     };
+  });
+
+  after(function () {
+    mockKnex.client.QueryBuilder.prototype.then = originalKnexQueryBuilderThen;
   });
 
   beforeEach(function () {
@@ -43,10 +50,15 @@ describe('MoronHasManyRelation', function () {
   });
 
   beforeEach(function () {
-    relation = new MoronHasManyRelation('nameOfOurRelation', {
+    relation = new MoronHasManyRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
       modelClass: RelatedModel,
-      joinColumn: 'ownerId'
-    }, OwnerModel);
+      relation: MoronHasManyRelation,
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
   });
 
   describe('find', function () {
@@ -142,7 +154,7 @@ describe('MoronHasManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "RelatedModel"."id"');
           expect(owner.nameOfOurRelation).to.eql(result);
           expect(result).to.eql([
             {a: 'str1', id: 1, ownerId: 666},
@@ -167,7 +179,7 @@ describe('MoronHasManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "RelatedModel"."id"');
           expect(result).to.eql([
             {a: 'str1', id: 1, ownerId: 666},
             {a: 'str2', id: 2, ownerId: 666}
@@ -191,7 +203,7 @@ describe('MoronHasManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "RelatedModel"."id"');
           expect(result).to.eql({a: 'str1', id: 1, ownerId: 666});
           expect(result).to.be.a(RelatedModel);
         });
@@ -211,7 +223,7 @@ describe('MoronHasManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "RelatedModel"."id"');
           expect(result).to.eql({a: 'str1', id: 1, ownerId: 666});
           expect(result).to.be.a(RelatedModel);
         });

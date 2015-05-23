@@ -7,6 +7,7 @@ var _ = require('lodash')
   , MoronHasOneRelation = require('../../../lib/relations/MoronHasOneRelation');
 
 describe('MoronHasOneRelation', function () {
+  var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];
   var executedQueries = [];
   var mockKnex = null;
@@ -16,11 +17,15 @@ describe('MoronHasOneRelation', function () {
 
   before(function () {
     mockKnex = knex({client: 'pg'});
-    console.log('TODO', 'replace this with inheritance!');
+    originalKnexQueryBuilderThen = mockKnex.client.QueryBuilder.prototype.then;
     mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
       executedQueries.push(this.toString());
       return Promise.resolve(mockKnexQueryResults.shift() || []).then(cb, ecb);
     };
+  });
+
+  after(function () {
+    mockKnex.client.QueryBuilder.prototype.then = originalKnexQueryBuilderThen;
   });
 
   beforeEach(function () {
@@ -43,10 +48,15 @@ describe('MoronHasOneRelation', function () {
   });
 
   beforeEach(function () {
-    relation = new MoronHasOneRelation('nameOfOurRelation', {
+    relation = new MoronHasOneRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
       modelClass: RelatedModel,
-      joinColumn: 'relatedId'
-    }, OwnerModel);
+      relation: MoronHasOneRelation,
+      join: {
+        from: 'OwnerModel.relatedId',
+        to: 'RelatedModel.id'
+      }
+    });
   });
 
   describe('find', function () {
@@ -132,8 +142,8 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result[0]);
           expect(result).to.eql([{a: 'str1', id: 1}]);
           expect(result[0]).to.be.a(RelatedModel);
@@ -154,8 +164,8 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'5\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'5\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result[0]);
           expect(result).to.eql([{a: 'str1', id: 5}]);
           expect(result[0]).to.be.a(RelatedModel);
@@ -176,8 +186,8 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result);
           expect(result).to.eql({a: 'str1', id: 1});
           expect(result).to.be.a(RelatedModel);
@@ -198,8 +208,8 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result);
           expect(result).to.eql({a: 'str1', id: 1});
           expect(result).to.be.a(RelatedModel);
@@ -395,7 +405,7 @@ describe('MoronHasOneRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql([10]);
-          expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = \'10\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.eql('update "OwnerModel" set "OwnerModel"."relatedId" = \'10\' where "OwnerModel"."id" = \'666\'');
         });
     });
 
@@ -411,7 +421,7 @@ describe('MoronHasOneRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql(11);
-          expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = \'11\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.eql('update "OwnerModel" set "OwnerModel"."relatedId" = \'11\' where "OwnerModel"."id" = \'666\'');
         });
     });
 
@@ -432,7 +442,7 @@ describe('MoronHasOneRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = NULL where "code" in (\'55\', \'66\', \'77\') and "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.eql('update "OwnerModel" set "OwnerModel"."relatedId" = NULL where "code" in (\'55\', \'66\', \'77\') and "OwnerModel"."id" = \'666\'');
         });
     });
 

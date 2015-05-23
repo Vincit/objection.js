@@ -7,6 +7,7 @@ var _ = require('lodash')
   , MoronManyToManyRelation = require('../../../lib/relations/MoronManyToManyRelation');
 
 describe('MoronManyToManyRelation', function () {
+  var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];
   var executedQueries = [];
   var mockKnex = null;
@@ -16,11 +17,15 @@ describe('MoronManyToManyRelation', function () {
 
   before(function () {
     mockKnex = knex({client: 'pg'});
-    console.log('TODO', 'replace this with inheritance!');
+    originalKnexQueryBuilderThen = mockKnex.client.QueryBuilder.prototype.then;
     mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
       executedQueries.push(this.toString());
       return Promise.resolve(mockKnexQueryResults.shift() || []).then(cb, ecb);
     };
+  });
+
+  after(function () {
+    mockKnex.client.QueryBuilder.prototype.then = originalKnexQueryBuilderThen;
   });
 
   beforeEach(function () {
@@ -43,14 +48,19 @@ describe('MoronManyToManyRelation', function () {
   });
 
   beforeEach(function () {
-    relation = new MoronManyToManyRelation('nameOfOurRelation', {
+    relation = new MoronManyToManyRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
       modelClass: RelatedModel,
+      relation: MoronManyToManyRelation,
       join: {
-        table: 'JoinTable',
-        ownerIdColumn: 'ownerId',
-        relatedIdColumn: 'relatedId'
+        from: 'OwnerModel.oid',
+        through: {
+          from: "JoinTable.ownerId",
+          to: "JoinTable.relatedId"
+        },
+        to: 'RelatedModel.rid'
       }
-    }, OwnerModel);
+    });
   });
 
   describe('find', function () {
@@ -58,7 +68,7 @@ describe('MoronManyToManyRelation', function () {
     it('should generate a find query', function () {
       var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
       mockKnexQueryResults = [expectedResult];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -77,7 +87,7 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.equal([
             'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
             'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
             'or "age" > \'60\'',
             'and "JoinTable"."ownerId" in (\'666\')'
@@ -88,7 +98,7 @@ describe('MoronManyToManyRelation', function () {
     it('should find for multiple owners', function () {
       var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}, {a: 3, _join_: 667}, {a: 4, _join_: 667}];
       mockKnexQueryResults = [expectedResult];
-      var owners = [OwnerModel.fromJson({id: 666}), OwnerModel.fromJson({id: 667})];
+      var owners = [OwnerModel.fromJson({oid: 666}), OwnerModel.fromJson({oid: 667})];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -110,7 +120,7 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.equal([
             'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
             'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
             'or "age" > \'60\'',
             'and "JoinTable"."ownerId" in (\'666\', \'667\')'
@@ -121,7 +131,7 @@ describe('MoronManyToManyRelation', function () {
     it('explicit selects should override the RelatedModel.*', function () {
       var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
       mockKnexQueryResults = [expectedResult];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -141,7 +151,7 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.equal([
             'select "name", "JoinTable"."ownerId" as "_join_"',
             'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
             'or "age" > \'60\'',
             'and "JoinTable"."ownerId" in (\'666\')'
@@ -156,9 +166,9 @@ describe('MoronManyToManyRelation', function () {
     it('should generate an insert query', function () {
       mockKnexQueryResults = [[1, 2]];
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0'})];
-      var related = [RelatedModel.fromJson({a: 'str1'}), RelatedModel.fromJson({a: 'str2'})];
+      var related = [RelatedModel.fromJson({a: 'str1', rid: 3}), RelatedModel.fromJson({a: 'str2', rid: 4})];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -168,12 +178,12 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\'), (\'str2\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\'), (\'666\', \'2\')');
-          expect(owner.nameOfOurRelation).to.eql([{a: 'str0'}, {a: 'str1', id: 1}, {a: 'str2', id: 2}]);
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
+          expect(owner.nameOfOurRelation).to.eql([{a: 'str0'}, {a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
           expect(result).to.eql([
-            {a: 'str1', id: 1},
-            {a: 'str2', id: 2}
+            {a: 'str1', id: 1, rid: 3},
+            {a: 'str2', id: 2, rid: 4}
           ]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
@@ -183,8 +193,8 @@ describe('MoronManyToManyRelation', function () {
     it('should accept json object array', function () {
       mockKnexQueryResults = [[1, 2]];
 
-      var owner = OwnerModel.fromJson({id: 666});
-      var related = [{a: 'str1'}, {a: 'str2'}];
+      var owner = OwnerModel.fromJson({oid: 666});
+      var related = [{a: 'str1', rid: 3}, {a: 'str2', rid: 4}];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -194,11 +204,12 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\'), (\'str2\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\'), (\'666\', \'2\')');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
+          expect(owner.nameOfOurRelation).to.eql([{a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
           expect(result).to.eql([
-            {a: 'str1', id: 1},
-            {a: 'str2', id: 2}
+            {a: 'str1', id: 1, rid: 3},
+            {a: 'str2', id: 2, rid: 4}
           ]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
@@ -208,8 +219,8 @@ describe('MoronManyToManyRelation', function () {
     it('should accept single model', function () {
       mockKnexQueryResults = [[1]];
 
-      var owner = OwnerModel.fromJson({id: 666});
-      var related = RelatedModel.fromJson({a: 'str1'});
+      var owner = OwnerModel.fromJson({oid: 666});
+      var related = RelatedModel.fromJson({a: 'str1', rid: 2});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -219,9 +230,9 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\')');
-          expect(result).to.eql({a: 'str1', id: 1});
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
+          expect(result).to.eql({a: 'str1', id: 1, rid: 2});
           expect(result).to.be.a(RelatedModel);
         });
     });
@@ -229,8 +240,8 @@ describe('MoronManyToManyRelation', function () {
     it('should accept single json object', function () {
       mockKnexQueryResults = [[1]];
 
-      var owner = OwnerModel.fromJson({id: 666});
-      var related = {a: 'str1'};
+      var owner = OwnerModel.fromJson({oid: 666});
+      var related = {a: 'str1', rid: 2};
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -240,9 +251,9 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'1\')');
-          expect(result).to.eql({a: 'str1', id: 1});
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
+          expect(result).to.eql({a: 'str1', id: 1, rid: 2});
           expect(result).to.be.a(RelatedModel);
         });
     });
@@ -252,7 +263,7 @@ describe('MoronManyToManyRelation', function () {
   describe('update', function () {
 
     it('should generate an update query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var update = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -270,9 +281,9 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
               'and "thingy" is not null',
               'and "JoinTable"."ownerId" in (\'666\'))'
@@ -281,7 +292,7 @@ describe('MoronManyToManyRelation', function () {
     });
 
     it('should accept json object', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var update = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -299,18 +310,18 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
+            'where "RelatedModel"."id" in',
+            '(select "RelatedModel"."id" from "RelatedModel"',
+            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
+            'where "gender" = \'male\'',
+            'and "thingy" is not null',
+            'and "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
         });
     });
 
     it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -323,16 +334,16 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" + 1',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
         });
     });
 
     it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -345,9 +356,9 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" - 10',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
         });
@@ -358,7 +369,7 @@ describe('MoronManyToManyRelation', function () {
   describe('patch', function () {
 
     it('should generate a patch query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -376,9 +387,9 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
               'and "thingy" is not null',
               'and "JoinTable"."ownerId" in (\'666\'))'
@@ -391,12 +402,13 @@ describe('MoronManyToManyRelation', function () {
         type: 'object',
         required: ['b'],
         properties: {
+          id: {type: 'number'},
           a: {type: 'string'},
           b: {type: 'string'}
         }
       };
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var patch = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -414,9 +426,9 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
               'and "thingy" is not null',
               'and "JoinTable"."ownerId" in (\'666\'))'
@@ -425,7 +437,7 @@ describe('MoronManyToManyRelation', function () {
     });
 
     it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -438,16 +450,16 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" + 1',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
         });
     });
 
     it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -460,9 +472,9 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" - 10',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
         });
@@ -473,7 +485,7 @@ describe('MoronManyToManyRelation', function () {
   describe('delete', function () {
 
     it('should generate a delete query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -491,16 +503,16 @@ describe('MoronManyToManyRelation', function () {
             'delete from "JoinTable"',
             'where "JoinTable"."relatedId" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
               'and "thingy" is not null',
               'and "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
           expect(executedQueries[1]).to.eql([
             'delete from "RelatedModel"',
-            'where "id" in',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
               'and "thingy" is not null',
               'and "JoinTable"."ownerId" in (\'666\'))'
@@ -514,7 +526,7 @@ describe('MoronManyToManyRelation', function () {
 
     it('should generate a relate query', function () {
       mockKnexQueryResults = [[5, 6, 7]];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -535,7 +547,7 @@ describe('MoronManyToManyRelation', function () {
 
     it('should accept one id', function () {
       mockKnexQueryResults = [[5]];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -555,7 +567,7 @@ describe('MoronManyToManyRelation', function () {
   describe('unrelate', function () {
 
     it('should generate a unrelate query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -571,7 +583,7 @@ describe('MoronManyToManyRelation', function () {
             'delete from "JoinTable"',
             'where "JoinTable"."relatedId" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."id"',
+              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "code" in (\'55\', \'66\', \'77\')',
               'and "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
