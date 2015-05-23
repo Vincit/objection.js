@@ -54,7 +54,7 @@ describe('MoronHasOneRelation', function () {
       relation: MoronHasOneRelation,
       join: {
         from: 'OwnerModel.relatedId',
-        to: 'RelatedModel.id'
+        to: 'RelatedModel.rid'
       }
     });
   });
@@ -62,7 +62,7 @@ describe('MoronHasOneRelation', function () {
   describe('find', function () {
 
     it('should generate a find query', function () {
-      var expectedResult = [{id: 1, a: 10}];
+      var expectedResult = [{id: 1, a: 10, rid: 1}];
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
 
@@ -77,14 +77,14 @@ describe('MoronHasOneRelation', function () {
           expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."id" in (\'1\')');
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (\'1\')');
         });
     });
 
     it('should find for multiple owners', function () {
-      var expectedResult = [{id: 1, a: 10}, {id: 2, a: 10}];
+      var expectedResult = [{id: 1, a: 10, rid: 2}, {id: 2, a: 10, rid: 3}];
       mockKnexQueryResults = [expectedResult];
-      var owners = [OwnerModel.fromJson({id: 666, relatedId: 1}), OwnerModel.fromJson({id: 667, relatedId: 2})];
+      var owners = [OwnerModel.fromJson({id: 666, relatedId: 2}), OwnerModel.fromJson({id: 667, relatedId: 3})];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -99,14 +99,14 @@ describe('MoronHasOneRelation', function () {
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."id" in (\'1\', \'2\')');
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (\'2\', \'3\')');
         });
     });
 
     it('explicit selects should override the RelatedModel.*', function () {
-      var expectedResult = [{id: 1, a: 10}];
+      var expectedResult = [{id: 1, a: 10, rid: 2}];
       mockKnexQueryResults = [expectedResult];
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -120,7 +120,7 @@ describe('MoronHasOneRelation', function () {
           expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
           expect(result[0]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('select "name" from "RelatedModel" where "RelatedModel"."id" in (\'1\')');
+          expect(executedQueries[0]).to.equal('select "name" from "RelatedModel" where "RelatedModel"."rid" in (\'2\')');
         });
     });
 
@@ -132,7 +132,7 @@ describe('MoronHasOneRelation', function () {
       mockKnexQueryResults = [[1]];
 
       var owner = OwnerModel.fromJson({id: 666});
-      var related = [RelatedModel.fromJson({a: 'str1'})];
+      var related = [RelatedModel.fromJson({a: 'str1', rid: 2})];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -142,10 +142,11 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result[0]);
-          expect(result).to.eql([{a: 'str1', id: 1}]);
+          expect(owner.relatedId).to.equal(2);
+          expect(result).to.eql([{a: 'str1', id: 1, rid: 2}]);
           expect(result[0]).to.be.a(RelatedModel);
         });
     });
@@ -154,7 +155,7 @@ describe('MoronHasOneRelation', function () {
       mockKnexQueryResults = [[5]];
 
       var owner = OwnerModel.fromJson({id: 666});
-      var related = [{a: 'str1'}];
+      var related = [{a: 'str1', rid: 2}];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -164,10 +165,11 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'5\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result[0]);
-          expect(result).to.eql([{a: 'str1', id: 5}]);
+          expect(owner.relatedId).to.equal(2);
+          expect(result).to.eql([{a: 'str1', id: 5, rid: 2}]);
           expect(result[0]).to.be.a(RelatedModel);
         });
     });
@@ -176,7 +178,7 @@ describe('MoronHasOneRelation', function () {
       mockKnexQueryResults = [[1]];
 
       var owner = OwnerModel.fromJson({id: 666});
-      var related = RelatedModel.fromJson({a: 'str1'});
+      var related = RelatedModel.fromJson({a: 'str1', rid: 2});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -186,10 +188,11 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result);
-          expect(result).to.eql({a: 'str1', id: 1});
+          expect(owner.relatedId).to.equal(2);
+          expect(result).to.eql({a: 'str1', id: 1, rid: 2});
           expect(result).to.be.a(RelatedModel);
         });
     });
@@ -198,7 +201,7 @@ describe('MoronHasOneRelation', function () {
       mockKnexQueryResults = [[1]];
 
       var owner = OwnerModel.fromJson({id: 666});
-      var related = {a: 'str1'};
+      var related = {a: 'str1', rid: 2};
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -208,10 +211,11 @@ describe('MoronHasOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a") values (\'str1\') returning "RelatedModel"."id"');
-          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'1\' where "OwnerModel"."id" = \'666\'');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[1]).to.equal('update "OwnerModel" set "OwnerModel"."relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result);
-          expect(result).to.eql({a: 'str1', id: 1});
+          expect(owner.relatedId).to.equal(2);
+          expect(result).to.eql({a: 'str1', id: 1, rid: 2});
           expect(result).to.be.a(RelatedModel);
         });
     });
@@ -221,7 +225,7 @@ describe('MoronHasOneRelation', function () {
   describe('update', function () {
 
     it('should generate an update query', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -234,12 +238,12 @@ describe('MoronHasOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."id" in (\'1\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
         });
     });
 
     it('should accept json object', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -252,12 +256,12 @@ describe('MoronHasOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."id" in (\'1\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
         });
     });
 
     it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -268,7 +272,7 @@ describe('MoronHasOneRelation', function () {
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"id\" in ('1')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" in ('2')");
         });
     });
 
@@ -284,7 +288,7 @@ describe('MoronHasOneRelation', function () {
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"id\" in ('2')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" in ('2')");
         });
     });
 
@@ -293,7 +297,7 @@ describe('MoronHasOneRelation', function () {
   describe('patch', function () {
 
     it('should generate an patch query', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -306,7 +310,7 @@ describe('MoronHasOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."id" in (\'1\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
         });
     });
 
@@ -320,7 +324,7 @@ describe('MoronHasOneRelation', function () {
         }
       };
 
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var patch = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -333,7 +337,7 @@ describe('MoronHasOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."id" in (\'1\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
         });
     });
 
@@ -349,7 +353,7 @@ describe('MoronHasOneRelation', function () {
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"id\" in ('1')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" in ('1')");
         });
     });
 
@@ -365,7 +369,7 @@ describe('MoronHasOneRelation', function () {
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"id\" in ('2')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" in ('2')");
         });
     });
 
@@ -374,7 +378,7 @@ describe('MoronHasOneRelation', function () {
   describe('delete', function () {
 
     it('should generate a delete query', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -385,7 +389,7 @@ describe('MoronHasOneRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"id\" in ('1')");
+          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" in ('2')");
         });
     });
 

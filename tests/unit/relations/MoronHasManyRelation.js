@@ -55,7 +55,7 @@ describe('MoronHasManyRelation', function () {
       modelClass: RelatedModel,
       relation: MoronHasManyRelation,
       join: {
-        from: 'OwnerModel.id',
+        from: 'OwnerModel.oid',
         to: 'RelatedModel.ownerId'
       }
     });
@@ -66,7 +66,7 @@ describe('MoronHasManyRelation', function () {
     it('should generate a find query', function () {
       var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}];
       mockKnexQueryResults = [expectedResult];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -89,7 +89,7 @@ describe('MoronHasManyRelation', function () {
     it('should find for multiple owners', function () {
       var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}, {a: 3, ownerId: 667}, {a: 4, ownerId: 667}];
       mockKnexQueryResults = [expectedResult];
-      var owners = [OwnerModel.fromJson({id: 666}), OwnerModel.fromJson({id: 667})];
+      var owners = [OwnerModel.fromJson({oid: 666}), OwnerModel.fromJson({oid: 667})];
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -115,7 +115,7 @@ describe('MoronHasManyRelation', function () {
     it('explicit selects should override the RelatedModel.*', function () {
       var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}];
       mockKnexQueryResults = [expectedResult];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -143,7 +143,7 @@ describe('MoronHasManyRelation', function () {
     it('should generate an insert query', function () {
       mockKnexQueryResults = [[1, 2]];
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var related = [RelatedModel.fromJson({a: 'str1'}), RelatedModel.fromJson({a: 'str2'})];
 
       return MoronQueryBuilder
@@ -168,7 +168,7 @@ describe('MoronHasManyRelation', function () {
     it('should accept json object array', function () {
       mockKnexQueryResults = [[1, 2]];
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var related = [{a: 'str1'}, {a: 'str2'}];
 
       return MoronQueryBuilder
@@ -192,7 +192,7 @@ describe('MoronHasManyRelation', function () {
     it('should accept single model', function () {
       mockKnexQueryResults = [[1]];
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var related = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -212,7 +212,7 @@ describe('MoronHasManyRelation', function () {
     it('should accept single json object', function () {
       mockKnexQueryResults = [[1]];
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var related = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -234,7 +234,7 @@ describe('MoronHasManyRelation', function () {
   describe('update', function () {
 
     it('should generate an update query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var update = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -255,7 +255,7 @@ describe('MoronHasManyRelation', function () {
     });
 
     it('should accept json object', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var update = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -276,7 +276,7 @@ describe('MoronHasManyRelation', function () {
     });
 
     it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -292,7 +292,7 @@ describe('MoronHasManyRelation', function () {
     });
 
     it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -312,7 +312,7 @@ describe('MoronHasManyRelation', function () {
   describe('patch', function () {
 
     it('should generate a patch query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
       return MoronQueryBuilder
@@ -342,7 +342,7 @@ describe('MoronHasManyRelation', function () {
         }
       };
 
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
       var patch = {a: 'str1'};
 
       return MoronQueryBuilder
@@ -363,7 +363,7 @@ describe('MoronHasManyRelation', function () {
     });
 
     it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -379,7 +379,7 @@ describe('MoronHasManyRelation', function () {
     });
 
     it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -399,7 +399,7 @@ describe('MoronHasManyRelation', function () {
   describe('delete', function () {
 
     it('should generate a delete query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -423,7 +423,7 @@ describe('MoronHasManyRelation', function () {
 
     it('should generate a relate query', function () {
       mockKnexQueryResults = [[5, 6, 7]];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -440,7 +440,7 @@ describe('MoronHasManyRelation', function () {
 
     it('should accept one id', function () {
       mockKnexQueryResults = [[5]];
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
@@ -460,7 +460,7 @@ describe('MoronHasManyRelation', function () {
   describe('unrelate', function () {
 
     it('should generate a unrelate query', function () {
-      var owner = OwnerModel.fromJson({id: 666});
+      var owner = OwnerModel.fromJson({oid: 666});
 
       return MoronQueryBuilder
         .forClass(RelatedModel)
