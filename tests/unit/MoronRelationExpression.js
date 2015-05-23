@@ -5,82 +5,127 @@ describe('MoronRelationExpression', function () {
 
   describe('parse', function () {
 
-    /*
     it('empty string', function () {
-      testParse('', {});
+      testParse('', {nodes: []});
     });
 
     it('non-string', function () {
-      testParse(null, {});
-      testParse(false, {});
-      testParse(true, {});
-      testParse(1, {});
-      testParse({}, {});
-      testParse([], {});
+      testParse(null, {nodes: []});
+      testParse(false, {nodes: []});
+      testParse(true, {nodes: []});
+      testParse(1, {nodes: []});
+      testParse({}, {nodes: []});
+      testParse([], {nodes: []});
     });
 
     it('single relation', function () {
-      testParse('a', {a: EagerType.None});
-      testParse('[a]', {a: EagerType.None});
-      testParse('[[[a]]]', {a: EagerType.None});
+      testParse('a', {
+        nodes: [{
+          name: 'a',
+          children: []
+        }]
+      });
+      testParse('[a]', {
+        nodes: [{
+          name: 'a',
+          children: []
+        }]
+      });
+      testParse('[[[a]]]', {
+        nodes: [{
+          name: 'a',
+          children: []
+        }]
+      });
     });
 
     it('nested relations', function () {
-      testParse('a.b', {a: {b: EagerType.None}});
-      testParse('a.b.c', {a: {b: {c: EagerType.None}}});
+      testParse('a.b', {
+        nodes: [{
+          name: 'a',
+          children: [{
+            name: 'b',
+            children: []
+          }]
+        }]
+      });
+      testParse('a.b.c', {
+        nodes: [{
+          name: 'a',
+          children: [{
+            name: 'b',
+            children: [{
+              name: 'c',
+              children: []
+            }]
+          }]
+        }]
+      });
     });
 
     it('multiple relations', function () {
-      testParse('[a, b, c]', {a: EagerType.None, b: EagerType.None, c: EagerType.None});
+      testParse('[a, b, c]', {
+        nodes: [{
+          name: 'a',
+          children: []
+        }, {
+          name: 'b',
+          children: []
+        }, {
+          name: 'c',
+          children: []
+        }]
+      });
     });
 
     it('multiple nested relations', function () {
       testParse('[a.b, c.d.e, f]', {
-        a: {b: EagerType.None},
-        c: {d: {e: EagerType.None}},
-        f: EagerType.None
+        nodes: [{
+          name: 'a',
+          children: [{
+            name: 'b',
+            children: []
+          }]
+        }, {
+          name: 'c',
+          children: [{
+            name: 'd',
+            children: [{
+              name: 'e',
+              children: []
+            }]
+          }]
+        }, {
+          name: 'f',
+          children: []
+        }]
       });
     });
 
     it('multiple sub relations', function () {
       testParse('[a.[b, c.[d, e.f]], g]', {
-        a: {
-          b: EagerType.None,
-          c: {
-            d: EagerType.None,
-            e: {
-              f: EagerType.None
-            }
-          }
-        },
-        g: EagerType.None
-      });
-    });
-
-    it('* into EagerType.AllRecursive', function () {
-      testParse('*', EagerType.AllRecursive);
-      testParse('a.b.*', {a: {b: EagerType.AllRecursive}});
-      testParse('a.b.[c, d.*, e]', {
-        a: {
-          b: {
-            c: EagerType.None,
-            d: EagerType.AllRecursive,
-            e: EagerType.None
-          }
-        }
-      });
-    });
-
-    it('^ into EagerType.Recursive', function () {
-      testParse('a.b.^', {a: {b: EagerType.Recursive}});
-      testParse('a.b.[c, d.^, e]', {
-        a: {
-          b: {
-            c: EagerType.None,
-            d: EagerType.Recursive,
-            e: EagerType.None
-          }
-        }
+        nodes: [{
+          name: 'a',
+          children: [{
+            name: 'b',
+            children: []
+          }, {
+            name: 'c',
+            children: [{
+              name: 'd',
+              children: []
+            }, {
+              name: 'e',
+              children: [{
+                name: 'f',
+                children: []
+              }]
+            }]
+          }]
+        }, {
+          name: 'g',
+          children: []
+        }]
       });
     });
 
@@ -102,8 +147,6 @@ describe('MoronRelationExpression', function () {
       testParseFail('[a,,b]');
       testParseFail('[a,b,]');
     });
-
-    */
 
   });
 
@@ -210,7 +253,7 @@ describe('MoronRelationExpression', function () {
   });
 
   function testParse(str, parsed) {
-    expect(MoronRelationExpression.parse(str).obj).to.eql(parsed);
+    expect(MoronRelationExpression.parse(str)).to.eql(parsed);
   }
 
   function testParseFail(str) {
