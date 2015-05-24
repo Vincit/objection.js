@@ -1,7 +1,4 @@
 var _ = require('lodash');
-var os = require('os');
-var fs = require('fs');
-var path = require('path');
 var Promise = require('bluebird');
 var MoronModel = require('../../lib/MoronModel');
 
@@ -25,6 +22,24 @@ module.exports.initialize = function (opt) {
   MoronModel.makeSubclass(Model2);
 
   Model1.tableName = 'Model1';
+  Model2.tableName = 'model_2';
+
+  Model2.prototype.$formatDatabaseJson = function (json) {
+    json = MoronModel.prototype.$formatDatabaseJson.call(this, json);
+
+    return _.mapKeys(json, function (value, key) {
+      return _.snakeCase(key);
+    });
+  };
+
+  Model2.prototype.$parseDatabaseJson = function (json) {
+    json = _.mapKeys(json, function (value, key) {
+      return _.camelCase(key);
+    });
+
+    return MoronModel.prototype.$parseDatabaseJson.call(this, json);
+  };
+
   Model1.relationMappings = {
     model1Relation1: {
       relation: MoronModel.HasOneRelation,
@@ -39,18 +54,17 @@ module.exports.initialize = function (opt) {
       modelClass: Model2,
       join: {
         from: 'Model1.id',
-        to: 'Model2.model1Id'
+        to: 'model_2.model_1_id'
       }
     }
   };
 
-  Model2.tableName = 'Model2';
   Model2.relationMappings = {
     model2Relation1: {
       relation: MoronModel.ManyToManyRelation,
       modelClass: Model1,
       join: {
-        from: 'Model2.id',
+        from: 'model_2.id',
         through: {
           from: 'Model1Model2.model2Id',
           to: 'Model1Model2.model1Id'
@@ -60,15 +74,7 @@ module.exports.initialize = function (opt) {
     }
   };
 
-  var dbFile = path.join(os.tmpdir(), 'test.db');
-  removeFile(dbFile);
-
-  var knex = require('knex')({
-    client: 'sqlite3',
-    connection: {
-      filename: dbFile
-    }
-  });
+  var knex = require('knex')(opt.knexConfig);
 
   Model1.knex = knex;
   Model2.knex = knex;
@@ -76,42 +82,53 @@ module.exports.initialize = function (opt) {
   Model1.idProperty = opt.modelIdProperties.Model1;
   Model2.idProperty = opt.modelIdProperties.Model2;
 
-  return knex.schema.createTable('Model1', function (table) {
-    table.bigincrements(Model1.idProperty);
-    table.biginteger('model1Id');
-    table.string('model1Prop1');
-    table.integer('model1Prop2');
-  }).createTable('Model2', function (table) {
-    table.bigincrements(Model2.idProperty);
-    table.biginteger('model1Id');
-    table.string('model2Prop1');
-    table.integer('model2Prop2');
-  }).createTable('Model1Model2', function (table) {
-    table.bigincrements('id');
-    table.biginteger('model1Id').notNullable();
-    table.biginteger('model2Id').notNullable();
-  }).then(function () {
-    return {
-      opt: opt,
-      knex: knex,
-      dbFile: dbFile,
-      models: {
-        Model1: Model1,
-        Model2: Model2
-      }
-    };
-  });
+  return {
+    opt: opt,
+    knex: knex,
+    models: {
+      Model1: Model1,
+      Model2: Model2
+    },
+    createDb: module.exports.createDb,
+    populate: module.exports.populate,
+    destroy: module.exports.destroy
+  };
 };
 
-module.exports.destroy = function (session) {
-  return session.knex.destroy().then(function () {
-    removeFile(session.dbFile);
-  });
+module.exports.createDb = function () {
+  var session = this;
+
+  return session.knex.schema
+    .dropTableIfExists('Model1')
+    .dropTableIfExists('model_2')
+    .dropTableIfExists('Model1Model2')
+    .createTable('Model1', function (table) {
+      table.bigincrements(session.models.Model1.idProperty);
+      table.biginteger('model1Id');
+      table.string('model1Prop1');
+      table.integer('model1Prop2');
+    })
+    .createTable('model_2', function (table) {
+      table.bigincrements(session.models.Model2.idProperty);
+      table.biginteger('model_1_id');
+      table.string('model_2_prop_1');
+      table.integer('model_2_prop_2');
+    })
+    .createTable('Model1Model2', function (table) {
+      table.bigincrements('id');
+      table.biginteger('model1Id').notNullable();
+      table.biginteger('model2Id').notNullable();
+    });
 };
 
-module.exports.populate = function (session, data) {
+module.exports.destroy = function () {
+  return this.knex.destroy();
+};
+
+module.exports.populate = function (data) {
   var rows = {};
-  var models = session.models;
+  var models = this.models;
+  var session = this;
 
   _.each(data, function (jsonModel) {
     createRows(jsonModel, models.Model1, rows);
@@ -119,11 +136,16 @@ module.exports.populate = function (session, data) {
 
   return Promise.all(_.map(rows, function (rows, table) {
     return session.knex(table).delete().then(function () {
-      return session.knex(table).insert(rows).returning('id');
+      return session.knex(table).insert(rows);
     }).then(function () {
       var maxId = _.max(_.pluck(rows, 'id'));
-      if (maxId && _.isFinite(maxId)) {
-        return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+
+      if (session.opt.knexConfig.client === 'sqlite3') {
+        if (maxId && _.isFinite(maxId)) {
+          return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+        }
+      } else {
+        throw new Error('not yet implemented');
       }
     });
   })).then(function () {
@@ -136,6 +158,7 @@ module.exports.populate = function (session, data) {
 
 function createRows(model, ModelClass, rows) {
   var relations = ModelClass.getRelations();
+  model = ModelClass.ensureModel(model);
 
   _.each(relations, function (relation, relationName) {
     if (!_.has(model, relationName)) {
@@ -144,43 +167,40 @@ function createRows(model, ModelClass, rows) {
 
     if (relation instanceof MoronModel.HasOneRelation) {
 
-      model[relation.ownerProp] = model[relationName][relation.relatedModelClass.idProperty];
-      createRows(model[relationName], relation.relatedModelClass, rows);
+      var related = relation.relatedModelClass.ensureModel(model[relationName]);
+      model[relation.ownerProp] = related[relation.relatedModelClass.idProperty];
+
+      createRows(related, relation.relatedModelClass, rows);
 
     } else if (relation instanceof MoronModel.HasManyRelation) {
 
-      _.each(model[relationName], function (relatedModel) {
-        relatedModel[relation.relatedProp] = model[ModelClass.idProperty];
-        createRows(relatedModel, relation.relatedModelClass, rows);
+      _.each(model[relationName], function (relatedJson) {
+        var related = relation.relatedModelClass.ensureModel(relatedJson);
+        related[relation.relatedProp] = model[ModelClass.idProperty];
+
+        createRows(related, relation.relatedModelClass, rows);
       });
 
     } else if (relation instanceof MoronModel.ManyToManyRelation) {
       var joinTable = [ModelClass.name, relation.relatedModelClass.name].sort().join('');
 
-      _.each(model[relationName], function (relatedModel) {
+      _.each(model[relationName], function (relatedJson) {
         var joinRow = {};
+        var related = relation.relatedModelClass.ensureModel(relatedJson);
 
-        joinRow[relation.joinTableRelatedCol.split('.')[1]] = relatedModel[relation.relatedModelClass.idProperty];
+        joinRow[relation.joinTableRelatedCol.split('.')[1]] = related[relation.relatedModelClass.idProperty];
         joinRow[relation.joinTableOwnerCol.split('.')[1]] = model[ModelClass.idProperty];
 
         rows[joinTable] = rows[joinTable] || [];
         rows[joinTable].push(joinRow);
 
-        createRows(relatedModel, relation.relatedModelClass, rows);
+        createRows(related, relation.relatedModelClass, rows);
       });
     } else {
       throw new Error('unsupported relation type');
     }
   });
 
-  rows[ModelClass.name] = rows[ModelClass.name] || [];
-  rows[ModelClass.name].push(_.omit(model, _.keys(relations)));
-}
-
-function removeFile(file) {
-  try {
-    fs.unlinkSync(file);
-  } catch (err) {
-    // ignore.
-  }
+  rows[ModelClass.tableName] = rows[ModelClass.tableName] || [];
+  rows[ModelClass.tableName].push(model.$toDatabaseJson());
 }
