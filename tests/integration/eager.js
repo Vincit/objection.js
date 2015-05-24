@@ -28,10 +28,10 @@ module.exports = function (session) {
         },
 
         model1Relation2: [{
-          id: 1,
+          idCol: 1,
           model2Prop1: 'hejsan 1'
         }, {
-          id: 2,
+          idCol: 2,
           model2Prop1: 'hejsan 2',
 
           model2Relation1: [{
@@ -47,7 +47,7 @@ module.exports = function (session) {
             },
 
             model1Relation2: [{
-              id: 3,
+              idCol: 3,
               model2Prop1: 'hejsan 3'
             }]
           }]
@@ -135,8 +135,8 @@ module.exports = function (session) {
           expect(models[0].model1Relation2).to.have.length(2);
           expect(models[0].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model1Relation2[1]).to.be.a(Model2);
-          expect(models[0].model1Relation2[0].id).to.equal(1);
-          expect(models[0].model1Relation2[1].id).to.equal(2);
+          expect(models[0].model1Relation2[0].idCol).to.equal(1);
+          expect(models[0].model1Relation2[1].idCol).to.equal(2);
           expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
           expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
 
@@ -161,8 +161,8 @@ module.exports = function (session) {
           expect(models[0].model1Relation2).to.have.length(2);
           expect(models[0].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model1Relation2[1]).to.be.a(Model2);
-          expect(models[0].model1Relation2[0].id).to.equal(1);
-          expect(models[0].model1Relation2[1].id).to.equal(2);
+          expect(models[0].model1Relation2[0].idCol).to.equal(1);
+          expect(models[0].model1Relation2[1].idCol).to.equal(2);
           expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
           expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
 
@@ -193,8 +193,8 @@ module.exports = function (session) {
           expect(models[0].model1Relation2).to.have.length(2);
           expect(models[0].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model1Relation2[1]).to.be.a(Model2);
-          expect(models[0].model1Relation2[0].id).to.equal(1);
-          expect(models[0].model1Relation2[1].id).to.equal(2);
+          expect(models[0].model1Relation2[0].idCol).to.equal(1);
+          expect(models[0].model1Relation2[1].idCol).to.equal(2);
           expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
           expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
 
@@ -213,7 +213,7 @@ module.exports = function (session) {
           expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1).to.be.a(Model1);
           expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1.id).to.equal(7);
-          expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].id).to.eql(3);
+          expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
 
         });
     });
@@ -234,8 +234,8 @@ module.exports = function (session) {
           expect(models[0].model1Relation2).to.have.length(2);
           expect(models[0].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model1Relation2[1]).to.be.a(Model2);
-          expect(models[0].model1Relation2[0].id).to.equal(1);
-          expect(models[0].model1Relation2[1].id).to.equal(2);
+          expect(models[0].model1Relation2[0].idCol).to.equal(1);
+          expect(models[0].model1Relation2[1].idCol).to.equal(2);
           expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
           expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
 
@@ -254,14 +254,14 @@ module.exports = function (session) {
           expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1).to.be.a(Model1);
           expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1.id).to.equal(7);
-          expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].id).to.eql(3);
+          expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
         });
     });
 
     it('c.*', function () {
       return Model2
         .query()
-        .where('id', 2)
+        .where('id_col', 2)
         .eager('model2Relation1.*')
         .then(function (models) {
           expect(models).to.have.length(1);
@@ -281,7 +281,7 @@ module.exports = function (session) {
           expect(models[0].model2Relation1[1].model1Relation1).to.be.a(Model1);
           expect(models[0].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
           expect(models[0].model2Relation1[1].model1Relation1.id).to.equal(7);
-          expect(models[0].model2Relation1[1].model1Relation2[0].id).to.eql(3);
+          expect(models[0].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
         });
     });
 

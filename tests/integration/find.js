@@ -15,15 +15,15 @@ module.exports = function (session) {
           id: 1,
           model1Prop1: 'hello 1',
           model1Relation2: [{
-            id: 1,
+            idCol: 1,
             model2Prop1: 'hejsan 1',
             model2Prop2: 30
           }, {
-            id: 2,
+            idCol: 2,
             model2Prop1: 'hejsan 2',
             model2Prop2: 20
           }, {
-            id: 3,
+            idCol: 3,
             model2Prop1: 'hejsan 3',
             model2Prop2: 10
           }]
@@ -50,10 +50,12 @@ module.exports = function (session) {
         it('.select()', function () {
           return Model2
             .query()
-            .select('model_2.id', 'model2Prop2')
+            .select('model_2.id_col', 'model_2_prop_2')
             .then(function (models) {
               expect(models[0]).to.be.a(Model2);
-              expect(_.unique(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql(['id', 'model2Prop2']);
+              expect(_.unique(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql(['idCol', 'model2Prop2']);
+              expect(_.pluck(models, 'idCol').sort()).to.eql([1, 2, 3]);
+              expect(_.pluck(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
             });
         });
 
@@ -236,15 +238,15 @@ module.exports = function (session) {
             id: 1,
             model1Prop1: 'hello 1',
             model1Relation2: [{
-              id: 1,
+              idCol: 1,
               model2Prop1: 'text 1',
               model2Prop2: 6
             }, {
-              id: 2,
+              idCol: 2,
               model2Prop1: 'text 2',
               model2Prop2: 5
             }, {
-              id: 3,
+              idCol: 3,
               model2Prop1: 'text 3',
               model2Prop2: 4
             }]
@@ -252,15 +254,15 @@ module.exports = function (session) {
             id: 2,
             model1Prop1: 'hello 2',
             model1Relation2: [{
-              id: 4,
+              idCol: 4,
               model2Prop1: 'text 4',
               model2Prop2: 3
             }, {
-              id: 5,
+              idCol: 5,
               model2Prop1: 'text 5',
               model2Prop2: 2
             }, {
-              id: 6,
+              idCol: 6,
               model2Prop1: 'text 6',
               model2Prop2: 1
             }]
@@ -287,7 +289,7 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
                 expect(related[0]).to.eql({
-                  id: 1,
+                  idCol: 1,
                   model1Id: parent1.id,
                   model2Prop1: 'text 1',
                   model2Prop2: 6
@@ -302,7 +304,7 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
                 expect(related[0]).to.eql({
-                  id: 4,
+                  idCol: 4,
                   model1Id: parent2.id,
                   model2Prop1: 'text 4',
                   model2Prop2: 3
@@ -316,14 +318,14 @@ module.exports = function (session) {
           it('.select()', function () {
             return parent1
               .$relatedQuery('model1Relation2')
-              .select('id')
+              .select('id_col')
               .then(function (related) {
                 expect(related.length).to.equal(3);
                 expect(related[0]).to.be.a(Model2);
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
-                expect(_.pluck(related, 'id').sort()).to.eql([1, 2, 3]);
-                expect(_.unique(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
+                expect(_.pluck(related, 'idCol').sort()).to.eql([1, 2, 3]);
+                expect(_.unique(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['idCol']);
               });
           });
 
@@ -351,8 +353,8 @@ module.exports = function (session) {
           it('.pluck()', function () {
             return parent2
               .$relatedQuery('model1Relation2')
-              .orderBy('id')
-              .pluck('id')
+              .orderBy('id_col')
+              .pluck('idCol')
               .then(function (values) {
                 expect(values).to.eql([4, 5, 6]);
               });
@@ -361,8 +363,8 @@ module.exports = function (session) {
           it('.first()', function () {
             return parent2
               .$relatedQuery('model1Relation2')
-              .orderBy('id')
-              .pluck('id')
+              .orderBy('id_col')
+              .pluck('idCol')
               .first()
               .then(function (value) {
                 expect(value).to.eql(4);
@@ -374,12 +376,12 @@ module.exports = function (session) {
               .$relatedQuery('model1Relation2')
               .select('model_2.*', 'Parent.model1Prop1 as parentProp1')
               .join('Model1 as Parent', 'model_2.model_1_id', 'Parent.id')
-              .orderBy('model_2.id', 'desc')
+              .orderBy('model_2.id_col', 'desc')
               .then(function (related) {
                 expect(related).to.have.length(3);
                 expect(related[0]).to.be.a(Model2);
                 expect(related[0]).to.eql({
-                  id: 6,
+                  idCol: 6,
                   model1Id: parent2.id,
                   model2Prop1: 'text 6',
                   model2Prop2: 1,
@@ -401,7 +403,7 @@ module.exports = function (session) {
             id: 1,
             model1Prop1: 'hello 1',
             model1Relation2: [{
-              id: 1,
+              idCol: 1,
               model2Prop1: 'text 1',
               model2Relation1: [{
                 id: 3,
@@ -421,7 +423,7 @@ module.exports = function (session) {
             id: 2,
             model1Prop1: 'hello 2',
             model1Relation2: [{
-              id: 2,
+              idCol: 2,
               model2Prop1: 'text 2',
               model2Relation1: [{
                 id: 6,
@@ -444,8 +446,8 @@ module.exports = function (session) {
           return Model2
             .query()
             .then(function (parents) {
-              parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 2});
+              parent1 = _.find(parents, {idCol: 1});
+              parent2 = _.find(parents, {idCol: 2});
             });
         });
 
@@ -547,7 +549,7 @@ module.exports = function (session) {
               parent1
                 .$relatedQuery('model2Relation1')
                 .select('Model1.*', 'model_2.model_2_prop_1 as parentProp1')
-                .join('model_2', 'Model1Model2.model2Id', 'model_2.id')
+                .join('model_2', 'Model1Model2.model2Id', 'model_2.id_col')
                 .orderBy('Model1.id', 'asc')
                 .then(function (related) {
                   expect(related).to.have.length(3);
@@ -577,7 +579,7 @@ module.exports = function (session) {
               parent2
                 .$relatedQuery('model2Relation1')
                 .select('Model1.*', 'model_2.model_2_prop_1 as parentProp1')
-                .join('model_2', 'Model1Model2.model2Id', 'model_2.id')
+                .join('model_2', 'Model1Model2.model2Id', 'model_2.id_col')
                 .orderBy('Model1.id', 'asc')
                 .then(function (related) {
                   expect(related).to.have.length(3);

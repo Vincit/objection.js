@@ -3,13 +3,6 @@ var Promise = require('bluebird');
 var MoronModel = require('../../lib/MoronModel');
 
 module.exports.initialize = function (opt) {
-  opt = _.defaults(opt || {}, {
-    modelIdProperties: {
-      Model1: 'id',
-      Model2: 'id'
-    }
-  });
-
   function Model1() {
     MoronModel.apply(this, arguments);
   }
@@ -64,7 +57,7 @@ module.exports.initialize = function (opt) {
       relation: MoronModel.ManyToManyRelation,
       modelClass: Model1,
       join: {
-        from: 'model_2.id',
+        from: 'model_2.id_col',
         through: {
           from: 'Model1Model2.model2Id',
           to: 'Model1Model2.model1Id'
@@ -79,8 +72,8 @@ module.exports.initialize = function (opt) {
   Model1.knex = knex;
   Model2.knex = knex;
 
-  Model1.idProperty = opt.modelIdProperties.Model1;
-  Model2.idProperty = opt.modelIdProperties.Model2;
+  Model1.idColumn = 'id';
+  Model2.idColumn = 'id_col';
 
   return {
     opt: opt,
@@ -103,13 +96,13 @@ module.exports.createDb = function () {
     .dropTableIfExists('model_2')
     .dropTableIfExists('Model1Model2')
     .createTable('Model1', function (table) {
-      table.bigincrements(session.models.Model1.idProperty);
+      table.bigincrements('id');
       table.biginteger('model1Id');
       table.string('model1Prop1');
       table.integer('model1Prop2');
     })
     .createTable('model_2', function (table) {
-      table.bigincrements(session.models.Model2.idProperty);
+      table.bigincrements('id_col');
       table.biginteger('model_1_id');
       table.string('model_2_prop_1');
       table.integer('model_2_prop_2');
@@ -138,7 +131,8 @@ module.exports.populate = function (data) {
     return session.knex(table).delete().then(function () {
       return session.knex(table).insert(rows);
     }).then(function () {
-      var maxId = _.max(_.pluck(rows, 'id'));
+      var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
+      var maxId = _.max(_.pluck(rows, idCol));
 
       if (session.opt.knexConfig.client === 'sqlite3') {
         if (maxId && _.isFinite(maxId)) {
@@ -168,7 +162,7 @@ function createRows(model, ModelClass, rows) {
     if (relation instanceof MoronModel.HasOneRelation) {
 
       var related = relation.relatedModelClass.ensureModel(model[relationName]);
-      model[relation.ownerProp] = related[relation.relatedModelClass.idProperty];
+      model[relation.ownerProp] = related.$id();
 
       createRows(related, relation.relatedModelClass, rows);
 
@@ -176,7 +170,7 @@ function createRows(model, ModelClass, rows) {
 
       _.each(model[relationName], function (relatedJson) {
         var related = relation.relatedModelClass.ensureModel(relatedJson);
-        related[relation.relatedProp] = model[ModelClass.idProperty];
+        related[relation.relatedProp] = model.$id();
 
         createRows(related, relation.relatedModelClass, rows);
       });
@@ -188,8 +182,8 @@ function createRows(model, ModelClass, rows) {
         var joinRow = {};
         var related = relation.relatedModelClass.ensureModel(relatedJson);
 
-        joinRow[relation.joinTableRelatedCol.split('.')[1]] = related[relation.relatedModelClass.idProperty];
-        joinRow[relation.joinTableOwnerCol.split('.')[1]] = model[ModelClass.idProperty];
+        joinRow[relation.joinTableRelatedCol.split('.')[1]] = related.$id();
+        joinRow[relation.joinTableOwnerCol.split('.')[1]] = model.$id();
 
         rows[joinTable] = rows[joinTable] || [];
         rows[joinTable].push(joinRow);
