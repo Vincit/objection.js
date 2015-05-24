@@ -10,7 +10,7 @@ module.exports = function (session) {
 
     describe('.query()', function () {
 
-      beforeEach(function () {
+      before(function () {
         return session.populate([{
           id: 1,
           model1Prop1: 'hello 1',
@@ -133,7 +133,7 @@ module.exports = function (session) {
         var parent1;
         var parent2;
 
-        beforeEach(function () {
+        before(function () {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
@@ -233,7 +233,7 @@ module.exports = function (session) {
         var parent1;
         var parent2;
 
-        beforeEach(function () {
+        before(function () {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
@@ -398,7 +398,7 @@ module.exports = function (session) {
         var parent1;
         var parent2;
 
-        beforeEach(function () {
+        before(function () {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',

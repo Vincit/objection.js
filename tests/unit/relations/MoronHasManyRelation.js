@@ -6,8 +6,6 @@ var _ = require('lodash')
   , MoronQueryBuilder = require('../../../lib/MoronQueryBuilder')
   , MoronHasManyRelation = require('../../../lib/relations/MoronHasManyRelation');
 
-Promise.longStackTraces();
-
 describe('MoronHasManyRelation', function () {
   var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];

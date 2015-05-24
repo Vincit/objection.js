@@ -7,7 +7,7 @@ module.exports = function (session) {
 
   describe('MoronModel eager queries', function () {
 
-    beforeEach(function () {
+    before(function () {
       return session.populate([{
         id: 1,
         model1Prop1: 'hello 1',
