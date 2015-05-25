@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var expect = require('expect.js');
+var MoronValidationError = require('../../lib/MoronValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
@@ -7,7 +8,7 @@ module.exports = function (session) {
 
   describe('MoronModel insert queries', function () {
 
-    describe('.query()', function () {
+    describe('.query().insert()', function () {
 
       beforeEach(function () {
         return session.populate([{
@@ -46,20 +47,78 @@ module.exports = function (session) {
       });
 
       it('should accept json', function () {
-
+        return Model1.query().insert({model1Prop1: 'hello 3'}).then(function (inserted) {
+          expect(inserted).to.be.a(Model1);
+          expect(inserted.id).to.eql(3);
+          expect(inserted.model1Prop1).to.equal('hello 3');
+          return session.knex(Model1.tableName);
+        }).then(function (rows) {
+          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+        });
       });
 
       it('should accept a json array', function () {
-
+        return Model1.query().insert([{model1Prop1: 'hello 3'}, {model1Prop1: 'hello 4'}]).then(function (inserted) {
+          expect(inserted[0]).to.be.a(Model1);
+          expect(inserted[1]).to.be.a(Model1);
+          expect(_.pluck(inserted, 'id').sort()).to.eql([3, 4]);
+          expect(_.pluck(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
+          return session.knex(Model1.tableName);
+        }).then(function (rows) {
+          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
+          expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3, 4]);
+        });
       });
 
       it('should validate', function () {
+        var ModelWithSchema = subClassWithSchema(Model1, {
+          type: 'object',
+          properties: {
+            id: {type: ['number', 'null']},
+            model1Prop1: {type: 'string'},
+            model1Prop2: {type: 'number'}
+          }
+        });
 
+        expect(function () {
+          ModelWithSchema.query().insert({model1Prop1: 666}).then();
+        }).to.throwException(function (err) {
+          expect(err).to.be.a(MoronValidationError);
+        });
+
+        return session.knex(Model1.tableName).then(function (rows) {
+          expect(_.pluck(rows, 'id').sort()).to.eql([1, 2]);
+        });
       });
 
     });
 
-    describe('.relatedQuery()', function () {
+    describe('.$query().insert()', function () {
+
+      beforeEach(function () {
+        return session.populate([{
+          id: 1,
+          model1Prop1: 'hello 1'
+        }, {
+          id: 2,
+          model1Prop1: 'hello 2'
+        }]);
+      });
+
+      it('should insert new model', function () {
+        return Model1.fromJson({model1Prop1: 'hello 3'}).$query().insert().then(function (inserted) {
+          expect(inserted).to.be.a(Model1);
+          expect(inserted.id).to.eql(3);
+          expect(inserted.model1Prop1).to.equal('hello 3');
+          return session.knex(Model1.tableName);
+        }).then(function (rows) {
+          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+        });
+      });
+
+    });
+
+    describe('.$relatedQuery().insert()', function () {
 
       describe('has one relation', function () {
         var parent1;
@@ -68,18 +127,10 @@ module.exports = function (session) {
         beforeEach(function () {
           return session.populate([{
             id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation1: {
-              id: 2,
-              model1Prop1: 'hello 2'
-            }
+            model1Prop1: 'hello 1'
           }, {
-            id: 3,
-            model1Prop1: 'hello 3',
-            model1Relation1: {
-              id: 4,
-              model1Prop1: 'hello 4'
-            }
+            id: 2,
+            model1Prop1: 'hello 3'
           }]);
         });
 
@@ -88,17 +139,71 @@ module.exports = function (session) {
             .query()
             .then(function (parents) {
               parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 3});
+              parent2 = _.find(parents, {id: 2});
             });
         });
 
-        describe('knex methods', function () {
+        it('should insert a related object', function () {
+          var inserted = null;
 
+          // First check that there is nothing in the relation.
+          return parent1.$relatedQuery('model1Relation1').then(function (model) {
+            expect(parent1.model1Id).to.equal(null);
+            expect(model).to.eql([]);
+            return parent1.$relatedQuery('model1Relation1').insert(Model1.fromJson({model1Prop1: 'test'}));
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted.id).to.equal(3);
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.model1Prop1).to.equal('test');
+            expect(parent1.model1Relation1).to.equal(inserted);
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(3);
+            expect(_.find(rows, {id: parent1.id}).model1Id).to.equal(3);
+            expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+          });
+        });
+
+        it('should accept json', function () {
+          var inserted = null;
+
+          return parent1.$relatedQuery('model1Relation1').insert({model1Prop1: 'inserted'}).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted.id).to.equal(3);
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.model1Prop1).to.equal('inserted');
+            expect(parent1.model1Relation1).to.equal(inserted);
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(3);
+            expect(_.find(rows, {id: parent1.id}).model1Id).to.equal(3);
+            expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('inserted');
+          });
+        });
+
+        it('insert replaces old related object, but doesn\'t remove it', function () {
+          var inserted = null;
+
+          return parent1.$relatedQuery('model1Relation1').insert({model1Prop1: 'inserted'}).then(function () {
+            return parent1.$relatedQuery('model1Relation1').insert({model1Prop1: 'inserted 2'});
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.id).to.equal(4);
+            expect(inserted.model1Prop1).to.equal('inserted 2');
+            expect(parent1.model1Relation1).to.equal(inserted);
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(4);
+            expect(_.find(rows, {id: parent1.id}).model1Id).to.equal(4);
+            expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('inserted 2');
+          });
         });
 
       });
 
-      describe('has may relation', function () {
+      describe('has many relation', function () {
         var parent1;
         var parent2;
 
@@ -107,33 +212,17 @@ module.exports = function (session) {
             id: 1,
             model1Prop1: 'hello 1',
             model1Relation2: [{
-              id: 1,
+              idCol: 1,
               model2Prop1: 'text 1',
               model2Prop2: 6
-            }, {
-              id: 2,
-              model2Prop1: 'text 2',
-              model2Prop2: 5
-            }, {
-              id: 3,
-              model2Prop1: 'text 3',
-              model2Prop2: 4
             }]
           }, {
             id: 2,
             model1Prop1: 'hello 2',
             model1Relation2: [{
-              id: 4,
+              idCol: 2,
               model2Prop1: 'text 4',
               model2Prop2: 3
-            }, {
-              id: 5,
-              model2Prop1: 'text 5',
-              model2Prop2: 2
-            }, {
-              id: 6,
-              model2Prop1: 'text 6',
-              model2Prop2: 1
             }]
           }]);
         });
@@ -147,8 +236,114 @@ module.exports = function (session) {
             });
         });
 
-        describe('knex methods', function () {
+        it('should insert a related object', function () {
+          var inserted = null;
+          var originalRelated = null;
 
+          return parent1.$relatedQuery('model1Relation2').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model1Relation2').insert(Model2.fromJson({model2Prop1: 'test'}));
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted.idCol).to.equal(3);
+            expect(inserted).to.be.a(Model2);
+            expect(inserted.model2Prop1).to.equal('test');
+            expect(inserted.model1Id).to.equal(parent1.id);
+            expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('model_2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(3);
+            expect(_.find(rows, {id_col: inserted.idCol}).model_1_id).to.equal(parent1.id);
+            expect(_.find(rows, {id_col: inserted.idCol}).model_2_prop_1).to.equal('test');
+          });
+        });
+
+        it('should accept json', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1.$relatedQuery('model1Relation2').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model1Relation2').insert({model2Prop1: 'test'});
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted.idCol).to.equal(3);
+            expect(inserted).to.be.a(Model2);
+            expect(inserted.model2Prop1).to.equal('test');
+            expect(inserted.model1Id).to.equal(parent1.id);
+            expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('model_2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(3);
+            expect(_.find(rows, {id_col: inserted.idCol}).model_1_id).to.equal(parent1.id);
+            expect(_.find(rows, {id_col: inserted.idCol}).model_2_prop_1).to.equal('test');
+          });
+        });
+
+        it('should accept an array', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1.$relatedQuery('model1Relation2').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model1Relation2').insert([
+              Model2.fromJson({model2Prop1: 'test 1'}),
+              Model2.fromJson({model2Prop1: 'test 2'})
+            ]);
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted[0].idCol).to.equal(3);
+            expect(inserted[1].idCol).to.equal(4);
+            expect(inserted[0]).to.be.a(Model2);
+            expect(inserted[1]).to.be.a(Model2);
+            expect(inserted[0].model2Prop1).to.equal('test 1');
+            expect(inserted[1].model2Prop1).to.equal('test 2');
+            expect(inserted[0].model1Id).to.equal(parent1.id);
+            expect(inserted[1].model1Id).to.equal(parent1.id);
+            expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('model_2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(4);
+            expect(_.find(rows, {id_col: inserted[0].idCol}).model_1_id).to.equal(parent1.id);
+            expect(_.find(rows, {id_col: inserted[0].idCol}).model_2_prop_1).to.equal('test 1');
+            expect(_.find(rows, {id_col: inserted[1].idCol}).model_1_id).to.equal(parent1.id);
+            expect(_.find(rows, {id_col: inserted[1].idCol}).model_2_prop_1).to.equal('test 2');
+          });
+        });
+
+        it('should accept a json array', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1.$relatedQuery('model1Relation2').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model1Relation2').insert([
+              {model2Prop1: 'test 1'},
+              {model2Prop1: 'test 2'}
+            ]);
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted[0].idCol).to.equal(3);
+            expect(inserted[1].idCol).to.equal(4);
+            expect(inserted[0]).to.be.a(Model2);
+            expect(inserted[1]).to.be.a(Model2);
+            expect(inserted[0].model2Prop1).to.equal('test 1');
+            expect(inserted[1].model2Prop1).to.equal('test 2');
+            expect(inserted[0].model1Id).to.equal(parent1.id);
+            expect(inserted[1].model1Id).to.equal(parent1.id);
+            expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('model_2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(4);
+            expect(_.find(rows, {id_col: inserted[0].idCol}).model_1_id).to.equal(parent1.id);
+            expect(_.find(rows, {id_col: inserted[0].idCol}).model_2_prop_1).to.equal('test 1');
+            expect(_.find(rows, {id_col: inserted[1].idCol}).model_1_id).to.equal(parent1.id);
+            expect(_.find(rows, {id_col: inserted[1].idCol}).model_2_prop_1).to.equal('test 2');
+          });
         });
 
       });
@@ -162,40 +357,24 @@ module.exports = function (session) {
             id: 1,
             model1Prop1: 'hello 1',
             model1Relation2: [{
-              id: 1,
+              idCol: 1,
               model2Prop1: 'text 1',
               model2Relation1: [{
                 id: 3,
                 model1Prop1: 'blaa 1',
                 model1Prop2: 6
-              }, {
-                id: 4,
-                model1Prop1: 'blaa 2',
-                model1Prop2: 5
-              }, {
-                id: 5,
-                model1Prop1: 'blaa 3',
-                model1Prop2: 4
               }]
             }]
           }, {
             id: 2,
             model1Prop1: 'hello 2',
             model1Relation2: [{
-              id: 2,
+              idCol: 2,
               model2Prop1: 'text 2',
               model2Relation1: [{
-                id: 6,
-                model1Prop1: 'blaa 4',
+                id: 4,
+                model1Prop1: 'blaa 2',
                 model1Prop2: 3
-              }, {
-                id: 7,
-                model1Prop1: 'blaa 5',
-                model1Prop2: 2
-              }, {
-                id: 8,
-                model1Prop1: 'blaa 6',
-                model1Prop2: 1
               }]
             }]
           }]);
@@ -205,13 +384,125 @@ module.exports = function (session) {
           return Model2
             .query()
             .then(function (parents) {
-              parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 2});
+              parent1 = _.find(parents, {idCol: 1});
+              parent2 = _.find(parents, {idCol: 2});
             });
         });
 
-        describe('knex methods', function () {
+        it('should insert a related object', function () {
+          var inserted = null;
+          var originalRelated = null;
 
+          return parent1.$relatedQuery('model2Relation1').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model2Relation1').insert(Model1.fromJson({model1Prop1: 'test'}));
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted.id).to.equal(5);
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.model1Prop1).to.equal('test');
+            expect(parent1.model2Relation1).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(5);
+            expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+            return session.knex('Model1Model2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(3);
+            expect(_.where(rows, {model1Id: inserted.id, model2Id: parent1.idCol})).to.have.length(1);
+          });
+        });
+
+        it('should accept json', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1.$relatedQuery('model2Relation1').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model2Relation1').insert({model1Prop1: 'test'});
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted.id).to.equal(5);
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.model1Prop1).to.equal('test');
+            expect(parent1.model2Relation1).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(5);
+            expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+            return session.knex('Model1Model2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(3);
+            expect(_.where(rows, {model1Id: inserted.id, model2Id: parent1.idCol})).to.have.length(1);
+          });
+        });
+
+        it('should accept an array', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1.$relatedQuery('model2Relation1').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model2Relation1').insert([
+              Model1.fromJson({model1Prop1: 'test 1'}),
+              Model1.fromJson({model1Prop1: 'test 2'})
+            ]);
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted[0].id).to.equal(5);
+            expect(inserted[1].id).to.equal(6);
+            expect(inserted[0]).to.be.a(Model1);
+            expect(inserted[1]).to.be.a(Model1);
+            expect(inserted[0].model1Prop1).to.equal('test 1');
+            expect(inserted[1].model1Prop1).to.equal('test 2');
+            expect(parent1.model2Relation1).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(6);
+            expect(_.find(rows, {id: inserted[0].id}).model1Prop1).to.equal('test 1');
+            expect(_.find(rows, {id: inserted[1].id}).model1Prop1).to.equal('test 2');
+            return session.knex('Model1Model2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(4);
+            expect(_.where(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})).to.have.length(1);
+            expect(_.where(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})).to.have.length(1);
+          });
+        });
+
+        it('should accept a json array', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1.$relatedQuery('model2Relation1').then(function (models) {
+            originalRelated = models;
+            expect(models).to.have.length(1);
+            return parent1.$relatedQuery('model2Relation1').insert([
+              {model1Prop1: 'test 1'},
+              {model1Prop1: 'test 2'}
+            ]);
+          }).then(function ($inserted) {
+            inserted = $inserted;
+            expect(inserted[0].id).to.equal(5);
+            expect(inserted[1].id).to.equal(6);
+            expect(inserted[0]).to.be.a(Model1);
+            expect(inserted[1]).to.be.a(Model1);
+            expect(inserted[0].model1Prop1).to.equal('test 1');
+            expect(inserted[1].model1Prop1).to.equal('test 2');
+            expect(parent1.model2Relation1).to.eql(_.flatten([originalRelated, inserted]));
+            return session.knex('Model1');
+          }).then(function (rows) {
+            expect(rows).to.have.length(6);
+            expect(_.find(rows, {id: inserted[0].id}).model1Prop1).to.equal('test 1');
+            expect(_.find(rows, {id: inserted[1].id}).model1Prop1).to.equal('test 2');
+            return session.knex('Model1Model2');
+          }).then(function (rows) {
+            expect(rows).to.have.length(4);
+            expect(_.where(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})).to.have.length(1);
+            expect(_.where(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})).to.have.length(1);
+          });
         });
 
       });

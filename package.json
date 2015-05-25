@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests"
+    "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail"
   },
   "dependencies": {
     "bluebird": "^2.9.24",

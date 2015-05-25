@@ -182,8 +182,8 @@ function createRows(model, ModelClass, rows) {
         var joinRow = {};
         var related = relation.relatedModelClass.ensureModel(relatedJson);
 
-        joinRow[relation.joinTableRelatedCol.split('.')[1]] = related.$id();
-        joinRow[relation.joinTableOwnerCol.split('.')[1]] = model.$id();
+        joinRow[relation.joinTableRelatedCol] = related.$id();
+        joinRow[relation.joinTableOwnerCol] = model.$id();
 
         rows[joinTable] = rows[joinTable] || [];
         rows[joinTable].push(joinRow);

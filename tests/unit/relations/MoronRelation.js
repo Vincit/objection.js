@@ -30,9 +30,9 @@ describe('MoronRelation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('OwnerModel.id');
+    expect(relation.ownerCol).to.equal('id');
     expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('RelatedModel.ownerId');
+    expect(relation.relatedCol).to.equal('ownerId');
     expect(relation.relatedProp).to.equal('ownerId');
     expect(relation.joinTable).to.equal(null);
     expect(relation.joinTableOwnerCol).to.equal(null);
@@ -200,9 +200,9 @@ describe('MoronRelation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('OwnerModel.id');
+    expect(relation.ownerCol).to.equal('id');
     expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('RelatedModel.ownerId');
+    expect(relation.relatedCol).to.equal('ownerId');
     expect(relation.relatedProp).to.equal('ownerId');
     expect(relation.joinTable).to.equal(null);
     expect(relation.joinTableOwnerCol).to.equal(null);
@@ -223,9 +223,9 @@ describe('MoronRelation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('OwnerModel.id');
+    expect(relation.ownerCol).to.equal('id');
     expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('RelatedModel.ownerId');
+    expect(relation.relatedCol).to.equal('ownerId');
     expect(relation.relatedProp).to.equal('ownerId');
     expect(relation.joinTable).to.equal(null);
     expect(relation.joinTableOwnerCol).to.equal(null);
@@ -260,9 +260,9 @@ describe('MoronRelation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('owner_model.id_col');
+    expect(relation.ownerCol).to.equal('id_col');
     expect(relation.ownerProp).to.equal('idCol');
-    expect(relation.relatedCol).to.equal('related-model.owner-id');
+    expect(relation.relatedCol).to.equal('owner-id');
     expect(relation.relatedProp).to.equal('ownerId');
     expect(relation.joinTable).to.equal(null);
     expect(relation.joinTableOwnerCol).to.equal(null);
@@ -287,13 +287,13 @@ describe('MoronRelation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('OwnerModel.id');
+    expect(relation.ownerCol).to.equal('id');
     expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('RelatedModel.ownerId');
+    expect(relation.relatedCol).to.equal('ownerId');
     expect(relation.relatedProp).to.equal('ownerId');
     expect(relation.joinTable).to.equal('JoinTable');
-    expect(relation.joinTableOwnerCol).to.equal('JoinTable.ownerId');
-    expect(relation.joinTableRelatedCol).to.equal('JoinTable.relatedId');
+    expect(relation.joinTableOwnerCol).to.equal('ownerId');
+    expect(relation.joinTableRelatedCol).to.equal('relatedId');
   });
 
   it('should be able to swap join.through.from and join.through.to', function () {
@@ -314,13 +314,13 @@ describe('MoronRelation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('OwnerModel.id');
+    expect(relation.ownerCol).to.equal('id');
     expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('RelatedModel.ownerId');
+    expect(relation.relatedCol).to.equal('ownerId');
     expect(relation.relatedProp).to.equal('ownerId');
     expect(relation.joinTable).to.equal('JoinTable');
-    expect(relation.joinTableOwnerCol).to.equal('JoinTable.ownerId');
-    expect(relation.joinTableRelatedCol).to.equal('JoinTable.relatedId');
+    expect(relation.joinTableOwnerCol).to.equal('ownerId');
+    expect(relation.joinTableRelatedCol).to.equal('relatedId');
   });
 
   it('should fail if join.through.to is missing', function () {
