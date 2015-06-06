@@ -30,6 +30,8 @@ describe('integration tests', function () {
       require('./update')(session);
       require('./patch')(session);
       require('./delete')(session);
+      require('./relate')(session);
+      require('./unrelate')(session);
       require('./eager')(session);
 
     });
