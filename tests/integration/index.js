@@ -27,6 +27,8 @@ describe('integration tests', function () {
 
       require('./find')(session);
       require('./insert')(session);
+      require('./update')(session);
+      require('./patch')(session);
       require('./eager')(session);
 
     });
