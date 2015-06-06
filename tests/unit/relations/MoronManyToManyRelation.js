@@ -500,8 +500,8 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries).to.have.length(2);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql([
-            'delete from "JoinTable"',
-            'where "JoinTable"."relatedId" in',
+            'delete from "RelatedModel"',
+            'where "RelatedModel"."id" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
               'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
@@ -509,8 +509,8 @@ describe('MoronManyToManyRelation', function () {
               'and "JoinTable"."ownerId" in (\'666\'))'
           ].join(' '));
           expect(executedQueries[1]).to.eql([
-            'delete from "RelatedModel"',
-            'where "RelatedModel"."id" in',
+            'delete from "JoinTable"',
+            'where "JoinTable"."relatedId" in',
               '(select "RelatedModel"."id" from "RelatedModel"',
               'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
               'where "gender" = \'male\'',
