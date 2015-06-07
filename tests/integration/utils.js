@@ -4,6 +4,8 @@ var MoronModel = require('../../lib/MoronModel');
 var expect = require('expect.js');
 
 module.exports.initialize = function (opt) {
+  var knex = require('knex')(opt.knexConfig);
+
   function Model1() {
     MoronModel.apply(this, arguments);
   }
@@ -68,10 +70,6 @@ module.exports.initialize = function (opt) {
     }
   };
 
-  var knex = require('knex')(opt.knexConfig);
-
-  MoronModel.knex(knex);
-
   Model1.idColumn = 'id';
   Model2.idColumn = 'id_col';
 
@@ -79,8 +77,8 @@ module.exports.initialize = function (opt) {
     opt: opt,
     knex: knex,
     models: {
-      Model1: Model1,
-      Model2: Model2
+      Model1: Model1.bindKnex(knex),
+      Model2: Model2.bindKnex(knex)
     },
     createDb: module.exports.createDb,
     populate: module.exports.populate,
@@ -127,22 +125,26 @@ module.exports.populate = function (data) {
     createRows(jsonModel, models.Model1, rows);
   });
 
-  return Promise.all(_.map(rows, function (rows, table) {
-    return session.knex(table).delete().then(function () {
-      return session.knex(table).insert(rows);
-    }).then(function () {
-      var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
-      var maxId = _.max(_.pluck(rows, idCol));
+  return Promise.all([
+    session.knex('Model1').delete(),
+    session.knex('Model1Model2').delete(),
+    session.knex('model_2').delete()
+  ]).then(function () {
+    return Promise.all(_.map(rows, function (rows, table) {
+      return session.knex(table).insert(rows).then(function () {
+        var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
+        var maxId = _.max(_.pluck(rows, idCol));
 
-      if (session.opt.knexConfig.client === 'sqlite3') {
-        if (maxId && _.isFinite(maxId)) {
-          return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+        if (session.opt.knexConfig.client === 'sqlite3') {
+          if (maxId && _.isFinite(maxId)) {
+            return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+          }
+        } else {
+          throw new Error('not yet implemented');
         }
-      } else {
-        throw new Error('not yet implemented');
-      }
-    });
-  })).then(function () {
+      });
+    }));
+  }).then(function () {
     return {
       rows: rows,
       tree: data
@@ -206,7 +208,10 @@ function createRows(model, ModelClass, rows) {
       });
 
     } else if (relation instanceof MoronModel.ManyToManyRelation) {
-      var joinTable = [ModelClass.name, relation.relatedModelClass.name].sort().join('');
+      var joinTable = [
+        _.capitalize(_.camelCase(ModelClass.tableName)),
+        _.capitalize(_.camelCase(relation.relatedModelClass.tableName))
+      ].sort().join('');
 
       _.each(model[relationName], function (relatedJson) {
         var joinRow = {};

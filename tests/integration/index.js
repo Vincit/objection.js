@@ -33,6 +33,7 @@ describe('integration tests', function () {
       require('./relate')(session);
       require('./unrelate')(session);
       require('./eager')(session);
+      require('./transactions')(session);
 
     });
   });
