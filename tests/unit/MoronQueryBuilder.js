@@ -28,7 +28,7 @@ describe('MoronQueryBuilder', function () {
     });
 
     Model.tableName = 'Model';
-    Model.knex = mockKnex;
+    Model.knex(mockKnex);
   });
 
   it('should call the callback passed to .then after execution', function (done) {

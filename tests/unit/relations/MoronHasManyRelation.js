@@ -41,10 +41,10 @@ describe('MoronHasManyRelation', function () {
     });
 
     OwnerModel.tableName = 'OwnerModel';
-    OwnerModel.knex = mockKnex;
+    OwnerModel.knex(mockKnex);
 
     RelatedModel.tableName = 'RelatedModel';
-    RelatedModel.knex = mockKnex;
+    RelatedModel.knex(mockKnex);
   });
 
   beforeEach(function () {

@@ -70,8 +70,7 @@ module.exports.initialize = function (opt) {
 
   var knex = require('knex')(opt.knexConfig);
 
-  Model1.knex = knex;
-  Model2.knex = knex;
+  MoronModel.knex(knex);
 
   Model1.idColumn = 'id';
   Model2.idColumn = 'id_col';

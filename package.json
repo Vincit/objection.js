@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "bluebird": "^2.9.24",
+    "function-name": "0.0.3",
     "knex": "^0.8.3",
     "lodash": "^3.9.0",
     "node-uuid": "^1.4.3",
