@@ -65,6 +65,7 @@ module.exports = function (session) {
           expect(models[0]).to.be.a(Model1);
 
           expect(models[0].model1Relation1).to.be.a(Model1);
+          expect
           expect(models[0].model1Relation1.id).to.equal(2);
           expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
           expect(models[0].model1Relation1.model1Relation1).to.equal(undefined);

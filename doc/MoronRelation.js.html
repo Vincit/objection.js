@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>moron.js Source: MoronRelation.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">moron.js</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="MoronHasManyRelation.html">MoronHasManyRelation</a></li><li><a href="MoronHasOneRelation.html">MoronHasOneRelation</a></li><li><a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a></li><li><a href="MoronRelation.html">MoronRelation</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html">Global</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+    		<h1 class="page-title">Source: MoronRelation.js</h1>
+			
+
+		<h1 class="page-title">Source: MoronRelation.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">"use strict";
+
+var _ = require('lodash')
+  , utils = require('../moronUtils')
+  , MoronQueryBuilder = require('../MoronQueryBuilder');
+
+/**
+ * @typedef {Object} MoronRelationJoin
+ *
+ * @property {String} from
+ * @property {String} to
+ * @property {Object} through
+ * @property {String} through.from
+ * @property {String} through.to
+ */
+
+/**
+ * @typedef {Object} MoronRelationMapping
+ *
+ * @property {MoronModel|String} modelClass
+ * @property {MoronRelation} relation
+ * @property {MoronRelationJoin} [join]
+ * @property {function(MoronQueryBuilder)|Object} [query]
+ */
+
+/**
+ * Represents a relation between two `MoronModel` subclasses.
+ *
+ * @param {String} relationName
+ *    Name of the relation.
+ *
+ * @param {MoronModel} OwnerClass
+ *    The MoronModel subclass that owns this relation.
+ *
+ * @constructor
+ */
+function MoronRelation(relationName, OwnerClass) {
+  /**
+   * Name of the relation.
+   *
+   * @type {String}
+   */
+  this.name = relationName;
+
+  /**
+   * The owner class of this relation.
+   *
+   * This must be a subclass of MoronModel.
+   *
+   * @type {MoronModel}
+   */
+  this.ownerModelClass = OwnerClass;
+
+  /**
+   * The related class.
+   *
+   * This must be a subclass of MoronModel.
+   *
+   * @type {MoronModel}
+   */
+  this.relatedModelClass = null;
+
+  /**
+   * The relation column in the owner table.
+   *
+   * @type {String}
+   */
+  this.ownerCol = null;
+
+  /**
+   * The relation property in the owner model.
+   *
+   * @type {String}
+   */
+  this.ownerProp = null;
+
+  /**
+   * The relation column in the related table.
+   *
+   * @type {String}
+   */
+  this.relatedCol = null;
+
+  /**
+   * The relation property in the related model.
+   *
+   * @type {String}
+   */
+  this.relatedProp = null;
+
+  /**
+   * The join table.
+   *
+   * @type {String}
+   */
+  this.joinTable = null;
+
+  /**
+   * The relation column in the join table that points to the owner table.
+   *
+   * @type {String}
+   */
+  this.joinTableOwnerCol = null;
+
+  /**
+   * The relation column in the join table that points to the related table.
+   *
+   * @type {String}
+   */
+  this.joinTableRelatedCol = null;
+
+  /**
+   * Optional additional query.
+   *
+   * @type {function (MoronQueryBuilder)}
+   */
+  this.additionalQuery = null;
+}
+
+/**
+ * Makes the given constructor a subclass of this class.
+ *
+ * @param {function=} subclassConstructor
+ * @return {function}
+ */
+MoronRelation.makeSubclass = function (subclassConstructor) {
+  utils.inherits(subclassConstructor, this);
+  return subclassConstructor;
+};
+
+MoronRelation.prototype.setMapping = function (mapping) {
+  var MoronModel = require('../MoronModel');
+
+  if (!utils.isSubclassOf(this.ownerModelClass, MoronModel)) {
+    throw new Error('Relation\'s owner is not a subclass of MoronModel');
+  }
+
+  var errorPrefix = this.ownerModelClass.name + '.relationMappings.' + this.name;
+
+  if (!mapping.modelClass) {
+    throw new Error(errorPrefix + '.modelClass is not defined');
+  }
+
+  if (_.isString(mapping.modelClass)) {
+    try {
+      this.relatedModelClass = require(mapping.modelClass);
+    } catch (err) {
+      throw new Error(errorPrefix + '.modelClass is an invalid file path to a model class.');
+    }
+
+    if (!utils.isSubclassOf(this.relatedModelClass, MoronModel)) {
+      throw new Error(errorPrefix + '.modelClass is a valid path to a module, but the module doesn\'t export a MoronModel subclass.');
+    }
+  } else {
+    this.relatedModelClass = mapping.modelClass;
+
+    if (!utils.isSubclassOf(this.relatedModelClass, MoronModel)) {
+      throw new Error(errorPrefix + '.modelClass is not a subclass of MoronModel or a file path to a module that exports one.');
+    }
+  }
+
+  if (!mapping.relation) {
+    throw new Error(errorPrefix + '.relation is not defined');
+  }
+
+  if (!utils.isSubclassOf(mapping.relation, MoronRelation)) {
+    throw new Error(errorPrefix + '.relation is not a subclass of MoronRelation');
+  }
+
+  if (!mapping.join || !_.isString(mapping.join.from) || !_.isString(mapping.join.to)) {
+    throw new Error(errorPrefix + '.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
+  }
+
+  var joinOwner = null;
+  var joinRelated = null;
+
+  var joinFrom = parseColumn(mapping.join.from);
+  var joinTo = parseColumn(mapping.join.to);
+
+  if (!joinFrom.table || !joinFrom.name) {
+    throw new Error(errorPrefix + '.join.from must have format TableName.columnName. For example `SomeTable.id`.');
+  }
+
+  if (!joinTo.table || !joinTo.name) {
+    throw new Error(errorPrefix + '.join.to must have format TableName.columnName. For example `SomeTable.id`.');
+  }
+
+  if (joinFrom.table === this.ownerModelClass.tableName) {
+    joinOwner = joinFrom;
+    joinRelated = joinTo;
+  } else if (joinTo.table === this.ownerModelClass.tableName) {
+    joinOwner = joinTo;
+    joinRelated = joinFrom;
+  } else {
+    throw new Error(errorPrefix + '.join: either `from` or `to` must point to the owner model table.');
+  }
+
+  if (joinRelated.table !== this.relatedModelClass.tableName) {
+    throw new Error(errorPrefix + '.join: either `from` or `to` must point to the related model table.');
+  }
+
+  if (mapping.join.through) {
+    if (!_.isString(mapping.join.through.from) || !_.isString(mapping.join.through.to)) {
+      throw new Error(errorPrefix + '.join.through must be an object that describes the join table. For example: {from: \'JoinTable.someId\', to: \'JoinTable.someOtherId\'}');
+    }
+
+    var joinTableFrom = parseColumn(mapping.join.through.from);
+    var joinTableTo = parseColumn(mapping.join.through.to);
+
+    if (!joinTableFrom.table || !joinTableFrom.name) {
+      throw new Error(errorPrefix + '.join.through.from must have format JoinTable.columnName. For example `JoinTable.someId`.');
+    }
+
+    if (!joinTableTo.table || !joinTableTo.name) {
+      throw new Error(errorPrefix + '.join.through.to must have format JoinTable.columnName. For example `JoinTable.someId`.');
+    }
+
+    if (joinTableFrom.table !== joinTableTo.table) {
+      throw new Error(errorPrefix + '.join.through `from` and `to` must point to the same join table.');
+    }
+
+    this.joinTable = joinTableFrom.table;
+
+    if (joinFrom.table === this.ownerModelClass.tableName) {
+      this.joinTableOwnerCol = joinTableFrom.name;
+      this.joinTableRelatedCol = joinTableTo.name;
+    } else {
+      this.joinTableRelatedCol = joinTableFrom.name;
+      this.joinTableOwnerCol = joinTableTo.name;
+    }
+  }
+
+  this.query = parseMappingQuery(mapping);
+  this.ownerProp = this._propertyName(joinOwner, this.ownerModelClass);
+  this.ownerCol = joinOwner.name;
+  this.relatedProp = this._propertyName(joinRelated, this.relatedModelClass);
+  this.relatedCol = joinRelated.name;
+};
+
+MoronRelation.prototype.fullOwnerCol = function () {
+  return this.ownerModelClass.tableName + '.' + this.ownerCol;
+};
+
+MoronRelation.prototype.fullRelatedCol = function () {
+  return this.relatedModelClass.tableName + '.' + this.relatedCol;
+};
+
+MoronRelation.prototype.fullJoinTableOwnerCol = function () {
+  return this.joinTable + '.' + this.joinTableOwnerCol;
+};
+
+MoronRelation.prototype.fullJoinTableRelatedCol = function () {
+  return this.joinTable + '.' + this.joinTableRelatedCol;
+};
+
+MoronRelation.prototype.clone = function () {
+  var clone = new this.constructor(this.name, this.ownerModelClass);
+
+  clone.relatedModelClass = this.relatedModelClass;
+  clone.ownerCol = this.ownerCol;
+  clone.ownerProp = this.ownerProp;
+  clone.relatedCol = this.relatedCol;
+  clone.relatedProp = this.relatedProp;
+  clone.joinTable = this.joinTable;
+  clone.joinTableOwnerCol = this.joinTableOwnerCol;
+  clone.joinTableRelatedCol = this.joinTableRelatedCol;
+  clone.additionalQuery = this.additionalQuery;
+
+  return clone;
+};
+
+MoronRelation.prototype.bindKnex = function (knex) {
+  var bound = this.clone();
+
+  bound.relatedModelClass = bound.relatedModelClass.bindKnex(knex);
+  bound.ownerModelClass = bound.ownerModelClass.bindKnex(knex);
+
+  return bound;
+};
+
+MoronRelation.prototype.find = function (builder, $owners) {
+  return builder;
+};
+
+MoronRelation.prototype.insert = function (builder, $owner, $insertion) {
+  return builder;
+};
+
+MoronRelation.prototype.update = function (builder, $owner, $update) {
+  return builder;
+};
+
+MoronRelation.prototype.patch = function (builder, $owner, $patch) {
+  return builder;
+};
+
+MoronRelation.prototype.delete = function (builder, $owner) {
+  return builder;
+};
+
+MoronRelation.prototype.relate = function (builder, $owner, ids) {
+  return builder;
+};
+
+MoronRelation.prototype.unrelate = function (builder, $owner) {
+  return builder;
+};
+
+MoronRelation.prototype._propertyName = function (column, modelClass) {
+  var propertyName = modelClass.columnNameToPropertyName(column.name);
+
+  if (!propertyName) {
+    throw new Error(modelClass.name +
+    '.$parseDatabaseJson probably transforms the value of the column ' + column.name + '.' +
+    ' This is a no-no because ' + column.name +
+    ' is needed in the relation ' + this.ownerModelClass.name + '.' + this.name);
+  }
+
+  return propertyName;
+};
+
+function parseMappingQuery(mapping) {
+  if (_.isFunction(mapping.query)) {
+    return mapping.query;
+  } else if (_.isObject(mapping.query)) {
+    return function (queryBuilder) {
+      queryBuilder.where(mapping.query);
+    };
+  } else {
+    return _.noop;
+  }
+}
+
+function parseColumn(column) {
+  var parts = column.split('.');
+
+  return {
+    table: parts[0] &amp;&amp; parts[0].trim(),
+    name: parts[1] &amp;&amp; parts[1].trim()
+  };
+}
+
+module.exports = MoronRelation;
+</pre>
+	</article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	moron.js Copyright © 2015-2015 Sami Koskimäki.
+	</span>
+	<br />
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
+	on Mon Jun 8th 2015 using the <a
+	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

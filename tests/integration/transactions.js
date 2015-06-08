@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var expect = require('expect.js');
+var Promise = require('bluebird');
 var transaction = require('../../lib/moronTransaction');
 
 module.exports = function (session) {
@@ -92,6 +93,33 @@ module.exports = function (session) {
 
       }).catch(function () {
         return session.knex('Model1');
+      }).then(function (rows) {
+        expect(rows).to.have.length(0);
+        return session.knex('model_2');
+      }).then(function (rows) {
+        expect(rows).to.have.length(0);
+        done();
+      }).catch(done);
+
+    });
+
+    it('should skip queries after rollback)', function (done) {
+      console.log('The following stacktrace is not an error. It should be there!');
+      transaction(Model1, function (Model1) {
+
+        return Model1.query().insert({model1Prop1: '123'}).then(function () {
+          return Promise.all(_.map(_.range(2), function (i) {
+            if (i === 1) {
+              throw new Error();
+            }
+            return Model1.query().insert({model1Prop1: i.toString()}).then();
+          }));
+        });
+
+      }).catch(function () {
+        return Promise.delay(5).then(function () {
+          return session.knex('Model1');
+        });
       }).then(function (rows) {
         expect(rows).to.have.length(0);
         return session.knex('model_2');

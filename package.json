@@ -15,6 +15,9 @@
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
+    "grunt": "^0.4.5",
+    "grunt-jsdoc": "^0.6.7",
+    "ink-docstrap": "^0.4.12",
     "mocha": "^2.2.4",
     "sqlite3": "^3.0.8"
   }
