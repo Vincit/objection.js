@@ -6161,7 +6161,15 @@ dl h4 .modifiers-container {
   color: #c1c1c1;
 }
 
+dl h4 .type-signature {
+  color: #c1c1c1;
+}
+
 h3.subsection-title {
   padding-top: 60px;
   border-bottom: 1px solid #5a5a5a;
+}
+
+.sunlight-menu {
+  display: none;
 }

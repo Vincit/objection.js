@@ -2,7 +2,7 @@ var _ = require('lodash')
   , MoronValidationError = require('./MoronValidationError');
 
 /**
- * @constructor
+ * @class
  */
 function MoronRelationExpressionNode(name) {
   this.name = name;

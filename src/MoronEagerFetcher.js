@@ -5,7 +5,7 @@ var _ = require('lodash')
   , MoronRelationExpression = require('./MoronRelationExpression');
 
 /**
- * @constructor
+ * @class
  */
 function MoronEagerFetcher(opt) {
   this.modelClass = opt.modelClass;

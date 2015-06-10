@@ -5,7 +5,7 @@ var _ = require('lodash')
   , ownerJoinColumnAlias = '_join_';
 
 /**
- * @constructor
+ * @class
  * @extends MoronRelation
  */
 function MoronManyToManyRelation() {

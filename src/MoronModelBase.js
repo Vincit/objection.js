@@ -15,38 +15,87 @@ tv4.addFormat(tv4Formats);
  * @typedef {Object} MoronModelOptions
  *
  * @property {Boolean} patch
- *    If true the json is treated as a patch.
+ *    If true the json is treated as a patch and the `required` field of the json schema is
+ *    ignored in the validation. This allows us to create models with a subset of required
+ *    properties for patch operations.
  */
 
 /**
  * Base class for models.
  *
- * `MoronModelBase` provides a mechanism for automatic JSON validation and a way to attach
- * functionality to plain javascript objects.
- *
- * Use `MoronModelBase.from*Json` methods to create models from JSON objects. The `MoronModelBase.from*Json`
- * methods copy the json properties to the created model:
+ * MoronModelBase provides a mechanism for automatic JSON validation and a way to attach
+ * functionality to plain javascript objects. A subclass can be created like this:
  *
  * ```js
- * var model = MoronModelBase.fromJson({foo: 'bar', id: 10});
- * console.log(model.foo); // --> bar
- * console.log(model.id); // --> 10
+ * function MyModel() {
+ *   MoronModelBase.apply(this, arguments);
+ * }
+ *
+ * MoronModelBase.extend(MyModel);
+ *
+ * MyModel.prototype.someMethod = function () {
+ *   return this.foo + ' ' + this.id;
+ * };
+ *
+ * MyModel.jsonSchema = {
+ *   type: 'object',
+ *   properties: {
+ *     id: {type: 'integer'},
+ *     foo: {type: ['string', 'null']}
+ *   }
+ * };
  * ```
  *
- * Properties that are prefixed with '$' are excluded from all JSON representations.
+ * Use `MoronModelBase.from*Json` methods to create models from JSON objects:
  *
  * ```js
- * var model = MoronModelBase.fromJson({foo: 'bar', id: 10});
+ * var model = MyModel.fromJson({foo: 'bar', id: 10});
+ *
+ * console.log(model.foo); // --> 'bar'
+ * console.log(model.id); // --> '10'
+ * console.log(model.someMethod()); // --> 'bar 10'
+ *
+ * // This throws because the schema validation fails.
+ * var model2 = MyModel.fromJson({foo: 10, id: 11});
+ * ```
+ *
+ * Properties that are prefixed with '$' are excluded from all JSON representations:
+ *
+ * ```js
+ * var model = MyModel.fromJson({foo: 'bar', id: 10});
  * model.$spam = 100;
+ *
  * console.log(model); // --> {foo: 'bar', id: 10, $spam: 100}
  * console.log(model.$toJson()); // --> {foo: 'bar', id: 10}
  * ```
  *
- * Set the static property `jsonSchema` to enable validation. Validation is performed when models
- * are created using the `fromJson` method or when the model is updated using the `$setJson`
- * method.
+ * MoronModelBase makes it possible to have a different database representation for a model.
+ * For example if your column names are snake_cased in the database but you want to use
+ * camelCased properties in the code and outside the server you can do this:
  *
- * @constructor
+ * ```
+ * // This is called when an object is serialized to database format.
+ * MyModel.prototype.$formatDatabaseJson = function (json) {
+ *   // Call superclass implementation.
+ *   json = MoronModelBase.prototype.$formatDatabaseJson.call(this, json);
+ *
+ *   return _.mapKeys(json, function (value, key) {
+ *     return _.snakeCase(key);
+ *   });
+ * };
+ *
+ * // This is called when an object is read from database.
+ * MyModel.prototype.$parseDatabaseJson = function (json) {
+ *   json = _.mapKeys(json, function (value, key) {
+ *     return _.camelCase(key);
+ *   });
+ *
+ *   // Call superclass implementation.
+ *   return MoronModelBase.prototype.$parseDatabaseJson.call(this, json);
+ * };
+ * ```
+ *
+ * @class
  */
 function MoronModelBase() {
   // Nothing to do here.
@@ -80,7 +129,7 @@ MoronModelBase.prototype.$beforeValidate = function (jsonSchema, json, options) 
  * automatically from `fromJson` and `$setJson` methods. This method can also be
  * called explicitly when needed.
  *
- * @throws MoronValidationError
+ * @throws {MoronValidationError}
  *    If validation fails.
  *
  * @param {Object=} json
@@ -147,7 +196,7 @@ MoronModelBase.prototype.$afterValidate = function (json, options) {
 };
 
 /**
- * This is called when a `MoronModelBase` is created from a database JSON object.
+ * This is called when a MoronModelBase is created from a database JSON object.
  *
  * Converts the JSON object from the database format to the internal format.
  *
@@ -169,7 +218,7 @@ MoronModelBase.prototype.$parseDatabaseJson = function (json) {
 };
 
 /**
- * This is called when a `MoronModelBase` is converted to database format.
+ * This is called when a MoronModelBase is converted to database format.
  *
  * Converts the JSON object from the internal format to the database format.
  *
@@ -186,7 +235,7 @@ MoronModelBase.prototype.$formatDatabaseJson = function (json) {
 };
 
 /**
- * This is called when a `MoronModelBase` is created from a JSON object.
+ * This is called when a MoronModelBase is created from a JSON object.
  *
  * Converts the JSON object to the internal format.
  *
@@ -206,7 +255,7 @@ MoronModelBase.prototype.$parseJson = function (json, options) {
 };
 
 /**
- * This is called when a `MoronModelBase` is converted to JSON.
+ * This is called when a MoronModelBase is converted to JSON.
  *
  * @note Remember to call the super class's implementation.
  *
@@ -315,6 +364,7 @@ MoronModelBase.prototype.$setDatabaseJson = function (json) {
  * @see $beforeValidate()
  * @see $validate()
  * @see $afterValidate()
+ *
  * @type {Object}
  */
 MoronModelBase.jsonSchema = null;
@@ -407,7 +457,7 @@ MoronModelBase.columnNameToPropertyName = function (columnName) {
 /**
  * Returns a deep copy of this model.
  *
- * If this object has instances of `MoronModelBase` as properties (or arrays of them)
+ * If this object has instances of MoronModelBase as properties (or arrays of them)
  * they are cloned using their `.$clone()` method.
  *
  * @return {MoronModelBase}

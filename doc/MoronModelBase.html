@@ -71,6 +71,10 @@
 							<a href="MoronRelationExpressionParser.html">MoronRelationExpressionParser</a>
 						</li>
 						
+						<li>
+							<a href="MoronValidationError.html">MoronValidationError</a>
+						</li>
+						
 
 					</ul>
 				</li>
@@ -132,19 +136,59 @@
     
     <div class="description">
         <p>Base class for models.</p>
-<p><code>MoronModelBase</code> provides a mechanism for automatic JSON validation and a way to attach
-functionality to plain javascript objects.</p>
-<p>Use <code>MoronModelBase.from*Json</code> methods to create models from JSON objects. The <code>MoronModelBase.from*Json</code>
-methods copy the json properties to the created model:</p>
-<pre class="prettyprint source lang-js"><code>var model = MoronModelBase.fromJson({foo: 'bar', id: 10});
-console.log(model.foo); // --> bar
-console.log(model.id); // --> 10</code></pre><p>Properties that are prefixed with '$' are excluded from all JSON representations.</p>
-<pre class="prettyprint source lang-js"><code>var model = MoronModelBase.fromJson({foo: 'bar', id: 10});
+<p>MoronModelBase provides a mechanism for automatic JSON validation and a way to attach
+functionality to plain javascript objects. A subclass can be created like this:</p>
+<pre class="prettyprint source lang-js"><code>function MyModel() {
+  MoronModelBase.apply(this, arguments);
+}
+
+MoronModelBase.extend(MyModel);
+
+MyModel.prototype.someMethod = function () {
+  return this.foo + ' ' + this.id;
+};
+
+MyModel.jsonSchema = {
+  type: 'object',
+  properties: {
+    id: {type: 'integer'},
+    foo: {type: ['string', 'null']}
+  }
+};</code></pre><p>Use <code>MoronModelBase.from*Json</code> methods to create models from JSON objects:</p>
+<pre class="prettyprint source lang-js"><code>var model = MyModel.fromJson({foo: 'bar', id: 10});
+
+console.log(model.foo); // --> 'bar'
+console.log(model.id); // --> '10'
+console.log(model.someMethod()); // --> 'bar 10'
+
+// This throws because the schema validation fails.
+var model2 = MyModel.fromJson({foo: 10, id: 11});</code></pre><p>Properties that are prefixed with '$' are excluded from all JSON representations:</p>
+<pre class="prettyprint source lang-js"><code>var model = MyModel.fromJson({foo: 'bar', id: 10});
 model.$spam = 100;
+
 console.log(model); // --> {foo: 'bar', id: 10, $spam: 100}
-console.log(model.$toJson()); // --> {foo: 'bar', id: 10}</code></pre><p>Set the static property <code>jsonSchema</code> to enable validation. Validation is performed when models
-are created using the <code>fromJson</code> method or when the model is updated using the <code>$setJson</code>
-method.</p>
+console.log(model.$toJson()); // --> {foo: 'bar', id: 10}</code></pre><p>MoronModelBase makes it possible to have a different database representation for a model.
+For example if your column names are snake_cased in the database but you want to use
+camelCased properties in the code and outside the server you can do this:</p>
+<pre class="prettyprint source"><code>// This is called when an object is serialized to database format.
+MyModel.prototype.$formatDatabaseJson = function (json) {
+  // Call superclass implementation.
+  json = MoronModelBase.prototype.$formatDatabaseJson.call(this, json);
+
+  return _.mapKeys(json, function (value, key) {
+    return _.snakeCase(key);
+  });
+};
+
+// This is called when an object is read from database.
+MyModel.prototype.$parseDatabaseJson = function (json) {
+  json = _.mapKeys(json, function (value, key) {
+    return _.camelCase(key);
+  });
+
+  // Call superclass implementation.
+  return MoronModelBase.prototype.$parseDatabaseJson.call(this, json);
+};</code></pre>
     </div>
     
 
@@ -1407,7 +1451,7 @@ by overriding this method.</p>
     
     <div class="description">
         <p>Returns a deep copy of this model.</p>
-<p>If this object has instances of <code>MoronModelBase</code> as properties (or arrays of them)
+<p>If this object has instances of MoronModelBase as properties (or arrays of them)
 they are cloned using their <code>.$clone()</code> method.</p>
     </div>
     
@@ -1501,7 +1545,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a <code>MoronModelBase</code> is converted to database format.</p>
+        <p>This is called when a MoronModelBase is converted to database format.</p>
 <p>Converts the JSON object from the internal format to the database format.</p>
     </div>
     
@@ -1648,7 +1692,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a <code>MoronModelBase</code> is converted to JSON.</p>
+        <p>This is called when a MoronModelBase is converted to JSON.</p>
     </div>
     
 
@@ -1794,7 +1838,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a <code>MoronModelBase</code> is created from a database JSON object.</p>
+        <p>This is called when a MoronModelBase is created from a database JSON object.</p>
 <p>Converts the JSON object from the database format to the internal format.</p>
     </div>
     
@@ -1941,7 +1985,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a <code>MoronModelBase</code> is created from a JSON object.</p>
+        <p>This is called when a MoronModelBase is created from a JSON object.</p>
 <p>Converts the JSON object to the internal format.</p>
     </div>
     
@@ -2781,12 +2825,26 @@ called explicitly when needed.</p>
     
             
 
-    <div class="param-desc">
-    
-        <p>MoronValidationError
-   If validation fails.</p>
-    
-    </div>
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If validation fails.</p>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="MoronValidationError.html">MoronValidationError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
 
 
         

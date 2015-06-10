@@ -35,7 +35,7 @@ var _ = require('lodash')
  *               ▼
  *            runAfter
  * ```
- * @constructor
+ * @class
  */
 function MoronQueryBuilder(modelClass) {
   this._modelClass = modelClass;
