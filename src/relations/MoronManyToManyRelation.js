@@ -12,7 +12,7 @@ function MoronManyToManyRelation() {
   MoronRelation.apply(this, arguments);
 }
 
-MoronRelation.makeSubclass(MoronManyToManyRelation);
+MoronRelation.extend(MoronManyToManyRelation);
 
 MoronManyToManyRelation.prototype.setMapping = function (mapping) {
   var retVal = MoronRelation.prototype.setMapping.call(this, mapping);

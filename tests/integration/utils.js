@@ -14,8 +14,8 @@ module.exports.initialize = function (opt) {
     MoronModel.apply(this, arguments);
   }
 
-  MoronModel.makeSubclass(Model1);
-  MoronModel.makeSubclass(Model2);
+  MoronModel.extend(Model1);
+  MoronModel.extend(Model2);
 
   Model1.tableName = 'Model1';
   Model2.tableName = 'model_2';

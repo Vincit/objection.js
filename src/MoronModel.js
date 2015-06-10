@@ -19,7 +19,7 @@ function MoronModel() {
   MoronModelBase.apply(this, arguments);
 }
 
-MoronModelBase.makeSubclass(MoronModel);
+MoronModelBase.extend(MoronModel);
 
 /**
  * fuck?
@@ -263,7 +263,7 @@ MoronModel.bindKnex = function (knex) {
     ModelClass.apply(this, arguments);
   };
 
-  ModelClass.makeSubclass(BoundModelClass);
+  ModelClass.extend(BoundModelClass);
 
   BoundModelClass.knex(knex);
   knex.$$moron.boundModels[ModelClass.tableName] = BoundModelClass;

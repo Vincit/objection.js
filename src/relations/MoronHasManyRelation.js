@@ -11,7 +11,7 @@ function MoronHasManyRelation() {
   MoronRelation.apply(this, arguments);
 }
 
-MoronRelation.makeSubclass(MoronHasManyRelation);
+MoronRelation.extend(MoronHasManyRelation);
 
 MoronHasManyRelation.prototype.find = function (builder, $owners) {
   var self = this;

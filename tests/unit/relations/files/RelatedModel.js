@@ -4,7 +4,7 @@ function RelatedModel() {
   MoronModel.apply(this, arguments);
 }
 
-module.exports = MoronModel.makeSubclass(RelatedModel);
+module.exports = MoronModel.extend(RelatedModel);
 
 RelatedModel.tableName = 'RelatedModel';
 

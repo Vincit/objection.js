@@ -485,7 +485,7 @@ module.exports = function (session) {
       function SubModel() {
         Model.apply(this, arguments);
       }
-      Model.makeSubclass(SubModel);
+      Model.extend(SubModel);
       SubModel.jsonSchema = schema;
       return SubModel;
     }

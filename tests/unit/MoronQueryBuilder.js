@@ -23,7 +23,7 @@ describe('MoronQueryBuilder', function () {
     mockKnexQueryResult = [];
     executedQueries = [];
 
-    Model = MoronModel.makeSubclass(function Model() {
+    Model = MoronModel.extend(function Model() {
       MoronModel.apply(this, arguments);
     });
 

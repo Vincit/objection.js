@@ -325,7 +325,7 @@ MoronModelBase.jsonSchema = null;
  * @param {function=} subclassConstructor
  * @return {function}
  */
-MoronModelBase.makeSubclass = function (subclassConstructor) {
+MoronModelBase.extend = function (subclassConstructor) {
   if (_.isEmpty(subclassConstructor.name)) {
     throw new Error('Each MoronModelBase subclass constructor must have a name');
   }

@@ -5,14 +5,14 @@ var _ = require('lodash')
 
 describe('MoronModelBase', function () {
 
-  describe('makeSubclass', function () {
+  describe('extend', function () {
 
     it('should create a subclass', function () {
       function Model() {
         MoronModelBase.apply(this, arguments);
       }
 
-      MoronModelBase.makeSubclass(Model);
+      MoronModelBase.extend(Model);
 
       var model = new Model();
 
@@ -28,7 +28,7 @@ describe('MoronModelBase', function () {
         Model.apply(this, arguments);
       }
 
-      MoronModelBase.makeSubclass(Model).makeSubclass(Model2);
+      MoronModelBase.extend(Model).extend(Model2);
 
       var model = new Model2();
 
@@ -43,7 +43,7 @@ describe('MoronModelBase', function () {
       };
 
       expect(function () {
-        MoronModelBase.makeSubclass(Model);
+        MoronModelBase.extend(Model);
       }).to.throwException();
     });
 
@@ -508,7 +508,7 @@ describe('MoronModelBase', function () {
       MoronModelBase.apply(this, arguments);
     }
 
-    MoronModelBase.makeSubclass(Model);
+    MoronModelBase.extend(Model);
 
     _.merge(Model.prototype, proto);
     _.merge(Model, staticStuff);

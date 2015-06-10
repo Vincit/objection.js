@@ -32,11 +32,11 @@ describe('MoronHasOneRelation', function () {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = MoronModel.makeSubclass(function Model () {
+    OwnerModel = MoronModel.extend(function Model () {
       MoronModel.apply(this, arguments);
     });
 
-    RelatedModel = MoronModel.makeSubclass(function Model () {
+    RelatedModel = MoronModel.extend(function Model () {
       MoronModel.apply(this, arguments);
     });
 

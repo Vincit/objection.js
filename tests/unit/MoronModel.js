@@ -197,7 +197,7 @@ describe('MoronModel', function () {
     function Model() {
       MoronModel.apply(this, arguments);
     }
-    MoronModel.makeSubclass(Model);
+    MoronModel.extend(Model);
     Model.tableName = tableName;
     return Model;
   }

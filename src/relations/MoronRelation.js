@@ -123,7 +123,7 @@ function MoronRelation(relationName, OwnerClass) {
  * @param {function=} subclassConstructor
  * @return {function}
  */
-MoronRelation.makeSubclass = function (subclassConstructor) {
+MoronRelation.extend = function (subclassConstructor) {
   utils.inherits(subclassConstructor, this);
   return subclassConstructor;
 };

@@ -4,6 +4,6 @@ function OwnerModel() {
   MoronModel.apply(this, arguments);
 }
 
-module.exports = MoronModel.makeSubclass(OwnerModel);
+module.exports = MoronModel.extend(OwnerModel);
 
 OwnerModel.tableName = 'OwnerModel';
