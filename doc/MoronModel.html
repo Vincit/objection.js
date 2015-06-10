@@ -134,6 +134,50 @@
 <dd>
     
     
+    <div class="description">
+        <p>Subclasses of this class represent database tables.</p>
+<p>Subclass can be created like this:</p>
+<pre class="prettyprint source lang-js"><code>function Person() {
+  MoronModel.apply(this, arguments);
+}
+
+MoronModel.extend(Person);
+
+Person.prototype.fullName = function () {
+  return this.firstName + ' ' + this.lastName;
+};
+
+Person.tableName = 'Person';
+
+Person.jsonSchema = {
+  type: 'object',
+  properties: {
+    id: {type: 'integer'},
+    firstName: {type: 'string'},
+    lastName: {type: 'string'}
+  }
+};
+
+Person.relationMappings = {
+  pets: {
+    relation: MoronModel.OneToManyRelation,
+    modelClass: Animal,
+    join: {
+      from: 'Person.id',
+      to: 'Animal.ownerId'
+    }
+  },
+  mother: {
+    relation: MoronModel.OneToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.motherId',
+      to: 'Person.id'
+    }
+  }
+};</code></pre>
+    </div>
+    
 
     
     
@@ -211,6 +255,8 @@
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+        
             
               
 <dt>
@@ -1223,7 +1269,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
         <h4 class="name" id="Sid">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$id</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">(<span class="optional">id</span>)</span><span class="type-signature"> &rarr; {*}</span></span>
         </h4>
     
     
@@ -1233,8 +1279,15 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>fuck?</p>
-<pre class="prettyprint source lang-js"><code>model.$id();</code></pre>
+        <p>Returns or sets the identifier of a model instance.</p>
+<pre class="prettyprint source lang-js"><code>// Returns the id.
+model.$id();
+// Sets the id.
+model.$id(100);</code></pre><p>The identifier property does not have to be accessed or set using this method.
+If the identifier property is known it can be accessed or set just like any
+other property:</p>
+<pre class="prettyprint source lang-js"><code>console.log(model.id);
+model.id = 100;</code></pre><p>This method is just a helper for the cases where the id property is not known.</p>
     </div>
     
 
@@ -1242,6 +1295,67 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -1285,6 +1399,184 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SloadRelated">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$loadRelated</span>
+          <span class="signature-container"><span class="signature">(relationExpression)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Loads related models using a <a href="MoronRelationExpression.html">MoronRelationExpression</a>.</p>
+<p>Example:</p>
+<pre class="prettyprint source"><code>jennifer.$loadRelated('[pets, children.[pets, father]]').then(function (jennifer) {
+  console.log('Jennifer has', jennifer.pets.length, 'pets');
+  console.log('Jennifer has', jennifer.children.length, 'children');
+  console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pets');
+  console.log('Jennifer had her first child with', jennifer.children[0].father.name);
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>relationExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="MoronRelationExpression.html">MoronRelationExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+	<dt class="tag-see">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="MoronRelationExpression.html">MoronRelationExpression</a> for more examples on relation expressions.</li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1633,6 +1925,326 @@ they are cloned using their <code>.$clone()</code> method.</p>
 	<dd>
 		
 <span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Squery">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$query</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a query builder for this model instance.</p>
+<p>All queries built using this method only affect this instance. For example to
+re-fetch the model from the database you can do this:</p>
+<pre class="prettyprint source lang-js"><code>model.$query().then(function (model) {
+  console.log(model);
+});</code></pre><p>Insert a new model to database.</p>
+<pre class="prettyprint source lang-js"><code>Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennifer) {
+  console.log(jennifer.id);
+});</code></pre><p>Patch values of an existing model:</p>
+<pre class="prettyprint source lang-js"><code>person.$query().patch({lastName: 'Cooper'}).then(function (person) {
+  console.log(person.lastName); // --> 'Cooper'.
+});</code></pre><p>Delete a model.</p>
+<pre class="prettyprint source lang-js"><code>person.$query().delete().then(function () {
+  console.log('person deleted');
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SrelatedQuery">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$relatedQuery</span>
+          <span class="signature-container"><span class="signature">(relationName)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Use this to build a query that only affects the models related to this instance through a relation.</p>
+<p>Fetch all models related to this instance through a relation. The fetched models are
+also stored to the owner model's property named after the relation:</p>
+<pre class="prettyprint source lang-js"><code>jennifer.$relatedQuery('pets').then(function (pets) {
+  console.log('jennifer has', pets.length, 'pets');
+  console.log(jennifer.pets === pets); // --> true
+});</code></pre><p>The related query is just like any other query. All <em>knex</em> methods are available:</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .select('Animal.*', 'Person.name as ownerName')
+  .where('species', '=', 'dog')
+  .orWhere('breed', '=', 'cat')
+  .innerJoin('Person', 'Person.id', 'Animal.ownerId')
+  .orderBy('Animal.name')
+  .then(function (dogsAndCats) {
+    // All the dogs and cats have the owner's name &quot;Jennifer&quot; joined as the `ownerName` property.
+    console.log(dogsAndCats);
+  });</code></pre><p>This inserts a new model to the database and binds it to the owner model as defined
+by the relation:</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .insert({species: 'dog', name: 'Fluffy'})
+  .then(function (waldo) {
+    console.log(waldo.id);
+  });</code></pre><p>To add an existing model to a relation the <code>relate</code> method can be used. In this example
+the dog <code>fluffy</code> already exists in the database but it isn't related to <code>jennifer</code> through
+the <code>pets</code> relation. We can make the connection like this:</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .relate(fluffy)
+  .then(function () {
+    console.log('fluffy is now related to jennifer through pets relation');
+  });</code></pre><p>The connection can be removed using the <code>unrelate</code> method. Again, this doesn't delete the
+related model. Only the connection is removed. For example in the case of ManyToMany relation
+the join table entries are deleted.</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .unrelate(fluffy.id)
+  .then(function () {
+    console.log('jennifer no longer has fluffy as a pet');
+  });</code></pre><p>Related models can be deleted using the delete method. Delete method deletes the related
+model <em>and</em> any connections to the owner. Naturally the delete query can be chained with
+any <em>knex</em> methods.</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .delete()
+  .where('species', 'cat')
+  .then(function () {
+    console.log('jennifer no longer has any cats');
+  });</code></pre><p><code>update</code> and <code>patch</code> can be used to update related models. Only difference between the mentioned
+methods is that <code>update</code> validates the input objects using the related model class's full schema
+and the <code>patch</code> ignores the <code>required</code> property of the schema. Use <code>update</code> when you want to update
+<em>all</em> properties of a model and <code>patch</code> when only a subset should be updated.</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .update({species: 'dog', name: 'Fluffy the great', vaccinated: false})
+  .where('id', fluffy.id)
+  .then(function (updatedFluffy) {
+    console.log('fluffy\'s new name is', updatedFluffy.name);
+  });
+
+// This will throw assuming that `name` or `species` is a required property for an Animal.
+jennifer.$relatedQuery('pets').patch({vaccinated: true});
+
+// This will _not_ throw.
+jennifer
+  .$relatedQuery('pets')
+  .patch({vaccinated: true})
+  .where('species', 'dog')
+  .then(function () {
+    console.log('jennifer just got all her dogs vaccinated');
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>relationName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the relation.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
 
 
 	</dd>
@@ -2536,7 +3148,7 @@ called explicitly when needed.</p>
 		</div>
 
 	</div>
-	<script src="scripts/sunlight.js"></script>
+	<!-- <script src="scripts/sunlight.js"></script> -->
 	<script src="scripts/docstrap.lib.js"></script>
 	<script src="scripts/bootstrap-dropdown.js"></script>
 	<script src="scripts/toc.js"></script>
@@ -2545,21 +3157,9 @@ called explicitly when needed.</p>
 		$( function () {
 			$( "[id*='$']" ).each( function () {
 				var $this = $( this );
-
 				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
 			} );
 
-			$( "#toc" ).toc( {
-				anchorName  : function ( i, heading, prefix ) {
-					return $( heading ).attr( "id" ) || ( prefix + i );
-				},
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : "100px"
-			} );
-
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
 			$( '.dropdown-toggle' ).dropdown();
 			$( "pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
@@ -2592,6 +3192,19 @@ called explicitly when needed.</p>
 				showMenu : true,
 				enableDoclinks : true
 			} );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
 		} );
 	 </script>
 

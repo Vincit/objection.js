@@ -12,6 +12,52 @@ var _ = require('lodash')
   , MoronManyToManyRelation = require('./relations/MoronManyToManyRelation');
 
 /**
+ * Subclasses of this class represent database tables.
+ *
+ * Subclass can be created like this:
+ *
+ * ```js
+ * function Person() {
+ *   MoronModel.apply(this, arguments);
+ * }
+ *
+ * MoronModel.extend(Person);
+ *
+ * Person.prototype.fullName = function () {
+ *   return this.firstName + ' ' + this.lastName;
+ * };
+ *
+ * Person.tableName = 'Person';
+ *
+ * Person.jsonSchema = {
+ *   type: 'object',
+ *   properties: {
+ *     id: {type: 'integer'},
+ *     firstName: {type: 'string'},
+ *     lastName: {type: 'string'}
+ *   }
+ * };
+ *
+ * Person.relationMappings = {
+ *   pets: {
+ *     relation: MoronModel.OneToManyRelation,
+ *     modelClass: Animal,
+ *     join: {
+ *       from: 'Person.id',
+ *       to: 'Animal.ownerId'
+ *     }
+ *   },
+ *   mother: {
+ *     relation: MoronModel.OneToOneRelation,
+ *     modelClass: Person,
+ *     join: {
+ *       from: 'Person.motherId',
+ *       to: 'Person.id'
+ *     }
+ *   }
+ * };
+ * ```
+ *
  * @extends MoronModelBase
  * @class
  */
@@ -22,11 +68,28 @@ function MoronModel() {
 MoronModelBase.extend(MoronModel);
 
 /**
- * fuck?
+ * Returns or sets the identifier of a model instance.
  *
  * ```js
+ * // Returns the id.
  * model.$id();
+ * // Sets the id.
+ * model.$id(100);
  * ```
+ *
+ * The identifier property does not have to be accessed or set using this method.
+ * If the identifier property is known it can be accessed or set just like any
+ * other property:
+ *
+ * ```js
+ * console.log(model.id);
+ * model.id = 100;
+ * ```
+ *
+ * This method is just a helper for the cases where the id property is not known.
+ *
+ * @param {*=} id
+ * @returns {*}
  */
 MoronModel.prototype.$id = function () {
   var ModelClass = this.constructor;
@@ -38,6 +101,44 @@ MoronModel.prototype.$id = function () {
   }
 };
 
+/**
+ * Creates a query builder for this model instance.
+ *
+ * All queries built using this method only affect this instance. For example to
+ * re-fetch the model from the database you can do this:
+ *
+ * ```js
+ * model.$query().then(function (model) {
+ *   console.log(model);
+ * });
+ * ```
+ *
+ * Insert a new model to database.
+ *
+ * ```js
+ * Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennifer) {
+ *   console.log(jennifer.id);
+ * });
+ * ```
+ *
+ * Patch values of an existing model:
+ *
+ * ```js
+ * person.$query().patch({lastName: 'Cooper'}).then(function (person) {
+ *   console.log(person.lastName); // --> 'Cooper'.
+ * });
+ * ```
+ *
+ * Delete a model.
+ *
+ * ```js
+ * person.$query().delete().then(function () {
+ *   console.log('person deleted');
+ * });
+ * ```
+ *
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.prototype.$query = function () {
   var ModelClass = this.constructor;
   var self = this;
@@ -67,6 +168,119 @@ MoronModel.prototype.$query = function () {
     });
 };
 
+/**
+ * Use this to build a query that only affects the models related to this instance through a relation.
+ *
+ * Fetch all models related to this instance through a relation. The fetched models are
+ * also stored to the owner model's property named after the relation:
+ *
+ * ```js
+ * jennifer.$relatedQuery('pets').then(function (pets) {
+ *   console.log('jennifer has', pets.length, 'pets');
+ *   console.log(jennifer.pets === pets); // --> true
+ * });
+ * ```
+ *
+ * The related query is just like any other query. All *knex* methods are available:
+ *
+ * ```js
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .select('Animal.*', 'Person.name as ownerName')
+ *   .where('species', '=', 'dog')
+ *   .orWhere('breed', '=', 'cat')
+ *   .innerJoin('Person', 'Person.id', 'Animal.ownerId')
+ *   .orderBy('Animal.name')
+ *   .then(function (dogsAndCats) {
+ *     // All the dogs and cats have the owner's name "Jennifer" joined as the `ownerName` property.
+ *     console.log(dogsAndCats);
+ *   });
+ * ```
+ *
+ * This inserts a new model to the database and binds it to the owner model as defined
+ * by the relation:
+ *
+ * ```js
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .insert({species: 'dog', name: 'Fluffy'})
+ *   .then(function (waldo) {
+ *     console.log(waldo.id);
+ *   });
+ * ```
+ *
+ * To add an existing model to a relation the `relate` method can be used. In this example
+ * the dog `fluffy` already exists in the database but it isn't related to `jennifer` through
+ * the `pets` relation. We can make the connection like this:
+ *
+ * ```js
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .relate(fluffy)
+ *   .then(function () {
+ *     console.log('fluffy is now related to jennifer through pets relation');
+ *   });
+ * ```
+ *
+ * The connection can be removed using the `unrelate` method. Again, this doesn't delete the
+ * related model. Only the connection is removed. For example in the case of ManyToMany relation
+ * the join table entries are deleted.
+ *
+ * ```js
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .unrelate(fluffy.id)
+ *   .then(function () {
+ *     console.log('jennifer no longer has fluffy as a pet');
+ *   });
+ * ```
+ *
+ * Related models can be deleted using the delete method. Delete method deletes the related
+ * model _and_ any connections to the owner. Naturally the delete query can be chained with
+ * any *knex* methods.
+ *
+ * ```js
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .delete()
+ *   .where('species', 'cat')
+ *   .then(function () {
+ *     console.log('jennifer no longer has any cats');
+ *   });
+ * ```
+ *
+ * `update` and `patch` can be used to update related models. Only difference between the mentioned
+ * methods is that `update` validates the input objects using the related model class's full schema
+ * and the `patch` ignores the `required` property of the schema. Use `update` when you want to update
+ * _all_ properties of a model and `patch` when only a subset should be updated.
+ *
+ * ```js
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .update({species: 'dog', name: 'Fluffy the great', vaccinated: false})
+ *   .where('id', fluffy.id)
+ *   .then(function (updatedFluffy) {
+ *     console.log('fluffy\'s new name is', updatedFluffy.name);
+ *   });
+ *
+ * // This will throw assuming that `name` or `species` is a required property for an Animal.
+ * jennifer.$relatedQuery('pets').patch({vaccinated: true});
+ *
+ * // This will _not_ throw.
+ * jennifer
+ *   .$relatedQuery('pets')
+ *   .patch({vaccinated: true})
+ *   .where('species', 'dog')
+ *   .then(function () {
+ *     console.log('jennifer just got all her dogs vaccinated');
+ *   });
+ * ```
+ *
+ * @param {String} relationName
+ *    Name of the relation.
+ *
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.prototype.$relatedQuery = function (relationName) {
   var relation = this.constructor.getRelation(relationName);
   var ModelClass = relation.relatedModelClass;
@@ -97,8 +311,27 @@ MoronModel.prototype.$relatedQuery = function (relationName) {
     });
 };
 
-MoronModel.prototype.$loadRelated = function (eagerExpression) {
-  return this.constructor.loadRelated(this, eagerExpression);
+/**
+ * Loads related models using a {@link MoronRelationExpression}.
+ *
+ * Example:
+ *
+ * ```
+ * jennifer.$loadRelated('[pets, children.[pets, father]]').then(function (jennifer) {
+ *   console.log('Jennifer has', jennifer.pets.length, 'pets');
+ *   console.log('Jennifer has', jennifer.children.length, 'children');
+ *   console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pets');
+ *   console.log('Jennifer had her first child with', jennifer.children[0].father.name);
+ * });
+ * ```
+ *
+ * @see {@link MoronRelationExpression} for more examples on relation expressions.
+ *
+ * @param {String|MoronRelationExpression} relationExpression
+ * @returns {Promise}
+ */
+MoronModel.prototype.$loadRelated = function (relationExpression) {
+  return this.constructor.loadRelated(this, relationExpression);
 };
 
 /**
@@ -465,6 +698,9 @@ MoronModel.$$update = function (builder, $update) {
   });
 };
 
+/**
+ * @protected
+ */
 MoronModel.$$patch = function (builder, $patch) {
   if (!$patch) {
     return builder;

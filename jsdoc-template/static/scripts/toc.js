@@ -7,6 +7,7 @@ $.fn.toc = function(options) {
   var headings = $(opts.selectors, container);
   var headingOffsets = [];
   var activeClassName = opts.prefix+'-active';
+  var timeout;
 
   var scrollTo = function(ev, el) {
     if (opts.smoothScrolling) {
@@ -22,15 +23,14 @@ $.fn.toc = function(options) {
     $(el).parent().addClass(activeClassName);
   };
 
-  //highlight on scroll
-  var timeout;
-  var highlightOnScroll = function(e) {
+  var highlightOnScroll = function () {
     if (timeout) {
       clearTimeout(timeout);
     }
     timeout = setTimeout(function() {
-      var top = $(window).scrollTop(),
-        highlighted;
+      var top = $(window).scrollTop();
+      var highlighted;
+
       for (var i = 0, c = headingOffsets.length; i < c; i++) {
         if (headingOffsets[i] >= top) {
           $('li', self).removeClass(activeClassName);
@@ -41,6 +41,7 @@ $.fn.toc = function(options) {
       }
     }, 50);
   };
+
   if (opts.highlightOnScroll) {
     $(window).bind('scroll', highlightOnScroll);
     highlightOnScroll();

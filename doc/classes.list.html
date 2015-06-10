@@ -255,7 +255,7 @@
 		</div>
 
 	</div>
-	<script src="scripts/sunlight.js"></script>
+	<!-- <script src="scripts/sunlight.js"></script> -->
 	<script src="scripts/docstrap.lib.js"></script>
 	<script src="scripts/bootstrap-dropdown.js"></script>
 	<script src="scripts/toc.js"></script>
@@ -264,21 +264,9 @@
 		$( function () {
 			$( "[id*='$']" ).each( function () {
 				var $this = $( this );
-
 				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
 			} );
 
-			$( "#toc" ).toc( {
-				anchorName  : function ( i, heading, prefix ) {
-					return $( heading ).attr( "id" ) || ( prefix + i );
-				},
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : "100px"
-			} );
-
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
 			$( '.dropdown-toggle' ).dropdown();
 			$( "pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
 
@@ -311,6 +299,19 @@
 				showMenu : true,
 				enableDoclinks : true
 			} );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
 		} );
 	 </script>
 

@@ -27,21 +27,22 @@ tv4.addFormat(tv4Formats);
  * functionality to plain javascript objects. A subclass can be created like this:
  *
  * ```js
- * function MyModel() {
+ * function Person() {
  *   MoronModelBase.apply(this, arguments);
  * }
  *
- * MoronModelBase.extend(MyModel);
+ * MoronModelBase.extend(Person);
  *
- * MyModel.prototype.someMethod = function () {
- *   return this.foo + ' ' + this.id;
+ * Person.prototype.fullName = function () {
+ *   return this.firstName + ' ' + this.lastName;
  * };
  *
- * MyModel.jsonSchema = {
+ * Person.jsonSchema = {
  *   type: 'object',
  *   properties: {
  *     id: {type: 'integer'},
- *     foo: {type: ['string', 'null']}
+ *     firstName: {type: 'string'},
+ *     lastName: {type: 'string'}
  *   }
  * };
  * ```
@@ -49,24 +50,24 @@ tv4.addFormat(tv4Formats);
  * Use `MoronModelBase.from*Json` methods to create models from JSON objects:
  *
  * ```js
- * var model = MyModel.fromJson({foo: 'bar', id: 10});
+ * var person = Person.fromJson({firstName: 'Jennifer', lastName: 'Lawrence'});
  *
- * console.log(model.foo); // --> 'bar'
- * console.log(model.id); // --> '10'
- * console.log(model.someMethod()); // --> 'bar 10'
+ * console.log(person.firstName); // --> 'Jennifer'
+ * console.log(person.lastName); // --> 'Lawrence'
+ * console.log(person.fullName()); // --> 'Jennifer Lawrence'
  *
  * // This throws because the schema validation fails.
- * var model2 = MyModel.fromJson({foo: 10, id: 11});
+ * var person2 = Person.fromJson({firstName: 10});
  * ```
  *
  * Properties that are prefixed with '$' are excluded from all JSON representations:
  *
  * ```js
- * var model = MyModel.fromJson({foo: 'bar', id: 10});
- * model.$spam = 100;
+ * var person = Person.fromJson({firstName: 'Jennifer');
+ * person.$spam = 100;
  *
- * console.log(model); // --> {foo: 'bar', id: 10, $spam: 100}
- * console.log(model.$toJson()); // --> {foo: 'bar', id: 10}
+ * console.log(person); // --> {firstName: 'Jennifer'}
+ * console.log(person.$toJson()); // --> {firstName: 'Jennifer'}
  * ```
  *
  * MoronModelBase makes it possible to have a different database representation for a model.
@@ -75,7 +76,7 @@ tv4.addFormat(tv4Formats);
  *
  * ```
  * // This is called when an object is serialized to database format.
- * MyModel.prototype.$formatDatabaseJson = function (json) {
+ * Person.prototype.$formatDatabaseJson = function (json) {
  *   // Call superclass implementation.
  *   json = MoronModelBase.prototype.$formatDatabaseJson.call(this, json);
  *
@@ -85,7 +86,7 @@ tv4.addFormat(tv4Formats);
  * };
  *
  * // This is called when an object is read from database.
- * MyModel.prototype.$parseDatabaseJson = function (json) {
+ * Person.prototype.$parseDatabaseJson = function (json) {
  *   json = _.mapKeys(json, function (value, key) {
  *     return _.camelCase(key);
  *   });
@@ -355,7 +356,7 @@ MoronModelBase.prototype.$setDatabaseJson = function (json) {
 };
 
 /**
- * The schema against which the JSON is validated.
+ * The optional schema against which the JSON is validated.
  *
  * The jsonSchema can be dynamically modified in the `$beforeValidate` method.
  *

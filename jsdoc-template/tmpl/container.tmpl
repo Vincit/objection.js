@@ -117,7 +117,7 @@
         <h3 class="subsection-title">Methods</h3>
 
         <dl><?js methods.forEach(function(m) { ?>
-            <?js if (m.attribs.indexOf('private') === -1) { ?>
+            <?js if (m.attribs.indexOf('private') === -1 && m.attribs.indexOf('protected') === -1) { ?>
               <?js= self.partial('method.tmpl', m) ?>
             <?js } ?>
         <?js }); ?></dl>
