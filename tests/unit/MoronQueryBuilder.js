@@ -2,8 +2,8 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , MoronModel = require('../../lib/MoronModel')
-  , MoronQueryBuilder = require('../../lib/MoronQueryBuilder');
+  , MoronModel = require('../../src/MoronModel')
+  , MoronQueryBuilder = require('../../src/MoronQueryBuilder');
 
 describe('MoronQueryBuilder', function () {
   var mockKnexQueryResult = [];

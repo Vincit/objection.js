@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-  , MoronRelationExpression = require('../../lib/MoronRelationExpression');
+  , MoronRelationExpression = require('../../src/MoronRelationExpression');
 
 describe('MoronRelationExpression', function () {
 

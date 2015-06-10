@@ -1,0 +1,3 @@
+#!/bin/sh
+grunt jsdoc
+git subtree push --prefix doc origin gh-pages

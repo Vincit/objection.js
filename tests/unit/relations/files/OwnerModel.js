@@ -1,4 +1,4 @@
-var MoronModel = require('../../../../lib/MoronModel');
+var MoronModel = require('../../../../src/MoronModel');
 
 function OwnerModel() {
   MoronModel.apply(this, arguments);

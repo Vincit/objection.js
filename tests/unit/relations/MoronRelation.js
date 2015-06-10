@@ -1,8 +1,8 @@
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
-  , MoronModel = require('../../../lib/MoronModel')
-  , MoronRelation = require('../../../lib/relations/MoronRelation');
+  , MoronModel = require('../../../src/MoronModel')
+  , MoronRelation = require('../../../src/relations/MoronRelation');
 
 describe('MoronRelation', function () {
   var OwnerModel = null;

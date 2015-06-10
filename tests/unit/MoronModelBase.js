@@ -1,7 +1,7 @@
 var _ = require('lodash')
   , expect = require('expect.js')
-  , MoronModelBase = require('../../lib/MoronModelBase')
-  , MoronValidationError = require('../../lib/MoronValidationError');
+  , MoronModelBase = require('../../src/MoronModelBase')
+  , MoronValidationError = require('../../src/MoronValidationError');
 
 describe('MoronModelBase', function () {
 

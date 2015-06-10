@@ -1,6 +1,6 @@
 var _ = require('lodash');
 var Promise = require('bluebird');
-var MoronModel = require('../../lib/MoronModel');
+var MoronModel = require('../../src/MoronModel');
 var expect = require('expect.js');
 
 module.exports.initialize = function (opt) {

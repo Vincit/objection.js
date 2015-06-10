@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var transaction = require('../../lib/moronTransaction');
+var transaction = require('../../src/moronTransaction');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;

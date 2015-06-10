@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var MoronModel = require('../../lib/MoronModel');
+var MoronModel = require('../../src/MoronModel');
 
 describe('MoronModel', function () {
 

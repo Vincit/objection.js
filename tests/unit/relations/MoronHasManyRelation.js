@@ -2,9 +2,9 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , MoronModel = require('../../../lib/MoronModel')
-  , MoronQueryBuilder = require('../../../lib/MoronQueryBuilder')
-  , MoronHasManyRelation = require('../../../lib/relations/MoronHasManyRelation');
+  , MoronModel = require('../../../src/MoronModel')
+  , MoronQueryBuilder = require('../../../src/MoronQueryBuilder')
+  , MoronHasManyRelation = require('../../../src/relations/MoronHasManyRelation');
 
 describe('MoronHasManyRelation', function () {
   var originalKnexQueryBuilderThen = null;
