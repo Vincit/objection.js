@@ -7,8 +7,8 @@ var _ = require('lodash')
   , MoronValidationError = require('./MoronValidationError')
   , MoronEagerFetcher = require('./MoronEagerFetcher')
   , MoronRelation = require('./relations/MoronRelation')
-  , MoronHasOneRelation = require('./relations/MoronHasOneRelation')
-  , MoronHasManyRelation = require('./relations/MoronHasManyRelation')
+  , MoronOneToOneRelation = require('./relations/MoronOneToOneRelation')
+  , MoronOneToManyRelation = require('./relations/MoronOneToManyRelation')
   , MoronManyToManyRelation = require('./relations/MoronManyToManyRelation');
 
 /**
@@ -33,8 +33,10 @@ var _ = require('lodash')
  *   type: 'object',
  *   properties: {
  *     id: {type: 'integer'},
+ *     fatherId: {type: 'integer'}
  *     firstName: {type: 'string'},
- *     lastName: {type: 'string'}
+ *     lastName: {type: 'string'},
+ *     age: {type: 'number'}
  *   }
  * };
  *
@@ -47,12 +49,26 @@ var _ = require('lodash')
  *       to: 'Animal.ownerId'
  *     }
  *   },
- *   mother: {
+ *
+ *   father: {
  *     relation: MoronModel.OneToOneRelation,
  *     modelClass: Person,
  *     join: {
- *       from: 'Person.motherId',
+ *       from: 'Person.fatherId',
  *       to: 'Person.id'
+ *     }
+ *   },
+ *
+ *   movies: {
+ *     relation: MoronModel.ManyToManyRelation,
+ *     modelClass: Movie,
+ *     join: {
+ *       from: 'Person.id',
+ *       through: {
+ *         from: 'Person_Movie.actorId',
+ *         to: 'Person_Movie.movieId'
+ *       },
+ *       to: 'Movie.id'
  *     }
  *   }
  * };
@@ -104,16 +120,23 @@ MoronModel.prototype.$id = function () {
 /**
  * Creates a query builder for this model instance.
  *
- * All queries built using this method only affect this instance. For example to
- * re-fetch the model from the database you can do this:
+ * The returned query builder has all the methods a *knex* query builder has. See
+ * {@link MoronQueryBuilder} and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+ * for more information.
+ *
+ * All queries built using the returned builder only affect this instance.
+ *
+ * Examples:
+ *
+ * Re-fetch the instance from the database:
  *
  * ```js
- * model.$query().then(function (model) {
- *   console.log(model);
+ * person.$query().then(function (person) {
+ *   console.log(person);
  * });
  * ```
  *
- * Insert a new model to database.
+ * Insert a new model to database:
  *
  * ```js
  * Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennifer) {
@@ -121,7 +144,7 @@ MoronModel.prototype.$id = function () {
  * });
  * ```
  *
- * Patch values of an existing model:
+ * Patch a model:
  *
  * ```js
  * person.$query().patch({lastName: 'Cooper'}).then(function (person) {
@@ -170,6 +193,12 @@ MoronModel.prototype.$query = function () {
 
 /**
  * Use this to build a query that only affects the models related to this instance through a relation.
+ *
+ * The returned query builder has all the methods a *knex* query builder has. See
+ * {@link MoronQueryBuilder} and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+ * for more information.
+ *
+ * Examples:
  *
  * Fetch all models related to this instance through a relation. The fetched models are
  * also stored to the owner model's property named after the relation:
@@ -251,7 +280,7 @@ MoronModel.prototype.$query = function () {
  *
  * `update` and `patch` can be used to update related models. Only difference between the mentioned
  * methods is that `update` validates the input objects using the related model class's full schema
- * and the `patch` ignores the `required` property of the schema. Use `update` when you want to update
+ * and `patch` ignores the `required` property of the schema. Use `update` when you want to update
  * _all_ properties of a model and `patch` when only a subset should be updated.
  *
  * ```js
@@ -339,7 +368,7 @@ MoronModel.prototype.$loadRelated = function (relationExpression) {
  */
 MoronModel.prototype.$parseDatabaseJson = function (json) {
   var ModelClass = this.constructor;
-  var jsonAttr = ModelClass.getJsonAttributes();
+  var jsonAttr = ModelClass.$$getJsonAttributes();
 
   if (jsonAttr.length) {
     for (var i = 0, l = jsonAttr.length; i < l; ++i) {
@@ -360,7 +389,7 @@ MoronModel.prototype.$parseDatabaseJson = function (json) {
  */
 MoronModel.prototype.$formatDatabaseJson = function (json) {
   var ModelClass = this.constructor;
-  var jsonAttr = ModelClass.getJsonAttributes();
+  var jsonAttr = ModelClass.$$getJsonAttributes();
 
   if (jsonAttr.length) {
     for (var i = 0, l = jsonAttr.length; i < l; ++i) {
@@ -420,22 +449,261 @@ MoronModel.prototype.$toJson = function (shallow) {
   }
 };
 
-MoronModel.HasOneRelation = MoronHasOneRelation;
-MoronModel.HasManyRelation = MoronHasManyRelation;
+/**
+ * one-to-many relation type.
+ *
+ * @type {MoronOneToOneRelation}
+ */
+MoronModel.OneToOneRelation = MoronOneToOneRelation;
+
+/**
+ * one-to-many relation type.
+ *
+ * @type {MoronOneToManyRelation}
+ */
+MoronModel.OneToManyRelation = MoronOneToManyRelation;
+
+/**
+ * may-to-many relation type.
+ *
+ * @type {MoronManyToManyRelation}
+ */
 MoronModel.ManyToManyRelation = MoronManyToManyRelation;
 
+/**
+ * Name of the database table of this model.
+ *
+ * @type {String}
+ */
 MoronModel.tableName = null;
+
+/**
+ * Name of the primary key column in the database table.
+ *
+ * Defaults to 'id'.
+ *
+ * @type {String}
+ */
 MoronModel.idColumn = 'id';
 
+/**
+ * Properties that should be saved to database as JSON strings.
+ *
+ * The properties listed here are serialized to JSON strings upon insertion to the database
+ * and parsed back to objects when models are read from the database. Combined with the
+ * postgresql's json or jsonb data type, this is a powerful way of representing documents
+ * as single database rows.
+ *
+ * If this property is left unset all properties declared as objects or arrays in the
+ * `jsonSchema` are implicitly added to this list.
+ *
+ * Example:
+ *
+ * ```js
+ * Person.jsonAttributes = ['address'];
+ *
+ * var jennifer = Person.fromJson({
+ *   name: 'Jennifer',
+ *   address: {
+ *     address: 'Someroad 10',
+ *     zipCode: '1234',
+ *     city: 'Los Angeles'
+ *   }
+ * });
+ *
+ * var dbRow = jennifer.$toDatabaseJson();
+ * console.log(dbRow);
+ * // --> {name: 'Jennifer', address: '{"address":"Someroad 10","zipCode":"1234","city":"Los Angeles"}'}
+ * ```
+ *
+ * @type {Array.<String>}
+ */
 MoronModel.jsonAttributes = null;
+
+/**
+ * This property defines the relations to other models.
+ *
+ * Relations to other models can be defined by setting this property. The best way to explain how to
+ * do this is by example:
+ *
+ * ```js
+ * Person.relationMappings = {
+ *   pets: {
+ *     relation: MoronModel.OneToManyRelation,
+ *     modelClass: Animal,
+ *     join: {
+ *       from: 'Person.id',
+ *       to: 'Animal.ownerId'
+ *     }
+ *   },
+ *
+ *   father: {
+ *     relation: MoronModel.OneToOneRelation,
+ *     modelClass: Person,
+ *     join: {
+ *       from: 'Person.fatherId',
+ *       to: 'Person.id'
+ *     }
+ *   },
+ *
+ *   movies: {
+ *     relation: MoronModel.ManyToManyRelation,
+ *     modelClass: Movie,
+ *     join: {
+ *       from: 'Person.id',
+ *       through: {
+ *         from: 'Person_Movie.actorId',
+ *         to: 'Person_Movie.movieId'
+ *       },
+ *       to: 'Movie.id'
+ *     }
+ *   }
+ * };
+ * ```
+ *
+ * relationMappings is an object whose keys are relation names and values define the relation. The
+ * `join` property in addition to the relation type define how the models are related to one another.
+ * The `from` and `to` properties of the `join` object define the database columns through which the
+ * models are associated. Note that neither of these columns need to be primary keys. They can be any
+ * columns!. In the case of ManyToManyRelation also the join table needs to be defined. This is
+ * done using the `through` object.
+ *
+ * The `modelClass` passed to the relation mappings is the class of the related model. It can be either
+ * a MoronModel subclass constructor or an absolute path to a module that exports one. Using file paths
+ * is a handy way to prevent require loops.
+ *
+ * @type {Object.<String, MoronRelationMapping>}
+ */
 MoronModel.relationMappings = null;
 
+/**
+ * @private
+ */
 MoronModel.$$knex = null;
+
+/**
+ * @private
+ */
 MoronModel.$$idProperty = null;
+
+/**
+ * @private
+ */
 MoronModel.$$relations = null;
+
+/**
+ * @private
+ */
 MoronModel.$$pickAttributes = null;
+
+/**
+ * @private
+ */
 MoronModel.$$omitAttributes = null;
 
+/**
+ * Creates a query builder for this table.
+ *
+ * The returned query builder has all the methods a *knex* query builder has. See
+ * {@link MoronQueryBuilder} and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+ * for more information.
+ *
+ * Read models from the database:
+ *
+ * ```js
+ * // Get all rows.
+ * Person.query().then(function(allPersons) {
+ *   console.log('there are', allPersons.length, 'persons in the database');
+ * });
+ *
+ * // Example of a more complex WHERE clause. This generates:
+ * // SELECT * FROM "Person" WHERE ("firstName" = 'Jennifer' AND "age" < 30) OR ("firstName" = "Mark" AND "age" > 30)
+ * Person
+ *   .query()
+ *   .where(function () {
+ *     this.where('firstName', 'Jennifer').where('age', '<', 30);
+ *   })
+ *   .orWhere(function () {
+ *     this.where('firstName', 'Mark').where('age', '>', 30);
+ *   })
+ *   .then(function (marksAndJennifers) {
+ *     console.log(marksAndJennifers);
+ *   });
+ *
+ * // Get a subset of rows and fetch related models for each row.
+ * Person
+ *   .query()
+ *   .where('age', '>', 60)
+ *   .eager('children.children.movies')
+ *   .then(function (oldPeople) {
+ *     console.log('some old person\'s grand child has appeared in',
+ *       oldPeople[0].children[0].children[0].movies.length,
+ *       'movies');
+ *   });
+ * ```
+ *
+ * Insert models to the database:
+ *
+ * ```js
+ * Person.query().insert({firstName: 'Sylvester', lastName: 'Stallone'}).then(function (sylvester) {
+ *   console.log(sylvester.fullName()); // --> 'Sylvester Stallone'.
+ * });
+ *
+ * // Batch insert. This only works on Postgresql as it is the only database that returns the
+ * // identifiers of _all_ inserted rows. If you need to do batch inserts on other databases use
+ * // *knex* directly. (See .knexQuery() method).
+ * Person
+ *   .query()
+ *   .insert([
+ *     {firstName: 'Arnold', lastName: 'Schwarzenegger'},
+ *     {firstName: 'Sylvester', lastName: 'Stallone'}
+ *   ])
+ *   .then(function (inserted) {
+ *     console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
+ *   });
+ * ```
+ *
+ * `update` and `patch` can be used to update models. Only difference between the mentioned methods
+ * is that `update` validates the input objects using the model class's full jsonSchema and `patch`
+ * ignores the `required` property of the schema. Use `update` when you want to update _all_ properties
+ * of a model and `patch` when only a subset should be updated.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 35})
+ *   .where('id', jennifer.id)
+ *   .then(function (updatedJennifer) {
+ *     console.log('Jennifer is now', updatedJennifer.age, 'years old');
+ *   });
+ *
+ * // This will throw assuming that `firstName` or `lastName` is a required property for a Person.
+ * Person.query().patch({age: 100});
+ *
+ * // This will _not_ throw.
+ * Person
+ *   .query()
+ *   .patch({age: 100})
+ *   .then(function () {
+ *     console.log('Everyone is now 100 years old');
+ *   });
+ * ```
+ *
+ * Models can be deleted using the delete method. Naturally the delete query can be chained with
+ * any *knex* methods:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .delete()
+ *   .where('age', '>', 90)
+ *   .then(function () {
+ *     console.log('anyone over 90 is now removed from the database');
+ *   });
+ * ```
+ *
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.query = function () {
   var ModelClass = this;
 
@@ -454,29 +722,107 @@ MoronModel.query = function () {
       ModelClass.$$delete(this);
     })
     .relateImpl(function () {
-      throw new Error('relate makes no sense in this context');
+      throw new Error('`relate` makes no sense in this context');
     })
     .unrelateImpl(function () {
-      throw new Error('relate makes no sense in this context');
+      throw new Error('`unrelate` makes no sense in this context');
     });
 };
 
-MoronModel.knex = function () {
+/**
+ * Get/Set the knex connection for this model class.
+ *
+ * Subclasses inherit the connection. A system-wide knex instance can be set by calling
+ * `MoronModel.knex(knex)`. This works even after subclasses have been created.
+ *
+ * ```js
+ * var knex = require('knex')({
+ *   client: 'sqlite3',
+ *   connection: {
+ *     filename: 'database.db'
+ *   }
+ * });
+ *
+ * MoronModel.knex(knex);
+ * knex = MoronModel.knex();
+ * ```
+ *
+ * @param {knex=} knex
+ *    The knex to set.
+ *
+ * @returns {knex|undefined}
+ */
+MoronModel.knex = function (knex) {
   if (arguments.length) {
-    this.$$knex = arguments[0];
+    this.$$knex = knex;
   } else {
     var modelClass = this;
+
     while (modelClass && !modelClass.$$knex) {
       modelClass = modelClass._super;
     }
+
     return modelClass && modelClass.$$knex;
   }
 };
 
+/**
+ * Shortcut for `SomeModel.knex().table(SomeModel.tableName)`.
+ *
+ * @returns {knex.QueryBuilder}
+ */
 MoronModel.knexQuery = function () {
   return this.knex().table(this.tableName);
 };
 
+/**
+ * Creates a subclass of this class that is bound to the given knex.
+ *
+ * This method can be used to bind a MoronModel subclass to multiple databases for example in
+ * a multi tenant system.
+ *
+ * Example:
+ *
+ * ```js
+ * var knex1 = require('knex')({
+ *   client: 'sqlite3',
+ *   connection: {
+ *     filename: 'database1.db'
+ *   }
+ * });
+ *
+ * var knex2 = require('knex')({
+ *   client: 'sqlite3',
+ *   connection: {
+ *     filename: 'database2.db'
+ *   }
+ * });
+ *
+ * SomeModel.knex(null);
+ *
+ * var BoundModel1 = SomeModel.bindKnex(knex1);
+ * var BoundModel2 = SomeModel.bindKnex(knex2);
+ *
+ * // Throws since the knex instance is null.
+ * SomeModel.query().then();
+ *
+ * // Works.
+ * BoundModel1.query().then(function (models) {
+ *  console.log(models[0] instanceof SomeModel); // --> true
+ *  console.log(models[0] instanceof BoundModel1); // --> true
+ * });
+ *
+ * // Works.
+ * BoundModel2.query().then(function (models) {
+ *  console.log(models[0] instanceof SomeModel); // --> true
+ *  console.log(models[0] instanceof BoundModel2); // --> true
+ * });
+ *
+ * ```
+ *
+ * @param {knex} knex
+ * @returns {MoronModel}
+ */
 MoronModel.bindKnex = function (knex) {
   var ModelClass = this;
 
@@ -509,6 +855,15 @@ MoronModel.bindKnex = function (knex) {
   return BoundModelClass;
 };
 
+/**
+ * Ensures that the given model is an instance of this class.
+ *
+ * If `model` is already an instance of this class, nothing is done.
+ *
+ * @param {MoronModel|Object} model
+ * @param {MoronModelOptions} options
+ * @returns {MoronModel}
+ */
 MoronModel.ensureModel = function (model, options) {
   var ModelClass = this;
 
@@ -525,6 +880,15 @@ MoronModel.ensureModel = function (model, options) {
   }
 };
 
+/**
+ * Ensures that each element in the given array is an instance of this class.
+ *
+ * If an element is already an instance of this class, nothing is done for it.
+ *
+ * @param {Array.<MoronModel|Object>} input
+ * @param {MoronModelOptions=} options
+ * @returns {Array.<MoronModel>}
+ */
 MoronModel.ensureModelArray = function (input, options) {
   var ModelClass = this;
 
@@ -542,6 +906,15 @@ MoronModel.ensureModelArray = function (input, options) {
   return models;
 };
 
+/**
+ * Returns the name of the identifier property.
+ *
+ * The identifier property is equal to the `idColumn` if `$parseDatabaseJson` is not
+ * implemented. If `$parseDatabaseJson` is implemented it may change the id property's
+ * name. This method passes the `idColumn` through `$parseDatabaseJson`.
+ *
+ * @returns {String}
+ */
 MoronModel.getIdProperty = function () {
   if (!this.$$idProperty) {
     this.$$idProperty = this.columnNameToPropertyName(this.idColumn);
@@ -556,11 +929,18 @@ MoronModel.getIdProperty = function () {
   return this.$$idProperty;
 };
 
+/**
+ * Full identifier column name like 'SomeTable.id'.
+ *
+ * @returns {String}
+ */
 MoronModel.getFullIdColumn = function () {
   return this.tableName + '.' + this.idColumn;
 };
 
 /**
+ * All relations of this class.
+ *
  * @return {Object.<String, MoronRelation>}
  */
 MoronModel.getRelations = function () {
@@ -579,6 +959,10 @@ MoronModel.getRelations = function () {
 };
 
 /**
+ * Get a relation by name.
+ *
+ * This should not be used to make queries. Use `$relatedQuery` or `loadRelated` instead.
+ *
  * @return {MoronRelation}
  */
 MoronModel.getRelation = function (name) {
@@ -591,7 +975,56 @@ MoronModel.getRelation = function (name) {
   return relation;
 };
 
-MoronModel.getJsonAttributes = function () {
+/**
+ * Generates an identifier for the inserted models of this class.
+ *
+ * Implement this to return an identifier if you wish to generate them in the code instead
+ * of the database. By default this method returns null which indicates that the database
+ * should generate the identifier.
+ *
+ * @returns {*}
+ */
+MoronModel.generateId = function () {
+  return null;
+};
+
+/**
+ * Exactly like $loadRelated but for multiple instances.
+ *
+ * ```js
+ * Person.loadRelated([person1, person2], 'children.pets').then(function (persons) {
+ *   var person1 = persons[0];
+ *   var person2 = persons[1];
+ * });
+ * ```
+ *
+ * @param $models
+ * @param expression
+ * @returns {*}
+ */
+MoronModel.loadRelated = function ($models, expression) {
+  if (!(expression instanceof MoronRelationExpression)) {
+    expression = MoronRelationExpression.parse(expression);
+  }
+
+  if (!expression) {
+    throw new Error('invalid expression ' + expression);
+  }
+
+  return new MoronEagerFetcher({
+    modelClass: this,
+    models: this.ensureModelArray($models),
+    eager: expression
+  }).fetch().then(function (models) {
+    return _.isArray($models) ? models : models[0];
+  });
+};
+
+/**
+ * @protected
+ * @returns {Array.<String>}
+ */
+MoronModel.$$getJsonAttributes = function () {
   var self = this;
 
   // If the jsonAttributes property is not set, try to create it based
@@ -624,28 +1057,10 @@ MoronModel.getJsonAttributes = function () {
   return this.jsonAttributes;
 };
 
-MoronModel.generateId = function () {
-  return null;
-};
-
-MoronModel.loadRelated = function ($models, expression) {
-  if (!(expression instanceof MoronRelationExpression)) {
-    expression = MoronRelationExpression.parse(expression);
-  }
-
-  if (!expression) {
-    throw new Error('invalid expression ' + expression);
-  }
-
-  return new MoronEagerFetcher({
-    modelClass: this,
-    models: this.ensureModelArray($models),
-    eager: expression
-  }).fetch().then(function (models) {
-    return _.isArray($models) ? models : models[0];
-  });
-};
-
+/**
+ * @protected
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.$$insert = function (builder, $models) {
   var ModelClass = this;
   var models = ModelClass.ensureModelArray($models);
@@ -682,6 +1097,10 @@ MoronModel.$$insert = function (builder, $models) {
   });
 };
 
+/**
+ * @protected
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.$$update = function (builder, $update) {
   if (!$update) {
     return builder;
@@ -700,6 +1119,7 @@ MoronModel.$$update = function (builder, $update) {
 
 /**
  * @protected
+ * @returns {MoronQueryBuilder}
  */
 MoronModel.$$patch = function (builder, $patch) {
   if (!$patch) {
@@ -723,6 +1143,10 @@ MoronModel.$$delete = function (builder) {
   });
 };
 
+/**
+ * @protected
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.$$omitNonColumns = function (json) {
   if (this.jsonSchema) {
     if (!this.$$pickAttributes) {
@@ -738,6 +1162,10 @@ MoronModel.$$omitNonColumns = function (json) {
   }
 };
 
+/**
+ * @protected
+ * @returns {MoronQueryBuilder}
+ */
 MoronModel.$$omitRelations = function (json) {
   if (!this.$$omitAttributes) {
     this.$$omitAttributes = _.keys(this.getRelations());
@@ -750,6 +1178,9 @@ MoronModel.$$omitRelations = function (json) {
   return json;
 };
 
+/**
+ * @private
+ */
 function ensureArray(obj) {
   if (_.isArray(obj)) {
     return obj;

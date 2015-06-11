@@ -7,13 +7,13 @@ var _ = require('lodash')
  * @class
  * @extends MoronRelation
  */
-function MoronHasOneRelation() {
+function MoronOneToOneRelation() {
   MoronRelation.apply(this, arguments);
 }
 
-MoronRelation.extend(MoronHasOneRelation);
+MoronRelation.extend(MoronOneToOneRelation);
 
-MoronHasOneRelation.prototype.find = function (builder, $owners) {
+MoronOneToOneRelation.prototype.find = function (builder, $owners) {
   var self = this;
   var owners = this.ownerModelClass.ensureModelArray($owners);
   var relatedIds = _.unique(_.compact(_.pluck(owners, this.ownerProp)));
@@ -29,13 +29,13 @@ MoronHasOneRelation.prototype.find = function (builder, $owners) {
   });
 };
 
-MoronHasOneRelation.prototype.insert = function (builder, $owner, $insertion) {
+MoronOneToOneRelation.prototype.insert = function (builder, $owner, $insertion) {
   var self = this;
   var owner = this.ownerModelClass.ensureModel($owner);
   var insertion = this.relatedModelClass.ensureModelArray($insertion);
 
   if (insertion.length > 1) {
-    throw new Error('can only insert one model to a MoronHasOneRelation');
+    throw new Error('can only insert one model to a MoronOneToOneRelation');
   }
 
   return this.relatedModelClass.$$insert(builder, insertion).runAfterModelCreate(function (inserted) {
@@ -52,7 +52,7 @@ MoronHasOneRelation.prototype.insert = function (builder, $owner, $insertion) {
   });
 };
 
-MoronHasOneRelation.prototype.update = function (builder, $owner, $update) {
+MoronOneToOneRelation.prototype.update = function (builder, $owner, $update) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   this._makeFindQuery(builder, [owner[this.ownerProp]]);
@@ -61,7 +61,7 @@ MoronHasOneRelation.prototype.update = function (builder, $owner, $update) {
   return builder;
 };
 
-MoronHasOneRelation.prototype.patch = function (builder, $owner, $patch) {
+MoronOneToOneRelation.prototype.patch = function (builder, $owner, $patch) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   this._makeFindQuery(builder, [owner[this.ownerProp]]);
@@ -70,7 +70,7 @@ MoronHasOneRelation.prototype.patch = function (builder, $owner, $patch) {
   return builder;
 };
 
-MoronHasOneRelation.prototype.delete = function (builder, $owner) {
+MoronOneToOneRelation.prototype.delete = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   this._makeFindQuery(builder, [owner[this.ownerProp]]);
@@ -79,12 +79,12 @@ MoronHasOneRelation.prototype.delete = function (builder, $owner) {
   return builder;
 };
 
-MoronHasOneRelation.prototype.relate = function (builder, $owner, $ids) {
+MoronOneToOneRelation.prototype.relate = function (builder, $owner, $ids) {
   var owner = this.ownerModelClass.ensureModel($owner);
   var ids = _.flatten([$ids]);
 
   if (ids.length > 1) {
-    throw new Error('can only relate one model to a MoronHasOneRelation');
+    throw new Error('can only relate one model to a MoronOneToOneRelation');
   }
 
   return builder
@@ -96,7 +96,7 @@ MoronHasOneRelation.prototype.relate = function (builder, $owner, $ids) {
     });
 };
 
-MoronHasOneRelation.prototype.unrelate = function (builder, $owner) {
+MoronOneToOneRelation.prototype.unrelate = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   return builder
@@ -108,7 +108,7 @@ MoronHasOneRelation.prototype.unrelate = function (builder, $owner) {
     });
 };
 
-MoronHasOneRelation.prototype._makeFindQuery = function (builder, relatedIds) {
+MoronOneToOneRelation.prototype._makeFindQuery = function (builder, relatedIds) {
   relatedIds = _.compact(relatedIds);
 
   if (_.isEmpty(relatedIds)) {
@@ -118,4 +118,4 @@ MoronHasOneRelation.prototype._makeFindQuery = function (builder, relatedIds) {
   }
 };
 
-module.exports = MoronHasOneRelation;
+module.exports = MoronOneToOneRelation;

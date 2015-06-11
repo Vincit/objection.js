@@ -9,7 +9,7 @@ describe('MoronModel', function () {
 
     Model1.relationMappings = {
       relation1: {
-        relation: MoronModel.HasManyRelation,
+        relation: MoronModel.OneToManyRelation,
         modelClass: Model2,
         join: {
           from: 'Model1.id',
@@ -17,7 +17,7 @@ describe('MoronModel', function () {
         }
       },
       relation2: {
-        relation: MoronModel.HasOneRelation,
+        relation: MoronModel.OneToOneRelation,
         modelClass: Model1,
         join: {
           from: 'Model1.id',

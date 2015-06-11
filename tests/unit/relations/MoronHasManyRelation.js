@@ -4,9 +4,9 @@ var _ = require('lodash')
   , Promise = require('bluebird')
   , MoronModel = require('../../../src/MoronModel')
   , MoronQueryBuilder = require('../../../src/MoronQueryBuilder')
-  , MoronHasManyRelation = require('../../../src/relations/MoronHasManyRelation');
+  , MoronOneToManyRelation = require('../../../src/relations/MoronOneToManyRelation');
 
-describe('MoronHasManyRelation', function () {
+describe('MoronOneToManyRelation', function () {
   var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];
   var executedQueries = [];
@@ -48,10 +48,10 @@ describe('MoronHasManyRelation', function () {
   });
 
   beforeEach(function () {
-    relation = new MoronHasManyRelation('nameOfOurRelation', OwnerModel);
+    relation = new MoronOneToManyRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
-      relation: MoronHasManyRelation,
+      relation: MoronOneToManyRelation,
       join: {
         from: 'OwnerModel.oid',
         to: 'RelatedModel.ownerId'

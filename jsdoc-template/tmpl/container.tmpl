@@ -106,7 +106,9 @@
         <h3 class="subsection-title">Members</h3>
 
         <dl><?js members.forEach(function(p) { ?>
-            <?js= self.partial('members.tmpl', p) ?>
+            <?js if (p.attribs.indexOf('private') === -1 && p.attribs.indexOf('protected') === -1) { ?>
+                <?js= self.partial('members.tmpl', p) ?>
+            <?js } ?>
         <?js }); ?></dl>
     <?js } ?>
 

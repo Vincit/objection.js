@@ -6,8 +6,8 @@ module.exports = {
   MoronValidationError: require('./MoronValidationError'),
 
   MoronRelation: require('./relations/MoronRelation'),
-  MoronHasOneRelation: require('./relations/MoronHasOneRelation'),
-  MoronHasManyRelation: require('./relations/MoronHasManyRelation'),
+  MoronOneToOneRelation: require('./relations/MoronOneToOneRelation'),
+  MoronOneToManyRelation: require('./relations/MoronOneToManyRelation'),
   MoronManyToManyRelation: require('./relations/MoronManyToManyRelation'),
 
   transaction: require('./moronTransaction')

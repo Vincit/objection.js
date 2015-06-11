@@ -32,14 +32,6 @@
 						</li>
 						
 						<li>
-							<a href="MoronHasManyRelation.html">MoronHasManyRelation</a>
-						</li>
-						
-						<li>
-							<a href="MoronHasOneRelation.html">MoronHasOneRelation</a>
-						</li>
-						
-						<li>
 							<a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a>
 						</li>
 						
@@ -49,6 +41,14 @@
 						
 						<li>
 							<a href="MoronModelBase.html">MoronModelBase</a>
+						</li>
+						
+						<li>
+							<a href="MoronOneToManyRelation.html">MoronOneToManyRelation</a>
+						</li>
+						
+						<li>
+							<a href="MoronOneToOneRelation.html">MoronOneToOneRelation</a>
 						</li>
 						
 						<li>
@@ -84,6 +84,10 @@
 						class="caret"></b></a>
 
 					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="global.html#ensureArray">ensureArray</a>
+						</li>
 						
 						<li>
 							<a href="global.html#inherits">inherits</a>
@@ -153,8 +157,10 @@ Person.jsonSchema = {
   type: 'object',
   properties: {
     id: {type: 'integer'},
+    fatherId: {type: 'integer'}
     firstName: {type: 'string'},
-    lastName: {type: 'string'}
+    lastName: {type: 'string'},
+    age: {type: 'number'}
   }
 };
 
@@ -167,12 +173,26 @@ Person.relationMappings = {
       to: 'Animal.ownerId'
     }
   },
-  mother: {
+
+  father: {
     relation: MoronModel.OneToOneRelation,
     modelClass: Person,
     join: {
-      from: 'Person.motherId',
+      from: 'Person.fatherId',
       to: 'Person.id'
+    }
+  },
+
+  movies: {
+    relation: MoronModel.ManyToManyRelation,
+    modelClass: Movie,
+    join: {
+      from: 'Person.id',
+      through: {
+        from: 'Person_Movie.actorId',
+        to: 'Person_Movie.movieId'
+      },
+      to: 'Movie.id'
     }
   }
 };</code></pre>
@@ -250,11 +270,1386 @@ Person.relationMappings = {
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_idColumn">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">idColumn</span>
+      <span class="signature-container"><span class="type-signature"> :String</span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Name of the primary key column in the database table.</p>
+<p>Defaults to 'id'.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_jsonAttributes">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">jsonAttributes</span>
+      <span class="signature-container"><span class="type-signature"> :Array.&lt;String></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Properties that should be saved to database as JSON strings.</p>
+<p>The properties listed here are serialized to JSON strings upon insertion to the database
+and parsed back to objects when models are read from the database. Combined with the
+postgresql's json or jsonb data type, this is a powerful way of representing documents
+as single database rows.</p>
+<p>If this property is left unset all properties declared as objects or arrays in the
+<code>jsonSchema</code> are implicitly added to this list.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>Person.jsonAttributes = ['address'];
+
+var jennifer = Person.fromJson({
+  name: 'Jennifer',
+  address: {
+    address: 'Someroad 10',
+    zipCode: '1234',
+    city: 'Los Angeles'
+  }
+});
+
+var dbRow = jennifer.$toDatabaseJson();
+console.log(dbRow);
+// --> {name: 'Jennifer', address: '{&quot;address&quot;:&quot;Someroad 10&quot;,&quot;zipCode&quot;:&quot;1234&quot;,&quot;city&quot;:&quot;Los Angeles&quot;}'}</code></pre>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_ManyToManyRelation">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">ManyToManyRelation</span>
+      <span class="signature-container"><span class="type-signature"> :<a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>may-to-many relation type.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_OneToManyRelation">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">OneToManyRelation</span>
+      <span class="signature-container"><span class="type-signature"> :<a href="MoronOneToManyRelation.html">MoronOneToManyRelation</a></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>one-to-many relation type.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="MoronOneToManyRelation.html">MoronOneToManyRelation</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_OneToOneRelation">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">OneToOneRelation</span>
+      <span class="signature-container"><span class="type-signature"> :<a href="MoronOneToOneRelation.html">MoronOneToOneRelation</a></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>one-to-many relation type.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="MoronOneToOneRelation.html">MoronOneToOneRelation</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_relationMappings">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">relationMappings</span>
+      <span class="signature-container"><span class="type-signature"> :Object.&lt;String, <a href="global.html#MoronRelationMapping">MoronRelationMapping</a>></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>This property defines the relations to other models.</p>
+<p>Relations to other models can be defined by setting this property. The best way to explain how to
+do this is by example:</p>
+<pre class="prettyprint source lang-js"><code>Person.relationMappings = {
+  pets: {
+    relation: MoronModel.OneToManyRelation,
+    modelClass: Animal,
+    join: {
+      from: 'Person.id',
+      to: 'Animal.ownerId'
+    }
+  },
+
+  father: {
+    relation: MoronModel.OneToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.fatherId',
+      to: 'Person.id'
+    }
+  },
+
+  movies: {
+    relation: MoronModel.ManyToManyRelation,
+    modelClass: Movie,
+    join: {
+      from: 'Person.id',
+      through: {
+        from: 'Person_Movie.actorId',
+        to: 'Person_Movie.movieId'
+      },
+      to: 'Movie.id'
+    }
+  }
+};</code></pre><p>relationMappings is an object whose keys are relation names and values define the relation. The
+<code>join</code> property in addition to the relation type define how the models are related to one another.
+The <code>from</code> and <code>to</code> properties of the <code>join</code> object define the database columns through which the
+models are associated. Note that neither of these columns need to be primary keys. They can be any
+columns!. In the case of ManyToManyRelation also the join table needs to be defined. This is
+done using the <code>through</code> object.</p>
+<p>The <code>modelClass</code> passed to the relation mappings is the class of the related model. It can be either
+a MoronModel subclass constructor or an absolute path to a module that exports one. Using file paths
+is a handy way to prevent require loops.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object.&lt;String, <a href="global.html#MoronRelationMapping">MoronRelationMapping</a>></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_tableName">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">tableName</span>
+      <span class="signature-container"><span class="type-signature"> :String</span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Name of the database table of this model.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        </dl>
+    
 
     
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_bindKnex">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">bindKnex</span>
+          <span class="signature-container"><span class="signature">(knex)</span><span class="type-signature"> &rarr; {<a href="MoronModel.html">MoronModel</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a subclass of this class that is bound to the given knex.</p>
+<p>This method can be used to bind a MoronModel subclass to multiple databases for example in
+a multi tenant system.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>var knex1 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database1.db'
+  }
+});
+
+var knex2 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database2.db'
+  }
+});
+
+SomeModel.knex(null);
+
+var BoundModel1 = SomeModel.bindKnex(knex1);
+var BoundModel2 = SomeModel.bindKnex(knex2);
+
+// Throws since the knex instance is null.
+SomeModel.query().then();
+
+// Works.
+BoundModel1.query().then(function (models) {
+ console.log(models[0] instanceof SomeModel); // --> true
+ console.log(models[0] instanceof BoundModel1); // --> true
+});
+
+// Works.
+BoundModel2.query().then(function (models) {
+ console.log(models[0] instanceof SomeModel); // --> true
+ console.log(models[0] instanceof BoundModel2); // --> true
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>knex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">knex</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_ensureModel">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">ensureModel</span>
+          <span class="signature-container"><span class="signature">(model, options)</span><span class="type-signature"> &rarr; {<a href="MoronModel.html">MoronModel</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ensures that the given model is an instance of this class.</p>
+<p>If <code>model</code> is already an instance of this class, nothing is done.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>model</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_ensureModelArray">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">ensureModelArray</span>
+          <span class="signature-container"><span class="signature">(input, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="MoronModel.html">MoronModel</a>>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ensures that each element in the given array is an instance of this class.</p>
+<p>If an element is already an instance of this class, nothing is done for it.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;(<a href="MoronModel.html">MoronModel</a>|Object)></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Array.&lt;<a href="MoronModel.html">MoronModel</a>></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_generateId">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">generateId</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Generates an identifier for the inserted models of this class.</p>
+<p>Implement this to return an identifier if you wish to generate them in the code instead
+of the database. By default this method returns null which indicates that the database
+should generate the identifier.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_getFullIdColumn">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">getFullIdColumn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Full identifier column name like 'SomeTable.id'.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_getIdProperty">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">getIdProperty</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the name of the identifier property.</p>
+<p>The identifier property is equal to the <code>idColumn</code> if <code>$parseDatabaseJson</code> is not
+implemented. If <code>$parseDatabaseJson</code> is implemented it may change the id property's
+name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJson</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
             
         
             
@@ -272,6 +1667,11 @@ Person.relationMappings = {
 </dt>
 <dd>
     
+    
+    <div class="description">
+        <p>Get a relation by name.</p>
+<p>This should not be used to make queries. Use <code>$relatedQuery</code> or <code>loadRelated</code> instead.</p>
+    </div>
     
 
     
@@ -362,6 +1762,10 @@ Person.relationMappings = {
 <dd>
     
     
+    <div class="description">
+        <p>All relations of this class.</p>
+    </div>
+    
 
     
     
@@ -422,6 +1826,597 @@ Person.relationMappings = {
 	<dd>
 		
 <span class="param-type">Object.&lt;String, <a href="MoronRelation.html">MoronRelation</a>></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_knex">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">knex</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">knex</span>)</span><span class="type-signature"> &rarr; {knex|undefined}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Get/Set the knex connection for this model class.</p>
+<p>Subclasses inherit the connection. A system-wide knex instance can be set by calling
+<code>MoronModel.knex(knex)</code>. This works even after subclasses have been created.</p>
+<pre class="prettyprint source lang-js"><code>var knex = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database.db'
+  }
+});
+
+MoronModel.knex(knex);
+knex = MoronModel.knex();</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>knex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">knex</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The knex to set.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">knex</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_knexQuery">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">knexQuery</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {knex.QueryBuilder}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Shortcut for <code>SomeModel.knex().table(SomeModel.tableName)</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">knex.QueryBuilder</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_loadRelated">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">loadRelated</span>
+          <span class="signature-container"><span class="signature">($models, expression)</span><span class="type-signature"> &rarr; {*}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Exactly like $loadRelated but for multiple instances.</p>
+<pre class="prettyprint source lang-js"><code>Person.loadRelated([person1, person2], 'children.pets').then(function (persons) {
+  var person1 = persons[0];
+  var person2 = persons[1];
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>$models</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>expression</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_query">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">query</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a query builder for this table.</p>
+<p>The returned query builder has all the methods a <em>knex</em> query builder has. See
+<a href="MoronQueryBuilder.html">MoronQueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+for more information.</p>
+<p>Read models from the database:</p>
+<pre class="prettyprint source lang-js"><code>// Get all rows.
+Person.query().then(function(allPersons) {
+  console.log('there are', allPersons.length, 'persons in the database');
+});
+
+// Example of a more complex WHERE clause. This generates:
+// SELECT * FROM &quot;Person&quot; WHERE (&quot;firstName&quot; = 'Jennifer' AND &quot;age&quot; &lt; 30) OR (&quot;firstName&quot; = &quot;Mark&quot; AND &quot;age&quot; > 30)
+Person
+  .query()
+  .where(function () {
+    this.where('firstName', 'Jennifer').where('age', '&lt;', 30);
+  })
+  .orWhere(function () {
+    this.where('firstName', 'Mark').where('age', '>', 30);
+  })
+  .then(function (marksAndJennifers) {
+    console.log(marksAndJennifers);
+  });
+
+// Get a subset of rows and fetch related models for each row.
+Person
+  .query()
+  .where('age', '>', 60)
+  .eager('children.children.movies')
+  .then(function (oldPeople) {
+    console.log('some old person\'s grand child has appeared in',
+      oldPeople[0].children[0].children[0].movies.length,
+      'movies');
+  });</code></pre><p>Insert models to the database:</p>
+<pre class="prettyprint source lang-js"><code>Person.query().insert({firstName: 'Sylvester', lastName: 'Stallone'}).then(function (sylvester) {
+  console.log(sylvester.fullName()); // --> 'Sylvester Stallone'.
+});
+
+// Batch insert. This only works on Postgresql as it is the only database that returns the
+// identifiers of _all_ inserted rows. If you need to do batch inserts on other databases use
+// *knex* directly. (See .knexQuery() method).
+Person
+  .query()
+  .insert([
+    {firstName: 'Arnold', lastName: 'Schwarzenegger'},
+    {firstName: 'Sylvester', lastName: 'Stallone'}
+  ])
+  .then(function (inserted) {
+    console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
+  });</code></pre><p><code>update</code> and <code>patch</code> can be used to update models. Only difference between the mentioned methods
+is that <code>update</code> validates the input objects using the model class's full jsonSchema and <code>patch</code>
+ignores the <code>required</code> property of the schema. Use <code>update</code> when you want to update <em>all</em> properties
+of a model and <code>patch</code> when only a subset should be updated.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 35})
+  .where('id', jennifer.id)
+  .then(function (updatedJennifer) {
+    console.log('Jennifer is now', updatedJennifer.age, 'years old');
+  });
+
+// This will throw assuming that `firstName` or `lastName` is a required property for a Person.
+Person.query().patch({age: 100});
+
+// This will _not_ throw.
+Person
+  .query()
+  .patch({age: 100})
+  .then(function () {
+    console.log('Everyone is now 100 years old');
+  });</code></pre><p>Models can be deleted using the delete method. Naturally the delete query can be chained with
+any <em>knex</em> methods:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .delete()
+  .where('age', '>', 90)
+  .then(function () {
+    console.log('anyone over 90 is now removed from the database');
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
 
 
 	</dd>
@@ -1956,14 +3951,18 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
     
     <div class="description">
         <p>Creates a query builder for this model instance.</p>
-<p>All queries built using this method only affect this instance. For example to
-re-fetch the model from the database you can do this:</p>
-<pre class="prettyprint source lang-js"><code>model.$query().then(function (model) {
-  console.log(model);
-});</code></pre><p>Insert a new model to database.</p>
+<p>The returned query builder has all the methods a <em>knex</em> query builder has. See
+<a href="MoronQueryBuilder.html">MoronQueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+for more information.</p>
+<p>All queries built using the returned builder only affect this instance.</p>
+<p>Examples:</p>
+<p>Re-fetch the instance from the database:</p>
+<pre class="prettyprint source lang-js"><code>person.$query().then(function (person) {
+  console.log(person);
+});</code></pre><p>Insert a new model to database:</p>
 <pre class="prettyprint source lang-js"><code>Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennifer) {
   console.log(jennifer.id);
-});</code></pre><p>Patch values of an existing model:</p>
+});</code></pre><p>Patch a model:</p>
 <pre class="prettyprint source lang-js"><code>person.$query().patch({lastName: 'Cooper'}).then(function (person) {
   console.log(person.lastName); // --> 'Cooper'.
 });</code></pre><p>Delete a model.</p>
@@ -2063,6 +4062,10 @@ re-fetch the model from the database you can do this:</p>
     
     <div class="description">
         <p>Use this to build a query that only affects the models related to this instance through a relation.</p>
+<p>The returned query builder has all the methods a <em>knex</em> query builder has. See
+<a href="MoronQueryBuilder.html">MoronQueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+for more information.</p>
+<p>Examples:</p>
 <p>Fetch all models related to this instance through a relation. The fetched models are
 also stored to the owner model's property named after the relation:</p>
 <pre class="prettyprint source lang-js"><code>jennifer.$relatedQuery('pets').then(function (pets) {
@@ -2113,7 +4116,7 @@ any <em>knex</em> methods.</p>
     console.log('jennifer no longer has any cats');
   });</code></pre><p><code>update</code> and <code>patch</code> can be used to update related models. Only difference between the mentioned
 methods is that <code>update</code> validates the input objects using the related model class's full schema
-and the <code>patch</code> ignores the <code>required</code> property of the schema. Use <code>update</code> when you want to update
+and <code>patch</code> ignores the <code>required</code> property of the schema. Use <code>update</code> when you want to update
 <em>all</em> properties of a model and <code>patch</code> when only a subset should be updated.</p>
 <pre class="prettyprint source lang-js"><code>jennifer
   .$relatedQuery('pets')
@@ -3133,7 +5136,7 @@ called explicitly when needed.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Wed Jun 10th 2015 using the <a
+		on Thu Jun 11th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

@@ -38,7 +38,7 @@ module.exports.initialize = function (opt) {
 
   Model1.relationMappings = {
     model1Relation1: {
-      relation: MoronModel.HasOneRelation,
+      relation: MoronModel.OneToOneRelation,
       modelClass: Model1,
       join: {
         from: 'Model1.model1Id',
@@ -46,7 +46,7 @@ module.exports.initialize = function (opt) {
       }
     },
     model1Relation2: {
-      relation: MoronModel.HasManyRelation,
+      relation: MoronModel.OneToManyRelation,
       modelClass: Model2,
       join: {
         from: 'Model1.id',
@@ -191,14 +191,14 @@ function createRows(model, ModelClass, rows) {
       return;
     }
 
-    if (relation instanceof MoronModel.HasOneRelation) {
+    if (relation instanceof MoronModel.OneToOneRelation) {
 
       var related = relation.relatedModelClass.ensureModel(model[relationName]);
       model[relation.ownerProp] = related.$id();
 
       createRows(related, relation.relatedModelClass, rows);
 
-    } else if (relation instanceof MoronModel.HasManyRelation) {
+    } else if (relation instanceof MoronModel.OneToManyRelation) {
 
       _.each(model[relationName], function (relatedJson) {
         var related = relation.relatedModelClass.ensureModel(relatedJson);
