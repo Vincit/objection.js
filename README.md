@@ -1,4 +1,4 @@
-# moron.js [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js)
+# moron.js [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
 A Node.js ORM for PostgreSQL, MySQL and SQLite3 based on Knex http://knexjs.org.
 
 [API documentation stub](http://vincit.github.io/moron.js)
