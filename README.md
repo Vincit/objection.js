@@ -43,7 +43,69 @@ Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of
 
 #Examples
 
-An example model:
+Fetch all Person models from the database:
+
+```js
+Person.query().then(function (persons) {
+  console.log(persons[0] instanceof Person); // --> true
+  console.log('there are', persons.length, 'in total');
+}).catch(function (err) {
+  console.log('oh noes');
+});
+```
+
+Query with a where clause:
+
+```js
+Person
+  .query()
+  .where('age', '>', 40)
+  .andWhere('age', '<', 60)
+  .andWhere('firstName', 'Jennifer')
+  .orderBy('lastName')
+  .then(function (middleAgedJennifers) {
+    console.log('The last name of the first middle aged Jennifer is', middleAgedJennifers[0].lastName);
+  });
+```
+
+Insert a related model:
+
+```js
+Person
+  .query()
+  .where('id', 100)
+  .first()
+  .then(function (person) {
+    return person.$relatedQuery('pets').insert({name: 'Fluffy'});
+  })
+  .then(function (fluffy) {
+    console.log(fully.id);
+  })
+  .catch(function (err) {
+    console.log('something went wrong with finding the person OR inserting the pet', err.stack);
+  });
+```
+
+Fetch relations eagerly:
+
+```js
+Person
+  .query()
+  .eager('[pets, children.pets]')
+  .then(function (persons) {
+    // Each person has the `.pets` property populated with the Animal object related through `pets` relation.
+    // The `.children` property contains the Person's children. Each children also has the `pets` relation
+    // eagerly fetched.
+    console.log("First person's first pet is", persons[0].pets[0].name);
+    console.log("First person's first child's first pet is named', persons[0].children[0].pets[0].name);
+  });
+```
+
+#Example model
+
+Models are created by inheriting from the `MoronModel` base class. In moron.js the inheritance is done as transparently
+as possible. There is no custom Class abstraction making you wonder what the hell is happening. Just plain old ugly
+javascript inheritance :D.
 
 ```js
 var MoronModel = require('moron').MoronModel;

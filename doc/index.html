@@ -151,7 +151,47 @@ write the commands:</p>
 node app.js</code></pre><p>The example project is a simple express server. The <code>example-requests</code> file contains a bunch of example curl commands
 for you to start playing with the REST API.</p>
 <pre class="prettyprint source lang-sh"><code>cat example-requests</code></pre><p>Also our <a href="http://vincit.github.io/moron.js">API documentation</a> contains a lot of examples.</p>
-<h1>Examples</h1><p>An example model:</p>
+<h1>Examples</h1><p>Fetch all Person models from the database:</p>
+<pre class="prettyprint source lang-js"><code>Person.query().then(function (persons) {
+  console.log(persons[0] instanceof Person); // --> true
+  console.log('there are', persons.length, 'in total');
+}).catch(function (err) {
+  console.log('oh noes');
+});</code></pre><p>Query with a where clause:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('age', '>', 40)
+  .andWhere('age', '&lt;', 60)
+  .andWhere('firstName', 'Jennifer')
+  .orderBy('lastName')
+  .then(function (middleAgedJennifers) {
+    console.log('The last name of the first middle aged Jennifer is', middleAgedJennifers[0].lastName);
+  });</code></pre><p>Insert a related model:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('id', 100)
+  .first()
+  .then(function (person) {
+    return person.$relatedQuery('pets').insert({name: 'Fluffy'});
+  })
+  .then(function (fluffy) {
+    console.log(fully.id);
+  })
+  .catch(function (err) {
+    console.log('something went wrong with finding the person OR inserting the pet', err.stack);
+  });</code></pre><p>Fetch relations eagerly:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('[pets, children.pets]')
+  .then(function (persons) {
+    // Each person has the `.pets` property populated with the Animal object related through `pets` relation.
+    // The `.children` property contains the Person's children. Each children also has the `pets` relation
+    // eagerly fetched.
+    console.log(&quot;First person's first pet is&quot;, persons[0].pets[0].name);
+    console.log(&quot;First person's first child's first pet is named', persons[0].children[0].pets[0].name);
+  });</code></pre><h1>Example model</h1><p>Models are created by inheriting from the <code>MoronModel</code> base class. In moron.js the inheritance is done as transparently
+as possible. There is no custom Class abstraction making you wonder what the hell is happening. Just plain old ugly
+javascript inheritance :D.</p>
 <pre class="prettyprint source lang-js"><code>var MoronModel = require('moron').MoronModel;
 
 function Person() {
