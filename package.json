@@ -1,7 +1,7 @@
 {
   "name": "moron",
   "version": "0.0.1",
-  "description": "A Node.js ORM for PostgreSQL, MySQL and SQLite3 based on Knex",
+  "description": "A Node.js ORM that doesn't get in your way",
   "main": "moron.js",
   "license": "MIT",
   "scripts": {
