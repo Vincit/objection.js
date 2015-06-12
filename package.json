@@ -1,5 +1,5 @@
 {
-  "name": "moron.js",
+  "name": "moron",
   "version": "0.0.1",
   "description": "A Node.js ORM for PostgreSQL, MySQL and SQLite3 based on Knex",
   "main": "moron.js",
@@ -16,13 +16,13 @@
     "url": "git://github.com/vincit/moron.js.git"
   },
   "keywords": [
+    "orm",
+    "knex",
     "sql",
     "query",
     "postgresql",
     "mysql",
-    "mariadb",
-    "sqlite3",
-    "oracle"
+    "sqlite3"
   ],
   "dependencies": {
     "bluebird": "^2.9.24",

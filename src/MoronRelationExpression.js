@@ -2,6 +2,7 @@ var _ = require('lodash')
   , MoronValidationError = require('./MoronValidationError');
 
 /**
+ * @ignore
  * @class
  */
 function MoronRelationExpressionNode(name) {
@@ -10,7 +11,8 @@ function MoronRelationExpressionNode(name) {
 }
 
 /**
- * @constructor
+ * @ignore
+ * @class
  */
 function MoronRelationExpressionParser() {
   this.str = null;
@@ -110,7 +112,7 @@ MoronRelationExpressionParser.prototype._throwInvalidExpressionError = function 
 };
 
 /**
- * @constructor
+ * @class
  */
 function MoronRelationExpression(nodes) {
   this.nodes = nodes;
