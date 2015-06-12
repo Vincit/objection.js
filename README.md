@@ -119,7 +119,7 @@ moron.transaction(Person, Animal, function (Person, Animal) {
 });
 ```
 
-The [example project](#Getting started) contains more examples.
+The [example project](#getting-started) contains more examples.
 
 #Example model
 
