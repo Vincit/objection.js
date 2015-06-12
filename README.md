@@ -116,8 +116,8 @@ moron.transaction(Person, Animal, function (Person, Animal) {
         .query()
         .insert({name: 'Scrappy'});
     });
-    
-}).then(function (fluffy) {
+
+}).then(function (scrappy) {
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
