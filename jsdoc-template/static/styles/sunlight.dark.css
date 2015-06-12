@@ -122,7 +122,6 @@
 .sunlight-ident,
 .sunlight-diff .sunlight-unchanged {
 	color: #E0E0E0 !important;
-	font-weight: bold !important;
 }
 .sunlight-comment,
 .sunlight-xmlDocCommentContent,
@@ -137,7 +136,6 @@
 .sunlight-guid,
 .sunlight-diff .sunlight-modified {
 	color: #F7BA7E !important;
-	font-weight: bold !important;
 }
 .sunlight-named-ident,
 .sunlight-xml .sunlight-attribute,
@@ -152,7 +150,6 @@
 .sunlight-erlang .sunlight-userDefinedFunction,
 .sunlight-diff .sunlight-removed {
 	color: #FBBDEE !important;
-	font-weight: bold !important;
 }
 .sunlight-keyword,
 .sunlight-languageConstruct,
@@ -162,7 +159,6 @@
 .sunlight-bash .sunlight-command,
 .sunlight-erlang .sunlight-moduleAttribute {
 	color: #A3CCF7 !important;
-	font-weight: bold !important;
 }
 .sunlight-shortOpenTag,
 .sunlight-openTag,
@@ -177,7 +173,6 @@
 }
 .sunlight-content {
 	color: #FFFFFF !important;
-	font-weight: bold !important;
 }
 .sunlight-function,
 .sunlight-globalFunction,
@@ -191,7 +186,6 @@
 .sunlight-sln .sunlight-sectionName,
 .sunlight-diff .sunlight-header {
 	color: #C8BBF1 !important;
-	font-weight: bold !important;
 }
 .sunlight-variable,
 .sunlight-environmentVariable,
@@ -201,7 +195,6 @@
 .sunlight-ruby .sunlight-globalVariable,
 .sunlight-ruby .sunlight-instanceVariable {
 	color: #F5E5B0 !important;
-	font-weight: bold !important;
 }
 .sunlight-regexLiteral,
 .sunlight-lisp .sunlight-operator,
@@ -212,7 +205,6 @@
 }
 .sunlight-specialVariable {
 	font-style: italic !important;
-	font-weight: bold !important;
 }
 .sunlight-csharp .sunlight-pragma,
 .sunlight-preprocessorDirective,
@@ -289,19 +281,16 @@
 
 /* python */
 .sunlight-python .sunlight-specialMethod {
-	font-weight: bold !important;
 	color: #B0A3C2;
 }
 
 /* ruby */
 .sunlight-ruby .sunlight-symbol {
-	font-weight: bold !important;
 	color: #90EEA2 !important;
 }
 
 /* brainfuck */
 .sunlight-brainfuck {
-	font-weight: bold !important;
 	color: #000000 !important;
 }
 .sunlight-brainfuck .sunlight-increment {
@@ -341,5 +330,4 @@
 /* erlang */
 .sunlight-erlang .sunlight-atom {
 	color: #FFFFFF !important;
-	font-weight: bold !important;
 }
