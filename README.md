@@ -64,7 +64,8 @@ Person
   .andWhere('firstName', 'Jennifer')
   .orderBy('lastName')
   .then(function (middleAgedJennifers) {
-    console.log('The last name of the first middle aged Jennifer is', middleAgedJennifers[0].lastName);
+    console.log('The last name of the first middle aged Jennifer is');
+    console.log(middleAgedJennifers[0].lastName);
   });
 ```
 
@@ -82,7 +83,8 @@ Person
     console.log(fully.id);
   })
   .catch(function (err) {
-    console.log('something went wrong with finding the person OR inserting the pet', err.stack);
+    console.log('something went wrong with finding the person OR inserting the pet');
+    console.log(err.stack);
   });
 ```
 
@@ -93,13 +95,31 @@ Person
   .query()
   .eager('[pets, children.pets]')
   .then(function (persons) {
-    // Each person has the `.pets` property populated with the Animal object related through `pets` relation.
-    // The `.children` property contains the Person's children. Each children also has the `pets` relation
-    // eagerly fetched.
-    console.log("First person's first pet is", persons[0].pets[0].name);
-    console.log("First person's first child's first pet is named', persons[0].children[0].pets[0].name);
+    // Each person has the `.pets` property populated with Animal objects related
+    // through `pets` relation. The `.children` property contains the Person's
+    // children. Each children also has the `pets` relation eagerly fetched.
+    console.log(persons[0].pets[0].name);
+    console.log(persons[3].children[2].pets[8].name);
   });
 ```
+
+Transaction:
+
+```js
+moron.transaction(Person, Animal, function (Person, Animal) {
+  return Person
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+    .then(function () {
+      return Animal.insert({name: 'Scrappy'});
+    });
+}).then(function (fluffy) {
+  console.log('Jennifer and Scrappy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+});
+```
+
+The [example project](#Getting started) contains more examples.
 
 #Example model
 

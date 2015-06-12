@@ -165,7 +165,8 @@ for you to start playing with the REST API.</p>
   .andWhere('firstName', 'Jennifer')
   .orderBy('lastName')
   .then(function (middleAgedJennifers) {
-    console.log('The last name of the first middle aged Jennifer is', middleAgedJennifers[0].lastName);
+    console.log('The last name of the first middle aged Jennifer is');
+    console.log(middleAgedJennifers[0].lastName);
   });</code></pre><p>Insert a related model:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
@@ -178,18 +179,31 @@ for you to start playing with the REST API.</p>
     console.log(fully.id);
   })
   .catch(function (err) {
-    console.log('something went wrong with finding the person OR inserting the pet', err.stack);
+    console.log('something went wrong with finding the person OR inserting the pet');
+    console.log(err.stack);
   });</code></pre><p>Fetch relations eagerly:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .eager('[pets, children.pets]')
   .then(function (persons) {
-    // Each person has the `.pets` property populated with the Animal object related through `pets` relation.
-    // The `.children` property contains the Person's children. Each children also has the `pets` relation
-    // eagerly fetched.
-    console.log(&quot;First person's first pet is&quot;, persons[0].pets[0].name);
-    console.log(&quot;First person's first child's first pet is named', persons[0].children[0].pets[0].name);
-  });</code></pre><h1>Example model</h1><p>Models are created by inheriting from the <code>MoronModel</code> base class. In moron.js the inheritance is done as transparently
+    // Each person has the `.pets` property populated with Animal objects related
+    // through `pets` relation. The `.children` property contains the Person's
+    // children. Each children also has the `pets` relation eagerly fetched.
+    console.log(persons[0].pets[0].name);
+    console.log(persons[3].children[2].pets[8].name);
+  });</code></pre><p>Transaction:</p>
+<pre class="prettyprint source lang-js"><code>moron.transaction(Person, Animal, function (Person, Animal) {
+  return Person
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+    .then(function () {
+      return Animal.insert({name: 'Scrappy'});
+    });
+}).then(function (fluffy) {
+  console.log('Jennifer and Scrappy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+});</code></pre><p>The <a href="#Getting started">example project</a> contains more examples.</p>
+<h1>Example model</h1><p>Models are created by inheriting from the <code>MoronModel</code> base class. In moron.js the inheritance is done as transparently
 as possible. There is no custom Class abstraction making you wonder what the hell is happening. Just plain old ugly
 javascript inheritance :D.</p>
 <pre class="prettyprint source lang-js"><code>var MoronModel = require('moron').MoronModel;
