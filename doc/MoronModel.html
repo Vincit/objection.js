@@ -28,10 +28,6 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
-							<a href="MoronEagerFetcher.html">MoronEagerFetcher</a>
-						</li>
-						
-						<li>
 							<a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a>
 						</li>
 						
@@ -97,6 +93,10 @@
 							<a href="global.html#isSubclassOf">isSubclassOf</a>
 						</li>
 						
+						<li>
+							<a href="global.html#queryMethod">queryMethod</a>
+						</li>
+						
 
 					</ul>
 				</li>
@@ -155,6 +155,7 @@ Person.tableName = 'Person';
 
 Person.jsonSchema = {
   type: 'object',
+  required: ['firstName', 'lastName']
   properties: {
     id: {type: 'integer'},
     fatherId: {type: 'integer'}
@@ -4094,7 +4095,7 @@ the dog <code>fluffy</code> already exists in the database but it isn't related 
 the <code>pets</code> relation. We can make the connection like this:</p>
 <pre class="prettyprint source lang-js"><code>jennifer
   .$relatedQuery('pets')
-  .relate(fluffy)
+  .relate(fluffy.id)
   .then(function () {
     console.log('fluffy is now related to jennifer through pets relation');
   });</code></pre><p>The connection can be removed using the <code>unrelate</code> method. Again, this doesn't delete the

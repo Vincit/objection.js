@@ -28,10 +28,6 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
-							<a href="MoronEagerFetcher.html">MoronEagerFetcher</a>
-						</li>
-						
-						<li>
 							<a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a>
 						</li>
 						
@@ -97,6 +93,10 @@
 							<a href="global.html#isSubclassOf">isSubclassOf</a>
 						</li>
 						
+						<li>
+							<a href="global.html#queryMethod">queryMethod</a>
+						</li>
+						
 
 					</ul>
 				</li>
@@ -139,32 +139,11 @@
     
     
     <div class="description">
-        <pre class="prettyprint source"><code>     [run custom methods]
- [defined by insertImpl etc.]
-              |
-              ▼
-         [build query]
-              |
-              ▼
-          runBefore
-              |
-              ▼
-        [execute query]
-              |
-              ▼
-      runAfterKnexQuery
-              |
-              ▼
-[convert result to MoronModels]
-              |
-              ▼
-      runAfterModelCreate
-              |
-              ▼
-        [eager fetch]
-              |
-              ▼
-           runAfter</code></pre>
+        <p>Query builder for MoronModels.</p>
+<p>This class is a wrapper around <a href="http://knexjs.org#Builder">knex QueryBuilder</a>.
+MoronQueryBuilder has all the methods a knex QueryBuilder has and more. While knex
+QueryBuilder returns plain javascript objects, MoronQueryBuilder returns MoronModel
+subclass instances.</p>
     </div>
     
 
@@ -234,6 +213,5697 @@
 
     
 
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_forClass">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">forClass</span>
+          <span class="signature-container"><span class="signature">(modelClass)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Create MoronQueryBuilder for a MoronModel subclass.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>MoronModel subclass.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="andWhere">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">andWhere</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="avg">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">avg</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="column">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">column</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="columns">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">columns</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="count">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">count</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="crossJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">crossJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="debug">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">debug</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="decrement">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">decrement</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="distinct">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">distinct</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="eager">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">eager</span>
+          <span class="signature-container"><span class="signature">(exp)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Fetch relations for the result rows.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>// Fetch `children` relation for each result Person and `pets` and `movies`
+// relations for all the children.
+Person
+  .query()
+  .eager('children.[pets, movies]')
+  .then(function (persons) {
+    console.log(persons[0].children[0].pets[0].name);
+    console.log(persons[0].children[0].movies[0].id);
+  });</code></pre><p>See <a href="MoronRelationExpression.html">MoronRelationExpression</a> for more examples and documentation.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>exp</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="from">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">from</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="fullOuterJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">fullOuterJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="groupBy">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">groupBy</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="having">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">having</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="havingRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">havingRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="increment">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">increment</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="innerJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">innerJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="into">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">into</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="join">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">join</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="leftJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">leftJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="leftOuterJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">leftOuterJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="limit">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">limit</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="max">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">max</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="min">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">min</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="offset">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">offset</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orderBy">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orderBy</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orHaving">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orHaving</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orHavingRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orHavingRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhere">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhere</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereBetween">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereBetween</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereExists">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereExists</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereIn">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereIn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereNotBetween">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereNotBetween</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereNotExists">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereNotExists</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereNotIn">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereNotIn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereNotNull">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereNotNull</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereNull">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereNull</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="outerJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">outerJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="resolve">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">resolve</span>
+          <span class="signature-container"><span class="signature">(resolve)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Skips the database query and &quot;fakes&quot; its result.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>resolve</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Object></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="returning">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">returning</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="rightJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">rightJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="rightOuterJoin">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">rightOuterJoin</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runAfter">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runAfter</span>
+          <span class="signature-container"><span class="signature">(runAfter)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Registers a function to be called after the query once the builder is executed.</p>
+<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runAfter(function (models) {
+   return models;
+ })
+ .runAfter(function (models) {
+   models.push(Person.fromJson({firstName: 'Jennifer'}));
+ });
+
+query.then(function (models) {
+  var jennifer = models[models.length - 1];
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>runAfter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runAfterKnexQuery">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runAfterKnexQuery</span>
+          <span class="signature-container"><span class="signature">(runAfterKnexQuery)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Registers a function to be called after the database query once the builder is executed.</p>
+<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runAfterKnexQuery(function (rows) {
+   return rows;
+ })
+ .runAfterKnexQuery(function (rows) {
+   rows.push({firstName: 'Jennifer'});
+ });
+
+query.then(function (models) {
+  var jennifer = models[models.length - 1];
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>runAfterKnexQuery</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runAfterKnexQueryPushFront">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runAfterKnexQueryPushFront</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Just like <code>runAfterKnexQuery</code> but pushes the function before any other runAfterKnexQuery functions.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runAfterKnexQuery(function (rows) {
+   console.log('hello 1');
+   return rows;
+ })
+ .runAfterKnexQueryPushFront(function (rows) {
+   console.log('hello 2');
+   return rows;
+ });
+
+query.then();
+// --> hello 2
+// --> hello 1</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runAfterModelCreate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runAfterModelCreate</span>
+          <span class="signature-container"><span class="signature">(runAfterModelCreate)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Registers a function to be called after the database rows are converted to MoronModel instances.</p>
+<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runAfterModelCreate(function (models) {
+   return models;
+ })
+ .runAfterKnexQuery(function (models) {
+   models.push(Person.fromJson({firstName: 'Jennifer'}));
+ });
+
+query.then(function (models) {
+  var jennifer = models[models.length - 1];
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>runAfterModelCreate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runAfterModelCreatePushFront">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runAfterModelCreatePushFront</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Just like <code>runAfterModelCreate</code> but pushes the function before any other runAfterModelCreate functions.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runAfterModelCreate(function (models) {
+   console.log('hello 1');
+   return models;
+ })
+ .runAfterModelCreatePushFront(function (models) {
+   console.log('hello 2');
+   return models;
+ });
+
+query.then();
+// --> hello 2
+// --> hello 1</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runAfterPushFront">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runAfterPushFront</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Just like <code>runAfter</code> but pushes the function before any other runAfter functions.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runAfter(function (models) {
+   console.log('hello 1');
+   return models;
+ })
+ .runAfterPushFront(function (models) {
+   console.log('hello 2');
+   return models;
+ });
+
+query.then();
+// --> hello 2
+// --> hello 1</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runBefore">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runBefore</span>
+          <span class="signature-container"><span class="signature">(runBefore)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Registers a function to be called before the database query once the builder is executed.</p>
+<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runBefore(function () {
+   console.log('hello 1');
+
+   return Promise.delay(10).then(function () {
+     console.log('hello 2');
+   });
+ })
+ .runBefore(function () {
+   console.log('hello 3');
+ });
+
+query.then();
+// --> hello 1
+// --> hello 2
+// --> hello 3</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>runBefore</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="runBeforePushFront">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">runBeforePushFront</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Just like <code>runBefore</code> but pushes the function before any other runBefore functions.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .runBefore(function () {
+   console.log('hello 1');
+ })
+ .runBeforePushFront(function () {
+   console.log('hello 2');
+ });
+
+query.then();
+// --> hello 2
+// --> hello 1</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="select">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">select</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="sum">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">sum</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="table">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">table</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="truncate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">truncate</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="union">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">union</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="unionAll">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">unionAll</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="where">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">where</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereBetween">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereBetween</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereExists">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereExists</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereIn">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereIn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereNotBetween">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereNotBetween</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereNotExists">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereNotExists</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereNotIn">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereNotIn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereNotNull">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereNotNull</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereNull">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereNull</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereWrapped">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereWrapped</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        </dl>
     
 
     

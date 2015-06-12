@@ -31,6 +31,7 @@ var _ = require('lodash')
  *
  * Person.jsonSchema = {
  *   type: 'object',
+ *   required: ['firstName', 'lastName']
  *   properties: {
  *     id: {type: 'integer'},
  *     fatherId: {type: 'integer'}
@@ -245,7 +246,7 @@ MoronModel.prototype.$query = function () {
  * ```js
  * jennifer
  *   .$relatedQuery('pets')
- *   .relate(fluffy)
+ *   .relate(fluffy.id)
  *   .then(function () {
  *     console.log('fluffy is now related to jennifer through pets relation');
  *   });
@@ -998,8 +999,8 @@ MoronModel.generateId = function () {
  * });
  * ```
  *
- * @param $models
- * @param expression
+ * @param {Array.<MoronModel|Object>} $models
+ * @param {String|MoronRelationExpression} expression
  * @returns {*}
  */
 MoronModel.loadRelated = function ($models, expression) {

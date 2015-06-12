@@ -6,6 +6,7 @@ var _ = require('lodash')
 
 /**
  * @class
+ * @ignore
  */
 function MoronEagerFetcher(opt) {
   this.modelClass = opt.modelClass;
