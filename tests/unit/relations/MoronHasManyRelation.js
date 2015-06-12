@@ -152,7 +152,7 @@ describe('MoronOneToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "id"');
           expect(owner.nameOfOurRelation).to.eql(result);
           expect(result).to.eql([
             {a: 'str1', id: 1, ownerId: 666},
@@ -177,7 +177,7 @@ describe('MoronOneToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\'), (\'str2\', \'666\') returning "id"');
           expect(result).to.eql([
             {a: 'str1', id: 1, ownerId: 666},
             {a: 'str2', id: 2, ownerId: 666}
@@ -201,7 +201,7 @@ describe('MoronOneToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "id"');
           expect(result).to.eql({a: 'str1', id: 1, ownerId: 666});
           expect(result).to.be.a(RelatedModel);
         });
@@ -221,7 +221,7 @@ describe('MoronOneToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerId") values (\'str1\', \'666\') returning "id"');
           expect(result).to.eql({a: 'str1', id: 1, ownerId: 666});
           expect(result).to.be.a(RelatedModel);
         });

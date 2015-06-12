@@ -54,7 +54,7 @@ module.exports = function (session) {
           .delete()
           .where('model_2_prop_2', 1)
           .then(function () {
-            return session.knex('model_2').orderBy('id');
+            return session.knex('model_2').orderBy('id_col');
           })
           .then(function (rows) {
             expect(rows).to.have.length(1);

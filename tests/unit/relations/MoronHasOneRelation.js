@@ -142,7 +142,7 @@ describe('MoronOneToOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
           expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result[0]);
           expect(owner.relatedId).to.equal(2);
@@ -165,7 +165,7 @@ describe('MoronOneToOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
           expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result[0]);
           expect(owner.relatedId).to.equal(2);
@@ -188,7 +188,7 @@ describe('MoronOneToOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
           expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result);
           expect(owner.relatedId).to.equal(2);
@@ -211,7 +211,7 @@ describe('MoronOneToOneRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
           expect(executedQueries[1]).to.equal('update "OwnerModel" set "relatedId" = \'2\' where "OwnerModel"."id" = \'666\'');
           expect(owner.nameOfOurRelation).to.equal(result);
           expect(owner.relatedId).to.equal(2);

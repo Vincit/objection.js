@@ -60,7 +60,7 @@ MoronQueryBuilder.prototype.resolve = function (resolve) {
 };
 
 /**
- * Skips the database query and "fakes" and error result.
+ * Skips the database query and "fakes" an error result.
  *
  * @param {Error} error
  * @returns {MoronQueryBuilder}

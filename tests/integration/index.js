@@ -10,6 +10,12 @@ describe('integration tests', function () {
     connection: {
       filename: path.join(os.tmpdir(), 'test.db')
     }
+  }, {
+    client: 'pg',
+    connection: {
+      host: '127.0.0.1',
+      database: 'moron_test'
+    }
   }], function (knexConfig) {
     var session = modelTestUtils.initialize({
       knexConfig: knexConfig

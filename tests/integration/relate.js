@@ -80,7 +80,7 @@ module.exports = function (session) {
                 .relate(2);
             })
             .then(function () {
-              return session.knex(Model2.tableName).orderBy('id');
+              return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(function (rows) {
               expect(rows[0].model_1_id).to.equal(1);

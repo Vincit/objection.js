@@ -178,7 +178,7 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
           expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
           expect(owner.nameOfOurRelation).to.eql([{a: 'str0'}, {a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
           expect(result).to.eql([
@@ -204,7 +204,7 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
           expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
           expect(owner.nameOfOurRelation).to.eql([{a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
           expect(result).to.eql([
@@ -230,7 +230,7 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
           expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
           expect(result).to.eql({a: 'str1', id: 1, rid: 2});
           expect(result).to.be.a(RelatedModel);
@@ -251,7 +251,7 @@ describe('MoronManyToManyRelation', function () {
         .insert(related)
         .then(function (result) {
           expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "RelatedModel"."id"');
+          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
           expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
           expect(result).to.eql({a: 'str1', id: 1, rid: 2});
           expect(result).to.be.a(RelatedModel);

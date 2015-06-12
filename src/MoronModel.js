@@ -1076,7 +1076,7 @@ MoronModel.$$insert = function (builder, $models) {
     return model.$toDatabaseJson();
   });
 
-  return builder.insert(json).returning(ModelClass.getFullIdColumn()).runAfterModelCreatePushFront(function (ids) {
+  return builder.insert(json).returning(ModelClass.idColumn).runAfterModelCreatePushFront(function (ids) {
     // TODO: will not work in all situations!!!!
     if (ids.length === 1 && models.length > 1) {
       var lastId = ids[0];

@@ -83,7 +83,7 @@ module.exports = function (session) {
           .then(function (updated) {
             expect(updated).to.be.a(Model2);
             expectPartEql(updated, {model2Prop1: 'updated text'});
-            return session.knex('model_2').orderBy('id');
+            return session.knex('model_2').orderBy('id_col');
           })
           .then(function (rows) {
             expect(rows).to.have.length(2);

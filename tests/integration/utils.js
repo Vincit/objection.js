@@ -73,6 +73,8 @@ module.exports.initialize = function (opt) {
   Model1.idColumn = 'id';
   Model2.idColumn = 'id_col';
 
+  convertPostgresBigIntegersToNumber();
+
   return {
     opt: opt,
     knex: knex,
@@ -135,9 +137,14 @@ module.exports.populate = function (data) {
         var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
         var maxId = _.max(_.pluck(rows, idCol));
 
+        // Reset sequence.
         if (session.opt.knexConfig.client === 'sqlite3') {
           if (maxId && _.isFinite(maxId)) {
             return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+          }
+        } else if (session.opt.knexConfig.client === 'pg') {
+          if (maxId && _.isFinite(maxId)) {
+            return session.knex.raw('ALTER SEQUENCE "' + table  + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
           }
         } else {
           throw new Error('not yet implemented');
@@ -232,4 +239,28 @@ function createRows(model, ModelClass, rows) {
 
   rows[ModelClass.tableName] = rows[ModelClass.tableName] || [];
   rows[ModelClass.tableName].push(model.$toDatabaseJson());
+}
+
+function convertPostgresBigIntegersToNumber() {
+  var pgTypes;
+  try {
+    pgTypes = require('pg').types;
+  } catch (err) {
+    // pg not installed. ignore.
+  }
+
+  if (pgTypes) {
+    var MaxSafeInteger = Math.pow(2, 53) - 1;
+    // Convert big integers to numbers.
+    pgTypes.setTypeParser(20, function (val) {
+      if (val === null) {
+        return null;
+      }
+      var number = parseInt(val, 10);
+      if (number > MaxSafeInteger) {
+        throw new Error('node-pg: bigint overflow: ' + number);
+      }
+      return number;
+    });
+  }
 }
