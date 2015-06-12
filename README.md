@@ -107,11 +107,16 @@ Transaction:
 
 ```js
 moron.transaction(Person, Animal, function (Person, Animal) {
+
   return Person
+    .query()
     .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
     .then(function () {
-      return Animal.insert({name: 'Scrappy'});
+      return Animal
+        .query()
+        .insert({name: 'Scrappy'});
     });
+    
 }).then(function (fluffy) {
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {

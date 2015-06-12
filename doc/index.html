@@ -193,11 +193,16 @@ for you to start playing with the REST API.</p>
     console.log(persons[3].children[2].pets[8].name);
   });</code></pre><p>Transaction:</p>
 <pre class="prettyprint source lang-js"><code>moron.transaction(Person, Animal, function (Person, Animal) {
+
   return Person
+    .query()
     .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
     .then(function () {
-      return Animal.insert({name: 'Scrappy'});
+      return Animal
+        .query()
+        .insert({name: 'Scrappy'});
     });
+
 }).then(function (fluffy) {
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {
