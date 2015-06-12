@@ -5,7 +5,8 @@
   "main": "moron.js",
   "license": "MIT",
   "scripts": {
-    "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests"
+    "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
+    "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "author": {
     "name": "Sami Koskimäki",
@@ -33,10 +34,12 @@
     "tv4-formats": "^1.0.0"
   },
   "devDependencies": {
+    "coveralls": "^2.11.2",
     "expect.js": "^0.3.1",
     "grunt": "^0.4.5",
     "grunt-jsdoc": "^0.6.7",
     "ink-docstrap": "^0.4.12",
+    "istanbul": "^0.3.15",
     "mocha": "^2.2.4",
     "sqlite3": "^3.0.8"
   }

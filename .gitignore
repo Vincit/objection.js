@@ -1,4 +1,5 @@
 node_modules
 .idea
+test-coverage
 *.iml
 *.DS_Store
