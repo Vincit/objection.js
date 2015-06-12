@@ -8,7 +8,7 @@ describe('integration tests', function () {
   _.each([{
     client: 'sqlite3',
     connection: {
-      filename: path.join(os.tmpdir(), 'test.db')
+      filename: path.join(os.tmpdir(), 'moron_test.db')
     }
   }, {
     client: 'pg',
