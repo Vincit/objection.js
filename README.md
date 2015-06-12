@@ -1,5 +1,5 @@
 # moron.js [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
-A Node.js ORM that doesn't get in your way
+A Node.js ORM that doesn't get in your way.
 
 Moron.js is an ORM built around the wonderful SQL query builder called [knex](http://knexjs.org). All databases
 supported by knex are supported by moron.js. The list includes SQLite3, Postgres and MySQL.

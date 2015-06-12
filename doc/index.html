@@ -130,9 +130,77 @@
 
 
     <section class="readme-section">
-        <article><h1>moron.js</h1><p>A Node.js ORM for PostgreSQL, MySQL and SQLite3 based on Knex http://knexjs.org.</p>
-<p><a href="http://vincit.github.io/moron.js">API documentation stub</a></p>
-<h2>Still very much under construction.. Documentation will appear as soon as there is something useful ready.</h2></article>
+        <article><h1>moron.js <a href="https://travis-ci.org/Vincit/moron.js"><img src="https://travis-ci.org/Vincit/moron.js.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/Vincit/moron.js"><img src="https://coveralls.io/repos/Vincit/moron.js/badge.svg" alt="Coverage Status"></a></h1><p>A Node.js ORM that doesn't get in your way.</p>
+<p>Moron.js is an ORM built around the wonderful SQL query builder called <a href="http://knexjs.org">knex</a>. All databases
+supported by knex are supported by moron.js. The list includes SQLite3, Postgres and MySQL.</p>
+<p>What moron.js gives you:</p>
+<ul>
+<li>An easy declarative way of defining models and relations between them.</li>
+<li>Simple and fun way to fetch, insert, update, patch and delete models using SQL.</li>
+<li>Powerful mechanism for loading arbitrarily big trees of relations.</li>
+<li>JSON schema validation.</li>
+</ul>
+<p>What moron.js doesn't give you:</p>
+<ul>
+<li>A custom query DSL. All queries are generated using the knex's SQL query builder.</li>
+<li>Automatic database schema creation. Moron.js leaves this to you. knex has a <a href="http://knexjs.org/#Migrations">great tool</a> for this.</li>
+</ul>
+<h1>Installation</h1><pre class="prettyprint source lang-sh"><code>npm install moron</code></pre><h1>Getting started</h1><p>Best way to get started is to download the example project <a href="">here</a>. Unzip the project and <code>cd</code> to the folder. Then
+write the commands:</p>
+<pre class="prettyprint source lang-sh"><code>sh install.sh
+node app.js</code></pre><p>The example project is a simple express server. The <code>example-requests</code> file contains a bunch of example curl commands
+for you to start playing with the REST API.</p>
+<pre class="prettyprint source lang-sh"><code>cat example-requests</code></pre><p>Also our <a href="http://vincit.github.io/moron.js">API documentation</a> contains a lot of examples.</p>
+<h1>Examples</h1><p>An example model:</p>
+<pre class="prettyprint source lang-js"><code>var MoronModel = require('moron').MoronModel;
+
+function Person() {
+  MoronModel.apply(this, arguments);
+}
+
+module.exports = MoronModel.extend(Person);
+
+// Table name is the only required property.
+Person.tableName = 'Person';
+
+// This is not the database schema! Nothing is generated based on this. This a schema
+// for the JSON objects from which Persons are created.
+Person.jsonSchema = {
+  type: 'object',
+  required: ['firstName', 'lastName'],
+
+  properties: {
+    id: {type: 'integer'},
+    parentId: {type: ['integer', 'null']},
+    firstName: {type: 'string', minLength: 1, maxLength: 255},
+    firstName: {type: 'string', minLength: 1, maxLength: 255},
+    age: {type: 'number'}
+  }
+};
+
+// This object defines the relations to other models. Person has two relations `pets`
+// and `children`.
+Person.relationMappings = {
+  pets: {
+    relation: MoronModel.OneToManyRelation,
+    // The related model. This can be either a MoronModel subclass constructor or an
+    // absolute file path to a module that exports one.
+    modelClass: __dirname + '/Animal',
+    join: {
+      from: 'Person.id',
+      to: 'Animal.ownerId'
+    }
+  },
+
+  children: {
+    relation: MoronModel.OneToManyRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.id',
+      to: 'Person.parentId'
+    }
+  }
+};</code></pre></article>
     </section>
 
 
