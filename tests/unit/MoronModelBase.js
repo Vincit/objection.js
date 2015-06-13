@@ -487,7 +487,7 @@ describe('MoronModelBase', function () {
         return jsn;
       };
 
-      var model = Model.fromJson({a: 1, g: {h: 100}});
+      var model = Model.fromJson({a: 1, g: {h: 100}, r: [{h: 50}]});
       model.b = Model2.fromJson({c: 2});
       model.e = [Model2.fromJson({f: 100})];
 
@@ -495,9 +495,10 @@ describe('MoronModelBase', function () {
 
       expect(clone).to.eql(model);
       expect(clone.$toJson()).to.eql(model.$toJson());
-      expect(clone.$toJson()).to.eql({a: 1, g: {h: 100}, b: {c: 2, d: 3}, e: [{f: 100, d: 3}]});
+      expect(clone.$toJson()).to.eql({a: 1, g: {h: 100}, r: [{h: 50}], b: {c: 2, d: 3}, e: [{f: 100, d: 3}]});
 
       expect(clone.g).to.not.equal(model.g);
+      expect(clone.r[0]).to.not.equal(model.r[0]);
       expect(clone.b).to.not.equal(model.b);
       expect(clone.e[0]).to.not.equal(model.e[0]);
     });

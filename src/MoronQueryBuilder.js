@@ -435,7 +435,7 @@ MoronQueryBuilder.prototype.allowEager = function (exp) {
 };
 
 MoronQueryBuilder.prototype.call = function (func) {
-  func.call(this);
+  func.call(this, this);
   return this;
 };
 

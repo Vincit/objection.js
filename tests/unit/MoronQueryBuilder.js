@@ -31,6 +31,37 @@ describe('MoronQueryBuilder', function () {
     Model.knex(mockKnex);
   });
 
+  it('modelClass() should return the model class', function () {
+    expect(MoronQueryBuilder.forClass(Model).modelClass() === Model).to.equal(true);
+  });
+
+  it('call() should execute the given function and pass the builder to it', function () {
+    var builder = MoronQueryBuilder.forClass(Model);
+    var called = false;
+
+    builder.call(function (b) {
+      called = true;
+      expect(b === builder).to.equal(true);
+      expect(this === builder).to.equal(true);
+    });
+
+    expect(called).to.equal(true);
+  });
+
+  it('dumpSql() should dump the contents of toString() to a logger', function () {
+    var logCalled = false;
+    var builder = MoronQueryBuilder.forClass(Model);
+
+    builder
+      .where('a', 10)
+      .dumpSql(function (str) {
+        logCalled = true;
+        expect(str).to.equal(builder.toString());
+      });
+
+    expect(logCalled).to.equal(true);
+  });
+
   it('should call the callback passed to .then after execution', function (done) {
     mockKnexQueryResult = [{a: 1}, {a: 2}];
     // Make sure the callback is called by not returning a promise from the test.
@@ -422,16 +453,22 @@ describe('MoronQueryBuilder', function () {
 
     query.then(function () {
       expect(executedQueries).to.have.length(1);
+      expect(query.toString()).to.equal(executedQueries[0]);
+      expect(query.toSql()).to.equal(executedQueries[0]);
       expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\' where "test" < \'100\'');
       executedQueries = [];
       return query;
     }).then(function () {
       expect(executedQueries).to.have.length(1);
+      expect(query.toString()).to.equal(executedQueries[0]);
+      expect(query.toSql()).to.equal(executedQueries[0]);
       expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\' where "test" < \'100\'');
       executedQueries = [];
       return query;
     }).then(function () {
       expect(executedQueries).to.have.length(1);
+      expect(query.toString()).to.equal(executedQueries[0]);
+      expect(query.toSql()).to.equal(executedQueries[0]);
       expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\' where "test" < \'100\'');
     });
   });

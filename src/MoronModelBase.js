@@ -120,6 +120,9 @@ function MoronModelBase() {
  *    The (possibly) modified jsonSchema.
  */
 MoronModelBase.prototype.$beforeValidate = function (jsonSchema, json, options) {
+  // This function is never invoked if it hasn't been overridden. And if it has been
+  // overridden it is also never called. So to sum up, this method is never called :D.
+  /* istanbul ignore next */
   return jsonSchema;
 };
 
