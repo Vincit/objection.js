@@ -1,29 +1,25 @@
 # moron.js [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
-A Node.js ORM that doesn't get in your way.
 
-Moron.js is an ORM built around the wonderful SQL query builder called [knex](http://knexjs.org). All databases
-supported by knex are supported by moron.js. SQLite3, Postgres and MySQL are fully tested.
+Moron.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
+supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are fully tested.
 
 What moron.js gives you:
 
- * An easy declarative way of defining models and relations between them.
- * Simple and fun way to fetch, insert, update, patch and delete models using the full power of SQL.
- * [Powerful mechanism](http://vincit.github.io/moron.js/MoronRelationExpression.html) for loading arbitrarily big trees of relations.
- * [JSON schema](http://json-schema.org/) validation.
- * Fully [Promise](https://github.com/petkaantonov/bluebird) based API.
- * A way to [store documents](#documents) as single rows.
+ * An easy declarative way of [defining models](#example-model) and relations between them
+ * Simple and fun way to [fetch, insert, update and delete](#query-examples) models using the full power of SQL
+ * A way to [store complex documents](#documents) as single rows
+ * Powerful mechanism for loading arbitrarily large [trees of relations](#fetching-relations-eagerly)
+ * Completely [Promise](https://github.com/petkaantonov/bluebird) based API
+ * Simple [transactions](#transactions)
+ * [JSON schema](http://json-schema.org/) validation
 
 What moron.js doesn't give you:
 
- * A custom query DSL.
-
-    Why create an inferior query language when we have SQL? All queries are generated using the knex's SQL query builder.
-
- * Automatic database schema creation/migration.
-
-    Automatic schema creation is useful for the simple things, but usually just gets in your way when doing
-    anything non-trivial. Moron.js leaves the schema and migration related things to you. knex has a great
-    [migration API](http://knexjs.org/#Migrations).
+ * A custom query DSL. SQL is used everywhere
+ * Automatic database schema creation and migration
+    Automatic schema creation and migration is useful for the simple things, but usually just gets in your
+    way when doing anything non-trivial. Moron.js leaves the schema and migration related things to you.
+    knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job.
 
 #Installation
 
@@ -42,11 +38,11 @@ sh install.sh
 npm start
 ```
 
-The `express` example project is a simple express server. The `example-requests` file contains a bunch of curl
+The `express` example project is a simple express server. The `example-requests.sh` file contains a bunch of curl
 commands for you to start playing with the REST API.
 
 ```sh
-cat example-requests
+cat example-requests.sh
 ```
 
 Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of examples.
@@ -55,7 +51,7 @@ Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of
 
 The Person model used in the examples is defined [here](#example-model).
 
-All queries are started with one of the MoronModel methods [query()](http://vincit.github.io/moron.js/MoronModel.html#_P_query),
+All queries are started with one of the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) methods [query()](http://vincit.github.io/moron.js/MoronModel.html#_P_query),
 [$query()](http://vincit.github.io/moron.js/MoronModel.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery).
 All these methods return a [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html) instance that can be used just like
 a [knex QueryBuilder](http://knexjs.org/#Builder).
@@ -83,7 +79,7 @@ Person
   .query()
   .then(function (persons) {
     console.log(persons[0] instanceof Person); // --> true
-    console.log('there are', persons.length, 'in total');
+    console.log('there are', persons.length, 'Persons in total');
   })
   .catch(function (err) {
     console.log('oh noes');
@@ -168,22 +164,89 @@ Person
   });
 ```
 
-Fetch relations eagerly:
+#Fetching relations eagerly
+
+Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly. The following
+examples demonstrate how to use it:
+
+Fetch one relation:
 
 ```js
 Person
   .query()
-  .eager('[pets, children.pets]')
+  .eager('pets')
   .then(function (persons) {
     // Each person has the `.pets` property populated with Animal objects related
-    // through `pets` relation. The `.children` property contains the Person's
-    // children. Each child also has the `pets` relation eagerly fetched.
+    // through `pets` relation.
     console.log(persons[0].pets[0].name);
-    console.log(persons[3].children[2].pets[8].name);
+    console.log(persons[0].pets[0] instanceof Animal); // --> true
   });
 ```
 
-Transaction:
+Fetch multiple relations on multiple levels:
+
+```js
+Person
+  .query()
+  .eager('[pets, children.[pets, children]]')
+  .then(function (persons) {
+    // Each person has the `.pets` property populated with Animal objects related
+    // through `pets` relation. The `.children` property contains the Person's
+    // children. Each child also has the `pets` and `children` relations eagerly
+    // fetched.
+    console.log(persons[0].pets[0].name);
+    console.log(persons[1].children[2].pets[1].name);
+    console.log(persons[1].children[2].children[0].name);
+  });
+```
+
+Fetch one relation recursively:
+
+```js
+Person
+  .query()
+  .eager('[pets, children.^]')
+  .then(function (persons) {
+    // The children relation is from Person to Person. If we want to fetch the whole
+    // descendant tree of a person we can just say "fetch this relation recursively"
+    // using the `.^` notation.
+    console.log(persons[0].children[0].children[0].children[0].children[0].firstName);
+  });
+```
+
+The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/moron.js/MoronRelationExpression.html).
+
+Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
+request. However using such expressions opens the whole database through the API. This is not very secure. Therefore
+the [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html) has the `.allowEager` method.
+allowEager can be used to limit the allowed eager expression to a certain subset. Like this:
+
+```js
+expressApp.get('/persons', function (req, res, next) {
+  Person
+    .query()
+    .allowEager('[pets, children.pets]')
+    .eager(req.query.eager)
+    .then(function (persons) { res.send(persons); })
+    .catch(next);
+});
+```
+
+The example above allows `req.query.eager` to be one of `'pets'`, `'children'`, `'children.pets'`, `'[pets, children]'` and
+`'[pets, children.pets]'`. Examples of failing eager expressions are `'movies'`, `'children.children'` and `'notEvenAnExistingRelation'`.
+
+In addition to the `.eager` method relations can be fetched using the `loadRelated` and `$loadRelated` methods of
+[MoronModel](http://vincit.github.io/moron.js/MoronModel.html).
+
+#Transactions
+
+Transactions are started by calling the [moron.transaction](http://vincit.github.io/moron.js/global.html#transaction)
+function. Give all the models you want to use in the transaction as parameters to the `transaction` function. The model
+classes are bound to a newly created transaction and passed to the callback function. Inside this callback all queries
+started through them take part in the same transaction.
+
+The transaction is committed if the returned Promise is resolved successfully. If the returned Promise is rejected
+the transaction is rolled back.
 
 ```js
 moron.transaction(Person, Animal, function (Person, Animal) {
@@ -206,10 +269,12 @@ moron.transaction(Person, Animal, function (Person, Animal) {
 
 #Documents
 
-The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#example-model).
-MoronModel automatically converts the property to a JSON string when inserted to database and back to an object
-when read from the database. The database column can be a normal text column. Postgresql has the json and jsonb
-data types that should be used instead.
+Moron.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
+objects or arrays in the model's `jsonSchema` are automatically converted to JSON strings in the database and
+back to objects when read from the database. The database columns for the object properties can be a normal
+text columns. Postgresql has the json and jsonb data types that can be used instead.
+
+The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#example-model):
 
 ```js
 Person
@@ -238,15 +303,15 @@ Person
 
 #Example model
 
-Models are created by inheriting from the `MoronModel` base class. In moron.js the inheritance is done as transparently
-as possible. There is no custom Class abstraction making you wonder what the hell is happening. Just plain old ugly
-javascript inheritance :D.
+Models are created by inheriting from the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) base class.
+In moron.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
+wonder what the hell is happening. Just plain old ugly javascript inheritance.
 
 ```js
 var MoronModel = require('moron').MoronModel;
 
 /**
- * @Override MoronModel
+ * @override MoronModel
  * @constructor
  */
 function Person() {
@@ -261,7 +326,7 @@ Person.tableName = 'Person';
 
 // This is not the database schema! Nothing is generated based on this. Whenever a
 // Person object is created from a JSON object, the JSON is checked against this
-// schema. For example when you call Person.fromJson({name: 'Matrix'});
+// schema. For example when you call Person.fromJson({firstName: 'Jennifer'});
 Person.jsonSchema = {
   type: 'object',
   required: ['firstName', 'lastName'],

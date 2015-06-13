@@ -14,7 +14,7 @@ module.exports = function (app) {
   });
 
 
-  // Patch a person.
+  // Patch a Person.
   app.patch('/persons/:id', function (req, res, next) {
     Person
       .query()
@@ -25,7 +25,7 @@ module.exports = function (app) {
   });
 
 
-  // Get all persons. The result can be filtered using query parameters:
+  // Get all Persons. The result can be filtered using query parameters:
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
   app.get('/persons', function (req, res, next) {
@@ -88,7 +88,7 @@ module.exports = function (app) {
   });
 
 
-  // Get a person's pets. The result can be filtered using query parameters:
+  // Get a Person's pets. The result can be filtered using query parameters:
   // `name` and `species`.
   app.get('/persons/:id/pets', function (req, res, next) {
     Person
@@ -147,7 +147,7 @@ module.exports = function (app) {
   });
 
 
-  // Get movie's actors.
+  // Get Movie's actors.
   app.get('/movies/:id/actors', function (req, res, next) {
     Movie
       .query()
@@ -155,7 +155,7 @@ module.exports = function (app) {
       .first()
       .then(function (movie) {
         if (!movie) { throwNotFound(); }
-        return movie.$relatedQuery('actors')
+        return movie.$relatedQuery('actors');
       })
       .then(function (actors) { res.send(actors); })
       .catch(next);
@@ -168,4 +168,3 @@ function throwNotFound() {
   error.statusCode = 404;
   throw error;
 }
-

@@ -89,6 +89,10 @@
 							<a href="global.html#queryMethod">queryMethod</a>
 						</li>
 						
+						<li>
+							<a href="global.html#transaction">transaction</a>
+						</li>
+						
 
 					</ul>
 				</li>
@@ -210,6 +214,8 @@ subclass instances.</p>
 
         <dl>
             
+        
+            
               
 <dt>
     
@@ -330,6 +336,8 @@ subclass instances.</p>
     
 </dd>
 
+            
+        
             
         
             
@@ -497,7 +505,7 @@ parameters of a http request.</p>
         <h4 class="name" id="andWhere">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">andWhere</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -558,6 +566,25 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -571,7 +598,7 @@ parameters of a http request.</p>
         <h4 class="name" id="avg">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">avg</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -632,6 +659,560 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="bind">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">bind</span>
+          <span class="signature-container"><span class="signature">(context)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and calls <code>.bind(context)</code> for the returned promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>context</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="call">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">call</span>
+          <span class="signature-container"><span class="signature">(func)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Calls the given function immediately and passes <code>this</code> as an argument.</p>
+<p>Handy for chaining conditional stuff:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .call(function (builder) {
+    if (something) {
+      builder.where('something', someValue);
+    }
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="catch">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">catch</span>
+          <span class="signature-container"><span class="signature">(errorHandler)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and calls <code>.catch(errorHandler)</code> for the returned promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>errorHandler</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="clone">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">clone</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Create a clone of this builder.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -645,7 +1226,7 @@ parameters of a http request.</p>
         <h4 class="name" id="column">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">column</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -706,6 +1287,25 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -719,7 +1319,7 @@ parameters of a http request.</p>
         <h4 class="name" id="columns">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">columns</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -780,6 +1380,25 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -793,7 +1412,7 @@ parameters of a http request.</p>
         <h4 class="name" id="count">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">count</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -854,6 +1473,25 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -867,7 +1505,7 @@ parameters of a http request.</p>
         <h4 class="name" id="crossJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">crossJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -928,6 +1566,25 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -941,7 +1598,7 @@ parameters of a http request.</p>
         <h4 class="name" id="debug">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">debug</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1002,6 +1659,25 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1015,7 +1691,7 @@ parameters of a http request.</p>
         <h4 class="name" id="decrement">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">decrement</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1076,6 +1752,211 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="del">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">del</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="delete">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">delete</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1089,7 +1970,7 @@ parameters of a http request.</p>
         <h4 class="name" id="distinct">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">distinct</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1150,6 +2031,188 @@ parameters of a http request.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="dumpSql">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">dumpSql</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">logger</span>)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Logs the SQL string.</p>
+<p>Handy for debugging:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('firstName', 'Jennifer')
+  .where('age', 100)
+  .dumpSql()
+  .then(function () {
+    ...
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>logger</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1315,10 +2378,109 @@ Person
               
 <dt>
     
+        <h4 class="name" id="first">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">first</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>If the result is an array, selects the first item.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .first()
+  .then(function (firstPerson) {
+    console.log(person.age);
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="from">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">from</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1379,6 +2541,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1392,7 +2573,7 @@ Person
         <h4 class="name" id="fullOuterJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">fullOuterJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1453,6 +2634,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1466,7 +2666,7 @@ Person
         <h4 class="name" id="groupBy">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">groupBy</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1527,10 +2727,31 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
 
+            
+        
             
         
             
@@ -1540,7 +2761,7 @@ Person
         <h4 class="name" id="having">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">having</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1601,6 +2822,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1614,7 +2854,7 @@ Person
         <h4 class="name" id="havingRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">havingRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1675,6 +2915,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1688,7 +2947,7 @@ Person
         <h4 class="name" id="increment">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">increment</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1749,6 +3008,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1762,7 +3040,7 @@ Person
         <h4 class="name" id="innerJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">innerJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1823,6 +3101,118 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="insert">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">insert</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1836,7 +3226,7 @@ Person
         <h4 class="name" id="into">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">into</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1897,6 +3287,118 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="isFindQuery">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">isFindQuery</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Boolean}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns true if none of the methods <code>insert</code>, <code>.update</code>, <code>patch</code>, <code>delete</code>, <code>relate</code> or <code>unrelate</code> has been called.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Boolean</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1910,7 +3412,7 @@ Person
         <h4 class="name" id="join">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">join</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -1971,6 +3473,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -1984,7 +3505,7 @@ Person
         <h4 class="name" id="leftJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">leftJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2045,6 +3566,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2058,7 +3598,7 @@ Person
         <h4 class="name" id="leftOuterJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">leftOuterJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2119,6 +3659,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2132,7 +3691,7 @@ Person
         <h4 class="name" id="limit">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">limit</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2193,6 +3752,167 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="map">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">map</span>
+          <span class="signature-container"><span class="signature">(mapper)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and calls <code>.map(mapper)</code> for the returned promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>mapper</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2206,7 +3926,7 @@ Person
         <h4 class="name" id="max">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">max</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2267,6 +3987,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2280,7 +4019,7 @@ Person
         <h4 class="name" id="min">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">min</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2341,6 +4080,118 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="modelClass">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">modelClass</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronModel.html">MoronModel</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the MoronModel subclass this builder is bound to.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2354,7 +4205,7 @@ Person
         <h4 class="name" id="offset">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">offset</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2415,6 +4266,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2428,7 +4298,7 @@ Person
         <h4 class="name" id="orderBy">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orderBy</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2489,6 +4359,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2502,7 +4391,7 @@ Person
         <h4 class="name" id="orHaving">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orHaving</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2563,6 +4452,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2576,7 +4484,7 @@ Person
         <h4 class="name" id="orHavingRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orHavingRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2637,6 +4545,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2650,7 +4577,7 @@ Person
         <h4 class="name" id="orWhere">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhere</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2711,6 +4638,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2724,7 +4670,7 @@ Person
         <h4 class="name" id="orWhereBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2785,6 +4731,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2798,7 +4763,7 @@ Person
         <h4 class="name" id="orWhereExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2859,6 +4824,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2872,7 +4856,7 @@ Person
         <h4 class="name" id="orWhereIn">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereIn</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2933,6 +4917,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2946,7 +4949,7 @@ Person
         <h4 class="name" id="orWhereNotBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNotBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3007,6 +5010,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3020,7 +5042,7 @@ Person
         <h4 class="name" id="orWhereNotExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNotExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3081,6 +5103,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3168,7 +5209,7 @@ Person
         <h4 class="name" id="orWhereNotNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNotNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3229,6 +5270,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3242,7 +5302,7 @@ Person
         <h4 class="name" id="orWhereNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3303,6 +5363,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3316,7 +5395,7 @@ Person
         <h4 class="name" id="orWhereRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3377,6 +5456,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3390,7 +5488,7 @@ Person
         <h4 class="name" id="outerJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">outerJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3451,6 +5549,613 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="page">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">page</span>
+          <span class="signature-container"><span class="signature">(page, pageSize)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and returns a page of the results along with the total count.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('age', '>', 20)
+  .page(5, 100)
+  .then(function (result) {
+    console.log(result.results.length); // --> 100
+    console.log(result.total); // --> 3341
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>page</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The index of the page to return.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>pageSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The page size.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="patch">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">patch</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="pluck">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">pluck</span>
+          <span class="signature-container"><span class="signature">(propertyName)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>If the result is an array, plucks a property from each object.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('age', '>', 20)
+  .pluck('firstName')
+  .then(function (firstNames) {
+    console.log(typeof firstNames[0]); // --> string
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>propertyName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The name of the property to pluck.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="range">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">range</span>
+          <span class="signature-container"><span class="signature">(start, end)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and returns a range of the results along with the total count.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('age', '>', 20)
+  .range(0, 100)
+  .then(function (result) {
+    console.log(result.results.length); // --> 101
+    console.log(result.total); // --> 3341
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>start</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The index of the first result (inclusive).</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>end</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The index of the last result (inclusive).</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3531,6 +6236,99 @@ Person
 	</tbody>
 </table>
 
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="relate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">relate</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
     
     
     
@@ -3745,10 +6543,257 @@ Person
               
 <dt>
     
+        <h4 class="name" id="resultSize">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">resultSize</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the amount of rows the current query would produce.</p>
+<p>Note that this executes a query (not the one we are building) and returns a Promise. Use it
+like this:</p>
+<pre class="prettyprint source lang-js"><code>var query = Person
+  .query()
+  .where('age', '>', 20);
+
+Promise.all([
+  query.resultSize(),
+  query.offset(100).limit(50)
+]).spread(function (total, models) {
+  ...
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="return">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">return</span>
+          <span class="signature-container"><span class="signature">(retVal)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and calls <code>.return(retVal)</code> for the returned promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>retVal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="returning">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">returning</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3809,6 +6854,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3822,7 +6886,7 @@ Person
         <h4 class="name" id="rightJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">rightJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3883,6 +6947,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3896,7 +6979,7 @@ Person
         <h4 class="name" id="rightOuterJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">rightOuterJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3957,6 +7040,25 @@ Person
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -4953,7 +8055,7 @@ query.then();
         <h4 class="name" id="select">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">select</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5014,6 +8116,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5027,7 +8148,7 @@ query.then();
         <h4 class="name" id="sum">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">sum</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5088,6 +8209,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5101,7 +8241,7 @@ query.then();
         <h4 class="name" id="table">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">table</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5162,6 +8302,398 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="then">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">then</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">success</span>, <span class="optional">error</span>)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and returns a Promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>success</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="toSql">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">toSql</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the SQL string.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="toString">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">toString</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the SQL string.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5175,7 +8707,7 @@ query.then();
         <h4 class="name" id="truncate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">truncate</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5236,6 +8768,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5249,7 +8800,7 @@ query.then();
         <h4 class="name" id="union">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">union</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5310,6 +8861,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5323,7 +8893,7 @@ query.then();
         <h4 class="name" id="unionAll">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">unionAll</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5384,6 +8954,211 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="unrelate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">unrelate</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="update">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">update</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>TODO</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5397,7 +9172,7 @@ query.then();
         <h4 class="name" id="where">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">where</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5458,6 +9233,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5471,7 +9265,7 @@ query.then();
         <h4 class="name" id="whereBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5532,6 +9326,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5545,7 +9358,7 @@ query.then();
         <h4 class="name" id="whereExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5606,6 +9419,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5619,7 +9451,7 @@ query.then();
         <h4 class="name" id="whereIn">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereIn</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5680,6 +9512,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5693,7 +9544,7 @@ query.then();
         <h4 class="name" id="whereNotBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5754,6 +9605,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5767,7 +9637,7 @@ query.then();
         <h4 class="name" id="whereNotExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5828,6 +9698,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5841,7 +9730,7 @@ query.then();
         <h4 class="name" id="whereNotIn">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotIn</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5902,6 +9791,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5915,7 +9823,7 @@ query.then();
         <h4 class="name" id="whereNotNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5976,6 +9884,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5989,7 +9916,7 @@ query.then();
         <h4 class="name" id="whereNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -6050,6 +9977,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -6063,7 +10009,7 @@ query.then();
         <h4 class="name" id="whereRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -6124,6 +10070,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -6137,7 +10102,7 @@ query.then();
         <h4 class="name" id="whereWrapped">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereWrapped</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -6198,6 +10163,25 @@ query.then();
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -6229,7 +10213,7 @@ query.then();
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Sat Jun 13th 2015 using the <a
+		on Sun Jun 14th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

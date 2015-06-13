@@ -5,7 +5,7 @@ var _ = require('lodash')
   , MoronRelationExpression = require('./MoronRelationExpression');
 
 /**
- * @class
+ * @constructor
  * @ignore
  */
 function MoronEagerFetcher(opt) {

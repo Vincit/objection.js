@@ -77,7 +77,7 @@ var _ = require('lodash')
  * ```
  *
  * @extends MoronModelBase
- * @class
+ * @constructor
  */
 function MoronModel() {
   MoronModelBase.apply(this, arguments);

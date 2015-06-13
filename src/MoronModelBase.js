@@ -96,7 +96,7 @@ tv4.addFormat(tv4Formats);
  * };
  * ```
  *
- * @class
+ * @constructor
  */
 function MoronModelBase() {
   // Nothing to do here.

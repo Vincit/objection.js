@@ -4,7 +4,7 @@ var _ = require('lodash')
   , MoronRelation = require('./MoronRelation');
 
 /**
- * @class
+ * @constructor
  * @extends MoronRelation
  */
 function MoronOneToManyRelation() {

@@ -2,7 +2,7 @@ var util = require('util');
 
 /**
  * @param data
- * @class
+ * @constructor
  */
 function MoronValidationError(data) {
   Error.call(this);

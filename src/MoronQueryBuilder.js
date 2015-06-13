@@ -13,7 +13,7 @@ var _ = require('lodash')
  * QueryBuilder returns plain javascript objects, MoronQueryBuilder returns MoronModel
  * subclass instances.
  *
- * @class
+ * @constructor
  */
 function MoronQueryBuilder(modelClass) {
   this._modelClass = modelClass;
@@ -434,15 +434,43 @@ MoronQueryBuilder.prototype.allowEager = function (exp) {
   return this;
 };
 
+/**
+ * Calls the given function immediately and passes `this` as an argument.
+ *
+ * Handy for chaining conditional stuff:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .call(function (builder) {
+ *     if (something) {
+ *       builder.where('something', someValue);
+ *     }
+ *   });
+ * ```
+ *
+ * @param {function} func
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.call = function (func) {
   func.call(this, this);
   return this;
 };
 
+/**
+ * Returns the MoronModel subclass this builder is bound to.
+ *
+ * @returns {MoronModel}
+ */
 MoronQueryBuilder.prototype.modelClass = function () {
   return this._modelClass;
 };
 
+/**
+ * Returns true if none of the methods `insert`, `.update`, `patch`, `delete`, `relate` or `unrelate` has been called.
+ *
+ * @returns {Boolean}
+ */
 MoronQueryBuilder.prototype.isFindQuery = function () {
   return _.isEmpty(this._knexCalls.insert) &&
     _.isEmpty(this._knexCalls.update) &&
@@ -452,19 +480,53 @@ MoronQueryBuilder.prototype.isFindQuery = function () {
     _.isEmpty(this._knexCalls.unrelate);
 };
 
+/**
+ * Returns the SQL string.
+ *
+ * @returns {String}
+ */
 MoronQueryBuilder.prototype.toString = function () {
   return this.build().toString();
 };
 
+/**
+ * Returns the SQL string.
+ *
+ * @returns {String}
+ */
 MoronQueryBuilder.prototype.toSql = function () {
   return this.toString();
 };
 
+/**
+ * Logs the SQL string.
+ *
+ * Handy for debugging:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .where('firstName', 'Jennifer')
+ *   .where('age', 100)
+ *   .dumpSql()
+ *   .then(function () {
+ *     ...
+ *   });
+ * ```
+ *
+ * @param {function=} logger
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.dumpSql = function (logger) {
   (logger || console.log)(this.toString());
   return this;
 };
 
+/**
+ * Create a clone of this builder.
+ *
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.clone = function () {
   var clone = new this.constructor(this._modelClass);
 
@@ -492,6 +554,9 @@ MoronQueryBuilder.prototype.clone = function () {
   return clone;
 };
 
+/**
+ * @protected
+ */
 MoronQueryBuilder.prototype.clearCustomImpl = function () {
   this._findImpl = null;
   this._insertImpl = null;
@@ -503,6 +568,9 @@ MoronQueryBuilder.prototype.clearCustomImpl = function () {
   return this;
 };
 
+/**
+ * @protected
+ */
 MoronQueryBuilder.prototype.clearAllBut = function () {
   var self = this;
   var args = _.toArray(arguments);
@@ -516,6 +584,9 @@ MoronQueryBuilder.prototype.clearAllBut = function () {
   return this;
 };
 
+/**
+ * @protected
+ */
 MoronQueryBuilder.prototype.clear = function () {
   if (arguments.length) {
     for (var i = 0; i < arguments.length; ++i) {
@@ -528,30 +599,85 @@ MoronQueryBuilder.prototype.clear = function () {
   return this;
 };
 
+/**
+ * @protected
+ */
 MoronQueryBuilder.prototype.has = function (methodName) {
   return !_.isEmpty(this._knexCalls[methodName]);
 };
 
+/**
+ * Executes the query and returns a Promise.
+ *
+ * @param {function=} success
+ * @param {function=} error
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.then = function (success, error) {
   return this._execute().then(success, error);
 };
 
+/**
+ * Executes the query and calls `.map(mapper)` for the returned promise.
+ *
+ * @param {function} mapper
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.map = function (mapper) {
   return this._execute().map(mapper);
 };
 
-MoronQueryBuilder.prototype.catch = function (error) {
-  return this._execute().catch(error);
+/**
+ * Executes the query and calls `.catch(errorHandler)` for the returned promise.
+ *
+ * @param {function} errorHandler
+ * @returns {Promise}
+ */
+MoronQueryBuilder.prototype.catch = function (errorHandler) {
+  return this._execute().catch(errorHandler);
 };
 
+/**
+ * Executes the query and calls `.return(retVal)` for the returned promise.
+ *
+ * @param {*} retVal
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.return = function (retVal) {
   return this._execute().return(retVal);
 };
 
+/**
+ * Executes the query and calls `.bind(context)` for the returned promise.
+ *
+ * @param {*} context
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.bind = function (context) {
   return this._execute().bind(context);
 };
 
+/**
+ * Returns the amount of rows the current query would produce.
+ *
+ * Note that this executes a query (not the one we are building) and returns a Promise. Use it
+ * like this:
+ *
+ * ```js
+ * var query = Person
+ *   .query()
+ *   .where('age', '>', 20);
+ *
+ * Promise.all([
+ *   query.resultSize(),
+ *   query.offset(100).limit(50)
+ * ]).spread(function (total, models) {
+ *   ...
+ * });
+ * ```
+ *
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.resultSize = function () {
   var knex = this._modelClass.knex();
 
@@ -567,10 +693,54 @@ MoronQueryBuilder.prototype.resultSize = function () {
   });
 };
 
+/**
+ * Executes the query and returns a page of the results along with the total count.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .where('age', '>', 20)
+ *   .page(5, 100)
+ *   .then(function (result) {
+ *     console.log(result.results.length); // --> 100
+ *     console.log(result.total); // --> 3341
+ *   });
+ * ```
+ *
+ * @param {Number} page
+ *    The index of the page to return.
+ *
+ * @param {Number} pageSize
+ *    The page size.
+ *
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.page = function (page, pageSize) {
   return this.range(page * pageSize, (page + 1) * pageSize - 1);
 };
 
+/**
+ * Executes the query and returns a range of the results along with the total count.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .where('age', '>', 20)
+ *   .range(0, 100)
+ *   .then(function (result) {
+ *     console.log(result.results.length); // --> 101
+ *     console.log(result.total); // --> 3341
+ *   });
+ * ```
+ *
+ * @param {Number} start
+ *    The index of the first result (inclusive).
+ *
+ * @param {Number} end
+ *    The index of the last result (inclusive).
+ *
+ * @returns {Promise}
+ */
 MoronQueryBuilder.prototype.range = function (start, end) {
   return Promise.all([
     this.resultSize(),
@@ -583,10 +753,16 @@ MoronQueryBuilder.prototype.range = function (start, end) {
   });
 };
 
+/**
+ * @protected
+ */
 MoronQueryBuilder.prototype.build = function () {
   return this.constructor.build(this.clone());
 };
 
+/**
+ * @protected
+ */
 MoronQueryBuilder.build = function (builder) {
   var isFindQuery = builder.isFindQuery();
 
@@ -674,6 +850,9 @@ MoronQueryBuilder.build = function (builder) {
   return knexBuilder;
 };
 
+/**
+ * @private
+ */
 MoronQueryBuilder.prototype._execute = function () {
   var builder = this.clone();
   var promise = Promise.resolve();
@@ -728,19 +907,48 @@ MoronQueryBuilder.prototype._execute = function () {
   return promise;
 };
 
-MoronQueryBuilder.prototype.pluck = function () {
-  var args = _.toArray(arguments);
-
+/**
+ * If the result is an array, plucks a property from each object.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .where('age', '>', 20)
+ *   .pluck('firstName')
+ *   .then(function (firstNames) {
+ *     console.log(typeof firstNames[0]); // --> string
+ *   });
+ * ```
+ *
+ * @param {String} propertyName
+ *    The name of the property to pluck.
+ *
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.pluck = function (propertyName) {
   return this.runAfter(function (result) {
     if (_.isArray(result)) {
-      args.unshift(result);
-      return _.pluck.apply(_, args);
+      return _.pluck(result, propertyName);
     } else {
       return result;
     }
   });
 };
 
+/**
+ * If the result is an array, selects the first item.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .first()
+ *   .then(function (firstPerson) {
+ *     console.log(person.age);
+ *   });
+ * ```
+ *
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.first = function () {
   return this.runAfter(function (result) {
     if (_.isArray(result)) {
@@ -751,185 +959,262 @@ MoronQueryBuilder.prototype.first = function () {
   });
 };
 
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.insert = queryMethod('insert');
+
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.update = queryMethod('update');
+
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.patch = queryMethod('patch');
+
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.delete = queryMethod('delete');
+
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.del = queryMethod('delete');
+
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.relate = queryMethod('relate');
+
+/**
+ * TODO
+ *
+ * @method
+ * @returns {MoronQueryBuilder}
+ */
 MoronQueryBuilder.prototype.unrelate = queryMethod('unrelate');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.select = queryMethod('select');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.columns = queryMethod('columns');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.column = queryMethod('column');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.from = queryMethod('from');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.into = queryMethod('into');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.table = queryMethod('table');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.distinct = queryMethod('distinct');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.join = queryMethod('join');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.innerJoin = queryMethod('innerJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.leftJoin = queryMethod('leftJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.leftOuterJoin = queryMethod('leftOuterJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.rightJoin = queryMethod('rightJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.rightOuterJoin = queryMethod('rightOuterJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.outerJoin = queryMethod('outerJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.fullOuterJoin = queryMethod('fullOuterJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.crossJoin = queryMethod('crossJoin');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.where = queryMethod('where');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.andWhere = queryMethod('andWhere');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhere = queryMethod('orWhere');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereRaw = queryMethod('whereRaw');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereWrapped = queryMethod('whereWrapped');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereRaw = queryMethod('orWhereRaw');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereExists = queryMethod('whereExists');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereExists = queryMethod('orWhereExists');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereNotExists = queryMethod('whereNotExists');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereNotExists = queryMethod('orWhereNotExists');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereIn = queryMethod('whereIn');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereIn = queryMethod('orWhereIn');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereNotIn = queryMethod('whereNotIn');
 
@@ -942,168 +1227,196 @@ MoronQueryBuilder.prototype.orWhereNotIn = queryMethod('orWhereNotIn');
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereNull = queryMethod('whereNull');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereNull = queryMethod('orWhereNull');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereNotNull = queryMethod('whereNotNull');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereNotNull = queryMethod('orWhereNotNull');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereBetween = queryMethod('whereBetween');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereNotBetween = queryMethod('whereNotBetween');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereBetween = queryMethod('orWhereBetween');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orWhereNotBetween = queryMethod('orWhereNotBetween');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.groupBy = queryMethod('groupBy');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orderBy = queryMethod('orderBy');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.union = queryMethod('union');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.unionAll = queryMethod('unionAll');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.having = queryMethod('having');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.havingRaw = queryMethod('havingRaw');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orHaving = queryMethod('orHaving');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.orHavingRaw = queryMethod('orHavingRaw');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.offset = queryMethod('offset');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.limit = queryMethod('limit');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.count = queryMethod('count');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.min = queryMethod('min');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.max = queryMethod('max');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.sum = queryMethod('sum');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.avg = queryMethod('avg');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.increment = queryMethod('increment');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.decrement = queryMethod('decrement');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.debug = queryMethod('debug');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.returning = queryMethod('returning');
 
 /**
  * See <a href="http://knexjs.org">knex documentation</a>
  * @method
+ * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.truncate = queryMethod('truncate');
 
@@ -1111,6 +1424,9 @@ MoronQueryBuilder.prototype.truncate = queryMethod('truncate');
  * @returns {Function}
  */
 function queryMethod(methodName) {
+  /**
+   * @returns {MoronQueryBuilder}
+   */
   return function () {
     var args = new Array(arguments.length);
 

@@ -63,9 +63,24 @@ curl "http://localhost:8641/movies/1/actors"
 curl "http://localhost:8641/persons?minAge=60&eager=%5Bpets,children.%5Bmovies,pets%5D%5D"
 
 
-###########
+########################
+### Failing requests ###
+########################
+
+
+# Validation error (no firstName)
+curl -H "Content-Type: application/json" -d '{"lastName":"Lawrence", "age":24}' http://localhost:8641/persons
+
+# Validation error (no name)
+curl -H "Content-Type: application/json" -d '{"species":"dog"}' http://localhost:8641/persons/1/pets
+
+# 404
+curl -H "Content-Type: application/json" -d '{"name":"Rex","species":"dog"}' http://localhost:8641/persons/9999/pets
+
+
+##############
 ### Delete ###
-###########
+##############
 
 
 # Delete Sylvester

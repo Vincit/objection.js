@@ -3,7 +3,7 @@ var _ = require('lodash')
 
 /**
  * @ignore
- * @class
+ * @constructor
  */
 function MoronRelationExpressionNode(name) {
   this.name = name;
@@ -12,7 +12,7 @@ function MoronRelationExpressionNode(name) {
 
 /**
  * @ignore
- * @class
+ * @constructor
  */
 function MoronRelationExpressionParser() {
   this.str = null;
@@ -112,7 +112,7 @@ MoronRelationExpressionParser.prototype._throwInvalidExpressionError = function 
 };
 
 /**
- * @class
+ * @constructor
  */
 function MoronRelationExpression(nodes) {
   this.nodes = nodes;

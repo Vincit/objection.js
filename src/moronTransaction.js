@@ -4,9 +4,12 @@ var MoronModel = require('./MoronModel');
 var utils = require('./moronUtils');
 
 /**
+ * Starts a transaction.
+ *
+ * @function transaction
  * @returns {Promise}
  */
-module.exports = function () {
+module.exports = function moronTransaction() {
   // There must be at least one model class and the callback.
   if (arguments.length < 2) {
     return Promise.reject(new Error('transaction: provide at least one MoronModel class to bind to the transaction'));
