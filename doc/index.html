@@ -140,6 +140,7 @@ supported by knex are supported by moron.js. SQLite3, Postgres and MySQL are ful
 <li><a href="http://vincit.github.io/moron.js/MoronRelationExpression.html">Powerful mechanism</a> for loading arbitrarily big trees of relations.</li>
 <li><a href="http://json-schema.org/">JSON schema</a> validation.</li>
 <li>Fully <a href="https://github.com/petkaantonov/bluebird">Promise</a> based API.</li>
+<li>A way to <a href="#documents">store documents</a> as single rows.</li>
 </ul>
 <p>What moron.js doesn't give you:</p>
 <ul>
@@ -159,7 +160,8 @@ sh install.sh
 npm start</code></pre><p>The <code>express</code> example project is a simple express server. The <code>example-requests</code> file contains a bunch of curl
 commands for you to start playing with the REST API.</p>
 <pre class="prettyprint source lang-sh"><code>cat example-requests</code></pre><p>Also our <a href="http://vincit.github.io/moron.js">API documentation</a> contains a lot of examples.</p>
-<h1>Query examples</h1><p>All queries are started with one of the MoronModel methods <a href="http://vincit.github.io/moron.js/MoronModel.html#_P_query">query()</a>,
+<h1>Query examples</h1><p>The Person model used in the examples is defined <a href="#example-model">here</a>.</p>
+<p>All queries are started with one of the MoronModel methods <a href="http://vincit.github.io/moron.js/MoronModel.html#_P_query">query()</a>,
 <a href="http://vincit.github.io/moron.js/MoronModel.html#Squery">$query()</a> or <a href="http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery">$relatedQuery()</a>.
 All these methods return a <a href="http://vincit.github.io/moron.js/MoronQueryBuilder.html">MoronQueryBuilder</a> instance that can be used just like
 a <a href="http://knexjs.org/#Builder">knex QueryBuilder</a>.</p>
@@ -267,8 +269,32 @@ Person
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-});</code></pre><p>The <a href="#getting-started">example project</a> contains more examples.</p>
-<h1>Example model</h1><p>Models are created by inheriting from the <code>MoronModel</code> base class. In moron.js the inheritance is done as transparently
+});</code></pre><h1>Documents</h1><p>The <code>address</code> property of the Person model is defined as an object in the <a href="#example-model">Person.jsonSchema</a>.
+MoronModel automatically converts the property to a JSON string when inserted to database and back to an object
+when read from the database. The database column can be a normal text column. Postgresql has the json and jsonb
+data types that should be used instead.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .insert({
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+    age: 24,
+    address: {
+      street: 'Somestreet 10',
+      zipCode: '123456',
+      city: 'Tampere'
+    }
+  })
+  .then(function (jennifer) {
+    console.log(jennifer.address.city); // --> Tampere
+    return Person.query().where('id', jennifer.id);
+  })
+  .then(function (jenniferFromDb) {
+    console.log(jenniferFromDb.address.city); // --> Tampere
+  })
+  .catch(function (err) {
+    console.log('oh noes');
+  });</code></pre><h1>Example model</h1><p>Models are created by inheriting from the <code>MoronModel</code> base class. In moron.js the inheritance is done as transparently
 as possible. There is no custom Class abstraction making you wonder what the hell is happening. Just plain old ugly
 javascript inheritance :D.</p>
 <pre class="prettyprint source lang-js"><code>var MoronModel = require('moron').MoronModel;
@@ -299,7 +325,16 @@ Person.jsonSchema = {
     parentId: {type: ['integer', 'null']},
     firstName: {type: 'string', minLength: 1, maxLength: 255},
     lastName: {type: 'string', minLength: 1, maxLength: 255},
-    age: {type: 'number'}
+    age: {type: 'number'},
+
+    address: {
+      type: 'object',
+      properties: {
+        street: {type: 'string'},
+        city: {type: 'string'},
+        zipCode: {type: 'string'}
+      }
+    }
   }
 };
 

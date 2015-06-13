@@ -11,6 +11,7 @@ What moron.js gives you:
  * [Powerful mechanism](http://vincit.github.io/moron.js/MoronRelationExpression.html) for loading arbitrarily big trees of relations.
  * [JSON schema](http://json-schema.org/) validation.
  * Fully [Promise](https://github.com/petkaantonov/bluebird) based API.
+ * A way to [store documents](#documents) as single rows.
 
 What moron.js doesn't give you:
 
@@ -51,6 +52,8 @@ cat example-requests
 Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of examples.
 
 #Query examples
+
+The Person model used in the examples is defined [here](#example-model).
 
 All queries are started with one of the MoronModel methods [query()](http://vincit.github.io/moron.js/MoronModel.html#_P_query),
 [$query()](http://vincit.github.io/moron.js/MoronModel.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery).
@@ -201,7 +204,37 @@ moron.transaction(Person, Animal, function (Person, Animal) {
 });
 ```
 
-The [example project](#getting-started) contains more examples.
+#Documents
+
+The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#example-model).
+MoronModel automatically converts the property to a JSON string when inserted to database and back to an object
+when read from the database. The database column can be a normal text column. Postgresql has the json and jsonb
+data types that should be used instead.
+
+```js
+Person
+  .query()
+  .insert({
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+    age: 24,
+    address: {
+      street: 'Somestreet 10',
+      zipCode: '123456',
+      city: 'Tampere'
+    }
+  })
+  .then(function (jennifer) {
+    console.log(jennifer.address.city); // --> Tampere
+    return Person.query().where('id', jennifer.id);
+  })
+  .then(function (jenniferFromDb) {
+    console.log(jenniferFromDb.address.city); // --> Tampere
+  })
+  .catch(function (err) {
+    console.log('oh noes');
+  });
+```
 
 #Example model
 
@@ -238,7 +271,16 @@ Person.jsonSchema = {
     parentId: {type: ['integer', 'null']},
     firstName: {type: 'string', minLength: 1, maxLength: 255},
     lastName: {type: 'string', minLength: 1, maxLength: 255},
-    age: {type: 'number'}
+    age: {type: 'number'},
+
+    address: {
+      type: 'object',
+      properties: {
+        street: {type: 'string'},
+        city: {type: 'string'},
+        zipCode: {type: 'string'}
+      }
+    }
   }
 };
 
