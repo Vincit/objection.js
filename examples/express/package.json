@@ -1,0 +1,18 @@
+{
+  "name": "moron-example-express",
+  "version": "0.1.0",
+  "description": "Moron.js express example",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app"
+  },
+  "author": "Sami Koskimäki",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.12.4",
+    "express": "^4.12.4",
+    "morgan": "^1.6.0",
+    "moron": "^0.1.0",
+    "sqlite3": "^3.0.8"
+  }
+}
