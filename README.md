@@ -2,19 +2,27 @@
 A Node.js ORM that doesn't get in your way.
 
 Moron.js is an ORM built around the wonderful SQL query builder called [knex](http://knexjs.org). All databases
-supported by knex are supported by moron.js. The list includes SQLite3, Postgres and MySQL.
+supported by knex are supported by moron.js. SQLite3, Postgres and MySQL are fully tested.
 
 What moron.js gives you:
 
  * An easy declarative way of defining models and relations between them.
- * Simple and fun way to fetch, insert, update, patch and delete models using SQL.
- * Powerful mechanism for loading arbitrarily big trees of relations.
- * JSON schema validation.
+ * Simple and fun way to fetch, insert, update, patch and delete models using the full power of SQL.
+ * [Powerful mechanism](http://vincit.github.io/moron.js/MoronRelationExpression.html) for loading arbitrarily big trees of relations.
+ * [JSON schema](http://json-schema.org/) validation.
+ * [Promises](https://github.com/petkaantonov/bluebird).
 
 What moron.js doesn't give you:
 
- * A custom query DSL. All queries are generated using the knex's SQL query builder.
- * Automatic database schema creation. Moron.js leaves this to you. knex has a [great tool](http://knexjs.org/#Migrations) for this.
+ * A custom query DSL.
+
+    Why create an inferior query language when we have SQL? All queries are generated using the knex's SQL query builder.
+
+ * Automatic database schema creation/migration.
+
+    Automatic schema creation is useful for the simple things, but usually just gets in your way when doing
+    anything non-trivial. Moron.js leaves the schema and migration related things to you. knex has a great
+    [migration API](http://knexjs.org/#Migrations).
 
 #Installation
 

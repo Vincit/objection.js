@@ -132,18 +132,25 @@
     <section class="readme-section">
         <article><h1>moron.js <a href="https://travis-ci.org/Vincit/moron.js"><img src="https://travis-ci.org/Vincit/moron.js.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/Vincit/moron.js"><img src="https://coveralls.io/repos/Vincit/moron.js/badge.svg" alt="Coverage Status"></a></h1><p>A Node.js ORM that doesn't get in your way.</p>
 <p>Moron.js is an ORM built around the wonderful SQL query builder called <a href="http://knexjs.org">knex</a>. All databases
-supported by knex are supported by moron.js. The list includes SQLite3, Postgres and MySQL.</p>
+supported by knex are supported by moron.js. SQLite3, Postgres and MySQL are fully tested.</p>
 <p>What moron.js gives you:</p>
 <ul>
 <li>An easy declarative way of defining models and relations between them.</li>
-<li>Simple and fun way to fetch, insert, update, patch and delete models using SQL.</li>
-<li>Powerful mechanism for loading arbitrarily big trees of relations.</li>
-<li>JSON schema validation.</li>
+<li>Simple and fun way to fetch, insert, update, patch and delete models using the full power of SQL.</li>
+<li><a href="http://vincit.github.io/moron.js/MoronRelationExpression.html">Powerful mechanism</a> for loading arbitrarily big trees of relations.</li>
+<li><a href="http://json-schema.org/">JSON schema</a> validation.</li>
+<li><a href="https://github.com/petkaantonov/bluebird">Promises</a>.</li>
 </ul>
 <p>What moron.js doesn't give you:</p>
 <ul>
-<li>A custom query DSL. All queries are generated using the knex's SQL query builder.</li>
-<li>Automatic database schema creation. Moron.js leaves this to you. knex has a <a href="http://knexjs.org/#Migrations">great tool</a> for this.</li>
+<li><p>A custom query DSL.</p>
+<p> Why create an inferior query language when we have SQL? All queries are generated using the knex's SQL query builder.</p>
+</li>
+<li><p>Automatic database schema creation/migration.</p>
+<p> Automatic schema creation is useful for the simple things, but usually just gets in your way when doing
+ anything non-trivial. Moron.js leaves the schema and migration related things to you. knex has a great
+ <a href="http://knexjs.org/#Migrations">migration API</a>.</p>
+</li>
 </ul>
 <h1>Installation</h1><pre class="prettyprint source lang-sh"><code>npm install moron</code></pre><h1>Getting started</h1><p>Best way to get started is to download the example project <a href="">here</a>. Unzip the project and <code>cd</code> to the folder. Then
 write the commands:</p>
