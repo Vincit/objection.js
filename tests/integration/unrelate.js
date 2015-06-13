@@ -8,6 +8,39 @@ module.exports = function (session) {
 
   describe('MoronModel unrelate queries', function () {
 
+    describe('.query()', function () {
+
+      it('should reject the query', function (done) {
+        Model1
+          .query()
+          .unrelate()
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function () {
+            done();
+          });
+      });
+
+    });
+
+    describe('.$query()', function () {
+
+      it('should reject the query', function (done) {
+        Model1
+          .fromJson({id: 1})
+          .$query()
+          .unrelate()
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function () {
+            done();
+          });
+      });
+
+    });
+
     describe('.$relatedQuery().unrelate()', function () {
 
       describe('has one relation', function () {

@@ -110,7 +110,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should validate (1)', function () {
+      it('should validate (1)', function (done) {
         var ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           properties: {
@@ -120,18 +120,23 @@ module.exports = function (session) {
           }
         });
 
-        expect(function () {
-          ModelWithSchema.query().update({model1Prop1: 666}).then();
-        }).to.throwException(function (err) {
-          expect(err).to.be.a(MoronValidationError);
-        });
-
-        return session.knex(Model1.tableName).then(function (rows) {
-          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
-        });
+        ModelWithSchema
+          .query()
+          .update({model1Prop1: 666})
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (err) {
+            expect(err).to.be.a(MoronValidationError);
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            done();
+          });
       });
 
-      it('should validate (2)', function () {
+      it('should validate (2)', function (done) {
         var ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           required: ['model1Prop2'],
@@ -142,15 +147,20 @@ module.exports = function (session) {
           }
         });
 
-        expect(function () {
-          ModelWithSchema.query().update({model1Prop1: 'text'}).then();
-        }).to.throwException(function (err) {
-          expect(err).to.be.a(MoronValidationError);
-        });
-
-        return session.knex(Model1.tableName).then(function (rows) {
-          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
-        });
+        ModelWithSchema
+          .query()
+          .update({model1Prop1: 'text'})
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (err) {
+            expect(err).to.be.a(MoronValidationError);
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            done();
+          });
       });
 
     });

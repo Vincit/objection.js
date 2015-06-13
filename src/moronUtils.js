@@ -41,6 +41,7 @@ module.exports.isSubclassOf = function(Constructor, SuperConstructor) {
 };
 
 module.exports.isSqlite = function (knex) {
+  /* istanbul ignore if */
   if (!knex.client || !_.isString(knex.client.dialect)) {
     throw new Error('knex API has changed');
   }
@@ -48,6 +49,7 @@ module.exports.isSqlite = function (knex) {
 };
 
 module.exports.isMySql = function (knex) {
+  /* istanbul ignore if */
   if (!knex.client || !_.isString(knex.client.dialect)) {
     throw new Error('knex API has changed');
   }
@@ -55,6 +57,7 @@ module.exports.isMySql = function (knex) {
 };
 
 module.exports.isPostgres = function (knex) {
+  /* istanbul ignore if */
   if (!knex.client || !_.isString(knex.client.dialect)) {
     throw new Error('knex API has changed');
   }

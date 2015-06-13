@@ -499,18 +499,6 @@ describe('MoronQueryBuilder', function () {
     expect(MoronQueryBuilder.forClass(Model).unrelate().isFindQuery()).to.equal(false);
   });
 
-  it('runBefore should be called after insertImpl, updateImpl etc.', function () {
-    console.log('TODO');
-  });
-
-  it('eager stuff', function () {
-    console.log('TODO');
-  });
-
-  it('increment and decrement should invoke custom update code', function () {
-    console.log('TODO');
-  });
-
   it('resolve should replace the database query with the given value', function (done) {
     MoronQueryBuilder
       .forClass(Model)
@@ -523,6 +511,89 @@ describe('MoronQueryBuilder', function () {
         done();
       })
       .catch(done);
+  });
+
+  describe('eager and allowEager' , function () {
+
+    it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", function (done) {
+      MoronQueryBuilder
+        .forClass(Model)
+        .allowEager('[a, b.c.[d, e]]')
+        .eager('a')
+        .then(function () {
+          done();
+        });
+    });
+
+    it("allowEager('[a, b.c.[d, e]]').eager('b.c') should be ok", function (done) {
+      MoronQueryBuilder
+        .forClass(Model)
+        .allowEager('[a, b.c.[d, e]]')
+        .eager('b.c')
+        .then(function () {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(function () {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('[a, b.c.[d, e]]').eager('b.c.e') should be ok", function (done) {
+      MoronQueryBuilder
+        .forClass(Model)
+        .allowEager('[a, b.c.[d, e]]')
+        .eager('b.c.e')
+        .then(function () {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(function () {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", function (done) {
+      MoronQueryBuilder
+        .forClass(Model)
+        .allowEager('[a, b.c.[d, e]]')
+        .eager('a.b')
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
+
+    it("eager('a.b').allowEager('[a, b.c.[d, e]]') should fail", function (done) {
+      MoronQueryBuilder
+        .forClass(Model)
+        .eager('a.b')
+        .allowEager('[a, b.c.[d, e]]')
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
+
+    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]') should fail", function (done) {
+      MoronQueryBuilder
+        .forClass(Model)
+        .eager('b.c.d.e')
+        .allowEager('[a, b.c.[d, e]]')
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
   });
 
   /*

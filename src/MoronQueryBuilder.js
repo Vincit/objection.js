@@ -66,7 +66,7 @@ MoronQueryBuilder.prototype.resolve = function (resolve) {
  * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.reject = function (error) {
-  this._explicitResolveValue = error;
+  this._explicitRejectValue = error;
   return this;
 };
 
@@ -680,7 +680,7 @@ MoronQueryBuilder.prototype._execute = function () {
   var knexBuilder = null;
 
   if (!builder._explicitResolveValue && !builder._explicitRejectValue) {
-    knexBuilder = builder.constructor.build(builder);
+    knexBuilder = tryBuild(builder);
   }
 
   _.each(builder._runBefore, function (func) {
@@ -1145,6 +1145,14 @@ function eagerFetch(builder, models) {
     return builder._modelClass.loadRelated(models, builder._eagerExpression);
   } else {
     return models;
+  }
+}
+
+function tryBuild(builder) {
+  try {
+    return builder.constructor.build(builder);
+  } catch (err) {
+    builder.reject(err);
   }
 }
 

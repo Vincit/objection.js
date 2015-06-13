@@ -186,10 +186,10 @@ MoronModel.prototype.$query = function () {
       ModelClass.$$delete(this).where(ModelClass.getFullIdColumn(), self.$id());
     })
     .relateImpl(function () {
-      throw new Error('relate makes no sense in this context');
+      throw new Error('`relate` makes no sense in this context');
     })
     .unrelateImpl(function () {
-      throw new Error('relate makes no sense in this context');
+      throw new Error('`unrelate` makes no sense in this context');
     });
 };
 

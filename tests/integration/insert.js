@@ -93,7 +93,7 @@ module.exports = function (session) {
         });
       }
 
-      it('should validate', function () {
+      it('should validate', function (done) {
         var ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           properties: {
@@ -103,15 +103,20 @@ module.exports = function (session) {
           }
         });
 
-        expect(function () {
-          ModelWithSchema.query().insert({model1Prop1: 666}).then();
-        }).to.throwException(function (err) {
-          expect(err).to.be.a(MoronValidationError);
-        });
-
-        return session.knex(Model1.tableName).then(function (rows) {
-          expect(_.pluck(rows, 'id').sort()).to.eql([1, 2]);
-        });
+        ModelWithSchema
+          .query()
+          .insert({model1Prop1: 666})
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (err) {
+            expect(err).to.be.a(MoronValidationError);
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.pluck(rows, 'id').sort()).to.eql([1, 2]);
+            done();
+          });
       });
 
     });

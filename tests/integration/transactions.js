@@ -22,6 +22,36 @@ module.exports = function (session) {
       });
     });
 
+    it('should fail without models', function (done) {
+      transaction(function () {
+        return {a: 1};
+      }).then(function () {
+        done(new Error('should not get here'));
+      }).catch(function () {
+        done();
+      });
+    });
+
+    it('should fail if one of the model classes is not a subclass of MoronModel', function (done) {
+      transaction(Model1, function () {}, function (Model1, NotMoronModel) {
+        return {a: 1};
+      }).then(function () {
+        done(new Error('should not get here'));
+      }).catch(function () {
+        done();
+      });
+    });
+
+    it('should fail if all ModelClasses are not bound to the same knex connection', function (done) {
+      transaction(Model1, Model2.bindKnex({}), function (Model1, Model2) {
+        return {a: 1};
+      }).then(function () {
+        done(new Error('should not get here'));
+      }).catch(function () {
+        done();
+      });
+    });
+
     it('should commit transaction if no errors occur', function (done) {
       transaction(Model1, Model2, function (Model1, Model2) {
 
