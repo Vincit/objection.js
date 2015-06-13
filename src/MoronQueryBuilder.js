@@ -1120,7 +1120,7 @@ function queryMethod(methodName) {
     // property `name`.
     for (var i = 0, l = arguments.length; i < l; ++i) {
       if (arguments[i] === undefined) {
-        return;
+        return this;
       } else {
         args[i] = arguments[i];
       }
