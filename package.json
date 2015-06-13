@@ -11,7 +11,8 @@
   },
   "author": {
     "name": "Sami Koskimäki",
-    "email": "sami.koskimaki@vincit.com"
+    "email": "sami.koskimaki@vincit.com",
+    "url": "https://github.com/koskimas"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,12 @@
     "postgresql",
     "mysql",
     "sqlite3"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE",
+    "src/*",
+    "moron.js"
   ],
   "dependencies": {
     "bluebird": "^2.9.24",

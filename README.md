@@ -10,7 +10,7 @@ What moron.js gives you:
  * Simple and fun way to fetch, insert, update, patch and delete models using the full power of SQL.
  * [Powerful mechanism](http://vincit.github.io/moron.js/MoronRelationExpression.html) for loading arbitrarily big trees of relations.
  * [JSON schema](http://json-schema.org/) validation.
- * [Promises](https://github.com/petkaantonov/bluebird).
+ * Fully [Promise](https://github.com/petkaantonov/bluebird) based API.
 
 What moron.js doesn't give you:
 
@@ -32,16 +32,17 @@ npm install moron
 
 #Getting started
 
-Best way to get started is to download the example project [here](). Unzip the project and `cd` to the folder. Then
-write the commands:
+Best way to get started is to use one of the example projects:
 
 ```sh
+git clone git@github.com:Vincit/moron.js.git
+cd moron/examples/express
 sh install.sh
-node app.js
+npm start
 ```
 
-The example project is a simple express server. The `example-requests` file contains a bunch of example curl commands
-for you to start playing with the REST API.
+The `express` example project is a simple express server. The `example-requests` file contains a bunch of curl
+commands for you to start playing with the REST API.
 
 ```sh
 cat example-requests
