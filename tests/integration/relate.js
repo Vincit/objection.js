@@ -13,6 +13,7 @@ module.exports = function (session) {
       describe('has one relation', function () {
         var model1;
         var model2;
+        var model3;
 
         beforeEach(function () {
           return session.populate([{
@@ -21,6 +22,9 @@ module.exports = function (session) {
           }, {
             id: 2,
             model1Prop1: 'hello 3'
+          }, {
+            id: 3,
+            model1Prop1: 'hello 4'
           }]);
         });
 
@@ -30,6 +34,7 @@ module.exports = function (session) {
             .then(function (models) {
               model1 = _.find(models, {id: 1});
               model2 = _.find(models, {id: 2});
+              model3 = _.find(models, {id: 3});
             });
         });
 
@@ -41,7 +46,10 @@ module.exports = function (session) {
               return session.knex(Model1.tableName).orderBy('id');
             })
             .then(function (rows) {
+              expect(rows).to.have.length(3);
               expect(rows[0].model1Id).to.equal(model2.id);
+              expect(rows[1].model1Id).to.equal(null);
+              expect(rows[2].model1Id).to.equal(null);
             });
         });
 
@@ -66,6 +74,14 @@ module.exports = function (session) {
               model2Prop1: 'text 4',
               model2Prop2: 3
             }]
+          }, {
+            id: 3,
+            model1Prop1: 'hello 3',
+            model1Relation2: [{
+              idCol: 3,
+              model2Prop1: 'text 5',
+              model2Prop2: 2
+            }]
           }]);
         });
 
@@ -83,8 +99,10 @@ module.exports = function (session) {
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(function (rows) {
+              expect(rows).to.have.length(3);
               expect(rows[0].model_1_id).to.equal(1);
               expect(rows[1].model_1_id).to.equal(1);
+              expect(rows[2].model_1_id).to.equal(3);
             });
         });
 
@@ -115,6 +133,14 @@ module.exports = function (session) {
                 id: 4,
                 model1Prop1: 'blaa 2',
                 model1Prop2: 3
+              }, {
+                id: 5,
+                model1Prop1: 'blaa 3',
+                model1Prop2: 2
+              }, {
+                id: 6,
+                model1Prop1: 'blaa 4',
+                model1Prop2: 1
               }]
             }]
           }]);
@@ -128,16 +154,18 @@ module.exports = function (session) {
             .then(function (model) {
               return model
                 .$relatedQuery('model2Relation1')
-                .relate(4);
+                .relate(5);
             })
             .then(function () {
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(function (rows) {
-              expect(rows).to.have.length(3);
+              expect(rows).to.have.length(5);
               expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 1, model1Id: 4})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
               expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
             });
         });
 

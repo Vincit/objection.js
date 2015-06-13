@@ -97,7 +97,7 @@ Person
   .then(function (persons) {
     // Each person has the `.pets` property populated with Animal objects related
     // through `pets` relation. The `.children` property contains the Person's
-    // children. Each children also has the `pets` relation eagerly fetched.
+    // children. Each child also has the `pets` relation eagerly fetched.
     console.log(persons[0].pets[0].name);
     console.log(persons[3].children[2].pets[8].name);
   });

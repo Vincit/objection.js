@@ -39,3 +39,24 @@ module.exports.isSubclassOf = function(Constructor, SuperConstructor) {
 
   return false;
 };
+
+module.exports.isSqlite = function (knex) {
+  if (!knex.client || !_.isString(knex.client.dialect)) {
+    throw new Error('knex API has changed');
+  }
+  return knex.client.dialect === 'sqlite3';
+};
+
+module.exports.isMySql = function (knex) {
+  if (!knex.client || !_.isString(knex.client.dialect)) {
+    throw new Error('knex API has changed');
+  }
+  return knex.client.dialect === 'mysql';
+};
+
+module.exports.isPostgres = function (knex) {
+  if (!knex.client || !_.isString(knex.client.dialect)) {
+    throw new Error('knex API has changed');
+  }
+  return knex.client.dialect === 'postgresql';
+};

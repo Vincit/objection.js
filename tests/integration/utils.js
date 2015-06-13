@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var utils = require('../../src/moronUtils')
 var Promise = require('bluebird');
 var MoronModel = require('../../src/MoronModel');
 var expect = require('expect.js');
@@ -92,25 +93,25 @@ module.exports.createDb = function () {
   var session = this;
 
   return session.knex.schema
+    .dropTableIfExists('Model1Model2')
     .dropTableIfExists('Model1')
     .dropTableIfExists('model_2')
-    .dropTableIfExists('Model1Model2')
     .createTable('Model1', function (table) {
-      table.bigincrements('id');
+      table.bigincrements('id').primary();
       table.biginteger('model1Id');
       table.string('model1Prop1');
       table.integer('model1Prop2');
     })
     .createTable('model_2', function (table) {
-      table.bigincrements('id_col');
+      table.bigincrements('id_col').primary();
       table.biginteger('model_1_id');
       table.string('model_2_prop_1');
       table.integer('model_2_prop_2');
     })
     .createTable('Model1Model2', function (table) {
-      table.bigincrements('id');
-      table.biginteger('model1Id').notNullable();
-      table.biginteger('model2Id').notNullable();
+      table.bigincrements('id').primary();
+      table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE');
+      table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE');
     });
 };
 
@@ -119,41 +120,51 @@ module.exports.destroy = function () {
 };
 
 module.exports.populate = function (data) {
-  var rows = {};
+  var insert = {};
   var models = this.models;
   var session = this;
 
   _.each(data, function (jsonModel) {
-    createRows(jsonModel, models.Model1, rows);
+    createRows(jsonModel, models.Model1, insert);
   });
 
   return Promise.all([
-    session.knex('Model1').delete(),
     session.knex('Model1Model2').delete(),
+    session.knex('Model1').delete(),
     session.knex('model_2').delete()
   ]).then(function () {
-    return Promise.all(_.map(rows, function (rows, table) {
+    return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).each(function (table) {
+      var rows = insert[table] || [];
+
+      if (_.isEmpty(rows)) {
+        return;
+      }
+
       return session.knex(table).insert(rows).then(function () {
         var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
         var maxId = _.max(_.pluck(rows, idCol));
 
         // Reset sequence.
-        if (session.opt.knexConfig.client === 'sqlite3') {
+        if (utils.isSqlite(session.knex)) {
           if (maxId && _.isFinite(maxId)) {
             return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
           }
-        } else if (session.opt.knexConfig.client === 'pg') {
+        } else if (utils.isPostgres(session.knex)) {
           if (maxId && _.isFinite(maxId)) {
             return session.knex.raw('ALTER SEQUENCE "' + table  + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
           }
+        } else if (utils.isMySql(session.knex)) {
+          if (maxId && _.isFinite(maxId)) {
+            return session.knex.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
+          }
         } else {
-          throw new Error('not yet implemented');
+          throw new Error('sequence truncate not implemented for the given database');
         }
       });
-    }));
+    });
   }).then(function () {
     return {
-      rows: rows,
+      rows: insert,
       tree: data
     };
   })

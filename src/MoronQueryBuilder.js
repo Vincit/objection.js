@@ -65,8 +65,8 @@ MoronQueryBuilder.prototype.resolve = function (resolve) {
  * @param {Error} error
  * @returns {MoronQueryBuilder}
  */
-MoronQueryBuilder.prototype.reject = function (resolve) {
-  this._explicitResolveValue = resolve;
+MoronQueryBuilder.prototype.reject = function (error) {
+  this._explicitResolveValue = error;
   return this;
 };
 

@@ -281,12 +281,11 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
+            'where "gender" = \'male\' and',
+            '"thingy" is not null and',
+            '"RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -310,12 +309,11 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "RelatedModel"."id" in',
-            '(select "RelatedModel"."id" from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-            'where "gender" = \'male\'',
-            'and "thingy" is not null',
-            'and "JoinTable"."ownerId" in (\'666\'))'
+            'where "gender" = \'male\' and',
+            '"thingy" is not null and',
+            '"RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -335,9 +333,8 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" + 1',
             'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -357,9 +354,8 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" - 10',
             'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -387,12 +383,11 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
+            'where "gender" = \'male\' and',
+            '"thingy" is not null and',
+            '"RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -426,12 +421,11 @@ describe('MoronManyToManyRelation', function () {
           expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
+            'where "gender" = \'male\' and',
+            '"thingy" is not null and',
+            '"RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -451,9 +445,8 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" + 1',
             'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -473,9 +466,8 @@ describe('MoronManyToManyRelation', function () {
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "test" = "test" - 10',
             'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "JoinTable"."ownerId" in (\'666\'))'
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
           ].join(' '));
         });
     });
@@ -497,26 +489,10 @@ describe('MoronManyToManyRelation', function () {
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
         .then(function (result) {
-          expect(executedQueries).to.have.length(2);
+          expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql([
-            'delete from "RelatedModel"',
-            'where "RelatedModel"."id" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
-          expect(executedQueries[1]).to.eql([
-            'delete from "JoinTable"',
-            'where "JoinTable"."relatedId" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "gender" = \'male\'',
-              'and "thingy" is not null',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          console.log(executedQueries);
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')');
         });
     });
 
@@ -579,14 +555,7 @@ describe('MoronManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql([
-            'delete from "JoinTable"',
-            'where "JoinTable"."relatedId" in',
-              '(select "RelatedModel"."id" from "RelatedModel"',
-              'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-              'where "code" in (\'55\', \'66\', \'77\')',
-              'and "JoinTable"."ownerId" in (\'666\'))'
-          ].join(' '));
+          expect(executedQueries[0]).to.eql('delete from "JoinTable" where "JoinTable"."ownerId" = \'666\' and "JoinTable"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" where "code" in (\'55\', \'66\', \'77\'))');
         });
     });
 

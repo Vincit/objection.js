@@ -14,6 +14,13 @@ describe('integration tests', function () {
     client: 'pg',
     connection: {
       host: '127.0.0.1',
+      database: 'moron_test',
+    }
+  }, {
+    client: 'mysql',
+    connection: {
+      host: '127.0.0.1',
+      user: 'travis',
       database: 'moron_test'
     }
   }], function (knexConfig) {

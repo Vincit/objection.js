@@ -77,13 +77,7 @@ MoronManyToManyRelation.prototype.insert = function (builder, $owner, $insertion
 
 MoronManyToManyRelation.prototype.update = function (builder, $owner, $update) {
   var owner = this.ownerModelClass.ensureModel($owner);
-  var idSelectQuery = this._makeFindIdQuery(builder, [owner[this.ownerProp]]).build();
-
-  // Clear all statements but increment and decrement. We don't want to include
-  // them in the main query since they are also in the idSelectQuery sub query.
-  // increment and decrement are actually update statements and they need to be
-  // in the main query.
-  builder.clearAllBut('increment', 'decrement');
+  var idSelectQuery = this._makeFindIdQuery(owner[this.ownerProp]);
 
   // This adds the update operation and the needed runAfter* methods.
   this.relatedModelClass.$$update(builder, $update);
@@ -93,13 +87,7 @@ MoronManyToManyRelation.prototype.update = function (builder, $owner, $update) {
 
 MoronManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
   var owner = this.ownerModelClass.ensureModel($owner);
-  var idSelectQuery = this._makeFindIdQuery(builder, [owner[this.ownerProp]]).build();
-
-  // Clear all statements but increment and decrement. We don't want to include
-  // them in the main query since they are also in the idSelectQuery sub query.
-  // increment and decrement are actually update statements and they need to be
-  // in the main query.
-  builder.clearAllBut('increment', 'decrement');
+  var idSelectQuery = this._makeFindIdQuery(owner[this.ownerProp]);
 
   // This adds the patch operation and the needed runAfter* methods.
   this.relatedModelClass.$$patch(builder, $patch);
@@ -108,28 +96,13 @@ MoronManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
 };
 
 MoronManyToManyRelation.prototype.delete = function (builder, $owner) {
-  var self = this;
   var owner = this.ownerModelClass.ensureModel($owner);
-  var idSelectQuery = this._makeFindIdQuery(builder, [owner[this.ownerProp]]).build();
-
-  // Clear all statements. We don't want to include them in the main query since they
-  // are also in the idSelectQuery sub query.
-  builder.clear();
+  var idSelectQuery = this._makeFindIdQuery(owner[this.ownerProp]);
 
   // This adds the delete operation and the needed runAfter* methods.
   this.relatedModelClass.$$delete(builder);
 
-  return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery).runAfterModelCreatePushFront(function (result) {
-    // Delete the join rows from the join table.
-    return self.relatedModelClass
-      .knexQuery()
-      .delete()
-      .from(self.joinTable)
-      .whereIn(self.fullJoinTableRelatedCol(), idSelectQuery)
-      .then(function () {
-        return result;
-      });
-  });
+  return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
 };
 
 MoronManyToManyRelation.prototype.relate = function (builder, $owner, $ids) {
@@ -149,17 +122,20 @@ MoronManyToManyRelation.prototype.relate = function (builder, $owner, $ids) {
 MoronManyToManyRelation.prototype.unrelate = function (builder, $owner) {
   var self = this;
   var owner = this.ownerModelClass.ensureModel($owner);
-  var idSelectQuery = this._makeFindIdQuery(builder, [owner[self.ownerProp]]).build();
 
-  // Clear all statements. We don't want to include them in the main query since they
-  // are also in the idSelectQuery sub query.
-  builder.clear();
+  var idSelectQuery = builder
+    .clone()
+    .clear('select')
+    .clearCustomImpl()
+    .select(this.fullRelatedCol());
 
   // Delete the join rows from the join table.
   return builder
+    .clear()
     .delete()
     .from(self.joinTable)
-    .whereIn(self.fullJoinTableRelatedCol(), idSelectQuery)
+    .where(self.fullJoinTableOwnerCol(), owner[this.ownerProp])
+    .whereIn(self.fullJoinTableRelatedCol(), idSelectQuery.build())
     .runAfterModelCreatePushFront(_.constant({}));
 };
 
@@ -169,14 +145,12 @@ MoronManyToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) 
     .whereIn(this.fullJoinTableOwnerCol(), ownerIds);
 };
 
-MoronManyToManyRelation.prototype._makeFindIdQuery = function (builder, ownerIds) {
-  builder = builder
-    .clone()
-    .clearCustomImpl()
-    .clear('insert', 'update', 'patch', 'delete', 'del', 'relate', 'unrelate', 'increment', 'decrement', 'orderBy', 'select')
-    .select(this.relatedModelClass.getFullIdColumn());
-
-  return this._makeFindQuery(builder, ownerIds);
+MoronManyToManyRelation.prototype._makeFindIdQuery = function (ownerId) {
+  return this.ownerModelClass
+    .knex()
+    .select(this.fullJoinTableRelatedCol())
+    .from(this.joinTable)
+    .where(this.fullJoinTableOwnerCol(), ownerId);
 };
 
 MoronManyToManyRelation.prototype._createJoinRows = function (ownerId, relatedIds) {

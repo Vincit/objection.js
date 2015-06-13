@@ -1,6 +1,7 @@
 "use strict";
 
 var _ = require('lodash')
+  , utils = require('./moronUtils')
   , MoronModelBase = require('./MoronModelBase')
   , MoronQueryBuilder = require('./MoronQueryBuilder')
   , MoronRelationExpression = require('./MoronRelationExpression')
@@ -259,15 +260,16 @@ MoronModel.prototype.$query = function () {
  * ```js
  * jennifer
  *   .$relatedQuery('pets')
- *   .unrelate(fluffy.id)
+ *   .unrelate()
+ *   .where('id', fluffy.id)
  *   .then(function () {
  *     console.log('jennifer no longer has fluffy as a pet');
  *   });
  * ```
  *
- * Related models can be deleted using the delete method. Delete method deletes the related
- * model _and_ any connections to the owner. Naturally the delete query can be chained with
- * any *knex* methods.
+ * Related models can be deleted using the delete method. Note that in the case of ManyToManyRelation
+ * the join table entries are not deleted. Naturally the delete query can be chained with any *knex*
+ * methods.
  *
  * ```js
  * jennifer
@@ -862,7 +864,7 @@ MoronModel.bindKnex = function (knex) {
  * If `model` is already an instance of this class, nothing is done.
  *
  * @param {MoronModel|Object} model
- * @param {MoronModelOptions} options
+ * @param {MoronModelOptions=} options
  * @returns {MoronModel}
  */
 MoronModel.ensureModel = function (model, options) {
@@ -1063,6 +1065,10 @@ MoronModel.$$getJsonAttributes = function () {
  * @returns {MoronQueryBuilder}
  */
 MoronModel.$$insert = function (builder, $models) {
+  if (_.isArray($models) && $models.length > 1 && !utils.isPostgres(this.knex())) {
+    throw new Error('batch insert only works with Postgresql');
+  }
+
   var ModelClass = this;
   var models = ModelClass.ensureModelArray($models);
 
@@ -1077,15 +1083,6 @@ MoronModel.$$insert = function (builder, $models) {
   });
 
   return builder.insert(json).returning(ModelClass.idColumn).runAfterModelCreatePushFront(function (ids) {
-    // TODO: will not work in all situations!!!!
-    if (ids.length === 1 && models.length > 1) {
-      var lastId = ids[0];
-      ids = [];
-      for (var i = models.length - 1; i >= 0; --i) {
-        ids.unshift(lastId--);
-      }
-    }
-
     _.each(models, function (model, idx) {
       model.$id(ids[idx]);
     });
