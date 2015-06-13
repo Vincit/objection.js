@@ -1112,8 +1112,23 @@ MoronQueryBuilder.prototype.truncate = queryMethod('truncate');
  */
 function queryMethod(methodName) {
   return function () {
+    var args = new Array(arguments.length);
+
+    // None of the query builder methods should accept undefined. Do nothing if
+    // one of the arguments is undefined. This enables us to do things like
+    // `.where('name', req.query.name)` without checking if req.query has the
+    // property `name`.
+    for (var i = 0, l = arguments.length; i < l; ++i) {
+      if (arguments[i] === undefined) {
+        return;
+      } else {
+        args[i] = arguments[i];
+      }
+    }
+
     this._knexCalls[methodName] = this._knexCalls[methodName] || [];
-    this._knexCalls[methodName].push(_.toArray(arguments));
+    this._knexCalls[methodName].push(args);
+
     return this;
   };
 }
