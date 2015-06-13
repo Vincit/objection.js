@@ -50,20 +50,45 @@ cat example-requests
 
 Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of examples.
 
-#Examples
+#Query examples
 
-Fetch all Person models from the database:
+All queries are started with one of the MoronModel methods [query()](http://vincit.github.io/moron.js/MoronModel.html#_P_query),
+[$query()](http://vincit.github.io/moron.js/MoronModel.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery).
+All these methods return a [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html) instance that can be used just like
+a [knex QueryBuilder](http://knexjs.org/#Builder).
+
+Insert a Person model to the database:
 
 ```js
-Person.query().then(function (persons) {
-  console.log(persons[0] instanceof Person); // --> true
-  console.log('there are', persons.length, 'in total');
-}).catch(function (err) {
-  console.log('oh noes');
-});
+Person
+  .query()
+  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+  .then(function (jennifer) {
+    console.log(jennifer instanceof Person); // --> true
+    console.log(jennifer.id);
+    console.log(jennifer.firstName); // --> Jennifer
+  })
+  .catch(function (err) {
+    console.log('oh noes');
+  });
 ```
 
-Query with a where clause:
+Fetch all Persons from the database:
+
+```js
+Person
+  .query()
+  .then(function (persons) {
+    console.log(persons[0] instanceof Person); // --> true
+    console.log('there are', persons.length, 'in total');
+  })
+  .catch(function (err) {
+    console.log('oh noes');
+  });
+```
+
+The `.query()` method has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has. Here
+is a simple example that uses some of them:
 
 ```js
 Person
@@ -75,6 +100,49 @@ Person
   .then(function (middleAgedJennifers) {
     console.log('The last name of the first middle aged Jennifer is');
     console.log(middleAgedJennifers[0].lastName);
+  });
+```
+
+Update models:
+
+```js
+Person
+  .query()
+  .patch({lastName: 'Dinosaur'});
+  .where('age', '>', 60)
+  .then(function (patch) {
+    console.log('all persons over 60 years old are now dinosaurs');
+    console.log(patch.lastName); // --> Dinosaur.
+  })
+  .catch(function (err) {
+    console.log(err.stack);
+  });
+```
+
+While the static `.query()` method can be used to create a query to a whole table `.$relatedQuery()` method
+can be used to query a single relation. `.$relatedQuery()` returns an instance of `MoronQueryBuilder` just like
+the `.query()` method.
+
+```js
+var jennifer;
+Person
+  .query()
+  .where('firstName', 'Jennifer')
+  .first()
+  .then(function (person) {
+    jennifer = person;
+    return jennifer
+      .$relatedQuery('pets')
+      .where('species', 'dog')
+      .orderBy('name');
+  })
+  .then(function (jennifersDogs) {
+    console.log(jennifersDogs[0] instanceof Animal); // --> true
+    console.log(jennifer.pets === jennifersDogs); // --> true
+    console.log('Jennifer has', jennifersDogs.length, 'dogs');
+  })
+  .catch(function (err) {
+    console.log(err.stack);
   });
 ```
 
@@ -144,17 +212,23 @@ javascript inheritance :D.
 ```js
 var MoronModel = require('moron').MoronModel;
 
+/**
+ * @Override MoronModel
+ * @constructor
+ */
 function Person() {
   MoronModel.apply(this, arguments);
 }
 
-module.exports = MoronModel.extend(Person);
+MoronModel.extend(Person);
+module.exports = Person;
 
 // Table name is the only required property.
 Person.tableName = 'Person';
 
-// This is not the database schema! Nothing is generated based on this. This a schema
-// for the JSON objects from which Persons are created.
+// This is not the database schema! Nothing is generated based on this. Whenever a
+// Person object is created from a JSON object, the JSON is checked against this
+// schema. For example when you call Person.fromJson({name: 'Matrix'});
 Person.jsonSchema = {
   type: 'object',
   required: ['firstName', 'lastName'],
@@ -163,22 +237,36 @@ Person.jsonSchema = {
     id: {type: 'integer'},
     parentId: {type: ['integer', 'null']},
     firstName: {type: 'string', minLength: 1, maxLength: 255},
-    firstName: {type: 'string', minLength: 1, maxLength: 255},
+    lastName: {type: 'string', minLength: 1, maxLength: 255},
     age: {type: 'number'}
   }
 };
 
-// This object defines the relations to other models. Person has two relations `pets`
-// and `children`.
+// This object defines the relations to other models.
 Person.relationMappings = {
   pets: {
     relation: MoronModel.OneToManyRelation,
     // The related model. This can be either a MoronModel subclass constructor or an
-    // absolute file path to a module that exports one.
+    // absolute file path to a module that exports one. We use the file path version
+    // here to prevent require loops.
     modelClass: __dirname + '/Animal',
     join: {
       from: 'Person.id',
       to: 'Animal.ownerId'
+    }
+  },
+
+  movies: {
+    relation: MoronModel.ManyToManyRelation,
+    modelClass: __dirname + '/Movie',
+    join: {
+      from: 'Person.id',
+      // ManyToMany relation needs the `through` object to describe the join table.
+      through: {
+        from: 'Person_Movie.personId',
+        to: 'Person_Movie.movieId'
+      },
+      to: 'Movie.id'
     }
   },
 
