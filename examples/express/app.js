@@ -20,20 +20,10 @@ require('./api')(app);
 
 // Error handling.
 app.use(function (err, req, res, next) {
-  if (!err) {
-    return next();
-  }
-
-  if (err.statusCode) {
-    res.status(err.statusCode);
+  if (err) {
+    res.status(err.statusCode || 500).send(err.data || err.message || {});
   } else {
-    res.status(500);
-  }
-
-  if (err.data || err.message) {
-    res.send(err.data || err.message);
-  } else {
-    res.end();
+    next();
   }
 });
 
