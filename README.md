@@ -18,10 +18,10 @@ What moron.js gives you:
 What moron.js doesn't give you:
 
  * A custom query DSL. SQL is used everywhere
- * Automatic database schema creation and migration
-    Automatic schema creation and migration is useful for the simple things, but usually just gets in your
-    way when doing anything non-trivial. Moron.js leaves the schema and migration related things to you.
-    knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job.
+ * Automatic database schema creation and migration.
+    It is useful for the simple things, but usually just gets in your way when doing anything non-trivial.
+    Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
+    that we recommend for this job.
 
 API documentation can be found [here](http://vincit.github.io/moron.js).
 
@@ -46,7 +46,7 @@ npm install moron
 Best way to get started is to use one of the example projects:
 
 ```sh
-git clone git@github.com:Vincit/moron.js.git
+git clone git@github.com:Vincit/moron.js.git moron
 cd moron/examples/express
 sh install.sh
 npm start
@@ -231,7 +231,7 @@ Person
 The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/moron.js/MoronRelationExpression.html).
 
 Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
-request. However using such expressions opens the whole database through the API. This is not very secure. Therefore
+request. However, using such expressions opens the whole database through the API. This is not very secure. Therefore
 the [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html) has the `.allowEager` method.
 allowEager can be used to limit the allowed eager expression to a certain subset. Like this:
 
@@ -249,14 +249,14 @@ expressApp.get('/persons', function (req, res, next) {
 The example above allows `req.query.eager` to be one of `'pets'`, `'children'`, `'children.pets'`, `'[pets, children]'` and
 `'[pets, children.pets]'`. Examples of failing eager expressions are `'movies'`, `'children.children'` and `'notEvenAnExistingRelation'`.
 
-In addition to the `.eager` method relations can be fetched using the `loadRelated` and `$loadRelated` methods of
+In addition to the `.eager` method, relations can be fetched using the `loadRelated` and `$loadRelated` methods of
 [MoronModel](http://vincit.github.io/moron.js/MoronModel.html).
 
 #Transactions
 
 Transactions are started by calling the [moron.transaction](http://vincit.github.io/moron.js/global.html#transaction)
 function. Give all the models you want to use in the transaction as parameters to the `transaction` function. The model
-classes are bound to a newly created transaction and passed to the callback function. Inside this callback all queries
+classes are bound to a newly created transaction and passed to the callback function. Inside this callback, all queries
 started through them take part in the same transaction.
 
 The transaction is committed if the returned Promise is resolved successfully. If the returned Promise is rejected
