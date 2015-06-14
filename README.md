@@ -78,8 +78,8 @@ Person
   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
   .then(function (jennifer) {
     console.log(jennifer instanceof Person); // --> true
-    console.log(jennifer.id);
-    console.log(jennifer.firstName); // --> Jennifer
+    console.log(jennifer.firstName); // --> 'Jennifer'
+    console.log(jennifer.fullName()); // --> 'Jennifer Lawrence'
   })
   .catch(function (err) {
     console.log('oh noes');
@@ -335,6 +335,12 @@ function Person() {
 
 MoronModel.extend(Person);
 module.exports = Person;
+
+// You can add custom functionality to MoronModels just as you would
+// to any javascript class.
+Person.prototype.fullName = function () {
+  return this.firstName + ' ' + this.lastName;
+};
 
 // Table name is the only required property.
 Person.tableName = 'Person';
