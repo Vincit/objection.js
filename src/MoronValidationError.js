@@ -1,3 +1,5 @@
+'use strict';
+
 var util = require('util');
 
 /**
@@ -6,7 +8,7 @@ var util = require('util');
  */
 function MoronValidationError(data) {
   Error.call(this);
-  Error.captureStackTrace(this, arguments.callee);
+  Error.captureStackTrace(this, MoronValidationError);
 
   this.data = data;
   this.statusCode = 400;

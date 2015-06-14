@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash')
   , utils = require('./moronUtils')
@@ -1168,11 +1168,11 @@ MoronModel.$$omitRelations = function (json) {
   if (!this.$$omitAttributes) {
     this.$$omitAttributes = _.keys(this.getRelations());
   }
-  
+
   if (this.$$omitAttributes.length) {
     return _.omit(json, this.$$omitAttributes);
   }
-  
+
   return json;
 };
 
