@@ -16,7 +16,7 @@ Person.tableName = 'Person';
 
 // This is not the database schema! Nothing is generated based on this. Whenever a
 // Person object is created from a JSON object, the JSON is checked against this
-// schema. For example when you call Person.fromJson({name: 'Matrix'});
+// schema. For example when you call Person.fromJson({firstName: 'Jennifer'});
 Person.jsonSchema = {
   type: 'object',
   required: ['firstName', 'lastName'],
