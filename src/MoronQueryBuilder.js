@@ -609,12 +609,13 @@ MoronQueryBuilder.prototype.has = function (methodName) {
 /**
  * Executes the query and returns a Promise.
  *
- * @param {function=} success
- * @param {function=} error
+ * @param {function=} successHandler
+ * @param {function=} errorHandler
  * @returns {Promise}
  */
-MoronQueryBuilder.prototype.then = function (success, error) {
-  return this._execute().then(success, error);
+MoronQueryBuilder.prototype.then = function (/*successHandler, errorHandler*/) {
+  var promise = this._execute();
+  return promise.then.apply(promise, arguments);
 };
 
 /**
@@ -623,8 +624,9 @@ MoronQueryBuilder.prototype.then = function (success, error) {
  * @param {function} mapper
  * @returns {Promise}
  */
-MoronQueryBuilder.prototype.map = function (mapper) {
-  return this._execute().map(mapper);
+MoronQueryBuilder.prototype.map = function (/*mapper*/) {
+  var promise = this._execute();
+  return promise.map.apply(promise, arguments);
 };
 
 /**
@@ -633,8 +635,9 @@ MoronQueryBuilder.prototype.map = function (mapper) {
  * @param {function} errorHandler
  * @returns {Promise}
  */
-MoronQueryBuilder.prototype.catch = function (errorHandler) {
-  return this._execute().catch(errorHandler);
+MoronQueryBuilder.prototype.catch = function (/*errorHandler*/) {
+  var promise = this._execute();
+  return promise.catch.apply(promise, arguments);
 };
 
 /**
@@ -643,8 +646,9 @@ MoronQueryBuilder.prototype.catch = function (errorHandler) {
  * @param {*} retVal
  * @returns {Promise}
  */
-MoronQueryBuilder.prototype.return = function (retVal) {
-  return this._execute().return(retVal);
+MoronQueryBuilder.prototype.return = function (/*retVal*/) {
+  var promise = this._execute();
+  return promise.return.apply(promise, arguments);
 };
 
 /**
@@ -653,8 +657,9 @@ MoronQueryBuilder.prototype.return = function (retVal) {
  * @param {*} context
  * @returns {Promise}
  */
-MoronQueryBuilder.prototype.bind = function (context) {
-  return this._execute().bind(context);
+MoronQueryBuilder.prototype.bind = function (/*context*/) {
+  var promise = this._execute();
+  return promise.bind.apply(promise, arguments);
 };
 
 /**
