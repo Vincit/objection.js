@@ -135,7 +135,7 @@
 
     <section class="readme-section">
         <article><h1>moron.js <a href="https://travis-ci.org/Vincit/moron.js"><img src="https://travis-ci.org/Vincit/moron.js.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/Vincit/moron.js"><img src="https://coveralls.io/repos/Vincit/moron.js/badge.svg" alt="Coverage Status"></a></h1><p>Moron.js is a Node.js ORM built around the wonderful SQL query builder <a href="http://knexjs.org">knex</a>. All databases
-supported by knex are supported by moron.js. <strong>SQLite3</strong>, <strong>Postgres</strong> and <strong>MySQL</strong> are fully tested.</p>
+supported by knex are supported by moron.js. <strong>SQLite3</strong>, <strong>Postgres</strong> and <strong>MySQL</strong> are <a href="https://travis-ci.org/Vincit/moron.js">fully tested</a>.</p>
 <p>What moron.js gives you:</p>
 <ul>
 <li>An easy declarative way of <a href="#example-model">defining models</a> and relations between them</li>
@@ -315,8 +315,9 @@ the transaction is rolled back.</p>
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
 });</code></pre><h1>Documents</h1><p>Moron.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
 objects or arrays in the model's <code>jsonSchema</code> are automatically converted to JSON strings in the database and
-back to objects when read from the database. The database columns for the object properties can be a normal
-text columns. Postgresql has the json and jsonb data types that can be used instead.</p>
+back to objects when read from the database. The database columns for the object properties can be normal
+text columns. Postgresql has the <code>json</code> and <code>jsonb</code> data types that can be used instead for better performance
+and possibility to <a href="http://www.postgresql.org/docs/9.4/static/functions-json.html">make queries</a> to the documents.</p>
 <p>The <code>address</code> property of the Person model is defined as an object in the <a href="#example-model">Person.jsonSchema</a>:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()

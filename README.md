@@ -1,7 +1,7 @@
 # moron.js [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
 
 Moron.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
-supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are fully tested.
+supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/moron.js).
 
 What moron.js gives you:
 
@@ -271,8 +271,9 @@ moron.transaction(Person, Animal, function (Person, Animal) {
 
 Moron.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
 objects or arrays in the model's `jsonSchema` are automatically converted to JSON strings in the database and
-back to objects when read from the database. The database columns for the object properties can be a normal
-text columns. Postgresql has the json and jsonb data types that can be used instead.
+back to objects when read from the database. The database columns for the object properties can be normal
+text columns. Postgresql has the `json` and `jsonb` data types that can be used instead for better performance
+and possibility to [make queries](http://www.postgresql.org/docs/9.4/static/functions-json.html) to the documents.
 
 The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#example-model):
 
