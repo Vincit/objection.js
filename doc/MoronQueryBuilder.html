@@ -140,6 +140,12 @@
 MoronQueryBuilder has all the methods a knex QueryBuilder has and more. While knex
 QueryBuilder returns plain javascript objects, MoronQueryBuilder returns MoronModel
 subclass instances.</p>
+<p>MoronQueryBuilder is thenable, meaning that it can be used like a promise. You can
+return query builder from a <code>.then</code> method of a promise and it gets chained just like
+a normal promise would.</p>
+<p>The query is executed when one of its promise methods <code>then()</code>, <code>catch()</code>, <code>map()</code>,
+<code>bind()</code> or <code>return()</code> is called. Also calling either of the paging methods <code>page()</code>
+or <code>range()</code> will execute the query.</p>
     </div>
     
 
@@ -8334,7 +8340,7 @@ query.then();
         <h4 class="name" id="then">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">then</span>
-          <span class="signature-container"><span class="signature">(<span class="optional">success</span>, <span class="optional">error</span>)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+          <span class="signature-container"><span class="signature">(<span class="optional">successHandler</span>, <span class="optional">errorHandler</span>)</span><span class="type-signature"> &rarr; {Promise}</span></span>
         </h4>
     
     
@@ -8380,7 +8386,7 @@ query.then();
 
         <tr>
             
-                <td class="name"><code>success</code></td>
+                <td class="name"><code>successHandler</code></td>
             
 
             <td class="type">
@@ -8413,7 +8419,7 @@ query.then();
 
         <tr>
             
-                <td class="name"><code>error</code></td>
+                <td class="name"><code>errorHandler</code></td>
             
 
             <td class="type">

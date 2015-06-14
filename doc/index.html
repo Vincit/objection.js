@@ -134,14 +134,15 @@
 
 
     <section class="readme-section">
-        <article><h1>moron.js <a href="https://travis-ci.org/Vincit/moron.js"><img src="https://travis-ci.org/Vincit/moron.js.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/Vincit/moron.js"><img src="https://coveralls.io/repos/Vincit/moron.js/badge.svg" alt="Coverage Status"></a></h1><p>Moron.js is a Node.js ORM built around the wonderful SQL query builder <a href="http://knexjs.org">knex</a>. All databases
+        <article><p><a href="https://travis-ci.org/Vincit/moron.js"><img src="https://travis-ci.org/Vincit/moron.js.svg?branch=master" alt="Build Status"></a> <a href="https://coveralls.io/r/Vincit/moron.js"><img src="https://coveralls.io/repos/Vincit/moron.js/badge.svg" alt="Coverage Status"></a></p>
+<h1>Introduction</h1><p>Moron.js is a Node.js ORM built around the wonderful SQL query builder <a href="http://knexjs.org">knex</a>. All databases
 supported by knex are supported by moron.js. <strong>SQLite3</strong>, <strong>Postgres</strong> and <strong>MySQL</strong> are <a href="https://travis-ci.org/Vincit/moron.js">fully tested</a>.</p>
 <p>What moron.js gives you:</p>
 <ul>
-<li>An easy declarative way of <a href="#example-model">defining models</a> and relations between them</li>
+<li>An easy declarative way of <a href="#models">defining models</a> and relations between them</li>
 <li>Simple and fun way to <a href="#query-examples">fetch, insert, update and delete</a> models using the full power of SQL</li>
 <li>A way to <a href="#documents">store complex documents</a> as single rows</li>
-<li>Powerful mechanism for loading arbitrarily large <a href="#fetching-relations-eagerly">trees of relations</a></li>
+<li>Powerful mechanism for loading arbitrarily large <a href="#eager-queries">trees of relations</a></li>
 <li>Completely <a href="https://github.com/petkaantonov/bluebird">Promise</a> based API</li>
 <li>Simple <a href="#transactions">transactions</a></li>
 <li><a href="http://json-schema.org/">JSON schema</a> validation</li>
@@ -154,6 +155,16 @@ supported by knex are supported by moron.js. <strong>SQLite3</strong>, <strong>P
  way when doing anything non-trivial. Moron.js leaves the schema and migration related things to you.
  knex has a great <a href="http://knexjs.org/#Migrations">migration tool</a> that we recommend for this job.</li>
 </ul>
+<p>API documentation can be found <a href="http://vincit.github.io/moron.js">here</a>.</p>
+<h1>Topics</h1><ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#getting-started">Getting started</a></li>
+<li><a href="#query-examples">Query examples</a></li>
+<li><a href="#eager-queries">Eager queries</a></li>
+<li><a href="#transactions">Transactions</a></li>
+<li><a href="#documents">Documents</a></li>
+<li><a href="#models">Models</a></li>
+</ul>
 <h1>Installation</h1><pre class="prettyprint source lang-sh"><code>npm install moron</code></pre><h1>Getting started</h1><p>Best way to get started is to use one of the example projects:</p>
 <pre class="prettyprint source lang-sh"><code>git clone git@github.com:Vincit/moron.js.git
 cd moron/examples/express
@@ -161,7 +172,7 @@ sh install.sh
 npm start</code></pre><p>The <code>express</code> example project is a simple express server. The <code>example-requests.sh</code> file contains a bunch of curl
 commands for you to start playing with the REST API.</p>
 <pre class="prettyprint source lang-sh"><code>cat example-requests.sh</code></pre><p>Also our <a href="http://vincit.github.io/moron.js">API documentation</a> contains a lot of examples.</p>
-<h1>Query examples</h1><p>The Person model used in the examples is defined <a href="#example-model">here</a>.</p>
+<h1>Query examples</h1><p>The Person model used in the examples is defined <a href="#models">here</a>.</p>
 <p>All queries are started with one of the <a href="http://vincit.github.io/moron.js/MoronModel.html">MoronModel</a> methods <a href="http://vincit.github.io/moron.js/MoronModel.html#_P_query">query()</a>,
 <a href="http://vincit.github.io/moron.js/MoronModel.html#Squery">$query()</a> or <a href="http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery">$relatedQuery()</a>.
 All these methods return a <a href="http://vincit.github.io/moron.js/MoronQueryBuilder.html">MoronQueryBuilder</a> instance that can be used just like
@@ -244,7 +255,7 @@ Person
   .catch(function (err) {
     console.log('something went wrong with finding the person OR inserting the pet');
     console.log(err.stack);
-  });</code></pre><h1>Fetching relations eagerly</h1><p>Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly. The following
+  });</code></pre><h1>Eager queries</h1><p>Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly. The following
 examples demonstrate how to use it:</p>
 <p>Fetch one relation:</p>
 <pre class="prettyprint source lang-js"><code>Person
@@ -318,7 +329,7 @@ objects or arrays in the model's <code>jsonSchema</code> are automatically conve
 back to objects when read from the database. The database columns for the object properties can be normal
 text columns. Postgresql has the <code>json</code> and <code>jsonb</code> data types that can be used instead for better performance
 and possibility to <a href="http://www.postgresql.org/docs/9.4/static/functions-json.html">make queries</a> to the documents.</p>
-<p>The <code>address</code> property of the Person model is defined as an object in the <a href="#example-model">Person.jsonSchema</a>:</p>
+<p>The <code>address</code> property of the Person model is defined as an object in the <a href="#models">Person.jsonSchema</a>:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .insert({
@@ -340,7 +351,7 @@ and possibility to <a href="http://www.postgresql.org/docs/9.4/static/functions-
   })
   .catch(function (err) {
     console.log('oh noes');
-  });</code></pre><h1>Example model</h1><p>Models are created by inheriting from the <a href="http://vincit.github.io/moron.js/MoronModel.html">MoronModel</a> base class.
+  });</code></pre><h1>Models</h1><p>Models are created by inheriting from the <a href="http://vincit.github.io/moron.js/MoronModel.html">MoronModel</a> base class.
 In moron.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
 wonder what the hell is happening. Just plain old ugly javascript inheritance.</p>
 <pre class="prettyprint source lang-js"><code>var MoronModel = require('moron').MoronModel;

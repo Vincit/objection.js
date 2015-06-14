@@ -13,6 +13,14 @@ var _ = require('lodash')
  * QueryBuilder returns plain javascript objects, MoronQueryBuilder returns MoronModel
  * subclass instances.
  *
+ * MoronQueryBuilder is thenable, meaning that it can be used like a promise. You can
+ * return query builder from a `.then` method of a promise and it gets chained just like
+ * a normal promise would.
+ *
+ * The query is executed when one of its promise methods `then()`, `catch()`, `map()`,
+ * `bind()` or `return()` is called. Also calling either of the paging methods `page()`
+ * or `range()` will execute the query.
+ *
  * @constructor
  */
 function MoronQueryBuilder(modelClass) {
@@ -767,6 +775,7 @@ MoronQueryBuilder.prototype.build = function () {
 
 /**
  * @protected
+ * @returns {knex.QueryBuilder}
  */
 MoronQueryBuilder.build = function (builder) {
   var isFindQuery = builder.isFindQuery();
@@ -857,6 +866,7 @@ MoronQueryBuilder.build = function (builder) {
 
 /**
  * @private
+ * @returns {Promise}
  */
 MoronQueryBuilder.prototype._execute = function () {
   var builder = this.clone();

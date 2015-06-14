@@ -1,14 +1,16 @@
-# moron.js [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
+[![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
+
+#Introduction
 
 Moron.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
 supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/moron.js).
 
 What moron.js gives you:
 
- * An easy declarative way of [defining models](#example-model) and relations between them
+ * An easy declarative way of [defining models](#models) and relations between them
  * Simple and fun way to [fetch, insert, update and delete](#query-examples) models using the full power of SQL
  * A way to [store complex documents](#documents) as single rows
- * Powerful mechanism for loading arbitrarily large [trees of relations](#fetching-relations-eagerly)
+ * Powerful mechanism for loading arbitrarily large [trees of relations](#eager-queries)
  * Completely [Promise](https://github.com/petkaantonov/bluebird) based API
  * Simple [transactions](#transactions)
  * [JSON schema](http://json-schema.org/) validation
@@ -20,6 +22,18 @@ What moron.js doesn't give you:
     Automatic schema creation and migration is useful for the simple things, but usually just gets in your
     way when doing anything non-trivial. Moron.js leaves the schema and migration related things to you.
     knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job.
+
+API documentation can be found [here](http://vincit.github.io/moron.js).
+
+#Topics
+
+- [Installation](#installation)
+- [Getting started](#getting-started)
+- [Query examples](#query-examples)
+- [Eager queries](#eager-queries)
+- [Transactions](#transactions)
+- [Documents](#documents)
+- [Models](#models)
 
 #Installation
 
@@ -49,7 +63,7 @@ Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of
 
 #Query examples
 
-The Person model used in the examples is defined [here](#example-model).
+The Person model used in the examples is defined [here](#models).
 
 All queries are started with one of the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) methods [query()](http://vincit.github.io/moron.js/MoronModel.html#_P_query),
 [$query()](http://vincit.github.io/moron.js/MoronModel.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery).
@@ -164,7 +178,7 @@ Person
   });
 ```
 
-#Fetching relations eagerly
+#Eager queries
 
 Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly. The following
 examples demonstrate how to use it:
@@ -275,7 +289,7 @@ back to objects when read from the database. The database columns for the object
 text columns. Postgresql has the `json` and `jsonb` data types that can be used instead for better performance
 and possibility to [make queries](http://www.postgresql.org/docs/9.4/static/functions-json.html) to the documents.
 
-The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#example-model):
+The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#models):
 
 ```js
 Person
@@ -302,7 +316,7 @@ Person
   });
 ```
 
-#Example model
+#Models
 
 Models are created by inheriting from the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) base class.
 In moron.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
