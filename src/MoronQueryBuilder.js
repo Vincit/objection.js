@@ -975,7 +975,44 @@ MoronQueryBuilder.prototype.first = function () {
 };
 
 /**
- * TODO
+ * Creates an insert query.
+ *
+ * Inserts an object or an array of objects. The array version only works on Postgres because
+ * Postgres is the only database engine that returns the identifiers of _all_ inserted rows.
+ * knex supports batch inserts on other databases also, but you only get the id of the first
+ * (or last) inserted object as a result. If you need batch insert on other databases you
+ * can use knex directly through `YourModel.knexQuery()`.
+ *
+ * The inserted objects are validated against the model's `jsonSchema`.
+ *
+ * Examples:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+ *   .then(function (jennifer) {
+ *     console.log(jennifer.id);
+ *   });
+ * ```
+ *
+ * Batch insert (Only works on Postgres):
+ *
+ * ```js
+ * someMovie
+ *   .$relatedQuery('actors')
+ *   .insert([
+ *     {firstName: 'Jennifer', lastName: 'Lawrence'},
+ *     {firstName: 'Bradley', lastName: 'Cooper'}
+ *   ])
+ *   .then(function (actors) {
+ *     console.log(actors[0].firstName);
+ *     console.log(actors[1].firstName);
+ *   });
+ * ```
+ *
+ * @param {Object|Array.<Object>} objects
+ *    Objects to insert.
  *
  * @method
  * @returns {MoronQueryBuilder}
@@ -983,7 +1020,28 @@ MoronQueryBuilder.prototype.first = function () {
 MoronQueryBuilder.prototype.insert = queryMethod('insert');
 
 /**
- * TODO
+ * Creates an update query.
+ *
+ * The update object is validated against the model's `jsonSchema`. This method is meant
+ * for updating _whole_ objects with all required properties. If you want to update a subset
+ * of properties use the `patch()` method.
+ *
+ * This method is mainly useful when updating a single model.
+ *
+ * Examples:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+ *   .where('id', 134)
+ *   .then(function (update) {
+ *     console.log(update.toJSON());
+ *   });
+ * ```
+ *
+ * @param {Object} object
+ *    The update object.
  *
  * @method
  * @returns {MoronQueryBuilder}
@@ -991,7 +1049,26 @@ MoronQueryBuilder.prototype.insert = queryMethod('insert');
 MoronQueryBuilder.prototype.update = queryMethod('update');
 
 /**
- * TODO
+ * Creates an patch query.
+ *
+ * The patch object is validated against the model's `jsonSchema` _but_ the `required` property
+ * of the `jsonSchema` is ignored. This way the properties in the patch object are still validated
+ * but an error isn't thrown if the patch object doesn't contain all required properties.
+ *
+ * Examples:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .patch({age: 24})
+ *   .where('id', 134)
+ *   .then(function (patch) {
+ *     console.log(patch.toJSON());
+ *   });
+ * ```
+ *
+ * @param {Object} object
+ *    The update object.
  *
  * @method
  * @returns {MoronQueryBuilder}
@@ -999,7 +1076,19 @@ MoronQueryBuilder.prototype.update = queryMethod('update');
 MoronQueryBuilder.prototype.patch = queryMethod('patch');
 
 /**
- * TODO
+ * Creates a delete query.
+ *
+ * Examples:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .delete()
+ *   .where('age', '>', 100)
+ *   .then(function () {
+ *     console.log('removed over 100 year old people');
+ *   });
+ * ```
  *
  * @method
  * @returns {MoronQueryBuilder}
@@ -1007,7 +1096,7 @@ MoronQueryBuilder.prototype.patch = queryMethod('patch');
 MoronQueryBuilder.prototype.delete = queryMethod('delete');
 
 /**
- * TODO
+ * Alias for delete.
  *
  * @method
  * @returns {MoronQueryBuilder}

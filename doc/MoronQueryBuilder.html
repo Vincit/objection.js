@@ -1800,7 +1800,7 @@ parameters of a http request.</p>
     
     
     <div class="description">
-        <p>TODO</p>
+        <p>Alias for delete.</p>
     </div>
     
 
@@ -1893,7 +1893,15 @@ parameters of a http request.</p>
     
     
     <div class="description">
-        <p>TODO</p>
+        <p>Creates a delete query.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .delete()
+  .where('age', '>', 100)
+  .then(function () {
+    console.log('removed over 100 year old people');
+  });</code></pre>
     </div>
     
 
@@ -3139,7 +3147,7 @@ Person
         <h4 class="name" id="insert">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">insert</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(objects)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3149,7 +3157,30 @@ Person
     
     
     <div class="description">
-        <p>TODO</p>
+        <p>Creates an insert query.</p>
+<p>Inserts an object or an array of objects. The array version only works on Postgres because
+Postgres is the only database engine that returns the identifiers of <em>all</em> inserted rows.
+knex supports batch inserts on other databases also, but you only get the id of the first
+(or last) inserted object as a result. If you need batch insert on other databases you
+can use knex directly through <code>YourModel.knexQuery()</code>.</p>
+<p>The inserted objects are validated against the model's <code>jsonSchema</code>.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+  .then(function (jennifer) {
+    console.log(jennifer.id);
+  });</code></pre><p>Batch insert (Only works on Postgres):</p>
+<pre class="prettyprint source lang-js"><code>someMovie
+  .$relatedQuery('actors')
+  .insert([
+    {firstName: 'Jennifer', lastName: 'Lawrence'},
+    {firstName: 'Bradley', lastName: 'Cooper'}
+  ])
+  .then(function (actors) {
+    console.log(actors[0].firstName);
+    console.log(actors[1].firstName);
+  });</code></pre>
     </div>
     
 
@@ -3157,6 +3188,58 @@ Person
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>objects</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array.&lt;Object></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Objects to insert.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -5760,7 +5843,7 @@ Person
         <h4 class="name" id="patch">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">patch</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(object)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5770,7 +5853,18 @@ Person
     
     
     <div class="description">
-        <p>TODO</p>
+        <p>Creates an patch query.</p>
+<p>The patch object is validated against the model's <code>jsonSchema</code> <em>but</em> the <code>required</code> property
+of the <code>jsonSchema</code> is ignored. This way the properties in the patch object are still validated
+but an error isn't thrown if the patch object doesn't contain all required properties.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .patch({age: 24})
+  .where('id', 134)
+  .then(function (patch) {
+    console.log(patch.toJSON());
+  });</code></pre>
     </div>
     
 
@@ -5778,6 +5872,55 @@ Person
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>object</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The update object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -9085,7 +9228,7 @@ query.then();
         <h4 class="name" id="update">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">update</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(object)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -9095,7 +9238,19 @@ query.then();
     
     
     <div class="description">
-        <p>TODO</p>
+        <p>Creates an update query.</p>
+<p>The update object is validated against the model's <code>jsonSchema</code>. This method is meant
+for updating <em>whole</em> objects with all required properties. If you want to update a subset
+of properties use the <code>patch()</code> method.</p>
+<p>This method is mainly useful when updating a single model.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .where('id', 134)
+  .then(function (update) {
+    console.log(update.toJSON());
+  });</code></pre>
     </div>
     
 
@@ -9103,6 +9258,55 @@ query.then();
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>object</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The update object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -10219,7 +10423,7 @@ query.then();
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Sun Jun 14th 2015 using the <a
+		on Mon Jun 15th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
