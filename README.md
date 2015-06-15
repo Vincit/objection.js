@@ -23,7 +23,7 @@ What moron.js doesn't give you:
     Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-API documentation can be found [here](http://vincit.github.io/moron.js).
+API documentation can be found [here](http://vincit.github.io/moron.js/MoronModel.html).
 
 #Topics
 
@@ -59,7 +59,7 @@ commands for you to start playing with the REST API.
 cat example-requests.sh
 ```
 
-Also our [API documentation](http://vincit.github.io/moron.js) contains a lot of examples.
+Also our [API documentation](http://vincit.github.io/moron.js/MoronModel.html) contains a lot of examples.
 
 #Query examples
 
