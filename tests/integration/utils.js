@@ -1,8 +1,19 @@
 var _ = require('lodash');
-var utils = require('../../src/moronUtils')
+var utils = require('../../src/moronUtils');
 var Promise = require('bluebird');
 var MoronModel = require('../../src/MoronModel');
 var expect = require('expect.js');
+
+var unhandledRejectionHandlers = [];
+Promise.onPossiblyUnhandledRejection(function (error) {
+  if (_.isEmpty(unhandledRejectionHandlers)) {
+    console.error(error.stack);
+  }
+
+  _.each(unhandledRejectionHandlers, function (handler) {
+    handler(error);
+  });
+});
 
 module.exports.initialize = function (opt) {
   var knex = require('knex')(opt.knexConfig);
@@ -79,13 +90,23 @@ module.exports.initialize = function (opt) {
   return {
     opt: opt,
     knex: knex,
+
     models: {
       Model1: Model1.bindKnex(knex),
       Model2: Model2.bindKnex(knex)
     },
+
     createDb: module.exports.createDb,
     populate: module.exports.populate,
-    destroy: module.exports.destroy
+    destroy: module.exports.destroy,
+
+    addUnhandledRejectionHandler: function (handler) {
+      unhandledRejectionHandlers.push(handler);
+    },
+
+    removeUnhandledRejectionHandler: function (handler) {
+      unhandledRejectionHandlers.splice(unhandledRejectionHandlers.indexOf(handler), 1);
+    }
   };
 };
 

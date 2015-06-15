@@ -13,6 +13,16 @@ module.exports = function (session) {
       return session.populate([]);
     });
 
+    before(function () {
+      // Disable unhandled exception logging. Some of the tests leak _should_ leak an exception
+      // but we don't want them to appear in the log.
+      session.addUnhandledRejectionHandler(_.noop);
+    });
+
+    after(function () {
+      session.removeUnhandledRejectionHandler(_.noop);
+    });
+
     it('should resolve an empty transaction', function (done) {
       transaction(Model1, Model2, function (Model1, Model2) {
         return {a: 1};
@@ -134,7 +144,6 @@ module.exports = function (session) {
     });
 
     it('should skip queries after rollback)', function (done) {
-      console.log('The following stacktrace is not an error. It should be there!');
       transaction(Model1, function (Model1) {
 
         return Model1.query().insert({model1Prop1: '123'}).then(function () {
