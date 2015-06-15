@@ -100,8 +100,8 @@ Person
   });
 ```
 
-The `.query()` method has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has. Here
-is a simple example that uses some of them:
+The return value of the `.query()` method is an instance of [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html)
+that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has. Here is a simple example that uses some of them:
 
 ```js
 Person
@@ -133,8 +133,8 @@ Person
 ```
 
 While the static `.query()` method can be used to create a query to a whole table `.$relatedQuery()` method
-can be used to query a single relation. `.$relatedQuery()` returns an instance of `MoronQueryBuilder` just like
-the `.query()` method.
+can be used to query a single relation. `.$relatedQuery()` returns an instance of [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html)
+just like the `.query()` method.
 
 ```js
 var jennifer;
