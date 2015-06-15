@@ -1,5 +1,9 @@
 var MoronModel = require('moron').MoronModel;
 
+/**
+ * @override MoronModel
+ * @constructor
+ */
 function Movie() {
   MoronModel.apply(this, arguments);
 }

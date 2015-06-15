@@ -143,7 +143,7 @@ module.exports = function (session) {
 
     });
 
-    it('should skip queries after rollback)', function (done) {
+    it('should skip queries after rollback', function (done) {
       transaction(Model1, function (Model1) {
 
         return Model1.query().insert({model1Prop1: '123'}).then(function () {

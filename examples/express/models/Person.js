@@ -1,7 +1,7 @@
 var MoronModel = require('moron').MoronModel;
 
 /**
- * @Override MoronModel
+ * @override MoronModel
  * @constructor
  */
 function Person() {
