@@ -134,11 +134,89 @@
 <dd>
     
     
+    <div class="description">
+        <p>Relation expression is a simple DSL for expressing relation trees.</p>
+<p>For example an expression <code>children.[movies.actors.[pets, children], pets]</code> represents a tree:</p>
+<pre class="prettyprint source"><code>              children
+              (Person)
+                 |
+         -----------------
+         |               |
+       movies           pets
+      (Movie)         (Animal)
+         |
+       actors
+      (Person)
+         |
+    -----------
+    |         |
+   pets    children
+ (Animal)  (Person)</code></pre><p>The model classes are shown in parenthesis.</p>
+<p>This class rarely needs to be used directly. The relation expression can be given to a bunch
+of functions in moron.js. For example:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('children.[movies.actors.[pets, children], pets]')
+  .then(function (persons) {
+    // All persons have the given relation tree fetched.
+    console.log(persons[0].children[0].movies[0].actors[0].pets[0].name);
+  });</code></pre>
+    </div>
+    
 
     
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>nodes</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;MoronRelationExpressionNode></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -200,7 +278,385 @@
     
 
     
+        <h3 class="subsection-title">Members</h3>
 
+        <dl>
+            
+                
+<dt>
+    <h4 class="name" id="nodes">
+      <span class="modifiers-container"><span class="type-signature"></span></span>
+      <span class="content">nodes</span>
+      <span class="signature-container"><span class="type-signature"> :Array.&lt;MoronRelationExpressionNode></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;MoronRelationExpressionNode></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_parse">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">parse</span>
+          <span class="signature-container"><span class="signature">(expression)</span><span class="type-signature"> &rarr; {<a href="MoronRelationExpression.html">MoronRelationExpression</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Parses an expression string into a <a href="MoronRelationExpression.html">MoronRelationExpression</a> object.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>expression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="MoronRelationExpression.html">MoronRelationExpression</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="isSubExpression">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">isSubExpression</span>
+          <span class="signature-container"><span class="signature">(expr)</span><span class="type-signature"> &rarr; {boolean}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Tests if another expression is a sub expression of this one.</p>
+<p>Expression B is a sub expression of expression A if:</p>
+<ul>
+<li>A and B have the same root</li>
+<li>And each path from root to a leaf in B can be found in A</li>
+</ul>
+<p>For example sub expressions of <code>children.[movies.actors, pets]</code> are:</p>
+<ul>
+<li><code>children</code></li>
+<li><code>children.movies</code></li>
+<li><code>children.pets</code></li>
+<li><code>children.movies.actors</code></li>
+<li><code>children.[movies, pets]</code></li>
+<li><code>children.[movies.actors, pets]</code></li>
+</ul>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>expr</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="MoronRelationExpression.html">MoronRelationExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        </dl>
     
 
     
@@ -226,7 +682,7 @@
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Mon Jun 15th 2015 using the <a
+		on Thu Jun 18th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
