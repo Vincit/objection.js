@@ -1104,15 +1104,49 @@ MoronQueryBuilder.prototype.delete = queryMethod('delete');
 MoronQueryBuilder.prototype.del = queryMethod('delete');
 
 /**
- * TODO
+ * Relates an existing model to another model.
+ *
+ * This method doesn't create a new instance but only updates the foreign keys and in
+ * the case of ManyToMany relation, creates a join row to the join table.
+ *
+ * On Postgres multiple models can be related by giving an array of identifiers.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .where('id', 123)
+ *   .first()
+ *   .then(function (person) {
+ *     return person.$relatedQuery('movies').relate(50);
+ *   })
+ *   .then(function () {
+ *     console.log('movie 50 is now related to person 123 through `movies` relation');
+ *   });
+ * ```
  *
  * @method
+ * @param {Number|String|Array.<Number|String>} ids
  * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.relate = queryMethod('relate');
 
 /**
- * TODO
+ * Removes a connection between two models.
+ *
+ * Doesn't delete the models. Only removes 
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .where('id', 123)
+ *   .first()
+ *   .then(function (person) {
+ *     return person.$relatedQuery('movies').unrelate().where('id', 50);
+ *   })
+ *   .then(function () {
+ *     console.log('movie 50 is no longer related to person 123 through `movies` relation');
+ *   });
+ * ```
  *
  * @method
  * @returns {MoronQueryBuilder}

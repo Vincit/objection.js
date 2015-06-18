@@ -1,7 +1,7 @@
 var MoronModel = require('moron').MoronModel;
 
 /**
- * @override MoronModel
+ * @extends MoronModel
  * @constructor
  */
 function Movie() {

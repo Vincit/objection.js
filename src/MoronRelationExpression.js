@@ -114,16 +114,68 @@ MoronRelationExpressionParser.prototype._throwInvalidExpressionError = function 
 };
 
 /**
+ * Relation expression is a simple DSL for expressing relation trees.
+ *
+ * For example an expression `children.[movies.actors.[pets, children], pets]` represents a tree:
+ *
+ * ```
+ *               children
+ *               (Person)
+ *                  |
+ *          -----------------
+ *          |               |
+ *        movies           pets
+ *       (Movie)         (Animal)
+ *          |
+ *        actors
+ *       (Person)
+ *          |
+ *     -----------
+ *     |         |
+ *    pets    children
+ *  (Animal)  (Person)
+ *
+ * ```
+ *
+ * The model classes are shown in parenthesis.
+ *
+ * This class rarely needs to be used directly. The relation expression can be given to a bunch
+ * of functions in moron.js. For example:
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .eager('children.[movies.actors.[pets, children], pets]')
+ *   .then(function (persons) {
+ *     // All persons have the given relation tree fetched.
+ *     console.log(persons[0].children[0].movies[0].actors[0].pets[0].name);
+ *   });
+ * ```
+ *
+ * @param nodes {Array.<MoronRelationExpressionNode>}
  * @constructor
  */
 function MoronRelationExpression(nodes) {
+  /**
+   * @type Array.<MoronRelationExpressionNode>
+   */
   this.nodes = nodes;
 }
 
+/**
+ * Parses an expression string into a {@link MoronRelationExpression} object.
+ *
+ * @param {String} expression
+ * @returns {MoronRelationExpression}
+ */
 MoronRelationExpression.parse = function (expression) {
   return MoronRelationExpressionParser.parse(expression);
 };
 
+/**
+ * @protected
+ * @returns {boolean}
+ */
 MoronRelationExpression.prototype.isRecursive = function (relationName) {
   for (var i = 0, l = this.nodes.length; i < l; ++i) {
     var node = this.nodes[i];
@@ -136,10 +188,18 @@ MoronRelationExpression.prototype.isRecursive = function (relationName) {
   return false;
 };
 
+/**
+ * @protected
+ * @returns {boolean}
+ */
 MoronRelationExpression.prototype.isAllRecursive = function () {
   return this.nodes.length === 1 && this.nodes[0].name === '*';
 };
 
+/**
+ * @protected
+ * @returns {MoronRelationExpression}
+ */
 MoronRelationExpression.prototype.relation = function (relationName) {
   if (this.isAllRecursive()) {
     return this;
@@ -162,6 +222,26 @@ MoronRelationExpression.prototype.relation = function (relationName) {
   return null;
 };
 
+/**
+ * Tests if another expression is a sub expression of this one.
+ *
+ * Expression B is a sub expression of expression A if:
+ *
+ * - A and B have the same root
+ * - And each path from root to a leaf in B can be found in A
+ *
+ * For example sub expressions of `children.[movies.actors, pets]` are:
+ *
+ * - `children`
+ * - `children.movies`
+ * - `children.pets`
+ * - `children.movies.actors`
+ * - `children.[movies, pets]`
+ * - `children.[movies.actors, pets]`
+ *
+ * @param {String|MoronRelationExpression} expr
+ * @returns {boolean}
+ */
 MoronRelationExpression.prototype.isSubExpression = function (expr) {
   if (!(expr instanceof MoronRelationExpression)) {
     expr = MoronRelationExpressionParser.parse(expr);
