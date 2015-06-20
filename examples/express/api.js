@@ -25,7 +25,7 @@ module.exports = function (app) {
   });
 
 
-  // Get all Persons. The result can be filtered using query parameters:
+  // Get all Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
   app.get('/persons', function (req, res, next) {
@@ -88,7 +88,7 @@ module.exports = function (app) {
   });
 
 
-  // Get a Person's pets. The result can be filtered using query parameters:
+  // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
   app.get('/persons/:id/pets', function (req, res, next) {
     Person
@@ -111,7 +111,8 @@ module.exports = function (app) {
 
   // Add a movie for a Person.
   app.post('/persons/:id/movies', function (req, res, next) {
-
+    // Inserting a movie for a person creates two queries: the movie insert query
+    // and the join table row insert query. It is wise to use a transaction here.
     moron.transaction(Person, function (Person) {
       return Person
         .query()
@@ -126,7 +127,6 @@ module.exports = function (app) {
     }).then(function (movie) {
       res.send(movie);
     }).catch(next);
-
   });
 
 

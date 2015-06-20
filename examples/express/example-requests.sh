@@ -11,7 +11,7 @@ curl -H "Content-Type: application/json" -d '{"firstName":"Jennifer", "lastName"
 curl -H "Content-Type: application/json" -d '{"firstName":"Bradley", "lastName":"Cooper", "age":40}' http://localhost:8641/persons
 curl -H "Content-Type: application/json" -d '{"firstName":"Sylvester", "lastName":"Stallone", "age":68}' http://localhost:8641/persons
 
-# Add a child for Sylvester
+# Add a child for Sylvester.
 curl -H "Content-Type: application/json" -d '{"firstName":"Sage", "lastName":"Stallone", "age":36}' http://localhost:8641/persons/3/children
 
 # Add some pets for Jennifer.
@@ -19,7 +19,7 @@ curl -H "Content-Type: application/json" -d '{"name":"Fluffy", "species":"dog"}'
 curl -H "Content-Type: application/json" -d '{"name":"Scrappy", "species":"dog"}' http://localhost:8641/persons/1/pets
 curl -H "Content-Type: application/json" -d '{"name":"Kitty", "species":"cat"}' http://localhost:8641/persons/1/pets
 
-# Add a pet for Sage
+# Add a pet for Sage.
 curl -H "Content-Type: application/json" -d '{"name":"Coco", "species":"dog"}' http://localhost:8641/persons/4/pets
 
 # Add some movies for Jennifer.
@@ -83,5 +83,5 @@ curl -H "Content-Type: application/json" -d '{"name":"Rex","species":"dog"}' htt
 ##############
 
 
-# Delete Sylvester
-curl -X DELETE http://localhost:8641/persons/3
+# Delete Bradley.
+curl -X DELETE http://localhost:8641/persons/2
