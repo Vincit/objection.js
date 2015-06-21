@@ -21,7 +21,7 @@ require('./api')(app);
 // Error handling.
 app.use(function (err, req, res, next) {
   if (err) {
-    res.status(err.statusCode || 500).send(err.data || err.message || {});
+    res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});
   } else {
     next();
   }
