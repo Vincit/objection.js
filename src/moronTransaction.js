@@ -8,6 +8,77 @@ var utils = require('./moronUtils');
 /**
  * Starts a transaction.
  *
+ * Give the the model classes you want to use in the transaction as arguments to this
+ * function. The model classes are bound to a newly created transaction and passed to
+ * the callback. All queries created using the bound model classes or any result acquired
+ * through them take part in the same transaction.
+ *
+ * You must return a promise from the callback. If this promise is fulfilled the transaction
+ * is committed. If the promise is rejected the transaction is rolled back.
+ *
+ * Examples:
+ *
+ * ```js
+ * moron.transaction(Person, Animal, function (Person, Animal) {
+ *
+ *  return Person
+ *    .query()
+ *    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+ *    .then(function () {
+ *      return Animal.query().insert({name: 'Scrappy'});
+ *    });
+ *
+ * }).then(function (scrappy) {
+ *   console.log('Jennifer and Scrappy were successfully inserted');
+ * }).catch(function (err) {
+ *   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+ * });
+ * ```
+ *
+ * Related model classes are automatically bound to the same transaction. So if you use
+ * `Animal` implicitly through `Person`'s relations you don't have to bind Animal explicitly.
+ * The following example clarifies this:
+ *
+ * ```js
+ * moron.transaction(Person, function (Person) {
+ *
+ *  return Person
+ *    .query()
+ *    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+ *    .then(function (jennifer) {
+ *      // This insert takes part in the transaction even though we didn't explicitly
+ *      // bind the `Animal` model class.
+ *      return jennifer.$relatedQuery('pets').insert({name: 'Scrappy'});
+ *    });
+ *
+ * }).then(function (scrappy) {
+ *   console.log('Jennifer and Scrappy were successfully inserted');
+ * }).catch(function (err) {
+ *   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+ * });
+ * ```
+ *
+ * Inside the callback `this` is the knex transaction object. So if you need to create
+ * knex queries you can do this:
+ *
+ * ```js
+ * moron.transaction(Person, function (Person) {
+ *  var knex = this;
+ *
+ *  return Person
+ *    .query()
+ *    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+ *    .then(function (jennifer) {
+ *      return knex.insert({name: 'Scrappy'}}.into('Animal');
+ *    });
+ *
+ * }).then(function (scrappy) {
+ *   console.log('Jennifer and Scrappy were successfully inserted');
+ * }).catch(function (err) {
+ *   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+ * });
+ * ```
+ *
  * @function transaction
  * @returns {Promise}
  */
