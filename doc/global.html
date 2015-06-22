@@ -28,10 +28,6 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
-							<a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a>
-						</li>
-						
-						<li>
 							<a href="MoronModel.html">MoronModel</a>
 						</li>
 						
@@ -40,19 +36,7 @@
 						</li>
 						
 						<li>
-							<a href="MoronOneToManyRelation.html">MoronOneToManyRelation</a>
-						</li>
-						
-						<li>
-							<a href="MoronOneToOneRelation.html">MoronOneToOneRelation</a>
-						</li>
-						
-						<li>
 							<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>
-						</li>
-						
-						<li>
-							<a href="MoronRelation.html">MoronRelation</a>
 						</li>
 						
 						<li>
@@ -75,14 +59,6 @@
 						
 						<li>
 							<a href="global.html#ensureArray">ensureArray</a>
-						</li>
-						
-						<li>
-							<a href="global.html#inherits">inherits</a>
-						</li>
-						
-						<li>
-							<a href="global.html#isSubclassOf">isSubclassOf</a>
 						</li>
 						
 						<li>
@@ -179,319 +155,6 @@
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
-        
-            
-              
-<dt>
-    
-        <h4 class="name" id="inherits">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">inherits</span>
-          <span class="signature-container"><span class="signature">(Constructor, SuperConstructor)</span><span class="type-signature"></span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Makes the <code>Constructor</code> inherit <code>SuperConstructor</code>.</p>
-<p>Calls node.js <code>util.inherits</code> but also copies the &quot;static&quot; properties from
-<code>SuperConstructor</code> to <code>Constructor</code>.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>Constructor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>SuperConstructor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-            
-        
-            
-              
-<dt>
-    
-        <h4 class="name" id="isSubclassOf">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">isSubclassOf</span>
-          <span class="signature-container"><span class="signature">(Constructor, SuperConstructor)</span><span class="type-signature"> &rarr; {boolean}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Tests if a constructor function inherits another constructor function.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>Constructor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>SuperConstructor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">boolean</span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
             
         
             
@@ -651,7 +314,7 @@ knex queries you can do this:</p>
      return knex.insert({name: 'Scrappy'}}.into('Animal');
    });
 
-}).then(function (scrappy) {
+}).then(function () {
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
@@ -1323,7 +986,7 @@ knex queries you can do this:</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Sun Jun 21st 2015 using the <a
+		on Mon Jun 22nd 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

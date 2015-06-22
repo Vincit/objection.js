@@ -6,6 +6,7 @@ var _ = require('lodash')
 
 /**
  * @constructor
+ * @ignore
  * @extends MoronRelation
  */
 function MoronManyToManyRelation() {

@@ -32,6 +32,7 @@ var _ = require('lodash')
  * @param {MoronModel} OwnerClass
  *    The MoronModel subclass that owns this relation.
  *
+ * @ignore
  * @constructor
  */
 function MoronRelation(relationName, OwnerClass) {

@@ -9,6 +9,7 @@ var _ = require('lodash')
  * Calls node.js `util.inherits` but also copies the "static" properties from
  * `SuperConstructor` to `Constructor`.
  *
+ * @ignore
  * @param {Object} Constructor
  * @param {Object} SuperConstructor
  */
@@ -25,6 +26,7 @@ module.exports.inherits = function(Constructor, SuperConstructor) {
 /**
  * Tests if a constructor function inherits another constructor function.
  *
+ * @ignore
  * @param {Object} Constructor
  * @param {Object} SuperConstructor
  * @returns {boolean}
@@ -42,6 +44,11 @@ module.exports.isSubclassOf = function(Constructor, SuperConstructor) {
   return false;
 };
 
+/**
+ * @ignore
+ * @param knex
+ * @returns {boolean}
+ */
 module.exports.isSqlite = function (knex) {
   /* istanbul ignore if */
   if (!knex.client || !_.isString(knex.client.dialect)) {
@@ -50,6 +57,11 @@ module.exports.isSqlite = function (knex) {
   return knex.client.dialect === 'sqlite3';
 };
 
+/**
+ * @ignore
+ * @param knex
+ * @returns {boolean}
+ */
 module.exports.isMySql = function (knex) {
   /* istanbul ignore if */
   if (!knex.client || !_.isString(knex.client.dialect)) {
@@ -58,6 +70,11 @@ module.exports.isMySql = function (knex) {
   return knex.client.dialect === 'mysql';
 };
 
+/**
+ * @ignore
+ * @param knex
+ * @returns {boolean}
+ */
 module.exports.isPostgres = function (knex) {
   /* istanbul ignore if */
   if (!knex.client || !_.isString(knex.client.dialect)) {
