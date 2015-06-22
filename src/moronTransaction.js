@@ -72,7 +72,7 @@ var utils = require('./moronUtils');
  *      return knex.insert({name: 'Scrappy'}}.into('Animal');
  *    });
  *
- * }).then(function (scrappy) {
+ * }).then(function () {
  *   console.log('Jennifer and Scrappy were successfully inserted');
  * }).catch(function (err) {
  *   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');

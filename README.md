@@ -23,8 +23,6 @@ What moron.js doesn't give you:
     Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-API documentation can be found [here](http://vincit.github.io/moron.js/MoronModel.html).
-
 #Topics
 
 - [Installation](#installation)
@@ -34,6 +32,8 @@ API documentation can be found [here](http://vincit.github.io/moron.js/MoronMode
 - [Transactions](#transactions)
 - [Documents](#documents)
 - [Models](#models)
+- [API Documentation](http://vincit.github.io/moron.js/MoronModel.html)
+- [Recipe book](RECIPES.md)
 
 #Installation
 

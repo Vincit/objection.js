@@ -74,7 +74,7 @@ tv4.addFormat(tv4Formats);
  * For example if your column names are snake_cased in the database but you want to use
  * camelCased properties in the code and outside the server you can do this:
  *
- * ```
+ * ```js
  * // This is called when an object is serialized to database format.
  * Person.prototype.$formatDatabaseJson = function (json) {
  *   // Call superclass implementation.
