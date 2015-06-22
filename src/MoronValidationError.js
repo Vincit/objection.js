@@ -13,12 +13,12 @@ function MoronValidationError(errorMessages) {
   Error.captureStackTrace(this, MoronValidationError);
 
   /**
-   * A hash of <property name, error message> pairs.
+   * A hash of `{'property name': 'error message'}` pairs.
    *
    * @type {Object.<String, String>}
    */
   this.data = errorMessages;
-  
+
   /**
    * @type {number}
    */
