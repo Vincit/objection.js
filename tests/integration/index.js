@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var os = require('os');
 var path = require('path');
+var Promise = require('bluebird');
 var modelTestUtils = require('./utils');
 
 describe('integration tests', function () {
@@ -28,15 +29,14 @@ describe('integration tests', function () {
       knexConfig: knexConfig
     });
 
-    before(function () {
-      return session.createDb();
-    });
-
-    after(function () {
-      return session.destroy();
-    });
-
     describe(knexConfig.client, function () {
+      before(function () {
+        return session.createDb();
+      });
+
+      after(function () {
+        return session.destroy();
+      });
 
       require('./find')(session);
       require('./insert')(session);
@@ -47,7 +47,6 @@ describe('integration tests', function () {
       require('./unrelate')(session);
       require('./eager')(session);
       require('./transactions')(session);
-
     });
   });
 
