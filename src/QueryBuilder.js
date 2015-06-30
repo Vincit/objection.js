@@ -3,7 +3,9 @@
 var _ = require('lodash')
   , Promise = require('bluebird')
   , RelationExpression = require('./RelationExpression')
-  , ValidationError = require('./ValidationError');
+  , ValidationError = require('./ValidationError')
+  , utils = require('./moronUtils')
+  ;
 
 /**
  * Query builder for Models.
