@@ -12,11 +12,11 @@ module.exports = function (session) {
 
   ModelJson.tableName = 'ModelJson';
 
-  // schema probably needed for automatic recognition if data is JSON?
   ModelJson.jsonSchema = {
     type: 'object',
     properties: {
-      id: {type: 'integer'},
+      id: { type: 'integer' },
+      name: { type: 'string' },
       jsonObject: { type: 'object' },
       jsonArray: { type: 'array' }
     }
@@ -27,6 +27,7 @@ module.exports = function (session) {
       .dropTableIfExists('ModelJson')
       .createTable('ModelJson', function (table) {
         table.bigincrements('id').primary();
+        table.string('name');
         table.json('jsonObject', true);
         table.json('jsonArray', true);
       });
@@ -39,6 +40,7 @@ module.exports = function (session) {
 
     before(function () {
       complexJsonObj = {
+        name: 'complex line',
         jsonObject: {
           stringField: "string in jsonObject.stringField",
           numberField: 1.5,
@@ -82,12 +84,58 @@ module.exports = function (session) {
         ]
       };
 
-      return BoundModel.query().insert(complexJsonObj);
+      return Promise
+        .all([
+          BoundModel.query().insert(complexJsonObj),
+          BoundModel.query().insert({ name: "empty object and array", jsonObject: {}, jsonArray: [] }),
+          BoundModel.query().insert({ name: "null object and array",  jsonObject: {}, jsonArray: [] }),
+          BoundModel.query().insert({ name: "empty object and [1]",   jsonObject: {}, jsonArray: [1] }),
+          BoundModel.query().insert({ name: "empty object and array [ null ]",   jsonObject: {}, jsonArray: [ null ] }),
+          BoundModel.query().insert({ name: "{a: 1} and empty array", jsonObject: {a: 1}, jsonArray: [] })
+        ]);
     });
 
     it('should have test data', function () {
       return BoundModel.query().then(function (all) {
-        expect(all[0].jsonObject.stringField).to.be(complexJsonObj.jsonObject.stringField);
+        expect(_.find(all, {name : 'complex line'}).jsonObject.stringField).to.be(complexJsonObj.jsonObject.stringField);
+      });
+    });
+
+    describe('.whereJsonEquals(fieldExpr, <array|object>)', function () {
+      it('should fail if input not array or object', function () {
+      });
+
+      it('should find results for jsonArray == []', function () {
+      });
+
+      it('should find results for jsonObject == {}', function () {
+      });
+
+      it('should not find results for jsonArray == {}', function () {
+      });
+
+      it('should not find results for jsonObject == []', function () {
+      });
+
+      it('should find result for jsonObject == {a: 1}', function () {
+      });
+
+      it('should not find result with wrong type as value jsonObject == {a: "1"}', function () {
+      });
+
+      it('should find results jsonArray[0].arrayfield[0] == { noMoreLevels: true }', function () {
+      });
+
+      it('should not find results jsonArray[0].arrayfield[0] == { noMoreLevels: false }', function () {
+      });
+
+      it('should find result with jsonArray == [ null ]', function () {
+      });
+
+      it('should find results with jsonArray == complexJsonObj.jsonArray', function () {
+      });
+
+      it('should find results with jsonObject == complexJsonObj.jsonArray', function () {
       });
     });
 
