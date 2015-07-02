@@ -1,22 +1,27 @@
+var _ = require('lodash');
+var Knex = require('knex');
+var morgan = require('morgan');
 var express = require('express');
+var bodyParser = require('body-parser');
 var knexConfig = require('./knexfile');
+var registerApi = require('./api');
 var MoronModel = require('moron').MoronModel;
 
-// Create knex instance. We use sqlite in this example project for simplicity.
-var knex = require('knex')(knexConfig.development);
+// Initialize knex.
+var knex = Knex(knexConfig.development);
 
-// Bind all MoronModels to the knex instance. If you only have one database in
+// Bind all MoronModels to a knex instance. If you only have one database in
 // your server this is all you have to do. For multi database systems, see
 // the MoronModel.bindKnex method.
 MoronModel.knex(knex);
 
 var app = express()
-  .use(require('body-parser').json())
-  .use(require('morgan')('dev'))
+  .use(bodyParser.json())
+  .use(morgan('dev'))
   .set('json spaces', 2);
 
 // Register our REST API.
-require('./api')(app);
+registerApi(app);
 
 // Error handling.
 app.use(function (err, req, res, next) {

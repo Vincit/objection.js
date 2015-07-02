@@ -14,9 +14,7 @@ var _ = require('lodash')
  * @param {Object} SuperConstructor
  */
 module.exports.inherits = function(Constructor, SuperConstructor) {
-  var keys = Object.keys(SuperConstructor);
-  for (var i = 0, l = keys.length; i < l; ++i) {
-    var key = keys[i];
+  for (var key in SuperConstructor) {
     Constructor[key] = SuperConstructor[key];
   }
   util.inherits(Constructor, SuperConstructor);
@@ -38,7 +36,8 @@ module.exports.isSubclassOf = function(Constructor, SuperConstructor) {
 
   while (_.isFunction(Constructor)) {
     if (Constructor === SuperConstructor) return true;
-    Constructor = Constructor._super;
+    var proto = Constructor.prototype.__proto__;
+    Constructor = proto && proto.constructor;
   }
 
   return false;
