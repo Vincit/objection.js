@@ -1574,6 +1574,32 @@ QueryBuilder.prototype.truncate = queryMethod('truncate');
  */
 
 /**
+ * Json field filter.
+ *
+ * Supports having field expression in both sides of operand, but right hand value cannot
+ * be any other value, but only string reference to other column/json filed, json array
+ * or json object.
+ *
+ * Converts left and right hand values to PostgreSQL acceptable format and add user chosen
+ * operator between left and right hand expressions.
+ *
+ * @param fieldExpression {String} Reference to column / jsonField.
+ * @param jsonObjectOrFieldExpression {Object|Array|String} Reference to column / jsonField or json object.
+ * @returns {MoronQueryBuilder}
+ */
+QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, jsonObjectOrFieldExpression) {
+  var fieldReference = parseFieldExpression(fieldExpression);
+  if (_.isString(jsonObjectOrFieldExpression)) {
+    var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
+    return this.whereRaw(fieldReference + " "  + operator + " " + rightHandReference);
+  } else if (_.isObject(jsonObjectOrFieldExpression)) {
+    return this.whereRaw(fieldReference + " " + operator + " ?", JSON.stringify(jsonObjectOrFieldExpression));
+  }
+  throw new Error("Invalid right hand expression.");
+};
+
+
+/**
  * Json equality comparison.
  *
  * Also supports having field expression in both sides of equality.
@@ -1600,14 +1626,45 @@ QueryBuilder.prototype.truncate = queryMethod('truncate');
  * @returns {MoronQueryBuilder}
  */
 QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var fieldReference = parseFieldExpression(fieldExpression);
-  if (_.isString(jsonObjectOrFieldExpression)) {
-    var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
-    return this.whereRaw(fieldReference + " = " + rightHandReference);
-  } else if (_.isObject(jsonObjectOrFieldExpression)) {
-    return this.whereRaw(fieldReference + " = ?", JSON.stringify(jsonObjectOrFieldExpression));
-  }
-  throw new Error("Invalid right hand expression.");
+  return this.whereJsonObject(fieldExpression, "=", jsonObjectOrFieldExpression);
+};
+
+/**
+ * Json filters all results where left hand operator is superset of the right hand operand.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .whereJsonSupersetOf('additionalData.myDogs', 'additionalData.dogsAtHome')
+ *   .then(function (person) {
+ *     // oh joy! these persons has all their dogs at home!
+ *     // But there might be actually some extra dogs there since
+ *     // we requested with subset
+ *   });
+ *
+ * Person
+ *   .query()
+ *   .whereJsonSupersetOf('additionalData.myDogs[0]', { name: "peter"})
+ *   .then(function (person) {
+ *     // these persons' first dog name is "peter", but the dog might have
+ *     // additional attributes as well
+ *   });
+ * ```
+ *
+ * For arrays this mean that all arrays of left side matches if it has all the elements
+ * listed in the right hand side. e.g.
+ *
+ * [1,2,3] isSuperSetOf [2] => true
+ * [1,2,3] isSuperSetOf [2,1,3] => true
+ * [1,2,3] isSuperSetOf [2,null] => false
+ * [1,2,3] isSuperSetOf [] => true
+ *
+ * @param fieldExpression {String} Reference to column / jsonField, which is tested being supoerset.
+ * @param jsonObjectOrFieldExpression {Object|Array|String} to which to compare.
+ * @returns {MoronQueryBuilder}
+ */
+QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return this.whereJsonObject(fieldExpression, "@>", jsonObjectOrFieldExpression);
 };
 
 /**

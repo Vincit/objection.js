@@ -117,7 +117,7 @@ module.exports = function (session) {
       });
     });
 
-    describe('.whereJsonEquals(fieldExpr, <array|object|string>)', function () {
+    describe('.whereJsonObject(fieldExpr, operator, <array|object|string>)', function () {
       it('should fail if right hand is null', function () {
         expect(function () {
           BoundModel.query().whereJsonEquals("jsonArray", null);
@@ -149,7 +149,9 @@ module.exports = function (session) {
           BoundModel.query().whereJsonEquals("jsonObject.", "jsonArray");
         }).to.throwException();
       });
+    });
 
+    describe('.whereJsonEquals(fieldExpr, <array|object|string>)', function () {
       it('should find results for jsonArray == []', function () {
         return BoundModel.query().whereJsonEquals("jsonArray", [])
           .then(function (results) {
@@ -259,6 +261,82 @@ module.exports = function (session) {
       });
     });
 
-  });
+    describe.only('.whereJsonSupersetOf(fieldExpr, <array|object|string>)', function () {
+      it('should find all empty arrays with jsonArray @> []', function () {
+        return BoundModel.query().whereJsonSupersetOf("jsonArray", [])
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
 
+      it('should find results jsonArray @> [1,2] (set is its own superset)', function () {
+        return BoundModel.query().whereJsonSupersetOf("jsonArray", [1,2])
+          .then(function (results) {
+            expectIdsEqual(results, [4]);
+          });
+      });
+
+      it('should not find results jsonArray @> {}', function () {
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonArray", {})
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+
+      it('should not find results jsonObject @> []', function () {
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject", [])
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+
+      it.skip('should find subset where both sides are references', function () {
+        // TODO: try to resolve how to do this with postgre
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject.a", "jsonObject.b")
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results jsonObject @> {}', function () {
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject", {})
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
+
+      it('should find results jsonObject.objectField @> complexJsonObj.jsonObject.objectField', function () {
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject.objectField", complexJsonObj.jsonObject.objectField )
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should not find results jsonObject.objectField @> complexJsonObj.jsonObject.objectField that has additional key', function () {
+        complexJsonObj.jsonObject.objectField.otherKey = "Im here too!";
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject.objectField", complexJsonObj.jsonObject.objectField )
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+
+      it('should not find results jsonObject.objectField @> { object: "other string" }', function () {
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject.objectField", {
+            object: "something else"
+          })
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+    });
+
+  });
 };
+
