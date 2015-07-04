@@ -6,16 +6,16 @@ var modelTestUtils = require('./utils');
 
 describe('integration tests', function () {
 
-  _.each([{
+  var testDatabaseConfigs = [{
     client: 'sqlite3',
     connection: {
       filename: path.join(os.tmpdir(), 'moron_test.db')
     }
   }, {
-    client: 'pg',
+    client: 'postgres',
     connection: {
       host: '127.0.0.1',
-      database: 'moron_test',
+      database: 'moron_test'
     }
   }, {
     client: 'mysql',
@@ -24,7 +24,10 @@ describe('integration tests', function () {
       user: 'travis',
       database: 'moron_test'
     }
-  }], function (knexConfig) {
+  }];
+
+  _.each(testDatabaseConfigs, function (knexConfig) {
+
     var session = modelTestUtils.initialize({
       knexConfig: knexConfig
     });

@@ -983,7 +983,8 @@ MoronQueryBuilder.prototype.first = function () {
  * (or last) inserted object as a result. If you need batch insert on other databases you
  * can use knex directly through `YourModel.knexQuery()`.
  *
- * The inserted objects are validated against the model's `jsonSchema`.
+ * The inserted objects are validated against the model's `jsonSchema`. If validation fails
+ * the Promise is rejected with a `MoronValidationError`.
  *
  * Examples:
  *
@@ -1011,7 +1012,7 @@ MoronQueryBuilder.prototype.first = function () {
  *   });
  * ```
  *
- * @param {Object|Array.<Object>} objects
+ * @param {Object|MoronModel|Array.<Object|MoronModel>} objects
  *    Objects to insert.
  *
  * @method
@@ -1022,9 +1023,11 @@ MoronQueryBuilder.prototype.insert = queryMethod('insert');
 /**
  * Creates an update query.
  *
- * The update object is validated against the model's `jsonSchema`. This method is meant
- * for updating _whole_ objects with all required properties. If you want to update a subset
- * of properties use the `patch()` method.
+ * The update object is validated against the model's `jsonSchema`. If validation fails
+ * the Promise is rejected with a `MoronValidationError`.
+ *
+ * This method is meant for updating _whole_ objects with all required properties. If you
+ * want to update a subset of properties use the `patch()` method.
  *
  * This method is mainly useful when updating a single model.
  *
@@ -1040,7 +1043,7 @@ MoronQueryBuilder.prototype.insert = queryMethod('insert');
  *   });
  * ```
  *
- * @param {Object} object
+ * @param {Object|MoronModel} object
  *    The update object.
  *
  * @method
@@ -1054,6 +1057,8 @@ MoronQueryBuilder.prototype.update = queryMethod('update');
  * The patch object is validated against the model's `jsonSchema` _but_ the `required` property
  * of the `jsonSchema` is ignored. This way the properties in the patch object are still validated
  * but an error isn't thrown if the patch object doesn't contain all required properties.
+ *
+ * If validation fails the Promise is rejected with a `MoronValidationError`.
  *
  * Examples:
  *
@@ -1133,7 +1138,9 @@ MoronQueryBuilder.prototype.relate = queryMethod('relate');
 /**
  * Removes a connection between two models.
  *
- * Doesn't delete the models. Only removes 
+ * Doesn't delete the models. Only removes the connection. For ManyToMany relations this
+ * deletes the join column from the join table. For other relation types this sets the
+ * join columns to null.
  *
  * ```js
  * Person

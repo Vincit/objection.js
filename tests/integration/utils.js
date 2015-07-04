@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var path = require('path');
 var utils = require('../../src/moronUtils');
 var Promise = require('bluebird');
 var MoronModel = require('../../src/MoronModel');
@@ -133,6 +134,14 @@ module.exports.createDb = function () {
       table.bigincrements('id').primary();
       table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE');
       table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE');
+    })
+    .catch(function () {
+      throw new Error('Could not connect to '
+        + session.opt.knexConfig.client
+        + '. Make sure the server is running and the database '
+        + session.opt.knexConfig.connection.database
+        + ' is created. You can see the test database configurations from file '
+        + path.join(__dirname, 'index.js'));
     });
 };
 

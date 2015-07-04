@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
 
-#Introduction
+# Introduction
 
 Moron.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
 supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/moron.js).
@@ -23,7 +23,7 @@ What moron.js doesn't give you:
     Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-#Topics
+# Topics
 
 - [Installation](#installation)
 - [Getting started](#getting-started)
@@ -32,16 +32,17 @@ What moron.js doesn't give you:
 - [Transactions](#transactions)
 - [Documents](#documents)
 - [Models](#models)
+- [Testing](#testing)
 - [API Documentation](http://vincit.github.io/moron.js/MoronModel.html)
 - [Recipe book](RECIPES.md)
 
-#Installation
+# Installation
 
 ```sh
 npm install moron
 ```
 
-#Getting started
+# Getting started
 
 Best way to get started is to use one of the example projects:
 
@@ -61,7 +62,7 @@ cat example-requests.sh
 
 Also our [API documentation](http://vincit.github.io/moron.js/MoronModel.html) contains a lot of examples.
 
-#Query examples
+# Query examples
 
 The Person model used in the examples is defined [here](#models).
 
@@ -178,7 +179,7 @@ Person
   });
 ```
 
-#Eager queries
+# Eager queries
 
 Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly. The following
 examples demonstrate how to use it:
@@ -252,7 +253,7 @@ The example above allows `req.query.eager` to be one of `'pets'`, `'children'`, 
 In addition to the `.eager` method, relations can be fetched using the `loadRelated` and `$loadRelated` methods of
 [MoronModel](http://vincit.github.io/moron.js/MoronModel.html).
 
-#Transactions
+# Transactions
 
 Transactions are started by calling the [moron.transaction](http://vincit.github.io/moron.js/global.html#transaction)
 function. Give all the models you want to use in the transaction as parameters to the `transaction` function. The model
@@ -281,7 +282,7 @@ moron.transaction(Person, Animal, function (Person, Animal) {
 });
 ```
 
-#Documents
+# Documents
 
 Moron.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
 objects or arrays in the model's `jsonSchema` are automatically converted to JSON strings in the database and
@@ -316,7 +317,7 @@ Person
   });
 ```
 
-#Models
+# Models
 
 Models are created by inheriting from the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) base class.
 In moron.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
@@ -408,4 +409,11 @@ Person.relationMappings = {
   }
 };
 ```
+
+# Testing
+
+To run the tests, all you need to do is configure the databases and run `npm test`. Check out
+[this](https://github.com/Vincit/moron.js/blob/master/tests/integration/index.js) file for the
+test database configurations. If you don't want to run the tests against all databases you can
+just comment out configurations from the `testDatabaseConfigs` list.
 

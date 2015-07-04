@@ -152,6 +152,15 @@ MoronRelationExpressionParser.prototype._throwInvalidExpressionError = function 
  *   });
  * ```
  *
+ * There are two tokens that have special meaning: `*` and `^`. `*` means "all relations recursively" and
+ * `^` means "this relation recursively".
+ *
+ * For example `children.*` means "relation `children` and all its relations, and all their relations and ...".
+ * The `*` token must be used with caution or you will end up fetching your entire database.
+ *
+ * Expression `parent.^` is equivalent to `parent.parent.parent.parent...` up to the point a relation no longer
+ * has results for the `parent` relation.
+ *
  * @param nodes {Array.<MoronRelationExpressionNode>}
  * @constructor
  */
