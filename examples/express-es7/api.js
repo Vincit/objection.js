@@ -2,7 +2,7 @@ import moron from 'moron';
 import Person from './models/Person';
 import Movie from './models/Movie';
 
-module.exports = function (app) {
+export default function (app) {
 
   // Create a new Person.
   app.post('/persons', async function (req, res) {
