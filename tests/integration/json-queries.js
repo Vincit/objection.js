@@ -3,6 +3,14 @@ var expect = require('expect.js');
 var Promise = require('bluebird');
 var MoronModel = require('../../src/MoronModel');
 
+function expectIdsEqual(resultArray, expectedIds) {
+  expectArraysEqual(_(resultArray).pluck('id').sort().value(), expectedIds);
+}
+
+function expectArraysEqual(arr1, arr2) {
+  expect({arr : arr1}).to.eql({arr: arr2});
+}
+
 module.exports = function (session) {
 
   function ModelJson() {
@@ -40,6 +48,7 @@ module.exports = function (session) {
 
     before(function () {
       complexJsonObj = {
+        id: 1,
         name: 'complex line',
         jsonObject: {
           stringField: "string in jsonObject.stringField",
@@ -84,14 +93,21 @@ module.exports = function (session) {
         ]
       };
 
+      complexJsonObj.jsonObject.jsonArray = _.cloneDeep(complexJsonObj.jsonArray);
+
       return Promise
         .all([
           BoundModel.query().insert(complexJsonObj),
-          BoundModel.query().insert({ name: "empty object and array", jsonObject: {}, jsonArray: [] }),
-          BoundModel.query().insert({ name: "null object and array",  jsonObject: {}, jsonArray: [] }),
-          BoundModel.query().insert({ name: "empty object and [1]",   jsonObject: {}, jsonArray: [1] }),
-          BoundModel.query().insert({ name: "empty object and array [ null ]",   jsonObject: {}, jsonArray: [ null ] }),
-          BoundModel.query().insert({ name: "{a: 1} and empty array", jsonObject: {a: 1}, jsonArray: [] })
+          BoundModel.query().insert({ id:2, name: "empty object and array", jsonObject: {}, jsonArray: [] }),
+          BoundModel.query().insert({ id:3, name: "null object and array"}),
+          BoundModel.query().insert({ id:4, name: "empty object and [1,2]",   jsonObject: {}, jsonArray: [1,2] }),
+          BoundModel.query().insert({ id:5, name: "empty object and array [ null ]",   jsonObject: {}, jsonArray: [ null ] }),
+          BoundModel.query().insert({ id:6, name: "{a: 1} and empty array", jsonObject: {a: 1}, jsonArray: [] }),
+          BoundModel.query().insert({
+            id: 7,
+            name: "{a: {1:1, 2:2}, b:{2:2, 1:1}} for equality comparisons",
+            jsonObject: {a: {1:1, 2:2}, b:{2:2, 1:1}}, jsonArray: []
+          })
         ]);
     });
 
@@ -101,41 +117,145 @@ module.exports = function (session) {
       });
     });
 
-    describe('.whereJsonEquals(fieldExpr, <array|object>)', function () {
-      it('should fail if input not array or object', function () {
+    describe('.whereJsonEquals(fieldExpr, <array|object|string>)', function () {
+      it('should fail if right hand is null', function () {
+        expect(function () {
+          BoundModel.query().whereJsonEquals("jsonArray", null);
+        }).to.throwException();
+      });
+
+      it('should fail if right hand is number', function () {
+        expect(function () {
+          BoundModel.query().whereJsonEquals("jsonArray", 1);
+        }).to.throwException();
+      });
+
+      it('should fail if right hand is not valid json', function () {
+        var selfreference = {};
+        selfreference.me = selfreference;
+        expect(function () {
+          BoundModel.query().whereJsonEquals("jsonObject", selfreference);
+        }).to.throwException();
+      });
+
+      it('should fail if right hand is not parseable expression', function () {
+        expect(function () {
+          BoundModel.query().whereJsonEquals("jsonObject", "jsonArray.");
+        }).to.throwException();
+      });
+
+      it('should fail if left hand is not parseable expression', function () {
+        expect(function () {
+          BoundModel.query().whereJsonEquals("jsonObject.", "jsonArray");
+        }).to.throwException();
       });
 
       it('should find results for jsonArray == []', function () {
+        return BoundModel.query().whereJsonEquals("jsonArray", [])
+          .then(function (results) {
+            expectIdsEqual(results, [2,6,7]);
+          });
       });
 
       it('should find results for jsonObject == {}', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject", {})
+          .then(function (results) {
+            expectIdsEqual(results, [2,4,5]);
+          });
       });
 
       it('should not find results for jsonArray == {}', function () {
+        return BoundModel.query().whereJsonEquals("jsonArray", {})
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
       });
 
       it('should not find results for jsonObject == []', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject", [])
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
       });
 
       it('should find result for jsonObject == {a: 1}', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject", {a:1})
+          .then(function (results) {
+            expectIdsEqual(results, [6]);
+          });
+      });
+
+      it('should find result for jsonObject.a == jsonObject[b]', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject.a", "jsonObject[b]")
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find result where keys are in different order jsonObject.a == {2:2, 1:1}', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject.a", {2:2, 1:1})
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
       });
 
       it('should not find result with wrong type as value jsonObject == {a: "1"}', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject", {a: "1"})
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
       });
 
-      it('should find results jsonArray[0].arrayfield[0] == { noMoreLevels: true }', function () {
+      it('should find results jsonArray[0].arrayField[0] == { noMoreLevels: true }', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray[0].arrayField[0]", { noMoreLevels: true })
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
       });
 
-      it('should not find results jsonArray[0].arrayfield[0] == { noMoreLevels: false }', function () {
+      it('should not find results jsonArray[0].arrayField[0] == { noMoreLevels: false }', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray[0].arrayField[0]", { noMoreLevels: false })
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
       });
 
       it('should find result with jsonArray == [ null ]', function () {
+        return BoundModel.query().whereJsonEquals("jsonArray", [ null ])
+          .then(function (results) {
+            expectIdsEqual(results, [5]);
+          });
       });
 
       it('should find results with jsonArray == complexJsonObj.jsonArray', function () {
+        return BoundModel.query().whereJsonEquals("jsonArray", complexJsonObj.jsonArray)
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
       });
 
-      it('should find results with jsonObject == complexJsonObj.jsonArray', function () {
+      it('should find results with jsonObject,jsonArray == complexJsonObj.jsonArray', function () {
+        return BoundModel.query().whereJsonEquals("jsonObject.jsonArray", complexJsonObj.jsonArray)
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should not find results jsonArray == [2,1]', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray", [2,1])
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+
+      it('should find results jsonArray == [1,2]', function () {
+        return BoundModel.query().whereJsonEquals("jsonArray", [1,2])
+          .then(function (results) {
+            expectIdsEqual(results, [4]);
+          });
       });
     });
 

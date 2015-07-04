@@ -5,6 +5,8 @@ var _ = require('lodash')
   , RelationExpression = require('./RelationExpression')
   , ValidationError = require('./ValidationError')
   , utils = require('./moronUtils')
+  , jsonFieldExpressionParser = require('./jsonFieldExpressionParser')
+  , knex = require('knex')
   ;
 
 /**
@@ -1568,6 +1570,47 @@ QueryBuilder.prototype.returning = queryMethod('returning');
 QueryBuilder.prototype.truncate = queryMethod('truncate');
 
 /**
+ * Json query APIs
+ */
+
+/**
+ * Json equality comparison.
+ *
+ * Also supports having field expression in both sides of equality.
+ *
+ * ```js
+ * Person
+ *   .query()
+ *   .whereJsonEquals('additionalData.myDogs', 'additionalData.dogsAtHome')
+ *   .then(function (person) {
+ *     // oh joy! these persons has all their dogs at home!
+ *   });
+ *
+ * Person
+ *   .query()
+ *   .whereJsonEquals('additionalData.myDogs[0]', { name: "peter"})
+ *   .then(function (person) {
+ *     // these persons' first dog name is "peter" and the dog has no other
+ *     // attributes, but its name
+ *   });
+ * ```
+ *
+ * @param fieldExpression {String} Reference to column / jsonField.
+ * @param jsonObjectOrFieldExpression {Object|Array|String} Reference to column / jsonField or json object.
+ * @returns {MoronQueryBuilder}
+ */
+QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
+  var fieldReference = parseFieldExpression(fieldExpression);
+  if (_.isString(jsonObjectOrFieldExpression)) {
+    var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
+    return this.whereRaw(fieldReference + " = " + rightHandReference);
+  } else if (_.isObject(jsonObjectOrFieldExpression)) {
+    return this.whereRaw(fieldReference + " = ?", JSON.stringify(jsonObjectOrFieldExpression));
+  }
+  throw new Error("Invalid right hand expression.");
+};
+
+/**
  * @returns {Function}
  */
 function queryMethod(methodName) {
@@ -1632,6 +1675,61 @@ function tryBuild(builder) {
   } catch (err) {
     builder.reject(err);
   }
+}
+
+/**
+ * Field expression how to refer certain nested field inside jsonb column.
+ *
+ * obj[key.with.dots][0].key.0.me[0] refers to
+ * obj = { "key.with.dots" : [{"key" : { "0": { me : [ "I was referred" ] }}}]
+ *
+ * There is 4 ways to refer fields:
+ *
+ * `array[<integer>]` This always refer to index of array and never to field of object.
+ *
+ * `object.<string>` This refers always to field of an object. May be used when
+ * field name does not contain dots nor square brackets.
+ *
+ * `object[<string>]` Refers always to field of an object. May be used when
+ * field name does not contain square brackets.
+ *
+ * `object["<string>"]` and `object['<string>']` Refers always to field of an
+ * object. May be used when field name has square brackets.
+ *
+ * PostgreSQL is pretty tight about if you are referring value with index or
+ * with key.
+ *
+ * e.g.
+ * array[1] refers to first element of json array.
+ * object[1] never finds anything, since json object's values must always be referred with strings
+ * object.1 refers to object = { "1": "I was referred" }
+ * array.1 never finds anything, because array must be referred with integers
+ *
+ * Reason why referring is so strict comes from PostgreSQL json reference handling:
+ *
+ * ```
+ * postgres94=# select '{"a": {"b":"foo", "0": [1, null]}}'::json->'a'->'0';
+ * returns: [1, null]
+ *
+ * postgres94=# select '{"a": {"b":"foo", "0": [1, null]}}'::json->'a'->'0'->'0';
+ * returns: <empty>
+ *
+ * postgres94=# select '{"a": {"b":"foo", "0": [1, null]}}'::json->'a'->'0'->0;
+ * returns: 1
+ * ```
+ *
+ * @param expression
+ * @returns {Array}
+ */
+function parseFieldExpression(expression) {
+  var parsed = jsonFieldExpressionParser.parse(expression);
+  var jsonRefs = _(parsed.access).pluck('ref')
+    .map(function (ref) {
+      return "->"+knex.raw('?', ref);
+    }).value().join("");
+  // TODO: Checkout if knex has some utility function to add correct kind of quotes to column name
+  //       this one is for PostgreSQL
+  return ['"', parsed.columnName, '"', jsonRefs].join("");
 }
 
 module.exports = QueryBuilder;

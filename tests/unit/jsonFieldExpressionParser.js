@@ -1,9 +1,9 @@
 var _ = require('lodash')
   , expect = require('expect.js')
-  , parser = require('../../src/JsonFieldExpressionParser.js')
+  , parser = require('../../src/jsonFieldExpressionParser.js')
   ;
 
-describe('JsonFieldExpressionParser', function () {
+describe('jsonFieldExpressionParser', function () {
 
   // basic index and field references
   testParsing("col[1]", ['col', 1]);

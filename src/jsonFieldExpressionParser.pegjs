@@ -1,6 +1,6 @@
 /**
  * Parser for parsing field expressions.
- * 
+ *
  * Syntax supports few flavors of reference to keys:
  *
  * Json arrays has only one type of syntax:
@@ -18,6 +18,12 @@
  *    Column `{ "Double.\"Quote\".[]" : "I was referred",  "Sinlge.'Quote'.[]" : "Mee too!" }`
  * 99. Keys containing dots, square brackets, single quotes and double quotes in one json key is 
  *     not currently supported
+ *
+ * For compiling this to parser run `pegjs JsonFieldExpressionParser.pegjs` which generates
+ * the `JsonFieldExpressionParser.js`
+ *
+ * For development there is nice page for interactively hacking parser code
+ * http://pegjs.org/online
  */
 
 start = 
