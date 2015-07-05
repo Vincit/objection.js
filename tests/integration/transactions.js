@@ -14,7 +14,7 @@ module.exports = function (session) {
     });
 
     before(function () {
-      // Disable unhandled exception logging. Some of the tests leak _should_ leak an exception
+      // Disable unhandled exception logging. Some of the tests _should_ leak an exception
       // but we don't want them to appear in the log.
       session.addUnhandledRejectionHandler(_.noop);
     });

@@ -629,6 +629,8 @@ MoronModel.$$omitAttributes = null;
  * {@link MoronQueryBuilder} and <a href="http://knexjs.org/#Builder">knexjs.org</a>
  * for more information.
  *
+ * Examples:
+ *
  * Read models from the database:
  *
  * ```js
@@ -751,9 +753,9 @@ MoronModel.query = function () {
 };
 
 /**
- * Get/Set the knex connection for this model class.
+ * Get/Set the knex instance for this model class.
  *
- * Subclasses inherit the connection. A system-wide knex instance can be set by calling
+ * Subclasses inherit the connection. A system-wide knex instance can thus be set by calling
  * `MoronModel.knex(knex)`. This works even after subclasses have been created.
  *
  * ```js

@@ -49,7 +49,10 @@ Best way to get started is to use one of the example projects:
 ```sh
 git clone git@github.com:Vincit/moron.js.git moron
 cd moron/examples/express
-sh install.sh
+npm install
+# We use knex for migrations.
+npm install knex -g
+knex migrate:latest
 npm start
 ```
 
@@ -58,6 +61,20 @@ commands for you to start playing with the REST API.
 
 ```sh
 cat example-requests.sh
+```
+
+We also have an ES7 version of the express example project. It uses [Babel](https://babeljs.io/) for the ES7 --> ES5
+transpiling.
+
+```sh
+git clone git@github.com:Vincit/moron.js.git moron
+cd moron/examples/express-es7
+npm install
+# We use knex for migrations.
+npm install knex -g
+knex migrate:latest
+# This runs the Babel transpiler and executes the app.
+npm start
 ```
 
 Also our [API documentation](http://vincit.github.io/moron.js/MoronModel.html) contains a lot of examples.
