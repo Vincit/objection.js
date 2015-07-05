@@ -1,10 +1,10 @@
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
-  , MoronModel = require('../../../src/MoronModel')
-  , MoronRelation = require('../../../src/relations/MoronRelation');
+  , Model = require('../../../src/Model')
+  , Relation = require('../../../src/relations/Relation');
 
-describe('MoronRelation', function () {
+describe('Relation', function () {
   var OwnerModel = null;
   var RelatedModel = null;
 
@@ -16,11 +16,11 @@ describe('MoronRelation', function () {
     RelatedModel = require(__dirname + '/files/RelatedModel');
   });
 
-  it('should accept a MoronModel subclass as modelClass', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+  it('should accept a Model subclass as modelClass', function () {
+    var relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
-      relation: MoronRelation,
+      relation: Relation,
       modelClass: RelatedModel,
       join: {
         from: 'OwnerModel.id',
@@ -39,12 +39,12 @@ describe('MoronRelation', function () {
     expect(relation.joinTableRelatedCol).to.equal(null);
   });
 
-  it('should fail if modelClass is not a subclass of MoronModel', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+  it('should fail if modelClass is not a subclass of Model', function () {
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: function SomeConstructor() {},
         join: {
           from: 'OwnerModel.id',
@@ -52,16 +52,16 @@ describe('MoronRelation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is not a subclass of MoronModel or a file path to a module that exports one.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is not a subclass of Model or a file path to a module that exports one.');
     });
   });
 
-  it('should fail if OwnerModelClass is not a subclass of MoronModel', function () {
-    var relation = new MoronRelation('testRelation', {});
+  it('should fail if OwnerModelClass is not a subclass of Model', function () {
+    var relation = new Relation('testRelation', {});
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
@@ -69,16 +69,16 @@ describe('MoronRelation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('Relation\'s owner is not a subclass of MoronModel');
+      expect(err.message).to.equal('Relation\'s owner is not a subclass of Model');
     });
   });
 
   it('join.to should have format ModelName.columnName', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
@@ -91,11 +91,11 @@ describe('MoronRelation', function () {
   });
 
   it('join.to should point to either of the related model classes', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'SomeOtherModel.id',
@@ -108,11 +108,11 @@ describe('MoronRelation', function () {
   });
 
   it('join.from should have format ModelName.columnName', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'id',
@@ -125,11 +125,11 @@ describe('MoronRelation', function () {
   });
 
   it('join.from should point to either of the related model classes', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
@@ -142,11 +142,11 @@ describe('MoronRelation', function () {
   });
 
   it('should fail if join object is missing', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel
       });
     }).to.throwException(function (err) {
@@ -155,11 +155,11 @@ describe('MoronRelation', function () {
   });
 
   it('should fail if join.from is missing', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           to: 'OwnerModel.id'
@@ -171,11 +171,11 @@ describe('MoronRelation', function () {
   });
 
   it('should fail if join.to is missing', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id'
@@ -187,10 +187,10 @@ describe('MoronRelation', function () {
   });
 
   it('the values of `join.to` and `join.from` can be swapped', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
-      relation: MoronRelation,
+      relation: Relation,
       modelClass: RelatedModel,
       join: {
         from: 'RelatedModel.ownerId',
@@ -209,11 +209,11 @@ describe('MoronRelation', function () {
     expect(relation.joinTableRelatedCol).to.equal(null);
   });
 
-  it('should accept a path to a MoronModel subclass as modelClass', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+  it('should accept a path to a Model subclass as modelClass', function () {
+    var relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
-      relation: MoronRelation,
+      relation: Relation,
       modelClass: __dirname + '/files/RelatedModel',
       join: {
         from: 'OwnerModel.id',
@@ -233,7 +233,7 @@ describe('MoronRelation', function () {
   });
 
   it('relatedCol and ownerCol should be in database format', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     OwnerModel.tableName = 'owner_model';
     OwnerModel.prototype.$parseDatabaseJson = function (json) {
@@ -250,7 +250,7 @@ describe('MoronRelation', function () {
     };
 
     relation.setMapping({
-      relation: MoronRelation,
+      relation: Relation,
       modelClass: RelatedModel,
       join: {
         from: 'owner_model.id_col',
@@ -270,10 +270,10 @@ describe('MoronRelation', function () {
   });
 
   it('should accept a join table in join.through object', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
-      relation: MoronRelation,
+      relation: Relation,
       modelClass: RelatedModel,
       join: {
         from: 'OwnerModel.id',
@@ -297,10 +297,10 @@ describe('MoronRelation', function () {
   });
 
   it('should be able to swap join.through.from and join.through.to', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
-      relation: MoronRelation,
+      relation: Relation,
       modelClass: RelatedModel,
       join: {
         from: 'RelatedModel.ownerId',
@@ -324,11 +324,11 @@ describe('MoronRelation', function () {
   });
 
   it('should fail if join.through.to is missing', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'RelatedModel.ownerId',
@@ -344,11 +344,11 @@ describe('MoronRelation', function () {
   });
 
   it('should fail if join.through.from is missing', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'RelatedModel.ownerId',
@@ -364,11 +364,11 @@ describe('MoronRelation', function () {
   });
 
   it('join.through.from should have format JoinTable.columnName', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'RelatedModel.ownerId',
@@ -386,11 +386,11 @@ describe('MoronRelation', function () {
 
 
   it('join.through.to should have format JoinTable.columnName', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'RelatedModel.ownerId',
@@ -407,11 +407,11 @@ describe('MoronRelation', function () {
   });
 
   it('join.through `to` and `from` should point to the same table', function () {
-    var relation = new MoronRelation('testRelation', OwnerModel);
+    var relation = new Relation('testRelation', OwnerModel);
 
     expect(function () {
       relation.setMapping({
-        relation: MoronRelation,
+        relation: Relation,
         modelClass: RelatedModel,
         join: {
           from: 'RelatedModel.ownerId',

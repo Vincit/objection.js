@@ -2,14 +2,14 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , MoronModel = require('../../src/MoronModel')
-  , MoronQueryBuilder = require('../../src/MoronQueryBuilder');
+  , Model = require('../../src/Model')
+  , QueryBuilder = require('../../src/QueryBuilder');
 
-describe('MoronQueryBuilder', function () {
+describe('QueryBuilder', function () {
   var mockKnexQueryResult = [];
   var executedQueries = [];
   var mockKnex = null;
-  var Model = null;
+  var TestModel = null;
 
   before(function () {
     mockKnex = knex({client: 'pg'});
@@ -23,20 +23,20 @@ describe('MoronQueryBuilder', function () {
     mockKnexQueryResult = [];
     executedQueries = [];
 
-    Model = MoronModel.extend(function Model() {
-      MoronModel.apply(this, arguments);
+    TestModel = Model.extend(function TestModel() {
+      Model.apply(this, arguments);
     });
 
-    Model.tableName = 'Model';
-    Model.knex(mockKnex);
+    TestModel.tableName = 'Model';
+    TestModel.knex(mockKnex);
   });
 
   it('modelClass() should return the model class', function () {
-    expect(MoronQueryBuilder.forClass(Model).modelClass() === Model).to.equal(true);
+    expect(QueryBuilder.forClass(TestModel).modelClass() === TestModel).to.equal(true);
   });
 
   it('call() should execute the given function and pass the builder to it', function () {
-    var builder = MoronQueryBuilder.forClass(Model);
+    var builder = QueryBuilder.forClass(TestModel);
     var called = false;
 
     builder.call(function (b) {
@@ -50,7 +50,7 @@ describe('MoronQueryBuilder', function () {
 
   it('dumpSql() should dump the contents of toString() to a logger', function () {
     var logCalled = false;
-    var builder = MoronQueryBuilder.forClass(Model);
+    var builder = QueryBuilder.forClass(TestModel);
 
     builder
       .where('a', 10)
@@ -67,38 +67,38 @@ describe('MoronQueryBuilder', function () {
     // Make sure the callback is called by not returning a promise from the test.
     // Instead call the `done` function so that the test times out if the callback
     // is not called.
-    MoronQueryBuilder.forClass(Model).then(function (result) {
+    QueryBuilder.forClass(TestModel).then(function (result) {
       expect(result).to.eql(mockKnexQueryResult);
       done();
     }).catch(done);
   });
 
   it('should return a promise from .then method', function () {
-    var promise = MoronQueryBuilder.forClass(Model).then(_.identity);
+    var promise = QueryBuilder.forClass(TestModel).then(_.identity);
     expect(promise).to.be.a(Promise);
     return promise;
   });
 
   it('should return a promise from .map method', function () {
-    var promise = MoronQueryBuilder.forClass(Model).map(_.identity);
+    var promise = QueryBuilder.forClass(TestModel).map(_.identity);
     expect(promise).to.be.a(Promise);
     return promise;
   });
 
   it('should return a promise from .return method', function () {
-    var promise = MoronQueryBuilder.forClass(Model).return({});
+    var promise = QueryBuilder.forClass(TestModel).return({});
     expect(promise).to.be.a(Promise);
     return promise;
   });
 
   it('should return a promise from .catch method', function () {
-    var promise = MoronQueryBuilder.forClass(Model).catch(_.noop);
+    var promise = QueryBuilder.forClass(TestModel).catch(_.noop);
     expect(promise).to.be.a(Promise);
     return promise;
   });
 
   it('should select all from the model table if no query methods are called', function () {
-    var queryBuilder = MoronQueryBuilder.forClass(Model);
+    var queryBuilder = QueryBuilder.forClass(TestModel);
     return queryBuilder.then(function () {
       expect(executedQueries).to.eql(['select * from "Model"']);
     });
@@ -107,8 +107,8 @@ describe('MoronQueryBuilder', function () {
   it('should have knex query builder methods', function () {
     // Doesn't test all the methods. Just enough to make sure the method calls are correctly
     // passed to the knex query builder.
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .select('name', 'id', 'age')
       .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')
       .where('id', 10)
@@ -129,26 +129,26 @@ describe('MoronQueryBuilder', function () {
       });
   });
 
-  it('should convert array query result into MoronModel instances', function () {
+  it('should convert array query result into Model instances', function () {
     mockKnexQueryResult = [{a: 1}, {a: 2}];
 
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .then(function (result) {
         expect(result).to.have.length(2);
-        expect(result[0]).to.be.a(Model);
-        expect(result[1]).to.be.a(Model);
+        expect(result[0]).to.be.a(TestModel);
+        expect(result[1]).to.be.a(TestModel);
         expect(result).to.eql(mockKnexQueryResult);
       });
   });
 
-  it('should convert an object query result into a MoronModel instance', function () {
+  it('should convert an object query result into a Model instance', function () {
     mockKnexQueryResult = {a: 1};
 
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .then(function (result) {
-        expect(result).to.be.a(Model);
+        expect(result).to.be.a(TestModel);
         expect(result.a).to.equal(1);
       });
   });
@@ -162,8 +162,8 @@ describe('MoronQueryBuilder', function () {
 
     // Again call `done` instead of returning a promise just to make sure the final
     // `.then` callback is called. (I'm paranoid).
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
 
       .runBefore(function () {
         expect(mockKnexQueryResult).to.equal(1);
@@ -230,8 +230,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should not execute query if an error is thrown from runBefore', function (done) {
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .runBefore(function () {
         throw new Error('some error');
       })
@@ -255,8 +255,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should not call other run* methods if an error is thrown from runAfterKnexQuery', function (done) {
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .runAfterKnexQuery(function () {
         throw new Error('some error');
       })
@@ -276,8 +276,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should not call other run* methods if an error is thrown from runAfterModelCreate', function (done) {
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .runAfterModelCreate(function () {
         throw new Error('some error');
       })
@@ -294,8 +294,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should reject promise if an error is throw from from runAfter', function (done) {
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .runAfter(function () {
         throw new Error('some error');
       })
@@ -309,8 +309,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom find implementation defined by findImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .findImpl(function () {
         this.where({a: 1});
       })
@@ -321,8 +321,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should not call custom find implementation defined by findImpl if insert is called', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .findImpl(function () {
         this.where({test: 'test'});
       })
@@ -334,8 +334,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should not call custom find implementation defined by findImpl if update is called', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .findImpl(function () {
         this.where({test: 'test'});
       })
@@ -347,8 +347,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should not call custom find implementation defined by findImpl if delete is called', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .findImpl(function () {
         this.where({test: 'test'});
       })
@@ -360,8 +360,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom insert implementation defined by insertImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .insertImpl(function (insert) {
         insert.b = 2;
         this.insert(insert);
@@ -374,8 +374,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom update implementation defined by updateImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .updateImpl(function (update) {
         update.b = 2;
         this.update(update);
@@ -388,8 +388,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom patch implementation defined by patchImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .patchImpl(function (patch) {
         patch.b = 2;
         this.update(patch);
@@ -402,8 +402,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom delete implementation defined by deleteImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .deleteImpl(function () {
         this.delete().where('id', 100);
       })
@@ -415,8 +415,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom relate implementation defined by relateImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .relateImpl(function (relate) {
         relate.b = 2;
         this.insert(relate);
@@ -429,8 +429,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should call custom unrelate implementation defined by unrelateImpl', function () {
-    return MoronQueryBuilder
-      .forClass(Model)
+    return QueryBuilder
+      .forClass(TestModel)
       .unrelateImpl(function () {
         this.delete().where('id', 100);
       })
@@ -442,8 +442,8 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('should be able to execute same query multiple times', function () {
-    var query = MoronQueryBuilder
-      .forClass(Model)
+    var query = QueryBuilder
+      .forClass(TestModel)
       .updateImpl(function (update) {
         update.b = 2;
         this.update(update);
@@ -475,8 +475,8 @@ describe('MoronQueryBuilder', function () {
 
   it('resultSize should create and execute a query that returns the size of the query', function (done) {
     mockKnexQueryResult = [{count: 123}];
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .resultSize()
@@ -492,8 +492,8 @@ describe('MoronQueryBuilder', function () {
 
   it('range should return a range and the total count', function (done) {
     mockKnexQueryResult = [{count: 123}];
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .range(100, 200)
@@ -510,8 +510,8 @@ describe('MoronQueryBuilder', function () {
 
   it('page should return a page and the total count', function (done) {
     mockKnexQueryResult = [{count: 123}];
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .page(10, 100)
@@ -527,18 +527,18 @@ describe('MoronQueryBuilder', function () {
   });
 
   it('isFindQuery should return true if none of the insert, update, patch, delete, relate or unrelate has been called', function () {
-    expect(MoronQueryBuilder.forClass(Model).isFindQuery()).to.equal(true);
-    expect(MoronQueryBuilder.forClass(Model).insert().isFindQuery()).to.equal(false);
-    expect(MoronQueryBuilder.forClass(Model).update().isFindQuery()).to.equal(false);
-    expect(MoronQueryBuilder.forClass(Model).patch().isFindQuery()).to.equal(false);
-    expect(MoronQueryBuilder.forClass(Model).delete().isFindQuery()).to.equal(false);
-    expect(MoronQueryBuilder.forClass(Model).relate().isFindQuery()).to.equal(false);
-    expect(MoronQueryBuilder.forClass(Model).unrelate().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).isFindQuery()).to.equal(true);
+    expect(QueryBuilder.forClass(TestModel).insert().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).update().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).patch().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).delete().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).relate().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).unrelate().isFindQuery()).to.equal(false);
   });
 
   it('resolve should replace the database query with the given value', function (done) {
-    MoronQueryBuilder
-      .forClass(Model)
+    QueryBuilder
+      .forClass(TestModel)
       .resolve([{b: '100'}])
       .where('test', 100)
       .orderBy('order')
@@ -553,8 +553,8 @@ describe('MoronQueryBuilder', function () {
   describe('eager and allowEager' , function () {
 
     it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", function (done) {
-      MoronQueryBuilder
-        .forClass(Model)
+      QueryBuilder
+        .forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('a')
         .then(function () {
@@ -563,8 +563,8 @@ describe('MoronQueryBuilder', function () {
     });
 
     it("allowEager('[a, b.c.[d, e]]').eager('b.c') should be ok", function (done) {
-      MoronQueryBuilder
-        .forClass(Model)
+      QueryBuilder
+        .forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('b.c')
         .then(function () {
@@ -577,8 +577,8 @@ describe('MoronQueryBuilder', function () {
     });
 
     it("allowEager('[a, b.c.[d, e]]').eager('b.c.e') should be ok", function (done) {
-      MoronQueryBuilder
-        .forClass(Model)
+      QueryBuilder
+        .forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('b.c.e')
         .then(function () {
@@ -591,8 +591,8 @@ describe('MoronQueryBuilder', function () {
     });
 
     it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", function (done) {
-      MoronQueryBuilder
-        .forClass(Model)
+      QueryBuilder
+        .forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
         .eager('a.b')
         .then(function () {
@@ -605,8 +605,8 @@ describe('MoronQueryBuilder', function () {
     });
 
     it("eager('a.b').allowEager('[a, b.c.[d, e]]') should fail", function (done) {
-      MoronQueryBuilder
-        .forClass(Model)
+      QueryBuilder
+        .forClass(TestModel)
         .eager('a.b')
         .allowEager('[a, b.c.[d, e]]')
         .then(function () {
@@ -619,8 +619,8 @@ describe('MoronQueryBuilder', function () {
     });
 
     it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]') should fail", function (done) {
-      MoronQueryBuilder
-        .forClass(Model)
+      QueryBuilder
+        .forClass(TestModel)
         .eager('b.c.d.e')
         .allowEager('[a, b.c.[d, e]]')
         .then(function () {
@@ -642,7 +642,7 @@ describe('MoronQueryBuilder', function () {
 
     // Warmup.
     for (var i = 0; i < 100; ++i) {
-      a.push(MoronQueryBuilder
+      a.push(QueryBuilder
         .forClass(Model)
         .select('name', 'id', 'age')
         .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')
@@ -664,7 +664,7 @@ describe('MoronQueryBuilder', function () {
     Promise.delay(1).then(function () {
       var d = new Date();
       for (var i = 0; i < N; ++i) {
-        a.push(MoronQueryBuilder
+        a.push(QueryBuilder
           .forClass(Model)
           .select('name', 'id', 'age')
           .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')

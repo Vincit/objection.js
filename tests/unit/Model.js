@@ -1,7 +1,7 @@
 var expect = require('expect.js');
-var MoronModel = require('../../src/MoronModel');
+var Model = require('../../src/Model');
 
-describe('MoronModel', function () {
+describe('Model', function () {
 
   it('should parse relations into Model instances and remove them from database representation', function () {
     var Model1 = modelClass('Model1');
@@ -9,7 +9,7 @@ describe('MoronModel', function () {
 
     Model1.relationMappings = {
       relation1: {
-        relation: MoronModel.OneToManyRelation,
+        relation: Model.OneToManyRelation,
         modelClass: Model2,
         join: {
           from: 'Model1.id',
@@ -17,7 +17,7 @@ describe('MoronModel', function () {
         }
       },
       relation2: {
-        relation: MoronModel.OneToOneRelation,
+        relation: Model.OneToOneRelation,
         modelClass: Model1,
         join: {
           from: 'Model1.id',
@@ -194,11 +194,11 @@ describe('MoronModel', function () {
   });
 
   function modelClass(tableName) {
-    function Model() {
-      MoronModel.apply(this, arguments);
+    function TestModel() {
+      Model.apply(this, arguments);
     }
-    MoronModel.extend(Model);
-    Model.tableName = tableName;
-    return Model;
+    Model.extend(TestModel);
+    TestModel.tableName = tableName;
+    return TestModel;
   }
 });

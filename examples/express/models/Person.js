@@ -1,14 +1,14 @@
-var MoronModel = require('moron').MoronModel;
+var Model = require('moron').Model;
 
 /**
- * @extends MoronModel
+ * @extends Model
  * @constructor
  */
 function Person() {
-  MoronModel.apply(this, arguments);
+  Model.apply(this, arguments);
 }
 
-MoronModel.extend(Person);
+Model.extend(Person);
 module.exports = Person;
 
 // Table name is the only required property.
@@ -42,8 +42,8 @@ Person.jsonSchema = {
 // This object defines the relations to other models.
 Person.relationMappings = {
   pets: {
-    relation: MoronModel.OneToManyRelation,
-    // The related model. This can be either a MoronModel subclass constructor or an
+    relation: Model.OneToManyRelation,
+    // The related model. This can be either a Model subclass constructor or an
     // absolute file path to a module that exports one. We use the file path version
     // here to prevent require loops.
     modelClass: __dirname + '/Animal',
@@ -54,7 +54,7 @@ Person.relationMappings = {
   },
 
   movies: {
-    relation: MoronModel.ManyToManyRelation,
+    relation: Model.ManyToManyRelation,
     modelClass: __dirname + '/Movie',
     join: {
       from: 'Person.id',
@@ -68,7 +68,7 @@ Person.relationMappings = {
   },
 
   children: {
-    relation: MoronModel.OneToManyRelation,
+    relation: Model.OneToManyRelation,
     modelClass: Person,
     join: {
       from: 'Person.id',

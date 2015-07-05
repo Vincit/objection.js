@@ -1,13 +1,13 @@
 var _ = require('lodash');
-var utils = require('../../src/moronUtils')
+var utils = require('../../src/utils')
 var expect = require('expect.js');
-var MoronValidationError = require('../../src/MoronValidationError');
+var ValidationError = require('../../src/ValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('MoronModel insert queries', function () {
+  describe('Model insert queries', function () {
 
     describe('.query().insert()', function () {
 
@@ -110,7 +110,7 @@ module.exports = function (session) {
             done(new Error('should not get here'));
           })
           .catch(function (err) {
-            expect(err).to.be.a(MoronValidationError);
+            expect(err).to.be.a(ValidationError);
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {

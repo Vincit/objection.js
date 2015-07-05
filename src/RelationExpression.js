@@ -1,13 +1,13 @@
 'use strict';
 
 var _ = require('lodash')
-  , MoronValidationError = require('./MoronValidationError');
+  , ValidationError = require('./ValidationError');
 
 /**
  * @ignore
  * @constructor
  */
-function MoronRelationExpressionNode(name) {
+function RelationExpressionNode(name) {
   this.name = name;
   this.children = [];
 }
@@ -16,25 +16,25 @@ function MoronRelationExpressionNode(name) {
  * @ignore
  * @constructor
  */
-function MoronRelationExpressionParser() {
+function RelationExpressionParser() {
   this.str = null;
 }
 
-MoronRelationExpressionParser.parse = function (str) {
-  return new MoronRelationExpressionParser().parse(str);
+RelationExpressionParser.parse = function (str) {
+  return new RelationExpressionParser().parse(str);
 };
 
-MoronRelationExpressionParser.prototype.parse = function (str) {
+RelationExpressionParser.prototype.parse = function (str) {
   this.str = str;
 
   if (!_.isString(str) || !str) {
-    return new MoronRelationExpression([]);
+    return new RelationExpression([]);
   } else {
-    return new MoronRelationExpression(this._parse(str));
+    return new RelationExpression(this._parse(str));
   }
 };
 
-MoronRelationExpressionParser.prototype._parse = function (str) {
+RelationExpressionParser.prototype._parse = function (str) {
   var rootNodes = [];
   var nodes = rootNodes;
 
@@ -45,7 +45,7 @@ MoronRelationExpressionParser.prototype._parse = function (str) {
   return rootNodes;
 };
 
-MoronRelationExpressionParser.prototype._parseIterator = function (token, nodes) {
+RelationExpressionParser.prototype._parseIterator = function (token, nodes) {
   if (isArrayToken(token)) {
     return this._parseArrayToken(token, nodes);
   } else {
@@ -53,7 +53,7 @@ MoronRelationExpressionParser.prototype._parseIterator = function (token, nodes)
   }
 };
 
-MoronRelationExpressionParser.prototype._parseArrayToken = function (arrayToken, nodes) {
+RelationExpressionParser.prototype._parseArrayToken = function (arrayToken, nodes) {
   arrayToken = stripArrayChars(arrayToken);
 
   this._forEachToken(arrayToken, ',', function (token) {
@@ -63,7 +63,7 @@ MoronRelationExpressionParser.prototype._parseArrayToken = function (arrayToken,
   return nodes;
 };
 
-MoronRelationExpressionParser.prototype._parseArrayIterator = function (token, nodes) {
+RelationExpressionParser.prototype._parseArrayIterator = function (token, nodes) {
   var rel = this._parse(token);
 
   for (var i = 0, l = rel.length; i < l; ++i) {
@@ -71,18 +71,18 @@ MoronRelationExpressionParser.prototype._parseArrayIterator = function (token, n
   }
 };
 
-MoronRelationExpressionParser.prototype._parseToken = function (token, nodes) {
+RelationExpressionParser.prototype._parseToken = function (token, nodes) {
   if (token.length === 0) {
     this._throwInvalidExpressionError();
   }
 
-  var node = new MoronRelationExpressionNode(token);
+  var node = new RelationExpressionNode(token);
   nodes.push(node);
 
   return node.children;
 };
 
-MoronRelationExpressionParser.prototype._forEachToken = function (str, separator, callback) {
+RelationExpressionParser.prototype._forEachToken = function (str, separator, callback) {
   var bracketDepth = 0;
   var previousMatchIndex = -1;
   var token = null;
@@ -109,8 +109,8 @@ MoronRelationExpressionParser.prototype._forEachToken = function (str, separator
   }
 };
 
-MoronRelationExpressionParser.prototype._throwInvalidExpressionError = function () {
-  throw new MoronValidationError({relationExpression: 'invalid relation expression: ' + this.str});
+RelationExpressionParser.prototype._throwInvalidExpressionError = function () {
+  throw new ValidationError({relationExpression: 'invalid relation expression: ' + this.str});
 };
 
 /**
@@ -161,31 +161,31 @@ MoronRelationExpressionParser.prototype._throwInvalidExpressionError = function 
  * Expression `parent.^` is equivalent to `parent.parent.parent.parent...` up to the point a relation no longer
  * has results for the `parent` relation.
  *
- * @param nodes {Array.<MoronRelationExpressionNode>}
+ * @param nodes {Array.<RelationExpressionNode>}
  * @constructor
  */
-function MoronRelationExpression(nodes) {
+function RelationExpression(nodes) {
   /**
-   * @type Array.<MoronRelationExpressionNode>
+   * @type Array.<RelationExpressionNode>
    */
   this.nodes = nodes;
 }
 
 /**
- * Parses an expression string into a {@link MoronRelationExpression} object.
+ * Parses an expression string into a {@link RelationExpression} object.
  *
  * @param {String} expression
- * @returns {MoronRelationExpression}
+ * @returns {RelationExpression}
  */
-MoronRelationExpression.parse = function (expression) {
-  return MoronRelationExpressionParser.parse(expression);
+RelationExpression.parse = function (expression) {
+  return RelationExpressionParser.parse(expression);
 };
 
 /**
  * @protected
  * @returns {boolean}
  */
-MoronRelationExpression.prototype.isRecursive = function (relationName) {
+RelationExpression.prototype.isRecursive = function (relationName) {
   for (var i = 0, l = this.nodes.length; i < l; ++i) {
     var node = this.nodes[i];
 
@@ -201,15 +201,15 @@ MoronRelationExpression.prototype.isRecursive = function (relationName) {
  * @protected
  * @returns {boolean}
  */
-MoronRelationExpression.prototype.isAllRecursive = function () {
+RelationExpression.prototype.isAllRecursive = function () {
   return this.nodes.length === 1 && this.nodes[0].name === '*';
 };
 
 /**
  * @protected
- * @returns {MoronRelationExpression}
+ * @returns {RelationExpression}
  */
-MoronRelationExpression.prototype.relation = function (relationName) {
+RelationExpression.prototype.relation = function (relationName) {
   if (this.isAllRecursive()) {
     return this;
   }
@@ -222,9 +222,9 @@ MoronRelationExpression.prototype.relation = function (relationName) {
     }
 
     if (this.isRecursive(node.name)) {
-      return new MoronRelationExpression([node]);
+      return new RelationExpression([node]);
     } else {
-      return new MoronRelationExpression(node.children);
+      return new RelationExpression(node.children);
     }
   }
 
@@ -248,12 +248,12 @@ MoronRelationExpression.prototype.relation = function (relationName) {
  * - `children.[movies, pets]`
  * - `children.[movies.actors, pets]`
  *
- * @param {String|MoronRelationExpression} expr
+ * @param {String|RelationExpression} expr
  * @returns {boolean}
  */
-MoronRelationExpression.prototype.isSubExpression = function (expr) {
-  if (!(expr instanceof MoronRelationExpression)) {
-    expr = MoronRelationExpressionParser.parse(expr);
+RelationExpression.prototype.isSubExpression = function (expr) {
+  if (!(expr instanceof RelationExpression)) {
+    expr = RelationExpressionParser.parse(expr);
   }
 
   if (expr.isAllRecursive()) {
@@ -286,4 +286,4 @@ function stripArrayChars(token) {
   return token.substring(1, token.length - 1);
 }
 
-module.exports = MoronRelationExpression;
+module.exports = RelationExpression;

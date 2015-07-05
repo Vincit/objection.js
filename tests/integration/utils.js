@@ -1,8 +1,8 @@
 var _ = require('lodash');
 var path = require('path');
-var utils = require('../../src/moronUtils');
+var utils = require('../../src/utils');
 var Promise = require('bluebird');
-var MoronModel = require('../../src/MoronModel');
+var Model = require('../../src/Model');
 var expect = require('expect.js');
 
 var unhandledRejectionHandlers = [];
@@ -20,21 +20,21 @@ module.exports.initialize = function (opt) {
   var knex = require('knex')(opt.knexConfig);
 
   function Model1() {
-    MoronModel.apply(this, arguments);
+    Model.apply(this, arguments);
   }
 
   function Model2() {
-    MoronModel.apply(this, arguments);
+    Model.apply(this, arguments);
   }
 
-  MoronModel.extend(Model1);
-  MoronModel.extend(Model2);
+  Model.extend(Model1);
+  Model.extend(Model2);
 
   Model1.tableName = 'Model1';
   Model2.tableName = 'model_2';
 
   Model2.prototype.$formatDatabaseJson = function (json) {
-    json = MoronModel.prototype.$formatDatabaseJson.call(this, json);
+    json = Model.prototype.$formatDatabaseJson.call(this, json);
 
     return _.mapKeys(json, function (value, key) {
       return _.snakeCase(key);
@@ -46,12 +46,12 @@ module.exports.initialize = function (opt) {
       return _.camelCase(key);
     });
 
-    return MoronModel.prototype.$parseDatabaseJson.call(this, json);
+    return Model.prototype.$parseDatabaseJson.call(this, json);
   };
 
   Model1.relationMappings = {
     model1Relation1: {
-      relation: MoronModel.OneToOneRelation,
+      relation: Model.OneToOneRelation,
       modelClass: Model1,
       join: {
         from: 'Model1.model1Id',
@@ -59,7 +59,7 @@ module.exports.initialize = function (opt) {
       }
     },
     model1Relation2: {
-      relation: MoronModel.OneToManyRelation,
+      relation: Model.OneToManyRelation,
       modelClass: Model2,
       join: {
         from: 'Model1.id',
@@ -70,7 +70,7 @@ module.exports.initialize = function (opt) {
 
   Model2.relationMappings = {
     model2Relation1: {
-      relation: MoronModel.ManyToManyRelation,
+      relation: Model.ManyToManyRelation,
       modelClass: Model1,
       join: {
         from: 'model_2.id_col',
@@ -239,14 +239,14 @@ function createRows(model, ModelClass, rows) {
       return;
     }
 
-    if (relation instanceof MoronModel.OneToOneRelation) {
+    if (relation instanceof Model.OneToOneRelation) {
 
       var related = relation.relatedModelClass.ensureModel(model[relationName]);
       model[relation.ownerProp] = related.$id();
 
       createRows(related, relation.relatedModelClass, rows);
 
-    } else if (relation instanceof MoronModel.OneToManyRelation) {
+    } else if (relation instanceof Model.OneToManyRelation) {
 
       _.each(model[relationName], function (relatedJson) {
         var related = relation.relatedModelClass.ensureModel(relatedJson);
@@ -255,7 +255,7 @@ function createRows(model, ModelClass, rows) {
         createRows(related, relation.relatedModelClass, rows);
       });
 
-    } else if (relation instanceof MoronModel.ManyToManyRelation) {
+    } else if (relation instanceof Model.ManyToManyRelation) {
       var joinTable = [
         _.capitalize(_.camelCase(ModelClass.tableName)),
         _.capitalize(_.camelCase(relation.relatedModelClass.tableName))

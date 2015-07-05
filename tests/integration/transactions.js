@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var transaction = require('../../src/moronTransaction');
+var transaction = require('../../src/transaction');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
@@ -42,8 +42,8 @@ module.exports = function (session) {
       });
     });
 
-    it('should fail if one of the model classes is not a subclass of MoronModel', function (done) {
-      transaction(Model1, function () {}, function (Model1, NotMoronModel) {
+    it('should fail if one of the model classes is not a subclass of Model', function (done) {
+      transaction(Model1, function () {}, function (Model1, NotModel) {
         return {a: 1};
       }).then(function () {
         done(new Error('should not get here'));

@@ -1,7 +1,7 @@
 var expect = require('expect.js')
-  , MoronRelationExpression = require('../../src/MoronRelationExpression');
+  , RelationExpression = require('../../src/RelationExpression');
 
-describe('MoronRelationExpression', function () {
+describe('RelationExpression', function () {
 
   describe('parse', function () {
 
@@ -253,24 +253,24 @@ describe('MoronRelationExpression', function () {
   });
 
   function testParse(str, parsed) {
-    expect(MoronRelationExpression.parse(str)).to.eql(parsed);
+    expect(RelationExpression.parse(str)).to.eql(parsed);
   }
 
   function testParseFail(str) {
     expect(function () {
-      MoronRelationExpression.parse(str);
+      RelationExpression.parse(str);
     }).to.throwException();
   }
 
   function testSubExpression(str, subStr) {
     it('"' + subStr + '" is a sub expression of "' + str + '"', function () {
-      expect(MoronRelationExpression.parse(str).isSubExpression(subStr)).to.equal(true);
+      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(true);
     });
   }
 
   function testNotSubExpression(str, subStr) {
     it('"' + subStr + '" is not a sub expression of "' + str + '"', function () {
-      expect(MoronRelationExpression.parse(str).isSubExpression(subStr)).to.equal(false);
+      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(false);
     });
   }
 

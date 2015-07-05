@@ -1,12 +1,12 @@
 var _ = require('lodash');
 var expect = require('expect.js');
-var MoronValidationError = require('../../src/MoronValidationError');
+var ValidationError = require('../../src/ValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('MoronModel relate queries', function () {
+  describe('Model relate queries', function () {
 
     describe('.query()', function () {
 

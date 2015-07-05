@@ -1,13 +1,13 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var expectPartEql = require('./utils').expectPartialEqual;
-var MoronValidationError = require('../../src/MoronValidationError');
+var ValidationError = require('../../src/ValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('MoronModel delete queries', function () {
+  describe('Model delete queries', function () {
 
     describe('.query().delete()', function () {
 

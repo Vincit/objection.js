@@ -1,49 +1,49 @@
 var _ = require('lodash')
   , expect = require('expect.js')
-  , MoronModelBase = require('../../src/MoronModelBase')
-  , MoronValidationError = require('../../src/MoronValidationError');
+  , ModelBase = require('../../src/ModelBase')
+  , ValidationError = require('../../src/ValidationError');
 
-describe('MoronModelBase', function () {
+describe('ModelBase', function () {
 
   describe('extend', function () {
 
     it('should create a subclass', function () {
       function Model() {
-        MoronModelBase.apply(this, arguments);
+        ModelBase.apply(this, arguments);
       }
 
-      MoronModelBase.extend(Model);
+      ModelBase.extend(Model);
 
       var model = new Model();
 
       expect(model).to.be.a(Model);
-      expect(model).to.be.a(MoronModelBase);
+      expect(model).to.be.a(ModelBase);
     });
 
     it('should create a subclass of subclass', function () {
       function Model() {
-        MoronModelBase.apply(this, arguments);
+        ModelBase.apply(this, arguments);
       }
       function Model2() {
         Model.apply(this, arguments);
       }
 
-      MoronModelBase.extend(Model).extend(Model2);
+      ModelBase.extend(Model).extend(Model2);
 
       var model = new Model2();
 
       expect(model).to.be.a(Model2);
       expect(model).to.be.a(Model);
-      expect(model).to.be.a(MoronModelBase);
+      expect(model).to.be.a(ModelBase);
     });
 
     it('should fail if the subclass constructor has no name', function () {
       var Model = function () {
-        MoronModelBase.apply(this, arguments);
+        ModelBase.apply(this, arguments);
       };
 
       expect(function () {
-        MoronModelBase.extend(Model);
+        ModelBase.extend(Model);
       }).to.throwException();
     });
 
@@ -122,7 +122,7 @@ describe('MoronModelBase', function () {
       expect(function () {
         Model.fromJson({a: 1, b: '1'});
       }).to.throwException(function (exp) {
-        expect(exp).to.be.a(MoronValidationError);
+        expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
         expect(exp.data).to.have.property('b');
       });
@@ -130,7 +130,7 @@ describe('MoronModelBase', function () {
       expect(function () {
         Model.fromJson({b: 1});
       }).to.throwException(function (exp) {
-        expect(exp).to.be.a(MoronValidationError);
+        expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
       });
 
@@ -150,7 +150,7 @@ describe('MoronModelBase', function () {
       };
 
       Model.prototype.$validate = function (jsn, opt) {
-        MoronModelBase.prototype.$validate.call(this, jsn, opt);
+        ModelBase.prototype.$validate.call(this, jsn, opt);
 
         ++calls;
         expect(opt).to.eql(options);
@@ -242,7 +242,7 @@ describe('MoronModelBase', function () {
       expect(function () {
         Model.fromJson({a: 1, b: '1'}, {patch: true});
       }).to.throwException(function (exp) {
-        expect(exp).to.be.a(MoronValidationError);
+        expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
         expect(exp.data).to.have.property('b');
       });
@@ -376,7 +376,7 @@ describe('MoronModelBase', function () {
       expect(calls).to.equal(1);
     });
 
-    it('should call $toJson for properties of class MoronModelBase', function () {
+    it('should call $toJson for properties of class ModelBase', function () {
       var Model2 = createModelClass();
 
       Model2.prototype.$formatJson = function (jsn) {
@@ -444,7 +444,7 @@ describe('MoronModelBase', function () {
       expect(calls).to.equal(1);
     });
 
-    it('should call $toDatabaseJson for properties of class MoronModelBase', function () {
+    it('should call $toDatabaseJson for properties of class ModelBase', function () {
       var Model2 = createModelClass();
 
       Model2.prototype.$formatDatabaseJson = function (jsn) {
@@ -506,10 +506,10 @@ describe('MoronModelBase', function () {
 
   function createModelClass(proto, staticStuff) {
     function Model() {
-      MoronModelBase.apply(this, arguments);
+      ModelBase.apply(this, arguments);
     }
 
-    MoronModelBase.extend(Model);
+    ModelBase.extend(Model);
 
     _.merge(Model.prototype, proto);
     _.merge(Model, staticStuff);

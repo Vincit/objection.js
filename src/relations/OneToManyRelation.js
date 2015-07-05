@@ -1,20 +1,20 @@
 'use strict';
 
 var _ = require('lodash')
-  , MoronRelation = require('./MoronRelation');
+  , Relation = require('./Relation');
 
 /**
  * @constructor
  * @ignore
- * @extends MoronRelation
+ * @extends Relation
  */
-function MoronOneToManyRelation() {
-  MoronRelation.apply(this, arguments);
+function OneToManyRelation() {
+  Relation.apply(this, arguments);
 }
 
-MoronRelation.extend(MoronOneToManyRelation);
+Relation.extend(OneToManyRelation);
 
-MoronOneToManyRelation.prototype.find = function (builder, $owners) {
+OneToManyRelation.prototype.find = function (builder, $owners) {
   var self = this;
   var owners = this.ownerModelClass.ensureModelArray($owners);
   var ownerIds = _.unique(_.pluck(owners, this.ownerProp));
@@ -30,7 +30,7 @@ MoronOneToManyRelation.prototype.find = function (builder, $owners) {
   });
 };
 
-MoronOneToManyRelation.prototype.insert = function (builder, $owner, $insertion) {
+OneToManyRelation.prototype.insert = function (builder, $owner, $insertion) {
   var self = this;
   var owner = this.ownerModelClass.ensureModel($owner);
   var insertion = this.relatedModelClass.ensureModelArray($insertion);
@@ -45,7 +45,7 @@ MoronOneToManyRelation.prototype.insert = function (builder, $owner, $insertion)
   });
 };
 
-MoronOneToManyRelation.prototype.update = function (builder, $owner, $update) {
+OneToManyRelation.prototype.update = function (builder, $owner, $update) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   this._makeFindQuery(builder, [owner[this.ownerProp]]);
@@ -54,7 +54,7 @@ MoronOneToManyRelation.prototype.update = function (builder, $owner, $update) {
   return builder;
 };
 
-MoronOneToManyRelation.prototype.patch = function (builder, $owner, $patch) {
+OneToManyRelation.prototype.patch = function (builder, $owner, $patch) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   this._makeFindQuery(builder, [owner[this.ownerProp]]);
@@ -63,7 +63,7 @@ MoronOneToManyRelation.prototype.patch = function (builder, $owner, $patch) {
   return builder;
 };
 
-MoronOneToManyRelation.prototype.delete = function (builder, $owner) {
+OneToManyRelation.prototype.delete = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   this._makeFindQuery(builder, [owner[this.ownerProp]]);
@@ -72,7 +72,7 @@ MoronOneToManyRelation.prototype.delete = function (builder, $owner) {
   return builder;
 };
 
-MoronOneToManyRelation.prototype.relate = function (builder, $owner, $ids) {
+OneToManyRelation.prototype.relate = function (builder, $owner, $ids) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   return builder
@@ -83,7 +83,7 @@ MoronOneToManyRelation.prototype.relate = function (builder, $owner, $ids) {
     });
 };
 
-MoronOneToManyRelation.prototype.unrelate = function (builder, $owner) {
+OneToManyRelation.prototype.unrelate = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
   return builder
@@ -94,8 +94,8 @@ MoronOneToManyRelation.prototype.unrelate = function (builder, $owner) {
     });
 };
 
-MoronOneToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) {
+OneToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) {
   return builder.whereIn(this.fullRelatedCol(), _.compact(ownerIds));
 };
 
-module.exports = MoronOneToManyRelation;
+module.exports = OneToManyRelation;

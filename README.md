@@ -33,7 +33,7 @@ What moron.js doesn't give you:
 - [Documents](#documents)
 - [Models](#models)
 - [Testing](#testing)
-- [API Documentation](http://vincit.github.io/moron.js/MoronModel.html)
+- [API Documentation](http://vincit.github.io/moron.js/Model.html)
 - [Recipe book](RECIPES.md)
 
 # Installation
@@ -77,15 +77,15 @@ knex migrate:latest
 npm start
 ```
 
-Also our [API documentation](http://vincit.github.io/moron.js/MoronModel.html) contains a lot of examples.
+Also our [API documentation](http://vincit.github.io/moron.js/Model.html) contains a lot of examples.
 
 # Query examples
 
 The Person model used in the examples is defined [here](#models).
 
-All queries are started with one of the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) methods [query()](http://vincit.github.io/moron.js/MoronModel.html#_P_query),
-[$query()](http://vincit.github.io/moron.js/MoronModel.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/MoronModel.html#SrelatedQuery).
-All these methods return a [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html) instance that can be used just like
+All queries are started with one of the [Model](http://vincit.github.io/moron.js/Model.html) methods [query()](http://vincit.github.io/moron.js/Model.html#_P_query),
+[$query()](http://vincit.github.io/moron.js/Model.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/Model.html#SrelatedQuery).
+All these methods return a [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html) instance that can be used just like
 a [knex QueryBuilder](http://knexjs.org/#Builder).
 
 Insert a Person model to the database:
@@ -118,7 +118,7 @@ Person
   });
 ```
 
-The return value of the `.query()` method is an instance of [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html)
+The return value of the `.query()` method is an instance of [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html)
 that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has. Here is a simple example that uses some of them:
 
 ```js
@@ -151,7 +151,7 @@ Person
 ```
 
 While the static `.query()` method can be used to create a query to a whole table `.$relatedQuery()` method
-can be used to query a single relation. `.$relatedQuery()` returns an instance of [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html)
+can be used to query a single relation. `.$relatedQuery()` returns an instance of [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html)
 just like the `.query()` method.
 
 ```js
@@ -246,11 +246,11 @@ Person
   });
 ```
 
-The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/moron.js/MoronRelationExpression.html).
+The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/moron.js/RelationExpression.html).
 
 Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
 request. However, using such expressions opens the whole database through the API. This is not very secure. Therefore
-the [MoronQueryBuilder](http://vincit.github.io/moron.js/MoronQueryBuilder.html) has the `.allowEager` method.
+the [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html) has the `.allowEager` method.
 allowEager can be used to limit the allowed eager expression to a certain subset. Like this:
 
 ```js
@@ -268,7 +268,7 @@ The example above allows `req.query.eager` to be one of `'pets'`, `'children'`, 
 `'[pets, children.pets]'`. Examples of failing eager expressions are `'movies'`, `'children.children'` and `'notEvenAnExistingRelation'`.
 
 In addition to the `.eager` method, relations can be fetched using the `loadRelated` and `$loadRelated` methods of
-[MoronModel](http://vincit.github.io/moron.js/MoronModel.html).
+[Model](http://vincit.github.io/moron.js/Model.html).
 
 # Transactions
 
@@ -384,25 +384,25 @@ Person
 
 # Models
 
-Models are created by inheriting from the [MoronModel](http://vincit.github.io/moron.js/MoronModel.html) base class.
+Models are created by inheriting from the [Model](http://vincit.github.io/moron.js/Model.html) base class.
 In moron.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
 wonder what the hell is happening. Just plain old ugly javascript inheritance.
 
 ```js
-var MoronModel = require('moron').MoronModel;
+var Model = require('moron').Model;
 
 /**
- * @override MoronModel
+ * @override Model
  * @constructor
  */
 function Person() {
-  MoronModel.apply(this, arguments);
+  Model.apply(this, arguments);
 }
 
-MoronModel.extend(Person);
+Model.extend(Person);
 module.exports = Person;
 
-// You can add custom functionality to MoronModels just as you would
+// You can add custom functionality to Models just as you would
 // to any javascript class.
 Person.prototype.fullName = function () {
   return this.firstName + ' ' + this.lastName;
@@ -439,8 +439,8 @@ Person.jsonSchema = {
 // This object defines the relations to other models.
 Person.relationMappings = {
   pets: {
-    relation: MoronModel.OneToManyRelation,
-    // The related model. This can be either a MoronModel subclass constructor or an
+    relation: Model.OneToManyRelation,
+    // The related model. This can be either a Model subclass constructor or an
     // absolute file path to a module that exports one. We use the file path version
     // here to prevent require loops.
     modelClass: __dirname + '/Animal',
@@ -451,7 +451,7 @@ Person.relationMappings = {
   },
 
   movies: {
-    relation: MoronModel.ManyToManyRelation,
+    relation: Model.ManyToManyRelation,
     modelClass: __dirname + '/Movie',
     join: {
       from: 'Person.id',
@@ -465,7 +465,7 @@ Person.relationMappings = {
   },
 
   children: {
-    relation: MoronModel.OneToManyRelation,
+    relation: Model.OneToManyRelation,
     modelClass: Person,
     join: {
       from: 'Person.id',

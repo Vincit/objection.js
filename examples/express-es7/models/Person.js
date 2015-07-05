@@ -1,6 +1,6 @@
-import {MoronModel} from 'moron';
+import {Model} from 'moron';
 
-export default class Person extends MoronModel {
+export default class Person extends Model {
   // Table name is the only required property.
   static tableName = 'Person';
   
@@ -32,8 +32,8 @@ export default class Person extends MoronModel {
   // This object defines the relations to other models.
   static relationMappings = {
     pets: {
-      relation: MoronModel.OneToManyRelation,
-      // The related model. This can be either a MoronModel subclass constructor or an
+      relation: Model.OneToManyRelation,
+      // The related model. This can be either a Model subclass constructor or an
       // absolute file path to a module that exports one. We use the file path version
       // here to prevent require loops.
       modelClass: __dirname + '/Animal',
@@ -44,7 +44,7 @@ export default class Person extends MoronModel {
     },
 
     movies: {
-      relation: MoronModel.ManyToManyRelation,
+      relation: Model.ManyToManyRelation,
       modelClass: __dirname + '/Movie',
       join: {
         from: 'Person.id',
@@ -58,7 +58,7 @@ export default class Person extends MoronModel {
     },
 
     children: {
-      relation: MoronModel.OneToManyRelation,
+      relation: Model.OneToManyRelation,
       modelClass: Person,
       join: {
         from: 'Person.id',

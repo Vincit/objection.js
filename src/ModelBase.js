@@ -4,15 +4,15 @@ var _ = require('lodash')
   , tv4 = require('tv4')
   , uuid = require('node-uuid')
   , tv4Formats = require('tv4-formats')
-  , utils = require('./moronUtils')
-  , MoronValidationError = require('./MoronValidationError');
+  , utils = require('./utils')
+  , ValidationError = require('./ValidationError');
 
 // Add validation formats, so that for example the following schema validation works:
 // createTime: {type: 'string', format: 'date-time'}
 tv4.addFormat(tv4Formats);
 
 /**
- * @typedef {Object} MoronModelOptions
+ * @typedef {Object} ModelOptions
  *
  * @property {Boolean} patch
  *    If true the json is treated as a patch and the `required` field of the json schema is
@@ -23,15 +23,15 @@ tv4.addFormat(tv4Formats);
 /**
  * Base class for models.
  *
- * MoronModelBase provides a mechanism for automatic JSON validation and a way to attach
+ * ModelBase provides a mechanism for automatic JSON validation and a way to attach
  * functionality to plain javascript objects. A subclass can be created like this:
  *
  * ```js
  * function Person() {
- *   MoronModelBase.apply(this, arguments);
+ *   ModelBase.apply(this, arguments);
  * }
  *
- * MoronModelBase.extend(Person);
+ * ModelBase.extend(Person);
  *
  * Person.prototype.fullName = function () {
  *   return this.firstName + ' ' + this.lastName;
@@ -47,7 +47,7 @@ tv4.addFormat(tv4Formats);
  * };
  * ```
  *
- * Use `MoronModelBase.from*Json` methods to create models from JSON objects:
+ * Use `ModelBase.from*Json` methods to create models from JSON objects:
  *
  * ```js
  * var person = Person.fromJson({firstName: 'Jennifer', lastName: 'Lawrence'});
@@ -70,7 +70,7 @@ tv4.addFormat(tv4Formats);
  * console.log(person.$toJson()); // --> {firstName: 'Jennifer'}
  * ```
  *
- * MoronModelBase makes it possible to have a different database representation for a model.
+ * ModelBase makes it possible to have a different database representation for a model.
  * For example if your column names are snake_cased in the database but you want to use
  * camelCased properties in the code and outside the server you can do this:
  *
@@ -78,7 +78,7 @@ tv4.addFormat(tv4Formats);
  * // This is called when an object is serialized to database format.
  * Person.prototype.$formatDatabaseJson = function (json) {
  *   // Call superclass implementation.
- *   json = MoronModelBase.prototype.$formatDatabaseJson.call(this, json);
+ *   json = ModelBase.prototype.$formatDatabaseJson.call(this, json);
  *
  *   return _.mapKeys(json, function (value, key) {
  *     return _.snakeCase(key);
@@ -92,13 +92,13 @@ tv4.addFormat(tv4Formats);
  *   });
  *
  *   // Call superclass implementation.
- *   return MoronModelBase.prototype.$parseDatabaseJson.call(this, json);
+ *   return ModelBase.prototype.$parseDatabaseJson.call(this, json);
  * };
  * ```
  *
  * @constructor
  */
-function MoronModelBase() {
+function ModelBase() {
   // Nothing to do here.
 }
 
@@ -113,13 +113,13 @@ function MoronModelBase() {
  * @param {Object} json
  *    The JSON object to be validated.
  *
- * @param {MoronModelOptions=} options
+ * @param {ModelOptions=} options
  *    Optional options.
  *
  * @return {Object}
  *    The (possibly) modified jsonSchema.
  */
-MoronModelBase.prototype.$beforeValidate = function (jsonSchema, json, options) {
+ModelBase.prototype.$beforeValidate = function (jsonSchema, json, options) {
   // This function is never invoked if it hasn't been overridden. And if it has been
   // overridden it is also never called. So to sum up, this method is never called :D.
   /* istanbul ignore next */
@@ -133,19 +133,19 @@ MoronModelBase.prototype.$beforeValidate = function (jsonSchema, json, options) 
  * automatically from `fromJson` and `$setJson` methods. This method can also be
  * called explicitly when needed.
  *
- * @throws {MoronValidationError}
+ * @throws {ValidationError}
  *    If validation fails.
  *
  * @param {Object=} json
  *    If not given ==> this.
  *
- * @param {MoronModelOptions=} options
+ * @param {ModelOptions=} options
  *    Optional options.
  *
  * @return {Object}
  *    The input json
  */
-MoronModelBase.prototype.$validate = function (json, options) {
+ModelBase.prototype.$validate = function (json, options) {
   var ModelClass = this.constructor;
   var jsonSchema = ModelClass.jsonSchema;
   var required;
@@ -158,7 +158,7 @@ MoronModelBase.prototype.$validate = function (json, options) {
   }
 
   // No need to call $beforeValidate (and clone the jsonSchema) if $beforeValidate has not been overwritten.
-  if (this.$beforeValidate !== MoronModelBase.prototype.$beforeValidate) {
+  if (this.$beforeValidate !== ModelBase.prototype.$beforeValidate) {
     jsonSchema = ModelClass.deepCloneJson(jsonSchema);
     jsonSchema = this.$beforeValidate(jsonSchema, json, options);
   }
@@ -187,20 +187,20 @@ MoronModelBase.prototype.$validate = function (json, options) {
 /**
  * This is called after successful validation.
  *
- * You can do further validation here and throw a MoronValidationError if something goes wrong.
+ * You can do further validation here and throw a ValidationError if something goes wrong.
  *
  * @param {Object=} json
  *    The JSON object to validate.
  *
- * @param {MoronModelOptions=} options
+ * @param {ModelOptions=} options
  *    Optional options.
  */
-MoronModelBase.prototype.$afterValidate = function (json, options) {
+ModelBase.prototype.$afterValidate = function (json, options) {
   // Do nothing by default.
 };
 
 /**
- * This is called when a MoronModelBase is created from a database JSON object.
+ * This is called when a ModelBase is created from a database JSON object.
  *
  * Converts the JSON object from the database format to the internal format.
  *
@@ -217,12 +217,12 @@ MoronModelBase.prototype.$afterValidate = function (json, options) {
  * @return {Object}
  *    The JSON object in internal format.
  */
-MoronModelBase.prototype.$parseDatabaseJson = function (json) {
+ModelBase.prototype.$parseDatabaseJson = function (json) {
   return json;
 };
 
 /**
- * This is called when a MoronModelBase is converted to database format.
+ * This is called when a ModelBase is converted to database format.
  *
  * Converts the JSON object from the internal format to the database format.
  *
@@ -234,12 +234,12 @@ MoronModelBase.prototype.$parseDatabaseJson = function (json) {
  * @return {Object}
  *    The JSON object in database format.
  */
-MoronModelBase.prototype.$formatDatabaseJson = function (json) {
+ModelBase.prototype.$formatDatabaseJson = function (json) {
   return json;
 };
 
 /**
- * This is called when a MoronModelBase is created from a JSON object.
+ * This is called when a ModelBase is created from a JSON object.
  *
  * Converts the JSON object to the internal format.
  *
@@ -248,18 +248,18 @@ MoronModelBase.prototype.$formatDatabaseJson = function (json) {
  * @param {Object} json
  *    The JSON object in external format.
  *
- * @param {MoronModelOptions=} options
+ * @param {ModelOptions=} options
  *    Optional options.
  *
  * @return {Object}
  *    The JSON object in internal format.
  */
-MoronModelBase.prototype.$parseJson = function (json, options) {
+ModelBase.prototype.$parseJson = function (json, options) {
   return json;
 };
 
 /**
- * This is called when a MoronModelBase is converted to JSON.
+ * This is called when a ModelBase is converted to JSON.
  *
  * @note Remember to call the super class's implementation.
  *
@@ -269,7 +269,7 @@ MoronModelBase.prototype.$parseJson = function (json, options) {
  * @return {Object}
  *    The JSON object in external format.
  */
-MoronModelBase.prototype.$formatJson = function (json) {
+ModelBase.prototype.$formatJson = function (json) {
   return json;
 };
 
@@ -281,7 +281,7 @@ MoronModelBase.prototype.$formatJson = function (json) {
  * @return {Object}
  *    This model as a JSON object in database format.
  */
-MoronModelBase.prototype.$toDatabaseJson = function () {
+ModelBase.prototype.$toDatabaseJson = function () {
   return this.$$toJson(true);
 };
 
@@ -293,7 +293,7 @@ MoronModelBase.prototype.$toDatabaseJson = function () {
  * @return {Object}
  *    This model as a JSON object.
  */
-MoronModelBase.prototype.$toJson = function () {
+ModelBase.prototype.$toJson = function () {
   return this.$$toJson(false);
 };
 
@@ -302,7 +302,7 @@ MoronModelBase.prototype.$toJson = function () {
  *
  * For JSON.stringify compatibility.
  */
-MoronModelBase.prototype.toJSON = function () {
+ModelBase.prototype.toJSON = function () {
   return this.$toJson();
 };
 
@@ -314,13 +314,13 @@ MoronModelBase.prototype.toJSON = function () {
  * @param {Object} json
  *    The JSON object to set.
  *
- * @param {MoronModelOptions=} options
+ * @param {ModelOptions=} options
  *    Optional options.
  *
- * @throws MoronValidationError
+ * @throws ValidationError
  *    If validation fails.
  */
-MoronModelBase.prototype.$setJson = function (json, options) {
+ModelBase.prototype.$setJson = function (json, options) {
   json = json || {};
   options = options || {};
   var ModelClass = this.constructor;
@@ -347,7 +347,7 @@ MoronModelBase.prototype.$setJson = function (json, options) {
  * @param {Object} json
  *    The JSON object in database format.
  */
-MoronModelBase.prototype.$setDatabaseJson = function (json) {
+ModelBase.prototype.$setDatabaseJson = function (json) {
   json = this.$parseDatabaseJson(json || {});
   var ModelClass = this.constructor;
 
@@ -371,7 +371,7 @@ MoronModelBase.prototype.$setDatabaseJson = function (json) {
  *
  * @type {Object}
  */
-MoronModelBase.jsonSchema = null;
+ModelBase.jsonSchema = null;
 
 /**
  * Makes the given constructor a subclass of this class.
@@ -379,9 +379,9 @@ MoronModelBase.jsonSchema = null;
  * @param {function=} subclassConstructor
  * @return {function}
  */
-MoronModelBase.extend = function (subclassConstructor) {
+ModelBase.extend = function (subclassConstructor) {
   if (_.isEmpty(subclassConstructor.name)) {
-    throw new Error('Each MoronModelBase subclass constructor must have a name');
+    throw new Error('Each ModelBase subclass constructor must have a name');
   }
 
   utils.inherits(subclassConstructor, this);
@@ -396,13 +396,13 @@ MoronModelBase.extend = function (subclassConstructor) {
  * @param {Object=} json
  *    The JSON from which to create the model.
  *
- * @param {MoronModelOptions=} options
+ * @param {ModelOptions=} options
  *    Optional options.
  *
- * @throws MoronValidationError
+ * @throws ValidationError
  *    If validation fails.
  */
-MoronModelBase.fromJson = function (json, options) {
+ModelBase.fromJson = function (json, options) {
   var model = new this();
   model.$setJson(json || {}, options);
   return model;
@@ -414,7 +414,7 @@ MoronModelBase.fromJson = function (json, options) {
  * @param {Object=} json
  *    The JSON from which to create the model.
  */
-MoronModelBase.fromDatabaseJson = function (json) {
+ModelBase.fromDatabaseJson = function (json) {
   var model = new this();
   model.$setDatabaseJson(json || {});
   return model;
@@ -423,7 +423,7 @@ MoronModelBase.fromDatabaseJson = function (json) {
 /**
  * Takes a deep clone of a pure JSON object.
  */
-MoronModelBase.deepCloneJson = function (json) {
+ModelBase.deepCloneJson = function (json) {
   return _.cloneDeep(json);
 };
 
@@ -436,11 +436,11 @@ MoronModelBase.deepCloneJson = function (json) {
  * @param {Object} object
  * @param {String} key
  */
-MoronModelBase.hasOwnJsonProperty = function (object, key) {
+ModelBase.hasOwnJsonProperty = function (object, key) {
   return object.hasOwnProperty(key) && key.charAt(0) !== '$' && !_.isFunction(object[key]);
 };
 
-MoronModelBase.columnNameToPropertyName = function (columnName) {
+ModelBase.columnNameToPropertyName = function (columnName) {
   var row = {};
   var value = uuid.v4();
 
@@ -461,12 +461,12 @@ MoronModelBase.columnNameToPropertyName = function (columnName) {
 /**
  * Returns a deep copy of this model.
  *
- * If this object has instances of MoronModelBase as properties (or arrays of them)
+ * If this object has instances of ModelBase as properties (or arrays of them)
  * they are cloned using their `.$clone()` method.
  *
- * @return {MoronModelBase}
+ * @return {ModelBase}
  */
-MoronModelBase.prototype.$clone = function () {
+ModelBase.prototype.$clone = function () {
   var ModelClass = this.constructor;
   var copy = new ModelClass();
 
@@ -480,7 +480,7 @@ MoronModelBase.prototype.$clone = function () {
       var arr = [];
 
       for (var i = 0, l = value.length; i < l; ++i) {
-        if (value[i] instanceof MoronModelBase) {
+        if (value[i] instanceof ModelBase) {
           arr.push(value[i].$clone());
         } else {
           arr.push(ModelClass.deepCloneJson(value[i]));
@@ -489,7 +489,7 @@ MoronModelBase.prototype.$clone = function () {
 
       copy[key] = arr;
     } else if (_.isObject(value)) {
-      if (value instanceof MoronModelBase) {
+      if (value instanceof ModelBase) {
         copy[key] = value.$clone();
       } else {
         copy[key] = ModelClass.deepCloneJson(value);
@@ -505,7 +505,7 @@ MoronModelBase.prototype.$clone = function () {
 /**
  * @private
  */
-MoronModelBase.prototype.$$toJson = function (createDbJson) {
+ModelBase.prototype.$$toJson = function (createDbJson) {
   var ModelClass = this.constructor;
   var json = {};
 
@@ -519,7 +519,7 @@ MoronModelBase.prototype.$$toJson = function (createDbJson) {
       var arr = [];
 
       for (var i = 0, l = value.length; i < l; ++i) {
-        if (value[i] instanceof MoronModelBase) {
+        if (value[i] instanceof ModelBase) {
           arr.push(value[i].$$toJson(createDbJson));
         } else {
           arr.push(ModelClass.deepCloneJson(value[i]));
@@ -528,7 +528,7 @@ MoronModelBase.prototype.$$toJson = function (createDbJson) {
 
       json[key] = arr;
     } else if (_.isObject(value)) {
-      if (value instanceof MoronModelBase) {
+      if (value instanceof ModelBase) {
         json[key] = value.$$toJson(createDbJson);
       } else {
         json[key] = ModelClass.deepCloneJson(value);
@@ -548,7 +548,7 @@ MoronModelBase.prototype.$$toJson = function (createDbJson) {
 /**
  * @private
  */
-MoronModelBase.$$mergeWithDefaults = function (json) {
+ModelBase.$$mergeWithDefaults = function (json) {
   var jsonSchema = this.jsonSchema;
   var merged = null;
 
@@ -587,7 +587,7 @@ MoronModelBase.$$mergeWithDefaults = function (json) {
 /**
  * @private
  */
-MoronModelBase.prototype.$$parseValidationError = function (report) {
+ModelBase.prototype.$$parseValidationError = function (report) {
   var errorHash = {};
   var index = 0;
 
@@ -614,7 +614,7 @@ MoronModelBase.prototype.$$parseValidationError = function (report) {
     errorHash[key] = error.message;
   }
 
-  return new MoronValidationError(errorHash);
+  return new ValidationError(errorHash);
 };
 
-module.exports = MoronModelBase;
+module.exports = ModelBase;

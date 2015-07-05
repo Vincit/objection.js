@@ -15,7 +15,7 @@ export default function (app) {
 
 
   // Patch a Person.
-  app.patch('/persons/:id', async function (req, res, next) {
+  app.patch('/persons/:id', async function (req, res) {
     let person = await Person
       .query()
       .where('id', req.params.id)
@@ -28,7 +28,7 @@ export default function (app) {
   // Get all Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
-  app.get('/persons', async function (req, res, next) {
+  app.get('/persons', async function (req, res) {
     // We don't need to check for the existence of the query parameters.
     // The query builder methods do nothing if one of the values is undefined.
     let persons = await Person
@@ -44,7 +44,7 @@ export default function (app) {
 
 
   // Delete a person.
-  app.delete('/persons/:id', async function (req, res, next) {
+  app.delete('/persons/:id', async function (req, res) {
     await Person
       .query()
       .delete()
@@ -55,7 +55,7 @@ export default function (app) {
 
 
   // Add a child for a Person.
-  app.post('/persons/:id/children', async function (req, res, next) {
+  app.post('/persons/:id/children', async function (req, res) {
     let person = await Person
       .query()
       .where('id', req.params.id)
@@ -74,7 +74,7 @@ export default function (app) {
 
 
   // Add a pet for a Person.
-  app.post('/persons/:id/pets', async function (req, res, next) {
+  app.post('/persons/:id/pets', async function (req, res) {
     let person = await Person
       .query()
       .where('id', req.params.id)
@@ -94,7 +94,7 @@ export default function (app) {
 
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
-  app.get('/persons/:id/pets', async function (req, res, next) {
+  app.get('/persons/:id/pets', async function (req, res) {
     let person = await Person
       .query()
       .where('id', req.params.id)
@@ -116,7 +116,7 @@ export default function (app) {
 
 
   // Add a movie for a Person.
-  app.post('/persons/:id/movies', async function (req, res, next) {
+  app.post('/persons/:id/movies', async function (req, res) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
     var movie = await moron.transaction(Person, async function (Person) {
@@ -139,7 +139,7 @@ export default function (app) {
 
 
   // Add existing Person as an actor to a movie.
-  app.post('/movies/:id/actors', async function (req, res, next) {
+  app.post('/movies/:id/actors', async function (req, res) {
     let movie = await Movie
       .query()
       .where('id', req.params.id)
@@ -158,7 +158,7 @@ export default function (app) {
 
 
   // Get Movie's actors.
-  app.get('/movies/:id/actors', async function (req, res, next) {
+  app.get('/movies/:id/actors', async function (req, res) {
     let movie = await Movie
       .query()
       .where('id', req.params.id)

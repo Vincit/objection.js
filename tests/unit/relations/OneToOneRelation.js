@@ -2,11 +2,11 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , MoronModel = require('../../../src/MoronModel')
-  , MoronQueryBuilder = require('../../../src/MoronQueryBuilder')
-  , MoronOneToOneRelation = require('../../../src/relations/MoronOneToOneRelation');
+  , Model = require('../../../src/Model')
+  , QueryBuilder = require('../../../src/QueryBuilder')
+  , OneToOneRelation = require('../../../src/relations/OneToOneRelation');
 
-describe('MoronOneToOneRelation', function () {
+describe('OneToOneRelation', function () {
   var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];
   var executedQueries = [];
@@ -32,12 +32,12 @@ describe('MoronOneToOneRelation', function () {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = MoronModel.extend(function Model () {
-      MoronModel.apply(this, arguments);
+    OwnerModel = Model.extend(function OwnerModel () {
+      Model.apply(this, arguments);
     });
 
-    RelatedModel = MoronModel.extend(function Model () {
-      MoronModel.apply(this, arguments);
+    RelatedModel = Model.extend(function RelatedModel () {
+      Model.apply(this, arguments);
     });
 
     OwnerModel.tableName = 'OwnerModel';
@@ -48,10 +48,10 @@ describe('MoronOneToOneRelation', function () {
   });
 
   beforeEach(function () {
-    relation = new MoronOneToOneRelation('nameOfOurRelation', OwnerModel);
+    relation = new OneToOneRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
-      relation: MoronOneToOneRelation,
+      relation: OneToOneRelation,
       join: {
         from: 'OwnerModel.relatedId',
         to: 'RelatedModel.rid'
@@ -66,7 +66,7 @@ describe('MoronOneToOneRelation', function () {
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
           relation.find(this, owner);
@@ -86,7 +86,7 @@ describe('MoronOneToOneRelation', function () {
       mockKnexQueryResults = [expectedResult];
       var owners = [OwnerModel.fromJson({id: 666, relatedId: 2}), OwnerModel.fromJson({id: 667, relatedId: 3})];
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
           relation.find(this, owners);
@@ -108,7 +108,7 @@ describe('MoronOneToOneRelation', function () {
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
           relation.find(this, owner);
@@ -134,7 +134,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666});
       var related = [RelatedModel.fromJson({a: 'str1', rid: 2})];
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
@@ -157,7 +157,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666});
       var related = [{a: 'str1', rid: 2}];
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
@@ -180,7 +180,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666});
       var related = RelatedModel.fromJson({a: 'str1', rid: 2});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
@@ -203,7 +203,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666});
       var related = {a: 'str1', rid: 2};
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
@@ -228,7 +228,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = RelatedModel.fromJson({a: 'str1'});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .updateImpl(function (updt) {
           relation.update(this, owner, updt);
@@ -246,7 +246,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = {a: 'str1'};
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .updateImpl(function (updt) {
           relation.update(this, owner, updt);
@@ -263,7 +263,7 @@ describe('MoronOneToOneRelation', function () {
     it('should work with increment', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .updateImpl(function (updt) {
           relation.update(this, owner, updt);
@@ -279,7 +279,7 @@ describe('MoronOneToOneRelation', function () {
     it('should work with decrement', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .updateImpl(function (updt) {
           relation.update(this, owner, updt);
@@ -300,7 +300,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
@@ -327,7 +327,7 @@ describe('MoronOneToOneRelation', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var patch = {a: 'str1'};
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
@@ -344,7 +344,7 @@ describe('MoronOneToOneRelation', function () {
     it('should work with increment', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
@@ -360,7 +360,7 @@ describe('MoronOneToOneRelation', function () {
     it('should work with decrement', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
@@ -380,7 +380,7 @@ describe('MoronOneToOneRelation', function () {
     it('should generate a delete query', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .deleteImpl(function () {
           relation.delete(this, owner);
@@ -400,7 +400,7 @@ describe('MoronOneToOneRelation', function () {
     it('should generate a relate query', function () {
       var owner = OwnerModel.fromJson({id: 666});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .relateImpl(function (ids) {
           relation.relate(this, owner, ids);
@@ -416,7 +416,7 @@ describe('MoronOneToOneRelation', function () {
     it('should accept one id', function () {
       var owner = OwnerModel.fromJson({id: 666});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .relateImpl(function (ids) {
           relation.relate(this, owner, ids);
@@ -436,7 +436,7 @@ describe('MoronOneToOneRelation', function () {
     it('should generate a unrelate query', function () {
       var owner = OwnerModel.fromJson({id: 666, relatedId: 123});
 
-      return MoronQueryBuilder
+      return QueryBuilder
         .forClass(RelatedModel)
         .unrelateImpl(function () {
           relation.unrelate(this, owner);

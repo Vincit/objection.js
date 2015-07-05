@@ -1,13 +1,13 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var expectPartEql = require('./utils').expectPartialEqual;
-var MoronValidationError = require('../../src/MoronValidationError');
+var ValidationError = require('../../src/ValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('MoronModel patch queries', function () {
+  describe('Model patch queries', function () {
 
     describe('.query().patch()', function () {
 
@@ -128,7 +128,7 @@ module.exports = function (session) {
             done(new Error('should not get here'));
           })
           .catch(function (err) {
-            expect(err).to.be.a(MoronValidationError);
+            expect(err).to.be.a(ValidationError);
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {

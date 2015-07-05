@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>moron.js Class: MoronModel</title>
+	<title>moron.js Class: Model</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -28,23 +28,23 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
-							<a href="MoronModel.html">MoronModel</a>
+							<a href="Model.html">Model</a>
 						</li>
 						
 						<li>
-							<a href="MoronModelBase.html">MoronModelBase</a>
+							<a href="ModelBase.html">ModelBase</a>
 						</li>
 						
 						<li>
-							<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>
+							<a href="QueryBuilder.html">QueryBuilder</a>
 						</li>
 						
 						<li>
-							<a href="MoronRelationExpression.html">MoronRelationExpression</a>
+							<a href="RelationExpression.html">RelationExpression</a>
 						</li>
 						
 						<li>
-							<a href="MoronValidationError.html">MoronValidationError</a>
+							<a href="ValidationError.html">ValidationError</a>
 						</li>
 						
 
@@ -86,12 +86,12 @@
 					
 
 
-	<!--<h1 class="page-title">Class: MoronModel</h1>-->
+	<!--<h1 class="page-title">Class: Model</h1>-->
 <section>
 
 <header>
     <h2>
-    MoronModel
+    Model
     </h2>
     
 </header>
@@ -113,13 +113,13 @@
     <div class="description">
         <p>Subclasses of this class represent database tables.</p>
 <p>Subclass can be created like this:</p>
-<pre class="prettyprint source lang-js"><code>  var MoronModel = require('moron').MoronModel;
+<pre class="prettyprint source lang-js"><code>  var Model = require('moron').Model;
 
   function Person() {
-    MoronModel.apply(this, arguments);
+    Model.apply(this, arguments);
   }
 
-  MoronModel.extend(Person);
+  Model.extend(Person);
   module.exports = Person;
 
   // Table name is the only required property.
@@ -153,8 +153,8 @@
   // This object defines the relations to other models.
   Person.relationMappings = {
     pets: {
-      relation: MoronModel.OneToManyRelation,
-      // The related model. This can be either a MoronModel subclass constructor or an
+      relation: Model.OneToManyRelation,
+      // The related model. This can be either a Model subclass constructor or an
       // absolute file path to a module that exports one. We use the file path version
       // here to prevent require loops.
       modelClass: __dirname + '/Animal',
@@ -165,7 +165,7 @@
     },
 
     movies: {
-      relation: MoronModel.ManyToManyRelation,
+      relation: Model.ManyToManyRelation,
       modelClass: __dirname + '/Movie',
       join: {
         from: 'Person.id',
@@ -179,7 +179,7 @@
     },
 
     children: {
-      relation: MoronModel.OneToManyRelation,
+      relation: Model.OneToManyRelation,
       modelClass: Person,
       join: {
         from: 'Person.id',
@@ -248,7 +248,7 @@
         <h3 class="subsection-title">Extends</h3>
 
         <ul>
-            <li><a href="MoronModelBase.html">MoronModelBase</a></li>
+            <li><a href="ModelBase.html">ModelBase</a></li>
         </ul>
     
 
@@ -436,7 +436,7 @@ console.log(dbRow);
     <h4 class="name" id="_P_ManyToManyRelation">
       <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
       <span class="content">ManyToManyRelation</span>
-      <span class="signature-container"><span class="type-signature"> :<a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a></span></span>
+      <span class="signature-container"><span class="type-signature"> :<a href="ManyToManyRelation.html">ManyToManyRelation</a></span></span>
     </h4>
 
     
@@ -453,7 +453,7 @@ console.log(dbRow);
         <ul>
             <li>
                 
-<span class="param-type"><a href="MoronManyToManyRelation.html">MoronManyToManyRelation</a></span>
+<span class="param-type"><a href="ManyToManyRelation.html">ManyToManyRelation</a></span>
 
 
             </li>
@@ -503,7 +503,7 @@ console.log(dbRow);
     <h4 class="name" id="_P_OneToManyRelation">
       <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
       <span class="content">OneToManyRelation</span>
-      <span class="signature-container"><span class="type-signature"> :<a href="MoronOneToManyRelation.html">MoronOneToManyRelation</a></span></span>
+      <span class="signature-container"><span class="type-signature"> :<a href="OneToManyRelation.html">OneToManyRelation</a></span></span>
     </h4>
 
     
@@ -520,7 +520,7 @@ console.log(dbRow);
         <ul>
             <li>
                 
-<span class="param-type"><a href="MoronOneToManyRelation.html">MoronOneToManyRelation</a></span>
+<span class="param-type"><a href="OneToManyRelation.html">OneToManyRelation</a></span>
 
 
             </li>
@@ -570,7 +570,7 @@ console.log(dbRow);
     <h4 class="name" id="_P_OneToOneRelation">
       <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
       <span class="content">OneToOneRelation</span>
-      <span class="signature-container"><span class="type-signature"> :<a href="MoronOneToOneRelation.html">MoronOneToOneRelation</a></span></span>
+      <span class="signature-container"><span class="type-signature"> :<a href="OneToOneRelation.html">OneToOneRelation</a></span></span>
     </h4>
 
     
@@ -587,7 +587,7 @@ console.log(dbRow);
         <ul>
             <li>
                 
-<span class="param-type"><a href="MoronOneToOneRelation.html">MoronOneToOneRelation</a></span>
+<span class="param-type"><a href="OneToOneRelation.html">OneToOneRelation</a></span>
 
 
             </li>
@@ -637,7 +637,7 @@ console.log(dbRow);
     <h4 class="name" id="_P_relationMappings">
       <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
       <span class="content">relationMappings</span>
-      <span class="signature-container"><span class="type-signature"> :Object.&lt;String, <a href="global.html#MoronRelationMapping">MoronRelationMapping</a>></span></span>
+      <span class="signature-container"><span class="type-signature"> :Object.&lt;String, <a href="global.html#RelationMapping">RelationMapping</a>></span></span>
     </h4>
 
     
@@ -650,7 +650,7 @@ console.log(dbRow);
 do this is by example:</p>
 <pre class="prettyprint source lang-js"><code>Person.relationMappings = {
   pets: {
-    relation: MoronModel.OneToManyRelation,
+    relation: Model.OneToManyRelation,
     modelClass: Animal,
     join: {
       from: 'Person.id',
@@ -659,7 +659,7 @@ do this is by example:</p>
   },
 
   father: {
-    relation: MoronModel.OneToOneRelation,
+    relation: Model.OneToOneRelation,
     modelClass: Person,
     join: {
       from: 'Person.fatherId',
@@ -668,7 +668,7 @@ do this is by example:</p>
   },
 
   movies: {
-    relation: MoronModel.ManyToManyRelation,
+    relation: Model.ManyToManyRelation,
     modelClass: Movie,
     join: {
       from: 'Person.id',
@@ -686,7 +686,7 @@ models are associated. Note that neither of these columns need to be primary key
 columns!. In the case of ManyToManyRelation also the join table needs to be defined. This is
 done using the <code>through</code> object.</p>
 <p>The <code>modelClass</code> passed to the relation mappings is the class of the related model. It can be either
-a MoronModel subclass constructor or an absolute path to a module that exports one. Using file paths
+a Model subclass constructor or an absolute path to a module that exports one. Using file paths
 is a handy way to prevent require loops.</p>
     </div>
     
@@ -696,7 +696,7 @@ is a handy way to prevent require loops.</p>
         <ul>
             <li>
                 
-<span class="param-type">Object.&lt;String, <a href="global.html#MoronRelationMapping">MoronRelationMapping</a>></span>
+<span class="param-type">Object.&lt;String, <a href="global.html#RelationMapping">RelationMapping</a>></span>
 
 
             </li>
@@ -832,7 +832,7 @@ is a handy way to prevent require loops.</p>
         <h4 class="name" id="_P_bindKnex">
           <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
           <span class="content">bindKnex</span>
-          <span class="signature-container"><span class="signature">(knex)</span><span class="type-signature"> &rarr; {<a href="MoronModel.html">MoronModel</a>}</span></span>
+          <span class="signature-container"><span class="signature">(knex)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span></span>
         </h4>
     
     
@@ -843,7 +843,7 @@ is a handy way to prevent require loops.</p>
     
     <div class="description">
         <p>Creates a subclass of this class that is bound to the given knex.</p>
-<p>This method can be used to bind a MoronModel subclass to multiple databases for example in
+<p>This method can be used to bind a Model subclass to multiple databases for example in
 a multi tenant system.</p>
 <p>Example:</p>
 <pre class="prettyprint source lang-js"><code>var knex1 = require('knex')({
@@ -989,7 +989,7 @@ BoundModel2.query().then(function (models) {
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+<span class="param-type"><a href="Model.html">Model</a></span>
 
 
 	</dd>
@@ -1010,7 +1010,7 @@ BoundModel2.query().then(function (models) {
         <h4 class="name" id="_P_ensureModel">
           <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
           <span class="content">ensureModel</span>
-          <span class="signature-container"><span class="signature">(model, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {<a href="MoronModel.html">MoronModel</a>}</span></span>
+          <span class="signature-container"><span class="signature">(model, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span></span>
         </h4>
     
     
@@ -1063,7 +1063,7 @@ BoundModel2.query().then(function (models) {
             <td class="type">
             
                 
-<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+<span class="param-type"><a href="Model.html">Model</a></span>
 |
 
 <span class="param-type">Object</span>
@@ -1097,7 +1097,7 @@ BoundModel2.query().then(function (models) {
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -1178,7 +1178,7 @@ BoundModel2.query().then(function (models) {
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronModel.html">MoronModel</a></span>
+<span class="param-type"><a href="Model.html">Model</a></span>
 
 
 	</dd>
@@ -1199,7 +1199,7 @@ BoundModel2.query().then(function (models) {
         <h4 class="name" id="_P_ensureModelArray">
           <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
           <span class="content">ensureModelArray</span>
-          <span class="signature-container"><span class="signature">(input, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="MoronModel.html">MoronModel</a>>}</span></span>
+          <span class="signature-container"><span class="signature">(input, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="Model.html">Model</a>>}</span></span>
         </h4>
     
     
@@ -1252,7 +1252,7 @@ BoundModel2.query().then(function (models) {
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;(<a href="MoronModel.html">MoronModel</a>|Object)></span>
+<span class="param-type">Array.&lt;(<a href="Model.html">Model</a>|Object)></span>
 
 
             
@@ -1283,7 +1283,7 @@ BoundModel2.query().then(function (models) {
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -1364,7 +1364,7 @@ BoundModel2.query().then(function (models) {
 	</dt>
 	<dd>
 		
-<span class="param-type">Array.&lt;<a href="MoronModel.html">MoronModel</a>></span>
+<span class="param-type">Array.&lt;<a href="Model.html">Model</a>></span>
 
 
 	</dd>
@@ -1670,7 +1670,7 @@ name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJ
         <h4 class="name" id="_P_getRelation">
           <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
           <span class="content">getRelation</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronRelation.html">MoronRelation</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Relation.html">Relation</a>}</span></span>
         </h4>
     
     
@@ -1743,7 +1743,7 @@ name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJ
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronRelation.html">MoronRelation</a></span>
+<span class="param-type"><a href="Relation.html">Relation</a></span>
 
 
 	</dd>
@@ -1764,7 +1764,7 @@ name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJ
         <h4 class="name" id="_P_getRelations">
           <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
           <span class="content">getRelations</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object.&lt;String, <a href="MoronRelation.html">MoronRelation</a>>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object.&lt;String, <a href="Relation.html">Relation</a>>}</span></span>
         </h4>
     
     
@@ -1836,7 +1836,7 @@ name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJ
 	</dt>
 	<dd>
 		
-<span class="param-type">Object.&lt;String, <a href="MoronRelation.html">MoronRelation</a>></span>
+<span class="param-type">Object.&lt;String, <a href="Relation.html">Relation</a>></span>
 
 
 	</dd>
@@ -1867,9 +1867,9 @@ name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJ
     
     
     <div class="description">
-        <p>Get/Set the knex connection for this model class.</p>
-<p>Subclasses inherit the connection. A system-wide knex instance can be set by calling
-<code>MoronModel.knex(knex)</code>. This works even after subclasses have been created.</p>
+        <p>Get/Set the knex instance for this model class.</p>
+<p>Subclasses inherit the connection. A system-wide knex instance can thus be set by calling
+<code>Model.knex(knex)</code>. This works even after subclasses have been created.</p>
 <pre class="prettyprint source lang-js"><code>var knex = require('knex')({
   client: 'sqlite3',
   connection: {
@@ -1877,8 +1877,8 @@ name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJ
   }
 });
 
-MoronModel.knex(knex);
-knex = MoronModel.knex();</code></pre>
+Model.knex(knex);
+knex = Model.knex();</code></pre>
     </div>
     
 
@@ -2172,7 +2172,7 @@ knex = MoronModel.knex();</code></pre>
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;(<a href="MoronModel.html">MoronModel</a>|Object)></span>
+<span class="param-type">Array.&lt;(<a href="Model.html">Model</a>|Object)></span>
 
 
             
@@ -2198,7 +2198,7 @@ knex = MoronModel.knex();</code></pre>
 <span class="param-type">String</span>
 |
 
-<span class="param-type"><a href="MoronRelationExpression.html">MoronRelationExpression</a></span>
+<span class="param-type"><a href="RelationExpression.html">RelationExpression</a></span>
 
 
             
@@ -2290,7 +2290,7 @@ knex = MoronModel.knex();</code></pre>
         <h4 class="name" id="_P_query">
           <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
           <span class="content">query</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2302,8 +2302,9 @@ knex = MoronModel.knex();</code></pre>
     <div class="description">
         <p>Creates a query builder for this table.</p>
 <p>The returned query builder has all the methods a <em>knex</em> query builder has. See
-<a href="MoronQueryBuilder.html">MoronQueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+<a href="QueryBuilder.html">QueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
 for more information.</p>
+<p>Examples:</p>
 <p>Read models from the database:</p>
 <pre class="prettyprint source lang-js"><code>// Get all rows.
 Person.query().then(function(allPersons) {
@@ -2440,7 +2441,7 @@ any <em>knex</em> methods:</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
 
 
 	</dd>
@@ -2476,7 +2477,7 @@ any <em>knex</em> methods:</p>
     
     <div class="description">
         <p>This is called after successful validation.</p>
-<p>You can do further validation here and throw a MoronValidationError if something goes wrong.</p>
+<p>You can do further validation here and throw a ValidationError if something goes wrong.</p>
     </div>
     
 
@@ -2551,7 +2552,7 @@ any <em>knex</em> methods:</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -2593,7 +2594,7 @@ any <em>knex</em> methods:</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$afterValidate">MoronModelBase#$afterValidate</a>
+				<a href="ModelBase.html#$afterValidate">ModelBase#$afterValidate</a>
 			</li>
 		</ul>
 	</dd>
@@ -2758,7 +2759,7 @@ any <em>knex</em> methods:</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -2800,7 +2801,7 @@ any <em>knex</em> methods:</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$beforeValidate">MoronModelBase#$beforeValidate</a>
+				<a href="ModelBase.html#$beforeValidate">ModelBase#$beforeValidate</a>
 			</li>
 		</ul>
 	</dd>
@@ -2873,7 +2874,7 @@ any <em>knex</em> methods:</p>
         <h4 class="name" id="Sclone">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$clone</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronModelBase.html">MoronModelBase</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ModelBase.html">ModelBase</a>}</span></span>
         </h4>
     
     
@@ -2884,7 +2885,7 @@ any <em>knex</em> methods:</p>
     
     <div class="description">
         <p>Returns a deep copy of this model.</p>
-<p>If this object has instances of MoronModelBase as properties (or arrays of them)
+<p>If this object has instances of ModelBase as properties (or arrays of them)
 they are cloned using their <code>.$clone()</code> method.</p>
     </div>
     
@@ -2908,7 +2909,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$clone">MoronModelBase#$clone</a>
+				<a href="ModelBase.html#$clone">ModelBase#$clone</a>
 			</li>
 		</ul>
 	</dd>
@@ -2956,7 +2957,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronModelBase.html">MoronModelBase</a></span>
+<span class="param-type"><a href="ModelBase.html">ModelBase</a></span>
 
 
 	</dd>
@@ -2987,7 +2988,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is converted to database format.</p>
+        <p>This is called when a ModelBase is converted to database format.</p>
 <p>Converts the JSON object from the internal format to the database format.</p>
     </div>
     
@@ -3060,7 +3061,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$formatDatabaseJson">MoronModelBase#$formatDatabaseJson</a>
+				<a href="ModelBase.html#$formatDatabaseJson">ModelBase#$formatDatabaseJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -3143,7 +3144,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is converted to JSON.</p>
+        <p>This is called when a ModelBase is converted to JSON.</p>
     </div>
     
 
@@ -3215,7 +3216,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$formatJson">MoronModelBase#$formatJson</a>
+				<a href="ModelBase.html#$formatJson">ModelBase#$formatJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -3460,7 +3461,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
     
     
     <div class="description">
-        <p>Loads related models using a <a href="MoronRelationExpression.html">MoronRelationExpression</a>.</p>
+        <p>Loads related models using a <a href="RelationExpression.html">RelationExpression</a>.</p>
 <p>Example:</p>
 <pre class="prettyprint source"><code>jennifer.$loadRelated('[pets, children.[pets, father]]').then(function (jennifer) {
   console.log('Jennifer has', jennifer.pets.length, 'pets');
@@ -3510,7 +3511,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
 <span class="param-type">String</span>
 |
 
-<span class="param-type"><a href="MoronRelationExpression.html">MoronRelationExpression</a></span>
+<span class="param-type"><a href="RelationExpression.html">RelationExpression</a></span>
 
 
             
@@ -3559,7 +3560,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="MoronRelationExpression.html">MoronRelationExpression</a> for more examples on relation expressions.</li>
+			<li><a href="RelationExpression.html">RelationExpression</a> for more examples on relation expressions.</li>
 			</ul>
 	</dd>
 	
@@ -3619,7 +3620,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is created from a database JSON object.</p>
+        <p>This is called when a ModelBase is created from a database JSON object.</p>
 <p>Converts the JSON object from the database format to the internal format.</p>
     </div>
     
@@ -3692,7 +3693,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$parseDatabaseJson">MoronModelBase#$parseDatabaseJson</a>
+				<a href="ModelBase.html#$parseDatabaseJson">ModelBase#$parseDatabaseJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -3775,7 +3776,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is created from a JSON object.</p>
+        <p>This is called when a ModelBase is created from a JSON object.</p>
 <p>Converts the JSON object to the internal format.</p>
     </div>
     
@@ -3849,7 +3850,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -3891,7 +3892,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$parseJson">MoronModelBase#$parseJson</a>
+				<a href="ModelBase.html#$parseJson">ModelBase#$parseJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -3964,7 +3965,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
         <h4 class="name" id="Squery">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$query</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3976,7 +3977,7 @@ model.id = 100;</code></pre><p>This method is just a helper for the cases where 
     <div class="description">
         <p>Creates a query builder for this model instance.</p>
 <p>The returned query builder has all the methods a <em>knex</em> query builder has. See
-<a href="MoronQueryBuilder.html">MoronQueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+<a href="QueryBuilder.html">QueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
 for more information.</p>
 <p>All queries built using the returned builder only affect this instance.</p>
 <p>Examples:</p>
@@ -4054,7 +4055,7 @@ for more information.</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
 
 
 	</dd>
@@ -4075,7 +4076,7 @@ for more information.</p>
         <h4 class="name" id="SrelatedQuery">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$relatedQuery</span>
-          <span class="signature-container"><span class="signature">(relationName)</span><span class="type-signature"> &rarr; {<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(relationName)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -4087,7 +4088,7 @@ for more information.</p>
     <div class="description">
         <p>Use this to build a query that only affects the models related to this instance through a relation.</p>
 <p>The returned query builder has all the methods a <em>knex</em> query builder has. See
-<a href="MoronQueryBuilder.html">MoronQueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+<a href="QueryBuilder.html">QueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
 for more information.</p>
 <p>Examples:</p>
 <p>Fetch all models related to this instance through a relation. The fetched models are
@@ -4272,7 +4273,7 @@ jennifer
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronQueryBuilder.html">MoronQueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
 
 
 	</dd>
@@ -4376,7 +4377,7 @@ jennifer
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$setDatabaseJson">MoronModelBase#$setDatabaseJson</a>
+				<a href="ModelBase.html#$setDatabaseJson">ModelBase#$setDatabaseJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -4510,7 +4511,7 @@ jennifer
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -4552,7 +4553,7 @@ jennifer
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$setJson">MoronModelBase#$setJson</a>
+				<a href="ModelBase.html#$setJson">ModelBase#$setJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -4593,7 +4594,7 @@ jennifer
 
     <div class="param-desc">
     
-        <p>MoronValidationError
+        <p>ValidationError
    If validation fails.</p>
     
     </div>
@@ -4649,7 +4650,7 @@ jennifer
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$toDatabaseJson">MoronModelBase#$toDatabaseJson</a>
+				<a href="ModelBase.html#$toDatabaseJson">ModelBase#$toDatabaseJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -4756,7 +4757,7 @@ jennifer
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$toJson">MoronModelBase#$toJson</a>
+				<a href="ModelBase.html#$toJson">ModelBase#$toJson</a>
 			</li>
 		</ul>
 	</dd>
@@ -4917,7 +4918,7 @@ called explicitly when needed.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -4959,7 +4960,7 @@ called explicitly when needed.</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#$validate">MoronModelBase#$validate</a>
+				<a href="ModelBase.html#$validate">ModelBase#$validate</a>
 			</li>
 		</ul>
 	</dd>
@@ -5011,7 +5012,7 @@ called explicitly when needed.</p>
             </dt>
             <dd>
                 
-<span class="param-type"><a href="MoronValidationError.html">MoronValidationError</a></span>
+<span class="param-type"><a href="ValidationError.html">ValidationError</a></span>
 
 
             </dd>
@@ -5093,7 +5094,7 @@ called explicitly when needed.</p>
 	<dd class="inherited-from">
 		<ul class="dummy">
 			<li>
-				<a href="MoronModelBase.html#toJSON">MoronModelBase#toJSON</a>
+				<a href="ModelBase.html#toJSON">ModelBase#toJSON</a>
 			</li>
 		</ul>
 	</dd>
@@ -5161,7 +5162,7 @@ called explicitly when needed.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Sat Jul 4th 2015 using the <a
+		on Sun Jul 5th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

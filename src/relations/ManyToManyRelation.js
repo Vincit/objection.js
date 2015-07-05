@@ -1,22 +1,22 @@
 'use strict';
 
 var _ = require('lodash')
-  , MoronRelation = require('./MoronRelation')
+  , Relation = require('./Relation')
   , ownerJoinColumnAlias = '_join_';
 
 /**
  * @constructor
  * @ignore
- * @extends MoronRelation
+ * @extends Relation
  */
-function MoronManyToManyRelation() {
-  MoronRelation.apply(this, arguments);
+function ManyToManyRelation() {
+  Relation.apply(this, arguments);
 }
 
-MoronRelation.extend(MoronManyToManyRelation);
+Relation.extend(ManyToManyRelation);
 
-MoronManyToManyRelation.prototype.setMapping = function (mapping) {
-  var retVal = MoronRelation.prototype.setMapping.call(this, mapping);
+ManyToManyRelation.prototype.setMapping = function (mapping) {
+  var retVal = Relation.prototype.setMapping.call(this, mapping);
 
   if (!this.joinTable || !this.joinTableOwnerCol || !this.joinTableRelatedCol) {
     throw new Error(this.ownerModelClass.name + '.relationMappings.' + this.name + '.join must have the `through` that describes the join table.');
@@ -25,7 +25,7 @@ MoronManyToManyRelation.prototype.setMapping = function (mapping) {
   return retVal;
 };
 
-MoronManyToManyRelation.prototype.find = function (builder, $owners) {
+ManyToManyRelation.prototype.find = function (builder, $owners) {
   var self = this;
   var owners = this.ownerModelClass.ensureModelArray($owners);
 
@@ -54,7 +54,7 @@ MoronManyToManyRelation.prototype.find = function (builder, $owners) {
   });
 };
 
-MoronManyToManyRelation.prototype.insert = function (builder, $owner, $insertion) {
+ManyToManyRelation.prototype.insert = function (builder, $owner, $insertion) {
   var self = this;
   var owner = this.ownerModelClass.ensureModel($owner);
 
@@ -76,7 +76,7 @@ MoronManyToManyRelation.prototype.insert = function (builder, $owner, $insertion
   });
 };
 
-MoronManyToManyRelation.prototype.update = function (builder, $owner, $update) {
+ManyToManyRelation.prototype.update = function (builder, $owner, $update) {
   var owner = this.ownerModelClass.ensureModel($owner);
   var idSelectQuery = this._makeFindIdQuery(owner[this.ownerProp]);
 
@@ -86,7 +86,7 @@ MoronManyToManyRelation.prototype.update = function (builder, $owner, $update) {
   return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
 };
 
-MoronManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
+ManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
   var owner = this.ownerModelClass.ensureModel($owner);
   var idSelectQuery = this._makeFindIdQuery(owner[this.ownerProp]);
 
@@ -96,7 +96,7 @@ MoronManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
   return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
 };
 
-MoronManyToManyRelation.prototype.delete = function (builder, $owner) {
+ManyToManyRelation.prototype.delete = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
   var idSelectQuery = this._makeFindIdQuery(owner[this.ownerProp]);
 
@@ -106,7 +106,7 @@ MoronManyToManyRelation.prototype.delete = function (builder, $owner) {
   return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
 };
 
-MoronManyToManyRelation.prototype.relate = function (builder, $owner, $ids) {
+ManyToManyRelation.prototype.relate = function (builder, $owner, $ids) {
   var owner = this.ownerModelClass.ensureModel($owner);
   var joinRows = this._createJoinRows(owner[this.ownerProp], _.flatten([$ids]));
   var arrayInput = _.isArray($ids);
@@ -120,7 +120,7 @@ MoronManyToManyRelation.prototype.relate = function (builder, $owner, $ids) {
   });
 };
 
-MoronManyToManyRelation.prototype.unrelate = function (builder, $owner) {
+ManyToManyRelation.prototype.unrelate = function (builder, $owner) {
   var self = this;
   var owner = this.ownerModelClass.ensureModel($owner);
 
@@ -140,13 +140,13 @@ MoronManyToManyRelation.prototype.unrelate = function (builder, $owner) {
     .runAfterModelCreatePushFront(_.constant({}));
 };
 
-MoronManyToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) {
+ManyToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) {
   return builder
     .join(this.joinTable, this.fullJoinTableRelatedCol(), this.fullRelatedCol())
     .whereIn(this.fullJoinTableOwnerCol(), ownerIds);
 };
 
-MoronManyToManyRelation.prototype._makeFindIdQuery = function (ownerId) {
+ManyToManyRelation.prototype._makeFindIdQuery = function (ownerId) {
   return this.ownerModelClass
     .knex()
     .select(this.fullJoinTableRelatedCol())
@@ -154,7 +154,7 @@ MoronManyToManyRelation.prototype._makeFindIdQuery = function (ownerId) {
     .where(this.fullJoinTableOwnerCol(), ownerId);
 };
 
-MoronManyToManyRelation.prototype._createJoinRows = function (ownerId, relatedIds) {
+ManyToManyRelation.prototype._createJoinRows = function (ownerId, relatedIds) {
   var self = this;
 
   if (!_.isArray(relatedIds)) {
@@ -171,4 +171,4 @@ MoronManyToManyRelation.prototype._createJoinRows = function (ownerId, relatedId
   });
 };
 
-module.exports = MoronManyToManyRelation;
+module.exports = ManyToManyRelation;

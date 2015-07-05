@@ -2,15 +2,15 @@
 
 var _ = require('lodash')
   , Promise = require('bluebird')
-  , MoronQueryBuilder = require('./MoronQueryBuilder')
-  , MoronValidationError = require('./MoronValidationError')
-  , MoronRelationExpression = require('./MoronRelationExpression');
+  , QueryBuilder = require('./QueryBuilder')
+  , ValidationError = require('./ValidationError')
+  , RelationExpression = require('./RelationExpression');
 
 /**
  * @constructor
  * @ignore
  */
-function MoronEagerFetcher(opt) {
+function EagerFetcher(opt) {
   this.modelClass = opt.modelClass;
   this.models = opt.models;
   this.eager = opt.eager;
@@ -19,7 +19,7 @@ function MoronEagerFetcher(opt) {
   this.promise = null;
 }
 
-MoronEagerFetcher.prototype.fetch = function () {
+EagerFetcher.prototype.fetch = function () {
   if (this.promise) {
     return this.promise;
   }
@@ -44,17 +44,17 @@ MoronEagerFetcher.prototype.fetch = function () {
   return this.promise;
 };
 
-MoronEagerFetcher.prototype._fetchRelation = function (relation, nextEager) {
+EagerFetcher.prototype._fetchRelation = function (relation, nextEager) {
   var self = this;
-  var queryBuilder = MoronQueryBuilder.forClass(relation.relatedModelClass);
+  var queryBuilder = QueryBuilder.forClass(relation.relatedModelClass);
 
   return relation.find(queryBuilder, this.models).then(function (related) {
     return self._fetchNextEager(relation, related, nextEager);
   });
 };
 
-MoronEagerFetcher.prototype._fetchNextEager = function (relation, related, eager) {
-  this.children[relation.name] = new MoronEagerFetcher({
+EagerFetcher.prototype._fetchNextEager = function (relation, related, eager) {
+  this.children[relation.name] = new EagerFetcher({
     modelClass: relation.relatedModelClass,
     models: related,
     eager: eager,
@@ -64,4 +64,4 @@ MoronEagerFetcher.prototype._fetchNextEager = function (relation, related, eager
   return this.children[relation.name].fetch();
 };
 
-module.exports = MoronEagerFetcher;
+module.exports = EagerFetcher;

@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>moron.js Class: MoronModelBase</title>
+	<title>moron.js Class: ModelBase</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -28,23 +28,23 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
-							<a href="MoronModel.html">MoronModel</a>
+							<a href="Model.html">Model</a>
 						</li>
 						
 						<li>
-							<a href="MoronModelBase.html">MoronModelBase</a>
+							<a href="ModelBase.html">ModelBase</a>
 						</li>
 						
 						<li>
-							<a href="MoronQueryBuilder.html">MoronQueryBuilder</a>
+							<a href="QueryBuilder.html">QueryBuilder</a>
 						</li>
 						
 						<li>
-							<a href="MoronRelationExpression.html">MoronRelationExpression</a>
+							<a href="RelationExpression.html">RelationExpression</a>
 						</li>
 						
 						<li>
-							<a href="MoronValidationError.html">MoronValidationError</a>
+							<a href="ValidationError.html">ValidationError</a>
 						</li>
 						
 
@@ -86,12 +86,12 @@
 					
 
 
-	<!--<h1 class="page-title">Class: MoronModelBase</h1>-->
+	<!--<h1 class="page-title">Class: ModelBase</h1>-->
 <section>
 
 <header>
     <h2>
-    MoronModelBase
+    ModelBase
     </h2>
     
 </header>
@@ -112,13 +112,13 @@
     
     <div class="description">
         <p>Base class for models.</p>
-<p>MoronModelBase provides a mechanism for automatic JSON validation and a way to attach
+<p>ModelBase provides a mechanism for automatic JSON validation and a way to attach
 functionality to plain javascript objects. A subclass can be created like this:</p>
 <pre class="prettyprint source lang-js"><code>function Person() {
-  MoronModelBase.apply(this, arguments);
+  ModelBase.apply(this, arguments);
 }
 
-MoronModelBase.extend(Person);
+ModelBase.extend(Person);
 
 Person.prototype.fullName = function () {
   return this.firstName + ' ' + this.lastName;
@@ -131,7 +131,7 @@ Person.jsonSchema = {
     firstName: {type: 'string'},
     lastName: {type: 'string'}
   }
-};</code></pre><p>Use <code>MoronModelBase.from*Json</code> methods to create models from JSON objects:</p>
+};</code></pre><p>Use <code>ModelBase.from*Json</code> methods to create models from JSON objects:</p>
 <pre class="prettyprint source lang-js"><code>var person = Person.fromJson({firstName: 'Jennifer', lastName: 'Lawrence'});
 
 console.log(person.firstName); // --> 'Jennifer'
@@ -144,13 +144,13 @@ var person2 = Person.fromJson({firstName: 10});</code></pre><p>Properties that a
 person.$spam = 100;
 
 console.log(person); // --> {firstName: 'Jennifer'}
-console.log(person.$toJson()); // --> {firstName: 'Jennifer'}</code></pre><p>MoronModelBase makes it possible to have a different database representation for a model.
+console.log(person.$toJson()); // --> {firstName: 'Jennifer'}</code></pre><p>ModelBase makes it possible to have a different database representation for a model.
 For example if your column names are snake_cased in the database but you want to use
 camelCased properties in the code and outside the server you can do this:</p>
 <pre class="prettyprint source lang-js"><code>// This is called when an object is serialized to database format.
 Person.prototype.$formatDatabaseJson = function (json) {
   // Call superclass implementation.
-  json = MoronModelBase.prototype.$formatDatabaseJson.call(this, json);
+  json = ModelBase.prototype.$formatDatabaseJson.call(this, json);
 
   return _.mapKeys(json, function (value, key) {
     return _.snakeCase(key);
@@ -164,7 +164,7 @@ Person.prototype.$parseDatabaseJson = function (json) {
   });
 
   // Call superclass implementation.
-  return MoronModelBase.prototype.$parseDatabaseJson.call(this, json);
+  return ModelBase.prototype.$parseDatabaseJson.call(this, json);
 };</code></pre>
     </div>
     
@@ -781,7 +781,7 @@ Person.prototype.$parseDatabaseJson = function (json) {
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -855,7 +855,7 @@ Person.prototype.$parseDatabaseJson = function (json) {
 
     <div class="param-desc">
     
-        <p>MoronValidationError
+        <p>ValidationError
    If validation fails.</p>
     
     </div>
@@ -1040,7 +1040,7 @@ by overriding this method.</p>
     
     <div class="description">
         <p>This is called after successful validation.</p>
-<p>You can do further validation here and throw a MoronValidationError if something goes wrong.</p>
+<p>You can do further validation here and throw a ValidationError if something goes wrong.</p>
     </div>
     
 
@@ -1115,7 +1115,7 @@ by overriding this method.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -1313,7 +1313,7 @@ by overriding this method.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -1419,7 +1419,7 @@ by overriding this method.</p>
         <h4 class="name" id="Sclone">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$clone</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="MoronModelBase.html">MoronModelBase</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ModelBase.html">ModelBase</a>}</span></span>
         </h4>
     
     
@@ -1430,7 +1430,7 @@ by overriding this method.</p>
     
     <div class="description">
         <p>Returns a deep copy of this model.</p>
-<p>If this object has instances of MoronModelBase as properties (or arrays of them)
+<p>If this object has instances of ModelBase as properties (or arrays of them)
 they are cloned using their <code>.$clone()</code> method.</p>
     </div>
     
@@ -1493,7 +1493,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="MoronModelBase.html">MoronModelBase</a></span>
+<span class="param-type"><a href="ModelBase.html">ModelBase</a></span>
 
 
 	</dd>
@@ -1524,7 +1524,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is converted to database format.</p>
+        <p>This is called when a ModelBase is converted to database format.</p>
 <p>Converts the JSON object from the internal format to the database format.</p>
     </div>
     
@@ -1671,7 +1671,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is converted to JSON.</p>
+        <p>This is called when a ModelBase is converted to JSON.</p>
     </div>
     
 
@@ -1817,7 +1817,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is created from a database JSON object.</p>
+        <p>This is called when a ModelBase is created from a database JSON object.</p>
 <p>Converts the JSON object from the database format to the internal format.</p>
     </div>
     
@@ -1964,7 +1964,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     
     <div class="description">
-        <p>This is called when a MoronModelBase is created from a JSON object.</p>
+        <p>This is called when a ModelBase is created from a JSON object.</p>
 <p>Converts the JSON object to the internal format.</p>
     </div>
     
@@ -2038,7 +2038,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -2352,7 +2352,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -2426,7 +2426,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
 
     <div class="param-desc">
     
-        <p>MoronValidationError
+        <p>ValidationError
    If validation fails.</p>
     
     </div>
@@ -2732,7 +2732,7 @@ called explicitly when needed.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#MoronModelOptions">MoronModelOptions</a></span>
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
 
 
             
@@ -2817,7 +2817,7 @@ called explicitly when needed.</p>
             </dt>
             <dd>
                 
-<span class="param-type"><a href="MoronValidationError.html">MoronValidationError</a></span>
+<span class="param-type"><a href="ValidationError.html">ValidationError</a></span>
 
 
             </dd>
@@ -2958,7 +2958,7 @@ called explicitly when needed.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Sat Jul 4th 2015 using the <a
+		on Sun Jul 5th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

@@ -6,7 +6,7 @@ module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('MoronModel eager queries', function () {
+  describe('Model eager queries', function () {
 
     before(function () {
       return session.populate([{
@@ -247,17 +247,17 @@ module.exports = function (session) {
 
     var idCol = opt.Model.idColumn;
 
-    it(expr + ' (MoronQueryBuilder.eager)', function () {
+    it(expr + ' (QueryBuilder.eager)', function () {
       return opt.Model.query().where(idCol, opt.id).eager(expr).then(tester);
     });
 
-    it(expr + ' (MoronModel.loadRelated)', function () {
+    it(expr + ' (Model.loadRelated)', function () {
       return opt.Model.query().where(idCol, opt.id).then(function (models) {
         return opt.Model.loadRelated(models, expr);
       }).then(tester);
     });
 
-    it(expr + ' (MoronModel.$loadRelated)', function () {
+    it(expr + ' (Model.$loadRelated)', function () {
       return opt.Model.query().where(idCol, opt.id).then(function (models) {
         return models[0].$loadRelated(expr);
       }).then(function (result) {

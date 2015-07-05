@@ -1,11 +1,11 @@
 'use strict';
 
 var _ = require('lodash')
-  , utils = require('../moronUtils')
-  , MoronQueryBuilder = require('../MoronQueryBuilder');
+  , utils = require('../utils')
+  , QueryBuilder = require('../QueryBuilder');
 
 /**
- * @typedef {Object} MoronRelationJoin
+ * @typedef {Object} RelationJoin
  *
  * @property {String} from
  * @property {String} to
@@ -15,27 +15,27 @@ var _ = require('lodash')
  */
 
 /**
- * @typedef {Object} MoronRelationMapping
+ * @typedef {Object} RelationMapping
  *
- * @property {MoronModel|String} modelClass
- * @property {MoronRelation} relation
- * @property {MoronRelationJoin} [join]
- * @property {function(MoronQueryBuilder)|Object} [query]
+ * @property {Model|String} modelClass
+ * @property {Relation} relation
+ * @property {RelationJoin} [join]
+ * @property {function(QueryBuilder)|Object} [query]
  */
 
 /**
- * Represents a relation between two `MoronModel` subclasses.
+ * Represents a relation between two `Model` subclasses.
  *
  * @param {String} relationName
  *    Name of the relation.
  *
- * @param {MoronModel} OwnerClass
- *    The MoronModel subclass that owns this relation.
+ * @param {Model} OwnerClass
+ *    The Model subclass that owns this relation.
  *
  * @ignore
  * @constructor
  */
-function MoronRelation(relationName, OwnerClass) {
+function Relation(relationName, OwnerClass) {
   /**
    * Name of the relation.
    *
@@ -46,18 +46,18 @@ function MoronRelation(relationName, OwnerClass) {
   /**
    * The owner class of this relation.
    *
-   * This must be a subclass of MoronModel.
+   * This must be a subclass of Model.
    *
-   * @type {MoronModel}
+   * @type {Model}
    */
   this.ownerModelClass = OwnerClass;
 
   /**
    * The related class.
    *
-   * This must be a subclass of MoronModel.
+   * This must be a subclass of Model.
    *
-   * @type {MoronModel}
+   * @type {Model}
    */
   this.relatedModelClass = null;
 
@@ -113,7 +113,7 @@ function MoronRelation(relationName, OwnerClass) {
   /**
    * Optional additional query.
    *
-   * @type {function (MoronQueryBuilder)}
+   * @type {function (QueryBuilder)}
    */
   this.additionalQuery = null;
 }
@@ -124,16 +124,16 @@ function MoronRelation(relationName, OwnerClass) {
  * @param {function=} subclassConstructor
  * @return {function}
  */
-MoronRelation.extend = function (subclassConstructor) {
+Relation.extend = function (subclassConstructor) {
   utils.inherits(subclassConstructor, this);
   return subclassConstructor;
 };
 
-MoronRelation.prototype.setMapping = function (mapping) {
-  var MoronModel = require('../MoronModel');
+Relation.prototype.setMapping = function (mapping) {
+  var Model = require('../Model');
 
-  if (!utils.isSubclassOf(this.ownerModelClass, MoronModel)) {
-    throw new Error('Relation\'s owner is not a subclass of MoronModel');
+  if (!utils.isSubclassOf(this.ownerModelClass, Model)) {
+    throw new Error('Relation\'s owner is not a subclass of Model');
   }
 
   var errorPrefix = this.ownerModelClass.name + '.relationMappings.' + this.name;
@@ -149,14 +149,14 @@ MoronRelation.prototype.setMapping = function (mapping) {
       throw new Error(errorPrefix + '.modelClass is an invalid file path to a model class.');
     }
 
-    if (!utils.isSubclassOf(this.relatedModelClass, MoronModel)) {
-      throw new Error(errorPrefix + '.modelClass is a valid path to a module, but the module doesn\'t export a MoronModel subclass.');
+    if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
+      throw new Error(errorPrefix + '.modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
     }
   } else {
     this.relatedModelClass = mapping.modelClass;
 
-    if (!utils.isSubclassOf(this.relatedModelClass, MoronModel)) {
-      throw new Error(errorPrefix + '.modelClass is not a subclass of MoronModel or a file path to a module that exports one.');
+    if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
+      throw new Error(errorPrefix + '.modelClass is not a subclass of Model or a file path to a module that exports one.');
     }
   }
 
@@ -164,8 +164,8 @@ MoronRelation.prototype.setMapping = function (mapping) {
     throw new Error(errorPrefix + '.relation is not defined');
   }
 
-  if (!utils.isSubclassOf(mapping.relation, MoronRelation)) {
-    throw new Error(errorPrefix + '.relation is not a subclass of MoronRelation');
+  if (!utils.isSubclassOf(mapping.relation, Relation)) {
+    throw new Error(errorPrefix + '.relation is not a subclass of Relation');
   }
 
   if (!mapping.join || !_.isString(mapping.join.from) || !_.isString(mapping.join.to)) {
@@ -238,23 +238,23 @@ MoronRelation.prototype.setMapping = function (mapping) {
   this.relatedCol = joinRelated.name;
 };
 
-MoronRelation.prototype.fullOwnerCol = function () {
+Relation.prototype.fullOwnerCol = function () {
   return this.ownerModelClass.tableName + '.' + this.ownerCol;
 };
 
-MoronRelation.prototype.fullRelatedCol = function () {
+Relation.prototype.fullRelatedCol = function () {
   return this.relatedModelClass.tableName + '.' + this.relatedCol;
 };
 
-MoronRelation.prototype.fullJoinTableOwnerCol = function () {
+Relation.prototype.fullJoinTableOwnerCol = function () {
   return this.joinTable + '.' + this.joinTableOwnerCol;
 };
 
-MoronRelation.prototype.fullJoinTableRelatedCol = function () {
+Relation.prototype.fullJoinTableRelatedCol = function () {
   return this.joinTable + '.' + this.joinTableRelatedCol;
 };
 
-MoronRelation.prototype.clone = function () {
+Relation.prototype.clone = function () {
   var clone = new this.constructor(this.name, this.ownerModelClass);
 
   clone.relatedModelClass = this.relatedModelClass;
@@ -270,7 +270,7 @@ MoronRelation.prototype.clone = function () {
   return clone;
 };
 
-MoronRelation.prototype.bindKnex = function (knex) {
+Relation.prototype.bindKnex = function (knex) {
   var bound = this.clone();
 
   bound.relatedModelClass = bound.relatedModelClass.bindKnex(knex);
@@ -279,35 +279,35 @@ MoronRelation.prototype.bindKnex = function (knex) {
   return bound;
 };
 
-MoronRelation.prototype.find = function (builder, $owners) {
+Relation.prototype.find = function (builder, $owners) {
   return builder;
 };
 
-MoronRelation.prototype.insert = function (builder, $owner, $insertion) {
+Relation.prototype.insert = function (builder, $owner, $insertion) {
   return builder;
 };
 
-MoronRelation.prototype.update = function (builder, $owner, $update) {
+Relation.prototype.update = function (builder, $owner, $update) {
   return builder;
 };
 
-MoronRelation.prototype.patch = function (builder, $owner, $patch) {
+Relation.prototype.patch = function (builder, $owner, $patch) {
   return builder;
 };
 
-MoronRelation.prototype.delete = function (builder, $owner) {
+Relation.prototype.delete = function (builder, $owner) {
   return builder;
 };
 
-MoronRelation.prototype.relate = function (builder, $owner, ids) {
+Relation.prototype.relate = function (builder, $owner, ids) {
   return builder;
 };
 
-MoronRelation.prototype.unrelate = function (builder, $owner) {
+Relation.prototype.unrelate = function (builder, $owner) {
   return builder;
 };
 
-MoronRelation.prototype._propertyName = function (column, modelClass) {
+Relation.prototype._propertyName = function (column, modelClass) {
   var propertyName = modelClass.columnNameToPropertyName(column.name);
 
   if (!propertyName) {
@@ -341,4 +341,4 @@ function parseColumn(column) {
   };
 }
 
-module.exports = MoronRelation;
+module.exports = Relation;

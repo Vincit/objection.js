@@ -3,14 +3,14 @@
 var util = require('util');
 
 /**
- * Error of this class is thrown when a MoronModel validation fails.
+ * Error of this class is thrown when a Model validation fails.
  *
  * @param {Object.<String, String>} errorMessages
  * @constructor
  */
-function MoronValidationError(errorMessages) {
+function ValidationError(errorMessages) {
   Error.call(this);
-  Error.captureStackTrace(this, MoronValidationError);
+  Error.captureStackTrace(this, ValidationError);
 
   /**
    * A hash of `{'property name': 'error message'}` pairs.
@@ -25,8 +25,8 @@ function MoronValidationError(errorMessages) {
   this.statusCode = 400;
 }
 
-util.inherits(MoronValidationError, Error);
+util.inherits(ValidationError, Error);
 
-module.exports = MoronValidationError;
+module.exports = ValidationError;
 
 

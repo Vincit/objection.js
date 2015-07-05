@@ -5,15 +5,15 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var knexConfig = require('./knexfile');
 var registerApi = require('./api');
-var MoronModel = require('moron').MoronModel;
+var Model = require('moron').Model;
 
 // Initialize knex.
 var knex = Knex(knexConfig.development);
 
-// Bind all MoronModels to a knex instance. If you only have one database in
+// Bind all Models to a knex instance. If you only have one database in
 // your server this is all you have to do. For multi database systems, see
-// the MoronModel.bindKnex method.
-MoronModel.knex(knex);
+// the Model.bindKnex method.
+Model.knex(knex);
 
 var app = express()
   .use(bodyParser.json())

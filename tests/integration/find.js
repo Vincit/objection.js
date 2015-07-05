@@ -6,7 +6,7 @@ module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('MoronModel find queries', function () {
+  describe('Model find queries', function () {
 
     describe('.query()', function () {
 

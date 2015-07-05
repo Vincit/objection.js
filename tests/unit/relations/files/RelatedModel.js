@@ -1,10 +1,10 @@
-var MoronModel = require('../../../../src/MoronModel');
+var Model = require('../../../../src/Model');
 
 function RelatedModel() {
-  MoronModel.apply(this, arguments);
+  Model.apply(this, arguments);
 }
 
-module.exports = MoronModel.extend(RelatedModel);
+module.exports = Model.extend(RelatedModel);
 
 RelatedModel.tableName = 'RelatedModel';
 

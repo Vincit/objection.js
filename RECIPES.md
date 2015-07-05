@@ -10,8 +10,8 @@
 ## Raw queries
 
 To write raw SQL queries, use the `.raw()` method of knex. You can always access a knex
-instance through [knex()](http://vincit.github.io/moron.js/MoronModel.html#_P_knex) method of
-any model class. There are also some helper methods such as `whereRaw()` in the `MoronQueryBuilder`.
+instance through [knex()](http://vincit.github.io/moron.js/Model.html#_P_knex) method of
+any model class. There are also some helper methods such as `whereRaw()` in the `QueryBuilder`.
 
 ```js
 var knex = Person.knex();
@@ -50,10 +50,10 @@ Person.idColumn = 'person_id';
 Sometimes you may want to use for example snake_cased column names in database tables
 and camelCased property names in code. You can use the functions
 
-- [$parseDatabaseJson](http://vincit.github.io/moron.js/MoronModel.html#SparseDatabaseJson)
-- [$formatDatabaseJson](http://vincit.github.io/moron.js/MoronModel.html#SformatDatabaseJson)
-- [$parseJson](http://vincit.github.io/moron.js/MoronModel.html#SparseJson)
-- [$formatJson](http://vincit.github.io/moron.js/MoronModel.html#SformatJson)
+- [$parseDatabaseJson](http://vincit.github.io/moron.js/Model.html#SparseDatabaseJson)
+- [$formatDatabaseJson](http://vincit.github.io/moron.js/Model.html#SformatDatabaseJson)
+- [$parseJson](http://vincit.github.io/moron.js/Model.html#SparseJson)
+- [$formatJson](http://vincit.github.io/moron.js/Model.html#SformatJson)
 
 to convert data between database and "external" representations. Example of the mentioned
 snake_case/camelCase conversion:
@@ -62,7 +62,7 @@ snake_case/camelCase conversion:
 // This is called when an object is serialized to database format.
 Person.prototype.$formatDatabaseJson = function (json) {
   // Call superclass implementation.
-  json = MoronModel.prototype.$formatDatabaseJson.call(this, json);
+  json = Model.prototype.$formatDatabaseJson.call(this, json);
 
   return _.mapKeys(json, function (value, key) {
     return _.snakeCase(key);
@@ -76,14 +76,14 @@ Person.prototype.$parseDatabaseJson = function (json) {
   });
 
   // Call superclass implementation.
-  return MoronModel.prototype.$parseDatabaseJson.call(this, json);
+  return Model.prototype.$parseDatabaseJson.call(this, json);
 };
 ```
 
 ## Paging
 
-Any query can be paged using the [page](http://vincit.github.io/moron.js/MoronQueryBuilder.html#page) or
-[range](http://vincit.github.io/moron.js/MoronQueryBuilder.html#range) method.
+Any query can be paged using the [page](http://vincit.github.io/moron.js/QueryBuilder.html#page) or
+[range](http://vincit.github.io/moron.js/QueryBuilder.html#range) method.
 
 ```js
 Person
