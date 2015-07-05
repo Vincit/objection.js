@@ -1,4 +1,3 @@
-var _ = require('lodash');
 var Knex = require('knex');
 var morgan = require('morgan');
 var express = require('express');
