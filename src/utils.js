@@ -18,7 +18,6 @@ module.exports.inherits = function(Constructor, SuperConstructor) {
     Constructor[key] = SuperConstructor[key];
   }
   util.inherits(Constructor, SuperConstructor);
-  Constructor._super = SuperConstructor;
 };
 
 /**

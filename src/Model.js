@@ -782,7 +782,8 @@ Model.knex = function (knex) {
     var modelClass = this;
 
     while (modelClass && !modelClass.$$knex) {
-      modelClass = modelClass._super;
+      var proto = modelClass.prototype.__proto__;
+      modelClass = proto && proto.constructor;
     }
 
     return modelClass && modelClass.$$knex;
