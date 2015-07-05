@@ -1,6 +1,6 @@
 {
   "name": "moron",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A simple ORM for Node.js",
   "main": "moron.js",
   "license": "MIT",
