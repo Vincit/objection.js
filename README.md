@@ -299,6 +299,54 @@ moron.transaction(Person, Animal, function (Person, Animal) {
 });
 ```
 
+You only need to give the `transaction` function the model classes you use explicitly. All the related model classes
+are implicitly bound to the same transaction.
+
+```js
+moron.transaction(Person, function (Person) {
+
+  return Person
+    .query()
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+    .then(function (jennifer) {
+      // This creates a query using the `Animal` model class but we
+      // don't need to give `Animal` as one of the arguments to the
+      // transaction function.
+      return jennifer
+        .$relatedQuery('pets')
+        .insert({name: 'Scrappy'});
+    });
+
+}).then(function (scrappy) {
+  console.log('Jennifer and Scrappy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+});
+```
+
+The only way you can mess up with the transactions is if you _explicitly_ start a query using a model class that is not
+bound to the transaction:
+
+```js
+var Person = require('./models/Person');
+var Animal = require('./models/Animal');
+
+moron.transaction(Person, function (Person) {
+
+  return Person
+    .query()
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+    .then(function (jennifer) {
+      // OH NO! This query is executed outside the transaction
+      // since the `Animal` class is not bound to the transaction.
+      return Animal
+        .query()
+        .insert({name: 'Scrappy'});
+    });
+
+});
+```
+
 # Documents
 
 Moron.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
