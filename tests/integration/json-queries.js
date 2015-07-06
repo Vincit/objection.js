@@ -413,6 +413,52 @@ module.exports = function (session) {
       });
     });
 
+    describe('.whereJsonIsArray(fieldExpr)', function () {
+      it('should find all arrays that has an array in index 5', function () {
+        return BoundModel.query().whereJsonIsArray("jsonArray[5]")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should find no arrays from object type of field arrays', function () {
+        return BoundModel.query().whereJsonIsArray("jsonObject.objectField")
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+
+      it('should find nothing for non existing field', function () {
+        return BoundModel.query().whereJsonIsObject("jsonObject.objectField.imNot")
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+    });
+
+    describe('.whereJsonIsObject(fieldExpr)', function () {
+      it('should find first object', function () {
+        return BoundModel.query().whereJsonIsObject("jsonObject.objectField")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should find nothing for array field', function () {
+        return BoundModel.query().whereJsonIsObject("jsonObject.arrayField")
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+
+      it('should find nothing for non existing field', function () {
+        return BoundModel.query().whereJsonIsObject("jsonObject.arrayField.imNot")
+          .then(function (results) {
+            expect(results).to.have.length(0);
+          });
+      });
+    });
+
   });
 };
 

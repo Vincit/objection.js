@@ -1651,6 +1651,8 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
  *   });
  * ```
  *
+ * Object and array are always their own supersets.
+ *
  * For arrays this mean that all arrays of left side matches if it has all the elements
  * listed in the right hand side. e.g.
  *
@@ -1670,14 +1672,36 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
 /**
  * Json filters all results where left hand operator is subset of the right hand operand.
  *
+ * Object and array are always their own subsets.
+ *
  * see {MoronQueryBuilder.prototype.whereJsonSupersetOf}
  *
- * @param fieldExpression
+ * @param fieldExpression {String}
  * @param jsonObjectOrFieldExpression
  * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
   return this.whereJsonObject(fieldExpression, "<@", jsonObjectOrFieldExpression);
+};
+
+/**
+ * Match field type to be an array.
+ *
+ * @param fieldExpression {String}
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
+  return this.whereJsonSupersetOf(fieldExpression, []);
+};
+
+/**
+ * Match field type to be an object.
+ *
+ * @param fieldExpression {String}
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
+  return this.whereJsonSupersetOf(fieldExpression, {});
 };
 
 /**
