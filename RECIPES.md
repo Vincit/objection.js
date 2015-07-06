@@ -2,6 +2,7 @@
 
 - [Raw queries](#raw-queries)
 - [Change id column](#change-id-column)
+- [Custom validation](#custom-validation)
 - [Map column names to different property names](#map-column-names-to-different-property-names)
 - [Paging](#paging)
 - [Subqueries](#subqueries)
@@ -43,6 +44,30 @@ a model class.
 
 ```js
 Person.idColumn = 'person_id';
+```
+
+## Custom validation
+
+If you want to use the json schema validation but add some custom validation on top of it you can override the
+[$beforeValidate](http://vincit.github.io/moron.js/Model.html#SbeforeValidate) and
+[$afterValidate](http://vincit.github.io/moron.js/Model.html#SafterValidate) methods.
+
+If you don't want to use the built-in json schema validation, you can just ignore the `jsonSchema` property. It is
+optional. If you want to use some other validation library, simply override the [$validate method](http://vincit.github.io/moron.js/Model.html#Svalidate)
+of the model class. You need to throw a [ValidationError](http://vincit.github.io/moron.js/ValidationError.html) when validation fails.
+
+```js
+Person.prototype.$validate = function (objectToValidate, options) {
+  // This makes revalidation possible: `someModel.$validate()`.
+  objectToValidate = objectToValidate || this;
+
+  if (!someCustomValidator(objectToValidate)) {
+    throw new moron.ValidationError({someProp: 'validation error message for the property'});
+  }
+
+  // Remember to return the input json object.
+  return objectToValidate;
+};
 ```
 
 ## Map column names to different property names

@@ -18,9 +18,14 @@ var _ = require('lodash')
  * @typedef {Object} RelationMapping
  *
  * @property {Model|String} modelClass
+ *    A {@link Model} subclass constructor or an absolute path to a module that exports one.
+ *
  * @property {Relation} relation
+ *    A relation constructor. You can use one of Model.OneToOneRelation, Model.OneToManyRelation and
+ *    Model.ManyToManyRelation or even write your own relation type by subclassing {@link Relation}.
+ *
  * @property {RelationJoin} [join]
- * @property {function(QueryBuilder)|Object} [query]
+ *    An object that describes how the two models are related.
  */
 
 /**

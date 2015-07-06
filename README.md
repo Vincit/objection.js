@@ -9,11 +9,11 @@ What moron.js gives you:
 
  * An easy declarative way of [defining models](#models) and relations between them
  * Simple and fun way to [fetch, insert, update and delete](#query-examples) models using the full power of SQL
- * A way to [store complex documents](#documents) as single rows
  * Powerful mechanism for loading arbitrarily large [trees of relations](#eager-queries)
+ * A way to [store complex documents](#documents) as single rows
  * Completely [Promise](https://github.com/petkaantonov/bluebird) based API
  * Simple [transactions](#transactions)
- * [JSON schema](http://json-schema.org/) validation
+ * [JSON schema](#validation) validation
 
 What moron.js doesn't give you:
 
@@ -23,6 +23,9 @@ What moron.js doesn't give you:
     Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
+Moron.js uses Promises and a coding style that makes it ready for future. You can already use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
+and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/moron.js/tree/master/examples/express-es7).
+
 # Topics
 
 - [Installation](#installation)
@@ -31,6 +34,7 @@ What moron.js doesn't give you:
 - [Eager queries](#eager-queries)
 - [Transactions](#transactions)
 - [Documents](#documents)
+- [Validation](#validation)
 - [Models](#models)
 - [Testing](#testing)
 - [API Documentation](http://vincit.github.io/moron.js/Model.html)
@@ -77,7 +81,7 @@ knex migrate:latest
 npm start
 ```
 
-Also our [API documentation](http://vincit.github.io/moron.js/Model.html) contains a lot of examples.
+Also check out our [API documentation](http://vincit.github.io/moron.js/Model.html) and [recipe book](RECIPES.md).
 
 # Query examples
 
@@ -381,6 +385,36 @@ Person
     console.log('oh noes');
   });
 ```
+
+# Validation
+
+[JSON schema](http://json-schema.org/) validation can be enabled by setting the [jsonSchema](#models) property
+of a model class. The validation is ran each time a `Model` instance is created. For example all these will trigger
+the validation:
+
+```js
+Person.fromJson({firstName: 'jennifer', lastName: 'Lawrence'});
+Person.query().insert({firstName: 'jennifer', lastName: 'Lawrence'});
+Person.query().update({firstName: 'jennifer', lastName: 'Lawrence'}).where('id', 10);
+// Patch operation ignores the `required` property of the schema and only validates the
+// given properties. This allows a subset of model's properties to be updated.
+Person.query().patch({age: 24}).where('age', '<', 24);
+```
+
+You rarely need to call [$validate](http://vincit.github.io/moron.js/Model.html#Svalidate) method explicitly, but you
+can do it when needed. If validation fails a [ValidationError](http://vincit.github.io/moron.js/ValidationError.html)
+will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of
+`ValidationError`.
+
+```js
+Person.query().insert({firstName: 'jennifer'}).catch(function (err) {
+  console.log(err instanceof moron.ValidationError); // --> true
+  console.log(err.data); // --> {lastName: 'required property missing'}
+});
+```
+
+See [the recipe book](https://github.com/Vincit/moron.js/blob/master/RECIPES.md#custom-validation) for instructions
+if you want to use some other validation library.
 
 # Models
 
