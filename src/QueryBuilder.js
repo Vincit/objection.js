@@ -1668,6 +1668,19 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
 };
 
 /**
+ * Json filters all results where left hand operator is subset of the right hand operand.
+ *
+ * see {MoronQueryBuilder.prototype.whereJsonSupersetOf}
+ *
+ * @param fieldExpression
+ * @param jsonObjectOrFieldExpression
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return this.whereJsonObject(fieldExpression, "<@", jsonObjectOrFieldExpression);
+};
+
+/**
  * @returns {Function}
  */
 function queryMethod(methodName) {
