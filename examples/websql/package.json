@@ -1,0 +1,13 @@
+{
+  "name": "moron-example-websql",
+  "version": "0.1.0",
+  "description": "Moron.js websql example",
+  "main": "app.js",
+  "author": "Sami Koskimäki",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "2.9.27",
+    "knex": "^0.8.6",
+    "lodash": "^3.10.0"
+  }
+}

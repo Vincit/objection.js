@@ -41,6 +41,7 @@
     "tv4-formats": "^1.0.0"
   },
   "devDependencies": {
+    "browserify-global-shim": "^1.0.0",
     "coveralls": "^2.11.2",
     "expect.js": "^0.3.1",
     "grunt": "^0.4.5",
@@ -51,5 +52,14 @@
     "mysql": "^2.7.0",
     "pg": "^4.4.0",
     "sqlite3": "^3.0.8"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-global-shim"
+    ]
+  },
+  "browserify-global-shim": {
+    "bluebird": "Promise",
+    "lodash": "_"
   }
 }

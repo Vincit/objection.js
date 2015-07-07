@@ -2,5 +2,6 @@ node_modules
 .idea
 test-coverage
 examples/*/*.db
+examples/websql/moron.js
 *.iml
 *.DS_Store
