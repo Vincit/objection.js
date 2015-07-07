@@ -1705,6 +1705,51 @@ MoronQueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
 };
 
 /**
+ * Match if one of given strings is found from json object key(s) or array items.
+ *
+ * @param fieldExpression {String}
+ * @param keys {String|Array.<String>} Strings that are looked from object or array.
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
+  return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?|', keys);
+};
+
+/**
+ * Match if all strings are found from json object key(s) or array items.
+ *
+ * @param fieldExpression {String}
+ * @param keys {String|Array.<String>} Strings that are looked from object or array.
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
+  return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?&', keys);
+};
+
+/**
+ * Helper method for making queries where there is field expression on left side and
+ * string or an array of strings on right hand side.
+ *
+ * @param fieldExpression
+ * @param operator
+ * @param keys
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExpression, operator, keys) {
+  var fieldReference = parseFieldExpression(fieldExpression);
+  keys = _.isString(keys) ? [keys] : keys;
+  var questionMarksArray = _.map(keys, function (key) {
+    if (!_.isString(key)) {
+      throw new Error("All keys to find must be strings.");
+    }
+    return "?";
+  });
+  var rawSqlTemplateString = "array[" + questionMarksArray.join(",") + "]";
+  var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
+  return this.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
+};
+
+/**
  * @returns {Function}
  */
 function queryMethod(methodName) {

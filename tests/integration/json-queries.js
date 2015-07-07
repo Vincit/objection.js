@@ -459,6 +459,63 @@ module.exports = function (session) {
       });
     });
 
+    // waiting for workaround / solution for knex issue: https://github.com/tgriesser/knex/issues/519
+    describe.skip('.whereJsonHasAny(fieldExpr, keys) and .whereJsonHasAll(fieldExpr, keys)', function () {
+      it('should throw error if null in input array', function () {
+        expect(function () {
+          BoundModel.query().whereJsonHasAny("jsonObject", [null]);
+        }).to.throwException();
+      });
+
+      it('should throw error if number in input array', function () {
+        expect(function () {
+          BoundModel.query().whereJsonHasAny("jsonObject", 1);
+        }).to.throwException();
+      });
+
+      it('should throw error if boolean in input array', function () {
+        expect(function () {
+          BoundModel.query().whereJsonHasAny("jsonObject", false);
+        }).to.throwException();
+      });
+
+      it('should find results for a', function () {
+        return BoundModel.query().whereJsonHasAny("jsonObject", 'a')
+          .then(function (results) {
+            expectIdsEqual(results, [6,7]);
+          });
+      });
+
+      it('should find results for a or b', function () {
+        return BoundModel.query().whereJsonHasAny("jsonObject", 'b')
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results for b or notMe', function () {
+        return BoundModel.query().whereJsonHasAny("jsonObject", ['b', 'notMe'])
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results for a and b', function () {
+        return BoundModel.query().whereJsonHasAll("jsonObject", ['a', 'b'])
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results for string in array "string in jsonArray[3]"', function () {
+        return BoundModel.query().whereJsonHasAny("jsonArray", "string in jsonArray[3]")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+    });
+
   });
 };
 
