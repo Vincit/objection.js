@@ -1909,7 +1909,8 @@ function parseFieldExpression(expression, extractAsText) {
   var extractor = extractAsText ? '#>>' : '#>';
   // TODO: Checkout if knex has some utility function to add correct kind of quotes to column name
   //       this one is for PostgreSQL
-  return ['"', parsed.columnName, '"', extractor, "'{", jsonRefs, "}'"].join("");
+  var middleQuotetColumnName = parsed.columnName.split('.').join('"."');
+  return ['"', middleQuotetColumnName, '"', extractor, "'{", jsonRefs, "}'"].join("");
 }
 
 module.exports = QueryBuilder;
