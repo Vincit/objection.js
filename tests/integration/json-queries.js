@@ -459,7 +459,7 @@ module.exports = function (session) {
       });
     });
 
-    // waiting for workaround / solution for knex issue: https://github.com/tgriesser/knex/issues/519
+    // TODO: waiting for workaround / solution for knex issue: https://github.com/tgriesser/knex/issues/519
     describe.skip('.whereJsonHasAny(fieldExpr, keys) and .whereJsonHasAll(fieldExpr, keys)', function () {
       it('should throw error if null in input array', function () {
         expect(function () {
@@ -513,7 +513,76 @@ module.exports = function (session) {
             expectIdsEqual(results, [1]);
           });
       });
+    });
 
+    describe('.whereJsonField(fieldExpr, operator, value)', function () {
+      it('should throw error if value is object', function () {
+        expect(function () {
+          BoundModel.query().whereJsonField("jsonObject.numberField", '>', {});
+        }).to.throwException();
+      });
+
+      it('should throw error if value is array', function () {
+        expect(function () {
+          BoundModel.query().whereJsonField("jsonObject.nullField", '=', []);
+        }).to.throwException();
+      });
+
+      it('should be able to find numbers with >', function () {
+        return BoundModel.query().whereJsonField("jsonObject.numberField", '>', 1.4)
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should not find where 1.5 < 1.5', function () {
+        return BoundModel.query().whereJsonField("jsonObject.numberField", '<', 1.5)
+          .then(function (results) {
+            expectIdsEqual(results, []);
+          });
+      });
+
+      it('should be able to find strings with =', function () {
+        return BoundModel.query().whereJsonField("jsonObject.stringField", '=', "string in jsonObject.stringField")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should be able to find strings with !=', function () {
+        return BoundModel.query().whereJsonField("jsonObject.stringField", '!=', "not me")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should be able to find strings with like', function () {
+        return BoundModel.query().whereJsonField("jsonObject.stringField", 'LIKE', "%jsonObject.st%")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should be able to find is null or field does not exist', function () {
+        return BoundModel.query().whereJsonField("jsonObject.nullField", 'IS', null)
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,3,4,5,6,7]);
+          });
+      });
+
+      it('should be able to find is not null', function () {
+        return BoundModel.query().whereJsonField("jsonObject.stringField", 'IS NOT', null)
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should be able to find boolean equals true', function () {
+        return BoundModel.query().whereJsonField("jsonObject.booleanField", '=', false)
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
+          });
+      });
     });
 
   });

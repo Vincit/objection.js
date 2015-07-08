@@ -1750,6 +1750,45 @@ MoronQueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fie
 };
 
 /**
+ * Match if json field value comparison match.
+ *
+ * Value may be number, string, null, boolean and referred json field is converted
+ * to TEXT, NUMERIC or BOOLEAN sql type for comparison.
+ *
+ * If left hand field does not exist rows appear IS null so if one needs to get only
+ * rows, which has key and it's value is null one may use e.g.
+ * `.whereJsonSupersetOf("column", { field: null })` or check is key exist and
+ * then `.whereJsonField('column.field', 'IS', null)`
+ *
+ * For testing against objects or arrays one should see tested with whereJsonEqual,
+ * whereJsonSupersetOf and whereJsonSubsetOf methods.
+ *
+ * @param fieldExpression {String} Expression pointing to certain value.
+ * @param operator {String} SQL comparator usually `<`, `>`, `<>`, `=` or `!=`
+ * @param value {Boolean|Number|String|null} Value to which field is compared to.
+ * @returns {MoronQueryBuilder}
+ */
+MoronQueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
+  var fieldReference = parseFieldExpression(fieldExpression, true);
+  // json type comparison takes json type in string format
+  var cast;
+  var escapedValue = knex.raw(" ?", value);
+  if (_.isNumber(value)) {
+    cast = "::NUMERIC";
+  } else if (_.isBoolean(value)) {
+    cast = "::BOOLEAN";
+  } else if (_.isString(value)) {
+    cast = "::TEXT";
+  } else if (_.isNull(value)) {
+    cast = "::TEXT";
+    escapedValue = 'NULL';
+  } else {
+    throw new Error("Value must be string, number, boolean or null.");
+  }
+  return this.whereRaw(["(", fieldReference, ")", cast, " ", operator," ", escapedValue].join(""));
+};
+
+/**
  * @returns {Function}
  */
 function queryMethod(methodName) {
@@ -1860,15 +1899,13 @@ function tryBuild(builder) {
  * @param expression
  * @returns {Array}
  */
-function parseFieldExpression(expression) {
+function parseFieldExpression(expression, extractAsText) {
   var parsed = jsonFieldExpressionParser.parse(expression);
-  var jsonRefs = _(parsed.access).pluck('ref')
-    .map(function (ref) {
-      return "->"+knex.raw('?', ref);
-    }).value().join("");
+  var jsonRefs = _(parsed.access).pluck('ref').value().join(",");
+  var extractor = extractAsText ? '#>>' : '#>';
   // TODO: Checkout if knex has some utility function to add correct kind of quotes to column name
   //       this one is for PostgreSQL
-  return ['"', parsed.columnName, '"', jsonRefs].join("");
+  return ['"', parsed.columnName, '"', extractor, "'{", jsonRefs, "}'"].join("");
 }
 
 module.exports = QueryBuilder;
