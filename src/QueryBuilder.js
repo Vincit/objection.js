@@ -1591,9 +1591,11 @@ QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, js
   var fieldReference = parseFieldExpression(fieldExpression);
   if (_.isString(jsonObjectOrFieldExpression)) {
     var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
-    return this.whereRaw(fieldReference + " "  + operator + " " + rightHandReference);
+    var refRefQuery = ["(", fieldReference, ")::jsonb ", operator, " (", rightHandReference, ")::jsonb"].join("");
+    return this.whereRaw(refRefQuery);
   } else if (_.isObject(jsonObjectOrFieldExpression)) {
-    return this.whereRaw(fieldReference + " " + operator + " ?", JSON.stringify(jsonObjectOrFieldExpression));
+    var refValQuery = ["(", fieldReference, ")::jsonb ", operator, " ?::jsonb"].join("");
+    return this.whereRaw(refValQuery, JSON.stringify(jsonObjectOrFieldExpression));
   }
   throw new Error("Invalid right hand expression.");
 };
@@ -1712,7 +1714,8 @@ MoronQueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
  * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
-  return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?|', keys);
+  throw new Error("Disabled because of knex issue #519.");
+  // return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?|', keys);
 };
 
 /**
@@ -1723,7 +1726,8 @@ MoronQueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
  * @returns {MoronQueryBuilder}
  */
 MoronQueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
-  return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?&', keys);
+  throw new Error("Disabled because of knex issue #519.");
+  // return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?&', keys);
 };
 
 /**
