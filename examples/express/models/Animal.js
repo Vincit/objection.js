@@ -14,9 +14,9 @@ module.exports = Animal;
 // Table name is the only required property.
 Animal.tableName = 'Animal';
 
-// This is not the database schema! Nothing is generated based on this. Whenever an
-// Animal object is created from a JSON object, the JSON is checked against this
-// schema. For example when you call Animal.fromJson({name: 'Fluffy'});
+// Optional JSON schema. This is not the database schema! Nothing is generated
+// based on this. This is only used for validation. Whenever a model instance
+// is created it is checked against this schema. http://json-schema.org/.
 Animal.jsonSchema = {
   type: 'object',
   required: ['name'],

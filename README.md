@@ -5,6 +5,9 @@
 Moron.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
 supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/moron.js).
 
+I wrote an [introductory blog post](http://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/)
+explaining what moron.js does better than other Node.js ORMs.
+
 What moron.js gives you:
 
  * An easy declarative way of [defining models](#models) and relations between them
@@ -23,7 +26,7 @@ What moron.js doesn't give you:
     Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-Moron.js uses Promises and a coding style that makes it ready for future. You can already use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
+Moron.js uses Promises and coding practices that make it ready for future. You can already use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
 and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/moron.js/tree/master/examples/express-es7).
 
 # Topics
@@ -54,7 +57,7 @@ Best way to get started is to use one of the example projects:
 git clone git@github.com:Vincit/moron.js.git moron
 cd moron/examples/express
 npm install
-# We use knex for migrations.
+# We use knex for migrations in this example.
 npm install knex -g
 knex migrate:latest
 npm start
@@ -74,7 +77,7 @@ transpiling.
 git clone git@github.com:Vincit/moron.js.git moron
 cd moron/examples/express-es7
 npm install
-# We use knex for migrations.
+# We use knex for migrations in this example.
 npm install knex -g
 knex migrate:latest
 # This runs the Babel transpiler and executes the app.
@@ -425,10 +428,6 @@ wonder what the hell is happening. Just plain old ugly javascript inheritance.
 ```js
 var Model = require('moron').Model;
 
-/**
- * @override Model
- * @constructor
- */
 function Person() {
   Model.apply(this, arguments);
 }
@@ -445,9 +444,9 @@ Person.prototype.fullName = function () {
 // Table name is the only required property.
 Person.tableName = 'Person';
 
-// This is not the database schema! Nothing is generated based on this. Whenever a
-// Person object is created from a JSON object, the JSON is checked against this
-// schema. For example when you call Person.fromJson({firstName: 'Jennifer'});
+// Optional JSON schema. This is not the database schema! Nothing is generated
+// based on this. This is only used for validation. Whenever a model instance
+// is created it is checked against this schema. http://json-schema.org/.
 Person.jsonSchema = {
   type: 'object',
   required: ['firstName', 'lastName'],

@@ -4,9 +4,9 @@ export default class Animal extends Model {
   // Table name is the only required property.
   static tableName = 'Animal';
 
-  // This is not the database schema! Nothing is generated based on this. Whenever an
-  // Animal object is created from a JSON object, the JSON is checked against this
-  // schema. For example when you call Animal.fromJson({name: 'Fluffy'});
+  // Optional JSON schema. This is not the database schema! Nothing is generated
+  // based on this. This is only used for validation. Whenever a model instance
+  // is created it is checked against this schema. http://json-schema.org/.
   static jsonSchema = {
     type: 'object',
     required: ['name'],

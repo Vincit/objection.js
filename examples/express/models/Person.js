@@ -14,9 +14,9 @@ module.exports = Person;
 // Table name is the only required property.
 Person.tableName = 'Person';
 
-// This is not the database schema! Nothing is generated based on this. Whenever a
-// Person object is created from a JSON object, the JSON is checked against this
-// schema. For example when you call Person.fromJson({firstName: 'Jennifer'});
+// Optional JSON schema. This is not the database schema! Nothing is generated
+// based on this. This is only used for validation. Whenever a model instance
+// is created it is checked against this schema. http://json-schema.org/.
 Person.jsonSchema = {
   type: 'object',
   required: ['firstName', 'lastName'],

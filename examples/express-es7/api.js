@@ -119,15 +119,15 @@ export default function (app) {
   app.post('/persons/:id/movies', async function (req, res) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    var movie = await moron.transaction(Person, async function (Person) {
-      var person = await Person
+    let movie = await moron.transaction(Person, async function (Person) {
+      let person = await Person
         .query()
         .where('id', req.params.id)
         .first();
 
       if (!person) {
-         throwNotFound();
-       }
+        throwNotFound();
+      }
        
       return await person
         .$relatedQuery('movies')
@@ -175,7 +175,7 @@ export default function (app) {
 };
 
 function throwNotFound() {
-  var error = new Error();
+  let error = new Error();
   error.statusCode = 404;
   throw error;
 }
