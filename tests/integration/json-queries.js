@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var MoronModel = require('../../src/MoronModel');
+var MoronModel = require('../../src/Model');
 
 function expectIdsEqual(resultArray, expectedIds) {
   expectArraysEqual(_(resultArray).pluck('id').sort().value(), expectedIds);

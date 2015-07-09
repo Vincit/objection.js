@@ -4,7 +4,7 @@ var _ = require('lodash')
   , Promise = require('bluebird')
   , RelationExpression = require('./RelationExpression')
   , ValidationError = require('./ValidationError')
-  , utils = require('./moronUtils')
+  , utils = require('./utils')
   , jsonFieldExpressionParser = require('./jsonFieldExpressionParser')
   , knex = require('knex')
   ;
@@ -1585,7 +1585,7 @@ QueryBuilder.prototype.truncate = queryMethod('truncate');
  *
  * @param fieldExpression {String} Reference to column / jsonField.
  * @param jsonObjectOrFieldExpression {Object|Array|String} Reference to column / jsonField or json object.
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, jsonObjectOrFieldExpression) {
   var fieldReference = parseFieldExpression(fieldExpression);
@@ -1625,7 +1625,7 @@ QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, js
  *
  * @param fieldExpression {String} Reference to column / jsonField.
  * @param jsonObjectOrFieldExpression {Object|Array|String} Reference to column / jsonField or json object.
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
   return this.whereJsonObject(fieldExpression, "=", jsonObjectOrFieldExpression);
@@ -1665,7 +1665,7 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
  *
  * @param fieldExpression {String} Reference to column / jsonField, which is tested being supoerset.
  * @param jsonObjectOrFieldExpression {Object|Array|String} to which to compare.
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
   return this.whereJsonObject(fieldExpression, "@>", jsonObjectOrFieldExpression);
@@ -1676,13 +1676,13 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
  *
  * Object and array are always their own subsets.
  *
- * see {MoronQueryBuilder.prototype.whereJsonSupersetOf}
+ * see {QueryBuilder.prototype.whereJsonSupersetOf}
  *
  * @param fieldExpression {String}
  * @param jsonObjectOrFieldExpression
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+QueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
   return this.whereJsonObject(fieldExpression, "<@", jsonObjectOrFieldExpression);
 };
 
@@ -1690,9 +1690,9 @@ MoronQueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonO
  * Match field type to be an array.
  *
  * @param fieldExpression {String}
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
+QueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
   return this.whereJsonSupersetOf(fieldExpression, []);
 };
 
@@ -1700,9 +1700,9 @@ MoronQueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
  * Match field type to be an object.
  *
  * @param fieldExpression {String}
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
+QueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
   return this.whereJsonSupersetOf(fieldExpression, {});
 };
 
@@ -1711,9 +1711,9 @@ MoronQueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
  *
  * @param fieldExpression {String}
  * @param keys {String|Array.<String>} Strings that are looked from object or array.
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
+QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
   // return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?|', keys);
 };
@@ -1723,9 +1723,9 @@ MoronQueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
  *
  * @param fieldExpression {String}
  * @param keys {String|Array.<String>} Strings that are looked from object or array.
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
+QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
   // return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?&', keys);
 };
@@ -1737,9 +1737,9 @@ MoronQueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
  * @param fieldExpression
  * @param operator
  * @param keys
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExpression, operator, keys) {
+QueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExpression, operator, keys) {
   var fieldReference = parseFieldExpression(fieldExpression);
   keys = _.isString(keys) ? [keys] : keys;
   var questionMarksArray = _.map(keys, function (key) {
@@ -1770,9 +1770,9 @@ MoronQueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fie
  * @param fieldExpression {String} Expression pointing to certain value.
  * @param operator {String} SQL comparator usually `<`, `>`, `<>`, `=` or `!=`
  * @param value {Boolean|Number|String|null} Value to which field is compared to.
- * @returns {MoronQueryBuilder}
+ * @returns {QueryBuilder}
  */
-MoronQueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
+QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
   var fieldReference = parseFieldExpression(fieldExpression, true);
   // json type comparison takes json type in string format
   var cast;
@@ -1862,43 +1862,13 @@ function tryBuild(builder) {
 /**
  * Field expression how to refer certain nested field inside jsonb column.
  *
- * obj[key.with.dots][0].key.0.me[0] refers to
+ * Table.jsonColumn:obj[key.with.dots][0].key.0.me[0] refers to
  * obj = { "key.with.dots" : [{"key" : { "0": { me : [ "I was referred" ] }}}]
  *
- * There is 4 ways to refer fields:
- *
- * `array[<integer>]` This always refer to index of array and never to field of object.
- *
- * `object.<string>` This refers always to field of an object. May be used when
- * field name does not contain dots nor square brackets.
- *
- * `object[<string>]` Refers always to field of an object. May be used when
- * field name does not contain square brackets.
- *
- * `object["<string>"]` and `object['<string>']` Refers always to field of an
- * object. May be used when field name has square brackets.
- *
- * PostgreSQL is pretty tight about if you are referring value with index or
- * with key.
- *
- * e.g.
- * array[1] refers to first element of json array.
- * object[1] never finds anything, since json object's values must always be referred with strings
- * object.1 refers to object = { "1": "I was referred" }
- * array.1 never finds anything, because array must be referred with integers
- *
- * Reason why referring is so strict comes from PostgreSQL json reference handling:
- *
- * ```
- * postgres94=# select '{"a": {"b":"foo", "0": [1, null]}}'::json->'a'->'0';
- * returns: [1, null]
- *
- * postgres94=# select '{"a": {"b":"foo", "0": [1, null]}}'::json->'a'->'0'->'0';
- * returns: <empty>
- *
- * postgres94=# select '{"a": {"b":"foo", "0": [1, null]}}'::json->'a'->'0'->0;
- * returns: 1
- * ```
+ * Since PostgreSql #>{field,0,field2,...} operator does not make difference if
+ * reference is string or a number, one can actually use also jsonArray.0 notation
+ * to refer index of an array. Like wise one can use object[123] notation to refer
+ * key of an object { "123" : null }.
  *
  * @param expression
  * @returns {Array}

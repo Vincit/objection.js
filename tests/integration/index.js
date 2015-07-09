@@ -51,7 +51,7 @@ describe('integration tests', function () {
       require('./eager')(session);
       require('./transactions')(session);
 
-      if (knexConfig.client === 'pg') {
+      if (knexConfig.client === 'postgres') {
         require('./json-queries')(session);
       }
     });
