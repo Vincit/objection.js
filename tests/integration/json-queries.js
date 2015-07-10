@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var MoronModel = require('../../src/Model');
+var Model = require('../../src/Model');
 
 function expectIdsEqual(resultArray, expectedIds) {
   expectArraysEqual(_(resultArray).pluck('id').sort().value(), expectedIds);
@@ -14,9 +14,9 @@ function expectArraysEqual(arr1, arr2) {
 module.exports = function (session) {
 
   function ModelJson() {
-    MoronModel.apply(this, arguments);
+    Model.apply(this, arguments);
   }
-  MoronModel.extend(ModelJson);
+  Model.extend(ModelJson);
 
   ModelJson.tableName = 'ModelJson';
 
@@ -43,7 +43,7 @@ module.exports = function (session) {
 
   var BoundModel = ModelJson.bindKnex(session.knex);
 
-  describe('MoronQueryBuilder JSON queries', function () {
+  describe('QueryBuilder JSON queries', function () {
     var complexJsonObj;
 
     before(function () {
