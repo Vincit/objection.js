@@ -5,9 +5,7 @@ var _ = require('lodash')
   , RelationExpression = require('./RelationExpression')
   , ValidationError = require('./ValidationError')
   , utils = require('./utils')
-  , jsonFieldExpressionParser = require('./jsonFieldExpressionParser')
-  , knex = require('knex')
-  ;
+  , jsonFieldExpressionParser = require('./jsonFieldExpressionParser');
 
 /**
  * Query builder for Models.
@@ -1740,6 +1738,7 @@ QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExpression, operator, keys) {
+  var knex = this._modelClass.knex();
   var fieldReference = parseFieldExpression(fieldExpression);
   keys = _.isString(keys) ? [keys] : keys;
   var questionMarksArray = _.map(keys, function (key) {
@@ -1773,10 +1772,11 @@ QueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExp
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
+  var knex = this._modelClass.knex();
   var fieldReference = parseFieldExpression(fieldExpression, true);
   // json type comparison takes json type in string format
   var cast;
-  var escapedValue = knex.raw(" ?", value);
+  var escapedValue = knex.raw(" ?", [value]);
   if (_.isNumber(value)) {
     cast = "::NUMERIC";
   } else if (_.isBoolean(value)) {
