@@ -1589,14 +1589,14 @@ _*/
  * ```js
  * Person
  *   .query()
- *   .whereJsonEquals('additionalData.myDogs', 'additionalData.dogsAtHome')
+ *   .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome')
  *   .then(function (person) {
  *     // oh joy! these persons have all their dogs at home!
  *   });
  *
  * Person
  *   .query()
- *   .whereJsonEquals('additionalData.myDogs[0]', { name: "peter"})
+ *   .whereJsonEquals('additionalData:myDogs[0]', { name: "peter"})
  *   .then(function (person) {
  *     // these persons' first dog name is "peter" and the dog has no other
  *     // attributes, but its name
@@ -1612,24 +1612,23 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
 };
 
 /**
- * Json filters all results where left hand operator is superset of the right hand operand.
+ * Where left hand json field reference is superset of the right json value or reference.
  *
  * ```js
  * Person
  *   .query()
- *   .whereJsonSupersetOf('additionalData.myDogs', 'additionalData.dogsAtHome')
+ *   .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome')
  *   .then(function (person) {
- *     // oh joy! these persons has all their dogs at home!
- *     // But there might be actually some extra dogs there since
- *     // we requested with subset
+ *     // These persons have all or some of their dogs at home. Person might have some
+ *     // additional dogs in their custody since myDogs is supreset of dogsAtHome.
  *   });
  *
  * Person
  *   .query()
- *   .whereJsonSupersetOf('additionalData.myDogs[0]', { name: "peter"})
+ *   .whereJsonSupersetOf('additionalData:myDogs[0]', { name: "peter"})
  *   .then(function (person) {
- *     // these persons' first dog name is "peter", but the dog might have
- *     // additional attributes as well
+ *     // These persons' first dog name is "peter", but the dog might have
+ *     // additional attributes as well.
  *   });
  * ```
  *
@@ -1643,7 +1642,7 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
  * [1,2,3] isSuperSetOf [2,null] => false
  * [1,2,3] isSuperSetOf [] => true
  *
- * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being supoerset.
+ * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being superset.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression to which to compare.
  * @returns {QueryBuilder}
  */
@@ -1652,11 +1651,11 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
 };
 
 /**
- * Json filters all results where left hand operator is subset of the right hand operand.
+ * Where left hand json field reference is subset of the right json value or reference.
  *
  * Object and array are always their own subsets.
  *
- * see {QueryBuilder.prototype.whereJsonSupersetOf}
+ * See {@link QueryBuilder.prototype.whereJsonSupersetOf}
  *
  * @param {FieldExpression} fieldExpression
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
@@ -1667,7 +1666,7 @@ QueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObject
 };
 
 /**
- * Match field type to be an array.
+ * Where json field reference is an array.
  *
  * @param {FieldExpression} fieldExpression
  * @returns {QueryBuilder}
@@ -1677,7 +1676,7 @@ QueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
 };
 
 /**
- * Match field type to be an object.
+ * Where json field reference is an object.
  *
  * @param {FieldExpression} fieldExpression
  * @returns {QueryBuilder}
@@ -1687,7 +1686,7 @@ QueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
 };
 
 /**
- * Match if one of given strings is found from json object key(s) or array items.
+ * Where any of given strings is found from json object key(s) or array items.
  *
  * @param {FieldExpression} fieldExpression
  * @param {String|Array.<String>} keys Strings that are looked from object or array.
@@ -1700,7 +1699,7 @@ QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
 };
 
 /**
- * Match if all strings are found from json object key(s) or array items.
+ * Where all of given strings are found from json object key(s) or array items.
  *
  * @param {FieldExpression} fieldExpression
  * @param {String|Array.<String>} keys Strings that are looked from object or array.
@@ -1713,7 +1712,7 @@ QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
 };
 
 /**
- * Match if json field value comparison match.
+ * Where referred json field value casted to same type with value fulfill given operand.
  *
  * Value may be number, string, null, boolean and referred json field is converted
  * to TEXT, NUMERIC or BOOLEAN sql type for comparison.
@@ -1721,7 +1720,7 @@ QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
  * If left hand field does not exist rows appear IS null so if one needs to get only
  * rows, which has key and it's value is null one may use e.g.
  * `.whereJsonSupersetOf("column", { field: null })` or check is key exist and
- * then `.whereJsonField('column.field', 'IS', null)`
+ * then `.whereJsonField('column:field', 'IS', null)`
  *
  * For testing against objects or arrays one should see tested with whereJsonEqual,
  * whereJsonSupersetOf and whereJsonSubsetOf methods.
@@ -1840,8 +1839,8 @@ function parseFieldExpression(expression, extractAsText) {
   var extractor = extractAsText ? '#>>' : '#>';
   // TODO: Checkout if knex has some utility function to add correct kind of quotes to column name
   //       this one is for PostgreSQL
-  var middleQuotetColumnName = parsed.columnName.split('.').join('"."');
-  return ['"', middleQuotetColumnName, '"', extractor, "'{", jsonRefs, "}'"].join("");
+  var middleQuotedColumnName = parsed.columnName.split('.').join('"."');
+  return ['"', middleQuotedColumnName, '"', extractor, "'{", jsonRefs, "}'"].join("");
 }
 
 /**

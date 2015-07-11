@@ -100,7 +100,7 @@ describe('jsonFieldExpressionParser', function () {
   testFail('col:field["fa"]il"]');
   testFail("col:field['fa']il']");
 
-  describe("yanking up test coverage...", function () {
+  describe("field expression parser's general options", function () {
     it("should fail if wrong start rule in parser options", function () {
       expect(function () {
         parser.parse('col', { startRule: 'undefined is not a function' })

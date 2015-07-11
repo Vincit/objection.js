@@ -588,7 +588,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should be able to find boolean equals true', function () {
+      it('should be able to find boolean equals false', function () {
         return BoundModel.query().whereJsonField("jsonObject:booleanField", '=', false)
           .then(function (results) {
             expectIdsEqual(results, [1]);
