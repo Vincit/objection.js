@@ -1569,38 +1569,20 @@ QueryBuilder.prototype.truncate = queryMethod('truncate');
 
 /**
  * Json query APIs
+_*/
+
+/**
+ * Json field expression to refer jsonb columns or keys / objects inside columns.
+ *
+ * e.g. `Person.jsonColumnName:details.names[1]` would refer column
+ * `Person.jsonColumnName` which has `{ details: { names: ['First', 'Second', 'Last'] } }`
+ * object stored in it.
+ *
+ * @typedef {String} FieldExpression
  */
 
 /**
- * Json field filter.
- *
- * Supports having field expression in both sides of operand, but right hand value cannot
- * be any other value, but only string reference to other column/json filed, json array
- * or json object.
- *
- * Converts left and right hand values to PostgreSQL acceptable format and add user chosen
- * operator between left and right hand expressions.
- *
- * @param fieldExpression {String} Reference to column / jsonField.
- * @param jsonObjectOrFieldExpression {Object|Array|String} Reference to column / jsonField or json object.
- * @returns {QueryBuilder}
- */
-QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, jsonObjectOrFieldExpression) {
-  var fieldReference = parseFieldExpression(fieldExpression);
-  if (_.isString(jsonObjectOrFieldExpression)) {
-    var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
-    var refRefQuery = ["(", fieldReference, ")::jsonb ", operator, " (", rightHandReference, ")::jsonb"].join("");
-    return this.whereRaw(refRefQuery);
-  } else if (_.isObject(jsonObjectOrFieldExpression)) {
-    var refValQuery = ["(", fieldReference, ")::jsonb ", operator, " ?::jsonb"].join("");
-    return this.whereRaw(refValQuery, JSON.stringify(jsonObjectOrFieldExpression));
-  }
-  throw new Error("Invalid right hand expression.");
-};
-
-
-/**
- * Json equality comparison.
+ * Where jsonb field reference equals jsonb object or other field reference.
  *
  * Also supports having field expression in both sides of equality.
  *
@@ -1609,7 +1591,7 @@ QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, js
  *   .query()
  *   .whereJsonEquals('additionalData.myDogs', 'additionalData.dogsAtHome')
  *   .then(function (person) {
- *     // oh joy! these persons has all their dogs at home!
+ *     // oh joy! these persons have all their dogs at home!
  *   });
  *
  * Person
@@ -1621,12 +1603,12 @@ QueryBuilder.prototype.whereJsonObject = function (fieldExpression, operator, js
  *   });
  * ```
  *
- * @param fieldExpression {String} Reference to column / jsonField.
- * @param jsonObjectOrFieldExpression {Object|Array|String} Reference to column / jsonField or json object.
+ * @param {FieldExpression} fieldExpression Reference to column / jsonField.
+ * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression Reference to column / jsonField or json object.
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
-  return this.whereJsonObject(fieldExpression, "=", jsonObjectOrFieldExpression);
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "=", jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1661,12 +1643,12 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
  * [1,2,3] isSuperSetOf [2,null] => false
  * [1,2,3] isSuperSetOf [] => true
  *
- * @param fieldExpression {String} Reference to column / jsonField, which is tested being supoerset.
- * @param jsonObjectOrFieldExpression {Object|Array|String} to which to compare.
+ * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being supoerset.
+ * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression to which to compare.
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
-  return this.whereJsonObject(fieldExpression, "@>", jsonObjectOrFieldExpression);
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1676,18 +1658,18 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
  *
  * see {QueryBuilder.prototype.whereJsonSupersetOf}
  *
- * @param fieldExpression {String}
- * @param jsonObjectOrFieldExpression
+ * @param {FieldExpression} fieldExpression
+ * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
-  return this.whereJsonObject(fieldExpression, "<@", jsonObjectOrFieldExpression);
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression);
 };
 
 /**
  * Match field type to be an array.
  *
- * @param fieldExpression {String}
+ * @param {FieldExpression} fieldExpression
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
@@ -1697,7 +1679,7 @@ QueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
 /**
  * Match field type to be an object.
  *
- * @param fieldExpression {String}
+ * @param {FieldExpression} fieldExpression
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
@@ -1707,49 +1689,25 @@ QueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
 /**
  * Match if one of given strings is found from json object key(s) or array items.
  *
- * @param fieldExpression {String}
- * @param keys {String|Array.<String>} Strings that are looked from object or array.
+ * @param {FieldExpression} fieldExpression
+ * @param {String|Array.<String>} keys Strings that are looked from object or array.
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
-  // return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?|', keys);
+  // return whereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?|', keys);
 };
 
 /**
  * Match if all strings are found from json object key(s) or array items.
  *
- * @param fieldExpression {String}
- * @param keys {String|Array.<String>} Strings that are looked from object or array.
+ * @param {FieldExpression} fieldExpression
+ * @param {String|Array.<String>} keys Strings that are looked from object or array.
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
-  // return this.whereJsonFieldRightStringArrayOnLeft(fieldExpression, '?&', keys);
-};
-
-/**
- * Helper method for making queries where there is field expression on left side and
- * string or an array of strings on right hand side.
- *
- * @param fieldExpression
- * @param operator
- * @param keys
- * @returns {QueryBuilder}
- */
-QueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExpression, operator, keys) {
-  var knex = this._modelClass.knex();
-  var fieldReference = parseFieldExpression(fieldExpression);
-  keys = _.isString(keys) ? [keys] : keys;
-  var questionMarksArray = _.map(keys, function (key) {
-    if (!_.isString(key)) {
-      throw new Error("All keys to find must be strings.");
-    }
-    return "?";
-  });
-  var rawSqlTemplateString = "array[" + questionMarksArray.join(",") + "]";
-  var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
-  return this.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
+  // return whereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
 };
 
 /**
@@ -1766,9 +1724,9 @@ QueryBuilder.prototype.whereJsonFieldRightStringArrayOnLeft = function (fieldExp
  * For testing against objects or arrays one should see tested with whereJsonEqual,
  * whereJsonSupersetOf and whereJsonSubsetOf methods.
  *
- * @param fieldExpression {String} Expression pointing to certain value.
- * @param operator {String} SQL comparator usually `<`, `>`, `<>`, `=` or `!=`
- * @param value {Boolean|Number|String|null} Value to which field is compared to.
+ * @param {FieldExpression} fieldExpression Expression pointing to certain value.
+ * @param {String} operator SQL comparator usually `<`, `>`, `<>`, `=` or `!=`
+ * @param {Boolean|Number|String|null} value Value to which field is compared to.
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
@@ -1870,8 +1828,9 @@ function tryBuild(builder) {
  * to refer index of an array. Like wise one can use object[123] notation to refer
  * key of an object { "123" : null }.
  *
- * @param expression
- * @returns {Array}
+ * @param {String} expression
+ * @param {Boolean} extractAsText Return text instead of jsonb object (useful for type casting).
+ * @returns {Array} Array of referred path, where first item is table/column.
  */
 function parseFieldExpression(expression, extractAsText) {
   var parsed = jsonFieldExpressionParser.parse(expression);
@@ -1881,6 +1840,72 @@ function parseFieldExpression(expression, extractAsText) {
   //       this one is for PostgreSQL
   var middleQuotetColumnName = parsed.columnName.split('.').join('"."');
   return ['"', middleQuotetColumnName, '"', extractor, "'{", jsonRefs, "}'"].join("");
+}
+
+/**
+ * Where jsonb reference on left hand side is compared to jsonb value or reference on the right hand side.
+ *
+ * Converts left and right hand values to PostgreSQL acceptable format and add user chosen
+ * operator between left and right hand expressions.
+ *
+ * ```javascript
+ * whereJsonbRefOnLeftJsonbValOrRefOnRight(queryBuilder, "ModelJson.jsonObject:objectField", "<@", { key: 1 })
+ * ```
+ *
+ * ```sql
+ * select * from "ModelJson" where ("ModelJson"."jsonObject"#>'{objectField}')::jsonb <@ '{\"key\":\ 1}'::jsonb
+ * ```
+ *
+ * @param {QueryBuilder} builder
+ * @param {FieldExpression} fieldExpression Reference to column / jsonField.
+ * @param {String} operator operator to apply.
+ * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression Reference to column / jsonField or json object.
+ * @returns {QueryBuilder}
+ */
+function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression) {
+  var fieldReference = parseFieldExpression(fieldExpression);
+  if (_.isString(jsonObjectOrFieldExpression)) {
+    var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
+    var refRefQuery = ["(", fieldReference, ")::jsonb ", operator, " (", rightHandReference, ")::jsonb"].join("");
+    return builder.whereRaw(refRefQuery);
+  } else if (_.isObject(jsonObjectOrFieldExpression)) {
+    var refValQuery = ["(", fieldReference, ")::jsonb ", operator, " ?::jsonb"].join("");
+    return builder.whereRaw(refValQuery, JSON.stringify(jsonObjectOrFieldExpression));
+  }
+  throw new Error("Invalid right hand expression.");
+}
+
+/**
+ * Where field expression on left side and string or an array of strings on right hand side.
+ *
+ * ```javascript
+ * whereJsonFieldRightStringArrayOnLeft(queryBuilder, "ModelJson.jsonObject:a", "?&",  ["1","2"])
+ * ```
+ *
+ * ```sql
+ * select * from "ModelJson" where "ModelJson"."jsonObject"#>'{a}' ?& array['1','2']
+ * ```
+ *
+ * @param {QueryBuilder} builder
+ * @param {FieldExpression} fieldExpression
+ * @param {String} operator
+ * @param {Array.<String>} keys
+ * @returns {QueryBuilder}
+ */
+function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
+  var knex = builder._modelClass.knex();
+  var fieldReference = parseFieldExpression(fieldExpression);
+  keys = _.isString(keys) ? [keys] : keys;
+  var questionMarksArray = _.map(keys, function (key) {
+    if (!_.isString(key)) {
+      throw new Error("All keys to find must be strings.");
+    }
+    return "?";
+  });
+  var rawSqlTemplateString = "array[" + questionMarksArray.join(",") + "]";
+  var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
+
+  return builder.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
 }
 
 module.exports = QueryBuilder;

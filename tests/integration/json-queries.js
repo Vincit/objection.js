@@ -129,7 +129,7 @@ module.exports = function (session) {
       });
     });
 
-    describe('.whereJsonObject(fieldExpr, operator, <array|object|string>)', function () {
+    describe('function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpr, operator, <array|object|string>)', function () {
       it('should fail if right hand is null', function () {
         expect(function () {
           BoundModel.query().whereJsonEquals("jsonArray", null);
@@ -201,7 +201,6 @@ module.exports = function (session) {
 
       it('should find result for jsonObject.a == jsonObject[b]', function () {
         return BoundModel.query().whereJsonEquals("jsonObject:a", "jsonObject:[b]")
-          .dumpSql()
           .then(function (results) {
             expectIdsEqual(results, [7]);
           });
