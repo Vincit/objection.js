@@ -1693,6 +1693,7 @@ QueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
  * @param {String|Array.<String>} keys Strings that are looked from object or array.
  * @returns {QueryBuilder}
  */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
 QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
   // return whereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?|', keys);
@@ -1705,6 +1706,7 @@ QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
  * @param {String|Array.<String>} keys Strings that are looked from object or array.
  * @returns {QueryBuilder}
  */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
 QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
   // return whereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
@@ -1892,6 +1894,7 @@ function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, opera
  * @param {Array.<String>} keys
  * @returns {QueryBuilder}
  */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
 function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
   var knex = builder._modelClass.knex();
   var fieldReference = parseFieldExpression(fieldExpression);
