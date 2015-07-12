@@ -159,6 +159,39 @@ describe('ManyToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+
+      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
+      mockKnexQueryResults = [expectedResult];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .where('name', 'Teppo')
+        .orWhere('age', '>', 60)
+        .findImpl(function () {
+          relation.find(this, owner);
+        })
+        .then(function (result) {
+          expect(result).to.have.length(2);
+          expect(result).to.eql(_.omit(expectedResult, '_join_'));
+          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, '_join_'));
+          expect(result[0]).to.be.a(RelatedModel);
+          expect(result[1]).to.be.a(RelatedModel);
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal([
+            'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
+            'from "RelatedModel"',
+            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
+            'where "name" = \'Teppo\'',
+            'and "someColumn" = \'100\'',
+            'or "age" > \'60\'',
+            'and "JoinTable"."ownerId" in (\'666\')'
+          ].join(' '));
+        });
+    });
+
   });
 
   describe('insert', function () {
@@ -360,6 +393,36 @@ describe('ManyToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+      var owner = OwnerModel.fromJson({oid: 666});
+      var update = RelatedModel.fromJson({a: 'str1'});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .updateImpl(function (updt) {
+          relation.update(this, owner, updt);
+        })
+        .update(update)
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored')
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({a: 'str1'});
+          expect(result).to.be.a(RelatedModel);
+          expect(executedQueries[0]).to.eql([
+            'update "RelatedModel" set "a" = \'str1\'',
+            'where "gender" = \'male\'',
+            'and "someColumn" = \'100\'',
+            'and "thingy" is not null and',
+            '"RelatedModel"."id" in',
+            '(select "JoinTable"."relatedId" from "JoinTable"',
+            'where "JoinTable"."ownerId" = \'666\')'
+          ].join(' '));
+        });
+    });
+
   });
 
   describe('patch', function () {
@@ -472,6 +535,36 @@ describe('ManyToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+      var owner = OwnerModel.fromJson({oid: 666});
+      var patch = RelatedModel.fromJson({a: 'str1'});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .patchImpl(function (patch) {
+          relation.patch(this, owner, patch);
+        })
+        .patch(patch)
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored')
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({a: 'str1'});
+          expect(result).to.be.a(RelatedModel);
+          expect(executedQueries[0]).to.eql([
+            'update "RelatedModel" set "a" = \'str1\'',
+            'where "gender" = \'male\'',
+            'and "someColumn" = \'100\'',
+            'and "thingy" is not null and',
+            '"RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
+          ].join(' '));
+        });
+    });
+
   });
 
   describe('delete', function () {
@@ -492,6 +585,26 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')');
+        });
+    });
+
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .deleteImpl(function () {
+          relation.delete(this, owner);
+        })
+        .delete()
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored')
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({});
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')');
         });
     });
 
@@ -542,6 +655,7 @@ describe('ManyToManyRelation', function () {
   describe('unrelate', function () {
 
     it('should generate a unrelate query', function () {
+      createFilteredRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
 
       return QueryBuilder
@@ -554,10 +668,27 @@ describe('ManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "JoinTable" where "JoinTable"."ownerId" = \'666\' and "JoinTable"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" where "code" in (\'55\', \'66\', \'77\'))');
+          expect(executedQueries[0]).to.eql('delete from "JoinTable" where "JoinTable"."ownerId" = \'666\' and "JoinTable"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" where "code" in (\'55\', \'66\', \'77\') and "someColumn" = \'100\')');
         });
     });
 
   });
+
+  function createFilteredRelation(filter) {
+    relation = new ManyToManyRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
+      modelClass: RelatedModel,
+      relation: ManyToManyRelation,
+      filter: filter,
+      join: {
+        from: 'OwnerModel.oid',
+        through: {
+          from: "JoinTable.ownerId",
+          to: "JoinTable.relatedId"
+        },
+        to: 'RelatedModel.rid'
+      }
+    });
+  }
 
 });

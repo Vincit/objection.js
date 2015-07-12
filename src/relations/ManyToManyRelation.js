@@ -83,7 +83,9 @@ ManyToManyRelation.prototype.update = function (builder, $owner, $update) {
   // This adds the update operation and the needed runAfter* methods.
   this.relatedModelClass.$$update(builder, $update);
 
-  return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
+  return builder
+    .whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery)
+    .call(this.filter);
 };
 
 ManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
@@ -93,7 +95,9 @@ ManyToManyRelation.prototype.patch = function (builder, $owner, $patch) {
   // This adds the patch operation and the needed runAfter* methods.
   this.relatedModelClass.$$patch(builder, $patch);
 
-  return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
+  return builder
+    .whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery)
+    .call(this.filter);
 };
 
 ManyToManyRelation.prototype.delete = function (builder, $owner) {
@@ -103,7 +107,9 @@ ManyToManyRelation.prototype.delete = function (builder, $owner) {
   // This adds the delete operation and the needed runAfter* methods.
   this.relatedModelClass.$$delete(builder);
 
-  return builder.whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery);
+  return builder
+    .whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery)
+    .call(this.filter);
 };
 
 ManyToManyRelation.prototype.relate = function (builder, $owner, $ids) {
@@ -128,7 +134,8 @@ ManyToManyRelation.prototype.unrelate = function (builder, $owner) {
     .clone()
     .clear('select')
     .clearCustomImpl()
-    .select(this.fullRelatedCol());
+    .select(this.fullRelatedCol())
+    .call(this.filter);
 
   // Delete the join rows from the join table.
   return builder
@@ -143,7 +150,8 @@ ManyToManyRelation.prototype.unrelate = function (builder, $owner) {
 ManyToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) {
   return builder
     .join(this.joinTable, this.fullJoinTableRelatedCol(), this.fullRelatedCol())
-    .whereIn(this.fullJoinTableOwnerCol(), ownerIds);
+    .whereIn(this.fullJoinTableOwnerCol(), ownerIds)
+    .call(this.filter);
 };
 
 ManyToManyRelation.prototype._makeFindIdQuery = function (ownerId) {

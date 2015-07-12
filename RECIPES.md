@@ -7,6 +7,7 @@
 - [Paging](#paging)
 - [Subqueries](#subqueries)
 - [Joins](#joins)
+- [Polymorphic associations](#polymorphic-associations)
 
 ## Raw queries
 
@@ -152,3 +153,49 @@ Person
     console.log(persons[0].parentName);
   });
 ```
+
+## Polymorphic associations
+
+Creating polymorphic associations isn't as easy as it could be at the moment, but it can be done using
+custom filters for relations. Let's assume we have tables `Comment`, `Issue` and `PullRequest`. Both
+`Issue` and `PullRequest` can have a list of comments. `Comment` has a column `commentableId` to hold
+the foreign key and `commentableType` to hold the related model type. You can set up the relations
+like this:
+
+```js
+Issue.relationMappings = {
+  comments: {
+    relation: Model.OneToManyRelation,
+    modelClass: Comment,
+    filter: {commentableType: 'Issue'},
+    join: {
+      from: 'Issue.id',
+      to: 'Comment.commentableId'
+    }
+  }
+};
+
+PullRequest.relationMappings = {
+  comments: {
+    relation: Model.OneToManyRelation,
+    modelClass: Comment,
+    filter: {commentableType: 'PullRequest'},
+    join: {
+      from: 'PullRequest.id',
+      to: 'Comment.commentableId'
+    }
+  }
+};
+```
+
+The `{commentableType: 'Type'}` filter adds a `WHERE "commentableType" = 'Type'` clause to the relation fetch
+query. It doesn't automatically set the type when you insert a new comment. You have to set the `commentableType`
+manually:
+
+```js
+someIssue
+  .$relatedQuery('comments')
+  .insert({text: 'blaa', commentableType: 'Issue'})
+  .then(...)
+```
+

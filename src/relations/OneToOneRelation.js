@@ -115,7 +115,7 @@ OneToOneRelation.prototype._makeFindQuery = function (builder, relatedIds) {
   if (_.isEmpty(relatedIds)) {
     return builder.resolve([]);
   } else {
-    return builder.whereIn(this.fullRelatedCol(), relatedIds);
+    return builder.whereIn(this.fullRelatedCol(), relatedIds).call(this.filter);
   }
 };
 

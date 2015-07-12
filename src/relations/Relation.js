@@ -24,6 +24,10 @@ var _ = require('lodash')
  *    A relation constructor. You can use one of Model.OneToOneRelation, Model.OneToManyRelation and
  *    Model.ManyToManyRelation or even write your own relation type by subclassing {@link Relation}.
  *
+ * @property {Object|function(QueryBuilder)} filter
+ *    Additional filter for the relation. It can be either a hash of {column: 'value'} pairs or
+ *    a function that takes a QueryBuilder as a parameter.
+ *
  * @property {RelationJoin} [join]
  *    An object that describes how the two models are related.
  */
@@ -116,11 +120,11 @@ function Relation(relationName, OwnerClass) {
   this.joinTableRelatedCol = null;
 
   /**
-   * Optional additional query.
+   * Optional additional filter query.
    *
    * @type {function (QueryBuilder)}
    */
-  this.additionalQuery = null;
+  this.filter = null;
 }
 
 /**
@@ -236,11 +240,11 @@ Relation.prototype.setMapping = function (mapping) {
     }
   }
 
-  this.query = parseMappingQuery(mapping);
   this.ownerProp = this._propertyName(joinOwner, this.ownerModelClass);
   this.ownerCol = joinOwner.name;
   this.relatedProp = this._propertyName(joinRelated, this.relatedModelClass);
   this.relatedCol = joinRelated.name;
+  this.filter = parseFilter(mapping);
 };
 
 Relation.prototype.fullOwnerCol = function () {
@@ -270,7 +274,7 @@ Relation.prototype.clone = function () {
   clone.joinTable = this.joinTable;
   clone.joinTableOwnerCol = this.joinTableOwnerCol;
   clone.joinTableRelatedCol = this.joinTableRelatedCol;
-  clone.additionalQuery = this.additionalQuery;
+  clone.filter = this.filter;
 
   return clone;
 };
@@ -325,12 +329,12 @@ Relation.prototype._propertyName = function (column, modelClass) {
   return propertyName;
 };
 
-function parseMappingQuery(mapping) {
-  if (_.isFunction(mapping.query)) {
-    return mapping.query;
-  } else if (_.isObject(mapping.query)) {
+function parseFilter(mapping) {
+  if (_.isFunction(mapping.filter)) {
+    return mapping.filter;
+  } else if (_.isObject(mapping.filter)) {
     return function (queryBuilder) {
-      queryBuilder.where(mapping.query);
+      queryBuilder.where(mapping.filter);
     };
   } else {
     return _.noop;

@@ -134,6 +134,31 @@ describe('OneToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 'foo'});
+
+      var expectedResult = [{a: 1, ownerId: 666}, {a: 2, ownerId: 666}];
+      mockKnexQueryResults = [expectedResult];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .where('name', 'Teppo')
+        .orWhere('age', '>', 60)
+        .findImpl(function () {
+          relation.find(this, owner);
+        })
+        .then(function (result) {
+          expect(result).to.have.length(2);
+          expect(result).to.eql(expectedResult);
+          expect(owner.nameOfOurRelation).to.eql(expectedResult);
+          expect(result[0]).to.be.a(RelatedModel);
+          expect(result[1]).to.be.a(RelatedModel);
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' and "someColumn" = \'foo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\')');
+        });
+    });
+
   });
 
   describe('insert', function () {
@@ -305,6 +330,29 @@ describe('OneToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+
+      var owner = OwnerModel.fromJson({oid: 666});
+      var update = RelatedModel.fromJson({a: 'str1'});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .updateImpl(function (updt) {
+          relation.update(this, owner, updt);
+        })
+        .update(update)
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored')
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({a: 'str1'});
+          expect(result).to.be.a(RelatedModel);
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+        });
+    });
+
   });
 
   describe('patch', function () {
@@ -392,6 +440,28 @@ describe('OneToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+
+      var owner = OwnerModel.fromJson({oid: 666});
+      var patch = RelatedModel.fromJson({a: 'str1'});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .patchImpl(function (patch) {
+          relation.patch(this, owner, patch);
+        })
+        .patch(patch)
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored')
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({a: 'str1'});
+          expect(result).to.be.a(RelatedModel);
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+        });
+    });
   });
 
   describe('delete', function () {
@@ -412,6 +482,26 @@ describe('OneToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+        });
+    });
+
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .deleteImpl(function () {
+          relation.delete(this, owner);
+        })
+        .delete()
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored')
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({});
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
         });
     });
 
@@ -474,6 +564,36 @@ describe('OneToManyRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100});
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .unrelateImpl(function () {
+          relation.unrelate(this, owner);
+        })
+        .unrelate()
+        .whereIn('code', [55, 66 ,77])
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({});
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = NULL where "code" in (\'55\', \'66\', \'77\') and "RelatedModel"."ownerId" = \'666\' and "someColumn" = \'100\'');
+        });
+    });
+
   });
 
+  function createFilteredRelation(filter) {
+    relation = new OneToManyRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
+      modelClass: RelatedModel,
+      relation: OneToManyRelation,
+      filter: filter,
+      join: {
+        from: 'OwnerModel.oid',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+  }
 });

@@ -89,13 +89,14 @@ OneToManyRelation.prototype.unrelate = function (builder, $owner) {
   return builder
     .update(this.relatedCol, null)
     .where(this.fullRelatedCol(), owner[this.ownerProp])
+    .call(this.filter)
     .runAfterPushFront(function () {
       return {};
     });
 };
 
 OneToManyRelation.prototype._makeFindQuery = function (builder, ownerIds) {
-  return builder.whereIn(this.fullRelatedCol(), _.compact(ownerIds));
+  return builder.whereIn(this.fullRelatedCol(), _.compact(ownerIds)).call(this.filter);
 };
 
 module.exports = OneToManyRelation;

@@ -124,6 +124,52 @@ describe('OneToOneRelation', function () {
         });
     });
 
+    it('should apply the filter (object)', function () {
+      createFilteredRelation({filterCol: 100});
+
+      var expectedResult = [{id: 1, a: 10, rid: 1}];
+      mockKnexQueryResults = [expectedResult];
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .findImpl(function () {
+          relation.find(this, owner);
+        })
+        .then(function (result) {
+          expect(result).to.have.length(1);
+          expect(result).to.eql(expectedResult);
+          expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
+          expect(result[0]).to.be.a(RelatedModel);
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (\'1\') and "filterCol" = \'100\'');
+        });
+    });
+
+    it('should apply the filter (function)', function () {
+      createFilteredRelation(function (query) {
+        query.where('name', 'Jennifer');
+      });
+
+      var expectedResult = [{id: 1, a: 10, rid: 1}];
+      mockKnexQueryResults = [expectedResult];
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .findImpl(function () {
+          relation.find(this, owner);
+        })
+        .then(function (result) {
+          expect(result).to.have.length(1);
+          expect(result).to.eql(expectedResult);
+          expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
+          expect(result[0]).to.be.a(RelatedModel);
+          expect(executedQueries).to.have.length(1);
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (\'1\') and "name" = \'Jennifer\'');
+        });
+    });
+
   });
 
   describe('insert', function () {
@@ -292,6 +338,26 @@ describe('OneToOneRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 'foo'});
+
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
+      var update = RelatedModel.fromJson({a: 'str1'});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .updateImpl(function (updt) {
+          relation.update(this, owner, updt);
+        })
+        .update(update)
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({a: 'str1'});
+          expect(result).to.be.a(RelatedModel);
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\') and "someColumn" = \'foo\'');
+        });
+    });
+
   });
 
   describe('patch', function () {
@@ -373,6 +439,26 @@ describe('OneToOneRelation', function () {
         });
     });
 
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 'foo'});
+
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
+      var update = RelatedModel.fromJson({a: 'str1'});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .patchImpl(function (patch) {
+          relation.patch(this, owner, patch);
+        })
+        .patch(update)
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({a: 'str1'});
+          expect(result).to.be.a(RelatedModel);
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\') and "someColumn" = \'foo\'');
+        });
+    });
+
   });
 
   describe('delete', function () {
@@ -390,6 +476,23 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" in ('2')");
+        });
+    });
+
+    it('should apply the filter', function () {
+      createFilteredRelation({someColumn: 100})
+      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
+
+      return QueryBuilder
+        .forClass(RelatedModel)
+        .deleteImpl(function () {
+          relation.delete(this, owner);
+        })
+        .delete()
+        .then(function (result) {
+          expect(executedQueries).to.have.length(1);
+          expect(result).to.eql({});
+          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" in ('2') and \"someColumn\" = '100'");
         });
     });
 
@@ -451,5 +554,18 @@ describe('OneToOneRelation', function () {
     });
 
   });
+
+  function createFilteredRelation(filter) {
+    relation = new OneToOneRelation('nameOfOurRelation', OwnerModel);
+    relation.setMapping({
+      modelClass: RelatedModel,
+      relation: OneToOneRelation,
+      filter: filter,
+      join: {
+        from: 'OwnerModel.relatedId',
+        to: 'RelatedModel.rid'
+      }
+    });
+  }
 
 });
