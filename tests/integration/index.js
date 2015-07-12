@@ -50,6 +50,10 @@ describe('integration tests', function () {
       require('./unrelate')(session);
       require('./eager')(session);
       require('./transactions')(session);
+
+      if (knexConfig.client === 'postgres') {
+        require('./json-queries')(session);
+      }
     });
   });
 
