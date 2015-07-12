@@ -1733,6 +1733,8 @@ QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
 QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
   var knex = this._modelClass.knex();
   var fieldReference = parseFieldExpression(fieldExpression, true);
+  var normalizedOperator = normalizeOperator(knex, operator);
+
   // json type comparison takes json type in string format
   var cast;
   var escapedValue = knex.raw(" ?", [value]);
@@ -1748,7 +1750,7 @@ QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, val
   } else {
     throw new Error("Value must be string, number, boolean or null.");
   }
-  return this.whereRaw(["(", fieldReference, ")", cast, " ", operator," ", escapedValue].join(""));
+  return this.whereRaw(["(", fieldReference, ")", cast, " ", normalizedOperator," ", escapedValue].join(""));
 };
 
 /**
@@ -1908,6 +1910,23 @@ function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator
   var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
 
   return builder.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
+}
+
+/**
+ * @private
+ * @param knex
+ * @param {String} operator
+ * @returns {String}
+ */
+function normalizeOperator(knex, operator) {
+  var trimmedLowerCase = operator.trim().toLowerCase();
+  switch (trimmedLowerCase) {
+    case "is":
+    case "is not":
+      return trimmedLowerCase;
+    default:
+      return knex.client.formatter().operator(operator);
+  }
 }
 
 module.exports = QueryBuilder;

@@ -527,6 +527,12 @@ module.exports = function (session) {
     });
 
     describe('.whereJsonField(fieldExpr, operator, value)', function () {
+      it('should throw error if operator is not valid', function () {
+        expect(function () {
+          BoundModel.query().whereJsonField("jsonObject:numberField", ';', {});
+        }).to.throwException();
+      });
+
       it('should throw error if value is object', function () {
         expect(function () {
           BoundModel.query().whereJsonField("jsonObject:numberField", '>', {});
