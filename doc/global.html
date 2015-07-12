@@ -62,11 +62,27 @@
 						</li>
 						
 						<li>
+							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
+						</li>
+						
+						<li>
 							<a href="global.html#queryMethod">queryMethod</a>
 						</li>
 						
 						<li>
 							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRight">whereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeft">whereJsonFieldRightStringArrayOnLeft</a>
 						</li>
 						
 
@@ -155,6 +171,183 @@
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="parseFieldExpression">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">parseFieldExpression</span>
+          <span class="signature-container"><span class="signature">(expression, extractAsText)</span><span class="type-signature"> &rarr; {Array}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Field expression how to refer certain nested field inside jsonb column.</p>
+<p>Table.jsonColumn:obj[key.with.dots][0].key.0.me[0] refers to
+obj = { &quot;key.with.dots&quot; : [{&quot;key&quot; : { &quot;0&quot;: { me : [ &quot;I was referred&quot; ] }}}]</p>
+<p>Since PostgreSql #&gt;{field,0,field2,...} operator does not make difference if
+reference is string or a number, one can actually use also jsonArray.0 notation
+to refer index of an array. Like wise one can use object[123] notation to refer
+key of an object { &quot;123&quot; : null }.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>expression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>extractAsText</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Return text instead of jsonb object (useful for type casting).</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Array of referred path, where first item is table/column.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Array</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
             
         
             
@@ -393,6 +586,438 @@ knex queries you can do this:</p>
 </dd>
 
             
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonbRefOnLeftJsonbValOrRefOnRight">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonbRefOnLeftJsonbValOrRefOnRight</span>
+          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where jsonb reference on left hand side is compared to jsonb value or reference on the right hand side.</p>
+<p>Converts left and right hand values to PostgreSQL acceptable format and add user chosen
+operator between left and right hand expressions.</p>
+<pre class="prettyprint source lang-javascript"><code>whereJsonbRefOnLeftJsonbValOrRefOnRight(queryBuilder, &quot;ModelJson.jsonObject:objectField&quot;, &quot;&lt;@&quot;, { key: 1 })</code></pre><pre class="prettyprint source lang-sql"><code>select * from &quot;ModelJson&quot; where (&quot;ModelJson&quot;.&quot;jsonObject&quot;#>'{objectField}')::jsonb &lt;@ '{\&quot;key\&quot;:\ 1}'::jsonb</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>builder</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>operator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>operator to apply.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonObjectOrFieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField or json object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonFieldRightStringArrayOnLeft">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonFieldRightStringArrayOnLeft</span>
+          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where field expression on left side and string or an array of strings on right hand side.</p>
+<pre class="prettyprint source lang-javascript"><code>whereJsonFieldRightStringArrayOnLeft(queryBuilder, &quot;ModelJson.jsonObject:a&quot;, &quot;?&&quot;,  [&quot;1&quot;,&quot;2&quot;])</code></pre><pre class="prettyprint source lang-sql"><code>select * from &quot;ModelJson&quot; where &quot;ModelJson&quot;.&quot;jsonObject&quot;#>'{a}' ?& array['1','2']</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>builder</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>operator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>keys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
         </dl>
     
 
@@ -400,6 +1025,74 @@ knex queries you can do this:</p>
         <h3 class="subsection-title">Type Definitions</h3>
 
         <dl>
+                
+<dt>
+    <h4 class="name" id="FieldExpression">
+      <span class="modifiers-container"></span>
+      <span class="content">FieldExpression</span>
+      <span class="signature-container"></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Json field expression to refer jsonb columns or keys / objects inside columns.</p>
+<p>e.g. <code>Person.jsonColumnName:details.names[1]</code> would refer column
+<code>Person.jsonColumnName</code> which has <code>{ details: { names: ['First', 'Second', 'Last'] } }</code>
+object stored in it.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
                 
 <dt>
     <h4 class="name" id="ModelOptions">
@@ -952,8 +1645,8 @@ knex queries you can do this:</p>
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Mon Jul 6th 2015 using the <a
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+		on Sun Jul 12th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

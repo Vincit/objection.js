@@ -62,11 +62,27 @@
 						</li>
 						
 						<li>
+							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
+						</li>
+						
+						<li>
 							<a href="global.html#queryMethod">queryMethod</a>
 						</li>
 						
 						<li>
 							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRight">whereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeft">whereJsonFieldRightStringArrayOnLeft</a>
 						</li>
 						
 
@@ -9817,6 +9833,1382 @@ want to update a subset of properties use the <code>patch()</code> method.</p>
               
 <dt>
     
+        <h4 class="name" id="whereJsonEquals">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonEquals</span>
+          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where jsonb field reference equals jsonb object or other field reference.</p>
+<p>Also supports having field expression in both sides of equality.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome')
+  .then(function (person) {
+    // oh joy! these persons have all their dogs at home!
+  });
+
+Person
+  .query()
+  .whereJsonEquals('additionalData:myDogs[0]', { name: &quot;peter&quot;})
+  .then(function (person) {
+    // these persons' first dog name is &quot;peter&quot; and the dog has no other
+    // attributes, but its name
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonObjectOrFieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField or json object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonField">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonField</span>
+          <span class="signature-container"><span class="signature">(fieldExpression, operator, value)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where referred json field value casted to same type with value fulfill given operand.</p>
+<p>Value may be number, string, null, boolean and referred json field is converted
+to TEXT, NUMERIC or BOOLEAN sql type for comparison.</p>
+<p>If left hand field does not exist rows appear IS null so if one needs to get only
+rows, which has key and it's value is null one may use e.g.
+<code>.whereJsonSupersetOf(&quot;column&quot;, { field: null })</code> or check is key exist and
+then <code>.whereJsonField('column:field', 'IS', null)</code></p>
+<p>For testing against objects or arrays one should see tested with whereJsonEqual,
+whereJsonSupersetOf and whereJsonSubsetOf methods.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Expression pointing to certain value.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>operator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>SQL comparator usually <code>&lt;</code>, <code>&gt;</code>, <code>&lt;&gt;</code>, <code>=</code> or <code>!=</code></p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+|
+
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">String</span>
+|
+
+<span class="param-type">null</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Value to which field is compared to.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonHasAll">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonHasAll</span>
+          <span class="signature-container"><span class="signature">(fieldExpression, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where all of given strings are found from json object key(s) or array items.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>keys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Strings that are looked from object or array.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonHasAny">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonHasAny</span>
+          <span class="signature-container"><span class="signature">(fieldExpression, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where any of given strings is found from json object key(s) or array items.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>keys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Strings that are looked from object or array.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonIsArray">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonIsArray</span>
+          <span class="signature-container"><span class="signature">(fieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where json field reference is an array.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonIsObject">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonIsObject</span>
+          <span class="signature-container"><span class="signature">(fieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where json field reference is an object.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonSubsetOf">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonSubsetOf</span>
+          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where left hand json field reference is subset of the right json value or reference.</p>
+<p>Object and array are always their own subsets.</p>
+<p>See QueryBuilder.prototype.whereJsonSupersetOf</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonObjectOrFieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonSupersetOf">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonSupersetOf</span>
+          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where left hand json field reference is superset of the right json value or reference.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome')
+  .then(function (person) {
+    // These persons have all or some of their dogs at home. Person might have some
+    // additional dogs in their custody since myDogs is supreset of dogsAtHome.
+  });
+
+Person
+  .query()
+  .whereJsonSupersetOf('additionalData:myDogs[0]', { name: &quot;peter&quot;})
+  .then(function (person) {
+    // These persons' first dog name is &quot;peter&quot;, but the dog might have
+    // additional attributes as well.
+  });</code></pre><p>Object and array are always their own supersets.</p>
+<p>For arrays this mean that all arrays of left side matches if it has all the elements
+listed in the right hand side. e.g.</p>
+<p>[1,2,3] isSuperSetOf [2] =&gt; true
+[1,2,3] isSuperSetOf [2,1,3] =&gt; true
+[1,2,3] isSuperSetOf [2,null] =&gt; false
+[1,2,3] isSuperSetOf [] =&gt; true</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField, which is tested being superset.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonObjectOrFieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>to which to compare.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="whereNotBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotBetween</span>
@@ -10488,8 +11880,8 @@ want to update a subset of properties use the <code>patch()</code> method.</p>
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a>
-		on Mon Jul 6th 2015 using the <a
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+		on Sun Jul 12th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
