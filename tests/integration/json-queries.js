@@ -271,6 +271,15 @@ module.exports = function (session) {
             expectIdsEqual(results, [4]);
           });
       });
+
+      it('should find results jsonArray == [2,1] OR jsonArray = [1,2]', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray", [2,1])
+          .orWhereJsonEquals("jsonArray", [1,2])
+          .then(function (results) {
+            expectIdsEqual(results, [4]);
+          });
+      });
     });
 
     describe('.whereJsonSupersetOf(fieldExpr, <array|object|string>)', function () {
@@ -346,24 +355,33 @@ module.exports = function (session) {
             expect(results).to.have.length(0);
           });
       });
+
+      it('should find results jsonObject @> [] OR jsonObject @> {}', function () {
+        return BoundModel.query()
+          .whereJsonSupersetOf("jsonObject", [])
+          .orWhereJsonSupersetOf("jsonObject", {})
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
     });
 
     describe('.whereJsonSubsetOf(fieldExpr, <array|object|string>)', function () {
-      it('should find all empty arrays with jsonArray @> []', function () {
+      it('should find all empty arrays with jsonArray <@ []', function () {
         return BoundModel.query().whereJsonSubsetOf("jsonArray", [])
           .then(function (results) {
             expectIdsEqual(results, [2,6,7]);
           });
       });
 
-      it('should find results jsonArray @> [1,2] (set is its own superset)', function () {
+      it('should find results jsonArray <@ [1,2] (set is its own subset)', function () {
         return BoundModel.query().whereJsonSubsetOf("jsonArray", [1,2])
           .then(function (results) {
             expectIdsEqual(results, [2,4,6,7]);
           });
       });
 
-      it('should not find results jsonArray @> {}', function () {
+      it('should not find results jsonArray <@ {}', function () {
         return BoundModel.query()
           .whereJsonSubsetOf("jsonArray", {})
           .then(function (results) {
@@ -371,7 +389,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should not find results jsonObject @> []', function () {
+      it('should not find results jsonObject <@ []', function () {
         return BoundModel.query()
           .whereJsonSubsetOf("jsonObject", [])
           .then(function (results) {
@@ -387,7 +405,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should find results jsonObject @> {}', function () {
+      it('should find results jsonObject <@ {}', function () {
         return BoundModel.query()
           .whereJsonSubsetOf("jsonObject", {})
           .then(function (results) {
@@ -395,7 +413,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should find results jsonObject.objectField @> complexJsonObj.jsonObject.objectField', function () {
+      it('should find results jsonObject.objectField <@ complexJsonObj.jsonObject.objectField', function () {
         return BoundModel.query()
           .whereJsonSubsetOf("jsonObject:objectField", complexJsonObj.jsonObject.objectField )
           .then(function (results) {
@@ -403,7 +421,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should find results jsonObject.objectField @> complexJsonObj.jsonObject.objectField that has additional key', function () {
+      it('should find results jsonObject.objectField <@ complexJsonObj.jsonObject.objectField that has additional key', function () {
         complexJsonObj.jsonObject.objectField.otherKey = "Im here too!";
         return BoundModel.query()
           .whereJsonSubsetOf("jsonObject:objectField", complexJsonObj.jsonObject.objectField )
@@ -412,13 +430,22 @@ module.exports = function (session) {
           });
       });
 
-      it('should not find results jsonObject.objectField @> { object: "other string" }', function () {
+      it('should not find results jsonObject.objectField <@ { object: "other string" }', function () {
         return BoundModel.query()
           .whereJsonSubsetOf("jsonObject:objectField", {
             object: "something else"
           })
           .then(function (results) {
             expect(results).to.have.length(0);
+          });
+      });
+
+      it('should find results jsonObject <@ {} OR jsonArray <@ []', function () {
+        return BoundModel.query()
+          .whereJsonSubsetOf("jsonObject", {})
+          .orWhereJsonSubsetOf("jsonArray", [])
+          .then(function (results) {
+            expectIdsEqual(results, [2,4,5,6,7]);
           });
       });
     });
@@ -438,10 +465,12 @@ module.exports = function (session) {
           });
       });
 
-      it('should find nothing for non existing field', function () {
-        return BoundModel.query().whereJsonIsObject("jsonObject:objectField.imNot")
+      it('should find objects with orWhereJsonIsArray', function () {
+        return BoundModel.query()
+          .whereJsonIsArray("jsonObject")
+          .orWhereJsonIsArray("jsonArray")
           .then(function (results) {
-            expect(results).to.have.length(0);
+            expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
     });
@@ -465,6 +494,15 @@ module.exports = function (session) {
         return BoundModel.query().whereJsonIsObject("jsonObject:arrayField.imNot")
           .then(function (results) {
             expect(results).to.have.length(0);
+          });
+      });
+
+      it('should find objects with orWhereJsonIsObject', function () {
+        return BoundModel.query()
+          .whereJsonIsObject("jsonArray")
+          .orWhereJsonIsObject("jsonObject:objectField")
+          .then(function (results) {
+            expectIdsEqual(results, [1]);
           });
       });
     });
