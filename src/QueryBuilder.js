@@ -1637,10 +1637,12 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
  * For arrays this mean that all arrays of left side matches if it has all the elements
  * listed in the right hand side. e.g.
  *
+ * ```
  * [1,2,3] isSuperSetOf [2] => true
  * [1,2,3] isSuperSetOf [2,1,3] => true
  * [1,2,3] isSuperSetOf [2,null] => false
  * [1,2,3] isSuperSetOf [] => true
+ * ```
  *
  * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being superset.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression to which to compare.
@@ -1655,7 +1657,7 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
  *
  * Object and array are always their own subsets.
  *
- * See {@link QueryBuilder.prototype.whereJsonSupersetOf}
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
  *
  * @param {FieldExpression} fieldExpression
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
@@ -1731,26 +1733,13 @@ QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
-  var knex = this._modelClass.knex();
-  var fieldReference = parseFieldExpression(fieldExpression, true);
-  var normalizedOperator = normalizeOperator(knex, operator);
+  var query = whereJsonFieldQuery(this, fieldExpression, operator, value);
+  return this.whereRaw(query);
+};
 
-  // json type comparison takes json type in string format
-  var cast;
-  var escapedValue = knex.raw(" ?", [value]);
-  if (_.isNumber(value)) {
-    cast = "::NUMERIC";
-  } else if (_.isBoolean(value)) {
-    cast = "::BOOLEAN";
-  } else if (_.isString(value)) {
-    cast = "::TEXT";
-  } else if (_.isNull(value)) {
-    cast = "::TEXT";
-    escapedValue = 'NULL';
-  } else {
-    throw new Error("Value must be string, number, boolean or null.");
-  }
-  return this.whereRaw(["(", fieldReference, ")", cast, " ", normalizedOperator," ", escapedValue].join(""));
+QueryBuilder.prototype.orWhereJsonField = function (fieldExpression, operator, value) {
+  var query = whereJsonFieldQuery(this, fieldExpression, operator, value);
+  return this.orWhereRaw(query);
 };
 
 /**
@@ -1910,6 +1899,33 @@ function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator
   var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
 
   return builder.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
+}
+
+/**
+ * @see {@link QueryBuilder#whereJsonField} for documentation.
+ * @private
+ */
+function whereJsonFieldQuery(builder, fieldExpression, operator, value, or) {
+  var knex = builder._modelClass.knex();
+  var fieldReference = parseFieldExpression(fieldExpression, true);
+  var normalizedOperator = normalizeOperator(knex, operator);
+
+  // json type comparison takes json type in string format
+  var cast;
+  var escapedValue = knex.raw(" ?", [value]);
+  if (_.isNumber(value)) {
+    cast = "::NUMERIC";
+  } else if (_.isBoolean(value)) {
+    cast = "::BOOLEAN";
+  } else if (_.isString(value)) {
+    cast = "::TEXT";
+  } else if (_.isNull(value)) {
+    cast = "::TEXT";
+    escapedValue = 'NULL';
+  } else {
+    throw new Error("Value must be string, number, boolean or null.");
+  }
+  return ["(", fieldReference, ")", cast, " ", normalizedOperator," ", escapedValue].join("")
 }
 
 /**

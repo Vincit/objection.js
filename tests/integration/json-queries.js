@@ -600,6 +600,15 @@ module.exports = function (session) {
             expectIdsEqual(results, [1]);
           });
       });
+
+      it('should be able to find every but first row where booleanField equals true or is NULL', function () {
+        return BoundModel.query()
+          .whereJsonField("jsonObject:booleanField", '=', true)
+          .orWhereJsonField("jsonObject:booleanField", 'IS', null)
+          .then(function (results) {
+            expectIdsEqual(results, [2,3,4,5,6,7]);
+          });
+      });
     });
 
   });
