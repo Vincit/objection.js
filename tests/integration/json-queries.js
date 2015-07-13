@@ -511,8 +511,26 @@ module.exports = function (session) {
           });
       });
 
+      it('should find results for hasAny(notMe) orHasAny(b)', function () {
+        return BoundModel.query()
+          .whereJsonHasAny("jsonObject", 'notMe')
+          .orWhereJsonHasAny("jsonObject", 'b')
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
       it('should find results for a and b', function () {
         return BoundModel.query().whereJsonHasAll("jsonObject", ['a', 'b'])
+          .then(function (results) {
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results for hasAll(notMe) orHasAll([a, b])', function () {
+        return BoundModel.query()
+          .whereJsonHasAll("jsonObject", 'notMe')
+          .orWhereJsonHasAll("jsonObject", ['a', 'b'])
           .then(function (results) {
             expectIdsEqual(results, [7]);
           });

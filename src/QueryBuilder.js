@@ -1701,6 +1701,14 @@ QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
 };
 
 /**
+ * @see {@link QueryBuilder#whereJsonHasAny}
+ */
+QueryBuilder.prototype.orWhereJsonHasAny = function (fieldExpression, keys) {
+  throw new Error("Disabled because of knex issue #519.");
+  // return orWhereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?|', keys);
+};
+
+/**
  * Where all of given strings are found from json object key(s) or array items.
  *
  * @param {FieldExpression} fieldExpression
@@ -1711,6 +1719,14 @@ QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
 QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
   // return whereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonHasAll}
+ */
+QueryBuilder.prototype.orWhereJsonHasAll = function (fieldExpression, keys) {
+  throw new Error("Disabled because of knex issue #519.");
+  // return orWhereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
 };
 
 /**
@@ -1737,6 +1753,9 @@ QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, val
   return this.whereRaw(query);
 };
 
+/**
+ * @see {@link QueryBuilder#whereJsonField}
+ */
 QueryBuilder.prototype.orWhereJsonField = function (fieldExpression, operator, value) {
   var query = whereJsonFieldQuery(this, fieldExpression, operator, value);
   return this.orWhereRaw(query);
@@ -1886,6 +1905,26 @@ function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, opera
  */
 /* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
 function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
+  var query = whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys);
+  return builder.whereRaw(query);
+}
+
+/**
+ * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
+ * @private
+ */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
+function orWhereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
+  var query = whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys);
+  return builder.orWhereRaw(query);
+}
+
+/**
+ * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
+ * @private
+ */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
+function whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys) {
   var knex = builder._modelClass.knex();
   var fieldReference = parseFieldExpression(fieldExpression);
   keys = _.isString(keys) ? [keys] : keys;
@@ -1898,7 +1937,7 @@ function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator
   var rawSqlTemplateString = "array[" + questionMarksArray.join(",") + "]";
   var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
 
-  return builder.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
+  return [fieldReference, " ", operator, " ", rightHandExpression].join("");
 }
 
 /**
