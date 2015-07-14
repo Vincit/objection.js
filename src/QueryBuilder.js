@@ -1619,6 +1619,26 @@ QueryBuilder.prototype.orWhereJsonEquals = function (fieldExpression, jsonObject
 };
 
 /**
+ * @see {@link QueryBuilder#whereJsonEquals}
+ */
+QueryBuilder.prototype.whereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression)
+    // select * from "ModelJson" where ("jsonArray"#>'{}')::jsonb != '[]'::jsonb;
+    // does not include rows where jsonArray is sql NULL so special treatment is added for it
+    .orWhereJsonField(fieldExpression, "IS", null);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonEquals}
+ */
+QueryBuilder.prototype.orWhereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression)
+    // select * from "ModelJson" where ("jsonArray"#>'{}')::jsonb != '[]'::jsonb;
+    // does not include rows where jsonArray is sql NULL so special treatment is added for it
+    .orWhereJsonField(fieldExpression, "IS", null);
+};
+
+/**
  * Where left hand json field reference is superset of the right json value or reference.
  *
  * ```js

@@ -171,6 +171,13 @@ module.exports = function (session) {
           });
       });
 
+      it('should find results for jsonArray != []', function () {
+        return BoundModel.query().whereJsonNotEquals("jsonArray", [])
+          .then(function (results) {
+            expectIdsEqual(results, [1,3,4,5]);
+          });
+      });
+
       it('should find results for jsonObject == {}', function () {
         return BoundModel.query().whereJsonEquals("jsonObject", {})
           .then(function (results) {
@@ -272,12 +279,21 @@ module.exports = function (session) {
           });
       });
 
-      it('should find results jsonArray == [2,1] OR jsonArray = [1,2]', function () {
+      it('should find results jsonArray == [2,1] OR jsonArray == [1,2]', function () {
         return BoundModel.query()
           .whereJsonEquals("jsonArray", [2,1])
           .orWhereJsonEquals("jsonArray", [1,2])
           .then(function (results) {
             expectIdsEqual(results, [4]);
+          });
+      });
+
+      it('should find results jsonArray == [1,2] OR jsonArray != [1,2]', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray", [1,2])
+          .orWhereJsonNotEquals("jsonArray", [1,2])
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,3,4,5,6,7]);
           });
       });
     });
