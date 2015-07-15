@@ -1622,20 +1622,16 @@ QueryBuilder.prototype.orWhereJsonEquals = function (fieldExpression, jsonObject
  * @see {@link QueryBuilder#whereJsonEquals}
  */
 QueryBuilder.prototype.whereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
-  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression)
-    // select * from "ModelJson" where ("jsonArray"#>'{}')::jsonb != '[]'::jsonb;
-    // does not include rows where jsonArray is sql NULL so special treatment is added for it
-    .orWhereJsonField(fieldExpression, "IS", null);
+  var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
+  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
  * @see {@link QueryBuilder#whereJsonEquals}
  */
 QueryBuilder.prototype.orWhereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
-  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression)
-    // select * from "ModelJson" where ("jsonArray"#>'{}')::jsonb != '[]'::jsonb;
-    // does not include rows where jsonArray is sql NULL so special treatment is added for it
-    .orWhereJsonField(fieldExpression, "IS", null);
+  var builder = orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
+  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1671,6 +1667,21 @@ QueryBuilder.prototype.orWhereJsonNotEquals = function (fieldExpression, jsonObj
  * [1,2,3] isSuperSetOf [] => true
  * ```
  *
+ * Not variants with jsonb operators behaves a bit illogically with postgres, since they
+ * does not match rows, which does not have the referred json key.
+ *
+ * To make not-variants to return all rows that normal query did not return returns some
+ * extra parts are added to query. TODO: add example and SQL
+ *
+ * ```
+ * select * where not ref1 superset of ref2
+ *
+ * should return:
+ * all rows where ref1 is null or does not exist
+ * all rows where ref2 is null or does not exist
+ * all rows where not ref1 superset of ref2
+ * ```
+ *
  * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being superset.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression to which to compare.
  * @returns {QueryBuilder}
@@ -1684,6 +1695,24 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
  */
 QueryBuilder.prototype.orWhereJsonSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
   return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
+ */
+QueryBuilder.prototype.whereJsonNotSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
+  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
+ */
+QueryBuilder.prototype.orWhereJsonNotSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  var builder = orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
+  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1706,6 +1735,24 @@ QueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObject
  */
 QueryBuilder.prototype.orWhereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
   return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSubsetOf}
+ */
+QueryBuilder.prototype.whereJsonNotSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
+  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSubsetOf}
+ */
+QueryBuilder.prototype.orWhereJsonNotSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  var builder = orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
+  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1926,10 +1973,11 @@ function parseFieldExpression(expression, extractAsText) {
  * @param {FieldExpression} fieldExpression Reference to column / jsonField.
  * @param {String} operator operator to apply.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression Reference to column / jsonField or json object.
+ * @param {String=} queryPrefix String prepended to query e.g. 'not'. Space after string added implicitly.
  * @returns {QueryBuilder}
  */
-function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression) {
-  var queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression);
+function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
+  var queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix);
   return builder.whereRaw.apply(builder, queryParams);
 }
 
@@ -1937,8 +1985,8 @@ function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, opera
  * @private
  * @see {@link whereJsonbRefOnLeftJsonbValOrRefOnRight} for documentation.
  */
-function orWhereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression) {
-  var queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression);
+function orWhereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
+  var queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix);
   return builder.orWhereRaw.apply(builder, queryParams);
 }
 
@@ -1947,15 +1995,21 @@ function orWhereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, ope
  * @see {@link whereJsonbRefOnLeftJsonbValOrRefOnRight} for documentation.
  * @return {Array} Parameters for whereRaw call.
  */
-function whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression) {
+function whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
   var fieldReference = parseFieldExpression(fieldExpression);
   if (_.isString(jsonObjectOrFieldExpression)) {
     var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
-    var refRefQuery = ["(", fieldReference, ")::jsonb ", operator, " (", rightHandReference, ")::jsonb"].join("");
-    return [refRefQuery];
+    var refRefQuery = ["(", fieldReference, ")::jsonb", operator, "(", rightHandReference, ")::jsonb"];
+    if (queryPrefix) {
+      refRefQuery.unshift(queryPrefix);
+    }
+    return [refRefQuery.join(" ")];
   } else if (_.isObject(jsonObjectOrFieldExpression)) {
-    var refValQuery = ["(", fieldReference, ")::jsonb ", operator, " ?::jsonb"].join("");
-    return [refValQuery, JSON.stringify(jsonObjectOrFieldExpression)];
+    var refValQuery = ["(", fieldReference, ")::jsonb", operator, "?::jsonb"];
+    if (queryPrefix) {
+      refValQuery.unshift(queryPrefix);
+    }
+    return [refValQuery.join(" "), JSON.stringify(jsonObjectOrFieldExpression)];
   }
   throw new Error("Invalid right hand expression.");
 }
@@ -2022,6 +2076,17 @@ function whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, ope
   var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
 
   return [fieldReference, " ", operator, " ", rightHandExpression].join("");
+}
+
+/**
+ * @private
+ */
+function orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression) {
+  builder = builder.orWhereJsonField(fieldExpression, "IS", null);
+  if (_.isString(jsonObjectOrFieldExpression)) {
+    builder = builder.orWhereJsonField(jsonObjectOrFieldExpression, "IS", null);
+  }
+ return builder;
 }
 
 /**
