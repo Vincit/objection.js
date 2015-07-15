@@ -174,7 +174,7 @@ module.exports = function (session) {
       it('should find results for jsonArray != []', function () {
         return BoundModel.query().whereJsonNotEquals("jsonArray", [])
           .then(function (results) {
-            expectIdsEqual(results, [1,3,4,5]);
+            expectIdsEqual(results, [1,4,5]);
           });
       });
 
@@ -293,7 +293,7 @@ module.exports = function (session) {
           .whereJsonEquals("jsonArray", [1,2])
           .orWhereJsonNotEquals("jsonArray", [1,2])
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6,7]);
+            expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
 
@@ -301,7 +301,7 @@ module.exports = function (session) {
         return BoundModel.query()
           .whereJsonNotEquals("jsonObject:a", "jsonObject:b")
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6]);
+            expectIdsEqual(results, []);
           });
       });
 
@@ -310,7 +310,24 @@ module.exports = function (session) {
           .whereJsonEquals("jsonObject:a", "jsonObject:b")
           .orWhereJsonNotEquals("jsonObject:a", "jsonObject:b")
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6, 7]);
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results jsonObject != jsonArray', function () {
+        return BoundModel.query()
+          .whereJsonNotEquals("jsonObject", "jsonArray")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
+
+      it('should find results jsonArray = {} or jsonObject != jsonArray', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray", {})
+          .orWhereJsonNotEquals("jsonObject", "jsonArray")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
     });
@@ -403,7 +420,7 @@ module.exports = function (session) {
         return BoundModel.query()
           .whereJsonNotSupersetOf("jsonObject:objectField", complexJsonObj.jsonObject.objectField)
           .then(function (results) {
-            expectIdsEqual(results, [2,3,4,5,6,7]);
+            expectIdsEqual(results, []);
           });
       });
 
@@ -411,7 +428,7 @@ module.exports = function (session) {
         return BoundModel.query()
           .whereJsonNotSupersetOf("jsonObject:a", "jsonObject:b")
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6]);
+            expectIdsEqual(results, []);
           });
       });
 
@@ -420,7 +437,24 @@ module.exports = function (session) {
           .whereJsonSupersetOf("jsonObject:a", "jsonObject:b")
           .orWhereJsonNotSupersetOf("jsonObject:a", "jsonObject:b")
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6,7]);
+            expectIdsEqual(results, [7]);
+          });
+      });
+
+      it('should find results not jsonObject.x @> jsonObject.y', function () {
+        return BoundModel.query()
+          .whereJsonNotSupersetOf("jsonObject:x", "jsonObject:y")
+          .then(function (results) {
+            expectIdsEqual(results, []);
+          });
+      });
+
+      it('should find results jsonArray = {} or not jsonObject @> jsonArray', function () {
+        return BoundModel.query()
+          .whereJsonEquals("jsonArray", {})
+          .orWhereJsonNotSupersetOf("jsonObject", "jsonArray")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
     });
@@ -513,7 +547,7 @@ module.exports = function (session) {
         return BoundModel.query()
           .whereJsonNotSubsetOf("jsonObject:a", "jsonObject:b")
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6]);
+            expectIdsEqual(results, []);
           });
       });
 
@@ -522,7 +556,7 @@ module.exports = function (session) {
           .whereJsonSubsetOf("jsonObject:a", "jsonObject:b")
           .orWhereJsonNotSubsetOf("jsonObject:a", "jsonObject:b")
           .then(function (results) {
-            expectIdsEqual(results, [1,2,3,4,5,6,7]);
+            expectIdsEqual(results, [7]);
           });
       });
     });

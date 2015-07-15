@@ -1622,16 +1622,14 @@ QueryBuilder.prototype.orWhereJsonEquals = function (fieldExpression, jsonObject
  * @see {@link QueryBuilder#whereJsonEquals}
  */
 QueryBuilder.prototype.whereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
-  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
 };
 
 /**
  * @see {@link QueryBuilder#whereJsonEquals}
  */
 QueryBuilder.prototype.orWhereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var builder = orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
-  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1667,20 +1665,23 @@ QueryBuilder.prototype.orWhereJsonNotEquals = function (fieldExpression, jsonObj
  * [1,2,3] isSuperSetOf [] => true
  * ```
  *
- * Not variants with jsonb operators behaves a bit illogically with postgres, since they
- * does not match rows, which does not have the referred json key.
- *
- * To make not-variants to return all rows that normal query did not return returns some
- * extra parts are added to query. TODO: add example and SQL
- *
+ * Not variants with jsonb operators behaves in a way that they won't match rows, which does not have
+ * the referred json key referred in field expression. e.g. for table
  * ```
- * select * where not ref1 superset of ref2
- *
- * should return:
- * all rows where ref1 is null or does not exist
- * all rows where ref2 is null or does not exist
- * all rows where not ref1 superset of ref2
+ *  id |    jsonObject
+ * ----+--------------------------
+ *   1 | {}
+ *   2 | NULL
+ *   3 | {"a": 1}
+ *   4 | {"a": 1, "b": 2}
+ *   5 | {"a": ['3'], "b": ['3']}
  * ```
+ * query:
+ * ```javascript
+ * .whereJsonNotEquals("jsonObject:a", "jsonObject:b")
+ * ```
+ * Returns only the row `4` which has keys `a` and `b` and `a` != `b`, but it won't return any rows which
+ * does not have `jsonObject.a` or `jsonObject.b`.
  *
  * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being superset.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression to which to compare.
@@ -1701,18 +1702,16 @@ QueryBuilder.prototype.orWhereJsonSupersetOf = function (fieldExpression, jsonOb
  * @see {@link QueryBuilder#whereJsonSupersetOf}
  */
 QueryBuilder.prototype.whereJsonNotSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(
     this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
-  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
  * @see {@link QueryBuilder#whereJsonSupersetOf}
  */
 QueryBuilder.prototype.orWhereJsonNotSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var builder = orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
     this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
-  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
@@ -1741,18 +1740,16 @@ QueryBuilder.prototype.orWhereJsonSubsetOf = function (fieldExpression, jsonObje
  * @see {@link QueryBuilder#whereJsonSubsetOf}
  */
 QueryBuilder.prototype.whereJsonNotSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(
     this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
-  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
  * @see {@link QueryBuilder#whereJsonSubsetOf}
  */
 QueryBuilder.prototype.orWhereJsonNotSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
-  var builder = orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
     this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
-  return orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression);
 };
 
 /**
@@ -2076,17 +2073,6 @@ function whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, ope
   var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
 
   return [fieldReference, " ", operator, " ", rightHandExpression].join("");
-}
-
-/**
- * @private
- */
-function orWhereOneOfExpressionsNullOrUndefined(builder, fieldExpression, jsonObjectOrFieldExpression) {
-  builder = builder.orWhereJsonField(fieldExpression, "IS", null);
-  if (_.isString(jsonObjectOrFieldExpression)) {
-    builder = builder.orWhereJsonField(jsonObjectOrFieldExpression, "IS", null);
-  }
- return builder;
 }
 
 /**
