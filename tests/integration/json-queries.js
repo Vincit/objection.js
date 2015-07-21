@@ -621,6 +621,15 @@ module.exports = function (session) {
             expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
+
+      it('should find all rows with orWhereJsonNotArray(jsonObject)', function () {
+        return BoundModel.query()
+          .whereJsonIsObject("jsonArray")
+          .orWhereJsonNotArray("jsonObject")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,3,4,5,6,7]);
+          });
+      });
     });
 
     describe('.whereJsonIsObject(fieldExpr)', function () {
@@ -688,6 +697,15 @@ module.exports = function (session) {
           .dumpSql()
           .then(function (results) {
             expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
+
+      it('should find all rows with orWhereJsonNotObject(jsonArray)', function () {
+        return BoundModel.query()
+          .whereJsonIsArray("jsonObject")
+          .orWhereJsonNotObject("jsonArray")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,3,4,5,6,7]);
           });
       });
     });
