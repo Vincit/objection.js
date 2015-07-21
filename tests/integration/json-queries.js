@@ -584,6 +584,43 @@ module.exports = function (session) {
             expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
+
+      it('should add parenthesis for find arrays with whereJsonNotArray()', function () {
+        return BoundModel.query()
+          .whereJsonNotArray("jsonObject")
+          .whereJsonIsObject("jsonObject")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
+
+      // TODO: may be enabled, when query builder does not reorder queries anymore
+      it.skip('should add parenthesis for find arrays with orWhereJsonNotArray()', function () {
+        // OUTPUTS:
+        // select * from "ModelJson" where
+        //   ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb and
+        //   ( "jsonObject"#>'{}' )::jsonb @> '{}'::jsonb or
+        //   (
+        //     not ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb or
+        //     ("jsonObject"#>>'{}')::TEXT is NULL
+        //   )
+        //
+        // SHOULD BE:
+        // select * from "ModelJson" where
+        //   ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb or
+        //   (
+        //     not ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb or
+        //     ("jsonObject"#>>'{}')::TEXT is NULL
+        //   ) and
+        //   ( "jsonObject"#>'{}' )::jsonb @> '{}'::jsonb
+        return BoundModel.query()
+          .whereJsonIsObject("jsonArray")
+          .orWhereJsonNotArray("jsonObject")
+          .whereJsonIsObject("jsonObject")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
     });
 
     describe('.whereJsonIsObject(fieldExpr)', function () {
@@ -614,6 +651,43 @@ module.exports = function (session) {
           .orWhereJsonIsObject("jsonObject:objectField")
           .then(function (results) {
             expectIdsEqual(results, [1]);
+          });
+      });
+
+      it('should add parenthesis for find objects with whereJsonNotObject(jsonArray)', function () {
+        return BoundModel.query()
+          .whereJsonNotObject("jsonArray")
+          .whereJsonIsArray("jsonArray")
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
+          });
+      });
+
+      // TODO: may be enabled, when query builder does not reorder queries anymore
+      it.skip('should add parenthesis for find objects with orWhereJsonNotObject(jsonArray)', function () {
+        // OUTPUTS:
+        // select * from "ModelJson" where
+        //   ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb and
+        //   ( "jsonArray"#>'{}' )::jsonb @> '[]'::jsonb or
+        //   (
+        //     not ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb or
+        //     ("jsonArray"#>>'{}')::TEXT is NULL
+        //   )
+        // SHOULD BE:
+        // select * from "ModelJson" where
+        //   ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb or
+        //   (
+        //     not ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb or
+        //     ("jsonArray"#>>'{}')::TEXT is NULL
+        //   ) and
+        //   ( "jsonArray"#>'{}' )::jsonb @> '[]'::jsonb
+        return BoundModel.query()
+          .whereJsonIsArray("jsonObject")
+          .orWhereJsonNotObject("jsonArray")
+          .whereJsonIsArray("jsonArray")
+          .dumpSql()
+          .then(function (results) {
+            expectIdsEqual(results, [1,2,4,5,6,7]);
           });
       });
     });
