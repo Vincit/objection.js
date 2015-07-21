@@ -1771,6 +1771,7 @@ QueryBuilder.prototype.orWhereJsonIsArray = function (fieldExpression) {
 
 /**
  * @see {@link QueryBuilder#whereJsonIsArray}
+ * @note Also returns rows where `fieldExpression` does not exist.
  */
 QueryBuilder.prototype.whereJsonNotArray = function (fieldExpression) {
   var knex = this._modelClass.knex();
@@ -1786,6 +1787,7 @@ QueryBuilder.prototype.whereJsonNotArray = function (fieldExpression) {
 
 /**
  * @see {@link QueryBuilder#whereJsonIsArray}
+ * @note Also returns rows where `fieldExpression` does not exist.
  */
 QueryBuilder.prototype.orWhereJsonNotArray = function (fieldExpression) {
   var knex = this._modelClass.knex();
@@ -1817,6 +1819,7 @@ QueryBuilder.prototype.orWhereJsonIsObject = function (fieldExpression) {
 
 /**
  * @see {@link QueryBuilder#whereJsonIsObject}
+ * @note Also returns rows where `fieldExpression` does not exist.
  */
 QueryBuilder.prototype.whereJsonNotObject = function (fieldExpression) {
   var knex = this._modelClass.knex();
@@ -1831,6 +1834,7 @@ QueryBuilder.prototype.whereJsonNotObject = function (fieldExpression) {
 
 /**
  * @see {@link QueryBuilder#whereJsonIsObject}
+ * @note Also returns rows where `fieldExpression` does not exist.
  */
 QueryBuilder.prototype.orWhereJsonNotObject = function (fieldExpression) {
   var knex = this._modelClass.knex();
