@@ -1612,6 +1612,27 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
 };
 
 /**
+ * @see {@link QueryBuilder#whereJsonEquals}
+ */
+QueryBuilder.prototype.orWhereJsonEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "=", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonEquals}
+ */
+QueryBuilder.prototype.whereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonEquals}
+ */
+QueryBuilder.prototype.orWhereJsonNotEquals = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
+};
+
+/**
  * Where left hand json field reference is superset of the right json value or reference.
  *
  * ```js
@@ -1637,10 +1658,30 @@ QueryBuilder.prototype.whereJsonEquals = function (fieldExpression, jsonObjectOr
  * For arrays this mean that all arrays of left side matches if it has all the elements
  * listed in the right hand side. e.g.
  *
+ * ```
  * [1,2,3] isSuperSetOf [2] => true
  * [1,2,3] isSuperSetOf [2,1,3] => true
  * [1,2,3] isSuperSetOf [2,null] => false
  * [1,2,3] isSuperSetOf [] => true
+ * ```
+ *
+ * Not variants with jsonb operators behaves in a way that they won't match rows, which does not have
+ * the referred json key referred in field expression. e.g. for table
+ * ```
+ *  id |    jsonObject
+ * ----+--------------------------
+ *   1 | {}
+ *   2 | NULL
+ *   3 | {"a": 1}
+ *   4 | {"a": 1, "b": 2}
+ *   5 | {"a": ['3'], "b": ['3']}
+ * ```
+ * query:
+ * ```javascript
+ * .whereJsonNotEquals("jsonObject:a", "jsonObject:b")
+ * ```
+ * Returns only the row `4` which has keys `a` and `b` and `a` != `b`, but it won't return any rows which
+ * does not have `jsonObject.a` or `jsonObject.b`.
  *
  * @param {FieldExpression} fieldExpression Reference to column / jsonField, which is tested being superset.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression to which to compare.
@@ -1651,11 +1692,34 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
 };
 
 /**
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
+ */
+QueryBuilder.prototype.orWhereJsonSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
+ */
+QueryBuilder.prototype.whereJsonNotSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
+ */
+QueryBuilder.prototype.orWhereJsonNotSupersetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
+};
+
+/**
  * Where left hand json field reference is subset of the right json value or reference.
  *
  * Object and array are always their own subsets.
  *
- * See {@link QueryBuilder.prototype.whereJsonSupersetOf}
+ * @see {@link QueryBuilder#whereJsonSupersetOf}
  *
  * @param {FieldExpression} fieldExpression
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
@@ -1663,6 +1727,29 @@ QueryBuilder.prototype.whereJsonSupersetOf = function (fieldExpression, jsonObje
  */
 QueryBuilder.prototype.whereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
   return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSubsetOf}
+ */
+QueryBuilder.prototype.orWhereJsonSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSubsetOf}
+ */
+QueryBuilder.prototype.whereJsonNotSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return whereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonSubsetOf}
+ */
+QueryBuilder.prototype.orWhereJsonNotSubsetOf = function (fieldExpression, jsonObjectOrFieldExpression) {
+  return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(
+    this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
 };
 
 /**
@@ -1676,6 +1763,44 @@ QueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
 };
 
 /**
+ * @see {@link QueryBuilder#whereJsonIsArray}
+ */
+QueryBuilder.prototype.orWhereJsonIsArray = function (fieldExpression) {
+  return this.orWhereJsonSupersetOf(fieldExpression, []);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonIsArray}
+ * @note Also returns rows where `fieldExpression` does not exist.
+ */
+QueryBuilder.prototype.whereJsonNotArray = function (fieldExpression) {
+  var knex = this._modelClass.knex();
+  // uhh... ugly. own subquery builder could help... now this refers to plain knex subquery builder
+  return this.where(function () {
+    // not array
+    var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", [], 'not');
+    var ifRefNotExistQuery = whereJsonFieldQuery(knex, fieldExpression, "IS", null);
+    // or not exist
+    builder.orWhereRaw(ifRefNotExistQuery);
+  });
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonIsArray}
+ * @note Also returns rows where `fieldExpression` does not exist.
+ */
+QueryBuilder.prototype.orWhereJsonNotArray = function (fieldExpression) {
+  var knex = this._modelClass.knex();
+  return this.orWhere(function () {
+    // not array
+    var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", [], 'not');
+    var ifRefNotExistQuery = whereJsonFieldQuery(knex, fieldExpression, "IS", null);
+    // or not exist
+    builder.orWhereRaw(ifRefNotExistQuery);
+  });
+};
+
+/**
  * Where json field reference is an object.
  *
  * @param {FieldExpression} fieldExpression
@@ -1683,6 +1808,43 @@ QueryBuilder.prototype.whereJsonIsArray = function (fieldExpression) {
  */
 QueryBuilder.prototype.whereJsonIsObject = function (fieldExpression) {
   return this.whereJsonSupersetOf(fieldExpression, {});
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonIsObject}
+ */
+QueryBuilder.prototype.orWhereJsonIsObject = function (fieldExpression) {
+  return this.orWhereJsonSupersetOf(fieldExpression, {});
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonIsObject}
+ * @note Also returns rows where `fieldExpression` does not exist.
+ */
+QueryBuilder.prototype.whereJsonNotObject = function (fieldExpression) {
+  var knex = this._modelClass.knex();
+  return this.where(function () {
+    // not object
+    var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", {}, 'not');
+    var ifRefNotExistQuery = whereJsonFieldQuery(knex, fieldExpression, "IS", null);
+    // or not exist
+    builder.orWhereRaw(ifRefNotExistQuery);
+  });
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonIsObject}
+ * @note Also returns rows where `fieldExpression` does not exist.
+ */
+QueryBuilder.prototype.orWhereJsonNotObject = function (fieldExpression) {
+  var knex = this._modelClass.knex();
+  return this.orWhere(function () {
+    // not object
+    var builder = whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", {}, 'not');
+    var ifRefNotExistQuery = whereJsonFieldQuery(knex, fieldExpression, "IS", null);
+    // or not exist
+    builder.orWhereRaw(ifRefNotExistQuery);
+  });
 };
 
 /**
@@ -1699,6 +1861,14 @@ QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
 };
 
 /**
+ * @see {@link QueryBuilder#whereJsonHasAny}
+ */
+QueryBuilder.prototype.orWhereJsonHasAny = function (fieldExpression, keys) {
+  throw new Error("Disabled because of knex issue #519.");
+  // return orWhereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?|', keys);
+};
+
+/**
  * Where all of given strings are found from json object key(s) or array items.
  *
  * @param {FieldExpression} fieldExpression
@@ -1709,6 +1879,14 @@ QueryBuilder.prototype.whereJsonHasAny = function (fieldExpression, keys) {
 QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
   throw new Error("Disabled because of knex issue #519.");
   // return whereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
+};
+
+/**
+ * @see {@link QueryBuilder#whereJsonHasAll}
+ */
+QueryBuilder.prototype.orWhereJsonHasAll = function (fieldExpression, keys) {
+  throw new Error("Disabled because of knex issue #519.");
+  // return orWhereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
 };
 
 /**
@@ -1731,26 +1909,16 @@ QueryBuilder.prototype.whereJsonHasAll = function (fieldExpression, keys) {
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.whereJsonField = function (fieldExpression, operator, value) {
-  var knex = this._modelClass.knex();
-  var fieldReference = parseFieldExpression(fieldExpression, true);
-  var normalizedOperator = normalizeOperator(knex, operator);
+  var query = whereJsonFieldQuery(this._modelClass.knex(), fieldExpression, operator, value);
+  return this.whereRaw(query);
+};
 
-  // json type comparison takes json type in string format
-  var cast;
-  var escapedValue = knex.raw(" ?", [value]);
-  if (_.isNumber(value)) {
-    cast = "::NUMERIC";
-  } else if (_.isBoolean(value)) {
-    cast = "::BOOLEAN";
-  } else if (_.isString(value)) {
-    cast = "::TEXT";
-  } else if (_.isNull(value)) {
-    cast = "::TEXT";
-    escapedValue = 'NULL';
-  } else {
-    throw new Error("Value must be string, number, boolean or null.");
-  }
-  return this.whereRaw(["(", fieldReference, ")", cast, " ", normalizedOperator," ", escapedValue].join(""));
+/**
+ * @see {@link QueryBuilder#whereJsonField}
+ */
+QueryBuilder.prototype.orWhereJsonField = function (fieldExpression, operator, value) {
+  var query = whereJsonFieldQuery(this._modelClass.knex(), fieldExpression, operator, value);
+  return this.orWhereRaw(query);
 };
 
 /**
@@ -1863,19 +2031,55 @@ function parseFieldExpression(expression, extractAsText) {
  * @param {FieldExpression} fieldExpression Reference to column / jsonField.
  * @param {String} operator operator to apply.
  * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression Reference to column / jsonField or json object.
+ * @param {String=} queryPrefix String prepended to query e.g. 'not'. Space after string added implicitly.
  * @returns {QueryBuilder}
  */
-function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression) {
+function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
+  var queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix);
+  return builder.whereRaw.apply(builder, queryParams);
+}
+
+/**
+ * @private
+ * @see {@link whereJsonbRefOnLeftJsonbValOrRefOnRight} for documentation.
+ */
+function orWhereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
+  var queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix);
+  return builder.orWhereRaw.apply(builder, queryParams);
+}
+
+/**
+ * @private
+ * @see {@link whereJsonbRefOnLeftJsonbValOrRefOnRight} for documentation.
+ * @return {Array} Parameters for whereRaw call.
+ */
+function whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
   var fieldReference = parseFieldExpression(fieldExpression);
   if (_.isString(jsonObjectOrFieldExpression)) {
     var rightHandReference = parseFieldExpression(jsonObjectOrFieldExpression);
-    var refRefQuery = ["(", fieldReference, ")::jsonb ", operator, " (", rightHandReference, ")::jsonb"].join("");
-    return builder.whereRaw(refRefQuery);
+    var refRefQuery = ["(", fieldReference, ")::jsonb", operator, "(", rightHandReference, ")::jsonb"];
+    if (queryPrefix) {
+      refRefQuery.unshift(queryPrefix);
+    }
+    return [refRefQuery.join(" ")];
   } else if (_.isObject(jsonObjectOrFieldExpression)) {
-    var refValQuery = ["(", fieldReference, ")::jsonb ", operator, " ?::jsonb"].join("");
-    return builder.whereRaw(refValQuery, JSON.stringify(jsonObjectOrFieldExpression));
+    var refValQuery = ["(", fieldReference, ")::jsonb", operator, "?::jsonb"];
+    if (queryPrefix) {
+      refValQuery.unshift(queryPrefix);
+    }
+    return [refValQuery.join(" "), JSON.stringify(jsonObjectOrFieldExpression)];
   }
   throw new Error("Invalid right hand expression.");
+}
+
+/**
+ * @private
+ * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
+ */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
+function orWhereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
+  var query = whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys);
+  return builder.orWhereRaw(query);
 }
 
 /**
@@ -1897,6 +2101,26 @@ function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, opera
  */
 /* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
 function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
+  var query = whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys);
+  return builder.whereRaw(query);
+}
+
+/**
+ * @private
+ * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
+ */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
+function orWhereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
+  var query = whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys);
+  return builder.orWhereRaw(query);
+}
+
+/**
+ * @private
+ * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
+ */
+/* istanbul ignore next */ // TODO: remove this when tests are enabled and knex bug #519 is fixed
+function whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys) {
   var knex = builder._modelClass.knex();
   var fieldReference = parseFieldExpression(fieldExpression);
   keys = _.isString(keys) ? [keys] : keys;
@@ -1909,7 +2133,33 @@ function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator
   var rawSqlTemplateString = "array[" + questionMarksArray.join(",") + "]";
   var rightHandExpression = knex.raw(rawSqlTemplateString, keys);
 
-  return builder.whereRaw(fieldReference + " "  + operator + " " + rightHandExpression);
+  return [fieldReference, " ", operator, " ", rightHandExpression].join("");
+}
+
+/**
+ * @private
+ * @see {@link QueryBuilder#whereJsonField} for documentation.
+ */
+function whereJsonFieldQuery(knex, fieldExpression, operator, value) {
+  var fieldReference = parseFieldExpression(fieldExpression, true);
+  var normalizedOperator = normalizeOperator(knex, operator);
+
+  // json type comparison takes json type in string format
+  var cast;
+  var escapedValue = knex.raw(" ?", [value]);
+  if (_.isNumber(value)) {
+    cast = "::NUMERIC";
+  } else if (_.isBoolean(value)) {
+    cast = "::BOOLEAN";
+  } else if (_.isString(value)) {
+    cast = "::TEXT";
+  } else if (_.isNull(value)) {
+    cast = "::TEXT";
+    escapedValue = 'NULL';
+  } else {
+    throw new Error("Value must be string, number, boolean or null.");
+  }
+  return ["(", fieldReference, ")", cast, " ", normalizedOperator," ", escapedValue].join("")
 }
 
 /**
