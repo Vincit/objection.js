@@ -842,6 +842,10 @@ is a handy way to prevent require loops.</p>
             
         
             
+        
+            
+        
+            
               
 <dt>
     
@@ -2479,6 +2483,217 @@ any <em>knex</em> methods:</p>
               
 <dt>
     
+        <h4 class="name" id="SafterInsert">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$afterInsert</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called after a model has been inserted into the database.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SafterUpdate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$afterUpdate</span>
+          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called after a model is updated.</p>
+<p>This method is also called after a model is patched. Therefore all the model's properties
+may not exist. You can check if the update operation is a patch by checking the <code>opt.patch</code>
+boolean.</p>
+<p>Also note that this method is called only once when you do something like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .$query()
+  .patch({firstName: 'Jennifer'})
+  .where('gender', 'female')
+  .then(function () {
+    ...
+  });</code></pre><p>The example above updates all rows whose <code>gender</code> equals <code>female</code> but the <code>$beforeUpdate</code>
+method is called only once for the <code>{firstName: 'Jennifer'}</code> model. This is because the
+updating is done completely in the database and the affected models are never fetched
+to the javascript side.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="SafterValidate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$afterValidate</span>
@@ -2614,6 +2829,217 @@ any <em>knex</em> methods:</p>
 			</li>
 		</ul>
 	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SbeforeInsert">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$beforeInsert</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called before a model is inserted into the database.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SbeforeUpdate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$beforeUpdate</span>
+          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called before a model is updated.</p>
+<p>This method is also called before a model is patched. Therefore all the model's properties
+may not exist. You can check if the update operation is a patch by checking the <code>opt.patch</code>
+boolean.</p>
+<p>Also note that this method is called only once when you do something like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .$query()
+  .patch({firstName: 'Jennifer'})
+  .where('gender', 'female')
+  .then(function () {
+    ...
+  });</code></pre><p>The example above updates all rows whose <code>gender</code> equals <code>female</code> but the <code>$beforeUpdate</code>
+method is called only once for the <code>{firstName: 'Jennifer'}</code> model. This is because the
+updating is done completely in the database and the affected models are never fetched
+to the javascript side.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
 	
 
 	
@@ -5178,7 +5604,7 @@ called explicitly when needed.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Sun Jul 12th 2015 using the <a
+		on Tue Aug 4th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

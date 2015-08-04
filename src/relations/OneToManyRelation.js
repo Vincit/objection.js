@@ -75,10 +75,13 @@ OneToManyRelation.prototype.delete = function (builder, $owner) {
 OneToManyRelation.prototype.relate = function (builder, $owner, $ids) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
-  return builder
-    .update(this.relatedCol, owner[this.ownerProp])
+  var patch = {};
+  patch[this.relatedProp] = owner[this.ownerProp];
+
+  return this.relatedModelClass
+    .$$patch(builder, patch)
     .whereIn(this.relatedModelClass.getFullIdColumn(), _.flatten([$ids]))
-    .runAfterPushFront(function () {
+    .runAfter(function () {
       return $ids;
     });
 };
@@ -86,11 +89,14 @@ OneToManyRelation.prototype.relate = function (builder, $owner, $ids) {
 OneToManyRelation.prototype.unrelate = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
-  return builder
-    .update(this.relatedCol, null)
+  var patch = {};
+  patch[this.relatedProp] = null;
+
+  return this.relatedModelClass
+    .$$patch(builder, patch)
     .where(this.fullRelatedCol(), owner[this.ownerProp])
     .call(this.filter)
-    .runAfterPushFront(function () {
+    .runAfter(function () {
       return {};
     });
 };

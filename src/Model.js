@@ -471,6 +471,80 @@ Model.prototype.$toJson = function (shallow) {
 };
 
 /**
+ * Called before a model is inserted into the database.
+ */
+Model.prototype.$beforeInsert = function () {
+
+};
+
+/**
+ * Called after a model has been inserted into the database.
+ */
+Model.prototype.$afterInsert = function () {
+
+};
+
+/**
+ * Called before a model is updated.
+ *
+ * This method is also called before a model is patched. Therefore all the model's properties
+ * may not exist. You can check if the update operation is a patch by checking the `opt.patch`
+ * boolean.
+ *
+ * Also note that this method is called only once when you do something like this:
+ *
+ * ```js
+ * Person
+ *   .$query()
+ *   .patch({firstName: 'Jennifer'})
+ *   .where('gender', 'female')
+ *   .then(function () {
+ *     ...
+ *   });
+ * ```
+ *
+ * The example above updates all rows whose `gender` equals `female` but the `$beforeUpdate`
+ * method is called only once for the `{firstName: 'Jennifer'}` model. This is because the
+ * updating is done completely in the database and the affected models are never fetched
+ * to the javascript side.
+ *
+ * @param {ModelOptions} opt
+ */
+Model.prototype.$beforeUpdate = function (opt) {
+  _.noop(opt);
+};
+
+/**
+ * Called after a model is updated.
+ *
+ * This method is also called after a model is patched. Therefore all the model's properties
+ * may not exist. You can check if the update operation is a patch by checking the `opt.patch`
+ * boolean.
+ *
+ * Also note that this method is called only once when you do something like this:
+ *
+ * ```js
+ * Person
+ *   .$query()
+ *   .patch({firstName: 'Jennifer'})
+ *   .where('gender', 'female')
+ *   .then(function () {
+ *     ...
+ *   });
+ * ```
+ *
+ * The example above updates all rows whose `gender` equals `female` but the `$beforeUpdate`
+ * method is called only once for the `{firstName: 'Jennifer'}` model. This is because the
+ * updating is done completely in the database and the affected models are never fetched
+ * to the javascript side.
+ *
+ * @param {ModelOptions} opt
+ */
+Model.prototype.$afterUpdate = function (opt) {
+  _.noop(opt);
+};
+
+/**
  * one-to-many relation type.
  *
  * @type {OneToOneRelation}
@@ -1100,6 +1174,7 @@ Model.$$insert = function (builder, $models) {
       model.$id(id);
     }
 
+    model.$beforeInsert();
     return model.$toDatabaseJson();
   });
 
@@ -1113,6 +1188,16 @@ Model.$$insert = function (builder, $models) {
     } else {
       return models[0];
     }
+  }).runAfter(function (model) {
+    if (_.isArray(model)) {
+      _.each(model, function (model) {
+        model.$afterInsert();
+      });
+    } else {
+      model.$afterInsert();
+    }
+
+    return model;
   });
 };
 
@@ -1121,19 +1206,7 @@ Model.$$insert = function (builder, $models) {
  * @returns {QueryBuilder}
  */
 Model.$$update = function (builder, $update) {
-  if (!$update) {
-    return builder;
-  }
-
-  var ModelClass = this;
-  $update = ModelClass.ensureModel($update);
-
-  var update = $update.$clone();
-  delete update[ModelClass.getIdProperty()];
-
-  return builder.update(update.$toDatabaseJson()).runAfterModelCreatePushFront(function () {
-    return $update;
-  });
+  return this.$$updateWithOptions(builder, $update);
 };
 
 /**
@@ -1141,21 +1214,38 @@ Model.$$update = function (builder, $update) {
  * @returns {QueryBuilder}
  */
 Model.$$patch = function (builder, $patch) {
-  if (!$patch) {
+  return this.$$updateWithOptions(builder, $patch, {patch: true});
+};
+
+/**
+ * @private
+ * @returns {QueryBuilder}
+ */
+Model.$$updateWithOptions = function (builder, $update, options) {
+  if (!$update) {
     return builder;
   }
 
   var ModelClass = this;
-  $patch = ModelClass.ensureModel($patch, {patch: true});
+  $update = ModelClass.ensureModel($update, options);
+  $update.$beforeUpdate(options);
 
-  var patch = $patch.$clone();
-  delete patch[ModelClass.getIdProperty()];
+  // We never want to change the identifier of a model. Delete it from the copy.
+  var update = $update.$clone();
+  delete update[ModelClass.getIdProperty()];
 
-  return builder.update(patch.$toDatabaseJson()).runAfterModelCreatePushFront(function () {
-    return $patch;
+  return builder.update(update.$toDatabaseJson()).runAfterModelCreatePushFront(function () {
+    return $update;
+  }).runAfter(function (model) {
+    model.$afterUpdate(options);
+    return model;
   });
 };
 
+/**
+ * @protected
+ * @returns {QueryBuilder}
+ */
 Model.$$delete = function (builder) {
   return builder.delete().runAfterModelCreatePushFront(function () {
     return {};

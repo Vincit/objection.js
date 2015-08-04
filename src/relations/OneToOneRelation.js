@@ -43,10 +43,14 @@ OneToOneRelation.prototype.insert = function (builder, $owner, $insertion) {
     owner[self.ownerProp] = inserted[0][self.relatedProp];
     owner[self.name] = inserted[0];
 
+    var patch = {};
+    patch[self.ownerProp] = inserted[0][self.relatedProp];
+    owner[self.ownerProp] = inserted[0][self.relatedProp];
+
     return self.ownerModelClass
-      .knexQuery()
+      .query()
+      .patch(patch)
       .where(self.ownerModelClass.getFullIdColumn(), owner.$id())
-      .update(self.ownerCol, inserted[0][self.relatedProp])
       .then(function () {
         return _.isArray($insertion) ? inserted : inserted[0];
       });
@@ -88,11 +92,15 @@ OneToOneRelation.prototype.relate = function (builder, $owner, $ids) {
     throw new Error('can only relate one model to a OneToOneRelation');
   }
 
-  return builder
+  var patch = {};
+  patch[this.ownerProp] = ids[0];
+  owner[this.ownerProp] = ids[0];
+
+  return this.ownerModelClass
+    .$$patch(builder, patch)
     .from(this.ownerModelClass.tableName)
-    .update(this.ownerCol, ids[0])
     .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
-    .runAfterModelCreatePushFront(function () {
+    .runAfter(function () {
       return $ids;
     });
 };
@@ -100,11 +108,15 @@ OneToOneRelation.prototype.relate = function (builder, $owner, $ids) {
 OneToOneRelation.prototype.unrelate = function (builder, $owner) {
   var owner = this.ownerModelClass.ensureModel($owner);
 
-  return builder
+  var patch = {};
+  patch[this.ownerProp] = null;
+  owner[this.ownerProp] = null;
+
+  return this.ownerModelClass
+    .$$patch(builder, patch)
     .from(this.ownerModelClass.tableName)
-    .update(this.ownerCol, null)
     .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
-    .runAfterModelCreatePushFront(function () {
+    .runAfter(function () {
       return {};
     });
 };

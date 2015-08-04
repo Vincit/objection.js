@@ -29,6 +29,8 @@ module.exports = function (session) {
           .insert(model)
           .then(function (inserted) {
             expect(inserted).to.be.a(Model1);
+            expect(inserted.$beforeInsertCalled).to.equal(true);
+            expect(inserted.$afterInsertCalled).to.equal(true);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
             return session.knex(Model1.tableName);
@@ -48,6 +50,10 @@ module.exports = function (session) {
             .then(function (inserted) {
               expect(inserted[0]).to.be.a(Model1);
               expect(inserted[1]).to.be.a(Model1);
+              expect(inserted[0].$beforeInsertCalled).to.equal(true);
+              expect(inserted[0].$afterInsertCalled).to.equal(true);
+              expect(inserted[1].$beforeInsertCalled).to.equal(true);
+              expect(inserted[1].$afterInsertCalled).to.equal(true);
               expect(_.pluck(inserted, 'id').sort()).to.eql([3, 4]);
               expect(_.pluck(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
               return session.knex(Model1.tableName);
@@ -140,6 +146,8 @@ module.exports = function (session) {
           .insert()
           .then(function (inserted) {
             expect(inserted).to.be.a(Model1);
+            expect(inserted.$beforeInsertCalled).to.equal(true);
+            expect(inserted.$afterInsertCalled).to.equal(true);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
             return session.knex(Model1.tableName);
@@ -192,6 +200,8 @@ module.exports = function (session) {
             })
             .then(function ($inserted) {
               inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(true);
+              expect(inserted.$afterInsertCalled).to.equal(true);
               expect(inserted.id).to.equal(3);
               expect(inserted).to.be.a(Model1);
               expect(inserted.model1Prop1).to.equal('test');
@@ -301,6 +311,8 @@ module.exports = function (session) {
             })
             .then(function ($inserted) {
               inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(true);
+              expect(inserted.$afterInsertCalled).to.equal(true);
               expect(inserted.idCol).to.equal(3);
               expect(inserted).to.be.a(Model2);
               expect(inserted.model2Prop1).to.equal('test');
@@ -484,6 +496,8 @@ module.exports = function (session) {
             })
             .then(function ($inserted) {
               inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(true);
+              expect(inserted.$afterInsertCalled).to.equal(true);
               expect(inserted.id).to.equal(5);
               expect(inserted).to.be.a(Model1);
               expect(inserted.model1Prop1).to.equal('test');

@@ -8,6 +8,7 @@
 - [Subqueries](#subqueries)
 - [Joins](#joins)
 - [Polymorphic associations](#polymorphic-associations)
+- [Timestamps](#timestamps)
 
 ## Raw queries
 
@@ -199,3 +200,19 @@ someIssue
   .then(...)
 ```
 
+## Timestamps
+
+You can implement the `$beforeInsert` and `$beforeUpdate` methods to set the timestamps:
+
+```js
+Person.prototype.$beforeInsert = function () {
+  this.createdAt = new Date().toISOString();
+};
+
+Person.prototype.$beforeUpdate = function () {
+  this.updatedAt = new Date().toISOString();
+};
+```
+
+If you want to do this for all your models, you can simply create common base class that
+implements these methods.

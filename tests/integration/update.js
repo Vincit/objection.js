@@ -43,6 +43,8 @@ module.exports = function (session) {
           .where('id', '=', 2)
           .then(function (updated) {
             expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateCalled).to.equal(true);
             expectPartEql(updated, {model1Prop1: 'updated text'});
             return session.knex('Model1').orderBy('id');
           })
@@ -61,6 +63,8 @@ module.exports = function (session) {
           .where('id', '=', 2)
           .then(function (updated) {
             expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateCalled).to.equal(true);
             expectPartEql(updated, {model1Prop1: 'updated text'});
             return session.knex('Model1').orderBy('id');
           })
@@ -99,6 +103,8 @@ module.exports = function (session) {
           .where('model1Prop1', '<', 'hello 3')
           .then(function (updated) {
             expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateCalled).to.equal(true);
             expectPartEql(updated, {model1Prop1: 'updated text'});
             return session.knex('Model1').orderBy('id');
           })
@@ -184,6 +190,8 @@ module.exports = function (session) {
           .update({model1Prop1: 'updated text'})
           .then(function (updated) {
             expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateCalled).to.equal(true);
             expectPartEql(updated, {model1Prop1: 'updated text'});
             return session.knex('Model1').orderBy('id');
           })
@@ -198,7 +206,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().update()', function () {
 
-      describe('has one relation', function () {
+      describe('one to one relation', function () {
         var parent1;
         var parent2;
 
@@ -235,6 +243,8 @@ module.exports = function (session) {
             .update({model1Prop1: 'updated text'})
             .then(function (updated) {
               expect(updated).to.be.a(Model1);
+              expect(updated.$beforeUpdateCalled).to.equal(true);
+              expect(updated.$afterUpdateCalled).to.equal(true);
               expectPartEql(updated, {model1Prop1: 'updated text'});
               return session.knex('Model1').orderBy('id');
             })
@@ -267,7 +277,7 @@ module.exports = function (session) {
 
       });
 
-      describe('has many relation', function () {
+      describe('one to many relation', function () {
         var parent1;
         var parent2;
 
@@ -323,6 +333,8 @@ module.exports = function (session) {
             .where('id_col', 2)
             .then(function (updated) {
               expect(updated).to.be.a(Model2);
+              expect(updated.$beforeUpdateCalled).to.equal(true);
+              expect(updated.$afterUpdateCalled).to.equal(true);
               expectPartEql(updated, {model2Prop1: 'updated text'});
               return session.knex('model_2').orderBy('id_col');
             })
@@ -425,6 +437,8 @@ module.exports = function (session) {
             .where('Model1.id', 5)
             .then(function (updated) {
               expect(updated).to.be.a(Model1);
+              expect(updated.$beforeUpdateCalled).to.equal(true);
+              expect(updated.$afterUpdateCalled).to.equal(true);
               expectPartEql(updated, {model1Prop1: 'updated text'});
               return session.knex('Model1').orderBy('Model1.id');
             })

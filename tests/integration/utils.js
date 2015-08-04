@@ -49,6 +49,42 @@ module.exports.initialize = function (opt) {
     return Model.prototype.$parseDatabaseJson.call(this, json);
   };
 
+  Model1.prototype.$beforeInsert = function () {
+    this.$beforeInsertCalled = true;
+  };
+
+  Model1.prototype.$afterInsert = function () {
+    this.$afterInsertCalled = true;
+  };
+
+  Model1.prototype.$beforeUpdate = function (options) {
+    this.$beforeUpdateCalled = true;
+    this.$beforeUpdateOptions = options;
+  };
+
+  Model1.prototype.$afterUpdate = function (options) {
+    this.$afterUpdateCalled = true;
+    this.$afterUpdateOptions = options;
+  };
+
+  Model2.prototype.$beforeInsert = function () {
+    this.$beforeInsertCalled  = true;
+  };
+
+  Model2.prototype.$afterInsert = function () {
+    this.$afterInsertCalled  = true;
+  };
+
+  Model2.prototype.$beforeUpdate = function (options) {
+    this.$beforeUpdateCalled  = true;
+    this.$beforeUpdateOptions = options;
+  };
+
+  Model2.prototype.$afterUpdate = function (options) {
+    this.$afterUpdateCalled  = true;
+    this.$afterUpdateOptions = options;
+  };
+
   Model1.relationMappings = {
     model1Relation1: {
       relation: Model.OneToOneRelation,
