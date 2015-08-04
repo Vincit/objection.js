@@ -185,9 +185,9 @@ describe('ManyToManyRelation', function () {
             'from "RelatedModel"',
             'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
-            'and "someColumn" = \'100\'',
             'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\')'
+            'and "JoinTable"."ownerId" in (\'666\')',
+            'and "someColumn" = \'100\''
           ].join(' '));
         });
     });
@@ -414,11 +414,11 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
             'where "gender" = \'male\'',
-            'and "someColumn" = \'100\'',
             'and "thingy" is not null and',
             '"RelatedModel"."id" in',
             '(select "JoinTable"."relatedId" from "JoinTable"',
-            'where "JoinTable"."ownerId" = \'666\')'
+            'where "JoinTable"."ownerId" = \'666\')',
+            'and "someColumn" = \'100\''
           ].join(' '));
         });
     });
@@ -556,11 +556,11 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
             'where "gender" = \'male\'',
-            'and "someColumn" = \'100\'',
             'and "thingy" is not null and',
             '"RelatedModel"."id" in',
               '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
+              'where "JoinTable"."ownerId" = \'666\')',
+            'and "someColumn" = \'100\'',
           ].join(' '));
         });
     });
@@ -604,7 +604,7 @@ describe('ManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')');
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\') and "someColumn" = \'100\'');
         });
     });
 

@@ -27,7 +27,7 @@ var _ = require('lodash')
  */
 function QueryBuilder(modelClass) {
   this._modelClass = modelClass;
-  this._knexCalls = {};
+  this._knexCalls = [];
   this._explicitResolveValue = null;
   this._explicitRejectValue = null;
 
@@ -482,12 +482,12 @@ QueryBuilder.prototype.modelClass = function () {
  * @returns {Boolean}
  */
 QueryBuilder.prototype.isFindQuery = function () {
-  return _.isEmpty(this._knexCalls.insert) &&
-    _.isEmpty(this._knexCalls.update) &&
-    _.isEmpty(this._knexCalls.patch) &&
-    _.isEmpty(this._knexCalls.delete) &&
-    _.isEmpty(this._knexCalls.relate) &&
-    _.isEmpty(this._knexCalls.unrelate);
+  return !this.has('insert') &&
+    !this.has('update') &&
+    !this.has('patch') &&
+    !this.has('delete') &&
+    !this.has('relate') &&
+    !this.has('unrelate');
 };
 
 /**
@@ -540,17 +540,13 @@ QueryBuilder.prototype.dumpSql = function (logger) {
 QueryBuilder.prototype.clone = function () {
   var clone = new this.constructor(this._modelClass);
 
-  // Simple two-level deep copy.
-  clone._knexCalls = _.mapValues(this._knexCalls, function (calls) {
-    return _.map(calls, _.identity);
-  });
-
+  clone._knexCalls = this._knexCalls.slice();
   clone._explicitResolveValue = this._explicitResolveValue;
   clone._explicitRejectValue = this._explicitRejectValue;
-  clone._runBefore = _.map(this._runBefore, _.identity);
-  clone._runAfterKnexQuery = _.map(this._runAfterKnexQuery, _.identity);
-  clone._runAfterModelCreate = _.map(this._runAfterModelCreate, _.identity);
-  clone._runAfter = _.map(this._runAfter, _.identity);
+  clone._runBefore = this._runBefore.slice();
+  clone._runAfterKnexQuery = this._runAfterKnexQuery.slice();
+  clone._runAfterModelCreate = this._runAfterModelCreate.slice();
+  clone._runAfter = this._runAfter.slice();
   clone._findImpl = this._findImpl;
   clone._insertImpl = this._insertImpl;
   clone._updateImpl = this._updateImpl;
@@ -581,29 +577,14 @@ QueryBuilder.prototype.clearCustomImpl = function () {
 /**
  * @protected
  */
-QueryBuilder.prototype.clearAllBut = function () {
-  var self = this;
-  var args = _.toArray(arguments);
-
-  _.each(this._knexCalls, function (calls, methodName) {
-    if (!_.contains(args, methodName)) {
-      self._knexCalls[methodName] = [];
-    }
-  });
-
-  return this;
-};
-
-/**
- * @protected
- */
 QueryBuilder.prototype.clear = function () {
   if (arguments.length) {
-    for (var i = 0; i < arguments.length; ++i) {
-      this._knexCalls[arguments[i]] = [];
-    }
+    var args = _.toArray(arguments);
+    this._knexCalls = _.reject(this._knexCalls, function (call) {
+      return _.contains(args, call.method);
+    });
   } else {
-    this._knexCalls = {};
+    this._knexCalls = [];
   }
 
   return this;
@@ -613,7 +594,7 @@ QueryBuilder.prototype.clear = function () {
  * @protected
  */
 QueryBuilder.prototype.has = function (methodName) {
-  return !_.isEmpty(this._knexCalls[methodName]);
+  return !!_.find(this._knexCalls, {method: methodName});
 };
 
 /**
@@ -782,70 +763,70 @@ QueryBuilder.prototype.build = function () {
 QueryBuilder.build = function (builder) {
   var isFindQuery = builder.isFindQuery();
 
-  var inserts = builder._knexCalls.insert;
-  var updates = builder._knexCalls.update;
-  var patches = builder._knexCalls.patch;
-  var deletes = builder._knexCalls.delete;
-  var relates = builder._knexCalls.relate;
-  var unrelates = builder._knexCalls.unrelate;
+  var inserts = _.where(builder._knexCalls, {method: 'insert'});
+  var updates = _.where(builder._knexCalls, {method: 'update'});
+  var patches = _.where(builder._knexCalls, {method: 'patch'});
+  var deletes = _.where(builder._knexCalls, {method: 'delete'});
+  var relates = _.where(builder._knexCalls, {method: 'relate'});
+  var unrelates = _.where(builder._knexCalls, {method: 'unrelate'});
+
+  if (builder._insertImpl && inserts.length) {
+    builder._knexCalls = _.reject(builder._knexCalls, {method: 'insert'});
+  }
+
+  if (builder._updateImpl && updates.length) {
+    builder._knexCalls = _.reject(builder._knexCalls, {method: 'update'});
+  }
+
+  if (builder._patchImpl && patches.length) {
+    builder._knexCalls = _.reject(builder._knexCalls, {method: 'patch'});
+  }
+
+  if (builder._deleteImpl && deletes.length) {
+    builder._knexCalls = _.reject(builder._knexCalls, {method: 'delete'});
+  }
+
+  if (builder._relateImpl && relates.length) {
+    builder._knexCalls = _.reject(builder._knexCalls, {method: 'relate'});
+  }
+
+  if (builder._unrelateImpl && unrelates.length) {
+    builder._knexCalls = _.reject(builder._knexCalls, {method: 'unrelate'});
+  }
 
   if (builder._insertImpl) {
-    builder._knexCalls.insert = [];
+    _.each(inserts, function (insert) {
+      builder._insertImpl.apply(builder, insert.args);
+    });
   }
 
   if (builder._updateImpl) {
-    builder._knexCalls.update = [];
-  }
-
-  if (builder._patchImpl) {
-    builder._knexCalls.patch = [];
-  }
-
-  if (builder._deleteImpl) {
-    builder._knexCalls.delete = [];
-  }
-
-  if (builder._relateImpl) {
-    builder._knexCalls.relate = [];
-  }
-
-  if (builder._unrelateImpl) {
-    builder._knexCalls.unrelate = [];
-  }
-
-  if (builder._insertImpl) {
-    _.each(inserts, function (args) {
-      builder._insertImpl.apply(builder, args);
-    });
-  }
-
-  if (builder._updateImpl) {
-    _.each(updates, function (args) {
-      builder._updateImpl.apply(builder, args);
+    _.each(updates, function (update) {
+      builder._updateImpl.apply(builder, update.args);
     });
   }
 
   if (builder._patchImpl) {
-    _.each(patches, function (args) {
-      builder._patchImpl.apply(builder, args);
+    _.each(patches, function (patch) {
+      builder._patchImpl.apply(builder, patch.args);
     });
   }
 
   if (builder._deleteImpl) {
-    _.each(deletes, function (args) {
-      builder._deleteImpl.apply(builder, args);
+    _.each(deletes, function (del) {
+      builder._deleteImpl.apply(builder, del.args);
     });
   }
 
   if (builder._relateImpl) {
-    _.each(relates, function (args) {
-      builder._relateImpl.apply(builder, args);
+    _.each(relates, function (relate) {
+      builder._relateImpl.apply(builder, relate.args);
     });
   }
 
   if (builder._unrelateImpl) {
-    _.each(unrelates, function (args) {
-      builder._unrelateImpl.apply(builder, args);
+    _.each(unrelates, function (unrelate) {
+      builder._unrelateImpl.apply(builder, unrelate.args);
     });
   }
 
@@ -855,11 +836,9 @@ QueryBuilder.build = function (builder) {
 
   var knexBuilder = builder._modelClass.knexQuery();
 
-  _.each(builder._knexCalls, function (calls, methodName) {
-    if (_.isFunction(knexBuilder[methodName])) {
-      _.each(calls, function (args) {
-        knexBuilder[methodName].apply(knexBuilder, args);
-      });
+  _.each(builder._knexCalls, function (call) {
+    if (_.isFunction(knexBuilder[call.method])) {
+      knexBuilder[call.method].apply(knexBuilder, call.args);
     }
   });
 
@@ -1943,8 +1922,10 @@ function queryMethod(methodName) {
       }
     }
 
-    this._knexCalls[methodName] = this._knexCalls[methodName] || [];
-    this._knexCalls[methodName].push(args);
+    this._knexCalls.push({
+      method: methodName,
+      args: args
+    });
 
     return this;
   };

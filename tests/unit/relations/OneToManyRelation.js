@@ -155,7 +155,7 @@ describe('OneToManyRelation', function () {
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' and "someColumn" = \'foo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\')');
+          expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'foo\'');
         });
     });
 
@@ -349,7 +349,7 @@ describe('OneToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
         });
     });
 
@@ -459,7 +459,7 @@ describe('OneToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
         });
     });
   });
@@ -501,7 +501,7 @@ describe('OneToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "someColumn" = \'100\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
         });
     });
 
