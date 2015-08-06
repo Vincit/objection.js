@@ -1,6 +1,6 @@
 var _ = require('lodash')
   , expect = require('expect.js')
-  , parser = require('../../src/jsonFieldExpressionParser.js')
+  , parser = require('../../lib/jsonFieldExpressionParser.js')
   ;
 
 describe('jsonFieldExpressionParser', function () {

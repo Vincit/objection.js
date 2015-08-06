@@ -1,5 +1,5 @@
 var expect = require('expect.js');
-var Model = require('../../src/Model');
+var Model = require('../../lib/Model');
 
 describe('Model', function () {
 

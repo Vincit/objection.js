@@ -1,26 +1,26 @@
 module.exports = {
-  ModelBase: require('./src/ModelBase'),
-  Model: require('./src/Model'),
-  QueryBuilder: require('./src/QueryBuilder'),
-  RelationExpression: require('./src/RelationExpression'),
-  ValidationError: require('./src/ValidationError'),
+  ModelBase: require('./lib/ModelBase'),
+  Model: require('./lib/Model'),
+  QueryBuilder: require('./lib/QueryBuilder'),
+  RelationExpression: require('./lib/RelationExpression'),
+  ValidationError: require('./lib/ValidationError'),
 
-  Relation: require('./src/relations/Relation'),
-  OneToOneRelation: require('./src/relations/OneToOneRelation'),
-  OneToManyRelation: require('./src/relations/OneToManyRelation'),
-  ManyToManyRelation: require('./src/relations/ManyToManyRelation'),
+  Relation: require('./lib/relations/Relation'),
+  OneToOneRelation: require('./lib/relations/OneToOneRelation'),
+  OneToManyRelation: require('./lib/relations/OneToManyRelation'),
+  ManyToManyRelation: require('./lib/relations/ManyToManyRelation'),
 
-  transaction: require('./src/transaction'),
+  transaction: require('./lib/transaction'),
 
   // Backwards compatibility. This change was made when the library probably had 10 users. So
   // these can be removed as soon as semver rules allow it.
-  MoronModelBase: require('./src/ModelBase'),
-  MoronModel: require('./src/Model'),
-  MoronQueryBuilder: require('./src/QueryBuilder'),
-  MoronRelationExpression: require('./src/RelationExpression'),
-  MoronValidationError: require('./src/ValidationError'),
-  MoronRelation: require('./src/relations/Relation'),
-  MoronOneToOneRelation: require('./src/relations/OneToOneRelation'),
-  MoronOneToManyRelation: require('./src/relations/OneToManyRelation'),
-  MoronManyToManyRelation: require('./src/relations/ManyToManyRelation')
+  MoronModelBase: require('./lib/ModelBase'),
+  MoronModel: require('./lib/Model'),
+  MoronQueryBuilder: require('./lib/QueryBuilder'),
+  MoronRelationExpression: require('./lib/RelationExpression'),
+  MoronValidationError: require('./lib/ValidationError'),
+  MoronRelation: require('./lib/relations/Relation'),
+  MoronOneToOneRelation: require('./lib/relations/OneToOneRelation'),
+  MoronOneToManyRelation: require('./lib/relations/OneToManyRelation'),
+  MoronManyToManyRelation: require('./lib/relations/ManyToManyRelation')
 };

@@ -1,7 +1,7 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var expectPartEql = require('./utils').expectPartialEqual;
-var ValidationError = require('../../src/ValidationError');
+var ValidationError = require('../../lib/ValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
