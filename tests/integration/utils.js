@@ -1,8 +1,8 @@
 var _ = require('lodash');
 var path = require('path');
-var utils = require('../../src/utils');
+var utils = require('../../lib/utils');
 var Promise = require('bluebird');
-var Model = require('../../src/Model');
+var Model = require('../../lib/Model');
 var expect = require('expect.js');
 
 var unhandledRejectionHandlers = [];

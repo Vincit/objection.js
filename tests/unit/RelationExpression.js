@@ -1,5 +1,5 @@
 var expect = require('expect.js')
-  , RelationExpression = require('../../src/RelationExpression');
+  , RelationExpression = require('../../lib/RelationExpression');
 
 describe('RelationExpression', function () {
 

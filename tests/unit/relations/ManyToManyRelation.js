@@ -2,9 +2,9 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../../../src/Model')
-  , QueryBuilder = require('../../../src/QueryBuilder')
-  , ManyToManyRelation = require('../../../src/relations/ManyToManyRelation');
+  , Model = require('../../../lib/Model')
+  , QueryBuilder = require('../../../lib/QueryBuilder')
+  , ManyToManyRelation = require('../../../lib/relations/ManyToManyRelation');
 
 describe('ManyToManyRelation', function () {
   var originalKnexQueryBuilderThen = null;
