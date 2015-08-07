@@ -1,4 +1,4 @@
-var Model = require('moron').Model;
+var Model = require('objection').Model;
 
 /**
  * @extends Model

@@ -9,20 +9,20 @@ describe('integration tests', function () {
   var testDatabaseConfigs = [{
     client: 'sqlite3',
     connection: {
-      filename: path.join(os.tmpdir(), 'moron_test.db')
+      filename: path.join(os.tmpdir(), 'objection_test.db')
     }
   }, {
     client: 'postgres',
     connection: {
       host: '127.0.0.1',
-      database: 'moron_test'
+      database: 'objection_test'
     }
   }, {
     client: 'mysql',
     connection: {
       host: '127.0.0.1',
       user: 'travis',
-      database: 'moron_test'
+      database: 'objection_test'
     }
   }];
 

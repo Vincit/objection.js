@@ -1,4 +1,4 @@
-import {Model} from 'moron';
+import {Model} from 'objection';
 
 export default class Person extends Model {
   // Table name is the only required property.

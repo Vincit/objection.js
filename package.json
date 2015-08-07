@@ -1,8 +1,8 @@
 {
-  "name": "moron",
+  "name": "objection",
   "version": "0.1.5",
-  "description": "A simple ORM for Node.js",
-  "main": "moron.js",
+  "description": "An SQL-friendly ORM for Node.js",
+  "main": "objection.js",
   "license": "MIT",
   "scripts": {
     "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/vincit/moron.js.git"
+    "url": "git://github.com/vincit/objection.js.git"
   },
   "keywords": [
     "orm",
@@ -31,7 +31,7 @@
     "README.md",
     "LICENSE",
     "src/*",
-    "moron.js"
+    "objection.js"
   ],
   "dependencies": {
     "bluebird": "^2.9.24",

@@ -1,4 +1,4 @@
-import moron from 'moron';
+import objection from 'objection';
 import Person from './models/Person';
 import Movie from './models/Movie';
 
@@ -119,7 +119,7 @@ export default function (app) {
   app.post('/persons/:id/movies', async function (req, res) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    let movie = await moron.transaction(Person, async function (Person) {
+    let movie = await objection.transaction(Person, async function (Person) {
       let person = await Person
         .query()
         .where('id', req.params.id)

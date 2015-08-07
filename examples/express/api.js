@@ -1,4 +1,4 @@
-var moron = require('moron');
+var objection = require('objection');
 var Person = require('./models/Person');
 var Movie = require('./models/Movie');
 
@@ -113,7 +113,7 @@ module.exports = function (app) {
   app.post('/persons/:id/movies', function (req, res, next) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    moron.transaction(Person, function (Person) {
+    objection.transaction(Person, function (Person) {
       return Person
         .query()
         .where('id', req.params.id)

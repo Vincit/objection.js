@@ -1,11 +1,11 @@
 # Install and run
 
 ```sh
-git clone git@github.com:Vincit/moron.js.git moron
-cd moron
+git clone git@github.com:Vincit/objection.js.git objection
+cd objection
 npm install
 npm install -g browserify
-browserify moron-browser.js -o examples/websql/moron.js
+browserify objection-browser.js -o examples/websql/objection.js
 cd examples/websql
 npm install
 ```
