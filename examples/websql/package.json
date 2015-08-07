@@ -1,7 +1,7 @@
 {
-  "name": "moron-example-websql",
+  "name": "objection-example-websql",
   "version": "0.1.0",
-  "description": "Moron.js websql example",
+  "description": "Objection.js websql example",
   "main": "app.js",
   "author": "Sami Koskimäki",
   "license": "MIT",

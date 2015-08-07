@@ -5,7 +5,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import knexConfig from './knexfile';
 import registerApi from './api';
-import {Model} from 'moron';
+import {Model} from 'objection';
 
 // Initialize knex.
 let knex = Knex(knexConfig.development);

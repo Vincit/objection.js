@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>moron.js websql example</title>
+  <title>objection.js websql example</title>
   <script src="node_modules/lodash/index.js"></script>
   <script src="node_modules/bluebird/js/browser/bluebird.js"></script>
   <script src="node_modules/knex/build/knex.js"></script>
-  <script src="moron.js"></script>
+  <script src="objection.js"></script>
   <script>
     var knex = Knex({
       client: 'websql',
@@ -20,10 +20,10 @@
     });
 
     function Test() {
-      moron.Model.apply(this, arguments);
+      objection.Model.apply(this, arguments);
     }
 
-    moron.Model.extend(Test);
+    objection.Model.extend(Test);
     Test.tableName = 'Test';
     Test.knex(knex);
 

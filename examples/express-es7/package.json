@@ -1,7 +1,7 @@
 {
-  "name": "moron-example-express-es7",
+  "name": "objection-example-express-es7",
   "version": "0.1.0",
-  "description": "Moron.js express ES7 example",
+  "description": "Objection.js express ES7 example",
   "main": "app.js",
   "scripts": {
     "start": "node_modules/babel/bin/babel-node --stage 0 app"
@@ -15,7 +15,7 @@
     "knex": "^0.8.6",
     "lodash": "^3.10.0",
     "morgan": "^1.6.0",
-    "moron": "^0.1.5",
+    "objection": "^0.1.5",
     "sqlite3": "^3.0.8"
   }
 }

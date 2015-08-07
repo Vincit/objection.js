@@ -1,14 +1,11 @@
-[![Build Status](https://travis-ci.org/Vincit/moron.js.svg?branch=master)](https://travis-ci.org/Vincit/moron.js) [![Coverage Status](https://coveralls.io/repos/Vincit/moron.js/badge.svg)](https://coveralls.io/r/Vincit/moron.js)
+[![Build Status](https://travis-ci.org/Vincit/objection.js.svg?branch=master)](https://travis-ci.org/Vincit/objection.js) [![Coverage Status](https://coveralls.io/repos/Vincit/objection.js/badge.svg)](https://coveralls.io/r/Vincit/objection.js)
 
 # Introduction
 
-Moron.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
-supported by knex are supported by moron.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/moron.js).
+Objection.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
+supported by knex are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/objection.js).
 
-I wrote an [introductory blog post](http://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/)
-explaining what moron.js does better than other Node.js ORMs.
-
-What moron.js gives you:
+What objection.js gives you:
 
  * An easy declarative way of [defining models](#models) and relations between them
  * Simple and fun way to [fetch, insert, update and delete](#query-examples) models using the full power of SQL
@@ -18,16 +15,16 @@ What moron.js gives you:
  * Simple [transactions](#transactions)
  * [JSON schema](#validation) validation
 
-What moron.js doesn't give you:
+What objection.js doesn't give you:
 
  * A custom query DSL. SQL is used everywhere
  * Automatic database schema creation and migration.
     It is useful for the simple things, but usually just gets in your way when doing anything non-trivial.
-    Moron.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
+    Objection.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-Moron.js uses Promises and coding practices that make it ready for future. You can already use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
-and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/moron.js/tree/master/examples/express-es7).
+Objection.js uses Promises and coding practices that make it ready for future. You can already use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
+and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7).
 
 # Topics
 
@@ -40,13 +37,13 @@ and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check o
 - [Validation](#validation)
 - [Models](#models)
 - [Testing](#testing)
-- [API Documentation](http://vincit.github.io/moron.js/Model.html)
+- [API Documentation](http://vincit.github.io/objection.js/Model.html)
 - [Recipe book](RECIPES.md)
 
 # Installation
 
 ```sh
-npm install moron
+npm install objection
 ```
 
 # Getting started
@@ -54,8 +51,8 @@ npm install moron
 Best way to get started is to use one of the example projects:
 
 ```sh
-git clone git@github.com:Vincit/moron.js.git moron
-cd moron/examples/express
+git clone git@github.com:Vincit/objection.js.git objection
+cd objection/examples/express
 npm install
 # We use knex for migrations in this example.
 npm install knex -g
@@ -74,8 +71,8 @@ We also have an ES7 version of the express example project. It uses [Babel](http
 transpiling.
 
 ```sh
-git clone git@github.com:Vincit/moron.js.git moron
-cd moron/examples/express-es7
+git clone git@github.com:Vincit/objection.js.git objection
+cd objection/examples/express-es7
 npm install
 # We use knex for migrations in this example.
 npm install knex -g
@@ -84,15 +81,15 @@ knex migrate:latest
 npm start
 ```
 
-Also check out our [API documentation](http://vincit.github.io/moron.js/Model.html) and [recipe book](RECIPES.md).
+Also check out our [API documentation](http://vincit.github.io/objection.js/Model.html) and [recipe book](RECIPES.md).
 
 # Query examples
 
 The Person model used in the examples is defined [here](#models).
 
-All queries are started with one of the [Model](http://vincit.github.io/moron.js/Model.html) methods [query()](http://vincit.github.io/moron.js/Model.html#_P_query),
-[$query()](http://vincit.github.io/moron.js/Model.html#Squery) or [$relatedQuery()](http://vincit.github.io/moron.js/Model.html#SrelatedQuery).
-All these methods return a [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html) instance that can be used just like
+All queries are started with one of the [Model](http://vincit.github.io/objection.js/Model.html) methods [query()](http://vincit.github.io/objection.js/Model.html#_P_query),
+[$query()](http://vincit.github.io/objection.js/Model.html#Squery) or [$relatedQuery()](http://vincit.github.io/objection.js/Model.html#SrelatedQuery).
+All these methods return a [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html) instance that can be used just like
 a [knex QueryBuilder](http://knexjs.org/#Builder).
 
 Insert a Person model to the database:
@@ -125,7 +122,7 @@ Person
   });
 ```
 
-The return value of the `.query()` method is an instance of [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html)
+The return value of the `.query()` method is an instance of [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html)
 that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has. Here is a simple example that uses some of them:
 
 ```js
@@ -158,7 +155,7 @@ Person
 ```
 
 While the static `.query()` method can be used to create a query to a whole table `.$relatedQuery()` method
-can be used to query a single relation. `.$relatedQuery()` returns an instance of [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html)
+can be used to query a single relation. `.$relatedQuery()` returns an instance of [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html)
 just like the `.query()` method.
 
 ```js
@@ -253,11 +250,11 @@ Person
   });
 ```
 
-The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/moron.js/RelationExpression.html).
+The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/objection.js/RelationExpression.html).
 
 Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
 request. However, using such expressions opens the whole database through the API. This is not very secure. Therefore
-the [QueryBuilder](http://vincit.github.io/moron.js/QueryBuilder.html) has the `.allowEager` method.
+the [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html) has the `.allowEager` method.
 allowEager can be used to limit the allowed eager expression to a certain subset. Like this:
 
 ```js
@@ -275,11 +272,11 @@ The example above allows `req.query.eager` to be one of `'pets'`, `'children'`, 
 `'[pets, children.pets]'`. Examples of failing eager expressions are `'movies'`, `'children.children'` and `'notEvenAnExistingRelation'`.
 
 In addition to the `.eager` method, relations can be fetched using the `loadRelated` and `$loadRelated` methods of
-[Model](http://vincit.github.io/moron.js/Model.html).
+[Model](http://vincit.github.io/objection.js/Model.html).
 
 # Transactions
 
-Transactions are started by calling the [moron.transaction](http://vincit.github.io/moron.js/global.html#transaction)
+Transactions are started by calling the [objection.transaction](http://vincit.github.io/objection.js/global.html#transaction)
 function. Give all the models you want to use in the transaction as parameters to the `transaction` function. The model
 classes are bound to a newly created transaction and passed to the callback function. Inside this callback, all queries
 started through them take part in the same transaction.
@@ -288,7 +285,7 @@ The transaction is committed if the returned Promise is resolved successfully. I
 the transaction is rolled back.
 
 ```js
-moron.transaction(Person, Animal, function (Person, Animal) {
+objection.transaction(Person, Animal, function (Person, Animal) {
 
   return Person
     .query()
@@ -310,7 +307,7 @@ You only need to give the `transaction` function the model classes you use expli
 are implicitly bound to the same transaction.
 
 ```js
-moron.transaction(Person, function (Person) {
+objection.transaction(Person, function (Person) {
 
   return Person
     .query()
@@ -338,7 +335,7 @@ bound to the transaction:
 var Person = require('./models/Person');
 var Animal = require('./models/Animal');
 
-moron.transaction(Person, function (Person) {
+objection.transaction(Person, function (Person) {
 
   return Person
     .query()
@@ -356,7 +353,7 @@ moron.transaction(Person, function (Person) {
 
 # Documents
 
-Moron.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
+Objection.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
 objects or arrays in the model's `jsonSchema` are automatically converted to JSON strings in the database and
 back to objects when read from the database. The database columns for the object properties can be normal
 text columns. Postgresql has the `json` and `jsonb` data types that can be used instead for better performance
@@ -404,29 +401,29 @@ Person.query().update({firstName: 'jennifer', lastName: 'Lawrence'}).where('id',
 Person.query().patch({age: 24}).where('age', '<', 24);
 ```
 
-You rarely need to call [$validate](http://vincit.github.io/moron.js/Model.html#Svalidate) method explicitly, but you
-can do it when needed. If validation fails a [ValidationError](http://vincit.github.io/moron.js/ValidationError.html)
+You rarely need to call [$validate](http://vincit.github.io/objection.js/Model.html#Svalidate) method explicitly, but you
+can do it when needed. If validation fails a [ValidationError](http://vincit.github.io/objection.js/ValidationError.html)
 will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of
 `ValidationError`.
 
 ```js
 Person.query().insert({firstName: 'jennifer'}).catch(function (err) {
-  console.log(err instanceof moron.ValidationError); // --> true
+  console.log(err instanceof objection.ValidationError); // --> true
   console.log(err.data); // --> {lastName: 'required property missing'}
 });
 ```
 
-See [the recipe book](https://github.com/Vincit/moron.js/blob/master/RECIPES.md#custom-validation) for instructions
+See [the recipe book](https://github.com/Vincit/objection.js/blob/master/RECIPES.md#custom-validation) for instructions
 if you want to use some other validation library.
 
 # Models
 
-Models are created by inheriting from the [Model](http://vincit.github.io/moron.js/Model.html) base class.
-In moron.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
+Models are created by inheriting from the [Model](http://vincit.github.io/objection.js/Model.html) base class.
+In objection.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
 wonder what the hell is happening. Just plain old ugly javascript inheritance.
 
 ```js
-var Model = require('moron').Model;
+var Model = require('objection').Model;
 
 function Person() {
   Model.apply(this, arguments);
@@ -511,7 +508,7 @@ Person.relationMappings = {
 # Testing
 
 To run the tests, all you need to do is configure the databases and run `npm test`. Check out
-[this](https://github.com/Vincit/moron.js/blob/master/tests/integration/index.js) file for the
+[this](https://github.com/Vincit/objection.js/blob/master/tests/integration/index.js) file for the
 test database configurations. If you don't want to run the tests against all databases you can
 just comment out configurations from the `testDatabaseConfigs` list.
 

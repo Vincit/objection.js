@@ -4,7 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var knexConfig = require('./knexfile');
 var registerApi = require('./api');
-var Model = require('moron').Model;
+var Model = require('objection').Model;
 
 // Initialize knex.
 var knex = Knex(knexConfig.development);

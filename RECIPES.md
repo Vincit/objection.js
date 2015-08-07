@@ -13,7 +13,7 @@
 ## Raw queries
 
 To write raw SQL queries, use the `.raw()` method of knex. You can always access a knex
-instance through [knex()](http://vincit.github.io/moron.js/Model.html#_P_knex) method of
+instance through [knex()](http://vincit.github.io/objection.js/Model.html#_P_knex) method of
 any model class. There are also some helper methods such as `whereRaw()` in the `QueryBuilder`.
 
 ```js
@@ -30,7 +30,7 @@ Person
 In transactions `this` points to the knex instance:
 
 ```js
-moron.transaction(Person, function (Person) {
+objection.transaction(Person, function (Person) {
   var knex = this;
 
   return knex.raw('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE').then(function () {
@@ -51,12 +51,12 @@ Person.idColumn = 'person_id';
 ## Custom validation
 
 If you want to use the json schema validation but add some custom validation on top of it you can override the
-[$beforeValidate](http://vincit.github.io/moron.js/Model.html#SbeforeValidate) and
-[$afterValidate](http://vincit.github.io/moron.js/Model.html#SafterValidate) methods.
+[$beforeValidate](http://vincit.github.io/objection.js/Model.html#SbeforeValidate) and
+[$afterValidate](http://vincit.github.io/objection.js/Model.html#SafterValidate) methods.
 
 If you don't want to use the built-in json schema validation, you can just ignore the `jsonSchema` property. It is
-optional. If you want to use some other validation library, simply override the [$validate method](http://vincit.github.io/moron.js/Model.html#Svalidate)
-of the model class. You need to throw a [ValidationError](http://vincit.github.io/moron.js/ValidationError.html) when validation fails.
+optional. If you want to use some other validation library, simply override the [$validate method](http://vincit.github.io/objection.js/Model.html#Svalidate)
+of the model class. You need to throw a [ValidationError](http://vincit.github.io/objection.js/ValidationError.html) when validation fails.
 
 ```js
 Person.prototype.$validate = function (objectToValidate, options) {
@@ -64,7 +64,7 @@ Person.prototype.$validate = function (objectToValidate, options) {
   objectToValidate = objectToValidate || this;
 
   if (!someCustomValidator(objectToValidate)) {
-    throw new moron.ValidationError({someProp: 'validation error message for the property'});
+    throw new objection.ValidationError({someProp: 'validation error message for the property'});
   }
 
   // Remember to return the input json object.
@@ -77,10 +77,10 @@ Person.prototype.$validate = function (objectToValidate, options) {
 Sometimes you may want to use for example snake_cased column names in database tables
 and camelCased property names in code. You can use the functions
 
-- [$parseDatabaseJson](http://vincit.github.io/moron.js/Model.html#SparseDatabaseJson)
-- [$formatDatabaseJson](http://vincit.github.io/moron.js/Model.html#SformatDatabaseJson)
-- [$parseJson](http://vincit.github.io/moron.js/Model.html#SparseJson)
-- [$formatJson](http://vincit.github.io/moron.js/Model.html#SformatJson)
+- [$parseDatabaseJson](http://vincit.github.io/objection.js/Model.html#SparseDatabaseJson)
+- [$formatDatabaseJson](http://vincit.github.io/objection.js/Model.html#SformatDatabaseJson)
+- [$parseJson](http://vincit.github.io/objection.js/Model.html#SparseJson)
+- [$formatJson](http://vincit.github.io/objection.js/Model.html#SformatJson)
 
 to convert data between database and "external" representations. Example of the mentioned
 snake_case/camelCase conversion:
@@ -109,8 +109,8 @@ Person.prototype.$parseDatabaseJson = function (json) {
 
 ## Paging
 
-Any query can be paged using the [page](http://vincit.github.io/moron.js/QueryBuilder.html#page) or
-[range](http://vincit.github.io/moron.js/QueryBuilder.html#range) method.
+Any query can be paged using the [page](http://vincit.github.io/objection.js/QueryBuilder.html#page) or
+[range](http://vincit.github.io/objection.js/QueryBuilder.html#range) method.
 
 ```js
 Person
