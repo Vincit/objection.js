@@ -504,6 +504,42 @@ describe('ModelBase', function () {
     });
   });
 
+  describe('propertyNameToColumnName', function () {
+    var Model;
+
+    beforeEach(function () {
+      Model = createModelClass({
+        $formatDatabaseJson: function (json) {
+          return _.mapKeys(json, function (value, key) {
+            return _.snakeCase(key);
+          });
+        }
+      });
+    });
+
+    it('should convert a property name to column name', function () {
+      expect(Model.propertyNameToColumnName('someProperty')).to.equal('some_property');
+    });
+  });
+
+  describe('columnNameToPropertyName', function () {
+    var Model;
+
+    beforeEach(function () {
+      Model = createModelClass({
+        $parseDatabaseJson: function (json) {
+          return _.mapKeys(json, function (value, key) {
+            return _.camelCase(key);
+          });
+        }
+      });
+    });
+
+    it('should convert a column name to property name', function () {
+      expect(Model.columnNameToPropertyName('some_property')).to.equal('someProperty');
+    });
+  });
+
   function createModelClass(proto, staticStuff) {
     function Model() {
       ModelBase.apply(this, arguments);
