@@ -182,6 +182,17 @@ module.exports = function (session) {
             });
         });
 
+        // This doesn't belong here, but there is no better place at the moment.
+        it('should join the related rows', function () {
+          return Model1
+            .getRelation('model1Relation1')
+            .join(Model1.query())
+            .then(function (models) {
+              expect(models).to.have.length(2);
+              expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 2', 'hello 4']);
+            });
+        });
+
         describe('knex methods', function () {
 
           it('.select()', function () {
@@ -319,6 +330,17 @@ module.exports = function (session) {
                 });
               })
           ]);
+        });
+
+        // This doesn't belong here, but there is no better place at the moment.
+        it('should join the related rows', function () {
+          return Model1
+            .getRelation('model1Relation2')
+            .join(Model1.query())
+            .then(function (models) {
+              expect(models).to.have.length(6);
+              expect(_.pluck(models, 'model_2_prop_1').sort()).to.eql(['text 1', 'text 2', 'text 3', 'text 4', 'text 5', 'text 6']);
+            });
         });
 
         describe('knex methods', function () {
@@ -494,6 +516,17 @@ module.exports = function (session) {
                 });
               })
           ]);
+        });
+
+        // This doesn't belong here, but there is no better place at the moment.
+        it('should join the related rows', function () {
+          return Model2
+            .getRelation('model2Relation1')
+            .join(Model2.query())
+            .then(function (models) {
+              expect(models).to.have.length(6);
+              expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3', 'blaa 4', 'blaa 5', 'blaa 6']);
+            });
         });
 
         describe('knex methods', function () {
