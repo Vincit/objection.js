@@ -135,7 +135,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery()', function () {
 
-      describe('has one relation', function () {
+      describe('one to one relation', function () {
         var parent1;
         var parent2;
 
@@ -235,7 +235,7 @@ module.exports = function (session) {
 
       });
 
-      describe('has many relation', function () {
+      describe('one to many relation', function () {
         var parent1;
         var parent2;
 
