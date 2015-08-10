@@ -1,3 +1,4 @@
+var knex = require('knex');
 var expect = require('expect.js');
 var Model = require('../../lib/Model');
 
@@ -191,6 +192,19 @@ describe('Model', function () {
     var model2 = Model.fromDatabaseJson(dbJson);
 
     expect(model2).to.eql(inputJson);
+  });
+
+  it('formatter() should return a knex formatter', function () {
+    var Model = modelClass('Model');
+
+    Model.knex(knex({client: 'sqlite3'}));
+    expect(Model.formatter().wrap('SomeTable.id')).to.equal('"SomeTable"."id"');
+
+    Model.knex(knex({client: 'pg'}));
+    expect(Model.formatter().wrap('SomeTable.id')).to.equal('"SomeTable"."id"');
+
+    Model.knex(knex({client: 'mysql'}));
+    expect(Model.formatter().wrap('SomeTable.id')).to.equal('`SomeTable`.`id`');
   });
 
   function modelClass(tableName) {
