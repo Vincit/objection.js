@@ -61,7 +61,7 @@ module.exports = function (session) {
           .then(function (result) {
             expect(result.results[0]).to.be.a(Model2);
             expect(result.results[1]).to.be.a(Model2);
-            expect(result.total).to.eql(3);
+            expect(result.total === 3).to.equal(true);
             expect(_.pluck(result.results, 'model2Prop2')).to.eql([20, 10]);
           });
       });
@@ -73,7 +73,7 @@ module.exports = function (session) {
           .orderBy('model_2_prop_2', 'desc')
           .then(function (result) {
             expect(result.results[0]).to.be.a(Model2);
-            expect(result.total).to.eql(3);
+            expect(result.total === 3).to.equal(true);
             expect(_.pluck(result.results, 'model2Prop2')).to.eql([10]);
           });
       });
