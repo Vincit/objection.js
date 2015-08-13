@@ -594,25 +594,7 @@ module.exports = function (session) {
           });
       });
 
-      // TODO: may be enabled, when query builder does not reorder queries anymore
-      it.skip('should add parenthesis for find arrays with orWhereJsonNotArray()', function () {
-        // OUTPUTS:
-        // select * from "ModelJson" where
-        //   ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb and
-        //   ( "jsonObject"#>'{}' )::jsonb @> '{}'::jsonb or
-        //   (
-        //     not ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb or
-        //     ("jsonObject"#>>'{}')::TEXT is NULL
-        //   )
-        //
-        // SHOULD BE:
-        // select * from "ModelJson" where
-        //   ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb or
-        //   (
-        //     not ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb or
-        //     ("jsonObject"#>>'{}')::TEXT is NULL
-        //   ) and
-        //   ( "jsonObject"#>'{}' )::jsonb @> '{}'::jsonb
+      it('should add parenthesis for find arrays with orWhereJsonNotArray()', function () {
         return BoundModel.query()
           .whereJsonIsObject("jsonArray")
           .orWhereJsonNotArray("jsonObject")
@@ -672,29 +654,11 @@ module.exports = function (session) {
           });
       });
 
-      // TODO: may be enabled, when query builder does not reorder queries anymore
-      it.skip('should add parenthesis for find objects with orWhereJsonNotObject(jsonArray)', function () {
-        // OUTPUTS:
-        // select * from "ModelJson" where
-        //   ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb and
-        //   ( "jsonArray"#>'{}' )::jsonb @> '[]'::jsonb or
-        //   (
-        //     not ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb or
-        //     ("jsonArray"#>>'{}')::TEXT is NULL
-        //   )
-        // SHOULD BE:
-        // select * from "ModelJson" where
-        //   ( "jsonObject"#>'{}' )::jsonb @> '[]'::jsonb or
-        //   (
-        //     not ( "jsonArray"#>'{}' )::jsonb @> '{}'::jsonb or
-        //     ("jsonArray"#>>'{}')::TEXT is NULL
-        //   ) and
-        //   ( "jsonArray"#>'{}' )::jsonb @> '[]'::jsonb
+      it('should add parenthesis for find objects with orWhereJsonNotObject(jsonArray)', function () {
         return BoundModel.query()
           .whereJsonIsArray("jsonObject")
           .orWhereJsonNotObject("jsonArray")
           .whereJsonIsArray("jsonArray")
-          .dumpSql()
           .then(function (results) {
             expectIdsEqual(results, [1,2,4,5,6,7]);
           });
