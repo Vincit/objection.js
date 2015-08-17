@@ -9,6 +9,8 @@
 - [Joins](#joins)
 - [Polymorphic associations](#polymorphic-associations)
 - [Timestamps](#timestamps)
+- [Custom query builder methods](#custom-query-builder-methods)
+- [Multi-tenancy](#multi-tenancy)
 
 ## Raw queries
 
@@ -216,3 +218,69 @@ Person.prototype.$beforeUpdate = function () {
 
 If you want to do this for all your models, you can simply create common base class that
 implements these methods.
+
+## Custom query builder methods
+
+You can extend the `QueryBuilder` returned by `Model.query()`, `modelInstance.$relatedQuery()`
+and `modelInstance.$query()` methods by setting the model class's static `QueryBuilder` property:
+
+```js
+var QueryBuilder = require('objection').QueryBuilder;
+
+function MyQueryBuilder() {
+  QueryBuilder.apply(this, arguments);
+}
+
+QueryBuilder.extend(MyQueryBuilder);
+
+// Some custom method.
+MyQueryBuilder.prototype.upsert = function (model) {
+  if (model.id) {
+    return this.update(model);
+  } else {
+    return this.insert(model);
+  }
+};
+
+Person.QueryBuilder = MyQueryBuilder;
+```
+
+Now you can do this:
+
+```js
+Person.query().upsert(person).then(function () {
+  ...
+});
+```
+
+If you want to set the custom query builder for all model classes you can just override the `QueryBuilder` property of
+the `Model` base class. A cleaner option would be to create your own Model subclass, set its `QueryBuilder` property
+and inherit all your models from the custom Model class.
+
+## Multi-tenancy
+
+By default, the examples guide you to setup the database connection by setting the knex object of the `Model` base
+class. This doesn't fly if you want to select the database based on the request as it sets the connection globally.
+
+If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
+`req.models` hash like so:
+
+```js
+app.use(function (req, res, next) {
+  // Function that parses the tenant id from path, header, query parameter etc.
+  // and returns an instance of knex.
+  var knex = getDatabaseForRequest(req);
+
+  req.models = {
+    Person: Person.bindKnex(knex),
+    Movie: Movie.bindKnex(knex),
+    Animal: Animal.bindKnex(knex)
+  };
+
+  next();
+});
+```
+
+and then _always_ use the models through `req.models` instead of requiring them directly. What `bindKnex` method
+actually does is that it creates an anonymous subclass of the model class and sets its knex connection. That way the
+database connection doesn't change for the other requests that are currently being executed.
