@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
-    "just-tests": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
+    "test-only": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
     "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "author": {
