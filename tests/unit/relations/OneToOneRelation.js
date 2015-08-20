@@ -266,6 +266,26 @@ describe('OneToOneRelation', function () {
         });
     });
 
+    it('should fail if trying to insert multiple', function (done) {
+      mockKnexQueryResults = [[1]];
+
+      var owner = OwnerModel.fromJson({id: 666});
+      var related = [{a: 'str1', rid: 2}, {a: 'str1', rid: 2}];
+
+      QueryBuilder
+        .forClass(RelatedModel)
+        .insertImpl(function (models) {
+          relation.insert(this, owner, models);
+        })
+        .insert(related)
+        .then(function (result) {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          done();
+        });
+    });
+
   });
 
   describe('update', function () {
@@ -529,6 +549,23 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql(11);
           expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = \'11\' where "OwnerModel"."id" = \'666\'');
+        });
+    });
+
+    it('should fail if trying to relate multiple', function (done) {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate([11, 12])
+        .then(function (result) {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          done();
         });
     });
 

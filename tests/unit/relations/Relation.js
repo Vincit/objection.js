@@ -39,6 +39,29 @@ describe('Relation', function () {
     expect(relation.joinTableRelatedCol).to.equal(null);
   });
 
+  it('should accept a path to a Model subclass as modelClass', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: __dirname + '/files/RelatedModel',
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerCol).to.equal('id');
+    expect(relation.ownerProp).to.equal('id');
+    expect(relation.relatedCol).to.equal('ownerId');
+    expect(relation.relatedProp).to.equal('ownerId');
+    expect(relation.joinTable).to.equal(null);
+    expect(relation.joinTableOwnerCol).to.equal(null);
+    expect(relation.joinTableRelatedCol).to.equal(null);
+  });
+
   it('should fail if modelClass is not a subclass of Model', function () {
     var relation = new Relation('testRelation', OwnerModel);
 
@@ -53,6 +76,90 @@ describe('Relation', function () {
       });
     }).to.throwException(function (err) {
       expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is not a subclass of Model or a file path to a module that exports one.');
+    });
+  });
+
+  it('should fail if modelClass is missing', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: Relation,
+        modelClass: null,
+        join: {
+          from: 'OwnerModel.id',
+          to: 'ownerId'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is not defined');
+    });
+  });
+
+  it('should fail if modelClass is an invalid file path', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: Relation,
+        modelClass: 'blaa',
+        join: {
+          from: 'OwnerModel.id',
+          to: 'ownerId'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is an invalid file path to a model class.');
+    });
+  });
+
+  it('should fail if modelClass is a file path that points to a non-model', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: Relation,
+        modelClass: __dirname + '/files/InvalidModel',
+        join: {
+          from: 'OwnerModel.id',
+          to: 'ownerId'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
+    });
+  });
+
+  it('should fail if relation is not defined', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        modelClass: RelatedModel,
+        join: {
+          from: 'OwnerModel.id',
+          to: 'ownerId'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.relation is not defined');
+    });
+  });
+
+  it('should fail if relation is not a Relation subclass', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: function () {},
+        modelClass: RelatedModel,
+        join: {
+          from: 'OwnerModel.id',
+          to: 'ownerId'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.relation is not a subclass of Relation');
     });
   });
 
@@ -195,29 +302,6 @@ describe('Relation', function () {
       join: {
         from: 'RelatedModel.ownerId',
         to: 'OwnerModel.id'
-      }
-    });
-
-    expect(relation.ownerModelClass).to.equal(OwnerModel);
-    expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('id');
-    expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('ownerId');
-    expect(relation.relatedProp).to.equal('ownerId');
-    expect(relation.joinTable).to.equal(null);
-    expect(relation.joinTableOwnerCol).to.equal(null);
-    expect(relation.joinTableRelatedCol).to.equal(null);
-  });
-
-  it('should accept a path to a Model subclass as modelClass', function () {
-    var relation = new Relation('testRelation', OwnerModel);
-
-    relation.setMapping({
-      relation: Relation,
-      modelClass: __dirname + '/files/RelatedModel',
-      join: {
-        from: 'OwnerModel.id',
-        to: 'RelatedModel.ownerId'
       }
     });
 
@@ -383,7 +467,6 @@ describe('Relation', function () {
       expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.through.from must have format JoinTable.columnName. For example `JoinTable.someId`.');
     });
   });
-
 
   it('join.through.to should have format JoinTable.columnName', function () {
     var relation = new Relation('testRelation', OwnerModel);
