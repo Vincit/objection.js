@@ -129,6 +129,49 @@ describe('QueryBuilder', function () {
       });
   });
 
+  it('whereRef should create a where clause using column references instead of values (1)', function () {
+    return QueryBuilder
+      .forClass(TestModel)
+      .whereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
+      .then(function () {
+        expect(executedQueries).to.eql([
+          'select * from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+        ]);
+      });
+  });
+
+  it('whereRef should create a where clause using column references instead of values (2)', function () {
+    return QueryBuilder
+      .forClass(TestModel)
+      .whereRef('SomeTable.someColumn', '>', 'SomeOtherTable.someOtherColumn')
+      .then(function () {
+        expect(executedQueries).to.eql([
+          'select * from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
+        ]);
+      });
+  });
+
+  it('whereRef should fail with invalid operator', function () {
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .whereRef('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
+        .toString();
+    }).to.throwException();
+  });
+
+  it('orWhereRef should create a where clause using column references instead of values', function () {
+    return QueryBuilder
+      .forClass(TestModel)
+      .where('id', 10)
+      .orWhereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
+      .then(function () {
+        expect(executedQueries).to.eql([
+          'select * from "Model" where "id" = \'10\' or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+        ]);
+      });
+  });
+
   it('should convert array query result into Model instances', function () {
     mockKnexQueryResult = [{a: 1}, {a: 2}];
 
