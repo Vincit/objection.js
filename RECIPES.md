@@ -14,31 +14,17 @@
 
 ## Raw queries
 
-To write raw SQL queries, use the `.raw()` method of knex. You can always access a knex
-instance through [knex()](http://vincit.github.io/objection.js/Model.html#_P_knex) method of
-any model class. There are also some helper methods such as `whereRaw()` in the `QueryBuilder`.
+To write raw SQL queries, use the `.raw()` method of any `Model` subclass. There are also some helper methods such as
+`whereRaw()` in the `QueryBuilder`. The `.raw()` method works just like the [knex's raw method](http://knexjs.org/#Raw).
 
 ```js
-var knex = Person.knex();
 Person
   .query()
-  .select(knex.raw('coalesce(sum(age), 0) as "childAgeSum"'))
+  .select(Person.raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
   .groupBy('parentId')
   .then(function (childAgeSums) {
     console.log(childAgeSums[0].childAgeSum);
   });
-```
-
-In transactions `this` points to the knex instance:
-
-```js
-objection.transaction(Person, function (Person) {
-  var knex = this;
-
-  return knex.raw('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE').then(function () {
-    return Person.query().insert(req.body);
-  });
-});
 ```
 
 ## Change id column
@@ -142,6 +128,17 @@ Person
 
 A bunch of query building methods accept a function. See the knex.js documentation or
 just try it out. A function is accepted in most places you would expect.
+
+You can also pass `QueryBuilder` instances instead of functions:
+
+```js
+Person
+  .query()
+  .where('age', '>', Person.query.avg('age'))
+  .then(function (personsOlderThanAverage) {
+    console.log(personsOlderThanAverage);
+  });
+```
 
 ## Joins
 

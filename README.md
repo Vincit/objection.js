@@ -12,19 +12,20 @@ What objection.js gives you:
  * Powerful mechanism for loading arbitrarily large [trees of relations](#eager-queries)
  * A way to [store complex documents](#documents) as single rows
  * Completely [Promise](https://github.com/petkaantonov/bluebird) based API
- * Simple [transactions](#transactions)
+ * Easy to use [transactions](#transactions)
  * [JSON schema](#validation) validation
 
-What objection.js doesn't give you:
+What objection.js **doesn't** give you:
 
- * A custom query DSL. SQL is used everywhere
+ * A custom query DSL. You can use the full power of SQL in your queries.
  * Automatic database schema creation and migration.
     It is useful for the simple things, but usually just gets in your way when doing anything non-trivial.
     Objection.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-Objection.js uses Promises and coding practices that make it ready for future. You can already use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
-and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7).
+Objection.js uses Promises and coding practices that make it ready for future. You can already use things like ES7
+[async/await](http://jakearchibald.com/2014/es7-async-functions/) and ES6 classes using a transpiler such as
+[Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7).
 
 # Topics
 
@@ -39,16 +40,46 @@ and ES6 classes using a transpiler such as [Babel](https://babeljs.io/). Check o
 - [Testing](#testing)
 - [API Documentation](http://vincit.github.io/objection.js/Model.html)
 - [Recipe book](RECIPES.md)
+- [Changelog](#changelog)
 
 # Installation
 
 ```sh
-npm install objection
+npm install knex objection
+```
+
+You also need to install one of the following depending on the database you want to use:
+
+```sh
+npm install pg
+npm install sqlite3
+npm install mysql
+npm install mysql2
+npm install mariasql
 ```
 
 # Getting started
 
-Best way to get started is to use one of the example projects:
+To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the
+connection to objection.js using `Model.knex(knex)`:
+
+```js
+var Knex = require('knex');
+var Model = require('objection').Model;
+
+var knex = Knex({
+  client: 'postgres',
+  connection: {
+    host: '127.0.0.1',
+    database: 'your_database'
+  }
+});
+
+Model.knex(knex);
+```
+
+The next step is to create some migrations and models and start using objection.js. The best way to get started is to
+use the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express):
 
 ```sh
 git clone git@github.com:Vincit/objection.js.git objection
@@ -85,14 +116,14 @@ Also check out our [API documentation](http://vincit.github.io/objection.js/Mode
 
 # Query examples
 
-The Person model used in the examples is defined [here](#models).
+The `Person` model used in the examples is defined [here](#models).
 
 All queries are started with one of the [Model](http://vincit.github.io/objection.js/Model.html) methods [query()](http://vincit.github.io/objection.js/Model.html#_P_query),
 [$query()](http://vincit.github.io/objection.js/Model.html#Squery) or [$relatedQuery()](http://vincit.github.io/objection.js/Model.html#SrelatedQuery).
 All these methods return a [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html) instance that can be used just like
 a [knex QueryBuilder](http://knexjs.org/#Builder).
 
-Insert a Person model to the database:
+Insert a person to the database:
 
 ```js
 Person
@@ -108,7 +139,11 @@ Person
   });
 ```
 
-Fetch all Persons from the database:
+```sql
+insert into "Person" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
+```
+
+Fetch all persons from the database:
 
 ```js
 Person
@@ -120,6 +155,10 @@ Person
   .catch(function (err) {
     console.log('oh noes');
   });
+```
+
+```sql
+select * from "Person"
 ```
 
 The return value of the `.query()` method is an instance of [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html)
@@ -138,12 +177,44 @@ Person
   });
 ```
 
+```sql
+select * from "Person"
+where "age" > 40
+and "age" < 60
+and "firstName" = 'Jennifer'
+order by "lastName" asc
+```
+
+This example shows how easy it is to do complex queries. Here we do a couple of subqueries and a join:
+
+```js
+Person
+  .query()
+  .select('Person.*', 'Parent.firstName as parentFirstName')
+  .join('Person as Parent', 'Person.parentId', 'Parent.id')
+  .where('Person.age', '<', Person.query().avg('Person.age'))
+  .whereExists(Animal.query().select(1).whereRef('Person.id', 'Animal.ownerId'))
+  .orderBy('Person.lastName')
+  .then(function (persons) {
+    console.log(persons[0].parentFirstName);
+  });
+```
+
+```sql
+select "Person".*, "Parent"."firstName" as "parentFirstName"
+from "Person"
+inner join "Person" as "Parent" on "Person"."parentId" = "Parent"."id"
+where "Person"."age" < (select avg("Person"."age") from "Person")
+and exists (select 1 from "Animal" where "Person"."id" = "Animal"."ownerId")
+order by "Person"."lastName" asc
+```
+
 Update models:
 
 ```js
 Person
   .query()
-  .patch({lastName: 'Dinosaur'});
+  .patch({lastName: 'Dinosaur'})
   .where('age', '>', 60)
   .then(function (patch) {
     console.log('all persons over 60 years old are now dinosaurs');
@@ -152,6 +223,10 @@ Person
   .catch(function (err) {
     console.log(err.stack);
   });
+```
+
+```sql
+update "Person" set "lastName" = 'Dinosaur' where "age" > 60
 ```
 
 While the static `.query()` method can be used to create a query to a whole table `.$relatedQuery()` method
@@ -181,23 +256,38 @@ Person
   });
 ```
 
+```sql
+select * from "Person" where "firstName" = 'Jennifer'
+
+select * from "Animal"
+where "species" = 'dog'
+and "Animal"."ownerId" = 1
+order by "name" asc
+```
+
 Insert a related model:
 
 ```js
 Person
   .query()
-  .where('id', 100)
+  .where('id', 1)
   .first()
   .then(function (person) {
     return person.$relatedQuery('pets').insert({name: 'Fluffy'});
   })
   .then(function (fluffy) {
-    console.log(fully.id);
+    console.log(fluffy.id);
   })
   .catch(function (err) {
     console.log('something went wrong with finding the person OR inserting the pet');
     console.log(err.stack);
   });
+```
+
+```sql
+select * from "Person" where "id" = 1
+
+insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
 ```
 
 # Eager queries
@@ -422,6 +512,28 @@ Models are created by inheriting from the [Model](http://vincit.github.io/object
 In objection.js the inheritance is done as transparently as possible. There is no custom Class abstraction making you
 wonder what the hell is happening. Just plain old ugly javascript inheritance.
 
+## Minimal model
+
+```js
+var Model = require('objection').Model;
+
+function MinimalModel() {
+  Model.apply(this, arguments);
+}
+
+// Inherit `Model`.
+Model.extend(MinimalModel);
+
+// After the js class boilerplate, all you need to do is set the table name.
+MinimalModel.tableName = 'SomeTableName';
+
+module.exports = MinimalModel;
+```
+
+## A model with custom methods, json schema validation and relations
+
+This is the model used in the examples:
+
 ```js
 var Model = require('objection').Model;
 
@@ -491,6 +603,15 @@ Person.relationMappings = {
         to: 'Person_Movie.movieId'
       },
       to: 'Movie.id'
+    }
+  },
+
+  parent: {
+    relation: Model.OneToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.parentId',
+      to: 'Person.id'
     }
   },
 
