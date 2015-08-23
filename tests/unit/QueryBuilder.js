@@ -196,10 +196,6 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should not execute query when calling run* methods', function () {
-
-  });
-
   it('should call run* methods in the correct order', function (done) {
     mockKnexQueryResult = 0;
 
@@ -675,62 +671,5 @@ describe('QueryBuilder', function () {
         });
     });
   });
-
-  /*
-  it.only('performance', function () {
-    mockKnexQueryResult = [{a: 1}, {a: 2}, {a: 3}, {a: 4}, {a: 5}];
-
-    var a = [];
-    var N = 10000;
-
-    // Warmup.
-    for (var i = 0; i < 100; ++i) {
-      a.push(QueryBuilder
-        .forClass(Model)
-        .select('name', 'id', 'age')
-        .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')
-        .where('id', 10)
-        .where('height', '>', '180')
-        .where({name: 'test'})
-        .orWhere(function () {
-          this.where('age', '<', 10).andWhere('eyeColor', 'blue');
-        })
-        .runAfterKnexQuery(function (x) {
-          return x;
-        })
-        .runAfterModelCreate(function (x) {
-          return x;
-        })
-        .then());
-    }
-
-    Promise.delay(1).then(function () {
-      var d = new Date();
-      for (var i = 0; i < N; ++i) {
-        a.push(QueryBuilder
-          .forClass(Model)
-          .select('name', 'id', 'age')
-          .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')
-          .where('id', 10)
-          .where('height', '>', '180')
-          .where({name: 'test'})
-          .orWhere(function () {
-            this.where('age', '<', 10).andWhere('eyeColor', 'blue');
-          })
-          .runAfterKnexQuery(function (x) {
-            return x;
-          })
-          .runAfterModelCreate(function (x) {
-            return x;
-          })
-          .then());
-      }
-
-      return Promise.all(a).then(function () {
-        console.log((new Date() - d) / N);
-      });
-    });
-  });
-  */
 
 });
