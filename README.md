@@ -633,3 +633,26 @@ To run the tests, all you need to do is configure the databases and run `npm tes
 test database configurations. If you don't want to run the tests against all databases you can
 just comment out configurations from the `testDatabaseConfigs` list.
 
+# Changelog
+
+## 0.2.0
+
+### New features
+
+ * New name `objection.js`.
+ * `$beforeInsert`, `$afterInsert`, `$beforeUpdate` and `$afterUpdate` hooks for `Model`.
+ * Postgres jsonb query methods: `whereJsonEquals`, `whereJsonSupersetOf`, `whereJsonSubsetOf` and friends.
+ * `whereRef` query method.
+ * Expose `knex.raw()` through `Model.raw()`.
+ * Expose `knex.client.formatter()` through `Model.formatter()`.
+ * Possibility to use a custom `QueryBuilder` subclass by overriding `Model.QueryBuilder`.
+ * Filter queries/objects for relations.
+ * A pile of bug fixes.
+
+### Breaking changes
+
+ * Project was renamed to objection.js. Migrate simply by replacing `moron` with `objection`.
+
+## 0.1.0
+
+First release.
