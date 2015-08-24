@@ -3,7 +3,7 @@
 # Introduction
 
 Objection.js is a Node.js ORM built around the wonderful SQL query builder [knex](http://knexjs.org). All databases
-supported by knex are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [fully tested](https://travis-ci.org/Vincit/objection.js).
+supported by knex are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thoroughly tested](https://travis-ci.org/Vincit/objection.js).
 
 What objection.js gives you:
 
@@ -17,13 +17,13 @@ What objection.js gives you:
 
 What objection.js **doesn't** give you:
 
- * A custom query DSL. You can use the full power of SQL in your queries.
+ * A custom query DSL. SQL is used as a query language.
  * Automatic database schema creation and migration.
     It is useful for the simple things, but usually just gets in your way when doing anything non-trivial.
     Objection.js leaves the schema related things to you. knex has a great [migration tool](http://knexjs.org/#Migrations)
     that we recommend for this job.
 
-Objection.js uses Promises and coding practices that make it ready for future. You can already use things like ES7
+Objection.js uses Promises and coding practices that make it ready for the future. You can already use things like ES7
 [async/await](http://jakearchibald.com/2014/es7-async-functions/) and ES6 classes using a transpiler such as
 [Babel](https://babeljs.io/). Check out our [ES7 example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7).
 
@@ -185,7 +185,7 @@ and "firstName" = 'Jennifer'
 order by "lastName" asc
 ```
 
-This example shows how easy it is to do complex queries. Here we do a couple of subqueries and a join:
+The next example shows how easy it is to build complex queries:
 
 ```js
 Person
@@ -292,8 +292,8 @@ insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
 
 # Eager queries
 
-Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly. The following
-examples demonstrate how to use it:
+Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly, as it isn't
+something that can be done easily using SQL. The following examples demonstrate how to use it:
 
 Fetch one relation:
 
@@ -358,8 +358,20 @@ expressApp.get('/persons', function (req, res, next) {
 });
 ```
 
-The example above allows `req.query.eager` to be one of `'pets'`, `'children'`, `'children.pets'`, `'[pets, children]'` and
-`'[pets, children.pets]'`. Examples of failing eager expressions are `'movies'`, `'children.children'` and `'notEvenAnExistingRelation'`.
+The example above allows `req.query.eager` to be one of:
+
+ * `'pets'`
+ * `'children'`
+ * `'children.pets'`
+ * `'[pets, children]'`
+ * `'[pets, children.pets]'`.
+
+Examples of failing eager expressions are:
+
+ * `'movies'`
+ * `'children.children'`
+ * `'[pets, children.children]'`
+ * `'notEvenAnExistingRelation'`.
 
 In addition to the `.eager` method, relations can be fetched using the `loadRelated` and `$loadRelated` methods of
 [Model](http://vincit.github.io/objection.js/Model.html).
@@ -514,6 +526,8 @@ wonder what the hell is happening. Just plain old ugly javascript inheritance.
 
 ## Minimal model
 
+A working model with minimal amount of code:
+
 ```js
 var Model = require('objection').Model;
 
@@ -521,7 +535,8 @@ function MinimalModel() {
   Model.apply(this, arguments);
 }
 
-// Inherit `Model`.
+// Inherit `Model`. This gives your model all those methods like `MinimalModel.query()`
+// and `MinimalModel.fromJson()`.
 Model.extend(MinimalModel);
 
 // After the js class boilerplate, all you need to do is set the table name.
@@ -645,6 +660,7 @@ just comment out configurations from the `testDatabaseConfigs` list.
  * `whereRef` query method.
  * Expose `knex.raw()` through `Model.raw()`.
  * Expose `knex.client.formatter()` through `Model.formatter()`.
+ * `QueryBuilder` can be used to make sub queries just like knex's `QueryBuilder`.
  * Possibility to use a custom `QueryBuilder` subclass by overriding `Model.QueryBuilder`.
  * Filter queries/objects for relations.
  * A pile of bug fixes.
