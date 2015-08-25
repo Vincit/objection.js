@@ -97,6 +97,35 @@ module.exports = function (session) {
               expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3, 4]);
             });
         });
+
+        it('returning(\'*\') should return all columns', function () {
+          return Model1
+            .query()
+            .insert({model1Prop1: 'hello 3'})
+            .returning('*')
+            .then(function (inserted) {
+              expect(inserted).to.be.a(Model1);
+              expect(inserted.$toJson()).to.eql({id: 3, model1Id: null, model1Prop1: 'hello 3', model1Prop2: null});
+              return session.knex(Model1.tableName);
+            })
+            .then(function (rows) {
+              expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+              expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3]);
+            });
+        });
+
+        it('returning(\'someColumn\', \'someOtherColumn\') should fail if the identifier is not in the list', function (done) {
+          return Model1
+            .query()
+            .insert({model1Prop1: 'hello 3'})
+            .returning(['model1Prop1', 'model1Prop2'])
+            .then(function () {
+              done(new Error('should not get here'));
+            })
+            .catch(function (err) {
+              done();
+            });
+        });
       }
 
       it('should validate', function (done) {
