@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>objection.js Class: ModelBase</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">objection.js</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Model.html">Model</a>
+						</li>
+						
+						<li>
+							<a href="ModelBase.html">ModelBase</a>
+						</li>
+						
+						<li>
+							<a href="QueryBuilder.html">QueryBuilder</a>
+						</li>
+						
+						<li>
+							<a href="RelationExpression.html">RelationExpression</a>
+						</li>
+						
+						<li>
+							<a href="ValidationError.html">ValidationError</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="global.html#ensureArray">ensureArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#orWhereJsonbRefOnLeftJsonbValOrRefOnRight">orWhereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#orWhereJsonFieldRightStringArrayOnLeft">orWhereJsonFieldRightStringArrayOnLeft</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseColumn">parseColumn</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFilter">parseFilter</a>
+						</li>
+						
+						<li>
+							<a href="global.html#queryMethod">queryMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRight">whereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams">whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldQuery">whereJsonFieldQuery</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeft">whereJsonFieldRightStringArrayOnLeft</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeftQuery">whereJsonFieldRightStringArrayOnLeftQuery</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+		<div class="span8">
+			
+				<div id="main">
+					
+
+
+	<!--<h1 class="page-title">Class: ModelBase</h1>-->
+<section>
+
+<header>
+    <h2>
+    ModelBase
+    </h2>
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+
+    
+        
+<dt>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Base class for models.</p>
+<p>ModelBase provides a mechanism for automatic JSON validation and a way to attach
+functionality to plain javascript objects. A subclass can be created like this:</p>
+<pre class="prettyprint source lang-js"><code>function Person() {
+  ModelBase.apply(this, arguments);
+}
+
+ModelBase.extend(Person);
+
+Person.prototype.fullName = function () {
+  return this.firstName + ' ' + this.lastName;
+};
+
+Person.jsonSchema = {
+  type: 'object',
+  properties: {
+    id: {type: 'integer'},
+    firstName: {type: 'string'},
+    lastName: {type: 'string'}
+  }
+};</code></pre><p>Use <code>ModelBase.from*Json</code> methods to create models from JSON objects:</p>
+<pre class="prettyprint source lang-js"><code>var person = Person.fromJson({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+console.log(person.firstName); // --> 'Jennifer'
+console.log(person.lastName); // --> 'Lawrence'
+console.log(person.fullName()); // --> 'Jennifer Lawrence'
+
+// This throws because the schema validation fails.
+var person2 = Person.fromJson({firstName: 10});</code></pre><p>Properties that are prefixed with '$' are excluded from all JSON representations:</p>
+<pre class="prettyprint source lang-js"><code>var person = Person.fromJson({firstName: 'Jennifer');
+person.$spam = 100;
+
+console.log(person); // --> {firstName: 'Jennifer'}
+console.log(person.$toJson()); // --> {firstName: 'Jennifer'}</code></pre><p>ModelBase makes it possible to have a different database representation for a model.
+For example if your column names are snake_cased in the database but you want to use
+camelCased properties in the code and outside the server you can do this:</p>
+<pre class="prettyprint source lang-js"><code>// This is called when an object is serialized to database format.
+Person.prototype.$formatDatabaseJson = function (json) {
+  // Call superclass implementation.
+  json = ModelBase.prototype.$formatDatabaseJson.call(this, json);
+
+  return _.mapKeys(json, function (value, key) {
+    return _.snakeCase(key);
+  });
+};
+
+// This is called when an object is read from database.
+Person.prototype.$parseDatabaseJson = function (json) {
+  json = _.mapKeys(json, function (value, key) {
+    return _.camelCase(key);
+  });
+
+  // Call superclass implementation.
+  return ModelBase.prototype.$parseDatabaseJson.call(this, json);
+};</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+                
+<dt>
+    <h4 class="name" id="_P_jsonSchema">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">jsonSchema</span>
+      <span class="signature-container"><span class="type-signature"> :Object</span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>The optional schema against which the JSON is validated.</p>
+<p>The jsonSchema can be dynamically modified in the <code>$beforeValidate</code> method.</p>
+<p>Must follow http://json-schema.org specification. If null no validation is done.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+	<dt class="tag-see">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li>$beforeValidate()</li>
+			
+			<li>$validate()</li>
+			
+			<li>$afterValidate()</li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_deepCloneJson">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">deepCloneJson</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Takes a deep clone of a pure JSON object.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_extend">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">extend</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">subclassConstructor</span>)</span><span class="type-signature"> &rarr; {function}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Makes the given constructor a subclass of this class.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>subclassConstructor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">function</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_fromDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">fromDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">json</span>)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a model instance from a JSON object in database format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON from which to create the model.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_fromJson">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">fromJson</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">json</span>, <span class="optional">options</span>)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a model instance from a JSON object.</p>
+<p>The object is checked against <code>jsonSchema</code> and an exception is thrown on failure.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON from which to create the model.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+    <div class="param-desc">
+    
+        <p>ValidationError
+   If validation fails.</p>
+    
+    </div>
+
+
+        
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_hasOwnJsonProperty">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">hasOwnJsonProperty</span>
+          <span class="signature-container"><span class="signature">(object, key)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns true if object[key] is copyable to the model when converting from JSON to a model.</p>
+<p>By default the properties that start with '$' are ignored. This behaviour can be changed
+by overriding this method.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>object</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SafterValidate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$afterValidate</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">json</span>, <span class="optional">options</span>)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called after successful validation.</p>
+<p>You can do further validation here and throw a ValidationError if something goes wrong.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object to validate.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SbeforeValidate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$beforeValidate</span>
+          <span class="signature-container"><span class="signature">(jsonSchema, json, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called before validation.</p>
+<p>Here you can dynamically edit the jsonSchema if needed.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonSchema</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>A deep clone of this class's jsonSchema.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object to be validated.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The (possibly) modified jsonSchema.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Sclone">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$clone</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ModelBase.html">ModelBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns a deep copy of this model.</p>
+<p>If this object has instances of ModelBase as properties (or arrays of them)
+they are cloned using their <code>.$clone()</code> method.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ModelBase.html">ModelBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SformatDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$formatDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is converted to database format.</p>
+<p>Converts the JSON object from the internal format to the database format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in internal format.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in database format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SformatJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$formatJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is converted to JSON.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in internal format</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in external format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SparseDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$parseDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is created from a database JSON object.</p>
+<p>Converts the JSON object from the database format to the internal format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in database format.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in internal format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SparseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$parseJson</span>
+          <span class="signature-container"><span class="signature">(json, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is created from a JSON object.</p>
+<p>Converts the JSON object to the internal format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object in external format.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in internal format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SsetDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$setDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets the values from a JSON object in database format.</p>
+<p>Calls <code>this.$parseDatabaseJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in database format.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SsetJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$setJson</span>
+          <span class="signature-container"><span class="signature">(json, <span class="optional">options</span>)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets the values from a JSON object.</p>
+<p>Validates the JSON before setting values. Calls <code>this.$parseJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object to set.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+    <div class="param-desc">
+    
+        <p>ValidationError
+   If validation fails.</p>
+    
+    </div>
+
+
+        
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="StoDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$toDatabaseJson</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Exports this model as a database JSON object.</p>
+<p>Calls <code>$formatDatabaseJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>This model as a JSON object in database format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="StoJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$toJson</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Exports this model as a JSON object.</p>
+<p>Calls <code>$formatJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>This model as a JSON object.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Svalidate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$validate</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">json</span>, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Validates the given JSON object.</p>
+<p>Calls <code>$beforeValidation</code> and <code>$afterValidation</code> methods. This method is called
+automatically from <code>fromJson</code> and <code>$setJson</code> methods. This method can also be
+called explicitly when needed.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>If not given ==&gt; this.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If validation fails.</p>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ValidationError.html">ValidationError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The input json</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="toJSON">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">toJSON</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Alias for <code>this.$toJson()</code>.</p>
+<p>For JSON.stringify compatibility.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					
+		<span class="copyright">
+		objection.js Copyright © 2015-2015 Sami Koskimäki.
+		</span>
+					<br />
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+		on Tue Aug 25th 2015 using the <a
+			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<div class="span3">
+				<div id="toc"></div>
+			</div>
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<!-- <script src="scripts/sunlight.js"></script> -->
+	<script src="scripts/docstrap.lib.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+	<script>
+		$( function () {
+			$( "[id*='$']" ).each( function () {
+				var $this = $( this );
+				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+			} );
+
+			$( '.dropdown-toggle' ).dropdown();
+			$( "pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+			$( "pre" ).each( function () {
+				var $this = $( this );
+
+				var example = $this.find( "code" );
+				exampleText = example.html();
+				var lang = /{@lang (.*?)}/.exec( exampleText );
+				if ( lang && lang[1] ) {
+					exampleText = exampleText.replace( lang[0], "" );
+					example.html( exampleText );
+					lang = lang[1];
+				} else {
+					lang = "javascript";
+				}
+
+				if ( lang ) {
+
+					$this
+						.addClass( "sunlight-highlight-" + lang )
+						.addClass( "linenums" )
+						.html( example.html() );
+
+				}
+			} );
+
+			Sunlight.highlightAll( {
+				lineNumbers : true,
+				showMenu : true,
+				enableDoclinks : true
+			} );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
+		} );
+	 </script>
+
+
+
+	<!--Navigation and Symbol Display-->
+	
+
+
+	<!--Google Analytics-->
+	
+
+</body>
+</html>

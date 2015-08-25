@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>objection.js Global</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">objection.js</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Model.html">Model</a>
+						</li>
+						
+						<li>
+							<a href="ModelBase.html">ModelBase</a>
+						</li>
+						
+						<li>
+							<a href="QueryBuilder.html">QueryBuilder</a>
+						</li>
+						
+						<li>
+							<a href="RelationExpression.html">RelationExpression</a>
+						</li>
+						
+						<li>
+							<a href="ValidationError.html">ValidationError</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="global.html#ensureArray">ensureArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#orWhereJsonbRefOnLeftJsonbValOrRefOnRight">orWhereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#orWhereJsonFieldRightStringArrayOnLeft">orWhereJsonFieldRightStringArrayOnLeft</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseColumn">parseColumn</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFilter">parseFilter</a>
+						</li>
+						
+						<li>
+							<a href="global.html#queryMethod">queryMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRight">whereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams">whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldQuery">whereJsonFieldQuery</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeft">whereJsonFieldRightStringArrayOnLeft</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeftQuery">whereJsonFieldRightStringArrayOnLeftQuery</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+		<div class="span8">
+			
+				<div id="main">
+					
+
+
+	<!--<h1 class="page-title">Global</h1>-->
+<section>
+
+<header>
+    <h2>
+    
+    </h2>
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+
+    
+        
+
+        
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="parseFieldExpression">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">parseFieldExpression</span>
+          <span class="signature-container"><span class="signature">(expression, extractAsText)</span><span class="type-signature"> &rarr; {Array}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Field expression how to refer certain nested field inside jsonb column.</p>
+<p>Table.jsonColumn:obj[key.with.dots][0].key.0.me[0] refers to
+obj = { &quot;key.with.dots&quot; : [{&quot;key&quot; : { &quot;0&quot;: { me : [ &quot;I was referred&quot; ] }}}]</p>
+<p>Since PostgreSql #&gt;{field,0,field2,...} operator does not make difference if
+reference is string or a number, one can actually use also jsonArray.0 notation
+to refer index of an array. Like wise one can use object[123] notation to refer
+key of an object { &quot;123&quot; : null }.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>expression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>extractAsText</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Return text instead of jsonb object (useful for type casting).</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Array of referred path, where first item is table/column.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Array</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="queryMethod">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">queryMethod</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {function}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">function</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="transaction">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">transaction</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Starts a transaction.</p>
+<p>Give the the model classes you want to use in the transaction as arguments to this
+function. The model classes are bound to a newly created transaction and passed to
+the callback. All queries created using the bound model classes or any result acquired
+through them take part in the same transaction.</p>
+<p>You must return a promise from the callback. If this promise is fulfilled the transaction
+is committed. If the promise is rejected the transaction is rolled back.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>objection.transaction(Person, Animal, function (Person, Animal) {
+
+ return Person
+   .query()
+   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+   .then(function () {
+     return Animal.query().insert({name: 'Scrappy'});
+   });
+
+}).then(function (scrappy) {
+  console.log('Jennifer and Scrappy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+});</code></pre><p>Related model classes are automatically bound to the same transaction. So if you use
+<code>Animal</code> implicitly through <code>Person</code>'s relations you don't have to bind Animal explicitly.
+The following example clarifies this:</p>
+<pre class="prettyprint source lang-js"><code>objection.transaction(Person, function (Person) {
+
+ return Person
+   .query()
+   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+   .then(function (jennifer) {
+     // This insert takes part in the transaction even though we didn't explicitly
+     // bind the `Animal` model class.
+     return jennifer.$relatedQuery('pets').insert({name: 'Scrappy'});
+   });
+
+}).then(function (scrappy) {
+  console.log('Jennifer and Scrappy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+});</code></pre><p>Inside the callback <code>this</code> is the knex transaction object. So if you need to create
+knex queries you can do this:</p>
+<pre class="prettyprint source lang-js"><code>objection.transaction(Person, function (Person) {
+ var knex = this;
+
+ return Person
+   .query()
+   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+   .then(function (jennifer) {
+     return knex.insert({name: 'Scrappy'}}.into('Animal');
+   });
+
+}).then(function () {
+  console.log('Jennifer and Scrappy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonbRefOnLeftJsonbValOrRefOnRight">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonbRefOnLeftJsonbValOrRefOnRight</span>
+          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, jsonObjectOrFieldExpression, <span class="optional">queryPrefix</span>)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where jsonb reference on left hand side is compared to jsonb value or reference on the right hand side.</p>
+<p>Converts left and right hand values to PostgreSQL acceptable format and add user chosen
+operator between left and right hand expressions.</p>
+<pre class="prettyprint source lang-javascript"><code>whereJsonbRefOnLeftJsonbValOrRefOnRight(queryBuilder, &quot;ModelJson.jsonObject:objectField&quot;, &quot;&lt;@&quot;, { key: 1 })</code></pre><pre class="prettyprint source lang-sql"><code>select * from &quot;ModelJson&quot; where (&quot;ModelJson&quot;.&quot;jsonObject&quot;#>'{objectField}')::jsonb &lt;@ '{\&quot;key\&quot;:\ 1}'::jsonb</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>builder</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>operator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>operator to apply.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonObjectOrFieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">Array</span>
+|
+
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Reference to column / jsonField or json object.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>queryPrefix</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>String prepended to query e.g. 'not'. Space after string added implicitly.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereJsonFieldRightStringArrayOnLeft">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereJsonFieldRightStringArrayOnLeft</span>
+          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Where field expression on left side and string or an array of strings on right hand side.</p>
+<pre class="prettyprint source lang-javascript"><code>whereJsonFieldRightStringArrayOnLeft(queryBuilder, &quot;ModelJson.jsonObject:a&quot;, &quot;?&&quot;,  [&quot;1&quot;,&quot;2&quot;])</code></pre><pre class="prettyprint source lang-sql"><code>select * from &quot;ModelJson&quot; where &quot;ModelJson&quot;.&quot;jsonObject&quot;#>'{a}' ?& array['1','2']</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>builder</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>fieldExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>operator</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>keys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        <dl>
+                
+<dt>
+    <h4 class="name" id="FieldExpression">
+      <span class="modifiers-container"></span>
+      <span class="content">FieldExpression</span>
+      <span class="signature-container"></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Json field expression to refer to jsonb columns or keys / objects inside columns.</p>
+<p>e.g. <code>Person.jsonColumnName:details.names[1]</code> would refer to column
+<code>Person.jsonColumnName</code> which has <code>{ details: { names: ['First', 'Second', 'Last'] } }</code>
+object stored in it.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+                
+<dt>
+    <h4 class="name" id="ModelOptions">
+      <span class="modifiers-container"></span>
+      <span class="content">ModelOptions</span>
+      <span class="signature-container"></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>patch</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>If true the json is treated as a patch and the <code>required</code> field of the json schema is
+   ignored in the validation. This allows us to create models with a subset of required
+   properties for patch operations.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>skipValidation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>If true the json schema validation is skipped.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</dl>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+                
+<dt>
+    <h4 class="name" id="RelationJoin">
+      <span class="modifiers-container"></span>
+      <span class="content">RelationJoin</span>
+      <span class="signature-container"></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>An object literal that describes how two tables are related to one another. For example:</p>
+<pre class="prettyprint source lang-js"><code>{
+  from: 'Animal.ownerId',
+  to: 'Person.id'
+}</code></pre><p>or in the case of a many-to-many relation:</p>
+<pre class="prettyprint source lang-js"><code>{
+  from: 'Person.id',
+  through: {
+    from: 'Person_Movie.actorId',
+    to: 'Person_Movie.movieId'
+  },
+  to: 'Movie.id'
+}</code></pre>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The relation column in the owner table. Must be given with the table name.
+   For example <code>Person.id</code>. Note that neither this nor <code>to</code> need to be foreign
+   keys or primary keys. You can join any column to any column.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The relation column in the related table. Must be given with the table name.
+   For example <code>Movie.id</code>. Note that neither this nor <code>from</code> need to be foreign
+   keys or primary keys. You can join any column to any column.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>through</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Describes the join table if the models are related through one.</p>
+                <h6>Properties</h6>
+
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>from</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The column that is joined to <code>from</code> property of the <code>RelationJoin</code>. For example
+   <code>Person_Movie.actorId</code> where <code>Person_Movie</code> is the join table.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The column that is joined to <code>to</code> property of the <code>RelationJoin</code>. For example
+   <code>Person_Movie.movieId</code> where <code>Person_Movie</code> is the join table.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+            </td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</dl>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+                
+<dt>
+    <h4 class="name" id="RelationMapping">
+      <span class="modifiers-container"></span>
+      <span class="content">RelationMapping</span>
+      <span class="signature-container"></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	<h5 class="subsection-title">Properties:</h5>
+
+	<dl>
+
+<table class="props table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>A <a href="Model.html">Model</a> subclass constructor or an absolute path to a module that exports one.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>relation</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Relation.html">Relation</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>A relation constructor. You can use one of Model.OneToOneRelation, Model.OneToManyRelation and
+   Model.ManyToManyRelation or even write your own relation type by subclassing <a href="Relation.html">Relation</a>.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>filter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Additional filter for the relation. It can be either a hash of {column: 'value'} pairs or
+   a function that takes a QueryBuilder as a parameter.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>join</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#RelationJoin">RelationJoin</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>An object that describes how the two models are related.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+</dl>
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            </dl>
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					
+		<span class="copyright">
+		objection.js Copyright © 2015-2015 Sami Koskimäki.
+		</span>
+					<br />
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+		on Tue Aug 25th 2015 using the <a
+			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<div class="span3">
+				<div id="toc"></div>
+			</div>
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<!-- <script src="scripts/sunlight.js"></script> -->
+	<script src="scripts/docstrap.lib.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+	<script>
+		$( function () {
+			$( "[id*='$']" ).each( function () {
+				var $this = $( this );
+				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+			} );
+
+			$( '.dropdown-toggle' ).dropdown();
+			$( "pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+			$( "pre" ).each( function () {
+				var $this = $( this );
+
+				var example = $this.find( "code" );
+				exampleText = example.html();
+				var lang = /{@lang (.*?)}/.exec( exampleText );
+				if ( lang && lang[1] ) {
+					exampleText = exampleText.replace( lang[0], "" );
+					example.html( exampleText );
+					lang = lang[1];
+				} else {
+					lang = "javascript";
+				}
+
+				if ( lang ) {
+
+					$this
+						.addClass( "sunlight-highlight-" + lang )
+						.addClass( "linenums" )
+						.html( example.html() );
+
+				}
+			} );
+
+			Sunlight.highlightAll( {
+				lineNumbers : true,
+				showMenu : true,
+				enableDoclinks : true
+			} );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
+		} );
+	 </script>
+
+
+
+	<!--Navigation and Symbol Display-->
+	
+
+
+	<!--Google Analytics-->
+	
+
+</body>
+</html>

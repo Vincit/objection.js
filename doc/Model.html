@@ -1,0 +1,5946 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>objection.js Class: Model</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.cyborg.css">
+
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">objection.js</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Model.html">Model</a>
+						</li>
+						
+						<li>
+							<a href="ModelBase.html">ModelBase</a>
+						</li>
+						
+						<li>
+							<a href="QueryBuilder.html">QueryBuilder</a>
+						</li>
+						
+						<li>
+							<a href="RelationExpression.html">RelationExpression</a>
+						</li>
+						
+						<li>
+							<a href="ValidationError.html">ValidationError</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="global.html#ensureArray">ensureArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#orWhereJsonbRefOnLeftJsonbValOrRefOnRight">orWhereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#orWhereJsonFieldRightStringArrayOnLeft">orWhereJsonFieldRightStringArrayOnLeft</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseColumn">parseColumn</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
+						</li>
+						
+						<li>
+							<a href="global.html#parseFilter">parseFilter</a>
+						</li>
+						
+						<li>
+							<a href="global.html#queryMethod">queryMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRight">whereJsonbRefOnLeftJsonbValOrRefOnRight</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams">whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldQuery">whereJsonFieldQuery</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeft">whereJsonFieldRightStringArrayOnLeft</a>
+						</li>
+						
+						<li>
+							<a href="global.html#whereJsonFieldRightStringArrayOnLeftQuery">whereJsonFieldRightStringArrayOnLeftQuery</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+		<div class="span8">
+			
+				<div id="main">
+					
+
+
+	<!--<h1 class="page-title">Class: Model</h1>-->
+<section>
+
+<header>
+    <h2>
+    Model
+    </h2>
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+
+    
+        
+<dt>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Subclasses of this class represent database tables.</p>
+<p>Subclass can be created like this:</p>
+<pre class="prettyprint source lang-js"><code>  var Model = require('objection').Model;
+
+  function Person() {
+    Model.apply(this, arguments);
+  }
+
+  Model.extend(Person);
+  module.exports = Person;
+
+  // Table name is the only required property.
+  Person.tableName = 'Person';
+
+  // This is not the database schema! Nothing is generated based on this. Whenever a
+  // Person object is created from a JSON object, the JSON is checked against this
+  // schema. For example when you call Person.fromJson({firstName: 'Jennifer'});
+  Person.jsonSchema = {
+    type: 'object',
+    required: ['firstName', 'lastName'],
+
+    properties: {
+      id: {type: 'integer'},
+      parentId: {type: ['integer', 'null']},
+      firstName: {type: 'string', minLength: 1, maxLength: 255},
+      lastName: {type: 'string', minLength: 1, maxLength: 255},
+      age: {type: 'number'},
+
+      address: {
+        type: 'object',
+        properties: {
+          street: {type: 'string'},
+          city: {type: 'string'},
+          zipCode: {type: 'string'}
+        }
+      }
+    }
+  };
+
+  // This object defines the relations to other models.
+  Person.relationMappings = {
+    pets: {
+      relation: Model.OneToManyRelation,
+      // The related model. This can be either a Model subclass constructor or an
+      // absolute file path to a module that exports one. We use the file path version
+      // here to prevent require loops.
+      modelClass: __dirname + '/Animal',
+      join: {
+        from: 'Person.id',
+        to: 'Animal.ownerId'
+      }
+    },
+
+    movies: {
+      relation: Model.ManyToManyRelation,
+      modelClass: __dirname + '/Movie',
+      join: {
+        from: 'Person.id',
+        // ManyToMany relation needs the `through` object to describe the join table.
+        through: {
+          from: 'Person_Movie.personId',
+          to: 'Person_Movie.movieId'
+        },
+        to: 'Movie.id'
+      }
+    },
+
+    children: {
+      relation: Model.OneToManyRelation,
+      modelClass: Person,
+      join: {
+        from: 'Person.id',
+        to: 'Person.parentId'
+      }
+    }
+  };</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        <ul>
+            <li><a href="ModelBase.html">ModelBase</a></li>
+        </ul>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_idColumn">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">idColumn</span>
+      <span class="signature-container"><span class="type-signature"> :String</span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Name of the primary key column in the database table.</p>
+<p>Defaults to 'id'.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_jsonAttributes">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">jsonAttributes</span>
+      <span class="signature-container"><span class="type-signature"> :Array.&lt;String></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Properties that should be saved to database as JSON strings.</p>
+<p>The properties listed here are serialized to JSON strings upon insertion to the database
+and parsed back to objects when models are read from the database. Combined with the
+postgresql's json or jsonb data type, this is a powerful way of representing documents
+as single database rows.</p>
+<p>If this property is left unset all properties declared as objects or arrays in the
+<code>jsonSchema</code> are implicitly added to this list.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>Person.jsonAttributes = ['address'];
+
+var jennifer = Person.fromJson({
+  name: 'Jennifer',
+  address: {
+    address: 'Someroad 10',
+    zipCode: '1234',
+    city: 'Los Angeles'
+  }
+});
+
+var dbRow = jennifer.$toDatabaseJson();
+console.log(dbRow);
+// --> {name: 'Jennifer', address: '{&quot;address&quot;:&quot;Someroad 10&quot;,&quot;zipCode&quot;:&quot;1234&quot;,&quot;city&quot;:&quot;Los Angeles&quot;}'}</code></pre>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_ManyToManyRelation">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">ManyToManyRelation</span>
+      <span class="signature-container"><span class="type-signature"> :<a href="ManyToManyRelation.html">ManyToManyRelation</a></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>may-to-many relation type.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="ManyToManyRelation.html">ManyToManyRelation</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_OneToManyRelation">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">OneToManyRelation</span>
+      <span class="signature-container"><span class="type-signature"> :<a href="OneToManyRelation.html">OneToManyRelation</a></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>one-to-many relation type.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="OneToManyRelation.html">OneToManyRelation</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_OneToOneRelation">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">OneToOneRelation</span>
+      <span class="signature-container"><span class="type-signature"> :<a href="OneToOneRelation.html">OneToOneRelation</a></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>one-to-many relation type.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="OneToOneRelation.html">OneToOneRelation</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_QueryBuilder">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">QueryBuilder</span>
+      <span class="signature-container"><span class="type-signature"></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>QueryBuilder subclass to use.</p>
+<p>This constructor is used whenever a query builder is created. You can override this
+to use your own <code>QueryBuilder</code> subclass.</p>
+    </div>
+    
+
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_relationMappings">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">relationMappings</span>
+      <span class="signature-container"><span class="type-signature"> :Object.&lt;String, <a href="global.html#RelationMapping">RelationMapping</a>></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>This property defines the relations to other models.</p>
+<p>Relations to other models can be defined by setting this property. The best way to explain how to
+do this is by example:</p>
+<pre class="prettyprint source lang-js"><code>Person.relationMappings = {
+  pets: {
+    relation: Model.OneToManyRelation,
+    modelClass: Animal,
+    join: {
+      from: 'Person.id',
+      to: 'Animal.ownerId'
+    }
+  },
+
+  father: {
+    relation: Model.OneToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.fatherId',
+      to: 'Person.id'
+    }
+  },
+
+  movies: {
+    relation: Model.ManyToManyRelation,
+    modelClass: Movie,
+    join: {
+      from: 'Person.id',
+      through: {
+        from: 'Person_Movie.actorId',
+        to: 'Person_Movie.movieId'
+      },
+      to: 'Movie.id'
+    }
+  }
+};</code></pre><p>relationMappings is an object whose keys are relation names and values define the relation. The
+<code>join</code> property in addition to the relation type define how the models are related to one another.
+The <code>from</code> and <code>to</code> properties of the <code>join</code> object define the database columns through which the
+models are associated. Note that neither of these columns need to be primary keys. They can be any
+columns!. In the case of ManyToManyRelation also the join table needs to be defined. This is
+done using the <code>through</code> object.</p>
+<p>The <code>modelClass</code> passed to the relation mappings is the class of the related model. It can be either
+a Model subclass constructor or an absolute path to a module that exports one. Using file paths
+is a handy way to prevent require loops.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">Object.&lt;String, <a href="global.html#RelationMapping">RelationMapping</a>></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_tableName">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">tableName</span>
+      <span class="signature-container"><span class="type-signature"> :String</span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Name of the database table of this model.</p>
+    </div>
+    
+
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type">String</span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        </dl>
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        <dl>
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_bindKnex">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">bindKnex</span>
+          <span class="signature-container"><span class="signature">(knex)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a subclass of this class that is bound to the given knex.</p>
+<p>This method can be used to bind a Model subclass to multiple databases for example in
+a multi tenant system.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>var knex1 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database1.db'
+  }
+});
+
+var knex2 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database2.db'
+  }
+});
+
+SomeModel.knex(null);
+
+var BoundModel1 = SomeModel.bindKnex(knex1);
+var BoundModel2 = SomeModel.bindKnex(knex2);
+
+// Throws since the knex instance is null.
+SomeModel.query().then();
+
+// Works.
+BoundModel1.query().then(function (models) {
+ console.log(models[0] instanceof SomeModel); // --> true
+ console.log(models[0] instanceof BoundModel1); // --> true
+});
+
+// Works.
+BoundModel2.query().then(function (models) {
+ console.log(models[0] instanceof SomeModel); // --> true
+ console.log(models[0] instanceof BoundModel2); // --> true
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>knex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">knex</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_ensureModel">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">ensureModel</span>
+          <span class="signature-container"><span class="signature">(model, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ensures that the given model is an instance of this class.</p>
+<p>If <code>model</code> is already an instance of this class, nothing is done.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>model</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_ensureModelArray">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">ensureModelArray</span>
+          <span class="signature-container"><span class="signature">(input, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Array.&lt;<a href="Model.html">Model</a>>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ensures that each element in the given array is an instance of this class.</p>
+<p>If an element is already an instance of this class, nothing is done for it.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;(<a href="Model.html">Model</a>|Object)></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Array.&lt;<a href="Model.html">Model</a>></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_formatter">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">formatter</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Formatter}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Shortcut for <code>SomeModel.knex().client.formatter()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Formatter</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_generateId">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">generateId</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {*}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Generates an identifier for the inserted models of this class.</p>
+<p>Implement this to return an identifier if you wish to generate them in the code instead
+of the database. By default this method returns null which indicates that the database
+should generate the identifier.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_getFullIdColumn">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">getFullIdColumn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Full identifier column name like 'SomeTable.id'.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_getIdProperty">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">getIdProperty</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the name of the identifier property.</p>
+<p>The identifier property is equal to the <code>idColumn</code> if <code>$parseDatabaseJson</code> is not
+implemented. If <code>$parseDatabaseJson</code> is implemented it may change the id property's
+name. This method passes the <code>idColumn</code> through <code>$parseDatabaseJson</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_getRelation">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">getRelation</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Relation.html">Relation</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Get a relation by name.</p>
+<p>This should not be used to make queries. Use <code>$relatedQuery</code> or <code>loadRelated</code> instead.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="Relation.html">Relation</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_getRelations">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">getRelations</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object.&lt;String, <a href="Relation.html">Relation</a>>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>All relations of this class.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object.&lt;String, <a href="Relation.html">Relation</a>></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_knex">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">knex</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">knex</span>)</span><span class="type-signature"> &rarr; {knex|undefined}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Get/Set the knex instance for this model class.</p>
+<p>Subclasses inherit the connection. A system-wide knex instance can thus be set by calling
+<code>Model.knex(knex)</code>. This works even after subclasses have been created.</p>
+<pre class="prettyprint source lang-js"><code>var knex = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database.db'
+  }
+});
+
+Model.knex(knex);
+knex = Model.knex();</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>knex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">knex</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The knex to set.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">knex</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_knexQuery">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">knexQuery</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {knex.QueryBuilder}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Shortcut for <code>SomeModel.knex().table(SomeModel.tableName)</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">knex.QueryBuilder</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_loadRelated">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">loadRelated</span>
+          <span class="signature-container"><span class="signature">($models, expression)</span><span class="type-signature"> &rarr; {*}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Exactly like $loadRelated but for multiple instances.</p>
+<pre class="prettyprint source lang-js"><code>Person.loadRelated([person1, person2], 'children.pets').then(function (persons) {
+  var person1 = persons[0];
+  var person2 = persons[1];
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>$models</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;(<a href="Model.html">Model</a>|Object)></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>expression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="RelationExpression.html">RelationExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_query">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">query</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a query builder for this table.</p>
+<p>The returned query builder has all the methods a <em>knex</em> query builder has. See
+<a href="QueryBuilder.html">QueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+for more information.</p>
+<p>Examples:</p>
+<p>Read models from the database:</p>
+<pre class="prettyprint source lang-js"><code>// Get all rows.
+Person.query().then(function(allPersons) {
+  console.log('there are', allPersons.length, 'persons in the database');
+});
+
+// Example of a more complex WHERE clause. This generates:
+// SELECT * FROM &quot;Person&quot; WHERE (&quot;firstName&quot; = 'Jennifer' AND &quot;age&quot; &lt; 30) OR (&quot;firstName&quot; = &quot;Mark&quot; AND &quot;age&quot; > 30)
+Person
+  .query()
+  .where(function () {
+    this.where('firstName', 'Jennifer').where('age', '&lt;', 30);
+  })
+  .orWhere(function () {
+    this.where('firstName', 'Mark').where('age', '>', 30);
+  })
+  .then(function (marksAndJennifers) {
+    console.log(marksAndJennifers);
+  });
+
+// Get a subset of rows and fetch related models for each row.
+Person
+  .query()
+  .where('age', '>', 60)
+  .eager('children.children.movies')
+  .then(function (oldPeople) {
+    console.log('some old person\'s grand child has appeared in',
+      oldPeople[0].children[0].children[0].movies.length,
+      'movies');
+  });</code></pre><p>Insert models to the database:</p>
+<pre class="prettyprint source lang-js"><code>Person.query().insert({firstName: 'Sylvester', lastName: 'Stallone'}).then(function (sylvester) {
+  console.log(sylvester.fullName()); // --> 'Sylvester Stallone'.
+});
+
+// Batch insert. This only works on Postgresql as it is the only database that returns the
+// identifiers of _all_ inserted rows. If you need to do batch inserts on other databases use
+// *knex* directly. (See .knexQuery() method).
+Person
+  .query()
+  .insert([
+    {firstName: 'Arnold', lastName: 'Schwarzenegger'},
+    {firstName: 'Sylvester', lastName: 'Stallone'}
+  ])
+  .then(function (inserted) {
+    console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
+  });</code></pre><p><code>update</code> and <code>patch</code> can be used to update models. Only difference between the mentioned methods
+is that <code>update</code> validates the input objects using the model class's full jsonSchema and <code>patch</code>
+ignores the <code>required</code> property of the schema. Use <code>update</code> when you want to update <em>all</em> properties
+of a model and <code>patch</code> when only a subset should be updated.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 35})
+  .where('id', jennifer.id)
+  .then(function (updatedJennifer) {
+    console.log('Jennifer is now', updatedJennifer.age, 'years old');
+  });
+
+// This will throw assuming that `firstName` or `lastName` is a required property for a Person.
+Person.query().patch({age: 100});
+
+// This will _not_ throw.
+Person
+  .query()
+  .patch({age: 100})
+  .then(function () {
+    console.log('Everyone is now 100 years old');
+  });</code></pre><p>Models can be deleted using the delete method. Naturally the delete query can be chained with
+any <em>knex</em> methods:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .delete()
+  .where('age', '>', 90)
+  .then(function () {
+    console.log('anyone over 90 is now removed from the database');
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_raw">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">raw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Shortcut for <code>SomeModel.knex().raw()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+        
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SafterInsert">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$afterInsert</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called after a model has been inserted into the database.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SafterUpdate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$afterUpdate</span>
+          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called after a model is updated.</p>
+<p>This method is also called after a model is patched. Therefore all the model's properties
+may not exist. You can check if the update operation is a patch by checking the <code>opt.patch</code>
+boolean.</p>
+<p>Also note that this method is called only once when you do something like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .$query()
+  .patch({firstName: 'Jennifer'})
+  .where('gender', 'female')
+  .then(function () {
+    ...
+  });</code></pre><p>The example above updates all rows whose <code>gender</code> equals <code>female</code> but the <code>$beforeUpdate</code>
+method is called only once for the <code>{firstName: 'Jennifer'}</code> model. This is because the
+updating is done completely in the database and the affected models are never fetched
+to the javascript side.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SafterValidate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$afterValidate</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">json</span>, <span class="optional">options</span>)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called after successful validation.</p>
+<p>You can do further validation here and throw a ValidationError if something goes wrong.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object to validate.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$afterValidate">ModelBase#$afterValidate</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SbeforeInsert">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$beforeInsert</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called before a model is inserted into the database.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SbeforeUpdate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$beforeUpdate</span>
+          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Called before a model is updated.</p>
+<p>This method is also called before a model is patched. Therefore all the model's properties
+may not exist. You can check if the update operation is a patch by checking the <code>opt.patch</code>
+boolean.</p>
+<p>Also note that this method is called only once when you do something like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .$query()
+  .patch({firstName: 'Jennifer'})
+  .where('gender', 'female')
+  .then(function () {
+    ...
+  });</code></pre><p>The example above updates all rows whose <code>gender</code> equals <code>female</code> but the <code>$beforeUpdate</code>
+method is called only once for the <code>{firstName: 'Jennifer'}</code> model. This is because the
+updating is done completely in the database and the affected models are never fetched
+to the javascript side.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>opt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SbeforeValidate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$beforeValidate</span>
+          <span class="signature-container"><span class="signature">(jsonSchema, json, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called before validation.</p>
+<p>Here you can dynamically edit the jsonSchema if needed.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>jsonSchema</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>A deep clone of this class's jsonSchema.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object to be validated.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$beforeValidate">ModelBase#$beforeValidate</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The (possibly) modified jsonSchema.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Sclone">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$clone</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ModelBase.html">ModelBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns a deep copy of this model.</p>
+<p>If this object has instances of ModelBase as properties (or arrays of them)
+they are cloned using their <code>.$clone()</code> method.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$clone">ModelBase#$clone</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ModelBase.html">ModelBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SformatDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$formatDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is converted to database format.</p>
+<p>Converts the JSON object from the internal format to the database format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in internal format.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$formatDatabaseJson">ModelBase#$formatDatabaseJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in database format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SformatJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$formatJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is converted to JSON.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in internal format</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$formatJson">ModelBase#$formatJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in external format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Sid">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$id</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">id</span>)</span><span class="type-signature"> &rarr; {*}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns or sets the identifier of a model instance.</p>
+<pre class="prettyprint source lang-js"><code>// Returns the id.
+model.$id();
+// Sets the id.
+model.$id(100);</code></pre><p>The identifier property does not have to be accessed or set using this method.
+If the identifier property is known it can be accessed or set just like any
+other property:</p>
+<pre class="prettyprint source lang-js"><code>console.log(model.id);
+model.id = 100;</code></pre><p>This method is just a helper for the cases where the id property is not known.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SloadRelated">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$loadRelated</span>
+          <span class="signature-container"><span class="signature">(relationExpression)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Loads related models using a <a href="RelationExpression.html">RelationExpression</a>.</p>
+<p>Example:</p>
+<pre class="prettyprint source"><code>jennifer.$loadRelated('[pets, children.[pets, father]]').then(function (jennifer) {
+  console.log('Jennifer has', jennifer.pets.length, 'pets');
+  console.log('Jennifer has', jennifer.children.length, 'children');
+  console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pets');
+  console.log('Jennifer had her first child with', jennifer.children[0].father.name);
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>relationExpression</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="RelationExpression.html">RelationExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+	<dt class="tag-see">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="RelationExpression.html">RelationExpression</a> for more examples on relation expressions.</li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SparseDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$parseDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is created from a database JSON object.</p>
+<p>Converts the JSON object from the database format to the internal format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in database format.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$parseDatabaseJson">ModelBase#$parseDatabaseJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in internal format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SparseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$parseJson</span>
+          <span class="signature-container"><span class="signature">(json, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>This is called when a ModelBase is created from a JSON object.</p>
+<p>Converts the JSON object to the internal format.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object in external format.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$parseJson">ModelBase#$parseJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The JSON object in internal format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Squery">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$query</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Creates a query builder for this model instance.</p>
+<p>The returned query builder has all the methods a <em>knex</em> query builder has. See
+<a href="QueryBuilder.html">QueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+for more information.</p>
+<p>All queries built using the returned builder only affect this instance.</p>
+<p>Examples:</p>
+<p>Re-fetch the instance from the database:</p>
+<pre class="prettyprint source lang-js"><code>person.$query().then(function (person) {
+  console.log(person);
+});</code></pre><p>Insert a new model to database:</p>
+<pre class="prettyprint source lang-js"><code>Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennifer) {
+  console.log(jennifer.id);
+});</code></pre><p>Patch a model:</p>
+<pre class="prettyprint source lang-js"><code>person.$query().patch({lastName: 'Cooper'}).then(function (person) {
+  console.log(person.lastName); // --> 'Cooper'.
+});</code></pre><p>Delete a model.</p>
+<pre class="prettyprint source lang-js"><code>person.$query().delete().then(function () {
+  console.log('person deleted');
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SrelatedQuery">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$relatedQuery</span>
+          <span class="signature-container"><span class="signature">(relationName)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Use this to build a query that only affects the models related to this instance through a relation.</p>
+<p>The returned query builder has all the methods a <em>knex</em> query builder has. See
+<a href="QueryBuilder.html">QueryBuilder</a> and <a href="http://knexjs.org/#Builder">knexjs.org</a>
+for more information.</p>
+<p>Examples:</p>
+<p>Fetch all models related to this instance through a relation. The fetched models are
+also stored to the owner model's property named after the relation:</p>
+<pre class="prettyprint source lang-js"><code>jennifer.$relatedQuery('pets').then(function (pets) {
+  console.log('jennifer has', pets.length, 'pets');
+  console.log(jennifer.pets === pets); // --> true
+});</code></pre><p>The related query is just like any other query. All <em>knex</em> methods are available:</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .select('Animal.*', 'Person.name as ownerName')
+  .where('species', '=', 'dog')
+  .orWhere('breed', '=', 'cat')
+  .innerJoin('Person', 'Person.id', 'Animal.ownerId')
+  .orderBy('Animal.name')
+  .then(function (dogsAndCats) {
+    // All the dogs and cats have the owner's name &quot;Jennifer&quot; joined as the `ownerName` property.
+    console.log(dogsAndCats);
+  });</code></pre><p>This inserts a new model to the database and binds it to the owner model as defined
+by the relation:</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .insert({species: 'dog', name: 'Fluffy'})
+  .then(function (waldo) {
+    console.log(waldo.id);
+  });</code></pre><p>To add an existing model to a relation the <code>relate</code> method can be used. In this example
+the dog <code>fluffy</code> already exists in the database but it isn't related to <code>jennifer</code> through
+the <code>pets</code> relation. We can make the connection like this:</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .relate(fluffy.id)
+  .then(function () {
+    console.log('fluffy is now related to jennifer through pets relation');
+  });</code></pre><p>The connection can be removed using the <code>unrelate</code> method. Again, this doesn't delete the
+related model. Only the connection is removed. For example in the case of ManyToMany relation
+the join table entries are deleted.</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .unrelate()
+  .where('id', fluffy.id)
+  .then(function () {
+    console.log('jennifer no longer has fluffy as a pet');
+  });</code></pre><p>Related models can be deleted using the delete method. Note that in the case of ManyToManyRelation
+the join table entries are not deleted. Naturally the delete query can be chained with any <em>knex</em>
+methods.</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .delete()
+  .where('species', 'cat')
+  .then(function () {
+    console.log('jennifer no longer has any cats');
+  });</code></pre><p><code>update</code> and <code>patch</code> can be used to update related models. Only difference between the mentioned
+methods is that <code>update</code> validates the input objects using the related model class's full schema
+and <code>patch</code> ignores the <code>required</code> property of the schema. Use <code>update</code> when you want to update
+<em>all</em> properties of a model and <code>patch</code> when only a subset should be updated.</p>
+<pre class="prettyprint source lang-js"><code>jennifer
+  .$relatedQuery('pets')
+  .update({species: 'dog', name: 'Fluffy the great', vaccinated: false})
+  .where('id', fluffy.id)
+  .then(function (updatedFluffy) {
+    console.log('fluffy\'s new name is', updatedFluffy.name);
+  });
+
+// This will throw assuming that `name` or `species` is a required property for an Animal.
+jennifer.$relatedQuery('pets').patch({vaccinated: true});
+
+// This will _not_ throw.
+jennifer
+  .$relatedQuery('pets')
+  .patch({vaccinated: true})
+  .where('species', 'dog')
+  .then(function () {
+    console.log('jennifer just got all her dogs vaccinated');
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>relationName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Name of the relation.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SsetDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$setDatabaseJson</span>
+          <span class="signature-container"><span class="signature">(json)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets the values from a JSON object in database format.</p>
+<p>Calls <code>this.$parseDatabaseJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The JSON object in database format.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$setDatabaseJson">ModelBase#$setDatabaseJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="SsetJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$setJson</span>
+          <span class="signature-container"><span class="signature">(json, <span class="optional">options</span>)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets the values from a JSON object.</p>
+<p>Validates the JSON before setting values. Calls <code>this.$parseJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The JSON object to set.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$setJson">ModelBase#$setJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+    <div class="param-desc">
+    
+        <p>ValidationError
+   If validation fails.</p>
+    
+    </div>
+
+
+        
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="StoDatabaseJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$toDatabaseJson</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Exports this model as a database JSON object.</p>
+<p>Calls <code>$formatDatabaseJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$toDatabaseJson">ModelBase#$toDatabaseJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>This model as a JSON object in database format.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="StoJson">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$toJson</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Exports this model as a JSON object.</p>
+<p>Calls <code>$formatJson()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$toJson">ModelBase#$toJson</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>This model as a JSON object.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Svalidate">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$validate</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">json</span>, <span class="optional">options</span>)</span><span class="type-signature"> &rarr; {Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Validates the given JSON object.</p>
+<p>Calls <code>$beforeValidation</code> and <code>$afterValidation</code> methods. This method is called
+automatically from <code>fromJson</code> and <code>$setJson</code> methods. This method can also be
+called explicitly when needed.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>json</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>If not given ==&gt; this.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ModelOptions">ModelOptions</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional options.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#$validate">ModelBase#$validate</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If validation fails.</p>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ValidationError.html">ValidationError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The input json</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="toJSON">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">toJSON</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Alias for <code>this.$toJson()</code>.</p>
+<p>For JSON.stringify compatibility.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="ModelBase.html#toJSON">ModelBase#toJSON</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        </dl>
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					
+		<span class="copyright">
+		objection.js Copyright © 2015-2015 Sami Koskimäki.
+		</span>
+					<br />
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+		on Tue Aug 25th 2015 using the <a
+			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<div class="span3">
+				<div id="toc"></div>
+			</div>
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<!-- <script src="scripts/sunlight.js"></script> -->
+	<script src="scripts/docstrap.lib.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+	<script>
+		$( function () {
+			$( "[id*='$']" ).each( function () {
+				var $this = $( this );
+				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+			} );
+
+			$( '.dropdown-toggle' ).dropdown();
+			$( "pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+			$( "pre" ).each( function () {
+				var $this = $( this );
+
+				var example = $this.find( "code" );
+				exampleText = example.html();
+				var lang = /{@lang (.*?)}/.exec( exampleText );
+				if ( lang && lang[1] ) {
+					exampleText = exampleText.replace( lang[0], "" );
+					example.html( exampleText );
+					lang = lang[1];
+				} else {
+					lang = "javascript";
+				}
+
+				if ( lang ) {
+
+					$this
+						.addClass( "sunlight-highlight-" + lang )
+						.addClass( "linenums" )
+						.html( example.html() );
+
+				}
+			} );
+
+			Sunlight.highlightAll( {
+				lineNumbers : true,
+				showMenu : true,
+				enableDoclinks : true
+			} );
+
+      $( "#toc" ).toc( {
+        anchorName  : function ( i, heading, prefix ) {
+          return $( heading ).attr( "id" ) || ( prefix + i );
+        },
+        selectors   : "h1,h2,h3,h4",
+        showAndHide : false,
+        scrollTo    : "100px"
+      } );
+
+      $( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+      $( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
+		} );
+	 </script>
+
+
+
+	<!--Navigation and Symbol Display-->
+	
+
+
+	<!--Google Analytics-->
+	
+
+</body>
+</html>
