@@ -650,6 +650,12 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.1
+
+### What's new
+
+ * bugfix: Chaining `insert` with `returning` now returns all listed columns. 
+
 ## 0.2.0
 
 ### What's new
