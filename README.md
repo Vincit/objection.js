@@ -652,7 +652,7 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 ## 0.2.0
 
-### New features
+### What's new
 
  * New name `objection.js`.
  * `$beforeInsert`, `$afterInsert`, `$beforeUpdate` and `$afterUpdate` hooks for `Model`.
