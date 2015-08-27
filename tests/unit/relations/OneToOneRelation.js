@@ -304,7 +304,7 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
         });
     });
 
@@ -322,7 +322,7 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
         });
     });
 
@@ -338,7 +338,7 @@ describe('OneToOneRelation', function () {
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" in ('2')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" = '2'");
         });
     });
 
@@ -354,7 +354,7 @@ describe('OneToOneRelation', function () {
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" in ('2')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" = '2'");
         });
     });
 
@@ -374,7 +374,7 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\') and "someColumn" = \'foo\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\' and "someColumn" = \'foo\'');
         });
     });
 
@@ -396,7 +396,7 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
         });
     });
 
@@ -423,7 +423,7 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
         });
     });
 
@@ -439,7 +439,7 @@ describe('OneToOneRelation', function () {
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" in ('1')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" = '1'");
         });
     });
 
@@ -455,7 +455,7 @@ describe('OneToOneRelation', function () {
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" in ('2')");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" = '2'");
         });
     });
 
@@ -475,7 +475,7 @@ describe('OneToOneRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({a: 'str1'});
           expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" in (\'2\') and "someColumn" = \'foo\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\' and "someColumn" = \'foo\'');
         });
     });
 
@@ -495,7 +495,7 @@ describe('OneToOneRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" in ('2')");
+          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" = '2'");
         });
     });
 
@@ -512,7 +512,7 @@ describe('OneToOneRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" in ('2') and \"someColumn\" = '100'");
+          expect(executedQueries[0]).to.eql("delete from \"RelatedModel\" where \"RelatedModel\".\"rid\" = '2' and \"someColumn\" = '100'");
         });
     });
 
