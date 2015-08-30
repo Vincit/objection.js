@@ -1,6 +1,7 @@
 var knex = require('knex');
 var expect = require('expect.js');
 var Model = require('../../lib/Model');
+var QueryBuilder = require('../../lib/QueryBuilder');
 
 describe('Model', function () {
 
@@ -363,6 +364,60 @@ describe('Model', function () {
     expect(function () {
       Model.query().insert([{a: 1}, {a: 2}]).build();
     }).to.throwException();
+  });
+
+  it('should use Model.QueryBuilder to create `query()` and `$query()`', function () {
+    function MyQueryBuilder() {
+      QueryBuilder.apply(this, arguments);
+    }
+
+    QueryBuilder.extend(MyQueryBuilder);
+
+    var Model = modelClass('Model');
+
+    Model.relationMappings = {
+      someRelation: {
+        relation: Model.OneToManyRelation,
+        modelClass: Model,
+        join: {
+          from: 'Model.id',
+          to: 'Model.someId'
+        }
+      }
+    };
+
+    Model.QueryBuilder = MyQueryBuilder;
+
+    expect(Model.query()).to.be.a(MyQueryBuilder);
+    expect(Model.fromJson({}).$query()).to.be.a(MyQueryBuilder);
+    expect(Model.fromJson({}).$relatedQuery('someRelation')).to.not.be.a(MyQueryBuilder);
+  });
+
+  it('should use Model.RelatedQueryBuilder to create `$relatedQuery()`', function () {
+    function MyQueryBuilder() {
+      QueryBuilder.apply(this, arguments);
+    }
+
+    QueryBuilder.extend(MyQueryBuilder);
+
+    var Model = modelClass('Model');
+
+    Model.relationMappings = {
+      someRelation: {
+        relation: Model.OneToManyRelation,
+        modelClass: Model,
+        join: {
+          from: 'Model.id',
+          to: 'Model.someId'
+        }
+      }
+    };
+
+    Model.RelatedQueryBuilder = MyQueryBuilder;
+
+    expect(Model.query()).to.not.be.a(MyQueryBuilder);
+    expect(Model.fromJson({}).$query()).to.not.be.a(MyQueryBuilder);
+    expect(Model.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder);
   });
 
   function modelClass(tableName) {
