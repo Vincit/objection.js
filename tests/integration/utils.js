@@ -50,39 +50,63 @@ module.exports.initialize = function (opt) {
   };
 
   Model1.prototype.$beforeInsert = function () {
-    this.$beforeInsertCalled = true;
+    var self = this;
+    return Promise.delay(5).then(function () {
+      self.$beforeInsertCalled = true;
+    });
   };
 
   Model1.prototype.$afterInsert = function () {
-    this.$afterInsertCalled = true;
+    var self = this;
+    return Promise.delay(1).then(function () {
+      self.$afterInsertCalled = true;
+    });
   };
 
   Model1.prototype.$beforeUpdate = function (options) {
-    this.$beforeUpdateCalled = true;
-    this.$beforeUpdateOptions = options;
+    var self = this;
+    return Promise.delay(5).then(function () {
+      self.$beforeUpdateCalled = true;
+      self.$beforeUpdateOptions = options;
+    });
   };
 
   Model1.prototype.$afterUpdate = function (options) {
-    this.$afterUpdateCalled = true;
-    this.$afterUpdateOptions = options;
+    var self = this;
+    return Promise.delay(1).then(function () {
+      self.$afterUpdateCalled = true;
+      self.$afterUpdateOptions = options;
+    });
   };
 
   Model2.prototype.$beforeInsert = function () {
-    this.$beforeInsertCalled  = true;
+    var self = this;
+    return Promise.delay(5).then(function () {
+      self.$beforeInsertCalled = true;
+    });
   };
 
   Model2.prototype.$afterInsert = function () {
-    this.$afterInsertCalled  = true;
+    var self = this;
+    return Promise.delay(1).then(function () {
+      self.$afterInsertCalled = true;
+    });
   };
 
   Model2.prototype.$beforeUpdate = function (options) {
-    this.$beforeUpdateCalled  = true;
-    this.$beforeUpdateOptions = options;
+    var self = this;
+    return Promise.delay(5).then(function () {
+      self.$beforeUpdateCalled = true;
+      self.$beforeUpdateOptions = options;
+    });
   };
 
   Model2.prototype.$afterUpdate = function (options) {
-    this.$afterUpdateCalled  = true;
-    this.$afterUpdateOptions = options;
+    var self = this;
+    return Promise.delay(1).then(function () {
+      self.$afterUpdateCalled = true;
+      self.$afterUpdateOptions = options;
+    });
   };
 
   Model1.relationMappings = {

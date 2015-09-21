@@ -71,7 +71,7 @@ describe('OneToManyRelation', function () {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(2);
@@ -121,7 +121,7 @@ describe('OneToManyRelation', function () {
         .orWhere('age', '>', 60)
         .select('name')
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(2);
@@ -146,7 +146,7 @@ describe('OneToManyRelation', function () {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(2);
@@ -298,38 +298,6 @@ describe('OneToManyRelation', function () {
         });
     });
 
-    it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({oid: 666});
-
-      return QueryBuilder
-        .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
-        })
-        .update()
-        .increment('test', 1)
-        .then(function () {
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"ownerId\" = '666'");
-        });
-    });
-
-    it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({oid: 666});
-
-      return QueryBuilder
-        .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
-        })
-        .update()
-        .decrement('test', 10)
-        .then(function () {
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"ownerId\" = '666'");
-        });
-    });
-
     it('should apply the filter', function () {
       createFilteredRelation({someColumn: 100});
 
@@ -416,11 +384,10 @@ describe('OneToManyRelation', function () {
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
         })
-        .patch()
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"ownerId\" = '666'");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + '1' where \"RelatedModel\".\"ownerId\" = '666'");
         });
     });
 
@@ -432,11 +399,10 @@ describe('OneToManyRelation', function () {
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
         })
-        .patch()
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"ownerId\" = '666'");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - '10' where \"RelatedModel\".\"ownerId\" = '666'");
         });
     });
 

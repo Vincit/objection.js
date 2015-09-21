@@ -58,7 +58,35 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
+							<a href="global.html#build">build</a>
+						</li>
+						
+						<li>
+							<a href="global.html#checkEager">checkEager</a>
+						</li>
+						
+						<li>
+							<a href="global.html#createModels">createModels</a>
+						</li>
+						
+						<li>
+							<a href="global.html#eagerFetch">eagerFetch</a>
+						</li>
+						
+						<li>
 							<a href="global.html#ensureArray">ensureArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#knexInsert">knexInsert</a>
+						</li>
+						
+						<li>
+							<a href="global.html#knexQueryMethod">knexQueryMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#knexUpdate">knexUpdate</a>
 						</li>
 						
 						<li>
@@ -86,11 +114,15 @@
 						</li>
 						
 						<li>
-							<a href="global.html#queryMethod">queryMethod</a>
+							<a href="global.html#relatePatch">relatePatch</a>
 						</li>
 						
 						<li>
 							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#tryCallWriteMethod">tryCallWriteMethod</a>
 						</li>
 						
 						<li>
@@ -232,6 +264,12 @@ a normal promise would.</p>
 
     
 
+    
+        <h3 class="subsection-title">Members</h3>
+
+        <dl>
+            
+        </dl>
     
 
     
@@ -537,8 +575,8 @@ a normal promise would.</p>
     
     <div class="description">
         <p>Sets the allowed eager expression.</p>
-<p>Any subset of the allowed expression is accepted by <code>.eager</code> method. For example setting
-the allowed expression to <code>a.b.c</code> expressions <code>a</code>, <code>a.b</code> and <code>a.b.c</code> are accepted by <code>.eager</code>
+<p>Any subset of the allowed expression is accepted by <code>eager</code> method. For example setting
+the allowed expression to <code>a.b.c</code> expressions <code>a</code>, <code>a.b</code> and <code>a.b.c</code> are accepted by <code>eager</code>
 method. Setting any other expression will reject the query and cause the promise error handlers
 to be called.</p>
 <p>This method is useful when the eager expression comes from an untrusted source like query
@@ -757,6 +795,148 @@ parameters of a http request.</p>
 	<dd>
 		
 <span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="asCallback">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">asCallback</span>
+          <span class="signature-container"><span class="signature">(callback)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and calls <code>.asCallback(callback)</code> for the returned promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
 
 
 	</dd>
@@ -1124,7 +1304,7 @@ parameters of a http request.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .call(function (builder) {
-    if (something) {
+    if (someCondition) {
       builder.where('something', someValue);
     }
   });</code></pre>
@@ -1392,10 +1572,6 @@ parameters of a http request.</p>
     
 </dd>
 
-            
-        
-            
-        
             
         
             
@@ -3033,8 +3209,6 @@ Person
             
         
             
-        
-            
               
 <dt>
     
@@ -3413,7 +3587,7 @@ Person
         <h4 class="name" id="insert">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">insert</span>
-          <span class="signature-container"><span class="signature">(objects)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(modelsOrObjects)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -3447,6 +3621,12 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
   .then(function (actors) {
     console.log(actors[0].firstName);
     console.log(actors[1].firstName);
+  });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .insert({
+    age: Person.query().avg('age'),
+    firstName: Person.raw(&quot;'Jenni' || 'fer'&quot;)
   });</code></pre>
     </div>
     
@@ -3481,7 +3661,7 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
 
         <tr>
             
-                <td class="name"><code>objects</code></td>
+                <td class="name"><code>modelsOrObjects</code></td>
             
 
             <td class="type">
@@ -3493,7 +3673,10 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
 <span class="param-type"><a href="Model.html">Model</a></span>
 |
 
-<span class="param-type">Array.&lt;(Object|<a href="Model.html">Model</a>)></span>
+<span class="param-type">Array.&lt;Object></span>
+|
+
+<span class="param-type">Array.&lt;<a href="Model.html">Model</a>></span>
 
 
             
@@ -4471,7 +4654,7 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
         <h4 class="name" id="modelClass">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">modelClass</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>}</span></span>
+          <span class="signature-container"><span class="signature">(modelClass)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>|<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -4481,7 +4664,294 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
     
     
     <div class="description">
-        <p>Returns the Model subclass this builder is bound to.</p>
+        <p>Gets the Model subclass this builder is bound to.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="nodeify">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">nodeify</span>
+          <span class="signature-container"><span class="signature">(callback)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Executes the query and calls <code>.nodeify(callback)</code> for the returned promise.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="offset">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">offset</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
     </div>
     
 
@@ -4543,7 +5013,7 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="Model.html">Model</a></span>
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
 
 
 	</dd>
@@ -4561,9 +5031,9 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
               
 <dt>
     
-        <h4 class="name" id="offset">
+        <h4 class="name" id="onBuild">
           <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">offset</span>
+          <span class="content">onBuild</span>
           <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
@@ -4574,7 +5044,18 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
     
     
     <div class="description">
-        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+        <p>Functions registered with this method are called as the last thing before the query is built.</p>
+<p>Unlike the run<em> methods these must be synchronous. Also you should not register any run</em> methods
+from these. You should <em>only</em> call the query building methods of the builder provided as a parameter.</p>
+<pre class="prettyprint source lang-js"><code>var query = Person.query();
+
+query
+ .onBuild(function (builder) {
+   builder.where('id', 1);
+ })
+ .onBuild(function () {
+   builder.orWhere('id', 2);
+ });</code></pre>
     </div>
     
 
@@ -7189,7 +7670,7 @@ the Promise is rejected with a <code>ValidationError</code>.</p>
         <h4 class="name" id="patch">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">patch</span>
-          <span class="signature-container"><span class="signature">(object)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(modelOrObject)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -7211,6 +7692,12 @@ but an error isn't thrown if the patch object doesn't contain all required prope
   .where('id', 134)
   .then(function (patch) {
     console.log(patch.toJSON());
+  });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .patch({
+    age: Person.query().avg('age'),
+    firstName: Person.raw(&quot;'Jenni' || 'fer'&quot;)
   });</code></pre>
     </div>
     
@@ -7245,12 +7732,15 @@ but an error isn't thrown if the patch object doesn't contain all required prope
 
         <tr>
             
-                <td class="name"><code>object</code></td>
+                <td class="name"><code>modelOrObject</code></td>
             
 
             <td class="type">
             
                 
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
 <span class="param-type">Object</span>
 
 
@@ -8215,7 +8705,7 @@ Promise.all([
         <h4 class="name" id="return">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">return</span>
-          <span class="signature-container"><span class="signature">(retVal)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+          <span class="signature-container"><span class="signature">(returnValue)</span><span class="type-signature"> &rarr; {Promise}</span></span>
         </h4>
     
     
@@ -8225,7 +8715,7 @@ Promise.all([
     
     
     <div class="description">
-        <p>Executes the query and calls <code>.return(retVal)</code> for the returned promise.</p>
+        <p>Executes the query and calls <code>.return(returnValue)</code> for the returned promise.</p>
     </div>
     
 
@@ -8259,7 +8749,7 @@ Promise.all([
 
         <tr>
             
-                <td class="name"><code>retVal</code></td>
+                <td class="name"><code>returnValue</code></td>
             
 
             <td class="type">
@@ -8647,7 +9137,9 @@ Promise.all([
     
     <div class="description">
         <p>Registers a function to be called when the builder is executed.</p>
-<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<p>These functions are executed as the last thing before any promise handlers
+registered using the <code>then</code> method. Multiple functions can be chained like
+<code>then</code> methods of a promise.</p>
 <pre class="prettyprint source lang-js"><code>var query = Person.query();
 
 query
@@ -8803,7 +9295,9 @@ query.then(function (models) {
     
     <div class="description">
         <p>Registers a function to be called after the database query when the builder is executed.</p>
-<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<p>The functions take the knex output as input. Usually this is an array of plain
+javascript objects: one for each row. Multiple functions can be chained like
+<code>then</code> methods of a promise.</p>
 <pre class="prettyprint source lang-js"><code>var query = Person.query();
 
 query
@@ -9048,7 +9542,7 @@ query.then();
     
     <div class="description">
         <p>Registers a function to be called after the database rows are converted to Model instances.</p>
-<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<p>Multiple functions can be chained like <code>then</code> methods of a promise.</p>
 <pre class="prettyprint source lang-js"><code>var query = Person.query();
 
 query
@@ -9379,7 +9873,7 @@ query.then();
     
     <div class="description">
         <p>Registers a function to be called before the database query when the builder is executed.</p>
-<p>Multiple functions can be chained like <code>.then</code> methods of a promise.</p>
+<p>Multiple functions can be chained like <code>then</code> methods of a promise.</p>
 <pre class="prettyprint source lang-js"><code>var query = Person.query();
 
 query
@@ -10653,7 +11147,7 @@ join columns to null.</p>
         <h4 class="name" id="update">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">update</span>
-          <span class="signature-container"><span class="signature">(object)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(modelOrObject)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -10676,6 +11170,13 @@ want to update a subset of properties use the <code>patch()</code> method.</p>
   .where('id', 134)
   .then(function (update) {
     console.log(update.toJSON());
+  });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .update({
+    firstName: Person.raw(&quot;'Jenni' || 'fer'&quot;),
+    lastName: 'Lawrence',
+    age: Person.query().avg('age')
   });</code></pre>
     </div>
     
@@ -10710,16 +11211,16 @@ want to update a subset of properties use the <code>patch()</code> method.</p>
 
         <tr>
             
-                <td class="name"><code>object</code></td>
+                <td class="name"><code>modelOrObject</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type"><a href="Model.html">Model</a></span>
 |
 
-<span class="param-type"><a href="Model.html">Model</a></span>
+<span class="param-type">Object</span>
 
 
             
@@ -13704,7 +14205,7 @@ does not have <code>jsonObject.a</code> or <code>jsonObject.b</code>.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Tue Aug 25th 2015 using the <a
+		on Tue Sep 22nd 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

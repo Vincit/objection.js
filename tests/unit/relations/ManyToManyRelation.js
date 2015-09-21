@@ -75,7 +75,7 @@ describe('ManyToManyRelation', function () {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(2);
@@ -139,7 +139,7 @@ describe('ManyToManyRelation', function () {
         .orWhere('age', '>', 60)
         .select('name')
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(2);
@@ -171,7 +171,7 @@ describe('ManyToManyRelation', function () {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(2);
@@ -351,48 +351,6 @@ describe('ManyToManyRelation', function () {
         });
     });
 
-    it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({oid: 666});
-
-      return QueryBuilder
-        .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
-        })
-        .update()
-        .increment('test', 1)
-        .then(function () {
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" + 1',
-            'where "RelatedModel"."id" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
-          ].join(' '));
-        });
-    });
-
-    it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({oid: 666});
-
-      return QueryBuilder
-        .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
-        })
-        .update()
-        .decrement('test', 10)
-        .then(function () {
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" - 10',
-            'where "RelatedModel"."id" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
-          ].join(' '));
-        });
-    });
-
     it('should apply the filter', function () {
       createFilteredRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
@@ -416,8 +374,8 @@ describe('ManyToManyRelation', function () {
             'where "gender" = \'male\'',
             'and "thingy" is not null and',
             '"RelatedModel"."id" in',
-            '(select "JoinTable"."relatedId" from "JoinTable"',
-            'where "JoinTable"."ownerId" = \'666\')',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')',
             'and "someColumn" = \'100\''
           ].join(' '));
         });
@@ -501,12 +459,11 @@ describe('ManyToManyRelation', function () {
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
         })
-        .patch()
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" + 1',
+            'update "RelatedModel" set "test" = "test" + \'1\'',
             'where "RelatedModel"."id" in',
               '(select "JoinTable"."relatedId" from "JoinTable"',
               'where "JoinTable"."ownerId" = \'666\')'
@@ -522,12 +479,11 @@ describe('ManyToManyRelation', function () {
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
         })
-        .patch()
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "test" = "test" - 10',
+            'update "RelatedModel" set "test" = "test" - \'10\'',
             'where "RelatedModel"."id" in',
               '(select "JoinTable"."relatedId" from "JoinTable"',
               'where "JoinTable"."ownerId" = \'666\')'
@@ -584,7 +540,14 @@ describe('ManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')');
+          expect(executedQueries[0]).to.eql([
+            'delete from "RelatedModel"',
+            'where "gender" = \'male\'',
+            'and "thingy" is not null',
+            'and "RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')'
+          ].join(' '));
         });
     });
 
@@ -604,7 +567,15 @@ describe('ManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."id" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\') and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql([
+            'delete from "RelatedModel"',
+            'where "gender" = \'male\'',
+            'and "thingy" is not null',
+            'and "RelatedModel"."id" in',
+              '(select "JoinTable"."relatedId" from "JoinTable"',
+              'where "JoinTable"."ownerId" = \'666\')',
+            'and "someColumn" = \'100\''
+          ].join(' '));
         });
     });
 
@@ -624,12 +595,10 @@ describe('ManyToManyRelation', function () {
         .relate([10, 20, 30])
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql([
-            { ownerId: 666, relatedId: 10, id: 5 },
-            { ownerId: 666, relatedId: 20, id: 6 },
-            { ownerId: 666, relatedId: 30, id: 7 }
-          ]);
-          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\') returning "id"');
+          expect(result).to.eql([10, 20, 30]);
+          expect(executedQueries[0]).to.eql([
+            'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\')'
+          ].join(' '));
         });
     });
 
@@ -645,8 +614,8 @@ describe('ManyToManyRelation', function () {
         .relate(11)
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({ ownerId: 666, relatedId: 11, id: 5 });
-          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'11\') returning "id"');
+          expect(result).to.eql(11);
+          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'11\')');
         });
     });
 
@@ -668,7 +637,14 @@ describe('ManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "JoinTable" where "JoinTable"."ownerId" = \'666\' and "JoinTable"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" where "code" in (\'55\', \'66\', \'77\') and "someColumn" = \'100\')');
+          expect(executedQueries[0]).to.eql([
+            'delete from "JoinTable"',
+            'where "JoinTable"."ownerId" = \'666\'',
+            'and "JoinTable"."relatedId" in',
+              '(select "RelatedModel"."rid" from "RelatedModel"',
+              'where "code" in (\'55\', \'66\', \'77\')',
+              'and "someColumn" = \'100\')'
+          ].join(' '));
         });
     });
 

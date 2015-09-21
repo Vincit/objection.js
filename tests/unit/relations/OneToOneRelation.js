@@ -69,7 +69,7 @@ describe('OneToOneRelation', function () {
       return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(1);
@@ -111,7 +111,7 @@ describe('OneToOneRelation', function () {
       return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .select('name')
         .then(function (result) {
@@ -134,7 +134,7 @@ describe('OneToOneRelation', function () {
       return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(1);
@@ -158,7 +158,7 @@ describe('OneToOneRelation', function () {
       return QueryBuilder
         .forClass(RelatedModel)
         .findImpl(function () {
-          relation.find(this, owner);
+          relation.find(this, [owner]);
         })
         .then(function (result) {
           expect(result).to.have.length(1);
@@ -326,38 +326,6 @@ describe('OneToOneRelation', function () {
         });
     });
 
-    it('should work with increment', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
-
-      return QueryBuilder
-        .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
-        })
-        .update()
-        .increment('test', 1)
-        .then(function () {
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" = '2'");
-        });
-    });
-
-    it('should work with decrement', function () {
-      var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
-
-      return QueryBuilder
-        .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
-        })
-        .update()
-        .decrement('test', 10)
-        .then(function () {
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" = '2'");
-        });
-    });
-
     it('should apply the filter', function () {
       createFilteredRelation({someColumn: 'foo'});
 
@@ -435,11 +403,10 @@ describe('OneToOneRelation', function () {
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
         })
-        .patch()
         .increment('test', 1)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + 1 where \"RelatedModel\".\"rid\" = '1'");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + '1' where \"RelatedModel\".\"rid\" = '1'");
         });
     });
 
@@ -451,11 +418,10 @@ describe('OneToOneRelation', function () {
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
         })
-        .patch()
         .decrement('test', 10)
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - 10 where \"RelatedModel\".\"rid\" = '2'");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - '10' where \"RelatedModel\".\"rid\" = '2'");
         });
     });
 
