@@ -91,6 +91,28 @@ describe('QueryBuilder', function () {
     return promise;
   });
 
+  it('should return a promise from .bind method', function () {
+    var promise = QueryBuilder.forClass(TestModel).bind({});
+    expect(promise).to.be.a(Promise);
+    return promise;
+  });
+
+  it('should pass node-style values to the asCallback method', function (done) {
+    mockKnexQueryResult = [{a: 1}, {a: 2}];
+    var promise = QueryBuilder.forClass(TestModel).asCallback(function (err, models) {
+      expect(models).to.eql(mockKnexQueryResult);
+      done();
+    });
+  });
+
+  it('should pass node-style values to the nodeify method', function (done) {
+    mockKnexQueryResult = [{a: 1}, {a: 2}];
+    var promise = QueryBuilder.forClass(TestModel).nodeify(function (err, models) {
+      expect(models).to.eql(mockKnexQueryResult);
+      done();
+    });
+  });
+
   it('should return a promise from .catch method', function () {
     var promise = QueryBuilder.forClass(TestModel).catch(_.noop);
     expect(promise).to.be.a(Promise);
@@ -368,7 +390,7 @@ describe('QueryBuilder', function () {
       .insert({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a") values (\'1\')');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a") values (\'1\') returning "id"');
       });
   });
 
@@ -402,13 +424,13 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .insertImpl(function (insert) {
-        insert.b = 2;
-        this.knexInsert(insert);
+        insert.model().b = 2;
+        this.$$insert(insert);
       })
       .insert({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (\'1\', \'2\')');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (\'1\', \'2\') returning "id"');
       });
   });
 
@@ -416,8 +438,8 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .updateImpl(function (update) {
-        update.b = 2;
-        this.knexUpdate(update);
+        update.model().b = 2;
+        this.$$update(update);
       })
       .update({a: 1})
       .then(function () {
@@ -430,8 +452,8 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .patchImpl(function (patch) {
-        patch.b = 2;
-        this.knexUpdate(patch);
+        patch.model().b = 2;
+        this.$$update(patch);
       })
       .patch({a: 1})
       .then(function () {
@@ -444,7 +466,7 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .deleteImpl(function () {
-        this.knexDelete().where('id', 100);
+        this.$$delete().where('id', 100);
       })
       .delete()
       .then(function () {
@@ -457,8 +479,8 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .relateImpl(function (relate) {
-        relate.b = 2;
-        this.knexInsert(relate);
+        relate[0].b = 2;
+        this.$$insert(relate);
       })
       .relate({a: 1})
       .then(function () {
@@ -471,7 +493,7 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .unrelateImpl(function () {
-        this.knexDelete().where('id', 100);
+        this.$$delete().where('id', 100);
       })
       .unrelate()
       .then(function () {
@@ -484,8 +506,8 @@ describe('QueryBuilder', function () {
     var query = QueryBuilder
       .forClass(TestModel)
       .updateImpl(function (update) {
-        update.b = 2;
-        this.knexUpdate(update);
+        update.model().b = 2;
+        this.$$update(update);
       })
       .where('test', '<', 100)
       .update({a: 1});
@@ -569,10 +591,10 @@ describe('QueryBuilder', function () {
     expect(QueryBuilder.forClass(TestModel).isFindQuery()).to.equal(true);
     expect(QueryBuilder.forClass(TestModel).insert().isFindQuery()).to.equal(false);
     expect(QueryBuilder.forClass(TestModel).update().isFindQuery()).to.equal(false);
-    expect(QueryBuilder.forClass(TestModel).patchImpl(function (model) { this.knexUpdate(model); }).patch().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).patchImpl(function (model) { this.$$update(model); }).patch().isFindQuery()).to.equal(false);
     expect(QueryBuilder.forClass(TestModel).delete().isFindQuery()).to.equal(false);
-    expect(QueryBuilder.forClass(TestModel).relateImpl(function (model) { this.knexInsert(model); }).relate().isFindQuery()).to.equal(false);
-    expect(QueryBuilder.forClass(TestModel).unrelateImpl(function () { this.knexDelete(); }).unrelate().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).relate(1).isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).unrelateImpl(function () { this.$$delete(); }).unrelate().isFindQuery()).to.equal(false);
   });
 
   it('resolve should replace the database query with the given value', function (done) {

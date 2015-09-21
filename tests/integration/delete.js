@@ -108,7 +108,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().delete()', function () {
 
-      describe('has one relation', function () {
+      describe('one to one relation', function () {
         var parent1;
         var parent2;
 
@@ -171,7 +171,7 @@ module.exports = function (session) {
 
       });
 
-      describe('has many relation', function () {
+      describe('one to many relation', function () {
         var parent1;
         var parent2;
 
@@ -217,6 +217,21 @@ module.exports = function (session) {
             .then(function (parents) {
               parent1 = _.find(parents, {id: 1});
               parent2 = _.find(parents, {id: 2});
+            });
+        });
+
+        it('should delete all related objects', function () {
+          return parent1
+            .$relatedQuery('model1Relation2')
+            .delete()
+            .then(function () {
+              return session.knex('model_2').orderBy('id_col');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expectPartEql(rows[0], {id_col: 4, model_2_prop_1: 'text 4'});
+              expectPartEql(rows[1], {id_col: 5, model_2_prop_1: 'text 5'});
+              expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
             });
         });
 
@@ -312,6 +327,23 @@ module.exports = function (session) {
             .then(function (parents) {
               parent1 = _.find(parents, {idCol: 1});
               parent2 = _.find(parents, {idCol: 2});
+            });
+        });
+
+        it('should delete all related objects', function () {
+          return parent1
+            .$relatedQuery('model2Relation1')
+            .delete()
+            .then(function () {
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(5);
+              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+              expectPartEql(rows[2], {id: 6, model1Prop1: 'blaa 4'});
+              expectPartEql(rows[3], {id: 7, model1Prop1: 'blaa 5'});
+              expectPartEql(rows[4], {id: 8, model1Prop1: 'blaa 6'});
             });
         });
 

@@ -58,7 +58,35 @@
 					<ul class="dropdown-menu ">
 						
 						<li>
+							<a href="global.html#build">build</a>
+						</li>
+						
+						<li>
+							<a href="global.html#checkEager">checkEager</a>
+						</li>
+						
+						<li>
+							<a href="global.html#createModels">createModels</a>
+						</li>
+						
+						<li>
+							<a href="global.html#eagerFetch">eagerFetch</a>
+						</li>
+						
+						<li>
 							<a href="global.html#ensureArray">ensureArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#knexInsert">knexInsert</a>
+						</li>
+						
+						<li>
+							<a href="global.html#knexQueryMethod">knexQueryMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#knexUpdate">knexUpdate</a>
 						</li>
 						
 						<li>
@@ -86,11 +114,15 @@
 						</li>
 						
 						<li>
-							<a href="global.html#queryMethod">queryMethod</a>
+							<a href="global.html#relatePatch">relatePatch</a>
 						</li>
 						
 						<li>
 							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#tryCallWriteMethod">tryCallWriteMethod</a>
 						</li>
 						
 						<li>
@@ -689,9 +721,68 @@ console.log(dbRow);
 <dd>
     
     <div class="description">
-        <p>QueryBuilder subclass to use.</p>
-<p>This constructor is used whenever a query builder is created. You can override this
-to use your own <code>QueryBuilder</code> subclass.</p>
+        <p>QueryBuilder subclass to use in <code>query()</code> or <code>$query()</code> methods.</p>
+<p>This constructor is used whenever a query builder is created using <code>query()</code> or <code>$query()</code> methods.
+You can override this to use your own <code>QueryBuilder</code> subclass.</p>
+    </div>
+    
+
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+
+    
+</dd>
+
+            
+        
+            
+                
+<dt>
+    <h4 class="name" id="_P_RelatedQueryBuilder">
+      <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+      <span class="content">RelatedQueryBuilder</span>
+      <span class="signature-container"><span class="type-signature"></span></span>
+    </h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>QueryBuilder subclass to use in <code>$relatedQuery()</code> method.</p>
+<p>This constructor is used whenever a query builder is created using the <code>$relatedQuery()</code> method.
+You can override this to use your own <code>QueryBuilder</code> subclass.</p>
     </div>
     
 
@@ -916,16 +1007,6 @@ is a handy way to prevent require loops.</p>
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
             
         
             
@@ -1479,6 +1560,80 @@ BoundModel2.query().then(function (models) {
 
 
         
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_fn">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">fn</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Shortcut for <code>SomeModel.knex().fn</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
     
     
 </dd>
@@ -2740,7 +2895,7 @@ any <em>knex</em> methods:</p>
         <h4 class="name" id="SafterInsert">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$afterInsert</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -2751,6 +2906,7 @@ any <em>knex</em> methods:</p>
     
     <div class="description">
         <p>Called after a model has been inserted into the database.</p>
+<p>You can return a promise from this function if you need to do asynchronous stuff.</p>
     </div>
     
 
@@ -2801,6 +2957,28 @@ any <em>knex</em> methods:</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -2814,7 +2992,7 @@ any <em>knex</em> methods:</p>
         <h4 class="name" id="SafterUpdate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$afterUpdate</span>
-          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -2825,6 +3003,7 @@ any <em>knex</em> methods:</p>
     
     <div class="description">
         <p>Called after a model is updated.</p>
+<p>You can return a promise from this function if you need to do asynchronous stuff.</p>
 <p>This method is also called after a model is patched. Therefore all the model's properties
 may not exist. You can check if the update operation is a patch by checking the <code>opt.patch</code>
 boolean.</p>
@@ -2938,6 +3117,28 @@ to the javascript side.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3129,7 +3330,7 @@ to the javascript side.</p>
         <h4 class="name" id="SbeforeInsert">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$beforeInsert</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -3140,6 +3341,9 @@ to the javascript side.</p>
     
     <div class="description">
         <p>Called before a model is inserted into the database.</p>
+<p>You can return a promise from this function if you need to do asynchronous stuff. You can
+also throw an exception to abort the insert and reject the query. This can be useful if
+you need to do insert specific validation.</p>
     </div>
     
 
@@ -3190,6 +3394,28 @@ to the javascript side.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -3203,7 +3429,7 @@ to the javascript side.</p>
         <h4 class="name" id="SbeforeUpdate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$beforeUpdate</span>
-          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"></span></span>
+          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -3214,6 +3440,9 @@ to the javascript side.</p>
     
     <div class="description">
         <p>Called before a model is updated.</p>
+<p>You can return a promise from this function if you need to do asynchronous stuff. You can
+also throw an exception to abort the update and reject the query. This can be useful if
+you need to do update specific validation.</p>
 <p>This method is also called before a model is patched. Therefore all the model's properties
 may not exist. You can check if the update operation is a patch by checking the <code>opt.patch</code>
 boolean.</p>
@@ -3327,6 +3556,28 @@ to the javascript side.</p>
     
     
     
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">*</span>
+
+
+	</dd>
+</dl>
+
+
+        
     
     
 </dd>
@@ -5992,7 +6243,7 @@ called explicitly when needed.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Tue Aug 25th 2015 using the <a
+		on Tue Sep 22nd 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

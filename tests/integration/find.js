@@ -50,6 +50,10 @@ module.exports = function (session) {
             expect(_.pluck(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2', 'hejsan 3']);
             expect(_.pluck(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
             expect(_.pluck(models, 'idCol').sort()).to.eql([1, 2, 3]);
+            return Model1.knexQuery().columnInfo();
+          })
+          .then(function (info) {
+            console.log(info);
           });
       });
 
@@ -147,12 +151,11 @@ module.exports = function (session) {
           .then(function (models) {
             expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
             models[0].model1Prop1 = 'blaa';
-            return models[0].$query();
+            return models[0].$query().first();
           })
-          .then(function (models) {
-            expect(models).to.have.length(1);
-            expect(models[0]).to.be.a(Model1);
-            expect(models[0].model1Prop1).to.equal('hello 1');
+          .then(function (model) {
+            expect(model).to.be.a(Model1);
+            expect(model.model1Prop1).to.equal('hello 1');
           });
       });
 

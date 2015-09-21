@@ -331,41 +331,6 @@ describe('Model', function () {
     }).to.throwException();
   });
 
-  it('id returned by generateId should be used on insert', function () {
-    var Model = modelClass('Model');
-    var knexInstance = knex({client: 'pg'});
-    Model.knex(knexInstance);
-    Model.generateId = function () {
-      return 'generated_id';
-    };
-    expect(Model.query().insert({a: 1}).toSql()).to.equal('insert into "Model" ("a", "id") values (\'1\', \'generated_id\') returning "id"');
-  });
-
-  it('inserting multiple models should only work with postgres', function () {
-    var Model = modelClass('Model');
-
-    var knexInstance = knex({client: 'pg'});
-    Model.knex(knexInstance);
-
-    expect(function () {
-      Model.query().insert([{a: 1}, {a: 2}]).build();
-    }).to.not.throwException();
-
-    var knexInstance = knex({client: 'sqlite3'});
-    Model.knex(knexInstance);
-
-    expect(function () {
-      Model.query().insert([{a: 1}, {a: 2}]).build();
-    }).to.throwException();
-
-    var knexInstance = knex({client: 'mysql'});
-    Model.knex(knexInstance);
-
-    expect(function () {
-      Model.query().insert([{a: 1}, {a: 2}]).build();
-    }).to.throwException();
-  });
-
   it('should use Model.QueryBuilder to create `query()` and `$query()`', function () {
     function MyQueryBuilder() {
       QueryBuilder.apply(this, arguments);

@@ -58,6 +58,26 @@ module.exports = function (session) {
           });
       });
 
+      it('should patch a model (2)', function () {
+        // Should ignore the id.
+        var model = Model2.fromJson({idCol: 666, model2Prop1: 'updated text'});
+
+        return Model2
+          .query()
+          .patch(model)
+          .where('id_col', '=', 1)
+          .then(function (updated) {
+            expect(updated).to.be.a(Model2);
+            expectPartEql(updated, {model2Prop1: 'updated text'});
+            return session.knex('model_2').orderBy('id_col');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'updated text', model_2_prop_2: 2});
+            expectPartEql(rows[1], {id_col: 2, model_2_prop_1: 'text 2', model_2_prop_2: 1});
+          });
+      });
+
       it('should accept json', function () {
         return Model1
           .query()
@@ -80,23 +100,52 @@ module.exports = function (session) {
           });
       });
 
-      it('should patch a model (2)', function () {
-        // Should ignore the id.
-        var model = Model2.fromJson({idCol: 666, model2Prop1: 'updated text'});
-
-        return Model2
+      it('should accept subqueries and raw expressions (1)', function () {
+        return Model1
           .query()
-          .patch(model)
-          .where('id_col', '=', 1)
+          .patch({
+            model1Prop1: Model2.raw('(select max(??) from ??)', ["model_2_prop_1", "model_2"]),
+            model1Prop2: Model2.query().sum('model_2_prop_2')
+          })
+          .where('id', '=', 1)
           .then(function (updated) {
-            expect(updated).to.be.a(Model2);
-            expectPartEql(updated, {model2Prop1: 'updated text'});
-            return session.knex('model_2').orderBy('id_col');
+            expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$beforeUpdateOptions).to.eql({patch: true});
+            expect(updated.$afterUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateOptions).to.eql({patch: true});
+            return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
-            expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'updated text', model_2_prop_2: 2});
-            expectPartEql(rows[1], {id_col: 2, model_2_prop_1: 'text 2', model_2_prop_2: 1});
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'text 2', model1Prop2: 3});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
+      it('should accept subqueries and raw expressions (2)', function () {
+        return Model1
+          .query()
+          .patch({
+            model1Prop1: 'Morten',
+            model1Prop2: Model2.knexQuery().sum('model_2_prop_2')
+          })
+          .where('id', '=', 1)
+          .then(function (updated) {
+            expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$beforeUpdateOptions).to.eql({patch: true});
+            expect(updated.$afterUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateOptions).to.eql({patch: true});
+            expectPartEql(updated, {model1Prop1: 'Morten'});
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'Morten', model1Prop2: 3});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
           });
       });
 
@@ -119,6 +168,46 @@ module.exports = function (session) {
             expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
             expectPartEql(rows[1], {id: 2, model1Prop1: 'updated text'});
             expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
+      it('increment should create patch', function () {
+        return Model2
+          .query()
+          .increment('model2Prop2', 10)
+          .where('id_col', '=', 2)
+          .then(function (updated) {
+            expect(updated).to.be.a(Model2);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$beforeUpdateOptions).to.eql({patch: true});
+            expect(updated.$afterUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateOptions).to.eql({patch: true});
+            return session.knex('model_2').orderBy('id_col');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id_col: 1, model_2_prop_2: 2});
+            expectPartEql(rows[1], {id_col: 2, model_2_prop_2: 11});
+          });
+      });
+
+      it('decrement should create patch', function () {
+        return Model2
+          .query()
+          .decrement('model2Prop2', 10)
+          .where('id_col', '=', 2)
+          .then(function (updated) {
+            expect(updated).to.be.a(Model2);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$beforeUpdateOptions).to.eql({patch: true});
+            expect(updated.$afterUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateOptions).to.eql({patch: true});
+            return session.knex('model_2').orderBy('id_col');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id_col: 1, model_2_prop_2: 2});
+            expectPartEql(rows[1], {id_col: 2, model_2_prop_2: -9});
           });
       });
 
@@ -212,7 +301,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().patch()', function () {
 
-      describe('has one relation', function () {
+      describe('one to one relation', function () {
         var parent1;
         var parent2;
 
@@ -285,7 +374,7 @@ module.exports = function (session) {
 
       });
 
-      describe('has many relation', function () {
+      describe('one to many relation', function () {
         var parent1;
         var parent2;
 

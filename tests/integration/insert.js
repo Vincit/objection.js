@@ -14,7 +14,14 @@ module.exports = function (session) {
       beforeEach(function () {
         return session.populate([{
           id: 1,
-          model1Prop1: 'hello 1'
+          model1Prop1: 'hello 1',
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'test 1'
+          }, {
+            idCol: 2,
+            model2Prop1: 'test 2'
+          }]
         }, {
           id: 2,
           model1Prop1: 'hello 2'
@@ -77,6 +84,24 @@ module.exports = function (session) {
           })
           .then(function (rows) {
             expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
+      it('should accept subqueries and raw expressions', function () {
+        return Model1
+          .query()
+          .insert({
+            model1Prop1: Model2.query().max('model_2_prop_1'),
+            model1Prop2: Model1.raw('5 + 8')
+          })
+          .then(function (inserted) {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.id).to.eql(3);
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'test 2']);
+            expect(_.find(rows, {id: 3, model1Prop1: 'test 2'}).model1Prop2).to.equal(13);
           });
       });
 
@@ -518,7 +543,6 @@ module.exports = function (session) {
             .then(function (models) {
               originalRelated = models;
               expect(models).to.have.length(1);
-
               return parent1
                 .$relatedQuery('model2Relation1')
                 .insert(Model1.fromJson({model1Prop1: 'test'}));
