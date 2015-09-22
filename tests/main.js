@@ -13,6 +13,7 @@ describe('main module', function () {
     expect(objection.OneToOneRelation).to.equal(require('../lib/relations/OneToOneRelation'));
     expect(objection.ManyToManyRelation).to.equal(require('../lib/relations/ManyToManyRelation'));
     expect(objection.transaction).to.equal(require('../lib/transaction'));
+    expect(objection.Promise).to.equal(require('bluebird'));
   });
 
 });

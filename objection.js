@@ -11,4 +11,5 @@ module.exports = {
   ManyToManyRelation: require('./lib/relations/ManyToManyRelation'),
 
   transaction: require('./lib/transaction'),
+  Promise: require('bluebird')
 };

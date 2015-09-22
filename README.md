@@ -650,6 +650,16 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.3
+
+ * Promise constructor is now exposed through `require('objection').Promise`.
+
+## 0.2.2
+
+ * $beforeUpdate, $afterUpdate, $beforeInsert etc. are now asynchronous and you can return promises from them.
+ * Added `Model.fn()` shortcut to `knex.fn`.
+ * Added missing `asCallback` and `nodeify` methods for `QueryBuilder`.
+
 ## 0.2.1
 
 ### What's new
