@@ -535,8 +535,8 @@ function MinimalModel() {
   Model.apply(this, arguments);
 }
 
-// Inherit `Model`. This gives your model all those methods like `MinimalModel.query()`
-// and `MinimalModel.fromJson()`.
+// Inherit `Model`. This does the basic prototype inheritance but also inherits all the static methods
+// like `Model.query()` and `Model.fromJson()`. This is consistent with ES6 class inheritance.
 Model.extend(MinimalModel);
 
 // After the js class boilerplate, all you need to do is set the table name.
@@ -650,11 +650,22 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.4
+
+#### What's new
+
+ * bugfix: many-to-many relations didn't work correctly with a snake_case to camelCase conversion
+   in the related model class.
+
 ## 0.2.3
+
+#### What's new
 
  * Promise constructor is now exposed through `require('objection').Promise`.
 
 ## 0.2.2
+
+#### What's new
 
  * $beforeUpdate, $afterUpdate, $beforeInsert etc. are now asynchronous and you can return promises from them.
  * Added `Model.fn()` shortcut to `knex.fn`.
@@ -662,13 +673,13 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 ## 0.2.1
 
-### What's new
+#### What's new
 
  * bugfix: Chaining `insert` with `returning` now returns all listed columns. 
 
 ## 0.2.0
 
-### What's new
+#### What's new
 
  * New name `objection.js`.
  * `$beforeInsert`, `$afterInsert`, `$beforeUpdate` and `$afterUpdate` hooks for `Model`.
@@ -681,7 +692,7 @@ just comment out configurations from the `testDatabaseConfigs` list.
  * Filter queries/objects for relations.
  * A pile of bug fixes.
 
-### Breaking changes
+#### Breaking changes
 
  * Project was renamed to objection.js. Migrate simply by replacing `moron` with `objection`.
 
