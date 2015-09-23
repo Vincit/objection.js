@@ -125,6 +125,18 @@ module.exports.initialize = function (opt) {
         from: 'Model1.id',
         to: 'model_2.model_1_id'
       }
+    },
+    model1Relation3: {
+      relation: Model.ManyToManyRelation,
+      modelClass: Model2,
+      join: {
+        from: 'Model1.id',
+        through: {
+          from: 'Model1Model2.model1Id',
+          to: 'Model1Model2.model2Id'
+        },
+        to: 'model_2.id_col'
+      }
     }
   };
 

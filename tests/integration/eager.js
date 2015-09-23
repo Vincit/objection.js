@@ -23,7 +23,11 @@ module.exports = function (session) {
 
             model1Relation1: {
               id: 4,
-              model1Prop1: 'hello 4'
+              model1Prop1: 'hello 4',
+              model1Relation2: [{
+                idCol: 4,
+                model2Prop1: 'hejsan 4'
+              }]
             }
           }
         },
@@ -98,6 +102,8 @@ module.exports = function (session) {
       expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.be.a(Model1);
       expect(models[0].model1Relation1.model1Relation1.model1Relation1.id).to.equal(4);
       expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Prop1).to.equal('hello 4');
+
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2).to.equal(undefined);
 
       expect(models[0].model1Relation2).to.equal(undefined);
     });
@@ -182,7 +188,7 @@ module.exports = function (session) {
       expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
     });
 
-    test('*', function (models) {
+    test('model1Relation1.*', function (models) {
       expect(models).to.have.length(1);
       expect(models[0]).to.be.a(Model1);
 
@@ -190,52 +196,20 @@ module.exports = function (session) {
       expect(models[0].model1Relation1.id).to.equal(2);
       expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
 
-      expect(models[0].model1Relation2).to.have.length(2);
-      expect(models[0].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1]).to.be.a(Model2);
-      expect(models[0].model1Relation2[0].idCol).to.equal(1);
-      expect(models[0].model1Relation2[1].idCol).to.equal(2);
-      expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
-      expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
+      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
+      expect(models[0].model1Relation1.model1Relation1.model1Prop1).to.equal('hello 3');
 
-      expect(models[0].model1Relation2[0].model2Relation1).to.have.length(0);
-      expect(models[0].model1Relation2[1].model2Relation1).to.have.length(2);
-      expect(models[0].model1Relation2[1].model2Relation1[0]).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[1]).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[0].id).to.equal(5);
-      expect(models[0].model1Relation2[1].model2Relation1[1].id).to.equal(6);
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Prop1).to.equal('hello 5');
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Prop1).to.equal('hello 6');
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.id).to.equal(4);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Prop1).to.equal('hello 4');
 
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Relation1).to.equal(null);
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Relation2).to.eql([]);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2).to.have.length(1);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2[0].idCol).to.equal(4);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2[0].model2Prop1).to.equal('hejsan 4');
 
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1.id).to.equal(7);
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
+      expect(models[0].model1Relation2).to.equal(undefined);
     });
-
-    test('model2Relation1.*', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model2);
-
-      expect(models[0].model2Relation1).to.have.length(2);
-      expect(models[0].model2Relation1[0]).to.be.a(Model1);
-      expect(models[0].model2Relation1[1]).to.be.a(Model1);
-      expect(models[0].model2Relation1[0].id).to.equal(5);
-      expect(models[0].model2Relation1[1].id).to.equal(6);
-      expect(models[0].model2Relation1[0].model1Prop1).to.equal('hello 5');
-      expect(models[0].model2Relation1[1].model1Prop1).to.equal('hello 6');
-
-      expect(models[0].model2Relation1[0].model1Relation1).to.equal(null);
-      expect(models[0].model2Relation1[0].model1Relation2).to.eql([]);
-
-      expect(models[0].model2Relation1[1].model1Relation1).to.be.a(Model1);
-      expect(models[0].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model2Relation1[1].model1Relation1.id).to.equal(7);
-      expect(models[0].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
-    }, {Model: Model2, id: 2});
   });
 
   // Tests all ways to fetch eagerly.

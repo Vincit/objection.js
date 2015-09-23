@@ -66,7 +66,7 @@ describe('ManyToManyRelation', function () {
   describe('find', function () {
 
     it('should generate a find query', function () {
-      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
+      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}];
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({oid: 666});
 
@@ -79,13 +79,13 @@ describe('ManyToManyRelation', function () {
         })
         .then(function (result) {
           expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, '_join_'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, '_join_'));
+          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
+            'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
             'from "RelatedModel"',
             'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
@@ -96,7 +96,7 @@ describe('ManyToManyRelation', function () {
     });
 
     it('should find for multiple owners', function () {
-      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}, {a: 3, _join_: 667}, {a: 4, _join_: 667}];
+      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}, {a: 3, objectiontmpjoin: 667}, {a: 4, objectiontmpjoin: 667}];
       mockKnexQueryResults = [expectedResult];
       var owners = [OwnerModel.fromJson({oid: 666}), OwnerModel.fromJson({oid: 667})];
 
@@ -109,7 +109,7 @@ describe('ManyToManyRelation', function () {
         })
         .then(function (result) {
           expect(result).to.have.length(4);
-          expect(result).to.eql(_.omit(expectedResult, '_join_'));
+          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
           expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
           expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
           expect(result[0]).to.be.a(RelatedModel);
@@ -118,7 +118,7 @@ describe('ManyToManyRelation', function () {
           expect(result[3]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
+            'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
             'from "RelatedModel"',
             'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
@@ -129,7 +129,7 @@ describe('ManyToManyRelation', function () {
     });
 
     it('explicit selects should override the RelatedModel.*', function () {
-      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
+      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}];
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({oid: 666});
 
@@ -143,13 +143,13 @@ describe('ManyToManyRelation', function () {
         })
         .then(function (result) {
           expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, '_join_'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, '_join_'));
+          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal([
-            'select "name", "JoinTable"."ownerId" as "_join_"',
+            'select "name", "JoinTable"."ownerId" as "objectiontmpjoin"',
             'from "RelatedModel"',
             'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',
@@ -162,7 +162,7 @@ describe('ManyToManyRelation', function () {
     it('should apply the filter', function () {
       createFilteredRelation({someColumn: 100});
 
-      var expectedResult = [{a: 1, _join_: 666}, {a: 2, _join_: 666}];
+      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}];
       mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({oid: 666});
 
@@ -175,13 +175,13 @@ describe('ManyToManyRelation', function () {
         })
         .then(function (result) {
           expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, '_join_'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, '_join_'));
+          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
           expect(result[0]).to.be.a(RelatedModel);
           expect(result[1]).to.be.a(RelatedModel);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "_join_"',
+            'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
             'from "RelatedModel"',
             'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
             'where "name" = \'Teppo\'',

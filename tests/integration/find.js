@@ -50,10 +50,6 @@ module.exports = function (session) {
             expect(_.pluck(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2', 'hejsan 3']);
             expect(_.pluck(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
             expect(_.pluck(models, 'idCol').sort()).to.eql([1, 2, 3]);
-            return Model1.knexQuery().columnInfo();
-          })
-          .then(function (info) {
-            console.log(info);
           });
       });
 
@@ -544,6 +540,21 @@ module.exports = function (session) {
                 });
               })
           ]);
+        });
+
+        it('should work in both directions', function () {
+          return Model1
+            .query()
+            .where({id: 6})
+            .first()
+            .then(function (model) {
+              return model.$relatedQuery('model1Relation3');
+            })
+            .then(function (models) {
+              expect(models).to.have.length(1);
+              expect(models[0]).to.be.a(Model2);
+              expect(models[0].idCol).to.equal(2);
+            });
         });
 
         // This doesn't belong here, but there is no better place at the moment.
