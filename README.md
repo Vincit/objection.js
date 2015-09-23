@@ -535,8 +535,9 @@ function MinimalModel() {
   Model.apply(this, arguments);
 }
 
-// Inherit `Model`. This does the basic prototype inheritance but also inherits all the static methods
-// like `Model.query()` and `Model.fromJson()`. This is consistent with ES6 class inheritance.
+// Inherit `Model`. This does the basic prototype inheritance but also 
+// inherits all the static methods and properties like `Model.query()` 
+// and `Model.fromJson()`. This is consistent with ES6 class inheritance.
 Model.extend(MinimalModel);
 
 // After the js class boilerplate, all you need to do is set the table name.
