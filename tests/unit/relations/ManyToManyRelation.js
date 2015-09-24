@@ -18,6 +18,7 @@ describe('ManyToManyRelation', function () {
   before(function () {
     mockKnex = knex({client: 'pg'});
     originalKnexQueryBuilderThen = mockKnex.client.QueryBuilder.prototype.then;
+
     mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
       executedQueries.push(this.toString());
       return Promise.resolve(mockKnexQueryResults.shift() || []).then(cb, ecb);
@@ -66,130 +67,168 @@ describe('ManyToManyRelation', function () {
   describe('find', function () {
 
     it('should generate a find query', function () {
-      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}];
-      mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({oid: 666});
+      var expectedResult = [
+        {a: 1, objectiontmpjoin: 666},
+        {a: 2, objectiontmpjoin: 666}
+      ];
 
-      return QueryBuilder
+      mockKnexQueryResults = [expectedResult];
+
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
           relation.find(this, [owner]);
-        })
-        .then(function (result) {
-          expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(result[0]).to.be.a(RelatedModel);
-          expect(result[1]).to.be.a(RelatedModel);
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\')'
-          ].join(' '));
         });
+
+      return builder.then(function (result) {
+        expect(result).to.have.length(2);
+        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal([
+          'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
+          'from "RelatedModel"',
+          'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
+          'where "name" = \'Teppo\'',
+          'or "age" > \'60\'',
+          'and "JoinTable"."ownerId" in (\'666\')'
+        ].join(' '));
+      });
     });
 
     it('should find for multiple owners', function () {
-      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}, {a: 3, objectiontmpjoin: 667}, {a: 4, objectiontmpjoin: 667}];
-      mockKnexQueryResults = [expectedResult];
-      var owners = [OwnerModel.fromJson({oid: 666}), OwnerModel.fromJson({oid: 667})];
+      var owners = [
+        OwnerModel.fromJson({oid: 666}),
+        OwnerModel.fromJson({oid: 667})
+      ];
 
-      return QueryBuilder
+      var expectedResult = [
+        {a: 1, objectiontmpjoin: 666},
+        {a: 2, objectiontmpjoin: 666},
+        {a: 3, objectiontmpjoin: 667},
+        {a: 4, objectiontmpjoin: 667}
+      ];
+
+      mockKnexQueryResults = [expectedResult];
+
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
           relation.find(this, owners);
-        })
-        .then(function (result) {
-          expect(result).to.have.length(4);
-          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
-          expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
-          expect(result[0]).to.be.a(RelatedModel);
-          expect(result[1]).to.be.a(RelatedModel);
-          expect(result[2]).to.be.a(RelatedModel);
-          expect(result[3]).to.be.a(RelatedModel);
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\', \'667\')'
-          ].join(' '));
         });
+
+      return builder.then(function (result) {
+        expect(result).to.have.length(4);
+        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
+        expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+        expect(result[2]).to.be.a(RelatedModel);
+        expect(result[3]).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal([
+          'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
+          'from "RelatedModel"',
+          'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
+          'where "name" = \'Teppo\'',
+          'or "age" > \'60\'',
+          'and "JoinTable"."ownerId" in (\'666\', \'667\')'
+        ].join(' '));
+      });
     });
 
     it('explicit selects should override the RelatedModel.*', function () {
-      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}];
-      mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({oid: 666});
+      var expectedResult = [
+        {a: 1, objectiontmpjoin: 666},
+        {a: 2, objectiontmpjoin: 666}
+      ];
 
-      return QueryBuilder
+      mockKnexQueryResults = [expectedResult];
+
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .select('name')
         .findImpl(function () {
           relation.find(this, [owner]);
-        })
-        .then(function (result) {
-          expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(result[0]).to.be.a(RelatedModel);
-          expect(result[1]).to.be.a(RelatedModel);
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal([
-            'select "name", "JoinTable"."ownerId" as "objectiontmpjoin"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\')'
-          ].join(' '));
         });
+
+      return builder.then(function (result) {
+        expect(result).to.have.length(2);
+        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal([
+          'select "name", "JoinTable"."ownerId" as "objectiontmpjoin"',
+          'from "RelatedModel"',
+          'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
+          'where "name" = \'Teppo\'',
+          'or "age" > \'60\'',
+          'and "JoinTable"."ownerId" in (\'666\')'
+        ].join(' '));
+      });
     });
 
     it('should apply the filter', function () {
       createFilteredRelation({someColumn: 100});
 
-      var expectedResult = [{a: 1, objectiontmpjoin: 666}, {a: 2, objectiontmpjoin: 666}];
-      mockKnexQueryResults = [expectedResult];
       var owner = OwnerModel.fromJson({oid: 666});
+      var expectedResult = [
+        {a: 1, objectiontmpjoin: 666},
+        {a: 2, objectiontmpjoin: 666}
+      ];
 
-      return QueryBuilder
+      mockKnexQueryResults = [expectedResult];
+
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findImpl(function () {
           relation.find(this, [owner]);
-        })
-        .then(function (result) {
-          expect(result).to.have.length(2);
-          expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
-          expect(result[0]).to.be.a(RelatedModel);
-          expect(result[1]).to.be.a(RelatedModel);
-          expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.equal([
-            'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
-            'from "RelatedModel"',
-            'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-            'where "name" = \'Teppo\'',
-            'or "age" > \'60\'',
-            'and "JoinTable"."ownerId" in (\'666\')',
-            'and "someColumn" = \'100\''
-          ].join(' '));
         });
+
+      return builder.then(function (result) {
+        expect(result).to.have.length(2);
+        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin'));
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal([
+          'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin"',
+          'from "RelatedModel"',
+          'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
+          'where "name" = \'Teppo\'',
+          'or "age" > \'60\'',
+          'and "JoinTable"."ownerId" in (\'666\')',
+          'and "someColumn" = \'100\''
+        ].join(' '));
+      });
     });
 
   });
@@ -200,53 +239,87 @@ describe('ManyToManyRelation', function () {
       mockKnexQueryResults = [[1, 2]];
 
       var owner = OwnerModel.fromJson({oid: 666});
-      owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0'})];
-      var related = [RelatedModel.fromJson({a: 'str1', rid: 3}), RelatedModel.fromJson({a: 'str2', rid: 4})];
+      var related = [
+        RelatedModel.fromJson({a: 'str1', rid: 3}),
+        RelatedModel.fromJson({a: 'str2', rid: 4})
+      ];
 
-      return QueryBuilder
+      owner.nameOfOurRelation = [
+        RelatedModel.fromJson({a: 'str0'})
+      ];
+
+      var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertImpl(function (insertion) {
+          relation.insert(this, owner, insertion);
         })
-        .insert(related)
-        .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
-          expect(owner.nameOfOurRelation).to.eql([{a: 'str0'}, {a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
-          expect(result).to.eql([
-            {a: 'str1', id: 1, rid: 3},
-            {a: 'str2', id: 2, rid: 4}
-          ]);
-          expect(result[0]).to.be.a(RelatedModel);
-          expect(result[1]).to.be.a(RelatedModel);
-        });
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
+
+        expect(owner.nameOfOurRelation).to.eql([
+          {a: 'str0'},
+          {a: 'str1', id: 1, rid: 3},
+          {a: 'str2', id: 2, rid: 4}
+        ]);
+
+        expect(result).to.eql([
+          {a: 'str1', id: 1, rid: 3},
+          {a: 'str2', id: 2, rid: 4}
+        ]);
+
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+      });
     });
 
     it('should accept json object array', function () {
       mockKnexQueryResults = [[1, 2]];
 
       var owner = OwnerModel.fromJson({oid: 666});
-      var related = [{a: 'str1', rid: 3}, {a: 'str2', rid: 4}];
+      var related = [
+        {a: 'str1', rid: 3},
+        {a: 'str2', rid: 4}
+      ];
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
         })
-        .insert(related)
-        .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
-          expect(owner.nameOfOurRelation).to.eql([{a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
-          expect(result).to.eql([
-            {a: 'str1', id: 1, rid: 3},
-            {a: 'str2', id: 2, rid: 4}
-          ]);
-          expect(result[0]).to.be.a(RelatedModel);
-          expect(result[1]).to.be.a(RelatedModel);
-        });
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
+
+        expect(owner.nameOfOurRelation).to.eql([
+          {a: 'str1', id: 1, rid: 3},
+          {a: 'str2', id: 2, rid: 4}
+        ]);
+
+        expect(result).to.eql([
+          {a: 'str1', id: 1, rid: 3},
+          {a: 'str2', id: 2, rid: 4}
+        ]);
+
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+      });
     });
 
     it('should accept single model', function () {
@@ -255,19 +328,26 @@ describe('ManyToManyRelation', function () {
       var owner = OwnerModel.fromJson({oid: 666});
       var related = RelatedModel.fromJson({a: 'str1', rid: 2});
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
         })
-        .insert(related)
-        .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
-          expect(result).to.eql({a: 'str1', id: 1, rid: 2});
-          expect(result).to.be.a(RelatedModel);
-        });
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
+
+        expect(result).to.eql({a: 'str1', id: 1, rid: 2});
+        expect(result).to.be.a(RelatedModel);
+      });
     });
 
     it('should accept single json object', function () {
@@ -276,19 +356,26 @@ describe('ManyToManyRelation', function () {
       var owner = OwnerModel.fromJson({oid: 666});
       var related = {a: 'str1', rid: 2};
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .insertImpl(function (models) {
           relation.insert(this, owner, models);
         })
-        .insert(related)
-        .then(function (result) {
-          expect(executedQueries).to.have.length(2);
-          expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
-          expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
-          expect(result).to.eql({a: 'str1', id: 1, rid: 2});
-          expect(result).to.be.a(RelatedModel);
-        });
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
+
+        expect(result).to.eql({a: 'str1', id: 1, rid: 2});
+        expect(result).to.be.a(RelatedModel);
+      });
     });
 
   });
@@ -299,7 +386,7 @@ describe('ManyToManyRelation', function () {
       var owner = OwnerModel.fromJson({oid: 666});
       var update = RelatedModel.fromJson({a: 'str1'});
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .updateImpl(function (updt) {
           relation.update(this, owner, updt);
@@ -307,20 +394,24 @@ describe('ManyToManyRelation', function () {
         .update(update)
         .where('gender', 'male')
         .whereNotNull('thingy')
-        .select('shouldBeIgnored')
-        .then(function (result) {
-          expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "a" = \'str1\'',
-            'where "gender" = \'male\' and',
-            '"thingy" is not null and',
-            '"RelatedModel"."id" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
-          ].join(' '));
-        });
+        .select('shouldBeIgnored');
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({a: 'str1'});
+        expect(result).to.be.a(RelatedModel);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'update "RelatedModel" set "a" = \'str1\'',
+          'where "gender" = \'male\' and',
+          '"thingy" is not null and',
+          '"RelatedModel"."id" in',
+            '(select "JoinTable"."relatedId" from "JoinTable"',
+            'where "JoinTable"."ownerId" = \'666\')'
+        ].join(' '));
+      });
     });
 
     it('should accept json object', function () {
@@ -389,7 +480,7 @@ describe('ManyToManyRelation', function () {
       var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .patchImpl(function (ptch) {
           relation.patch(this, owner, ptch);
@@ -397,20 +488,24 @@ describe('ManyToManyRelation', function () {
         .patch(patch)
         .where('gender', 'male')
         .whereNotNull('thingy')
-        .select('shouldBeIgnored')
-        .then(function (result) {
-          expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
-          expect(executedQueries[0]).to.eql([
-            'update "RelatedModel" set "a" = \'str1\'',
-            'where "gender" = \'male\' and',
-            '"thingy" is not null and',
-            '"RelatedModel"."id" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
-          ].join(' '));
-        });
+        .select('shouldBeIgnored');
+
+      return builder.then(function (result) {
+        expect(result).to.eql({a: 'str1'});
+        expect(result).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'update "RelatedModel" set "a" = \'str1\'',
+          'where "gender" = \'male\' and',
+          '"thingy" is not null and',
+          '"RelatedModel"."id" in',
+            '(select "JoinTable"."relatedId" from "JoinTable"',
+            'where "JoinTable"."ownerId" = \'666\')'
+        ].join(' '));
+      });
     });
 
     it('should accept json object', function () {
@@ -493,6 +588,7 @@ describe('ManyToManyRelation', function () {
 
     it('should apply the filter', function () {
       createFilteredRelation({someColumn: 100});
+
       var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
@@ -528,7 +624,7 @@ describe('ManyToManyRelation', function () {
     it('should generate a delete query', function () {
       var owner = OwnerModel.fromJson({oid: 666});
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .deleteImpl(function () {
           relation.delete(this, owner);
@@ -536,19 +632,23 @@ describe('ManyToManyRelation', function () {
         .delete()
         .where('gender', 'male')
         .whereNotNull('thingy')
-        .select('shouldBeIgnored')
-        .then(function (result) {
-          expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql([
-            'delete from "RelatedModel"',
-            'where "gender" = \'male\'',
-            'and "thingy" is not null',
-            'and "RelatedModel"."id" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
-          ].join(' '));
-        });
+        .select('shouldBeIgnored');
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'delete from "RelatedModel"',
+          'where "gender" = \'male\'',
+          'and "thingy" is not null',
+          'and "RelatedModel"."id" in',
+            '(select "JoinTable"."relatedId" from "JoinTable"',
+            'where "JoinTable"."ownerId" = \'666\')'
+        ].join(' '));
+      });
     });
 
     it('should apply the filter', function () {
@@ -587,19 +687,24 @@ describe('ManyToManyRelation', function () {
       mockKnexQueryResults = [[5, 6, 7]];
       var owner = OwnerModel.fromJson({oid: 666});
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .relateImpl(function (ids) {
           relation.relate(this, owner, ids);
         })
-        .relate([10, 20, 30])
-        .then(function (result) {
-          expect(executedQueries).to.have.length(1);
-          expect(result).to.eql([10, 20, 30]);
-          expect(executedQueries[0]).to.eql([
-            'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\')'
-          ].join(' '));
-        });
+        .relate([10, 20, 30]);
+
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql([10, 20, 30]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\')'
+        ].join(' '));
+      });
     });
 
     it('should accept one id', function () {
@@ -627,25 +732,29 @@ describe('ManyToManyRelation', function () {
       createFilteredRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
 
-      return QueryBuilder
+      var builder = QueryBuilder
         .forClass(RelatedModel)
         .unrelateImpl(function () {
           relation.unrelate(this, owner);
         })
         .unrelate()
-        .whereIn('code', [55, 66 ,77])
-        .then(function (result) {
-          expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql([
-            'delete from "JoinTable"',
-            'where "JoinTable"."ownerId" = \'666\'',
-            'and "JoinTable"."relatedId" in',
-              '(select "RelatedModel"."rid" from "RelatedModel"',
-              'where "code" in (\'55\', \'66\', \'77\')',
-              'and "someColumn" = \'100\')'
-          ].join(' '));
-        });
+        .whereIn('code', [55, 66 ,77]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'delete from "JoinTable"',
+          'where "JoinTable"."ownerId" = \'666\'',
+          'and "JoinTable"."relatedId" in',
+            '(select "RelatedModel"."rid" from "RelatedModel"',
+            'where "code" in (\'55\', \'66\', \'77\')',
+            'and "someColumn" = \'100\')'
+        ].join(' '));
+      });
     });
 
   });

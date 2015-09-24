@@ -651,6 +651,12 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.6
+
+#### What's new
+
+ * bugfix: fix regression bug that broke dumpSql.
+
 ## 0.2.5
 
 #### What's new
