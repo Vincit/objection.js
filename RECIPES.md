@@ -134,7 +134,7 @@ You can also pass `QueryBuilder` instances instead of functions:
 ```js
 Person
   .query()
-  .where('age', '>', Person.query.avg('age'))
+  .where('age', '>', Person.query().avg('age'))
   .then(function (personsOlderThanAverage) {
     console.log(personsOlderThanAverage);
   });
