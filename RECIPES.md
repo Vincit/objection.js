@@ -219,7 +219,8 @@ implements these methods.
 ## Custom query builder methods
 
 You can extend the `QueryBuilder` returned by `Model.query()`, `modelInstance.$relatedQuery()`
-and `modelInstance.$query()` methods by setting the model class's static `QueryBuilder` property:
+and `modelInstance.$query()` methods by setting the model class's static `QueryBuilder` and/or
+`RelatedQueryBuilder` property:
 
 ```js
 var QueryBuilder = require('objection').QueryBuilder;
@@ -233,13 +234,16 @@ QueryBuilder.extend(MyQueryBuilder);
 // Some custom method.
 MyQueryBuilder.prototype.upsert = function (model) {
   if (model.id) {
-    return this.update(model);
+    return this.update(model).where('id', model.id);
   } else {
     return this.insert(model);
   }
 };
 
+// Instance of this is created when you call `query()` or `$query()`.
 Person.QueryBuilder = MyQueryBuilder;
+// Instance of this is created when you call `$relatedQuery()`.
+Person.RelatedQueryBuilder = MyQueryBuilder;
 ```
 
 Now you can do this:
