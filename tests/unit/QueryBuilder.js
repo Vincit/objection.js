@@ -627,9 +627,12 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it('update() should call $beforeUpdate on the model (json input)', function (done) {
+  it('update() should call $beforeUpdate on the model (async)', function (done) {
     TestModel.prototype.$beforeUpdate = function () {
-      this.c = 'beforeUpdate';
+      var self = this;
+      return Promise.delay(5).then(function () {
+        self.c = 'beforeUpdate'
+      });
     };
 
     QueryBuilder
@@ -659,9 +662,12 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it('patch() should call $beforeUpdate on the model (json input)', function (done) {
+  it('patch() should call $beforeUpdate on the model (async)', function (done) {
     TestModel.prototype.$beforeUpdate = function () {
-      this.c = 'beforeUpdate';
+      var self = this;
+      return Promise.delay(5).then(function () {
+        self.c = 'beforeUpdate'
+      });
     };
 
     QueryBuilder
@@ -691,9 +697,12 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it('insert() should call $beforeInsert on the model (json input)', function (done) {
+  it('insert() should call $beforeInsert on the model (async)', function (done) {
     TestModel.prototype.$beforeInsert = function () {
-      this.c = 'beforeInsert';
+      var self = this;
+      return Promise.delay(5).then(function () {
+        self.c = 'beforeInsert'
+      });
     };
 
     QueryBuilder
