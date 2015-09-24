@@ -611,6 +611,102 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
+  it('update() should call $beforeUpdate on the model', function (done) {
+    TestModel.prototype.$beforeUpdate = function () {
+      this.c = 'beforeUpdate';
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .update(TestModel.fromJson({a: 10, b: 'test'}))
+      .then(function (model) {
+        expect(model.c).to.equal('beforeUpdate');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('update() should call $beforeUpdate on the model (json input)', function (done) {
+    TestModel.prototype.$beforeUpdate = function () {
+      this.c = 'beforeUpdate';
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .update({a: 10, b: 'test'})
+      .then(function (model) {
+        expect(model.c).to.equal('beforeUpdate');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('patch() should call $beforeUpdate on the model', function (done) {
+    TestModel.prototype.$beforeUpdate = function () {
+      this.c = 'beforeUpdate';
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .patch(TestModel.fromJson({a: 10, b: 'test'}))
+      .then(function (model) {
+        expect(model.c).to.equal('beforeUpdate');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('patch() should call $beforeUpdate on the model (json input)', function (done) {
+    TestModel.prototype.$beforeUpdate = function () {
+      this.c = 'beforeUpdate';
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .patch({a: 10, b: 'test'})
+      .then(function (model) {
+        expect(model.c).to.equal('beforeUpdate');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('insert() should call $beforeInsert on the model', function (done) {
+    TestModel.prototype.$beforeInsert = function () {
+      this.c = 'beforeInsert';
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .insert(TestModel.fromJson({a: 10, b: 'test'}))
+      .then(function (model) {
+        expect(model.c).to.equal('beforeInsert');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (\'10\', \'test\', \'beforeInsert\') returning "id"');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('insert() should call $beforeInsert on the model (json input)', function (done) {
+    TestModel.prototype.$beforeInsert = function () {
+      this.c = 'beforeInsert';
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .insert({a: 10, b: 'test'})
+      .then(function (model) {
+        expect(model.c).to.equal('beforeInsert');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (\'10\', \'test\', \'beforeInsert\') returning "id"');
+        done();
+      })
+      .catch(done);
+  });
+
   describe('eager and allowEager' , function () {
 
     it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", function (done) {

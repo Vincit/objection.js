@@ -651,6 +651,13 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.5
+
+#### What's new
+
+ * bugfix: fix regression bug that prevented values assigned to `this` in `$before` callbacks from getting into
+   the actual database query
+
 ## 0.2.4
 
 #### What's new
