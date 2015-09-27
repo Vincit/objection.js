@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var utils = require('../../lib/utils')
 var expect = require('expect.js');
+var Promise = require('bluebird');
 var ValidationError = require('../../lib/ValidationError');
 
 module.exports = function (session) {
@@ -205,6 +206,29 @@ module.exports = function (session) {
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
             return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
+      it('model edits in $beforeInsert should get into database query', function () {
+        var model = Model1.fromJson({});
+
+        model.$beforeInsert = function () {
+          var self = this;
+          return Promise.delay(1).then(function () {
+            self.model1Prop1 = 'hello 3';
+          });
+        };
+
+        return model
+          .$query()
+          .insert()
+          .then(function (inserted) {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.model1Prop1).to.equal('hello 3');
+            return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
             expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);

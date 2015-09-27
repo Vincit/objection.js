@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var expect = require('expect.js');
+var Promise = require('bluebird');
 var expectPartEql = require('./utils').expectPartialEqual;
 var ValidationError = require('../../lib/ValidationError');
 
@@ -183,7 +184,7 @@ module.exports = function (session) {
         }]);
       });
 
-      it('should update a model', function () {
+      it('should update a model (1)', function () {
         return Model1
           .fromJson({id: 1})
           .$query()
@@ -192,6 +193,51 @@ module.exports = function (session) {
             expect(updated).to.be.a(Model1);
             expect(updated.$beforeUpdateCalled).to.equal(true);
             expect(updated.$afterUpdateCalled).to.equal(true);
+            expectPartEql(updated, {model1Prop1: 'updated text'});
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
+      it('should update a model (2)', function () {
+        var model = Model1.fromJson({id: 1, model1Prop1: 'updated text'});
+
+        return model
+          .$query()
+          .update()
+          .then(function (updated) {
+            expect(updated).to.be.a(Model1);
+            expect(updated.$beforeUpdateCalled).to.equal(true);
+            expect(updated.$afterUpdateCalled).to.equal(true);
+            expectPartEql(updated, {model1Prop1: 'updated text'});
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
+      it('model edits in $beforeUpdate should get into database query', function () {
+        var model = Model1.fromJson({id: 1});
+
+        model.$beforeUpdate = function () {
+          var self = this;
+          return Promise.delay(1).then(function () {
+            self.model1Prop1 = 'updated text';
+          });
+        };
+
+        return model
+          .$query()
+          .update()
+          .then(function (updated) {
+            expect(updated).to.be.a(Model1);
             expectPartEql(updated, {model1Prop1: 'updated text'});
             return session.knex('Model1').orderBy('id');
           })
