@@ -651,6 +651,13 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.7
+
+#### What's new
+
+ * bugfix: fix #37 also for `$query()`.
+ * Significant `toJson`/`fromJson` performance boost.
+
 ## 0.2.6
 
 #### What's new
