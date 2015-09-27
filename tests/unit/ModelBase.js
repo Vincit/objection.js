@@ -313,20 +313,6 @@ describe('ModelBase', function () {
       expect(model.e[2].f).to.equal('str2');
     });
 
-    it('should skip properties starting with $', function () {
-      var model = Model.fromDatabaseJson({a: 1, $b: 2});
-
-      expect(model.a).to.equal(1);
-      expect(model).not.to.have.property('$b');
-    });
-
-    it('should skip functions', function () {
-      var model = Model.fromDatabaseJson({a: 1, b: function () {}});
-
-      expect(model.a).to.equal(1);
-      expect(model).not.to.have.property('b');
-    });
-
     it('should call $parseDatabaseJson', function () {
       var calls = 0;
       var json = {a: 1};
@@ -353,7 +339,7 @@ describe('ModelBase', function () {
       Model = createModelClass();
     });
 
-    it('should return then internal representation by default', function () {
+    it('should return the internal representation by default', function () {
       expect(Model.fromJson({a: 1, b: 2, c: {d: [1, 3]}}).$toJson()).to.eql({a: 1, b: 2, c: {d: [1, 3]}});
     });
 
