@@ -1,3 +1,4 @@
+var _ = require('lodash')
 var knex = require('knex');
 var expect = require('expect.js');
 var Model = require('../../lib/Model');
@@ -383,6 +384,114 @@ describe('Model', function () {
     expect(Model.query()).to.not.be.a(MyQueryBuilder);
     expect(Model.fromJson({}).$query()).to.not.be.a(MyQueryBuilder);
     expect(Model.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder);
+  });
+
+  it('traverse() should traverse trough the relation tree', function () {
+    var Model1 = modelClass('Model1');
+    var Model2 = modelClass('Model2');
+
+    Model1.relationMappings = {
+      relation1: {
+        relation: Model.OneToManyRelation,
+        modelClass: Model2,
+        join: {
+          from: 'Model1.id',
+          to: 'Model2.model1Id'
+        }
+      },
+      relation2: {
+        relation: Model.OneToOneRelation,
+        modelClass: Model1,
+        join: {
+          from: 'Model1.id',
+          to: 'Model1.model1Id'
+        }
+      }
+    };
+
+    var model = Model1.fromJson({
+      id: 1,
+      model1Id: 2,
+      relation1: [
+        {id: 4, model1Id: 1},
+        {id: 5, model1Id: 1}
+      ],
+      relation2: {
+        id: 2,
+        model1Id: 3,
+        relation1: [
+          {id: 6, model1Id: 2},
+          {id: 7, model1Id: 2}
+        ],
+        relation2: {
+          id: 3,
+          model1Id: null,
+          relation1: [
+            {id: 8, model1Id: 3},
+            {id: 9, model1Id: 3},
+            {id: 10, model1Id: 3},
+            {id: 11, model1Id: 3},
+            {id: 12, model1Id: 3},
+            {id: 13, model1Id: 3},
+            {id: 14, model1Id: 3},
+            {id: 15, model1Id: 3},
+            {id: 16, model1Id: 3},
+            {id: 17, model1Id: 3},
+            {id: 18, model1Id: 3},
+            {id: 19, model1Id: 3},
+            {id: 20, model1Id: 3},
+            {id: 21, model1Id: 3},
+            {id: 22, model1Id: 3},
+            {id: 23, model1Id: 3},
+            {id: 24, model1Id: 3},
+            {id: 25, model1Id: 3}
+          ]
+        }
+      }
+    });
+
+    var model1Ids = [];
+    var model2Ids = [];
+
+    var n = 0;
+    Model1.traverse([model], function (model) {
+      if (model instanceof Model1) {
+        model1Ids.push(model.id);
+      } else if (model instanceof Model2) {
+        model2Ids.push(model.id);
+      }
+    });
+
+    expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+    expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+
+    model1Ids = [];
+    model2Ids = [];
+
+    Model1.traverse(model, function (model) {
+      if (model instanceof Model1) {
+        model1Ids.push(model.id);
+      } else if (model instanceof Model2) {
+        model2Ids.push(model.id);
+      }
+    });
+
+    expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+    expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+
+    model1Ids = [];
+    model2Ids = [];
+
+    model.$traverse(function (model) {
+      if (model instanceof Model1) {
+        model1Ids.push(model.id);
+      } else if (model instanceof Model2) {
+        model2Ids.push(model.id);
+      }
+    });
+
+    expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+    expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
   });
 
   function modelClass(tableName) {
