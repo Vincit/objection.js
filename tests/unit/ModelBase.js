@@ -526,6 +526,78 @@ describe('ModelBase', function () {
     });
   });
 
+  describe('$pick', function () {
+
+    it('should pick only the given properties to be visible in JSON representations', function () {
+      var Model = createModelClass();
+
+      var model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$pick('a').toJSON()).to.eql({a:1});
+      expect(model.$pick('a').$toDatabaseJson()).to.eql({a:1});
+      expect(model.$pick('a').$e).to.eql('5');
+
+      model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$pick('a', 'c').toJSON()).to.eql({a:1, c:3});
+      expect(model.$pick('a', 'c').$toDatabaseJson()).to.eql({a:1, c:3});
+      expect(model.$pick('a', 'c').$e).to.eql('5');
+
+      model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$pick(['a', 'b']).toJSON()).to.eql({a:1, b:2});
+      expect(model.$pick(['a', 'b']).$toDatabaseJson()).to.eql({a:1, b:2});
+      expect(model.$pick(['a', 'b']).$e).to.eql('5');
+
+      model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$pick({a:true, b:false, d:true}).toJSON()).to.eql({a:1, d:'4'});
+      expect(model.$pick({a:true, b:false, d:true}).$toDatabaseJson()).to.eql({a:1, d:'4'});
+      expect(model.$pick({a:true, b:false, d:true}).$e).to.eql('5');
+    });
+
+  });
+
+  describe('$omit', function () {
+
+    it('should omit the given properties from the JSON representations', function () {
+      var Model = createModelClass();
+
+      var model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$omit('a').toJSON()).to.eql({b:2, c:3, d:'4'});
+      expect(model.$omit('a').$toDatabaseJson()).to.eql({b:2, c:3, d:'4'});
+      expect(model.$omit('$e').$e).to.eql('5');
+
+      model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$omit('b', 'd').toJSON()).to.eql({a:1, c:3});
+      expect(model.$omit('b', 'd').$toDatabaseJson()).to.eql({a:1, c:3});
+      expect(model.$omit('b', 'd', '$e').$e).to.eql('5');
+
+      model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$omit(['c', 'd']).toJSON()).to.eql({a:1, b:2});
+      expect(model.$omit(['c', 'd']).$toDatabaseJson()).to.eql({a:1, b:2});
+      expect(model.$omit(['c', 'd', '$e']).$e).to.eql('5');
+
+      model = Model.fromJson({a:1, b:2, c:3, d:'4'});
+      model.$e = '5';
+
+      expect(model.$omit({a:false, b:true, c:true}).toJSON()).to.eql({a:1, d:'4'});
+      expect(model.$omit({a:false, b:true, c:true}).$toDatabaseJson()).to.eql({a:1, d:'4'});
+      expect(model.$omit({a:false, b:true, c:true, $e: true}).$e).to.eql('5');
+    });
+
+  });
+
   function createModelClass(proto, staticStuff) {
     function Model() {
       ModelBase.apply(this, arguments);
