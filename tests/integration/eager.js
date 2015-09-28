@@ -210,6 +210,149 @@ module.exports = function (session) {
 
       expect(models[0].model1Relation2).to.equal(undefined);
     });
+
+    describe('QueryBuilder.pick', function () {
+
+      it('pick(properties) should pick properties recursively', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .first()
+          .pick(['id', 'idCol', 'model1Relation1', 'model1Relation2', 'model2Relation1'])
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Relation2: [{
+                idCol: 1,
+                model2Relation1: []
+              }, {
+                idCol: 2,
+                model2Relation1: [{
+                  id: 5,
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  id: 6,
+                  model1Relation1: {
+                    id: 7
+                  },
+                  model1Relation2: [{
+                    idCol: 3
+                  }]
+                }]
+              }]
+            });
+          });
+      });
+
+      it('pick(modelClass, properties) should pick properties recursively based on model class', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .first()
+          .pick(Model1, ['id', 'model1Relation1', 'model1Relation2'])
+          .pick(Model2, ['idCol', 'model2Relation1'])
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Relation2: [{
+                idCol: 1,
+                model2Relation1: []
+              }, {
+                idCol: 2,
+                model2Relation1: [{
+                  id: 5,
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  id: 6,
+                  model1Relation1: {
+                    id: 7
+                  },
+                  model1Relation2: [{
+                    idCol: 3
+                  }]
+                }]
+              }]
+            });
+          });
+      });
+
+    });
+
+    describe('QueryBuilder.omit', function () {
+
+      it('omit(properties) should omit properties recursively', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .first()
+          .omit(['model1Id', 'model1Prop1', 'model1Prop2', 'model2Prop1', 'model2Prop2'])
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Relation2: [{
+                idCol: 1,
+                model2Relation1: []
+              }, {
+                idCol: 2,
+                model2Relation1: [{
+                  id: 5,
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  id: 6,
+                  model1Relation1: {
+                    id: 7
+                  },
+                  model1Relation2: [{
+                    idCol: 3
+                  }]
+                }]
+              }]
+            });
+          });
+      });
+
+      it('omit(modelClass, properties) should omit properties recursively based on model class', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .first()
+          .omit(Model1, ['model1Id', 'model1Prop1', 'model1Prop2'])
+          .omit(Model2, ['model1Id', 'model2Prop1', 'model2Prop2'])
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Relation2: [{
+                idCol: 1,
+                model2Relation1: []
+              }, {
+                idCol: 2,
+                model2Relation1: [{
+                  id: 5,
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  id: 6,
+                  model1Relation1: {
+                    id: 7
+                  },
+                  model1Relation2: [{
+                    idCol: 3
+                  }]
+                }]
+              }]
+            });
+          });
+      });
+
+    });
+
   });
 
   // Tests all ways to fetch eagerly.

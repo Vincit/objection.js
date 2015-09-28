@@ -386,112 +386,211 @@ describe('Model', function () {
     expect(Model.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder);
   });
 
-  it('traverse() should traverse trough the relation tree', function () {
-    var Model1 = modelClass('Model1');
-    var Model2 = modelClass('Model2');
+  describe('traverse() and $traverse()', function () {
+    var Model1;
+    var Model2;
+    var model;
 
-    Model1.relationMappings = {
-      relation1: {
-        relation: Model.OneToManyRelation,
-        modelClass: Model2,
-        join: {
-          from: 'Model1.id',
-          to: 'Model2.model1Id'
-        }
-      },
-      relation2: {
-        relation: Model.OneToOneRelation,
-        modelClass: Model1,
-        join: {
-          from: 'Model1.id',
-          to: 'Model1.model1Id'
-        }
-      }
-    };
+    beforeEach(function () {
+      Model1 = modelClass('Model1');
+      Model2 = modelClass('Model2');
 
-    var model = Model1.fromJson({
-      id: 1,
-      model1Id: 2,
-      relation1: [
-        {id: 4, model1Id: 1},
-        {id: 5, model1Id: 1}
-      ],
-      relation2: {
-        id: 2,
-        model1Id: 3,
+      Model1.relationMappings = {
+        relation1: {
+          relation: Model.OneToManyRelation,
+          modelClass: Model2,
+          join: {
+            from: 'Model1.id',
+            to: 'Model2.model1Id'
+          }
+        },
+        relation2: {
+          relation: Model.OneToOneRelation,
+          modelClass: Model1,
+          join: {
+            from: 'Model1.id',
+            to: 'Model1.model1Id'
+          }
+        }
+      };
+    });
+
+    beforeEach(function () {
+      model = Model1.fromJson({
+        id: 1,
+        model1Id: 2,
         relation1: [
-          {id: 6, model1Id: 2},
-          {id: 7, model1Id: 2}
+          {id: 4, model1Id: 1},
+          {id: 5, model1Id: 1}
         ],
         relation2: {
-          id: 3,
-          model1Id: null,
+          id: 2,
+          model1Id: 3,
           relation1: [
-            {id: 8, model1Id: 3},
-            {id: 9, model1Id: 3},
-            {id: 10, model1Id: 3},
-            {id: 11, model1Id: 3},
-            {id: 12, model1Id: 3},
-            {id: 13, model1Id: 3},
-            {id: 14, model1Id: 3},
-            {id: 15, model1Id: 3},
-            {id: 16, model1Id: 3},
-            {id: 17, model1Id: 3},
-            {id: 18, model1Id: 3},
-            {id: 19, model1Id: 3},
-            {id: 20, model1Id: 3},
-            {id: 21, model1Id: 3},
-            {id: 22, model1Id: 3},
-            {id: 23, model1Id: 3},
-            {id: 24, model1Id: 3},
-            {id: 25, model1Id: 3}
-          ]
+            {id: 6, model1Id: 2},
+            {id: 7, model1Id: 2}
+          ],
+          relation2: {
+            id: 3,
+            model1Id: null,
+            relation1: [
+              {id: 8, model1Id: 3},
+              {id: 9, model1Id: 3},
+              {id: 10, model1Id: 3},
+              {id: 11, model1Id: 3},
+              {id: 12, model1Id: 3},
+              {id: 13, model1Id: 3},
+              {id: 14, model1Id: 3},
+              {id: 15, model1Id: 3},
+              {id: 16, model1Id: 3},
+              {id: 17, model1Id: 3},
+              {id: 18, model1Id: 3},
+              {id: 19, model1Id: 3},
+              {id: 20, model1Id: 3},
+              {id: 21, model1Id: 3},
+              {id: 22, model1Id: 3},
+              {id: 23, model1Id: 3},
+              {id: 24, model1Id: 3},
+              {id: 25, model1Id: 3}
+            ]
+          }
         }
-      }
+      });
     });
 
-    var model1Ids = [];
-    var model2Ids = [];
+    it('traverse(modelArray, traverser) should traverse through the relation tree', function () {
+      var model1Ids = [];
+      var model2Ids = [];
 
-    var n = 0;
-    Model1.traverse([model], function (model) {
-      if (model instanceof Model1) {
-        model1Ids.push(model.id);
-      } else if (model instanceof Model2) {
+      Model1.traverse([model], function (model) {
+        if (model instanceof Model1) {
+          model1Ids.push(model.id);
+        } else if (model instanceof Model2) {
+          model2Ids.push(model.id);
+        }
+      });
+
+      expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+      expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+    });
+
+    it('traverse callback should be passed the model, its parent (if any) and the relation it is in (if any)', function () {
+      Model1.traverse([model], function (model, parent, relationName) {
+        if (model instanceof Model1) {
+          if (model.id === 1) {
+            expect(parent).to.equal(null);
+            expect(relationName).to.equal(null);
+          } else if (model.id === 2) {
+            expect(parent.id).to.equal(1);
+            expect(relationName).to.equal('relation2');
+          } else if (model.id === 3) {
+            expect(parent.id).to.equal(2);
+            expect(relationName).to.equal('relation2');
+          } else {
+            throw new Error('should never get here');
+          }
+        } else if (model instanceof Model2) {
+          if (model.id >= 4 && model.id <= 5) {
+            expect(parent).to.be.a(Model1);
+            expect(parent.id).to.equal(1);
+            expect(relationName).to.equal('relation1');
+          } else if (model.id >= 6 && model.id <= 7) {
+            expect(parent).to.be.a(Model1);
+            expect(parent.id).to.equal(2);
+            expect(relationName).to.equal('relation1');
+          } else if (model.id >= 8 && model.id <= 25) {
+            expect(parent).to.be.a(Model1);
+            expect(parent.id).to.equal(3);
+            expect(relationName).to.equal('relation1');
+          } else {
+            throw new Error('should never get here');
+          }
+        }
+      });
+    });
+
+    it('traverse(singleModel, traverser) should traverse through the relation tree', function () {
+      var model1Ids = [];
+      var model2Ids = [];
+
+      Model1.traverse(model, function (model) {
+        if (model instanceof Model1) {
+          model1Ids.push(model.id);
+        } else if (model instanceof Model2) {
+          model2Ids.push(model.id);
+        }
+      });
+
+      expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+      expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+    });
+
+    it('traverse(null, singleModel, traverser) should traverse through the relation tree', function () {
+      var model1Ids = [];
+      var model2Ids = [];
+
+      Model1.traverse(null, model, function (model) {
+        if (model instanceof Model1) {
+          model1Ids.push(model.id);
+        } else if (model instanceof Model2) {
+          model2Ids.push(model.id);
+        }
+      });
+
+      expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+      expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+    });
+
+    it('traverse(ModelClass, model, traverser) should traverse through all ModelClass instances in the relation tree', function () {
+      var model1Ids = [];
+      var model2Ids = [];
+
+      Model1.traverse(Model2, model, function (model) {
         model2Ids.push(model.id);
-      }
-    });
-
-    expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
-    expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
-
-    model1Ids = [];
-    model2Ids = [];
-
-    Model1.traverse(model, function (model) {
-      if (model instanceof Model1) {
+      }).traverse(Model1, model, function (model) {
         model1Ids.push(model.id);
-      } else if (model instanceof Model2) {
-        model2Ids.push(model.id);
-      }
+      });
+
+      expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+      expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
     });
 
-    expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
-    expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+    it('$traverse(traverser) should traverse through the relation tree', function () {
+      var model1Ids = [];
+      var model2Ids = [];
 
-    model1Ids = [];
-    model2Ids = [];
+      model.$traverse(function (model) {
+        if (model instanceof Model1) {
+          model1Ids.push(model.id);
+        } else if (model instanceof Model2) {
+          model2Ids.push(model.id);
+        }
+      });
 
-    model.$traverse(function (model) {
-      if (model instanceof Model1) {
+      expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+      expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+    });
+
+    it('$traverse(ModelClass, traverser) should traverse through the ModelClass instances in the relation tree', function () {
+      var model1Ids = [];
+      var model2Ids = [];
+
+      model.$traverse(Model1, function (model) {
         model1Ids.push(model.id);
-      } else if (model instanceof Model2) {
+      }).$traverse(Model2, function (model) {
         model2Ids.push(model.id);
-      }
+      });
+
+      expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
+      expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
     });
 
-    expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
-    expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
+  });
+
+  it('fn() should be a shortcut to knex.fn', function () {
+    var Model1 = modelClass('Model1');
+    Model1.knex({fn: {a: 1}});
+    expect(Model1.fn()).to.eql({a: 1});
   });
 
   function modelClass(tableName) {
