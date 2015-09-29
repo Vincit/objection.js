@@ -253,6 +253,32 @@ describe('ModelBase', function () {
 
     });
 
+    it('should skip validation if options.skipValidation == true', function () {
+      Model.jsonSchema = {
+        required: ['a'],
+        properties: {
+          a: {type: 'string'},
+          b: {type: 'number'}
+        }
+      };
+
+      expect(function () {
+        Model.fromJson({a: 'str', b: 1}, {skipValidation: true});
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson({a: 'str'}, {skipValidation: true});
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson({a: 1, b: '1'}, {skipValidation: true});
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson({b: 1}, {skipValidation: true});
+      }).not.to.throwException();
+    });
+
     it('should merge default values from jsonSchema', function () {
       var obj = {a: 100, b: 200};
 
@@ -292,6 +318,65 @@ describe('ModelBase', function () {
       expect(model).to.not.have.property('c');
     });
 
+    it('should throw if anything non-object is given', function () {
+      function SomeClass() {}
+
+      expect(function () {
+        Model.fromJson();
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson(null);
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson(undefined);
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson({});
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson(new SomeClass());
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson('hello');
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(new String('hello'));
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(1);
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(new Number(1));
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson([{a: 1}]);
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(/.*/);
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(new Date());
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(function () {});
+      }).to.throwException();
+
+      expect(function () {
+        Model.fromJson(new Int16Array(100));
+      }).to.throwException();
+    });
   });
 
   describe('fromDatabaseJson', function () {

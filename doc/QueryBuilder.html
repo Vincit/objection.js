@@ -66,6 +66,18 @@
 						</li>
 						
 						<li>
+							<a href="global.html#cloneArray">cloneArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#cloneObject">cloneObject</a>
+						</li>
+						
+						<li>
+							<a href="global.html#contains">contains</a>
+						</li>
+						
+						<li>
 							<a href="global.html#createModels">createModels</a>
 						</li>
 						
@@ -90,7 +102,19 @@
 						</li>
 						
 						<li>
+							<a href="global.html#mergeWithDefaults">mergeWithDefaults</a>
+						</li>
+						
+						<li>
 							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#omitArray">omitArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#omitObject">omitObject</a>
 						</li>
 						
 						<li>
@@ -114,11 +138,43 @@
 						</li>
 						
 						<li>
+							<a href="global.html#parseValidationError">parseValidationError</a>
+						</li>
+						
+						<li>
+							<a href="global.html#pickArray">pickArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#pickObject">pickObject</a>
+						</li>
+						
+						<li>
 							<a href="global.html#relatePatch">relatePatch</a>
 						</li>
 						
 						<li>
+							<a href="global.html#toJsonArray">toJsonArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#toJsonImpl">toJsonImpl</a>
+						</li>
+						
+						<li>
+							<a href="global.html#toJsonObject">toJsonObject</a>
+						</li>
+						
+						<li>
 							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#traverse">traverse</a>
+						</li>
+						
+						<li>
+							<a href="global.html#traverseOne">traverseOne</a>
 						</li>
 						
 						<li>
@@ -5034,6 +5090,204 @@ through <code>YourModel.knexQuery()</code>.</p>
               
 <dt>
     
+        <h4 class="name" id="omit">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">omit</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">modelClass</span>, properties)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Omit properties of result models.</p>
+<p>There are two ways to call this methods:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('pets').
+  .omit(['parentId', 'ownerId']);</code></pre><p>and</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('pets')
+  .omit(Person, ['parentId', 'age'])
+  .omit(Animal, ['ownerId', 'species']);</code></pre><p>The first one goes through all models (including relations) and omits the properties
+<code>parentId</code> and <code>ownerId</code>. The second one also traverses the whole model tree and
+omits the properties <code>parentId</code> and <code>age</code> from all <code>Person</code> instances and <code>ownerId</code>
+and <code>species</code> properties of all <code>Animal</code> instances.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="onBuild">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">onBuild</span>
@@ -7757,6 +8011,204 @@ method. This is because we don't make an additional fetch query after the patch.
             
 
             <td class="description last"><p>The update object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="pick">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">pick</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">modelClass</span>, properties)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Pick properties from result models.</p>
+<p>There are two ways to call this methods:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('pets').
+  .pick(['id', 'name']);</code></pre><p>and</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('pets')
+  .pick(Person, ['id', 'firstName'])
+  .pick(Animal, ['id', 'name']);</code></pre><p>The first one goes through all models (including relations) and discards all
+properties by <code>id</code> and <code>name</code>. The second one also traverses the whole model
+tree and discards all but <code>id</code> and <code>firstName</code> properties of all <code>Person</code>
+instances and <code>id</code> and <code>name</code> properties of all <code>Animal</code> instances.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
         </tr>
 
 	
@@ -10747,6 +11199,199 @@ query.then();
 	<dd>
 		
 <span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="traverse">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">traverse</span>
+          <span class="signature-container"><span class="signature">(modelClass, traverser)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Traverses through all models in the result, including the eagerly loaded relations.</p>
+<p>The optional first parameter can be a constructor. If given, the traverser
+function is only called for the models of that class.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('pets')
+  .traverse(function (model, parentModel, relationName) {
+    delete model.id;
+  })
+  .then(function (persons) {
+    console.log(persons[0].id); // --> undefined
+    console.log(persons[0].pets[0].id); // --> undefined
+  });</code></pre><pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('pets')
+  .traverse(Animal, function (animal, parentModel, relationName) {
+    delete animal.id;
+  })
+  .then(function (persons) {
+    console.log(persons[0].id); // --> 1
+    console.log(persons[0].pets[0].id); // --> undefined
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClass</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The optional model class filter. If given, the traverser function is only
+   called for models of this class.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>traverser</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The traverser function that is called for each model. The first argument
+   is the model itself. If the model is in a relation of some other model
+   the second argument is the parent model and the third argument is the
+   name of the relation.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
 
 
 	</dd>
@@ -14211,7 +14856,7 @@ does not have <code>jsonObject.a</code> or <code>jsonObject.b</code>.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Wed Sep 23rd 2015 using the <a
+		on Tue Sep 29th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
