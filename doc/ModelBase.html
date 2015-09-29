@@ -66,6 +66,18 @@
 						</li>
 						
 						<li>
+							<a href="global.html#cloneArray">cloneArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#cloneObject">cloneObject</a>
+						</li>
+						
+						<li>
+							<a href="global.html#contains">contains</a>
+						</li>
+						
+						<li>
 							<a href="global.html#createModels">createModels</a>
 						</li>
 						
@@ -90,7 +102,19 @@
 						</li>
 						
 						<li>
+							<a href="global.html#mergeWithDefaults">mergeWithDefaults</a>
+						</li>
+						
+						<li>
 							<a href="global.html#normalizeOperator">normalizeOperator</a>
+						</li>
+						
+						<li>
+							<a href="global.html#omitArray">omitArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#omitObject">omitObject</a>
 						</li>
 						
 						<li>
@@ -114,11 +138,43 @@
 						</li>
 						
 						<li>
+							<a href="global.html#parseValidationError">parseValidationError</a>
+						</li>
+						
+						<li>
+							<a href="global.html#pickArray">pickArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#pickObject">pickObject</a>
+						</li>
+						
+						<li>
 							<a href="global.html#relatePatch">relatePatch</a>
 						</li>
 						
 						<li>
+							<a href="global.html#toJsonArray">toJsonArray</a>
+						</li>
+						
+						<li>
+							<a href="global.html#toJsonImpl">toJsonImpl</a>
+						</li>
+						
+						<li>
+							<a href="global.html#toJsonObject">toJsonObject</a>
+						</li>
+						
+						<li>
 							<a href="global.html#transaction">transaction</a>
+						</li>
+						
+						<li>
+							<a href="global.html#traverse">traverse</a>
+						</li>
+						
+						<li>
+							<a href="global.html#traverseOne">traverseOne</a>
 						</li>
 						
 						<li>
@@ -406,77 +462,9 @@ Person.prototype.$parseDatabaseJson = function (json) {
             
         
             
-              
-<dt>
-    
-        <h4 class="name" id="_P_deepCloneJson">
-          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
-          <span class="content">deepCloneJson</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Takes a deep clone of a pure JSON object.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
+        
+            
+        
             
         
             
@@ -948,156 +936,6 @@ Person.prototype.$parseDatabaseJson = function (json) {
     
 </dd>
 
-            
-        
-            
-              
-<dt>
-    
-        <h4 class="name" id="_P_hasOwnJsonProperty">
-          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
-          <span class="content">hasOwnJsonProperty</span>
-          <span class="signature-container"><span class="signature">(object, key)</span><span class="type-signature"></span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Returns true if object[key] is copyable to the model when converting from JSON to a model.</p>
-<p>By default the properties that start with '$' are ignored. This behaviour can be changed
-by overriding this method.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>object</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>key</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-            
-        
             
         
             
@@ -1884,6 +1722,151 @@ they are cloned using their <code>.$clone()</code> method.</p>
               
 <dt>
     
+        <h4 class="name" id="Somit">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$omit</span>
+          <span class="signature-container"><span class="signature">(keys)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Omits a set of properties.</p>
+<p>The selected properties are set to <code>undefined</code>. Note that this is done in-place.
+Properties are set to undefined instead of deleting them for performance reasons
+(V8 doesn't like delete).</p>
+<pre class="prettyprint source lang-js"><code>var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$omit('lastName')
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false</code></pre><pre class="prettyprint source lang-js"><code>var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$omit('lastName')
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false</code></pre><pre class="prettyprint source lang-js"><code>var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$omit('lastName')
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>keys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+|
+
+<span class="param-type">Object.&lt;String, Boolean></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="SparseDatabaseJson">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$parseDatabaseJson</span>
@@ -2211,6 +2194,151 @@ they are cloned using their <code>.$clone()</code> method.</p>
 
 
         
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="Spick">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">$pick</span>
+          <span class="signature-container"><span class="signature">(keys)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Picks a set of properties.</p>
+<p>All other properties but the selected ones are set to <code>undefined</code>. Note that
+this is done in-place. Properties are set to undefined instead of deleting
+them for performance reasons (V8 doesn't like delete).</p>
+<pre class="prettyprint source lang-js"><code>var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$pick('firstName', 'age')
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false</code></pre><pre class="prettyprint source lang-js"><code>var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$pick(['firstName', 'age'])
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false</code></pre><pre class="prettyprint source lang-js"><code>var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$pick({firstName: true, age: true})
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>keys</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+|
+
+<span class="param-type">Object.&lt;String, Boolean></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
     
     
 </dd>
@@ -3163,7 +3291,7 @@ called explicitly when needed.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Wed Sep 23rd 2015 using the <a
+		on Tue Sep 29th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
