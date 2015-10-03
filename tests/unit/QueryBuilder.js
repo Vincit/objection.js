@@ -597,20 +597,6 @@ describe('QueryBuilder', function () {
     expect(QueryBuilder.forClass(TestModel).unrelateImpl(function () { this.$$delete(); }).unrelate().isFindQuery()).to.equal(false);
   });
 
-  it('resolve should replace the database query with the given value', function (done) {
-    QueryBuilder
-      .forClass(TestModel)
-      .resolve([{b: '100'}])
-      .where('test', 100)
-      .orderBy('order')
-      .then(function (res) {
-        expect(executedQueries).to.have.length(0);
-        expect(res).to.eql([{b: '100'}]);
-        done();
-      })
-      .catch(done);
-  });
-
   it('update() should call $beforeUpdate on the model', function (done) {
     TestModel.prototype.$beforeUpdate = function () {
       this.c = 'beforeUpdate';

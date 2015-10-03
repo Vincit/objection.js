@@ -48,6 +48,26 @@ module.exports = function (session) {
           });
       });
 
+      it('should insert new model with identifier', function () {
+        var model = Model1.fromJson({id: 1000, model1Prop1: 'hello 3'});
+
+        return Model1
+          .query()
+          .insert(model)
+          .then(function (inserted) {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.id).to.equal(1000);
+            expect(inserted.$beforeInsertCalled).to.equal(true);
+            expect(inserted.$afterInsertCalled).to.equal(true);
+            expect(inserted.model1Prop1).to.equal('hello 3');
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.where(rows, {id: 1000, model1Prop1: 'hello 3'})).to.have.length(1);
+            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
       if (utils.isPostgres(session.knex)) {
         it('should accept an array', function () {
           var models = [Model1.fromJson({model1Prop1: 'hello 3'}), Model1.fromJson({model1Prop1: 'hello 4'})];

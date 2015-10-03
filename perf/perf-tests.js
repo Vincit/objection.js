@@ -169,7 +169,7 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '400 fromJson calls for the dataset (34000 function calls)',
+      name: '400 fromJson calls for the dataset (34000 individual models)',
       runCount: 400,
       runtimeGoal: 1000,
       test: function () {
@@ -180,7 +180,7 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '2000 toJSON calls for the dataset (160000 function calls)',
+      name: '2000 toJSON calls for the dataset (160000 individual models)',
       runCount: 2000,
       runtimeGoal: 1000,
       beforeTest: function () {
@@ -194,7 +194,7 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '2000 $clone calls for the dataset (160000 function calls)',
+      name: '2000 $clone calls for the dataset (160000 individual models)',
       runCount: 2000,
       runtimeGoal: 1000,
       beforeTest: function () {
