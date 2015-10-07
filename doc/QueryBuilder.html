@@ -775,6 +775,172 @@ parameters of a http request.</p>
               
 <dt>
     
+        <h4 class="name" id="allowInsert">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">allowInsert</span>
+          <span class="signature-container"><span class="signature">(exp)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets the allowed tree of relations to insert using <code>insertWithRelated</code> method.</p>
+<p>If the model tree given to the <code>insertWithRelated</code> method</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .allowInsert('[children.pets, movies]')
+  .insertWithRelated({
+    firstName: 'Sylvester',
+    children: [{
+      firstName: 'Sage',
+      pets: [{
+        name: 'Fluffy'
+        species: 'dog'
+      }, {
+        name: 'Scrappy',
+        species: 'dog'
+      }],
+    }]
+  })
+  .then(function () {
+
+  });</code></pre><p>See methods <code>QueryBuilder.eager</code>, <code>QueryBuilder.allowEager</code> and class <a href="RelationExpression.html">RelationExpression</a> for
+more information on relation expressions.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>exp</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type"><a href="RelationExpression.html">RelationExpression</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="andWhere">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">andWhere</span>
@@ -2758,7 +2924,17 @@ Person
   .then(function (persons) {
     console.log(persons[0].children[0].pets[0].name);
     console.log(persons[0].children[0].movies[0].id);
-  });</code></pre><p>See <a href="RelationExpression.html">RelationExpression</a> for more examples and documentation.</p>
+  });</code></pre><p>The eager queries are optimized to avoid the N + 1 query problem. Consider this query:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .where('id', 1)
+  .eager('children.children')
+  .then(function (persons) {
+    console.log(persons[0].children.length); // --> 10
+    console.log(persons[0].children[9].children.length); // --> 10
+  });</code></pre><p>The person has 10 children and they all have 10 children. The query above will
+return 100 database rows but will generate only three database queries.</p>
+<p>See <a href="RelationExpression.html">RelationExpression</a> for more examples and documentation.</p>
     </div>
     
 
@@ -3687,6 +3863,199 @@ that returns the identifiers of <em>all</em> inserted rows. knex supports batch 
 other databases also, but you only get the id of the first (or last) inserted object
 as a result. If you need batch insert on other databases you can use knex directly
 through <code>YourModel.knexQuery()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelsOrObjects</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">Array.&lt;Object></span>
+|
+
+<span class="param-type">Array.&lt;<a href="Model.html">Model</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Objects to insert.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="insertWithRelated">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">insertWithRelated</span>
+          <span class="signature-container"><span class="signature">(modelsOrObjects)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Insert models with relations.</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .insertWithRelated({
+    firstName: 'Sylvester',
+    lasName: 'Stallone',
+
+    children: [{
+      firstName: 'Sage',
+      lastName: 'Stallone',
+
+      pets: [{
+        name: 'Fluffy',
+        species: 'dog'
+      }]
+    }]
+  });</code></pre><p>The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create
+relationships between them as defined in the <code>relationMappings</code> of the models.</p>
+<p>If you need to relate the same model in multiple places you can use the
+special keys <code>#id</code> and <code>#ref</code> like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .insertWithRelated([{
+    firstName: 'Sylvester',
+    lastName: 'Stallone',
+    movies: [{
+      &quot;#id&quot;: 'Silver Linings Playbook'
+      name: 'Silver Linings Playbook',
+      duration: 118
+    }]
+  }, {
+    firstName: 'Bradley',
+    lastName: 'Cooper',
+    movies: [{
+      &quot;#ref&quot;: 'Silver Linings Playbook'
+    }]
+  }]);</code></pre><p>This will insert only one movie (the 'Silver Linings Playbook') but both
+'Jennifer' and 'Bradley' will have the movie related to them through the
+many-to-many relation <code>movies</code>.</p>
+<p>See the <code>allowInsert</code> method if you need to limit which relations can
+be inserted using this method.</p>
+<p>By the way, if you are using Postgres the inserts are done in batches for
+maximum performance.</p>
     </div>
     
 
@@ -8912,148 +9281,6 @@ the case of ManyToMany relation, creates a join row to the join table.</p>
               
 <dt>
     
-        <h4 class="name" id="resolve">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">resolve</span>
-          <span class="signature-container"><span class="signature">(resolve)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Skips the database query and &quot;fakes&quot; its result.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>resolve</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Object></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
-            
-        
-            
-              
-<dt>
-    
         <h4 class="name" id="resultSize">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">resultSize</span>
@@ -9738,253 +9965,6 @@ query.then(function (models) {
               
 <dt>
     
-        <h4 class="name" id="runAfterKnexQuery">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">runAfterKnexQuery</span>
-          <span class="signature-container"><span class="signature">(runAfterKnexQuery)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Registers a function to be called after the database query when the builder is executed.</p>
-<p>The functions take the knex output as input. Usually this is an array of plain
-javascript objects: one for each row. Multiple functions can be chained like
-<code>then</code> methods of a promise.</p>
-<pre class="prettyprint source lang-js"><code>var query = Person.query();
-
-query
- .runAfterKnexQuery(function (rows) {
-   return rows;
- })
- .runAfterKnexQuery(function (rows) {
-   rows.push({firstName: 'Jennifer'});
- });
-
-query.then(function (models) {
-  var jennifer = models[models.length - 1];
-});</code></pre>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>runAfterKnexQuery</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
-            
-        
-            
-              
-<dt>
-    
-        <h4 class="name" id="runAfterKnexQueryPushFront">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">runAfterKnexQueryPushFront</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"></span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Just like <code>runAfterKnexQuery</code> but pushes the function before any other runAfterKnexQuery functions.</p>
-<pre class="prettyprint source lang-js"><code>var query = Person.query();
-
-query
- .runAfterKnexQuery(function (rows) {
-   console.log('hello 1');
-   return rows;
- })
- .runAfterKnexQueryPushFront(function (rows) {
-   console.log('hello 2');
-   return rows;
- });
-
-query.then();
-// --> hello 2
-// --> hello 1</code></pre>
-    </div>
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-            
-        
-            
-              
-<dt>
-    
         <h4 class="name" id="runAfterModelCreate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">runAfterModelCreate</span>
@@ -10585,6 +10565,151 @@ query.then();
     
     
     
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="setQueryExecutor">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">setQueryExecutor</span>
+          <span class="signature-container"><span class="signature">(executor)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets a custom query executor.</p>
+<p>Setting this will cause the query builder to not be executed. Instead the fully built
+query builder is passed to the function registered using this method and the function
+should execute some other query.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>executor</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -14856,7 +14981,7 @@ does not have <code>jsonObject.a</code> or <code>jsonObject.b</code>.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Tue Sep 29th 2015 using the <a
+		on Thu Oct 8th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

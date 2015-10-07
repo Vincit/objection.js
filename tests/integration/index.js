@@ -12,16 +12,16 @@ describe('integration tests', function () {
       filename: path.join(os.tmpdir(), 'objection_test.db')
     }
   }, {
-    client: 'postgres',
-    connection: {
-      host: '127.0.0.1',
-      database: 'objection_test'
-    }
-  }, {
     client: 'mysql',
     connection: {
       host: '127.0.0.1',
       user: 'travis',
+      database: 'objection_test'
+    }
+  }, {
+    client: 'postgres',
+    connection: {
+      host: '127.0.0.1',
       database: 'objection_test'
     }
   }];
@@ -43,6 +43,7 @@ describe('integration tests', function () {
 
       require('./find')(session);
       require('./insert')(session);
+      require('./insertWithRelated')(session);
       require('./update')(session);
       require('./patch')(session);
       require('./delete')(session);

@@ -1,5 +1,7 @@
+'use strict';
+
 var _ = require('lodash');
-var utils = require('../../lib/utils')
+var utils = require('../../lib/utils');
 var expect = require('expect.js');
 var Promise = require('bluebird');
 var ValidationError = require('../../lib/ValidationError');

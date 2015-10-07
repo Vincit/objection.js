@@ -239,53 +239,38 @@ describe('QueryBuilder', function () {
         return ++mockKnexQueryResult;
       })
 
-      .runAfterKnexQuery(function (res) {
+      .runAfterModelCreate(function (res) {
         expect(res).to.equal(4);
         return Promise.delay(1).then(function () {
           return ++res;
         });
       })
-      .runAfterKnexQuery(function (res) {
+      .runAfterModelCreate(function (res) {
         expect(res).to.equal(5);
         return ++res;
       })
-      .runAfterKnexQueryPushFront(function (res) {
+      .runAfterModelCreatePushFront(function (res) {
         expect(res).to.equal(3);
         return ++res;
       })
 
-      .runAfterModelCreate(function (res) {
+      .runAfter(function (res) {
         expect(res).to.equal(7);
         return Promise.delay(1).then(function () {
           return ++res;
         });
       })
-      .runAfterModelCreate(function (res) {
+      .runAfter(function (res) {
         expect(res).to.equal(8);
         return ++res;
       })
-      .runAfterModelCreatePushFront(function (res) {
+      .runAfterPushFront(function (res) {
         expect(res).to.equal(6);
         return ++res;
       })
 
-      .runAfter(function (res) {
-        expect(res).to.equal(10);
-        return Promise.delay(1).then(function () {
-          return ++res;
-        });
-      })
-      .runAfter(function (res) {
-        expect(res).to.equal(11);
-        return ++res;
-      })
-      .runAfterPushFront(function (res) {
-        expect(res).to.equal(9);
-        return ++res;
-      })
-
       .then(function (res) {
-        expect(res).to.equal(12);
+        expect(res).to.equal(9);
         done();
       }).catch(done);
   });
@@ -295,9 +280,6 @@ describe('QueryBuilder', function () {
       .forClass(TestModel)
       .runBefore(function () {
         throw new Error('some error');
-      })
-      .runAfterKnexQuery(function () {
-        done(new Error('should not get here'));
       })
       .runAfterModelCreate(function () {
         done(new Error('should not get here'));
@@ -311,27 +293,6 @@ describe('QueryBuilder', function () {
       .catch(function (err) {
         expect(err.message).to.equal('some error');
         expect(executedQueries).to.have.length(0);
-        done();
-      });
-  });
-
-  it('should not call other run* methods if an error is thrown from runAfterKnexQuery', function (done) {
-    QueryBuilder
-      .forClass(TestModel)
-      .runAfterKnexQuery(function () {
-        throw new Error('some error');
-      })
-      .runAfterModelCreate(function () {
-        done(new Error('should not get here'));
-      })
-      .runAfter(function () {
-        done(new Error('should not get here'));
-      })
-      .then(function () {
-        done(new Error('should not get here'));
-      })
-      .catch(function (err) {
-        expect(err.message).to.equal('some error');
         done();
       });
   });
@@ -700,6 +661,15 @@ describe('QueryBuilder', function () {
         done();
       })
       .catch(done);
+  });
+
+  it('should not be able to call setQueryExecutor twice', function () {
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .setQueryExecutor(function () {})
+        .setQueryExecutor(function () {});
+    }).to.throwException();
   });
 
   describe('eager and allowEager' , function () {

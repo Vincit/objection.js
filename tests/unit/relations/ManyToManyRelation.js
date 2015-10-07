@@ -245,7 +245,7 @@ describe('ManyToManyRelation', function () {
       ];
 
       owner.nameOfOurRelation = [
-        RelatedModel.fromJson({a: 'str0'})
+        RelatedModel.fromJson({a: 'str0', id: 3})
       ];
 
       var builder = QueryBuilder
@@ -266,9 +266,9 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
 
         expect(owner.nameOfOurRelation).to.eql([
-          {a: 'str0'},
           {a: 'str1', id: 1, rid: 3},
-          {a: 'str2', id: 2, rid: 4}
+          {a: 'str2', id: 2, rid: 4},
+          {a: 'str0', id: 3}
         ]);
 
         expect(result).to.eql([

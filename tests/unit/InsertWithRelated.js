@@ -1,0 +1,1097 @@
+var _ = require('lodash')
+  , knex = require('knex')
+  , expect = require('expect.js')
+  , Promise = require('bluebird')
+  , Model = require('../../lib/Model')
+  , QueryBuilder = require('../../lib/QueryBuilder')
+  , InsertWithRelated = require('../../lib/InsertWithRelated')
+  , RelationExpression = require('../../lib/RelationExpression');
+
+describe('InsertWithRelated', function () {
+  var mockKnexQueryResult = [];
+  var executedQueries = [];
+  var mockKnex = null;
+
+  var Person = null;
+  var Animal = null;
+  var Movie = null;
+
+  before(function () {
+    mockKnex = knex({client: 'pg'});
+
+    mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
+      executedQueries.push(this.toString());
+      return Promise.resolve(mockKnexQueryResult).then(cb, ecb);
+    };
+  });
+
+  beforeEach(function () {
+    mockKnexQueryResult = [];
+    executedQueries = [];
+  });
+
+  beforeEach(function () {
+    Person = function Person() {
+      Model.apply(this, arguments);
+    };
+
+    Animal = function Animal() {
+      Model.apply(this, arguments);
+    };
+
+    Movie = function Movie() {
+      Model.apply(this, arguments);
+    };
+
+    Model.extend(Person);
+    Model.extend(Animal);
+    Model.extend(Movie);
+  });
+
+  beforeEach(function () {
+    Person.tableName = 'Person';
+
+    Person.relationMappings = {
+      pets: {
+        relation: Model.OneToManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'Person.id',
+          to: 'Animal.ownerId'
+        }
+      },
+
+      movies: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Movie,
+        join: {
+          from: 'Person.id',
+          through: {
+            from: 'Person_Movie.personId',
+            to: 'Person_Movie.movieId'
+          },
+          to: 'Movie.id'
+        }
+      },
+
+      children: {
+        relation: Model.OneToManyRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.id',
+          to: 'Person.parentId'
+        }
+      },
+
+      parent: {
+        relation: Model.OneToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.parentId',
+          to: 'Person.id'
+        }
+      }
+    };
+  });
+
+  beforeEach(function () {
+    Animal.tableName = 'Animal';
+
+    Animal.relationMappings = {
+      owner: {
+        relation: Model.OneToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Animal.ownerId',
+          to: 'Person.id'
+        }
+      }
+    };
+  });
+
+  beforeEach(function () {
+    Movie.tableName = 'Movie';
+
+    Movie.relationMappings = {
+      actors: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Person,
+        join: {
+          from: 'Movie.id',
+          through: {
+            from: 'Person_Movie.movieId',
+            to: 'Person_Movie.personId'
+          },
+          to: 'Person.id'
+        }
+      }
+    };
+  });
+
+  it('one Person', function () {
+    var models = [{
+      name: 'person1'
+    }];
+
+    return test({
+      models: models,
+      modelClass: Person,
+      expectedInsertions: [{
+        tableName: 'Person',
+        models: [{
+          name: 'person1'
+        }]
+      }]
+    })
+  });
+
+  it('two Persons', function () {
+    var models = [{
+      name: 'person1'
+    }, {
+      name: 'person2'
+    }];
+
+    return test({
+      models: models,
+      modelClass: Person,
+      expectedInsertions: [{
+        tableName: 'Person',
+        models: [{
+          name: 'person1'
+        }, {
+          name: 'person2'
+        }]
+      }]
+    })
+  });
+
+  it('one-to-one relation', function () {
+    var models = [{
+      name: 'child',
+      parent: {
+        name: 'parent'
+      }
+    }];
+
+    return test({
+      models: models,
+      modelClass: Person,
+      // Parent should be inserted first as the child needs the `parentId`
+      // to be set before it can be inserted.
+      expectedInsertions: [{
+        tableName: 'Person',
+        models: [{
+          name: 'parent'
+        }]
+      }, {
+        tableName: 'Person',
+        models: [{
+          name: 'child',
+          parentId: 1
+        }]
+      }]
+    })
+  });
+
+  it('one-to-many relation (1)', function () {
+    var models = [{
+      name: 'parent1',
+      children: [{
+        name: 'child11'
+      }, {
+        name: 'child12'
+      }]
+    }, {
+      name: 'parent2',
+      children: [{
+        name: 'child21'
+      }, {
+        name: 'child22'
+      }]
+    }];
+
+    return test({
+      models: models,
+      modelClass: Person,
+      // The both parents should be inserted first as the children need
+      // to have `parentId` set before they can be inserted. All the
+      // children should be inserted as one batch after the parents.
+      expectedInsertions: [{
+        tableName: 'Person',
+        models: [{
+          name: 'parent1'
+        }, {
+          name: 'parent2'
+        }]
+      }, {
+        tableName: 'Person',
+        models: [{
+          name: 'child11',
+          parentId: 1
+        }, {
+          name: 'child12',
+          parentId: 1
+        }, {
+          name: 'child21',
+          parentId: 2
+        }, {
+          name: 'child22',
+          parentId: 2
+        }]
+      }]
+    })
+  });
+
+  it('one-to-many relation (2)', function () {
+    var models = [{
+      name: 'parent1',
+      children: [{
+        name: 'child1'
+      }, {
+        name: 'child2'
+      }],
+      pets: [{
+        name: 'pet1',
+        species: 'dog'
+      }, {
+        name: 'pet2',
+        species: 'cat'
+      }]
+    }];
+
+    return test({
+      models: models,
+      modelClass: Person,
+      // Models of different tables need to be inserted in different batches.
+      expectedInsertions: [{
+        tableName: 'Person',
+        models: [{
+          name: 'parent1'
+        }]
+      }, {
+        tableName: 'Animal',
+        models: [{
+          name: 'pet1',
+          species: 'dog',
+          ownerId: 1
+        }, {
+          name: 'pet2',
+          species: 'cat',
+          ownerId: 1
+        }]
+      }, {
+        tableName: 'Person',
+        models: [{
+          name: 'child1',
+          parentId: 1
+        }, {
+          name: 'child2',
+          parentId: 1
+        }]
+      }]
+    })
+  });
+
+  it('many-to-many relation', function () {
+    var models = [{
+      name: 'parent1',
+      movies: [{
+        name: 'movie1'
+      }, {
+        name: 'movie2'
+      }]
+    }];
+
+    return test({
+      models: models,
+      modelClass: Person,
+      // ManyToMany relation should not create any dependencies as the relations are
+      // created using join rows in a separate table. The join rows should be inserted
+      // as the last batch.
+      expectedInsertions: [{
+        tableName: 'Person',
+        models: [{
+          name: 'parent1'
+        }]
+      }, {
+        tableName: 'Movie',
+        models: [{
+          name: 'movie1'
+        }, {
+          name: 'movie2'
+        }]
+      }, {
+        // The join rows.
+        tableName: 'Person_Movie',
+        models: [{
+          personId: 1,
+          movieId: 2
+        }, {
+          personId: 1,
+          movieId: 3
+        }]
+      }]
+    })
+  });
+
+  describe('allowedRelations', function () {
+    var models;
+    var expectedInsertions;
+
+    beforeEach(function () {
+      models = [{
+        "#id": 'person_1',
+        name: 'person_1',
+
+        parent: {
+          name: 'person_1_parent'
+        },
+
+        children: [{
+          name: 'person_1_child_1',
+
+          pets: [{
+            name: 'person_1_child_1_pet_1',
+            species: 'cat'
+          }]
+        }, {
+          name: 'person_1_child_2'
+        }],
+
+        pets: [{
+          name: 'person_1_pet_1',
+          species: 'dog'
+        }],
+
+        movies: [{
+          name: 'person_1_movie_1',
+          actors: [{
+            "#ref": 'person_1'
+          }, {
+            name: 'person_2'
+          }]
+        }, {
+          name: 'person_1_movie_2'
+        }]
+      }];
+
+      expectedInsertions = [{
+        "tableName": "Movie",
+        "models": [{
+          "name": "person_1_movie_1"
+        }, {
+          "name": "person_1_movie_2"
+        }]
+      }, {
+        "tableName": "Person",
+        "models": [{
+          "name": "person_2"
+        }, {
+          "name": "person_1_parent"
+        }]
+      }, {
+        "tableName": "Person",
+        "models": [{
+          "name": "person_1",
+          "parentId": 4
+        }]
+      }, {
+        "tableName": "Animal",
+        "models": [{
+          "name": "person_1_pet_1",
+          "species": "dog",
+          "ownerId": 5
+        }]
+      }, {
+        "tableName": "Person",
+        "models": [{
+          "name": "person_1_child_1",
+          "parentId": 5
+        }, {
+          "name": "person_1_child_2",
+          "parentId": 5
+        }]
+      }, {
+        "tableName": "Animal",
+        "models": [{
+          "name": "person_1_child_1_pet_1",
+          "species": "cat",
+          "ownerId": 7
+        }]
+      }, {
+        "tableName": "Person_Movie",
+        "models": [{
+          "personId": 5,
+          "movieId": 1
+        }, {
+          "personId": 5,
+          "movieId": 2
+        }, {
+          "movieId": 1,
+          "personId": 3
+        }]
+      }];
+    });
+
+    it('should not throw if an allowed model tree is given (1)', function () {
+      return test({
+        modelClass: Person,
+        models: models,
+        allowedRelations: '[parent, children.pets, pets, movies.actors]',
+        expectedInsertions: expectedInsertions
+      });
+    });
+
+    it('should not throw if an allowed model tree is given (2)', function () {
+      return test({
+        modelClass: Person,
+        models: models,
+        allowedRelations: '[parent.children, children.[pets], pets, movies.actors.[pets, children]]',
+        expectedInsertions: expectedInsertions
+      });
+    });
+
+    it('should throw if an unallowed model tree is given (1)', function () {
+      return test({
+        modelClass: Person,
+        models: models,
+        // children.pets is missing.
+        allowedRelations: '[parent, children, pets, movies.actors]',
+        expectErrorWithData: {allowedRelations: 'trying to insert an unallowed relation'}
+      });
+    });
+
+    it('should throw if an unallowed model tree is given (2)', function () {
+      return test({
+        modelClass: Person,
+        models: models,
+        // movies.actors missing.
+        allowedRelations: '[parent, children.pets, pets, movies]',
+        expectErrorWithData: {allowedRelations: 'trying to insert an unallowed relation'}
+      });
+    });
+
+    it('should throw if an unallowed model tree is given (3)', function () {
+      return test({
+        modelClass: Person,
+        models: models,
+        // parent missing.
+        allowedRelations: '[children.pets, pets, movies.actors]',
+        expectErrorWithData: {allowedRelations: 'trying to insert an unallowed relation'}
+      });
+    });
+
+  });
+
+  describe('#ref', function () {
+
+    it('one-to-one relation', function () {
+      var models = [{
+        name: 'child1',
+        parent: {
+          "#id": 'parent',
+          name: 'parent'
+        }
+      }, {
+        name: 'child2',
+        parent: {
+          "#ref": 'parent'
+        }
+      }];
+
+      return test({
+        models: models,
+        modelClass: Person,
+        // Both children have the same parent. The parent should be inserted first
+        // and then the children with the same `parentId`.
+        expectedInsertions: [{
+          tableName: 'Person',
+          models: [{
+            name: 'parent'
+          }]
+        }, {
+          tableName: 'Person',
+          models: [{
+            name: 'child1',
+            parentId: 1
+          }, {
+            name: 'child2',
+            parentId: 1
+          }]
+        }]
+      })
+    });
+
+    it('one-to-many relation', function () {
+      var models = [{
+        id: 1,
+        "#id": 'parent1',
+        name: 'parent1',
+        children: [{
+          id: 2,
+          name: 'child11'
+        }]
+      }, {
+        id: 3,
+        name: 'parent2',
+        children: [{
+          id: 4,
+          name: 'child21',
+          children: [{
+            id: 6,
+            name: 'grandChild211'
+          }, {
+            "#ref": 'parent1'
+          }]
+        }, {
+          id: 5,
+          name: 'child22'
+        }]
+      }];
+
+      return test({
+        models: models,
+        modelClass: Person,
+        expectedInsertions: [{
+          tableName: 'Person',
+          models: [{
+            id: 3,
+            name: 'parent2'
+          }]
+        }, {
+          tableName: 'Person',
+          models: [{
+            id: 4,
+            name: 'child21',
+            parentId: 3
+          }, {
+            id: 5,
+            name: 'child22',
+            parentId: 3
+          }]
+        }, {
+          tableName: 'Person',
+          models: [{
+            id: 1,
+            name: 'parent1',
+            parentId: 4
+          }, {
+            id: 6,
+            name: 'grandChild211',
+            parentId: 4
+          }]
+        }, {
+          tableName: 'Person',
+          models: [{
+            id: 2,
+            name: 'child11',
+            parentId: 1
+          }]
+        }]
+      })
+    });
+
+    it('many-to-many relation', function () {
+      var model = {
+        "#id": 'actor1',
+        name: 'actor1',
+        movies: [{
+          "#id": 'movie1',
+          name: 'movie1',
+          actors: [{
+            "#ref": 'actor1'
+          }, {
+            name: 'actor2',
+            parent: {
+              name: 'actor3',
+              movies: [{
+                "#ref": 'movie1'
+              }, {
+                "#ref": 'movie2'
+              }]
+            }
+          }]
+        }, {
+          "#id": 'movie2',
+          name: 'movie2'
+        }]
+      };
+
+      return test({
+        modelClass: Person,
+        models: model,
+        expectedInsertions: [{
+          "tableName": "Person",
+          "models": [{
+            "name": "actor1"
+          }, {
+            "name": "actor3"
+          }]
+        }, {
+          "tableName": "Movie",
+          "models": [{
+            "name": "movie1"
+          }, {
+            "name": "movie2"
+          }]
+        },
+        {
+          "tableName": "Person",
+          "models": [{
+            "name": "actor2",
+            "parentId": 2
+          }]
+        },
+        {
+          "tableName": "Person_Movie",
+          "models": [{
+            "personId": 1,
+            "movieId": 3
+          }, {
+            "personId": 1,
+            "movieId": 4
+          }, {
+            "movieId": 3,
+            "personId": 5
+          }, {
+            "personId": 2,
+            "movieId": 3
+          }, {
+            "personId": 2,
+            "movieId": 4
+          }]
+        }]
+      })
+    });
+
+    it('should throw error if model tree contain reference cycles', function () {
+
+      test({
+        models: [{
+          "#id": 'child',
+          parent: {
+            "#ref": 'child'
+          }
+        }],
+        modelClass: Person,
+        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+      });
+
+      test({
+        models: [{
+          "#id": 'child',
+          parent: {
+            "#id": 'parent',
+            parent: {
+              "#ref": 'child'
+            }
+          }
+        }],
+        modelClass: Person,
+        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+      });
+
+      test({
+        models: [{
+          "#id": 'root',
+          children: [{
+            "#id": 'child1'
+          }, {
+            "#id": 'child2',
+            children: [{
+              "#ref": 'root'
+            }, {
+              "#id": 'grandChild1'
+            }]
+          }]
+        }],
+        modelClass: Person,
+        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+      });
+
+      test({
+        models: [{
+          "#id": 'child',
+          parent: {
+            jsonProp: {
+              prop1: [{
+                prop2: 'some test around #ref{child.id} the reference'
+              }]
+            }
+          }
+        }],
+        modelClass: Person,
+        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+      });
+
+      test({
+        models: [{
+          "#id": 'child',
+          parent: {
+            prop: '#ref{child.id}'
+          }
+        }],
+        modelClass: Person,
+        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+      });
+
+    });
+
+    it('should be able to change the reference keys through `Model.uidProp` and `Model.uidRefProp`', function () {
+      Person.uidProp = 'myCustomIdKey';
+      Person.uidRefProp = 'myCustomRefKey';
+
+      Animal.uidProp = 'myCustomIdKey';
+      Animal.uidRefProp = 'myCustomRefKey';
+
+      Movie.uidProp = 'myCustomIdKey';
+      Movie.uidRefProp = 'myCustomRefKey';
+
+      var models = [{
+        "myCustomIdKey": 'person_1',
+        name: 'person_1',
+
+        parent: {
+          name: 'person_1_parent'
+        },
+
+        children: [{
+          name: 'person_1_child_1',
+
+          pets: [{
+            name: 'person_1_child_1_pet_1',
+            species: 'cat'
+          }]
+        }, {
+          name: 'person_1_child_2'
+        }],
+
+        pets: [{
+          name: 'person_1_pet_1',
+          species: 'dog'
+        }],
+
+        movies: [{
+          name: 'person_1_movie_1',
+          actors: [{
+            "myCustomRefKey": 'person_1'
+          }, {
+            name: 'person_2'
+          }]
+        }, {
+          name: 'person_1_movie_2'
+        }]
+      }];
+
+      var expectedInsertions = [{
+        "tableName": "Movie",
+        "models": [{
+          "name": "person_1_movie_1"
+        }, {
+          "name": "person_1_movie_2"
+        }]
+      }, {
+        "tableName": "Person",
+        "models": [{
+          "name": "person_2"
+        }, {
+          "name": "person_1_parent"
+        }]
+      }, {
+        "tableName": "Person",
+        "models": [{
+          "name": "person_1",
+          "parentId": 4
+        }]
+      }, {
+        "tableName": "Animal",
+        "models": [{
+          "name": "person_1_pet_1",
+          "species": "dog",
+          "ownerId": 5
+        }]
+      }, {
+        "tableName": "Person",
+        "models": [{
+          "name": "person_1_child_1",
+          "parentId": 5
+        }, {
+          "name": "person_1_child_2",
+          "parentId": 5
+        }]
+      }, {
+        "tableName": "Animal",
+        "models": [{
+          "name": "person_1_child_1_pet_1",
+          "species": "cat",
+          "ownerId": 7
+        }]
+      }, {
+        "tableName": "Person_Movie",
+        "models": [{
+          "personId": 5,
+          "movieId": 1
+        }, {
+          "personId": 5,
+          "movieId": 2
+        }, {
+          "movieId": 1,
+          "personId": 3
+        }]
+      }];
+
+      return test({
+        modelClass: Person,
+        models: models,
+        expectedInsertions: expectedInsertions
+      })
+    });
+
+    it('should fail if a reference cannot be found from the graph', function () {
+      test({
+        models: [{
+          parent: {
+            "#ref": 'child'
+          }
+        }],
+        modelClass: Person,
+        expectErrorWithData: {ref: 'could not resolve reference "child"'}
+      });
+    });
+
+  });
+
+  describe('#ref{id.prop}', function () {
+
+    it('should replace references with the inserted values (1)', function () {
+      var models = [{
+        firstName: 'I am the child of #ref{parent.firstName} #ref{parent.lastName}',
+        lastName: '#ref{parent.id}',
+        parent: {
+          "#id": 'parent',
+          firstName: 'Parent',
+          lastName: 'Parentsson'
+        }
+      }];
+
+      return test({
+        models: models,
+        modelClass: Person,
+        expectedInsertions: [{
+          tableName: 'Person',
+          models: [{
+            firstName: 'Parent',
+            lastName: 'Parentsson'
+          }]
+        }, {
+          tableName: 'Person',
+          models: [{
+            firstName: 'I am the child of Parent Parentsson',
+            lastName: 1,
+            parentId: 1
+          }]
+        }]
+      })
+    });
+
+    it('should replace references with the inserted values (2)', function () {
+      var models = [{
+        "#id": 'actor',
+        name: 'actor',
+        metaData: [{
+          movieNames: ['#ref{movie2.name}']
+        }],
+        movies: [{
+          name: 'movie 1',
+          metaData: {
+            someActorId: '#ref{actor.id}'
+          }
+        }, {
+          "#id": 'movie2',
+          name: 'movie 2'
+        }, {
+          name: 'movie 3'
+        }]
+      }];
+
+      return test({
+        models: models,
+        modelClass: Person,
+        expectedInsertions: [{
+          tableName: "Movie",
+          models: [{
+            name: "movie 2"
+          }, {
+            name: "movie 3"
+          }]
+        }, {
+          tableName: "Person",
+          models: [{
+            name: "actor",
+            metaData: [{
+              movieNames: ["movie 2"]
+            }]
+          }]
+        }, {
+          tableName: "Movie",
+          models: [{
+            name: "movie 1",
+            metaData: {
+              someActorId: 3
+            }
+          }]
+        }, {
+          tableName: "Person_Movie",
+          models: [{
+            personId: 3,
+            movieId: 4
+          }, {
+            personId: 3,
+            movieId: 1
+          }, {
+            personId: 3,
+            movieId: 2
+          }]
+        }]
+      })
+    });
+
+    it('should replace references inside deep json properties with the inserted values', function () {
+      var models = [{
+        firstName: 'Child',
+        lastName: 'Childsson',
+        jsonProp: {
+          data: [{
+            parentFirstName: '#ref{parent.firstName}',
+            parentLastName: '#ref{parent.lastName}'
+          }]
+        },
+        parent: {
+          "#id": 'parent',
+          firstName: 'Parent',
+          lastName: 'Parentsson'
+        }
+      }];
+
+      return test({
+        models: models,
+        modelClass: Person,
+        expectedInsertions: [{
+          tableName: 'Person',
+          models: [{
+            firstName: 'Parent',
+            lastName: 'Parentsson'
+          }]
+        }, {
+          tableName: 'Person',
+          models: [{
+            firstName: 'Child',
+            lastName: 'Childsson',
+            parentId: 1,
+            jsonProp: {
+              data: [{
+                parentFirstName: 'Parent',
+                parentLastName: 'Parentsson'
+              }]
+            }
+          }]
+        }]
+      })
+    });
+
+    it('should fail if a reference is not found', function () {
+      var models = [{
+        firstName: 'I am the child of #ref{parent.firstName} #ref{parent.lastName}',
+        lastName: '#ref{doesNotExist.id}',
+        parent: {
+          "#id": 'parent',
+          firstName: 'Parent',
+          lastName: 'Parentsson'
+        }
+      }];
+
+      test({
+        models: models,
+        modelClass: Person,
+        expectErrorWithData: {
+          ref: 'could not resolve reference "#ref{doesNotExist.id}"'
+        }
+      })
+    });
+
+  });
+
+  function test(opt) {
+    // Convert the input object graph into model graph. The input may be
+    // an array of objects or a single object.
+    if (_.isArray(opt.models)) {
+      opt.models = _.map(opt.models, function (model) {
+        return opt.modelClass.fromJson(model);
+      });
+    } else {
+      opt.models = opt.modelClass.fromJson(opt.models);
+    }
+
+    function createInserter() {
+      var insertOpt = {
+        modelClass: opt.modelClass,
+        models: opt.models
+      };
+
+      if (opt.allowedRelations) {
+        insertOpt.allowedRelations = RelationExpression.parse(opt.allowedRelations);
+      }
+
+      return new InsertWithRelated(insertOpt);
+    }
+
+    var inserter;
+
+     if (opt.expectErrorWithData) {
+      expect(createInserter).to.throwException(function (err) {
+        expect(err.data).to.eql(opt.expectErrorWithData);
+      });
+      return;
+    } else {
+      inserter = createInserter();
+    }
+
+    var id = 1;
+    var insertions = [];
+
+    return inserter.execute(function (tableInsertion) {
+      var ret = _.clone(tableInsertion.models);
+
+      _.each(tableInsertion.models, function (model, idx) {
+        if (_.isArray(opt.models)) {
+          expect(opt.models.indexOf(model) !== -1).to.equal(tableInsertion.isInputModel[idx]);
+        } else {
+          expect(model === opt.models).to.equal(tableInsertion.isInputModel[idx]);
+        }
+      });
+
+      insertions.push({
+        tableName: tableInsertion.tableName,
+        models: _.map(tableInsertion.models, function (model) {
+          if (model instanceof Model) {
+            return model.$toJson(true)
+          } else {
+            return _.clone(model);
+          }
+        })
+      });
+
+      _.each(ret, function(model) {
+        if (!model.id) {
+          model.id = id++;
+        }
+      });
+
+      return Promise.resolve(ret);
+    }).then(function () {
+      expect(insertions).to.eql(opt.expectedInsertions);
+    });
+  }
+
+});
