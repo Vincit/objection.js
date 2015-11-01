@@ -1,0 +1,21 @@
+{
+  "name": "objection-example-express-es6",
+  "version": "0.2.0",
+  "description": "Objection.js express ES6 example",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --harmony app"
+  },
+  "author": "Sami Koskimäki",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.0.3",
+    "body-parser": "^1.12.4",
+    "express": "^4.12.4",
+    "knex": "^0.8.6",
+    "lodash": "^3.10.0",
+    "morgan": "^1.6.0",
+    "objection": "^0.2.0",
+    "sqlite3": "^3.0.8"
+  }
+}
