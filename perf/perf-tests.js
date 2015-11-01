@@ -180,7 +180,7 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '2000 toJSON calls for the dataset (160000 individual models)',
+      name: '2000 $toJson calls for the dataset (160000 individual models)',
       runCount: 2000,
       runtimeGoal: 1000,
       beforeTest: function () {
@@ -189,7 +189,21 @@ describe('Performance tests', function () {
         });
       },
       test: function (persons) {
-        _.invoke(persons, 'toJSON');
+        _.invoke(persons, '$toJson');
+      }
+    });
+
+    perfTest({
+      name: '4000 $toDatabaseJson calls for the dataset (100000 individual models)',
+      runCount: 4000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        return _.map(data, function (person) {
+          return Person.fromJson(person);
+        });
+      },
+      test: function (persons) {
+        _.invoke(persons, '$toDatabaseJson');
       }
     });
 
@@ -236,6 +250,10 @@ describe('Performance tests', function () {
         }
       }
     });
+
+    after(function () {
+      return Promise.delay(500);
+    })
   });
 
   function perfTest(opt) {
@@ -254,11 +272,13 @@ describe('Performance tests', function () {
 
       if (runtime > opt.runtimeGoal) {
         throw new Error('runtime ' + runtime + ' ms exceeds the runtimeGoal ' + opt.runtimeGoal + " ms");
-      } else {
-        setTimeout(function () {
-          //console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
-        }, 0);
       }
+
+      Promise.delay(100).then(function () {
+        console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
+      });
+
+      return Promise.delay(50);
     });
   }
 
