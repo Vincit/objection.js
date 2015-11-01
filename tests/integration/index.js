@@ -52,7 +52,7 @@ describe('integration tests', function () {
       require('./transactions')(session);
 
       if (knexConfig.client === 'postgres') {
-        require('./json-queries')(session);
+        require('./jsonQueries')(session);
       }
     });
   });
