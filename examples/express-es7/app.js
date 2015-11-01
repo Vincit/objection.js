@@ -8,14 +8,14 @@ import registerApi from './api';
 import {Model} from 'objection';
 
 // Initialize knex.
-let knex = Knex(knexConfig.development);
+const knex = Knex(knexConfig.development);
 
 // Bind all Models to a knex instance. If you only have one database in
 // your server this is all you have to do. For multi database systems, see
 // the Model.bindKnex method.
 Model.knex(knex);
 
-let app = express()
+const app = express()
   .use(bodyParser.json())
   .use(morgan('dev'))
   .set('json spaces', 2);
@@ -34,7 +34,7 @@ app.use(function (err, req, res, next) {
   }
 });
 
-let server = app.listen(8641, function () {
+const server = app.listen(8641, function () {
   console.log('Example app listening at port %s', server.address().port);
 });
 
@@ -43,16 +43,16 @@ let server = app.listen(8641, function () {
 // wrap our route handlers in try-catch blocks.
 function monkeyPatchRouteMethods(app) {
   ['get', 'put', 'post', 'delete', 'patch'].forEach(function (routeMethodName) {
-    let originalRouteMethod = app[routeMethodName];
+    const originalRouteMethod = app[routeMethodName];
 
     app[routeMethodName] = function () {
-      let args = _.toArray(arguments);
-      let originalRouteHandler = _.last(args);
+      const args = _.toArray(arguments);
+      const originalRouteHandler = _.last(args);
 
       if (_.isFunction(originalRouteHandler)) {
         // Overwrite the route handler.
         args[args.length - 1] = function (req, res, next) {
-          let ret = originalRouteHandler.call(this, req, res, next);
+          const ret = originalRouteHandler.call(this, req, res, next);
 
           // If the route handler returns a Promise (probably an async function) catch
           // the error and pass it to the next middleware.
