@@ -147,7 +147,7 @@ module.exports = function (session) {
           .then(function (models) {
             expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
             models[0].model1Prop1 = 'blaa';
-            return models[0].$query().first();
+            return models[0].$query();
           })
           .then(function (model) {
             expect(model).to.be.a(Model1);
