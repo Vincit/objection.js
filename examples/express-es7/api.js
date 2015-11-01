@@ -6,7 +6,7 @@ export default function (app) {
 
   // Create a new Person.
   app.post('/persons', async function (req, res) {
-    let person = await Person
+    const person = await Person
       .query()
       .insert(req.body);
       
@@ -16,7 +16,7 @@ export default function (app) {
 
   // Patch a Person.
   app.patch('/persons/:id', async function (req, res) {
-    let person = await Person
+    const person = await Person
       .query()
       .where('id', req.params.id)
       .patch(req.body);
@@ -31,7 +31,7 @@ export default function (app) {
   app.get('/persons', async function (req, res) {
     // We don't need to check for the existence of the query parameters.
     // The query builder methods do nothing if one of the values is undefined.
-    let persons = await Person
+    const persons = await Person
       .query()
       .allowEager('[pets, children.[pets, movies], movies]')
       .eager(req.query.eager)
@@ -56,7 +56,7 @@ export default function (app) {
 
   // Add a child for a Person.
   app.post('/persons/:id/children', async function (req, res) {
-    let person = await Person
+    const person = await Person
       .query()
       .where('id', req.params.id)
       .first();
@@ -65,7 +65,7 @@ export default function (app) {
       throwNotFound(); 
     }
     
-    let child = await person
+    const child = await person
       .$relatedQuery('children')
       .insert(req.body);
       
@@ -75,7 +75,7 @@ export default function (app) {
 
   // Add a pet for a Person.
   app.post('/persons/:id/pets', async function (req, res) {
-    let person = await Person
+    const person = await Person
       .query()
       .where('id', req.params.id)
       .first();
@@ -84,7 +84,7 @@ export default function (app) {
       throwNotFound(); 
     }
     
-    let pet = await person
+    const pet = await person
       .$relatedQuery('pets')
       .insert(req.body);
       
@@ -95,7 +95,7 @@ export default function (app) {
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
   app.get('/persons/:id/pets', async function (req, res) {
-    let person = await Person
+    const person = await Person
       .query()
       .where('id', req.params.id)
       .first();
@@ -106,7 +106,7 @@ export default function (app) {
     
     // We don't need to check for the existence of the query parameters.
     // The query builder methods do nothing if one of the values is undefined.
-    let pets = await person
+    const pets = await person
       .$relatedQuery('pets')
       .where('name', 'like', req.query.name)
       .where('species', req.query.species);
@@ -119,8 +119,8 @@ export default function (app) {
   app.post('/persons/:id/movies', async function (req, res) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    let movie = await objection.transaction(Person, async function (Person) {
-      let person = await Person
+    const movie = await objection.transaction(Person, async function (Person) {
+      const person = await Person
         .query()
         .where('id', req.params.id)
         .first();
@@ -140,7 +140,7 @@ export default function (app) {
 
   // Add existing Person as an actor to a movie.
   app.post('/movies/:id/actors', async function (req, res) {
-    let movie = await Movie
+    const movie = await Movie
       .query()
       .where('id', req.params.id)
       .first();
@@ -159,23 +159,23 @@ export default function (app) {
 
   // Get Movie's actors.
   app.get('/movies/:id/actors', async function (req, res) {
-    let movie = await Movie
+    const movie = await Movie
       .query()
       .where('id', req.params.id)
-      .first()
+      .first();
     
     if (!movie) {
       throwNotFound();
     }
     
-    let actors = await movie.$relatedQuery('actors');
+    const actors = await movie.$relatedQuery('actors');
     
     res.send(actors);
   });
 };
 
 function throwNotFound() {
-  let error = new Error();
+  const error = new Error();
   error.statusCode = 404;
   throw error;
 }
