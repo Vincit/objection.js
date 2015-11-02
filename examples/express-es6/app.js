@@ -51,8 +51,6 @@ function monkeyPatchRouteMethods(app) {
       const args = _.toArray(arguments);
       const originalRouteHandler = _.last(args);
 
-      // TODO: _.isFunction returns false for generator functions. It has been fixed in the lodash master
-      // but not yet available in the most recent release. Fix this later.
       if (Object.prototype.toString.call(originalRouteHandler) === '[object GeneratorFunction]') {
         const routeHandler = Promise.coroutine(originalRouteHandler);
 
