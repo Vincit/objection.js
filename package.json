@@ -37,7 +37,6 @@
   "dependencies": {
     "bluebird": "^2.9.24",
     "lodash": "^3.9.0",
-    "node-uuid": "^1.4.3",
     "tv4": "^1.1.9",
     "tv4-formats": "^1.0.0"
   },
