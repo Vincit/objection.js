@@ -51,7 +51,7 @@ function monkeyPatchRouteMethods(app) {
       const args = _.toArray(arguments);
       const originalRouteHandler = _.last(args);
 
-      if (Object.prototype.toString.call(originalRouteHandler) === '[object GeneratorFunction]') {
+      if (isGenerator(originalRouteHandler)) {
         const routeHandler = Promise.coroutine(originalRouteHandler);
 
         // Overwrite the route handler.
@@ -63,4 +63,8 @@ function monkeyPatchRouteMethods(app) {
       return originalRouteMethod.apply(this, args);
     };
   });
+}
+
+function isGenerator(fn) {
+  return fn && fn.constructor && fn.constructor.name === 'GeneratorFunction';
 }
