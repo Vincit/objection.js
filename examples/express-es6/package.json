@@ -15,7 +15,7 @@
     "knex": "^0.8.6",
     "lodash": "^3.10.0",
     "morgan": "^1.6.0",
-    "objection": "^0.2.0",
+    "objection": "git://github.com/Vincit/objection.js.git#d6a111d",
     "sqlite3": "^3.0.8"
   }
 }
