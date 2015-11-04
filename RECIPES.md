@@ -42,6 +42,18 @@ If you want to use the json schema validation but add some custom validation on 
 [$beforeValidate](http://vincit.github.io/objection.js/Model.html#SbeforeValidate) and
 [$afterValidate](http://vincit.github.io/objection.js/Model.html#SafterValidate) methods.
 
+If you need to do validation on insert or update you can throw exceptions from the 
+[$beforeInsert](http://vincit.github.io/objection.js/Model.html#SbeforeInsert) and 
+[$beforeUpdate](http://vincit.github.io/objection.js/Model.html#SbeforeUpdate) methods.
+
+```js
+Person.prototype.$beforeInsert = function () {
+  if (this.id) {
+    throw new objection.ValidationError({id: 'identifier should not be defined before insert'});
+  }
+};
+```
+
 If you don't want to use the built-in json schema validation, you can just ignore the `jsonSchema` property. It is
 optional. If you want to use some other validation library, simply override the [$validate method](http://vincit.github.io/objection.js/Model.html#Svalidate)
 of the model class. You need to throw a [ValidationError](http://vincit.github.io/objection.js/ValidationError.html) when validation fails.
