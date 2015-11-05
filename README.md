@@ -655,6 +655,15 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.2.8
+
+#### What's new
+
+ * ES6 inheritance support
+ * generator function support for transactions
+ * traverse,pick and omit methods for Model and QueryBuilder
+ * bugfix: issue #38
+ 
 ## 0.2.7
 
 #### What's new
