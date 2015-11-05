@@ -16,6 +16,9 @@
     "email": "sami.koskimaki@vincit.com",
     "url": "https://github.com/koskimas"
   },
+  "contributors": [
+    "Mikael Lepistö <mikael.lepisto@vincit.com> (https://github.com/elhigu)"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/vincit/objection.js.git"
