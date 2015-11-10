@@ -5,7 +5,7 @@
 Objection.js is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [Node.js](https://nodejs.org/)
 whose goal is to make it as easy as possible to use the full power of SQL and the underlying database engine. It offers
 good defaults like [JSON schema validation](#validation) but allows you to make your own choices. Everything can be
-easily configured or overwritten. Flexibility over simplicity!
+easily configured or overwritten.
 
 You may need to use ten minutes to get started with objection.js instead of the one minute that some other ORMs advertise 
 but you won't hit the wall as easily when your project and its needs grow. If you do hit the wall, please open an issue
