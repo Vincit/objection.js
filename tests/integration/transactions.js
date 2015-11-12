@@ -199,11 +199,20 @@ module.exports = function (session) {
         var trx;
         transaction.start(Model1.knex()).then(function (trans) {
           trx = trans;
-          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 1'});
+          return Model1
+            .bindTransaction(trx)
+            .query()
+            .insert({model1Prop1: 'test 1'});
         }).then(function () {
-          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 2'});
+          return Model1
+            .bindTransaction(trx)
+            .query()
+            .insert({model1Prop1: 'test 2'});
         }).then(function () {
-          return Model2.bindKnex(trx).query().insert({model2Prop1: 'test 3'});
+          return Model2
+            .bindTransaction(trx)
+            .query()
+            .insert({model2Prop1: 'test 3'});
         }).then(function () {
           return trx.commit();
         }).then(function () {
@@ -223,11 +232,20 @@ module.exports = function (session) {
         var trx;
         transaction.start(Model1).then(function (trans) {
           trx = trans;
-          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 1'});
+          return Model1
+            .bindTransaction(trx)
+            .query()
+            .insert({model1Prop1: 'test 1'});
         }).then(function () {
-          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 2'});
+          return Model1
+            .bindTransaction(trx)
+            .query()
+            .insert({model1Prop1: 'test 2'});
         }).then(function () {
-          return Model2.bindKnex(trx).query().insert({model2Prop1: 'test 3'});
+          return Model2
+            .bindTransaction(trx)
+            .query()
+            .insert({model2Prop1: 'test 3'});
         }).then(function () {
           return trx.rollback();
         }).then(function () {
