@@ -169,5 +169,87 @@ module.exports = function (session) {
 
     });
 
+    describe('transaction.start()', function () {
+
+      it('should commit transaction when the commit method is called', function (done) {
+        var trx;
+        transaction.start(Model1).then(function (trans) {
+          trx = trans;
+          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 1'});
+        }).then(function () {
+          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 2'});
+        }).then(function () {
+          return Model2.bindKnex(trx).query().insert({model2Prop1: 'test 3'});
+        }).then(function () {
+          return trx.commit();
+        }).then(function () {
+          return session.knex('Model1');
+        }).then(function (rows) {
+          expect(rows).to.have.length(2);
+          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+          return session.knex('model_2');
+        }).then(function (rows) {
+          expect(rows).to.have.length(1);
+          expect(rows[0].model_2_prop_1).to.equal('test 3');
+          done();
+        }).catch(done);
+      });
+
+      it('should work when a knex connection is passed instead of a model', function (done) {
+        var trx;
+        transaction.start(Model1.knex()).then(function (trans) {
+          trx = trans;
+          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 1'});
+        }).then(function () {
+          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 2'});
+        }).then(function () {
+          return Model2.bindKnex(trx).query().insert({model2Prop1: 'test 3'});
+        }).then(function () {
+          return trx.commit();
+        }).then(function () {
+          return session.knex('Model1');
+        }).then(function (rows) {
+          expect(rows).to.have.length(2);
+          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+          return session.knex('model_2');
+        }).then(function (rows) {
+          expect(rows).to.have.length(1);
+          expect(rows[0].model_2_prop_1).to.equal('test 3');
+          done();
+        }).catch(done);
+      });
+
+      it('should rollback transaction when the rollback method is called', function (done) {
+        var trx;
+        transaction.start(Model1).then(function (trans) {
+          trx = trans;
+          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 1'});
+        }).then(function () {
+          return Model1.bindKnex(trx).query().insert({model1Prop1: 'test 2'});
+        }).then(function () {
+          return Model2.bindKnex(trx).query().insert({model2Prop1: 'test 3'});
+        }).then(function () {
+          return trx.rollback();
+        }).then(function () {
+          return session.knex('Model1');
+        }).then(function (rows) {
+          expect(rows).to.have.length(0);
+          return session.knex('model_2');
+        }).then(function (rows) {
+          expect(rows).to.have.length(0);
+          done();
+        }).catch(done);
+      });
+
+      it('should fail if neither a model or a knex connection is passed', function (done) {
+        transaction.start({}).then(function () {
+          done(new Error('should not get here'));
+        }).catch(function () {
+          done();
+        });
+      });
+
+    });
+
   });
 };
