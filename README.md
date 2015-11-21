@@ -3,13 +3,8 @@
 # Introduction
 
 Objection.js is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [Node.js](https://nodejs.org/)
-whose goal is to make it as easy as possible to use the full power of SQL and the underlying database engine. It offers
-good defaults like [JSON schema validation](#validation) but allows you to make your own choices. Everything can be
-easily configured or overwritten.
-
-You may need to use ten minutes to get started with objection.js instead of the one minute that some other ORMs advertise 
-but you won't hit the wall as easily when your project and its needs grow. If you do hit the wall, please open an issue
-even for the smallest problems. We love to help you and make objection.js better in the process.
+that aims to stay out of your way and make it as easy as possible to use the full power of SQL and the underlying 
+database engine.
 
 Objection.js is built on the wonderful SQL query builder [knex](http://knexjs.org). All databases supported by knex 
 are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thoroughly tested](https://travis-ci.org/Vincit/objection.js).
@@ -18,7 +13,7 @@ What objection.js gives you:
 
  * An easy declarative way of [defining models](#models) and relations between them
  * Simple and fun way to [fetch, insert, update and delete](#query-examples) models using the full power of SQL
- * Powerful mechanism for eager loading arbitrarily large [trees of relations](#eager-queries)
+ * Powerful mechanisms for [eager loading](#eager-queries) and [inserting](#eager-inserts) arbitrarily large trees of relations
  * A way to [store complex documents](#documents) as single rows
  * Completely [Promise](https://github.com/petkaantonov/bluebird) based API
  * Easy to use [transactions](#transactions)
@@ -44,6 +39,7 @@ and [ES7](https://github.com/Vincit/objection.js/tree/master/examples/express-es
 - [Getting started](#getting-started)
 - [Query examples](#query-examples)
 - [Eager queries](#eager-queries)
+- [Eager inserts](#eager-inserts)
 - [Transactions](#transactions)
 - [Documents](#documents)
 - [Validation](#validation)
@@ -297,9 +293,10 @@ insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
 # Eager queries
 
 Okay I said there is no custom DSL but actually we have teeny-tiny one for fetching relations eagerly, as it isn't
-something that can be done easily using SQL. The following examples demonstrate how to use it:
+something that can be done easily using SQL. In addition to making your life easier, eager queries avoid the select N+1
+problem and provide a great performance. The following examples demonstrate how to use it:
 
-Fetch one relation:
+Fetch the `pets` relation for all results of a query:
 
 ```js
 Person
@@ -344,11 +341,33 @@ Person
   });
 ```
 
+Relations can be filtered using named filters like this:
+
+```js
+Person
+  .query()
+  .eager('[pets(orderByName, onlyDogs), children(orderByAge).[pets, children]]', {
+    orderByName: function (builder) {
+      builder.orderBy('name');
+    },
+    orderByAge: function (builder) {
+      builder.orderBy('age')
+    },
+    onlyDogs: function (builder) {
+      builder.where('species', 'dog')
+    }
+  })
+  .then(function (persons) {
+    console.log(persons[0].children[0].pets[0].name);
+    console.log(persons[0].children[0].movies[0].id); 
+ });
+```
+
 The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/objection.js/RelationExpression.html).
 
 Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
-request. However, using such expressions opens the whole database through the API. This is not very secure. Therefore
-the [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html) has the `.allowEager` method.
+request. However, allowing the client to pass expressions like this without any limitations is not very secure. 
+Therefore the [QueryBuilder](http://vincit.github.io/objection.js/QueryBuilder.html) has the `.allowEager` method.
 allowEager can be used to limit the allowed eager expression to a certain subset. Like this:
 
 ```js
@@ -380,7 +399,98 @@ Examples of failing eager expressions are:
 In addition to the `.eager` method, relations can be fetched using the `loadRelated` and `$loadRelated` methods of
 [Model](http://vincit.github.io/objection.js/Model.html).
 
+# Eager inserts
+
+Arbitrary relation trees can be inserted using the [insertWithRelated()](http://vincit.github.io/objection.js/QueryBuilder.html#insertWithRelated)
+method:
+
+```js
+Person
+  .query()
+  .insertWithRelated({
+    firstName: 'Sylvester',
+    lastName: 'Stallone',
+
+    children: [{
+      firstName: 'Sage',
+      lastName: 'Stallone',
+
+      pets: [{
+        name: 'Fluffy',
+        species: 'dog'
+      }]
+    }]
+  });
+```
+
+The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined 
+in the `relationMappings` of the models.
+
+If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
+
+```js
+Person
+  .query()
+  .insertWithRelated([{
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    movies: [{
+      "#id": 'Silver Linings Playbook'
+      name: 'Silver Linings Playbook',
+      duration: 122
+    }]
+  }, {
+    firstName: 'Bradley',
+    lastName: 'Cooper',
+
+    movies: [{
+      "#ref": 'Silver Linings Playbook'
+    }]
+  }]);
+```
+
+The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have 
+the movie related to them through the many-to-many relation `movies`.
+
+You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}` 
+as long as the reference doesn't create a circular dependency. For example:
+
+```js
+Person
+  .query()
+  .insertWithRelated([{
+    "#id": 'jenniLaw',
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    pets: [{
+      name: "I am the dog of #ref{jenniLaw.firstName} #ref{jenniLaw.lastName}",
+      species: 'dog'
+    }]
+  }]);
+```
+
+The query above will insert a pet named `I am the dog of Jennifer Lawrence` for Jennifer.
+
+See the `allowInsert` method if you need to limit which relations can be inserted using this method to avoid security
+issues.
+
+By the way, if you are using Postgres the inserts are done in batches for maximum performance.
+
 # Transactions
+
+There are two ways to use transactions in objection.js
+
+ 1. [Transaction callback](#transaction-callback)
+ 2. [Transaction object](#transaction-object)
+ 
+## Transaction callback
+
+The first way to work with transactions is to perform all operations inside one callback using the
+[objection.transaction](http://vincit.github.io/objection.js/global.html#transaction) function. The beauty of this
+method is that you don't need to pass a transaction object to each query explicitly as long as you start all queries 
+using the bound model classes that are passed to the transaction callback as arguments.
 
 Transactions are started by calling the [objection.transaction](http://vincit.github.io/objection.js/global.html#transaction)
 function. Give all the models you want to use in the transaction as parameters to the `transaction` function. The model
@@ -456,6 +566,84 @@ objection.transaction(Person, function (Person) {
 
 });
 ```
+
+## Transaction object
+
+The second way to use transactions is to express the transaction as an object and bind model classes to the transaction
+when you use them. This way is more convenient when you need to pass the transaction to functions and services.
+
+The transaction object can be created using the [objection.transaction.start](http://vincit.github.io/objection.js/global.html#transaction#start)
+method. You need to remember to call either the `commit` or `rollback` method of the transaction object.
+
+```js
+// You need to pass some model (any model with a knex connection)
+// or the knex connection itself to the start method.
+var trx;
+objection.transaction.start(Person).then(function (transaction) {
+  trx = transaction;
+  return Person
+    .bindTransaction(trx)
+    .query()
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+}).then(function (jennifer) {
+  // jennifer was created using a bound model class. Therefore
+  // all queries started through it automatically take part in
+  // the same transaction. We don't need to bind anything here.
+  return jennifer
+    .$relatedQuery('pets')
+    .insert({name: 'Fluffy'});
+}).then(function () {
+  return Movie
+    .bindTransaction(trx)
+    .query()
+    .where('name', 'ilike', '%forrest%');
+}).then(function (movies) {
+  console.log(movies);
+  return trx.commit();
+}).catch(function () {
+  return trx.rollback();
+});
+```
+
+To understand what is happening in the above example you need to know how `bindTransaction` method works.
+`bindTransaction` actually returns an anonymous subclass of the model class you call it for and sets the
+transaction's database connection as that class's database connection. This way all queries started through
+that anonymous class use the same connection and take part in the same transaction. If we didn't create a
+subclass and just set the original model's database connection, all query chains running in parallel would
+suddenly jump into the same transaction and things would go terribly wrong.
+
+Now that you have an idea how the `bindTransaction` works you should see that the previous example could
+also be implemented like this:
+
+```js
+// You need to pass some model (any model with a knex connection)
+// or the knex connection itself to the start method.
+var BoundPerson;
+var BoundMovie;
+objection.transaction.start(Person).then(function (transaction) {
+  BoundPerson = Person.bindTransaction(transaction);
+  BoundMovie = Movie.bindTransaction(transaction);
+  return BoundPerson
+    .query()
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+}).then(function (jennifer) {
+  return jennifer
+    .$relatedQuery('pets')
+    .insert({name: 'Fluffy'});
+}).then(function () {
+  return BoundMovie
+    .query()
+    .where('name', 'ilike', '%forrest%');
+}).then(function (movies) {
+  console.log(movies);
+  return BoundPerson.knex().commit();
+}).catch(function () {
+  return BoundPerson.knex().rollback();
+});
+```
+
+which is pretty much what the [objection.transaction](http://vincit.github.io/objection.js/global.html#transaction) 
+function does.
 
 # Documents
 
@@ -654,6 +842,26 @@ test database configurations. If you don't want to run the tests against all dat
 just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
+
+## 0.3.0
+
+#### What's new
+
+ * [insertWithRelated](http://vincit.github.io/objection.js/QueryBuilder.html#insertWithRelated) method for
+   inserting model trees
+ * [insertAndFetch](http://vincit.github.io/objection.js/QueryBuilder.html#insertAndFetch),
+   [updateAndFetchById](http://vincit.github.io/objection.js/QueryBuilder.html#updateAndFetchById) and
+   [patchAndFetchById](http://vincit.github.io/objection.js/QueryBuilder.html#patchAndFetchById) helper methods
+ * Filters for [eager expressions](#eager-queries)
+ * [New alternative way to use transactions](#transaction-object)
+ * Many performance updates related to cloning, serializing and deserializing model trees.
+
+#### Breaking changes
+
+ * QueryBuilder methods `update`, `patch` and `delete` now return the number of affected rows
+   the new methods `updateAndFetchById` and `patchAndFetchById` may help with the migration
+ * `modelInstance.$query()` instance method now returns a single model instead of an array
+ * Removed `Model.generateId()` method. `$beforeInsert` can be used instead
 
 ## 0.2.8
 

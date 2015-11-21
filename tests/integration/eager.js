@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
+var ValidationError = require('../../lib/ValidationError');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
@@ -108,6 +109,36 @@ module.exports = function (session) {
       expect(models[0].model1Relation2).to.equal(undefined);
     });
 
+    test('model1Relation1.^(selectId)', function (models) {
+      expect(models).to.have.length(1);
+      expect(models[0]).to.be.a(Model1);
+
+      expect(models[0].model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.id).to.equal(2);
+      expect(models[0].model1Relation1).to.not.have.property('model1Prop1');
+      expect(models[0].model1Relation1).to.not.have.property('model1Prop2');
+
+      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
+      expect(models[0].model1Relation1.model1Relation1).to.not.have.property('model1Prop1');
+      expect(models[0].model1Relation1.model1Relation1).to.not.have.property('model1Prop2');
+
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.id).to.equal(4);
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.not.have.property('model1Prop1');
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.not.have.property('model1Prop2');
+
+      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2).to.equal(undefined);
+
+      expect(models[0].model1Relation2).to.equal(undefined);
+    }, {
+      filters: {
+        selectId: function (builder) {
+          builder.select('id', 'model1Id');
+        }
+      }
+    });
+
     test('[model1Relation1, model1Relation2]', function (models) {
       expect(models).to.have.length(1);
       expect(models[0]).to.be.a(Model1);
@@ -126,6 +157,38 @@ module.exports = function (session) {
 
       expect(models[0].model1Relation2[0].model2Relation1).to.equal(undefined);
       expect(models[0].model1Relation2[1].model2Relation1).to.equal(undefined);
+    });
+
+    test('[model1Relation1, model1Relation2(orderByDesc, selectProps)]', function (models) {
+      expect(models).to.have.length(1);
+      expect(models[0]).to.be.a(Model1);
+
+      expect(models[0].model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.id).to.equal(2);
+      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
+      expect(models[0].model1Relation1).to.have.property('model1Prop2');
+
+      expect(models[0].model1Relation2).to.have.length(2);
+      expect(models[0].model1Relation2[0]).to.be.a(Model2);
+      expect(models[0].model1Relation2[1]).to.be.a(Model2);
+      expect(models[0].model1Relation2[0].idCol).to.equal(2);
+      expect(models[0].model1Relation2[1].idCol).to.equal(1);
+      expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 2');
+      expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 1');
+      expect(models[0].model1Relation2[0]).to.not.have.property('model2Prop2');
+      expect(models[0].model1Relation2[1]).to.not.have.property('model2Prop2');
+
+      expect(models[0].model1Relation2[0].model2Relation1).to.equal(undefined);
+      expect(models[0].model1Relation2[1].model2Relation1).to.equal(undefined);
+    }, {
+      filters: {
+        selectProps: function (builder) {
+          builder.select('id_col', 'model_1_id', 'model_2_prop_1');
+        },
+        orderByDesc: function (builder) {
+          builder.orderBy('model_2_prop_1', 'desc');
+        }
+      }
     });
 
     test('[model1Relation1, model1Relation2.model2Relation1]', function (models) {
@@ -209,6 +272,22 @@ module.exports = function (session) {
       expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2[0].model2Prop1).to.equal('hejsan 4');
 
       expect(models[0].model1Relation2).to.equal(undefined);
+    });
+
+    it('should fail if given missing filter', function (done) {
+      Model1
+        .query()
+        .where('id', 1)
+        .eager('model1Relation2(missingFilter)')
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function (error) {
+          expect(error).to.be.a(ValidationError);
+          expect(error.data).to.have.property('eager');
+          done();
+        })
+        .catch(done);
     });
 
     describe('QueryBuilder.pick', function () {
@@ -357,26 +436,27 @@ module.exports = function (session) {
 
   // Tests all ways to fetch eagerly.
   function test(expr, tester, opt) {
-    opt = opt || {
+    opt = _.defaults(opt || {}, {
       Model: Model1,
+      filters: {},
       id: 1
-    };
+    });
 
     var idCol = opt.Model.idColumn;
 
     it(expr + ' (QueryBuilder.eager)', function () {
-      return opt.Model.query().where(idCol, opt.id).eager(expr).then(tester);
+      return opt.Model.query().where(idCol, opt.id).eager(expr, opt.filters).then(tester);
     });
 
     it(expr + ' (Model.loadRelated)', function () {
       return opt.Model.query().where(idCol, opt.id).then(function (models) {
-        return opt.Model.loadRelated(models, expr);
+        return opt.Model.loadRelated(models, expr, opt.filters);
       }).then(tester);
     });
 
     it(expr + ' (Model.$loadRelated)', function () {
       return opt.Model.query().where(idCol, opt.id).then(function (models) {
-        return models[0].$loadRelated(expr);
+        return models[0].$loadRelated(expr, opt.filters);
       }).then(function (result) {
         tester([result]);
       });
