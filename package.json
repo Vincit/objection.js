@@ -40,7 +40,7 @@
     "objection.js"
   ],
   "dependencies": {
-    "bluebird": "^2.9.24",
+    "bluebird": "^3.0.5",
     "lodash": "^3.9.0",
     "tv4": "^1.1.9",
     "tv4-formats": "^1.0.0"
@@ -50,10 +50,10 @@
     "coveralls": "^2.11.2",
     "expect.js": "^0.3.1",
     "grunt": "^0.4.5",
-    "grunt-jsdoc": "^0.6.7",
-    "istanbul": "^0.3.15",
+    "grunt-jsdoc": "^1.0.0",
+    "istanbul": "^0.4.0",
     "knex": "^0.9.0",
-    "mocha": "^2.2.4",
+    "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^4.4.0",
     "sqlite3": "^3.0.8"
