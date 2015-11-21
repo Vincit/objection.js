@@ -154,6 +154,10 @@
 						</li>
 						
 						<li>
+							<a href="global.html#start">start</a>
+						</li>
+						
+						<li>
 							<a href="global.html#toJsonArray">toJsonArray</a>
 						</li>
 						
@@ -179,6 +183,10 @@
 						
 						<li>
 							<a href="global.html#tryCallWriteMethod">tryCallWriteMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#tryValidate">tryValidate</a>
 						</li>
 						
 						<li>
@@ -244,15 +252,9 @@
     
     <div class="description">
         <p>Query builder for Models.</p>
-<p>This class is a wrapper around <a href="http://knexjs.org#Builder">knex QueryBuilder</a>.
-QueryBuilder has all the methods a knex QueryBuilder has and more. While knex
-QueryBuilder returns plain javascript objects, QueryBuilder returns Model
-subclass instances.</p>
-<p>QueryBuilder is thenable, meaning that it can be used like a promise. You can
-return query builder from a <code>.then</code> method of a promise and it gets chained just like
-a normal promise would.</p>
-<p>The query is executed when one of its promise methods <code>then()</code>, <code>catch()</code>, <code>map()</code>,
-<code>bind()</code> or <code>return()</code> is called.</p>
+<p>This class is a wrapper around <a href="http://knexjs.org#Builder">knex QueryBuilder</a>.<br>QueryBuilder has all the methods a knex QueryBuilder has and more. While knex<br>QueryBuilder returns plain javascript objects, QueryBuilder returns Model<br>subclass instances.</p>
+<p>QueryBuilder is thenable, meaning that it can be used like a promise. You can<br>return query builder from a <code>.then</code> method of a promise and it gets chained just like<br>a normal promise would.</p>
+<p>The query is executed when one of its promise methods <code>then()</code>, <code>catch()</code>, <code>map()</code>,<br><code>bind()</code> or <code>return()</code> is called.</p>
     </div>
     
 
@@ -631,12 +633,8 @@ a normal promise would.</p>
     
     <div class="description">
         <p>Sets the allowed eager expression.</p>
-<p>Any subset of the allowed expression is accepted by <code>eager</code> method. For example setting
-the allowed expression to <code>a.b.c</code> expressions <code>a</code>, <code>a.b</code> and <code>a.b.c</code> are accepted by <code>eager</code>
-method. Setting any other expression will reject the query and cause the promise error handlers
-to be called.</p>
-<p>This method is useful when the eager expression comes from an untrusted source like query
-parameters of a http request.</p>
+<p>Any subset of the allowed expression is accepted by <code>eager</code> method. For example setting<br>the allowed expression to <code>a.b.c</code> expressions <code>a</code>, <code>a.b</code> and <code>a.b.c</code> are accepted by <code>eager</code><br>method. Setting any other expression will reject the query and cause the promise error handlers<br>to be called.</p>
+<p>This method is useful when the eager expression comes from an untrusted source like query<br>parameters of a http request.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .allowEager('[children.pets, movies]')
@@ -789,7 +787,7 @@ parameters of a http request.</p>
     
     <div class="description">
         <p>Sets the allowed tree of relations to insert using <code>insertWithRelated</code> method.</p>
-<p>If the model tree given to the <code>insertWithRelated</code> method</p>
+<p>If the model tree given to the <code>insertWithRelated</code> method isn't a subtree of the<br>given expression, the query is rejected.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .allowInsert('[children.pets, movies]')
@@ -808,8 +806,7 @@ parameters of a http request.</p>
   })
   .then(function () {
 
-  });</code></pre><p>See methods <code>QueryBuilder.eager</code>, <code>QueryBuilder.allowEager</code> and class <a href="RelationExpression.html">RelationExpression</a> for
-more information on relation expressions.</p>
+  });</code></pre><p>See methods <code>QueryBuilder.eager</code>, <code>QueryBuilder.allowEager</code> and class <a href="RelationExpression.html">RelationExpression</a> for<br>more information on relation expressions.</p>
     </div>
     
 
@@ -2563,8 +2560,8 @@ more information on relation expressions.</p>
   .query()
   .delete()
   .where('age', '>', 100)
-  .then(function () {
-    console.log('removed over 100 year old people');
+  .then(function (numberOfDeletedRows) {
+    console.log('removed', numberOfDeletedRows, 'people');
   });</code></pre>
     </div>
     
@@ -2904,7 +2901,7 @@ more information on relation expressions.</p>
         <h4 class="name" id="eager">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">eager</span>
-          <span class="signature-container"><span class="signature">(exp)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(exp, <span class="optional">filters</span>)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -2924,6 +2921,23 @@ Person
   .then(function (persons) {
     console.log(persons[0].children[0].pets[0].name);
     console.log(persons[0].children[0].movies[0].id);
+  });</code></pre><p>Relations can be filtered by giving named filter functions as arguments<br>to the relations:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
+    orderByAge: function (builder) {
+      builder.orderBy('age')
+    },
+    orderByName: function (builder) {
+      builder.orderBy('name');
+    },
+    onlyDogs: function (builder) {
+      builder.where('species', 'dog')
+    }
+  })
+  .then(function (persons) {
+    console.log(persons[0].children[0].pets[0].name);
+    console.log(persons[0].children[0].movies[0].id);
   });</code></pre><p>The eager queries are optimized to avoid the N + 1 query problem. Consider this query:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
@@ -2932,8 +2946,7 @@ Person
   .then(function (persons) {
     console.log(persons[0].children.length); // --> 10
     console.log(persons[0].children[9].children.length); // --> 10
-  });</code></pre><p>The person has 10 children and they all have 10 children. The query above will
-return 100 database rows but will generate only three database queries.</p>
+  });</code></pre><p>The person has 10 children and they all have 10 children. The query above will<br>return 100 database rows but will generate only three database queries.</p>
 <p>See <a href="RelationExpression.html">RelationExpression</a> for more examples and documentation.</p>
     </div>
     
@@ -2955,6 +2968,8 @@ return 100 database rows but will generate only three database queries.</p>
 
 		<th>Type</th>
 
+		
+		<th>Argument</th>
 		
 
 		
@@ -2983,6 +2998,47 @@ return 100 database rows but will generate only three database queries.</p>
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>filters</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object.&lt;String, function(<a href="QueryBuilder.html">QueryBuilder</a>)></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -3830,12 +3886,8 @@ return 100 database rows but will generate only three database queries.</p>
     
     <div class="description">
         <p>Creates an insert query.</p>
-<p>The inserted objects are validated against the model's <code>jsonSchema</code>. If validation fails
-the Promise is rejected with a <code>ValidationError</code>.</p>
-<p>NOTE: The return value of the insert query only contains the properties given to the insert
-method plus the identifier. This is because we don't make an additional fetch query after
-the insert. Using postgres you can chain <code>.returning('*')</code> to the query to get all properties.
-On other databases you have to make an additional query to achieve the same.</p>
+<p>The inserted objects are validated against the model's <code>jsonSchema</code>. If validation fails<br>the Promise is rejected with a <code>ValidationError</code>.</p>
+<p>NOTE: The return value of the insert query <em>only</em> contains the properties given to the insert<br>method plus the identifier. This is because we don't make an additional fetch query after<br>the insert. Using postgres you can chain <code>.returning('*')</code> to the query to get all properties.<br>On other databases you can use the <code>insertAndFetch</code> method.</p>
 <p>Examples:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
@@ -3858,11 +3910,159 @@ On other databases you have to make an additional query to achieve the same.</p>
   .insert({
     age: Person.query().avg('age'),
     firstName: Person.raw(&quot;'Jenni' || 'fer'&quot;)
-  });</code></pre><p>The batch insert only works on Postgres because Postgres is the only database engine
-that returns the identifiers of <em>all</em> inserted rows. knex supports batch inserts on
-other databases also, but you only get the id of the first (or last) inserted object
-as a result. If you need batch insert on other databases you can use knex directly
-through <code>YourModel.knexQuery()</code>.</p>
+  });</code></pre><p>The batch insert only works on Postgres because Postgres is the only database engine<br>that returns the identifiers of <em>all</em> inserted rows. knex supports batch inserts on<br>other databases also, but you only get the id of the first (or last) inserted object<br>as a result. If you need batch insert on other databases you can use knex directly<br>through <code>YourModel.knexQuery()</code>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelsOrObjects</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+|
+
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">Array.&lt;Object></span>
+|
+
+<span class="param-type">Array.&lt;<a href="Model.html">Model</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Objects to insert.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="insertAndFetch">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">insertAndFetch</span>
+          <span class="signature-container"><span class="signature">(modelsOrObjects)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Just like <code>insert</code> but also fetches the model afterwards.</p>
+<p>Note that on postgresql you can just chain <code>.returning('*')</code> to the normal insert method<br>to get the same result without an additional query.</p>
     </div>
     
 
@@ -4014,11 +4214,12 @@ through <code>YourModel.knexQuery()</code>.</p>
     
     <div class="description">
         <p>Insert models with relations.</p>
+<p>You can insert any asyclic graph of models like this:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .insertWithRelated({
     firstName: 'Sylvester',
-    lasName: 'Stallone',
+    lastName: 'Stallone',
 
     children: [{
       firstName: 'Sage',
@@ -4029,33 +4230,42 @@ through <code>YourModel.knexQuery()</code>.</p>
         species: 'dog'
       }]
     }]
-  });</code></pre><p>The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create
-relationships between them as defined in the <code>relationMappings</code> of the models.</p>
-<p>If you need to relate the same model in multiple places you can use the
-special keys <code>#id</code> and <code>#ref</code> like this:</p>
+  });</code></pre><p>The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create<br>relationships between them as defined in the <code>relationMappings</code> of the models.</p>
+<p>If you need to refer to the same model in multiple places you can use the<br>special properties <code>#id</code> and <code>#ref</code> like this:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .insertWithRelated([{
-    firstName: 'Sylvester',
-    lastName: 'Stallone',
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
     movies: [{
       &quot;#id&quot;: 'Silver Linings Playbook'
       name: 'Silver Linings Playbook',
-      duration: 118
+      duration: 122
     }]
   }, {
     firstName: 'Bradley',
     lastName: 'Cooper',
+
     movies: [{
       &quot;#ref&quot;: 'Silver Linings Playbook'
     }]
-  }]);</code></pre><p>This will insert only one movie (the 'Silver Linings Playbook') but both
-'Jennifer' and 'Bradley' will have the movie related to them through the
-many-to-many relation <code>movies</code>.</p>
-<p>See the <code>allowInsert</code> method if you need to limit which relations can
-be inserted using this method.</p>
-<p>By the way, if you are using Postgres the inserts are done in batches for
-maximum performance.</p>
+  }]);</code></pre><p>The query above will insert only one movie (the 'Silver Linings Playbook') but<br>both 'Jennifer' and 'Bradley' will have the movie related to them through the<br>many-to-many relation <code>movies</code>.</p>
+<p>You can refer to the properties of other models in the graph using expressions<br>of format <code>#ref{&lt;id&gt;.&lt;property&gt;}</code> for example:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .insertWithRelated([{
+    &quot;#id&quot;: 'jenniLaw',
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    pets: [{
+      name: &quot;I am the dog of #ref{jenniLaw.firstName} #ref{jenniLaw.lastName}&quot;,
+      species: 'dog'
+    }]
+  }]);</code></pre><p>The query above will insert a pet named <code>I am the dog of Jennifer Lawrence</code> for Jennifer.</p>
+<p>See the <code>allowInsert</code> method if you need to limit which relations can be inserted using<br>this method to avoid security issues.</p>
+<p>By the way, if you are using Postgres the inserts are done in batches for<br>maximum performance.</p>
     </div>
     
 
@@ -5482,10 +5692,7 @@ maximum performance.</p>
   .query()
   .eager('pets')
   .omit(Person, ['parentId', 'age'])
-  .omit(Animal, ['ownerId', 'species']);</code></pre><p>The first one goes through all models (including relations) and omits the properties
-<code>parentId</code> and <code>ownerId</code>. The second one also traverses the whole model tree and
-omits the properties <code>parentId</code> and <code>age</code> from all <code>Person</code> instances and <code>ownerId</code>
-and <code>species</code> properties of all <code>Animal</code> instances.</p>
+  .omit(Animal, ['ownerId', 'species']);</code></pre><p>The first one goes through all models (including relations) and omits the properties<br><code>parentId</code> and <code>ownerId</code>. The second one also traverses the whole model tree and<br>omits the properties <code>parentId</code> and <code>age</code> from all <code>Person</code> instances and <code>ownerId</code><br>and <code>species</code> properties of all <code>Animal</code> instances.</p>
     </div>
     
 
@@ -5671,8 +5878,7 @@ and <code>species</code> properties of all <code>Animal</code> instances.</p>
     
     <div class="description">
         <p>Functions registered with this method are called as the last thing before the query is built.</p>
-<p>Unlike the run<em> methods these must be synchronous. Also you should not register any run</em> methods
-from these. You should <em>only</em> call the query building methods of the builder provided as a parameter.</p>
+<p>Unlike the run<em> methods these must be synchronous. Also you should not register any run</em> methods<br>from these. You should <em>only</em> call the query building methods of the builder provided as a parameter.</p>
 <pre class="prettyprint source lang-js"><code>var query = Person.query();
 
 query
@@ -8307,19 +8513,16 @@ query
     
     <div class="description">
         <p>Creates an patch query.</p>
-<p>The patch object is validated against the model's <code>jsonSchema</code> <em>but</em> the <code>required</code> property
-of the <code>jsonSchema</code> is ignored. This way the properties in the patch object are still validated
-but an error isn't thrown if the patch object doesn't contain all required properties.</p>
+<p>The patch object is validated against the model's <code>jsonSchema</code> <em>but</em> the <code>required</code> property<br>of the <code>jsonSchema</code> is ignored. This way the properties in the patch object are still validated<br>but an error isn't thrown if the patch object doesn't contain all required properties.</p>
 <p>If validation fails the Promise is rejected with a <code>ValidationError</code>.</p>
-<p>NOTE: The return value of the patch query only contains the properties given to the patch
-method. This is because we don't make an additional fetch query after the patch.</p>
+<p>NOTE: The return value of the query will be the number of affected rows. If you want<br>the updated row as a result, you may want to use the <code>patchAndFetchById</code> method.</p>
 <p>Examples:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .patch({age: 24})
   .where('id', 134)
-  .then(function (patch) {
-    console.log(patch.toJSON());
+  .then(function (numberOfAffectedRows) {
+    console.log(numberOfAffectedRows);
   });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
@@ -8356,6 +8559,192 @@ method. This is because we don't make an additional fetch query after the patch.
 	</thead>
 
 	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelOrObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The patch object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="patchAndFetchById">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">patchAndFetchById</span>
+          <span class="signature-container"><span class="signature">(id, modelOrObject)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Patches a single model by id and fetches it from the database afterwards.</p>
+<p>The patch object is validated against the model's <code>jsonSchema</code> <em>but</em> the <code>required</code> property<br>of the <code>jsonSchema</code> is ignored. This way the properties in the patch object are still validated<br>but an error isn't thrown if the patch object doesn't contain all required properties.</p>
+<p>If validation fails the Promise is rejected with a <code>ValidationError</code>.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .patchAndFetchById(134, {age: 24})
+  .then(function (updatedModel) {
+    console.log(updatedModel.firstName);
+  });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .patchAndFetchById(134, {
+    age: Person.query().avg('age'),
+    firstName: Person.raw(&quot;'Jenni' || 'fer'&quot;)
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The identifier of the object to update.</p></td>
+        </tr>
+
 	
 
         <tr>
@@ -8481,10 +8870,7 @@ method. This is because we don't make an additional fetch query after the patch.
   .query()
   .eager('pets')
   .pick(Person, ['id', 'firstName'])
-  .pick(Animal, ['id', 'name']);</code></pre><p>The first one goes through all models (including relations) and discards all
-properties by <code>id</code> and <code>name</code>. The second one also traverses the whole model
-tree and discards all but <code>id</code> and <code>firstName</code> properties of all <code>Person</code>
-instances and <code>id</code> and <code>name</code> properties of all <code>Animal</code> instances.</p>
+  .pick(Animal, ['id', 'name']);</code></pre><p>The first one goes through all models (including relations) and discards all<br>properties by <code>id</code> and <code>name</code>. The second one also traverses the whole model<br>tree and discards all but <code>id</code> and <code>firstName</code> properties of all <code>Person</code><br>instances and <code>id</code> and <code>name</code> properties of all <code>Animal</code> instances.</p>
     </div>
     
 
@@ -9134,8 +9520,7 @@ instances and <code>id</code> and <code>name</code> properties of all <code>Anim
     
     <div class="description">
         <p>Relates an existing model to another model.</p>
-<p>This method doesn't create a new instance but only updates the foreign keys and in
-the case of ManyToMany relation, creates a join row to the join table.</p>
+<p>This method doesn't create a new instance but only updates the foreign keys and in<br>the case of ManyToMany relation, creates a join row to the join table.</p>
 <p>On Postgres multiple models can be related by giving an array of identifiers.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
@@ -9295,8 +9680,7 @@ the case of ManyToMany relation, creates a join row to the join table.</p>
     
     <div class="description">
         <p>Returns the amount of rows the current query would produce without <code>limit</code> and <code>offset</code> applied.</p>
-<p>Note that this executes a query (not the one we are building) and returns a Promise. Use it
-like this:</p>
+<p>Note that this executes a query (not the one we are building) and returns a Promise. Use it<br>like this:</p>
 <pre class="prettyprint source lang-js"><code>var query = Person
   .query()
   .where('age', '>', 20);
@@ -9821,9 +10205,7 @@ Promise.all([
     
     <div class="description">
         <p>Registers a function to be called when the builder is executed.</p>
-<p>These functions are executed as the last thing before any promise handlers
-registered using the <code>then</code> method. Multiple functions can be chained like
-<code>then</code> methods of a promise.</p>
+<p>These functions are executed as the last thing before any promise handlers<br>registered using the <code>then</code> method. Multiple functions can be chained like<br><code>then</code> methods of a promise.</p>
 <pre class="prettyprint source lang-js"><code>var query = Person.query();
 
 query
@@ -10651,9 +11033,7 @@ query.then();
     
     <div class="description">
         <p>Sets a custom query executor.</p>
-<p>Setting this will cause the query builder to not be executed. Instead the fully built
-query builder is passed to the function registered using this method and the function
-should execute some other query.</p>
+<p>Setting this will cause the query builder to not be executed. Instead the fully built<br>query builder is passed to the function registered using this method and the function<br>should execute some other query.</p>
     </div>
     
 
@@ -11355,8 +11735,7 @@ should execute some other query.</p>
     
     <div class="description">
         <p>Traverses through all models in the result, including the eagerly loaded relations.</p>
-<p>The optional first parameter can be a constructor. If given, the traverser
-function is only called for the models of that class.</p>
+<p>The optional first parameter can be a constructor. If given, the traverser<br>function is only called for the models of that class.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .eager('pets')
@@ -11428,8 +11807,7 @@ function is only called for the models of that class.</p>
 
             
 
-            <td class="description last"><p>The optional model class filter. If given, the traverser function is only
-   called for models of this class.</p></td>
+            <td class="description last"><p>The optional model class filter. If given, the traverser function is only<br>   called for models of this class.</p></td>
         </tr>
 
 	
@@ -11452,10 +11830,7 @@ function is only called for the models of that class.</p>
 
             
 
-            <td class="description last"><p>The traverser function that is called for each model. The first argument
-   is the model itself. If the model is in a relation of some other model
-   the second argument is the parent model and the third argument is the
-   name of the relation.</p></td>
+            <td class="description last"><p>The traverser function that is called for each model. The first argument<br>   is the model itself. If the model is in a relation of some other model<br>   the second argument is the parent model and the third argument is the<br>   name of the relation.</p></td>
         </tr>
 
 	
@@ -11827,9 +12202,7 @@ function is only called for the models of that class.</p>
     
     <div class="description">
         <p>Removes a connection between two models.</p>
-<p>Doesn't delete the models. Only removes the connection. For ManyToMany relations this
-deletes the join column from the join table. For other relation types this sets the
-join columns to null.</p>
+<p>Doesn't delete the models. Only removes the connection. For ManyToMany relations this<br>deletes the join column from the join table. For other relation types this sets the<br>join columns to null.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .where('id', 123)
@@ -11933,19 +12306,16 @@ join columns to null.</p>
     
     <div class="description">
         <p>Creates an update query.</p>
-<p>The update object is validated against the model's <code>jsonSchema</code>. If validation fails
-the Promise is rejected with a <code>ValidationError</code>.</p>
-<p>This method is meant for updating <em>whole</em> objects with all required properties. If you
-want to update a subset of properties use the <code>patch()</code> method.</p>
-<p>NOTE: The return value of the update query only contains the properties given to the update
-method. This is because we don't make an additional fetch query after the update.</p>
+<p>The update object is validated against the model's <code>jsonSchema</code>. If validation fails<br>the Promise is rejected with a <code>ValidationError</code>.</p>
+<p>This method is meant for updating <em>whole</em> objects with all required properties. If you<br>want to update a subset of properties use the <code>patch()</code> method.</p>
+<p>NOTE: The return value of the query will be the number of affected rows. If you want<br>the updated row as a result, you may want to use the <code>updateAndFetchById</code> method.</p>
 <p>Examples:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
   .where('id', 134)
-  .then(function (update) {
-    console.log(update.toJSON());
+  .then(function (numberOfAffectedRows) {
+    console.log(numberOfAffectedRows);
   });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
@@ -11983,6 +12353,193 @@ method. This is because we don't make an additional fetch query after the update
 	</thead>
 
 	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelOrObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The update object.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="updateAndFetchById">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">updateAndFetchById</span>
+          <span class="signature-container"><span class="signature">(id, modelOrObject)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Updates a single model by id and fetches it from the database afterwards.</p>
+<p>The update object is validated against the model's <code>jsonSchema</code>. If validation fails<br>the Promise is rejected with a <code>ValidationError</code>.</p>
+<p>This method is meant for updating <em>whole</em> objects with all required properties. If you<br>want to update a subset of properties use the <code>patchAndFetchById()</code> method.</p>
+<p>Examples:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .updateAndFetchById(134, {firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .then(function (updatedModel) {
+    console.log(updatedModel.firstName);
+  });</code></pre><p>You can also give raw expressions and subqueries as values like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .updateAndFetchById(134, {
+    firstName: Person.raw(&quot;'Jenni' || 'fer'&quot;),
+    lastName: 'Lawrence',
+    age: Person.query().avg('age')
+  });</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The identifier of the object to update.</p></td>
+        </tr>
+
 	
 
         <tr>
@@ -12657,14 +13214,9 @@ Person
     
     <div class="description">
         <p>Where referred json field value casted to same type with value fulfill given operand.</p>
-<p>Value may be number, string, null, boolean and referred json field is converted
-to TEXT, NUMERIC or BOOLEAN sql type for comparison.</p>
-<p>If left hand field does not exist rows appear IS null so if one needs to get only
-rows, which has key and it's value is null one may use e.g.
-<code>.whereJsonSupersetOf(&quot;column&quot;, { field: null })</code> or check is key exist and
-then <code>.whereJsonField('column:field', 'IS', null)</code></p>
-<p>For testing against objects or arrays one should see tested with whereJsonEqual,
-whereJsonSupersetOf and whereJsonSubsetOf methods.</p>
+<p>Value may be number, string, null, boolean and referred json field is converted<br>to TEXT, NUMERIC or BOOLEAN sql type for comparison.</p>
+<p>If left hand field does not exist rows appear IS null so if one needs to get only<br>rows, which has key and it's value is null one may use e.g.<br><code>.whereJsonSupersetOf(&quot;column&quot;, { field: null })</code> or check is key exist and<br>then <code>.whereJsonField('column:field', 'IS', null)</code></p>
+<p>For testing against objects or arrays one should see tested with whereJsonEqual,<br>whereJsonSupersetOf and whereJsonSubsetOf methods.</p>
     </div>
     
 
@@ -14061,13 +14613,11 @@ Person
     // These persons' first dog name is &quot;peter&quot;, but the dog might have
     // additional attributes as well.
   });</code></pre><p>Object and array are always their own supersets.</p>
-<p>For arrays this means that left side matches if it has all the elements
-listed in the right hand side. e.g.</p>
+<p>For arrays this means that left side matches if it has all the elements<br>listed in the right hand side. e.g.</p>
 <pre class="prettyprint source"><code>[1,2,3] isSuperSetOf [2] => true
 [1,2,3] isSuperSetOf [2,1,3] => true
 [1,2,3] isSuperSetOf [2,null] => false
-[1,2,3] isSuperSetOf [] => true</code></pre><p>Not variants with jsonb operators behave in a way that they won't match rows, which does not have
-the referred json key referred in field expression. e.g. for table</p>
+[1,2,3] isSuperSetOf [] => true</code></pre><p>Not variants with jsonb operators behave in a way that they won't match rows, which does not have<br>the referred json key referred in field expression. e.g. for table</p>
 <pre class="prettyprint source"><code> id |    jsonObject
 ----+--------------------------
   1 | {}
@@ -14075,8 +14625,7 @@ the referred json key referred in field expression. e.g. for table</p>
   3 | {&quot;a&quot;: 1}
   4 | {&quot;a&quot;: 1, &quot;b&quot;: 2}
   5 | {&quot;a&quot;: ['3'], &quot;b&quot;: ['3']}</code></pre><p>query:</p>
-<pre class="prettyprint source lang-js"><code>builder.whereJsonNotEquals(&quot;jsonObject:a&quot;, &quot;jsonObject:b&quot;)</code></pre><p>Returns only the row <code>4</code> which has keys <code>a</code> and <code>b</code> and <code>a</code> != <code>b</code>, but it won't return any rows which
-does not have <code>jsonObject.a</code> or <code>jsonObject.b</code>.</p>
+<pre class="prettyprint source lang-js"><code>builder.whereJsonNotEquals(&quot;jsonObject:a&quot;, &quot;jsonObject:b&quot;)</code></pre><p>Returns only the row <code>4</code> which has keys <code>a</code> and <code>b</code> and <code>a</code> != <code>b</code>, but it won't return any rows which<br>does not have <code>jsonObject.a</code> or <code>jsonObject.b</code>.</p>
     </div>
     
 
@@ -14980,8 +15529,8 @@ does not have <code>jsonObject.a</code> or <code>jsonObject.b</code>.</p>
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Thu Oct 8th 2015 using the <a
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+		on Sat Nov 21st 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

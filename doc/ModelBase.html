@@ -154,6 +154,10 @@
 						</li>
 						
 						<li>
+							<a href="global.html#start">start</a>
+						</li>
+						
+						<li>
 							<a href="global.html#toJsonArray">toJsonArray</a>
 						</li>
 						
@@ -179,6 +183,10 @@
 						
 						<li>
 							<a href="global.html#tryCallWriteMethod">tryCallWriteMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#tryValidate">tryValidate</a>
 						</li>
 						
 						<li>
@@ -244,8 +252,7 @@
     
     <div class="description">
         <p>Base class for models.</p>
-<p>ModelBase provides a mechanism for automatic JSON validation and a way to attach
-functionality to plain javascript objects. A subclass can be created like this:</p>
+<p>ModelBase provides a mechanism for automatic JSON validation and a way to attach<br>functionality to plain javascript objects. A subclass can be created like this:</p>
 <pre class="prettyprint source lang-js"><code>function Person() {
   ModelBase.apply(this, arguments);
 }
@@ -276,9 +283,7 @@ var person2 = Person.fromJson({firstName: 10});</code></pre><p>Properties that a
 person.$spam = 100;
 
 console.log(person); // --> {firstName: 'Jennifer'}
-console.log(person.$toJson()); // --> {firstName: 'Jennifer'}</code></pre><p>ModelBase makes it possible to have a different database representation for a model.
-For example if your column names are snake_cased in the database but you want to use
-camelCased properties in the code and outside the server you can do this:</p>
+console.log(person.$toJson()); // --> {firstName: 'Jennifer'}</code></pre><p>ModelBase makes it possible to have a different database representation for a model.<br>For example if your column names are snake_cased in the database but you want to use<br>camelCased properties in the code and outside the server you can do this:</p>
 <pre class="prettyprint source lang-js"><code>// This is called when an object is serialized to database format.
 Person.prototype.$formatDatabaseJson = function (json) {
   // Call superclass implementation.
@@ -923,13 +928,159 @@ Person.prototype.$parseDatabaseJson = function (json) {
 
     <div class="param-desc">
     
-        <p>ValidationError
-   If validation fails.</p>
+        <p>ValidationError<br>   If validation fails.</p>
     
     </div>
 
 
         
+    
+    
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="_P_omitImpl">
+          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
+          <span class="content">omitImpl</span>
+          <span class="signature-container"><span class="signature">(obj, prop)</span><span class="type-signature"></span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Omit implementation to use.</p>
+<p>The default just sets the property to undefined for performance reasons.<br>If the slight performance drop is not an issue for you, you can override<br>this method to delete the property instead.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>obj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>prop</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
     
     
     
@@ -1348,8 +1499,7 @@ Person.prototype.$parseDatabaseJson = function (json) {
     
     <div class="description">
         <p>Returns a deep copy of this model.</p>
-<p>If this object has instances of ModelBase as properties (or arrays of them)
-they are cloned using their <code>.$clone()</code> method.</p>
+<p>If this object has instances of ModelBase as properties (or arrays of them)<br>they are cloned using their <code>.$clone()</code> method.</p>
     </div>
     
 
@@ -1736,9 +1886,7 @@ they are cloned using their <code>.$clone()</code> method.</p>
     
     <div class="description">
         <p>Omits a set of properties.</p>
-<p>The selected properties are set to <code>undefined</code>. Note that this is done in-place.
-Properties are set to undefined instead of deleting them for performance reasons
-(V8 doesn't like delete).</p>
+<p>The selected properties are set to <code>undefined</code>. Note that this is done in-place.<br>Properties are set to undefined instead of deleting them for performance reasons<br>(V8 doesn't like delete).</p>
 <pre class="prettyprint source lang-js"><code>var json = person
   .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
   .$omit('lastName')
@@ -2218,9 +2366,7 @@ console.log(_.has(json, 'lastName')); // --> false</code></pre>
     
     <div class="description">
         <p>Picks a set of properties.</p>
-<p>All other properties but the selected ones are set to <code>undefined</code>. Note that
-this is done in-place. Properties are set to undefined instead of deleting
-them for performance reasons (V8 doesn't like delete).</p>
+<p>All other properties but the selected ones are set to <code>undefined</code>. Note that<br>this is done in-place. Properties are set to undefined instead of deleting<br>them for performance reasons (V8 doesn't like delete).</p>
 <pre class="prettyprint source lang-js"><code>var json = person
   .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
   .$pick('firstName', 'age')
@@ -2363,8 +2509,7 @@ console.log(_.has(json, 'lastName')); // --> false</code></pre>
     
     <div class="description">
         <p>Sets the values from another model or object.</p>
-<p>Unlike $setJson, this doesn't call any <code>$parseJson</code> methods or validate the input.
-This simply sets each value in the object to this object.</p>
+<p>Unlike $setJson, this doesn't call any <code>$parseJson</code> methods or validate the input.<br>This simply sets each value in the object to this object.</p>
     </div>
     
 
@@ -2759,8 +2904,7 @@ This simply sets each value in the object to this object.</p>
 
     <div class="param-desc">
     
-        <p>ValidationError
-   If validation fails.</p>
+        <p>ValidationError<br>   If validation fails.</p>
     
     </div>
 
@@ -2988,9 +3132,7 @@ This simply sets each value in the object to this object.</p>
     
     <div class="description">
         <p>Validates the given JSON object.</p>
-<p>Calls <code>$beforeValidation</code> and <code>$afterValidation</code> methods. This method is called
-automatically from <code>fromJson</code> and <code>$setJson</code> methods. This method can also be
-called explicitly when needed.</p>
+<p>Calls <code>$beforeValidation</code> and <code>$afterValidation</code> methods. This method is called<br>automatically from <code>fromJson</code> and <code>$setJson</code> methods. This method can also be<br>called explicitly when needed.</p>
     </div>
     
 
@@ -3290,8 +3432,8 @@ called explicitly when needed.</p>
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Thu Oct 8th 2015 using the <a
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+		on Sat Nov 21st 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

@@ -154,6 +154,10 @@
 						</li>
 						
 						<li>
+							<a href="global.html#start">start</a>
+						</li>
+						
+						<li>
 							<a href="global.html#toJsonArray">toJsonArray</a>
 						</li>
 						
@@ -179,6 +183,10 @@
 						
 						<li>
 							<a href="global.html#tryCallWriteMethod">tryCallWriteMethod</a>
+						</li>
+						
+						<li>
+							<a href="global.html#tryValidate">tryValidate</a>
 						</li>
 						
 						<li>
@@ -434,12 +442,8 @@
     
     <div class="description">
         <p>Field expression how to refer certain nested field inside jsonb column.</p>
-<p>Table.jsonColumn:obj[key.with.dots][0].key.0.me[0] refers to
-obj = { &quot;key.with.dots&quot; : [{&quot;key&quot; : { &quot;0&quot;: { me : [ &quot;I was referred&quot; ] }}}]</p>
-<p>Since PostgreSql #&gt;{field,0,field2,...} operator does not make difference if
-reference is string or a number, one can actually use also jsonArray.0 notation
-to refer index of an array. Like wise one can use object[123] notation to refer
-key of an object { &quot;123&quot; : null }.</p>
+<p>Table.jsonColumn:obj[key.with.dots][0].key.0.me[0] refers to<br>obj = { &quot;key.with.dots&quot; : [{&quot;key&quot; : { &quot;0&quot;: { me : [ &quot;I was referred&quot; ] }}}]</p>
+<p>Since PostgreSql #&gt;{field,0,field2,...} operator does not make difference if<br>reference is string or a number, one can actually use also jsonArray.0 notation<br>to refer index of an array. Like wise one can use object[123] notation to refer<br>key of an object { &quot;123&quot; : null }.</p>
     </div>
     
 
@@ -602,6 +606,172 @@ key of an object { &quot;123&quot; : null }.</p>
             
         
             
+              
+<dt>
+    
+        <h4 class="name" id="start">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">start</span>
+          <span class="signature-container"><span class="signature">(modelClassOrKnex)</span><span class="type-signature"> &rarr; {Promise}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Starts a transaction.</p>
+<p>The returned promise is resolved with a knex transaction object that can be used as<br>a query builder. You can bind <code>Model</code> classes to the transaction using the <code>Model.bindTransaction</code><br>method. The transaction object has <code>commit</code> and <code>rollback</code> methods for committing and<br>rolling back the transaction.</p>
+<pre class="prettyprint source lang-js"><code>var Person = require('./models/Person');
+var transaction;
+
+objection.transaction.start(Person).then(function (trx) {
+  transaction = trx;
+  return Person
+    .bindTransaction(transaction)
+    .query()
+    .insert({firstName: 'Jennifer'});
+}).then(function (jennifer) {
+  return Person
+    .bindTransaction(transaction)
+    .query()
+    .patch({lastName: 'Lawrence'})
+    .where('id', jennifer.id);
+}).then(function () {
+  return transaction.commit();
+}).catch(function () {
+  return transaction.rollback();
+});</code></pre>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>modelClassOrKnex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Model.html">Model</a></span>
+|
+
+<span class="param-type">knex</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>A knex instance or any model that has a knex connection set. Note that you can bind any model<br>   to the created transaction regardless of the model given to this method. This argument is used<br>   only to get a knex connection for starting the transaction.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Promise</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
         
             
         
@@ -625,12 +795,8 @@ key of an object { &quot;123&quot; : null }.</p>
     
     <div class="description">
         <p>Starts a transaction.</p>
-<p>Give the the model classes you want to use in the transaction as arguments to this
-function. The model classes are bound to a newly created transaction and passed to
-the callback. All queries created using the bound model classes or any result acquired
-through them take part in the same transaction.</p>
-<p>You must return a promise from the callback. If this promise is fulfilled the transaction
-is committed. If the promise is rejected the transaction is rolled back.</p>
+<p>Give the the model classes you want to use in the transaction as arguments to this<br>function. The model classes are bound to a newly created transaction and passed to<br>the callback. All queries created using the bound model classes or any result acquired<br>through them take part in the same transaction.</p>
+<p>You must return a promise from the callback. If this promise is fulfilled the transaction<br>is committed. If the promise is rejected the transaction is rolled back.</p>
 <p>Examples:</p>
 <pre class="prettyprint source lang-js"><code>objection.transaction(Person, Animal, function (Person, Animal) {
 
@@ -645,9 +811,7 @@ is committed. If the promise is rejected the transaction is rolled back.</p>
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-});</code></pre><p>Related model classes are automatically bound to the same transaction. So if you use
-<code>Animal</code> implicitly through <code>Person</code>'s relations you don't have to bind Animal explicitly.
-The following example clarifies this:</p>
+});</code></pre><p>Related model classes are automatically bound to the same transaction. So if you use<br><code>Animal</code> implicitly through <code>Person</code>'s relations you don't have to bind Animal explicitly.<br>The following example clarifies this:</p>
 <pre class="prettyprint source lang-js"><code>objection.transaction(Person, function (Person) {
 
  return Person
@@ -663,8 +827,7 @@ The following example clarifies this:</p>
   console.log('Jennifer and Scrappy were successfully inserted');
 }).catch(function (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-});</code></pre><p>Inside the callback <code>this</code> is the knex transaction object. So if you need to create
-knex queries you can do this:</p>
+});</code></pre><p>Inside the callback <code>this</code> is the knex transaction object. So if you need to create<br>knex queries you can do this:</p>
 <pre class="prettyprint source lang-js"><code>objection.transaction(Person, function (Person) {
  var knex = this;
 
@@ -762,6 +925,8 @@ knex queries you can do this:</p>
             
         
             
+        
+            
               
 <dt>
     
@@ -779,8 +944,7 @@ knex queries you can do this:</p>
     
     <div class="description">
         <p>Where jsonb reference on left hand side is compared to jsonb value or reference on the right hand side.</p>
-<p>Converts left and right hand values to PostgreSQL acceptable format and add user chosen
-operator between left and right hand expressions.</p>
+<p>Converts left and right hand values to PostgreSQL acceptable format and add user chosen<br>operator between left and right hand expressions.</p>
 <pre class="prettyprint source lang-javascript"><code>whereJsonbRefOnLeftJsonbValOrRefOnRight(queryBuilder, &quot;ModelJson.jsonObject:objectField&quot;, &quot;&lt;@&quot;, { key: 1 })</code></pre><pre class="prettyprint source lang-sql"><code>select * from &quot;ModelJson&quot; where (&quot;ModelJson&quot;.&quot;jsonObject&quot;#>'{objectField}')::jsonb &lt;@ '{\&quot;key\&quot;:\ 1}'::jsonb</code></pre>
     </div>
     
@@ -1286,9 +1450,7 @@ operator between left and right hand expressions.</p>
     
     <div class="description">
         <p>Json field expression to refer to jsonb columns or keys / objects inside columns.</p>
-<p>e.g. <code>Person.jsonColumnName:details.names[1]</code> would refer to column
-<code>Person.jsonColumnName</code> which has <code>{ details: { names: ['First', 'Second', 'Last'] } }</code>
-object stored in it.</p>
+<p>e.g. <code>Person.jsonColumnName:details.names[1]</code> would refer to column<br><code>Person.jsonColumnName</code> which has <code>{ details: { names: ['First', 'Second', 'Last'] } }</code><br>object stored in it.</p>
     </div>
     
 
@@ -1421,9 +1583,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>If true the json is treated as a patch and the <code>required</code> field of the json schema is
-   ignored in the validation. This allows us to create models with a subset of required
-   properties for patch operations.</p></td>
+            <td class="description last"><p>If true the json is treated as a patch and the <code>required</code> field of the json schema is<br>   ignored in the validation. This allows us to create models with a subset of required<br>   properties for patch operations.</p></td>
         </tr>
 
 	
@@ -1583,9 +1743,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>The relation column in the owner table. Must be given with the table name.
-   For example <code>Person.id</code>. Note that neither this nor <code>to</code> need to be foreign
-   keys or primary keys. You can join any column to any column.</p></td>
+            <td class="description last"><p>The relation column in the owner table. Must be given with the table name.<br>   For example <code>Person.id</code>. Note that neither this nor <code>to</code> need to be foreign<br>   keys or primary keys. You can join any column to any column.</p></td>
         </tr>
 
 	
@@ -1608,9 +1766,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>The relation column in the related table. Must be given with the table name.
-   For example <code>Movie.id</code>. Note that neither this nor <code>from</code> need to be foreign
-   keys or primary keys. You can join any column to any column.</p></td>
+            <td class="description last"><p>The relation column in the related table. Must be given with the table name.<br>   For example <code>Movie.id</code>. Note that neither this nor <code>from</code> need to be foreign<br>   keys or primary keys. You can join any column to any column.</p></td>
         </tr>
 
 	
@@ -1674,8 +1830,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>The column that is joined to <code>from</code> property of the <code>RelationJoin</code>. For example
-   <code>Person_Movie.actorId</code> where <code>Person_Movie</code> is the join table.</p></td>
+            <td class="description last"><p>The column that is joined to <code>from</code> property of the <code>RelationJoin</code>. For example<br>   <code>Person_Movie.actorId</code> where <code>Person_Movie</code> is the join table.</p></td>
         </tr>
 
 	
@@ -1698,8 +1853,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>The column that is joined to <code>to</code> property of the <code>RelationJoin</code>. For example
-   <code>Person_Movie.movieId</code> where <code>Person_Movie</code> is the join table.</p></td>
+            <td class="description last"><p>The column that is joined to <code>to</code> property of the <code>RelationJoin</code>. For example<br>   <code>Person_Movie.movieId</code> where <code>Person_Movie</code> is the join table.</p></td>
         </tr>
 
 	
@@ -1859,8 +2013,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>A relation constructor. You can use one of Model.OneToOneRelation, Model.OneToManyRelation and
-   Model.ManyToManyRelation or even write your own relation type by subclassing <a href="Relation.html">Relation</a>.</p></td>
+            <td class="description last"><p>A relation constructor. You can use one of Model.OneToOneRelation, Model.OneToManyRelation and<br>   Model.ManyToManyRelation or even write your own relation type by subclassing <a href="Relation.html">Relation</a>.</p></td>
         </tr>
 
 	
@@ -1892,8 +2045,7 @@ object stored in it.</p>
 
             
 
-            <td class="description last"><p>Additional filter for the relation. It can be either a hash of {column: 'value'} pairs or
-   a function that takes a QueryBuilder as a parameter.</p></td>
+            <td class="description last"><p>Additional filter for the relation. It can be either a hash of {column: 'value'} pairs or<br>   a function that takes a QueryBuilder as a parameter.</p></td>
         </tr>
 
 	
@@ -1988,8 +2140,8 @@ object stored in it.</p>
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-		on Thu Oct 8th 2015 using the <a
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+		on Sat Nov 21st 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
