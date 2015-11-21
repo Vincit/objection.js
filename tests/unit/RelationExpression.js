@@ -22,18 +22,21 @@ describe('RelationExpression', function () {
       testParse('a', {
         nodes: [{
           name: 'a',
+          args: [],
           children: []
         }]
       });
       testParse('[a]', {
         nodes: [{
           name: 'a',
+          args: [],
           children: []
         }]
       });
       testParse('[[[a]]]', {
         nodes: [{
           name: 'a',
+          args: [],
           children: []
         }]
       });
@@ -43,8 +46,10 @@ describe('RelationExpression', function () {
       testParse('a.b', {
         nodes: [{
           name: 'a',
+          args: [],
           children: [{
             name: 'b',
+            args: [],
             children: []
           }]
         }]
@@ -52,10 +57,13 @@ describe('RelationExpression', function () {
       testParse('a.b.c', {
         nodes: [{
           name: 'a',
+          args: [],
           children: [{
             name: 'b',
+            args: [],
             children: [{
               name: 'c',
+              args: [],
               children: []
             }]
           }]
@@ -67,12 +75,15 @@ describe('RelationExpression', function () {
       testParse('[a, b, c]', {
         nodes: [{
           name: 'a',
+          args: [],
           children: []
         }, {
           name: 'b',
+          args: [],
           children: []
         }, {
           name: 'c',
+          args: [],
           children: []
         }]
       });
@@ -82,21 +93,27 @@ describe('RelationExpression', function () {
       testParse('[a.b, c.d.e, f]', {
         nodes: [{
           name: 'a',
+          args: [],
           children: [{
             name: 'b',
+            args: [],
             children: []
           }]
         }, {
           name: 'c',
+          args: [],
           children: [{
             name: 'd',
+            args: [],
             children: [{
               name: 'e',
+              args: [],
               children: []
             }]
           }]
         }, {
           name: 'f',
+          args: [],
           children: []
         }]
       });
@@ -106,25 +123,58 @@ describe('RelationExpression', function () {
       testParse('[a.[b, c.[d, e.f]], g]', {
         nodes: [{
           name: 'a',
+          args: [],
           children: [{
             name: 'b',
+            args: [],
             children: []
           }, {
             name: 'c',
+            args: [],
             children: [{
               name: 'd',
+              args: [],
               children: []
             }, {
               name: 'e',
+              args: [],
               children: [{
                 name: 'f',
+                args: [],
                 children: []
               }]
             }]
           }]
         }, {
           name: 'g',
+          args: [],
           children: []
+        }]
+      });
+    });
+
+    it('arguments', function () {
+      testParse('[a(arg1, \narg2, arg3), \n \n b(arg4).[c(), d(arg5, arg6), e]]', {
+        nodes: [{
+          name: 'a',
+          args: ['arg1', 'arg2', 'arg3'],
+          children: []
+        }, {
+          name: 'b',
+          args: ['arg4'],
+          children: [{
+            name: 'c',
+            args: [],
+            children: []
+          }, {
+            name: 'd',
+            args: ['arg5', 'arg6'],
+            children: []
+          }, {
+            name: 'e',
+            args: [],
+            children: []
+          }]
         }]
       });
     });
