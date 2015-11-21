@@ -8,6 +8,7 @@
     "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
     "test-only": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
+    "test-bail": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail",
     "test-trace-opt": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --trace_opt --trace_deopt",
     "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },

@@ -306,6 +306,8 @@ describe('OneToManyRelation', function () {
   describe('update', function () {
 
     it('should generate an update query', function () {
+      mockKnexQueryResults = [42];
+
       var owner = OwnerModel.fromJson({oid: 666});
       var update = RelatedModel.fromJson({a: 'str1'});
 
@@ -319,11 +321,9 @@ describe('OneToManyRelation', function () {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(function (result) {
+      return builder.then(function (numUpdated) {
+        expect(numUpdated).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({a: 'str1'});
-        expect(result).to.be.a(RelatedModel);
-
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
@@ -331,6 +331,8 @@ describe('OneToManyRelation', function () {
     });
 
     it('should accept json object', function () {
+      mockKnexQueryResults = [42];
+
       var owner = OwnerModel.fromJson({oid: 666});
       var update = {a: 'str1'};
 
@@ -343,15 +345,16 @@ describe('OneToManyRelation', function () {
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(function (result) {
+        .then(function (numUpdated) {
+          expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
         });
     });
 
     it('should apply the filter', function () {
+      mockKnexQueryResults = [42];
+
       createFilteredRelation({someColumn: 100});
 
       var owner = OwnerModel.fromJson({oid: 666});
@@ -366,10 +369,9 @@ describe('OneToManyRelation', function () {
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(function (result) {
+        .then(function (numUpdated) {
+          expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\' and "someColumn" = \'100\'');
         });
     });
@@ -379,6 +381,8 @@ describe('OneToManyRelation', function () {
   describe('patch', function () {
 
     it('should generate a patch query', function () {
+      mockKnexQueryResults = [42];
+
       var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
@@ -392,11 +396,9 @@ describe('OneToManyRelation', function () {
         .whereNotNull('thingy')
         .select('shouldBeIgnored');
 
-      return builder.then(function (result) {
+      return builder.then(function (numUpdated) {
+        expect(numUpdated).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({a: 'str1'});
-        expect(result).to.be.a(RelatedModel);
-
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
@@ -404,6 +406,8 @@ describe('OneToManyRelation', function () {
     });
 
     it('should accept json object', function () {
+      mockKnexQueryResults = [42];
+
       RelatedModel.jsonSchema = {
         type: 'object',
         required: ['b'],
@@ -425,15 +429,15 @@ describe('OneToManyRelation', function () {
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(function (result) {
+        .then(function (numUpdated) {
+          expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
         });
     });
 
     it('should work with increment', function () {
+      mockKnexQueryResults = [42];
       var owner = OwnerModel.fromJson({oid: 666});
 
       return QueryBuilder
@@ -442,13 +446,15 @@ describe('OneToManyRelation', function () {
           relation.patch(this, owner, ptch);
         })
         .increment('test', 1)
-        .then(function () {
+        .then(function (numUpdated) {
+          expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + '1' where \"RelatedModel\".\"ownerId\" = '666'");
         });
     });
 
     it('should work with decrement', function () {
+      mockKnexQueryResults = [42];
       var owner = OwnerModel.fromJson({oid: 666});
 
       return QueryBuilder
@@ -457,7 +463,8 @@ describe('OneToManyRelation', function () {
           relation.patch(this, owner, ptch);
         })
         .decrement('test', 10)
-        .then(function () {
+        .then(function (numUpdated) {
+          expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - '10' where \"RelatedModel\".\"ownerId\" = '666'");
         });
@@ -478,10 +485,8 @@ describe('OneToManyRelation', function () {
         .where('gender', 'male')
         .whereNotNull('thingy')
         .select('shouldBeIgnored')
-        .then(function (result) {
+        .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\' and "someColumn" = \'100\'');
         });
     });

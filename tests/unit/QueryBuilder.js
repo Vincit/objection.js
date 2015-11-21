@@ -563,10 +563,11 @@ describe('QueryBuilder', function () {
       this.c = 'beforeUpdate';
     };
 
+    var model = TestModel.fromJson({a: 10, b: 'test'});
     QueryBuilder
       .forClass(TestModel)
-      .update(TestModel.fromJson({a: 10, b: 'test'}))
-      .then(function (model) {
+      .update(model)
+      .then(function () {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
@@ -582,10 +583,11 @@ describe('QueryBuilder', function () {
       });
     };
 
+    var model = TestModel.fromJson({a: 10, b: 'test'});
     QueryBuilder
       .forClass(TestModel)
-      .update({a: 10, b: 'test'})
-      .then(function (model) {
+      .update(model)
+      .then(function () {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
@@ -598,10 +600,11 @@ describe('QueryBuilder', function () {
       this.c = 'beforeUpdate';
     };
 
+    var model = TestModel.fromJson({a: 10, b: 'test'});
     QueryBuilder
       .forClass(TestModel)
-      .patch(TestModel.fromJson({a: 10, b: 'test'}))
-      .then(function (model) {
+      .patch(model)
+      .then(function () {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
@@ -617,10 +620,11 @@ describe('QueryBuilder', function () {
       });
     };
 
+    var model = TestModel.fromJson({a: 10, b: 'test'})
     QueryBuilder
       .forClass(TestModel)
-      .patch({a: 10, b: 'test'})
-      .then(function (model) {
+      .patch(model)
+      .then(function () {
         expect(model.c).to.equal('beforeUpdate');
         expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
         done();

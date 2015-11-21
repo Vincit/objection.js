@@ -320,6 +320,8 @@ describe('OneToOneRelation', function () {
   describe('update', function () {
 
     it('should generate an update query', function () {
+      mockKnexQueryResults = [42];
+
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = RelatedModel.fromJson({a: 'str1'});
 
@@ -330,11 +332,9 @@ describe('OneToOneRelation', function () {
         })
         .update(update);
 
-      return builder.then(function (result) {
+      return builder.then(function (numUpdates) {
+        expect(numUpdates).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({a: 'str1'});
-        expect(result).to.be.a(RelatedModel);
-
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
@@ -342,6 +342,8 @@ describe('OneToOneRelation', function () {
     });
 
     it('should accept json object', function () {
+      mockKnexQueryResults = [42];
+
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = {a: 'str1'};
 
@@ -351,10 +353,9 @@ describe('OneToOneRelation', function () {
           relation.update(this, owner, updt);
         })
         .update(update)
-        .then(function (result) {
+        .then(function (numUpdates) {
+          expect(numUpdates).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
         });
     });
@@ -371,10 +372,8 @@ describe('OneToOneRelation', function () {
           relation.update(this, owner, updt);
         })
         .update(update)
-        .then(function (result) {
+        .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\' and "someColumn" = \'foo\'');
         });
     });
@@ -384,6 +383,8 @@ describe('OneToOneRelation', function () {
   describe('patch', function () {
 
     it('should generate an patch query', function () {
+      mockKnexQueryResults = [42];
+
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var patch = RelatedModel.fromJson({a: 'str1'});
 
@@ -394,11 +395,9 @@ describe('OneToOneRelation', function () {
         })
         .patch(patch);
       
-      return builder.then(function (result) {
+      return builder.then(function (numUpdates) {
+        expect(numUpdates).to.equal(42);
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({a: 'str1'});
-        expect(result).to.be.a(RelatedModel);
-
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
@@ -406,6 +405,8 @@ describe('OneToOneRelation', function () {
     });
 
     it('should accept json object', function () {
+      mockKnexQueryResults = [42];
+
       RelatedModel.jsonSchema = {
         type: 'object',
         required: ['b'],
@@ -424,15 +425,15 @@ describe('OneToOneRelation', function () {
           relation.patch(this, owner, ptch);
         })
         .patch(patch)
-        .then(function (result) {
+        .then(function (numUpdates) {
+          expect(numUpdates).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\'');
         });
     });
 
     it('should work with increment', function () {
+      mockKnexQueryResults = [42];
       var owner = OwnerModel.fromJson({id: 666, relatedId: 1});
 
       return QueryBuilder
@@ -441,13 +442,15 @@ describe('OneToOneRelation', function () {
           relation.patch(this, owner, ptch);
         })
         .increment('test', 1)
-        .then(function () {
+        .then(function (numUpdates) {
+          expect(numUpdates).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + '1' where \"RelatedModel\".\"rid\" = '1'");
         });
     });
 
     it('should work with decrement', function () {
+      mockKnexQueryResults = [42];
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
       return QueryBuilder
@@ -456,13 +459,15 @@ describe('OneToOneRelation', function () {
           relation.patch(this, owner, ptch);
         })
         .decrement('test', 10)
-        .then(function () {
+        .then(function (numUpdates) {
+          expect(numUpdates).to.equal(42);
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - '10' where \"RelatedModel\".\"rid\" = '2'");
         });
     });
 
     it('should apply the filter', function () {
+      mockKnexQueryResults = [42];
       createFilteredRelation({someColumn: 'foo'});
 
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
@@ -474,10 +479,9 @@ describe('OneToOneRelation', function () {
           relation.patch(this, owner, patch);
         })
         .patch(update)
-        .then(function (result) {
+        .then(function (numUpdates) {
+          expect(numUpdates).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({a: 'str1'});
-          expect(result).to.be.a(RelatedModel);
           expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."rid" = \'2\' and "someColumn" = \'foo\'');
         });
     });

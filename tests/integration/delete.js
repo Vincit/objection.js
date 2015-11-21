@@ -38,7 +38,8 @@ module.exports = function (session) {
           .query()
           .delete()
           .where('id', '=', 2)
-          .then(function () {
+          .then(function (numDeleted) {
+            expect(numDeleted).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
@@ -53,7 +54,8 @@ module.exports = function (session) {
           .query()
           .delete()
           .where('model_2_prop_2', 1)
-          .then(function () {
+          .then(function (numDeleted) {
+            expect(numDeleted).to.equal(1);
             return session.knex('model_2').orderBy('id_col');
           })
           .then(function (rows) {
@@ -67,7 +69,8 @@ module.exports = function (session) {
           .query()
           .delete()
           .where('model1Prop1', '<', 'hello 3')
-          .then(function () {
+          .then(function (numDeleted) {
+            expect(numDeleted).to.equal(2);
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
@@ -95,7 +98,8 @@ module.exports = function (session) {
           .fromJson({id: 1})
           .$query()
           .delete()
-          .then(function () {
+          .then(function (numDeleted) {
+            expect(numDeleted).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
@@ -143,7 +147,8 @@ module.exports = function (session) {
           return parent1
             .$relatedQuery('model1Relation1')
             .delete()
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
             .then(function (rows) {
@@ -158,7 +163,8 @@ module.exports = function (session) {
           return parent2
             .$relatedQuery('model1Relation1')
             .delete()
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
             .then(function (rows) {
@@ -224,7 +230,8 @@ module.exports = function (session) {
           return parent1
             .$relatedQuery('model1Relation2')
             .delete()
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(3);
               return session.knex('model_2').orderBy('id_col');
             })
             .then(function (rows) {
@@ -240,7 +247,8 @@ module.exports = function (session) {
             .$relatedQuery('model1Relation2')
             .delete()
             .where('id_col', 2)
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(1);
               return session.knex('model_2').orderBy('id_col');
             })
             .then(function (rows) {
@@ -259,7 +267,8 @@ module.exports = function (session) {
             .delete()
             .where('model_2_prop_2', '<', 6)
             .where('model_2_prop_1', 'like', 'text %')
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(2);
               return session.knex('model_2').orderBy('id_col');
             })
             .then(function (rows) {
@@ -334,7 +343,8 @@ module.exports = function (session) {
           return parent1
             .$relatedQuery('model2Relation1')
             .delete()
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(3);
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(function (rows) {
@@ -352,7 +362,8 @@ module.exports = function (session) {
             .$relatedQuery('model2Relation1')
             .delete()
             .where('Model1.id', 5)
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(1);
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(function (rows) {
@@ -373,7 +384,8 @@ module.exports = function (session) {
             .delete()
             .where('model1Prop1', 'like', 'blaa 4')
             .orWhere('model1Prop1', 'like', 'blaa 6')
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(2);
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(function (rows) {
@@ -392,7 +404,8 @@ module.exports = function (session) {
             .$relatedQuery('model2Relation1')
             .delete()
             .where('model1Prop2', '<', 6)
-            .then(function () {
+            .then(function (numDeleted) {
+              expect(numDeleted).to.equal(2);
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(function (rows) {

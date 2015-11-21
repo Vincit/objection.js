@@ -205,6 +205,92 @@ module.exports = function (session) {
 
     });
 
+    describe('.query().insertAndFetch()', function () {
+
+      beforeEach(function () {
+        return session.populate([{
+          id: 1,
+          model1Prop1: 'hello 1',
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'test 1'
+          }, {
+            idCol: 2,
+            model2Prop1: 'test 2'
+          }]
+        }, {
+          id: 2,
+          model1Prop1: 'hello 2'
+        }]);
+      });
+
+      it('should insert and fetch new model', function () {
+        var model = Model1.fromJson({model1Prop1: 'hello 3'});
+
+        return Model1
+          .query()
+          .insertAndFetch(model)
+          .then(function (inserted) {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted).to.equal(model);
+            expect(inserted).to.eql({
+              id: 3,
+              model1Prop1: 'hello 3',
+              model1Prop2: null,
+              model1Id: null,
+              $beforeInsertCalled: true,
+              $afterInsertCalled: true
+            });
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
+      if (utils.isPostgres(session.knex)) {
+        it('should insert and fetch an array of new models', function () {
+          var model1 = Model1.fromJson({model1Prop1: 'hello 3'});
+          var model2 = Model1.fromJson({model1Prop1: 'hello 4', model1Prop2: 10});
+
+          return Model1
+            .query()
+            .insertAndFetch([model1, model2])
+            .then(function (inserted) {
+              expect(inserted).to.have.length(2);
+
+              expect(inserted[0]).to.be.a(Model1);
+              expect(inserted[0]).to.equal(model1);
+              expect(inserted[0]).to.eql({
+                id: 3,
+                model1Prop1: 'hello 3',
+                model1Prop2: null,
+                model1Id: null,
+                $beforeInsertCalled: true,
+                $afterInsertCalled: true
+              });
+
+              expect(inserted[1]).to.be.a(Model1);
+              expect(inserted[1]).to.equal(model2);
+              expect(inserted[1]).to.eql({
+                id: 4,
+                model1Prop1: 'hello 4',
+                model1Prop2: 10,
+                model1Id: null,
+                $beforeInsertCalled: true,
+                $afterInsertCalled: true
+              });
+
+              return session.knex(Model1.tableName);
+            })
+            .then(function (rows) {
+              expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
+            });
+        });
+      }
+
+    });
+
     describe('.$query().insert()', function () {
 
       beforeEach(function () {
