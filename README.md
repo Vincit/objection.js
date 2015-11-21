@@ -858,8 +858,8 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 #### Breaking changes
 
- * QueryBuilder methods `update`, `patch` and `delete` now return the number of affected rows
-   the new methods `updateAndFetchById` and `patchAndFetchById` may help with the migration
+ * QueryBuilder methods `update`, `patch` and `delete` now return the number of affected rows.
+   The new methods `updateAndFetchById` and `patchAndFetchById` may help with the migration
  * `modelInstance.$query()` instance method now returns a single model instead of an array
  * Removed `Model.generateId()` method. `$beforeInsert` can be used instead
 
