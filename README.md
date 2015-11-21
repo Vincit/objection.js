@@ -360,7 +360,7 @@ Person
   .then(function (persons) {
     console.log(persons[0].children[0].pets[0].name);
     console.log(persons[0].children[0].movies[0].id); 
- });
+  });
 ```
 
 The expressions can be arbitrarily deep. See the full description [here](http://vincit.github.io/objection.js/RelationExpression.html).
@@ -572,7 +572,7 @@ objection.transaction(Person, function (Person) {
 The second way to use transactions is to express the transaction as an object and bind model classes to the transaction
 when you use them. This way is more convenient when you need to pass the transaction to functions and services.
 
-The transaction object can be created using the [objection.transaction.start](http://vincit.github.io/objection.js/global.html#transaction#start)
+The transaction object can be created using the [objection.transaction.start](http://vincit.github.io/objection.js/global.html#start)
 method. You need to remember to call either the `commit` or `rollback` method of the transaction object.
 
 ```js
