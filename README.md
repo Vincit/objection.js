@@ -424,7 +424,8 @@ Person
 ```
 
 The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined 
-in the `relationMappings` of the models.
+in the `relationMappings` of the models. Technically `insertWithRelated` builds a dependency graph from the object
+tree and inserts the models that don't depend on any other models until the whole tree is inserted.
 
 If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
 
@@ -436,7 +437,7 @@ Person
     lastName: 'Lawrence',
 
     movies: [{
-      "#id": 'Silver Linings Playbook'
+      "#id": 'silverLiningsPlaybook'
       name: 'Silver Linings Playbook',
       duration: 122
     }]
@@ -445,13 +446,15 @@ Person
     lastName: 'Cooper',
 
     movies: [{
-      "#ref": 'Silver Linings Playbook'
+      "#ref": 'silverLiningsPlaybook'
     }]
   }]);
 ```
 
 The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have 
-the movie related to them through the many-to-many relation `movies`.
+the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format
+or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily
+`insertWithRelated` detects them and rejects the query with a clear error message.
 
 You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}` 
 as long as the reference doesn't create a circular dependency. For example:
@@ -471,10 +474,12 @@ Person
   }]);
 ```
 
-The query above will insert a pet named `I am the dog of Jennifer Lawrence` for Jennifer.
+The query above will insert a pet named `I am the dog of Jennifer Lawrence` for Jennifer. If `#ref{}` is used within a
+string, the references are replaced with the referred values inside the string. If the reference string contains nothing
+but the reference, the referred value is copied to it's place preserving its type.
 
-See the `allowInsert` method if you need to limit which relations can be inserted using this method to avoid security
-issues.
+See the [allowInsert](http://vincit.github.io/objection.js/QueryBuilder.html#allowInsert) method if you need to limit 
+which relations can be inserted using `insertWithRelated` method to avoid security issues.
 
 By the way, if you are using Postgres the inserts are done in batches for maximum performance.
 
@@ -616,13 +621,13 @@ Now that you have an idea how the `bindTransaction` works you should see that th
 also be implemented like this:
 
 ```js
-// You need to pass some model (any model with a knex connection)
-// or the knex connection itself to the start method.
 var BoundPerson;
 var BoundMovie;
+
 objection.transaction.start(Person).then(function (transaction) {
   BoundPerson = Person.bindTransaction(transaction);
   BoundMovie = Movie.bindTransaction(transaction);
+  
   return BoundPerson
     .query()
     .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
