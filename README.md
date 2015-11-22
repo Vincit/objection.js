@@ -468,15 +468,15 @@ Person
     lastName: 'Lawrence',
 
     pets: [{
-      name: "I am the dog of #ref{jenniLaw.firstName} #ref{jenniLaw.lastName}",
+      name: "I am the dog of #ref{jenniLaw.firstName} whose id is #ref{jenniLaw.id}",
       species: 'dog'
     }]
   }]);
 ```
 
-The query above will insert a pet named `I am the dog of Jennifer Lawrence` for Jennifer. If `#ref{}` is used within a
-string, the references are replaced with the referred values inside the string. If the reference string contains nothing
-but the reference, the referred value is copied to it's place preserving its type.
+The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used 
+within a string, the references are replaced with the referred values inside the string. If the reference string
+contains nothing but the reference, the referred value is copied to it's place preserving its type.
 
 See the [allowInsert](http://vincit.github.io/objection.js/QueryBuilder.html#allowInsert) method if you need to limit 
 which relations can be inserted using `insertWithRelated` method to avoid security issues.
