@@ -674,9 +674,7 @@ module.exports = function (session) {
       });
     });
 
-    // TODO: waiting for workaround / solution for knex issue: https://github.com/tgriesser/knex/issues/519
-    //       and https://github.com/tgriesser/knex/pull/888
-    describe.skip('.whereJsonHasAny(fieldExpr, keys) and .whereJsonHasAll(fieldExpr, keys)', function () {
+    describe('.whereJsonHasAny(fieldExpr, keys) and .whereJsonHasAll(fieldExpr, keys)', function () {
       it('should throw error if null in input array', function () {
         expect(function () {
           BoundModel.query().whereJsonHasAny("jsonObject", [null]);
