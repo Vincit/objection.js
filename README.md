@@ -216,9 +216,9 @@ Person
   .query()
   .patch({lastName: 'Dinosaur'})
   .where('age', '>', 60)
-  .then(function (patch) {
+  .then(function (numUpdated) {
     console.log('all persons over 60 years old are now dinosaurs');
-    console.log(patch.lastName); // --> Dinosaur.
+    console.log(numUpdated, 'people were updated');.
   })
   .catch(function (err) {
     console.log(err.stack);
@@ -227,6 +227,26 @@ Person
 
 ```sql
 update "Person" set "lastName" = 'Dinosaur' where "age" > 60
+```
+
+The `.patch()` and `.update()` method return the number of updated rows. If you want the fresly updated
+model as aresult you can use the helper method `.patchAndFetchById()` and `.updateAndFetchById()`.
+
+```js
+Person
+  .query()
+  .patchAndFetchById(246, {lastName: 'Updated'})
+  .then(function (updated) {
+    console.log(updated.lastName); // --> Updated.
+  })
+  .catch(function (err) {
+    console.log(err.stack);
+  });
+```
+
+```sql
+update "Person" set "lastName" = 'Updated' where "id" = 246
+select * from "Person" where "id" = 246
 ```
 
 While the static `.query()` method can be used to create a query to a whole table `.$relatedQuery()` method
