@@ -107,6 +107,15 @@ Person.prototype.$parseDatabaseJson = function (json) {
 };
 ```
 
+Note that even though column names are mapped when fetching / storing data, one still has to use
+correct db column names when writing queries:
+
+```js
+await Person.query().insert({ firstName: 'Jennifer' });
+let jen = await Person.query().where('first_name', 'Jennifer');
+expect(jen.firstName).to.equal('Jennifer');
+```
+
 ## Paging
 
 Any query can be paged using the [page](http://vincit.github.io/objection.js/QueryBuilder.html#page) or
