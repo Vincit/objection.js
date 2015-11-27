@@ -230,46 +230,50 @@ module.exports.populate = function (data) {
     createRows(jsonModel, models.Model1, insert);
   });
 
-  return Promise.all([
-    session.knex('Model1Model2').delete(),
-    session.knex('Model1').delete(),
-    session.knex('model_2').delete()
-  ]).then(function () {
-    return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).each(function (table) {
-      var rows = insert[table] || [];
+  return session.knex('Model1Model2').delete()
+    .then(function () {
+      return session.knex('Model1').delete();
+    })
+    .then(function () {
+      return session.knex('model_2').delete();
+    })
+    .then(function () {
+      return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).each(function (table) {
+        var rows = insert[table] || [];
 
-      if (_.isEmpty(rows)) {
-        return;
-      }
-
-      return session.knex(table).insert(rows).then(function () {
-        var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
-        var maxId = _.max(_.pluck(rows, idCol));
-
-        // Reset sequence.
-        if (utils.isSqlite(session.knex)) {
-          if (maxId && _.isFinite(maxId)) {
-            return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
-          }
-        } else if (utils.isPostgres(session.knex)) {
-          if (maxId && _.isFinite(maxId)) {
-            return session.knex.raw('ALTER SEQUENCE "' + table  + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
-          }
-        } else if (utils.isMySql(session.knex)) {
-          if (maxId && _.isFinite(maxId)) {
-            return session.knex.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
-          }
-        } else {
-          throw new Error('sequence truncate not implemented for the given database');
+        if (_.isEmpty(rows)) {
+          return;
         }
+
+        return session.knex(table).insert(rows).then(function () {
+          var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
+          var maxId = _.max(_.pluck(rows, idCol));
+
+          // Reset sequence.
+          if (utils.isSqlite(session.knex)) {
+            if (maxId && _.isFinite(maxId)) {
+              return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+            }
+          } else if (utils.isPostgres(session.knex)) {
+            if (maxId && _.isFinite(maxId)) {
+              return session.knex.raw('ALTER SEQUENCE "' + table  + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
+            }
+          } else if (utils.isMySql(session.knex)) {
+            if (maxId && _.isFinite(maxId)) {
+              return session.knex.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
+            }
+          } else {
+            throw new Error('sequence truncate not implemented for the given database');
+          }
+        });
       });
+    })
+    .then(function () {
+      return {
+        rows: insert,
+        tree: data
+      };
     });
-  }).then(function () {
-    return {
-      rows: insert,
-      tree: data
-    };
-  })
 };
 
 /**
