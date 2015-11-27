@@ -52,7 +52,7 @@ module.exports = function (session) {
       it('should delete a model (2)', function () {
         return Model2
           .query()
-          .delete()
+          .del()
           .where('model_2_prop_2', 1)
           .then(function (numDeleted) {
             expect(numDeleted).to.equal(1);

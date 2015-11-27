@@ -3,7 +3,9 @@ var _ = require('lodash')
   , expect = require('expect.js')
   , Promise = require('bluebird')
   , Model = require('../../lib/Model')
-  , QueryBuilder = require('../../lib/QueryBuilder');
+  , QueryBuilder = require('../../lib/QueryBuilder')
+  , QueryBuilderBase = require('../../lib/QueryBuilderBase')
+  , RelationExpression = require('../../lib/RelationExpression');
 
 describe('QueryBuilder', function () {
   var mockKnexQueryResult = [];
@@ -99,7 +101,7 @@ describe('QueryBuilder', function () {
 
   it('should pass node-style values to the asCallback method', function (done) {
     mockKnexQueryResult = [{a: 1}, {a: 2}];
-    var promise = QueryBuilder.forClass(TestModel).asCallback(function (err, models) {
+    QueryBuilder.forClass(TestModel).asCallback(function (err, models) {
       expect(models).to.eql(mockKnexQueryResult);
       done();
     });
@@ -107,7 +109,7 @@ describe('QueryBuilder', function () {
 
   it('should pass node-style values to the nodeify method', function (done) {
     mockKnexQueryResult = [{a: 1}, {a: 2}];
-    var promise = QueryBuilder.forClass(TestModel).nodeify(function (err, models) {
+    QueryBuilder.forClass(TestModel).nodeify(function (err, models) {
       expect(models).to.eql(mockKnexQueryResult);
       done();
     });
@@ -136,7 +138,11 @@ describe('QueryBuilder', function () {
       .where('id', 10)
       .where('height', '>', '180')
       .where({name: 'test'})
-      .orWhere(function () {
+      .orWhere(function (builder) {
+        // The builder passed to these functions should be a QueryBuilderBase instead of
+        // knex query builder.
+        expect(this).to.equal(builder);
+        expect(this).to.be.a(QueryBuilderBase);
         this.where('age', '<', 10).andWhere('eyeColor', 'blue');
       })
       .then(function () {
@@ -674,6 +680,34 @@ describe('QueryBuilder', function () {
         .setQueryExecutor(function () {})
         .setQueryExecutor(function () {});
     }).to.throwException();
+  });
+
+  it('clearEager() should clear everything related to eager', function () {
+    var builder = QueryBuilder
+      .forClass(TestModel)
+      .eager('a(f).b', {
+        f: _.noop
+      });
+
+    expect(builder._eagerExpression).to.be.a(RelationExpression);
+    expect(builder._eagerFilters).to.have.property('f');
+
+    builder.clearEager();
+
+    expect(builder._eagerExpression).to.equal(null);
+    expect(builder._eagerFilters).to.equal(null);
+  });
+
+  it('clearReject() should clear remove explicit rejection', function () {
+    var builder = QueryBuilder
+      .forClass(TestModel)
+      .reject('error');
+
+    expect(builder._explicitRejectValue).to.equal('error');
+
+    builder.clearReject();
+
+    expect(builder._explicitRejectValue).to.equal(null);
   });
 
   describe('eager and allowEager' , function () {
