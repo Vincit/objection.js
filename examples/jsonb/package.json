@@ -1,0 +1,15 @@
+{
+  "name": "objection-example-jsonb",
+  "version": "0.1.0",
+  "description": "Objection.js PostgreSQL jsonb example",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Mikael Lepistö",
+  "license": "MIT",
+  "dependencies": {
+    "knex": "git+https://github.com/tgriesser/knex.git",
+    "objection": "^0.3.0"
+  }
+}
