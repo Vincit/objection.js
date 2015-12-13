@@ -18,8 +18,7 @@ module.exports = function (app) {
   app.patch('/persons/:id', function (req, res, next) {
     Person
       .query()
-      .where('id', req.params.id)
-      .patch(req.body)
+      .patchAndFetchById(req.params.id, req.body)
       .then(function (person) { res.send(person); })
       .catch(next);
   });

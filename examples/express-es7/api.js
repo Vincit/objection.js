@@ -18,8 +18,7 @@ export default function (app) {
   app.patch('/persons/:id', async function (req, res) {
     const person = await Person
       .query()
-      .where('id', req.params.id)
-      .patch(req.body);
+      .patchAndFetchById(req.params.id, req.body);
       
     res.send(person);
   });
