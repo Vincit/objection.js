@@ -1,4 +1,5 @@
 var expect = require('expect.js')
+  , ValidationError = require('../../lib/ValidationError')
   , RelationExpression = require('../../lib/RelationExpression');
 
 describe('RelationExpression', function () {
@@ -6,176 +7,309 @@ describe('RelationExpression', function () {
   describe('parse', function () {
 
     it('empty string', function () {
-      testParse('', {nodes: []});
+      testParse('', {
+        name: null,
+        args: [],
+        numChildren: 0,
+        children: {}
+      });
     });
 
     it('non-string', function () {
-      testParse(null, {nodes: []});
-      testParse(false, {nodes: []});
-      testParse(true, {nodes: []});
-      testParse(1, {nodes: []});
-      testParse({}, {nodes: []});
-      testParse([], {nodes: []});
+      var expectedResult = {
+        name: null,
+        args: [],
+        numChildren: 0,
+        children: {}
+      };
+
+      testParse(null, expectedResult);
+      testParse(false, expectedResult);
+      testParse(true, expectedResult);
+      testParse(1, expectedResult);
+      testParse({}, expectedResult);
+      testParse([], expectedResult);
     });
 
-    it('single relation', function () {
-      testParse('a', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: []
-        }]
-      });
-      testParse('[a]', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: []
-        }]
-      });
-      testParse('[[[a]]]', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: []
-        }]
-      });
-    });
+    describe('single relation', function () {
 
-    it('nested relations', function () {
-      testParse('a.b', {
-        nodes: [{
-          name: 'a',
+      it('single relation', function () {
+        testParse('a', {
+          name: null,
           args: [],
-          children: [{
-            name: 'b',
-            args: [],
-            children: []
-          }]
-        }]
-      });
-      testParse('a.b.c', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: [{
-            name: 'b',
-            args: [],
-            children: [{
-              name: 'c',
+          numChildren: 1,
+          children: {
+            a: {
+              name: 'a',
               args: [],
-              children: []
-            }]
-          }]
-        }]
+              numChildren: 0,
+              children: {}
+            }
+          }
+        });
       });
+
+      it('list with one value', function () {
+        testParse('[a]', {
+          name: null,
+          args: [],
+          numChildren: 1,
+          children: {
+            a: {
+              name: 'a',
+              args: [],
+              numChildren: 0,
+              children: {}
+            }
+          }
+        });
+      });
+
+      it('weird characters', function () {
+        testParse('_-%§$?+1Aa!€^', {
+          name: null,
+          args: [],
+          numChildren: 1,
+          children: {
+            "_-%§$?+1Aa!€^": {
+              name: '_-%§$?+1Aa!€^',
+              args: [],
+              numChildren: 0,
+              children: {}
+            }
+          }
+        });
+      });
+
+    });
+
+    describe('nested relations', function () {
+
+      it('one level', function () {
+        testParse('a.b', {
+          name: null,
+          args: [],
+          numChildren: 1,
+          children: {
+            a: {
+              name: 'a',
+              args: [],
+              numChildren: 1,
+              children: {
+                b: {
+                  name: 'b',
+                  args: [],
+                  numChildren: 0,
+                  children: {}
+                }
+              }
+            }
+          }
+        });
+      });
+
+      it('two levels', function () {
+        testParse('a.b.c', {
+          name: null,
+          args: [],
+          numChildren: 1,
+          children: {
+            a: {
+              name: 'a',
+              args: [],
+              numChildren: 1,
+              children: {
+                b: {
+                  name: 'b',
+                  args: [],
+                  numChildren: 1,
+                  children: {
+                    c: {
+                      name: 'c',
+                      args: [],
+                      numChildren: 0,
+                      children: {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+      });
+
     });
 
     it('multiple relations', function () {
       testParse('[a, b, c]', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: []
-        }, {
-          name: 'b',
-          args: [],
-          children: []
-        }, {
-          name: 'c',
-          args: [],
-          children: []
-        }]
+        name: null,
+        args: [],
+        numChildren: 3,
+        children: {
+          a: {
+            name: 'a',
+            args: [],
+            numChildren: 0,
+            children: {}
+          },
+          b: {
+            name: 'b',
+            args: [],
+            numChildren: 0,
+            children: {}
+          },
+          c: {
+            name: 'c',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
       });
     });
 
     it('multiple nested relations', function () {
       testParse('[a.b, c.d.e, f]', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: [{
-            name: 'b',
+        name: null,
+        args: [],
+        numChildren: 3,
+        children: {
+          a: {
+            name: 'a',
             args: [],
-            children: []
-          }]
-        }, {
-          name: 'c',
-          args: [],
-          children: [{
-            name: 'd',
+            numChildren: 1,
+            children: {
+              b: {
+                name: 'b',
+                args: [],
+                numChildren: 0,
+                children: {}
+              }
+            }
+          },
+          c: {
+            name: 'c',
             args: [],
-            children: [{
-              name: 'e',
-              args: [],
-              children: []
-            }]
-          }]
-        }, {
-          name: 'f',
-          args: [],
-          children: []
-        }]
+            numChildren: 1,
+            children: {
+              d: {
+                name: 'd',
+                args: [],
+                numChildren: 1,
+                children: {
+                  e: {
+                    name: 'e',
+                    args: [],
+                    numChildren: 0,
+                    children: {}
+                  }
+                }
+              }
+            }
+          },
+          f: {
+            name: 'f',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
       });
     });
 
-    it('multiple sub relations', function () {
+    it('deep nesting and nested lists', function () {
       testParse('[a.[b, c.[d, e.f]], g]', {
-        nodes: [{
-          name: 'a',
-          args: [],
-          children: [{
-            name: 'b',
+        name: null,
+        args: [],
+        numChildren: 2,
+        children: {
+          a: {
+            name: 'a',
             args: [],
-            children: []
-          }, {
-            name: 'c',
-            args: [],
-            children: [{
-              name: 'd',
-              args: [],
-              children: []
-            }, {
-              name: 'e',
-              args: [],
-              children: [{
-                name: 'f',
+            numChildren: 2,
+            children: {
+              b: {
+                name: 'b',
                 args: [],
+                numChildren: 0,
                 children: []
-              }]
-            }]
-          }]
-        }, {
-          name: 'g',
-          args: [],
-          children: []
-        }]
+              },
+              c: {
+                name: 'c',
+                args: [],
+                numChildren: 2,
+                children: {
+                  d: {
+                    name: 'd',
+                    args: [],
+                    numChildren: 0,
+                    children: []
+                  },
+                  e: {
+                    name: 'e',
+                    args: [],
+                    numChildren: 1,
+                    children: {
+                      f: {
+                        name: 'f',
+                        args: [],
+                        numChildren: 0,
+                        children: {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          g: {
+            name: 'g',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
       });
     });
 
     it('arguments', function () {
       testParse('[a(arg1, \narg2, arg3), \n \n b(arg4).[c(), d(arg5, arg6), e]]', {
-        nodes: [{
-          name: 'a',
-          args: ['arg1', 'arg2', 'arg3'],
-          children: []
-        }, {
-          name: 'b',
-          args: ['arg4'],
-          children: [{
-            name: 'c',
-            args: [],
-            children: []
-          }, {
-            name: 'd',
-            args: ['arg5', 'arg6'],
-            children: []
-          }, {
-            name: 'e',
-            args: [],
-            children: []
-          }]
-        }]
+        name: null,
+        args: [],
+        numChildren: 2,
+        children: {
+          a: {
+            name: 'a',
+            args: ['arg1', 'arg2', 'arg3'],
+            numChildren: 0,
+            children: {}
+          },
+          b: {
+            name: 'b',
+            args: ['arg4'],
+            numChildren: 3,
+            children: {
+              c: {
+                name: 'c',
+                args: [],
+                numChildren: 0,
+                children: {}
+              },
+              d: {
+                name: 'd',
+                args: ['arg5', 'arg6'],
+                numChildren: 0,
+                children: {}
+              },
+              e: {
+                name: 'e',
+                args: [],
+                numChildren: 0,
+                children: {}
+              }
+            }
+          }
+        }
       });
     });
 
@@ -186,7 +320,6 @@ describe('RelationExpression', function () {
       testParseFail('.a');
       testParseFail('[');
       testParseFail(']');
-      testParseFail('[]');
       testParseFail('[[]]');
       testParseFail('[a');
       testParseFail('a]');
@@ -195,7 +328,6 @@ describe('RelationExpression', function () {
       testParseFail('a.[.]');
       testParseFail('a.[.b]');
       testParseFail('[a,,b]');
-      testParseFail('[a,b,]');
     });
 
   });
@@ -309,7 +441,9 @@ describe('RelationExpression', function () {
   function testParseFail(str) {
     expect(function () {
       RelationExpression.parse(str);
-    }).to.throwException();
+    }).to.throwException(function (err) {
+      expect(err).to.be.a(ValidationError);
+    });
   }
 
   function testSubExpression(str, subStr) {

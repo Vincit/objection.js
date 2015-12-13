@@ -90,15 +90,7 @@
 						</li>
 						
 						<li>
-							<a href="global.html#knexInsert">knexInsert</a>
-						</li>
-						
-						<li>
 							<a href="global.html#knexQueryMethod">knexQueryMethod</a>
-						</li>
-						
-						<li>
-							<a href="global.html#knexUpdate">knexUpdate</a>
 						</li>
 						
 						<li>
@@ -209,6 +201,10 @@
 							<a href="global.html#whereJsonFieldRightStringArrayOnLeftQuery">whereJsonFieldRightStringArrayOnLeftQuery</a>
 						</li>
 						
+						<li>
+							<a href="global.html#wrapFunctionArg">wrapFunctionArg</a>
+						</li>
+						
 
 					</ul>
 				</li>
@@ -290,14 +286,6 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
-
-        <dl>
-            
-        
-            
-        </dl>
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -320,93 +308,6 @@
             
         
             
-              
-<dt>
-    
-        <h4 class="name" id="knexQueryMethod">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">knexQueryMethod</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {function}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">function</span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
-            
         
             
         
@@ -422,177 +323,6 @@
         
             
         
-            
-        
-            
-              
-<dt>
-    
-        <h4 class="name" id="parseFieldExpression">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">parseFieldExpression</span>
-          <span class="signature-container"><span class="signature">(expression, extractAsText)</span><span class="type-signature"> &rarr; {Array}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Field expression how to refer certain nested field inside jsonb column.</p>
-<p>Table.jsonColumn:obj[key.with.dots][0].key.0.me[0] refers to<br>obj = { &quot;key.with.dots&quot; : [{&quot;key&quot; : { &quot;0&quot;: { me : [ &quot;I was referred&quot; ] }}}]</p>
-<p>Since PostgreSql #&gt;{field,0,field2,...} operator does not make difference if<br>reference is string or a number, one can actually use also jsonArray.0 notation<br>to refer index of an array. Like wise one can use object[123] notation to refer<br>key of an object { &quot;123&quot; : null }.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>expression</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>extractAsText</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Return text instead of jsonb object (useful for type casting).</p></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>Array of referred path, where first item is table/column.</p>
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Array</span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
             
         
             
@@ -927,290 +657,6 @@ objection.transaction.start(Person).then(function (trx) {
             
         
             
-              
-<dt>
-    
-        <h4 class="name" id="whereJsonbRefOnLeftJsonbValOrRefOnRight">
-          <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">whereJsonbRefOnLeftJsonbValOrRefOnRight</span>
-          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, jsonObjectOrFieldExpression, <span class="optional">queryPrefix</span>)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Where jsonb reference on left hand side is compared to jsonb value or reference on the right hand side.</p>
-<p>Converts left and right hand values to PostgreSQL acceptable format and add user chosen<br>operator between left and right hand expressions.</p>
-<pre class="prettyprint source lang-javascript"><code>whereJsonbRefOnLeftJsonbValOrRefOnRight(queryBuilder, &quot;ModelJson.jsonObject:objectField&quot;, &quot;&lt;@&quot;, { key: 1 })</code></pre><pre class="prettyprint source lang-sql"><code>select * from &quot;ModelJson&quot; where (&quot;ModelJson&quot;.&quot;jsonObject&quot;#>'{objectField}')::jsonb &lt;@ '{\&quot;key\&quot;:\ 1}'::jsonb</code></pre>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-		<th>Argument</th>
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>builder</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>fieldExpression</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Reference to column / jsonField.</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>operator</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>operator to apply.</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>jsonObjectOrFieldExpression</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-|
-
-<span class="param-type">Array</span>
-|
-
-<span class="param-type"><a href="global.html#FieldExpression">FieldExpression</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>Reference to column / jsonField or json object.</p></td>
-        </tr>
-
-	
-
-        <tr>
-            
-                <td class="name"><code>queryPrefix</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>String prepended to query e.g. 'not'. Space after string added implicitly.</p></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
-            
         
             
         
@@ -1223,7 +669,7 @@ objection.transaction.start(Person).then(function (trx) {
         <h4 class="name" id="whereJsonFieldRightStringArrayOnLeft">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonFieldRightStringArrayOnLeft</span>
-          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(builder, fieldExpression, operator, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -1274,7 +720,7 @@ objection.transaction.start(Person).then(function (trx) {
             <td class="type">
             
                 
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
             
@@ -1414,7 +860,7 @@ objection.transaction.start(Person).then(function (trx) {
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -1426,6 +872,8 @@ objection.transaction.start(Person).then(function (trx) {
     
 </dd>
 
+            
+        
             
         
             
@@ -2141,7 +1589,7 @@ objection.transaction.start(Person).then(function (trx) {
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
-		on Sat Nov 21st 2015 using the <a
+		on Sun Dec 13th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

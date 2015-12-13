@@ -1,6 +1,5 @@
 var _ = require('lodash');
 var expect = require('expect.js');
-var Promise = require('bluebird');
 var ValidationError = require('../../lib/ValidationError');
 
 module.exports = function (session) {
@@ -109,7 +108,7 @@ module.exports = function (session) {
       expect(models[0].model1Relation2).to.equal(undefined);
     });
 
-    test('model1Relation1.^(selectId)', function (models) {
+    test('model1Relation1(selectId).^', function (models) {
       expect(models).to.have.length(1);
       expect(models[0]).to.be.a(Model1);
 
@@ -279,6 +278,22 @@ module.exports = function (session) {
         .query()
         .where('id', 1)
         .eager('model1Relation2(missingFilter)')
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function (error) {
+          expect(error).to.be.a(ValidationError);
+          expect(error.data).to.have.property('eager');
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should fail if given missing relation', function (done) {
+      Model1
+        .query()
+        .where('id', 1)
+        .eager('invalidRelation')
         .then(function () {
           done(new Error('should not get here'));
         })

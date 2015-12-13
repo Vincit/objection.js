@@ -1,5 +1,5 @@
 instrumentation:
-  excludes: ['lib/jsonFieldExpressionParser.js']
+  excludes: ['lib/jsonFieldExpressionParser.js', 'lib/relationExpressionParser.js']
 
 reporting:
   dir: ./test-coverage

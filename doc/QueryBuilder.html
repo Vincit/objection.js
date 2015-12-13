@@ -90,15 +90,7 @@
 						</li>
 						
 						<li>
-							<a href="global.html#knexInsert">knexInsert</a>
-						</li>
-						
-						<li>
 							<a href="global.html#knexQueryMethod">knexQueryMethod</a>
-						</li>
-						
-						<li>
-							<a href="global.html#knexUpdate">knexUpdate</a>
 						</li>
 						
 						<li>
@@ -209,6 +201,10 @@
 							<a href="global.html#whereJsonFieldRightStringArrayOnLeftQuery">whereJsonFieldRightStringArrayOnLeftQuery</a>
 						</li>
 						
+						<li>
+							<a href="global.html#wrapFunctionArg">wrapFunctionArg</a>
+						</li>
+						
 
 					</ul>
 				</li>
@@ -313,6 +309,12 @@
     </div>
 
     
+        <h3 class="subsection-title">Extends</h3>
+
+        <ul>
+            <li><a href="QueryBuilderBase.html">QueryBuilderBase</a></li>
+        </ul>
+    
 
     
 
@@ -334,160 +336,6 @@
         <h3 class="subsection-title">Methods</h3>
 
         <dl>
-            
-              
-<dt>
-    
-        <h4 class="name" id="_P_extend">
-          <span class="modifiers-container"><span class="type-signature">&lt;static> </span></span>
-          <span class="content">extend</span>
-          <span class="signature-container"><span class="signature">(<span class="optional">subclassConstructor</span>)</span><span class="type-signature"> &rarr; {function}</span></span>
-        </h4>
-    
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Makes the given constructor a subclass of this class.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-		<th>Argument</th>
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>subclassConstructor</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">function</span>
-
-
-	</dd>
-</dl>
-
-
-        
-    
-    
-</dd>
-
-            
-        
             
               
 <dt>
@@ -801,7 +649,7 @@
       }, {
         name: 'Scrappy',
         species: 'dog'
-      }],
+      }]
     }]
   })
   .then(function () {
@@ -941,7 +789,7 @@
         <h4 class="name" id="andWhere">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">andWhere</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -969,6 +817,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#andWhere">QueryBuilderBase#andWhere</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -1013,7 +870,109 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="as">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">as</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#as">QueryBuilderBase#as</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -1176,7 +1135,7 @@
         <h4 class="name" id="avg">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">avg</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -1204,6 +1163,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#avg">QueryBuilderBase#avg</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -1248,7 +1216,109 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="avgDistinct">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">avgDistinct</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#avgDistinct">QueryBuilderBase#avgDistinct</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -1502,13 +1572,15 @@
             
         
             
+        
+            
               
 <dt>
     
         <h4 class="name" id="call">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">call</span>
-          <span class="signature-container"><span class="signature">(func)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(func)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -1520,13 +1592,11 @@
     <div class="description">
         <p>Calls the given function immediately and passes <code>this</code> as an argument.</p>
 <p>Handy for chaining conditional stuff:</p>
-<pre class="prettyprint source lang-js"><code>Person
-  .query()
-  .call(function (builder) {
-    if (someCondition) {
-      builder.where('something', someValue);
-    }
-  });</code></pre>
+<pre class="prettyprint source lang-js"><code>new QueryBuilderBase().call(function (builder) {
+  if (someCondition) {
+    builder.where('something', someValue);
+  }
+});</code></pre>
     </div>
     
 
@@ -1594,6 +1664,15 @@
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#call">QueryBuilderBase#call</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -1637,7 +1716,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -1887,13 +1966,15 @@
             
         
             
+        
+            
               
 <dt>
     
         <h4 class="name" id="column">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">column</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -1921,6 +2002,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#column">QueryBuilderBase#column</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -1965,7 +2055,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -1986,7 +2076,7 @@
         <h4 class="name" id="columns">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">columns</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -2014,6 +2104,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#columns">QueryBuilderBase#columns</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -2058,7 +2157,109 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="connection">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">connection</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#connection">QueryBuilderBase#connection</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -2079,7 +2280,7 @@
         <h4 class="name" id="count">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">count</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -2107,6 +2308,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#count">QueryBuilderBase#count</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -2151,7 +2361,109 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="countDistinct">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">countDistinct</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#countDistinct">QueryBuilderBase#countDistinct</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -2172,7 +2484,7 @@
         <h4 class="name" id="crossJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">crossJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -2200,6 +2512,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#crossJoin">QueryBuilderBase#crossJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -2244,7 +2565,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -2265,7 +2586,7 @@
         <h4 class="name" id="debug">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">debug</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -2293,6 +2614,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#debug">QueryBuilderBase#debug</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -2337,7 +2667,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -2645,7 +2975,7 @@
         <h4 class="name" id="distinct">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">distinct</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -2673,6 +3003,15 @@
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#distinct">QueryBuilderBase#distinct</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -2717,7 +3056,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -3224,7 +3563,7 @@ Person
         <h4 class="name" id="from">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">from</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -3252,6 +3591,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#from">QueryBuilderBase#from</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -3296,7 +3644,109 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="fromJS">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">fromJS</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#fromJS">QueryBuilderBase#fromJS</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -3317,7 +3767,7 @@ Person
         <h4 class="name" id="fullOuterJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">fullOuterJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -3345,6 +3795,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#fullOuterJoin">QueryBuilderBase#fullOuterJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -3389,7 +3848,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -3410,7 +3869,7 @@ Person
         <h4 class="name" id="groupBy">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">groupBy</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -3438,6 +3897,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#groupBy">QueryBuilderBase#groupBy</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -3482,7 +3950,109 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="groupByRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">groupByRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#groupByRaw">QueryBuilderBase#groupByRaw</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -3503,7 +4073,7 @@ Person
         <h4 class="name" id="having">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">having</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -3531,6 +4101,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#having">QueryBuilderBase#having</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -3575,7 +4154,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -3596,7 +4175,7 @@ Person
         <h4 class="name" id="havingRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">havingRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -3624,6 +4203,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#havingRaw">QueryBuilderBase#havingRaw</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -3668,7 +4256,109 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="havingWrapped">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">havingWrapped</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#havingWrapped">QueryBuilderBase#havingWrapped</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -3782,7 +4472,7 @@ Person
         <h4 class="name" id="innerJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">innerJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -3810,6 +4500,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#innerJoin">QueryBuilderBase#innerJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -3854,7 +4553,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -4406,7 +5105,7 @@ Person
         <h4 class="name" id="into">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">into</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -4434,6 +5133,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#into">QueryBuilderBase#into</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -4478,7 +5186,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -4592,7 +5300,7 @@ Person
         <h4 class="name" id="join">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">join</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -4620,6 +5328,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#join">QueryBuilderBase#join</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -4664,7 +5381,109 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="joinRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">joinRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#joinRaw">QueryBuilderBase#joinRaw</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -4685,7 +5504,7 @@ Person
         <h4 class="name" id="leftJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">leftJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -4713,6 +5532,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#leftJoin">QueryBuilderBase#leftJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -4757,7 +5585,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -4778,7 +5606,7 @@ Person
         <h4 class="name" id="leftOuterJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">leftOuterJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -4806,6 +5634,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#leftOuterJoin">QueryBuilderBase#leftOuterJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -4850,7 +5687,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -4871,7 +5708,7 @@ Person
         <h4 class="name" id="limit">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">limit</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -4899,6 +5736,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#limit">QueryBuilderBase#limit</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -4943,7 +5789,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -5106,7 +5952,7 @@ Person
         <h4 class="name" id="max">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">max</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -5134,6 +5980,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#max">QueryBuilderBase#max</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -5178,7 +6033,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -5199,7 +6054,7 @@ Person
         <h4 class="name" id="min">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">min</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -5227,6 +6082,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#min">QueryBuilderBase#min</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -5271,7 +6135,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -5292,7 +6156,7 @@ Person
         <h4 class="name" id="modelClass">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">modelClass</span>
-          <span class="signature-container"><span class="signature">(modelClass)</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>|<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Model.html">Model</a>|<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
         </h4>
     
     
@@ -5310,55 +6174,6 @@ Person
     
     
     
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>modelClass</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Model.html">Model</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
     
     
     
@@ -5579,7 +6394,7 @@ Person
         <h4 class="name" id="offset">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">offset</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -5607,6 +6422,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#offset">QueryBuilderBase#offset</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -5651,7 +6475,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -5970,7 +6794,7 @@ query
         <h4 class="name" id="orderBy">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orderBy</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -5998,6 +6822,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orderBy">QueryBuilderBase#orderBy</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6042,7 +6875,109 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orderByRaw">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orderByRaw</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orderByRaw">QueryBuilderBase#orderByRaw</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6063,7 +6998,7 @@ query
         <h4 class="name" id="orHaving">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orHaving</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -6091,6 +7026,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orHaving">QueryBuilderBase#orHaving</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6135,7 +7079,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6156,7 +7100,7 @@ query
         <h4 class="name" id="orHavingRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orHavingRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -6184,6 +7128,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orHavingRaw">QueryBuilderBase#orHavingRaw</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6228,7 +7181,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6249,7 +7202,7 @@ query
         <h4 class="name" id="orWhere">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhere</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -6277,6 +7230,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhere">QueryBuilderBase#orWhere</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6321,7 +7283,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6342,7 +7304,7 @@ query
         <h4 class="name" id="orWhereBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -6370,6 +7332,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereBetween">QueryBuilderBase#orWhereBetween</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6414,7 +7385,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6435,7 +7406,7 @@ query
         <h4 class="name" id="orWhereExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -6463,6 +7434,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereExists">QueryBuilderBase#orWhereExists</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6507,7 +7487,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6528,7 +7508,7 @@ query
         <h4 class="name" id="orWhereIn">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereIn</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -6556,6 +7536,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereIn">QueryBuilderBase#orWhereIn</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -6600,7 +7589,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -6646,6 +7635,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonEquals">QueryBuilderBase#orWhereJsonEquals</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -6667,7 +7665,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonEquals">QueryBuilder#whereJsonEquals</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonEquals">QueryBuilderBase#whereJsonEquals</a></li>
 			</ul>
 	</dd>
 	
@@ -6723,6 +7721,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonField">QueryBuilderBase#orWhereJsonField</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -6744,7 +7751,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonField">QueryBuilder#whereJsonField</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonField">QueryBuilderBase#whereJsonField</a></li>
 			</ul>
 	</dd>
 	
@@ -6800,6 +7807,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonHasAll">QueryBuilderBase#orWhereJsonHasAll</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -6821,7 +7837,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonHasAll">QueryBuilder#whereJsonHasAll</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonHasAll">QueryBuilderBase#whereJsonHasAll</a></li>
 			</ul>
 	</dd>
 	
@@ -6877,6 +7893,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonHasAny">QueryBuilderBase#orWhereJsonHasAny</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -6898,7 +7923,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonHasAny">QueryBuilder#whereJsonHasAny</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonHasAny">QueryBuilderBase#whereJsonHasAny</a></li>
 			</ul>
 	</dd>
 	
@@ -6954,6 +7979,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonIsArray">QueryBuilderBase#orWhereJsonIsArray</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -6975,7 +8009,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonIsArray">QueryBuilder#whereJsonIsArray</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonIsArray">QueryBuilderBase#whereJsonIsArray</a></li>
 			</ul>
 	</dd>
 	
@@ -7031,6 +8065,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonIsObject">QueryBuilderBase#orWhereJsonIsObject</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7052,7 +8095,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonIsObject">QueryBuilder#whereJsonIsObject</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonIsObject">QueryBuilderBase#whereJsonIsObject</a></li>
 			</ul>
 	</dd>
 	
@@ -7108,6 +8151,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonNotArray">QueryBuilderBase#orWhereJsonNotArray</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7129,7 +8181,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonIsArray">QueryBuilder#whereJsonIsArray</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonIsArray">QueryBuilderBase#whereJsonIsArray</a></li>
 			</ul>
 	</dd>
 	
@@ -7185,6 +8237,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonNotEquals">QueryBuilderBase#orWhereJsonNotEquals</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7206,7 +8267,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonEquals">QueryBuilder#whereJsonEquals</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonEquals">QueryBuilderBase#whereJsonEquals</a></li>
 			</ul>
 	</dd>
 	
@@ -7262,6 +8323,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonNotObject">QueryBuilderBase#orWhereJsonNotObject</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7283,7 +8353,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonIsObject">QueryBuilder#whereJsonIsObject</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonIsObject">QueryBuilderBase#whereJsonIsObject</a></li>
 			</ul>
 	</dd>
 	
@@ -7339,6 +8409,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonNotSubsetOf">QueryBuilderBase#orWhereJsonNotSubsetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7360,7 +8439,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSubsetOf">QueryBuilder#whereJsonSubsetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSubsetOf">QueryBuilderBase#whereJsonSubsetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -7416,6 +8495,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonNotSupersetOf">QueryBuilderBase#orWhereJsonNotSupersetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7437,7 +8525,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSupersetOf">QueryBuilder#whereJsonSupersetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSupersetOf">QueryBuilderBase#whereJsonSupersetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -7493,6 +8581,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonSubsetOf">QueryBuilderBase#orWhereJsonSubsetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7514,7 +8611,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSubsetOf">QueryBuilder#whereJsonSubsetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSubsetOf">QueryBuilderBase#whereJsonSubsetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -7570,6 +8667,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereJsonSupersetOf">QueryBuilderBase#orWhereJsonSupersetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7591,7 +8697,7 @@ query
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSupersetOf">QueryBuilder#whereJsonSupersetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSupersetOf">QueryBuilderBase#whereJsonSupersetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -7619,10 +8725,10 @@ query
               
 <dt>
     
-        <h4 class="name" id="orWhereNotBetween">
+        <h4 class="name" id="orWhereNot">
           <span class="modifiers-container"><span class="type-signature"></span></span>
-          <span class="content">orWhereNotBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="content">orWhereNot</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -7650,6 +8756,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereNot">QueryBuilderBase#orWhereNot</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -7694,7 +8809,109 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="orWhereNotBetween">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">orWhereNotBetween</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereNotBetween">QueryBuilderBase#orWhereNotBetween</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -7715,7 +8932,7 @@ query
         <h4 class="name" id="orWhereNotExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNotExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -7743,6 +8960,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereNotExists">QueryBuilderBase#orWhereNotExists</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -7787,7 +9013,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -7837,6 +9063,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereNotIn">QueryBuilderBase#orWhereNotIn</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -7882,7 +9117,7 @@ query
         <h4 class="name" id="orWhereNotNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNotNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -7910,6 +9145,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereNotNull">QueryBuilderBase#orWhereNotNull</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -7954,7 +9198,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -7975,7 +9219,7 @@ query
         <h4 class="name" id="orWhereNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -8003,6 +9247,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereNull">QueryBuilderBase#orWhereNull</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -8047,7 +9300,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -8068,7 +9321,7 @@ query
         <h4 class="name" id="orWhereRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">orWhereRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -8096,6 +9349,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereRaw">QueryBuilderBase#orWhereRaw</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -8140,7 +9402,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -8191,6 +9453,15 @@ query
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#orWhereRef">QueryBuilderBase#orWhereRef</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -8236,7 +9507,7 @@ query
         <h4 class="name" id="outerJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">outerJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -8264,6 +9535,15 @@ query
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#outerJoin">QueryBuilderBase#outerJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -8308,7 +9588,7 @@ query
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -9915,7 +11195,7 @@ Promise.all([
         <h4 class="name" id="returning">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">returning</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -9943,6 +11223,15 @@ Promise.all([
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#returning">QueryBuilderBase#returning</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -9987,7 +11276,7 @@ Promise.all([
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -10008,7 +11297,7 @@ Promise.all([
         <h4 class="name" id="rightJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">rightJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -10036,6 +11325,15 @@ Promise.all([
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#rightJoin">QueryBuilderBase#rightJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -10080,7 +11378,7 @@ Promise.all([
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -10101,7 +11399,7 @@ Promise.all([
         <h4 class="name" id="rightOuterJoin">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">rightOuterJoin</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -10129,6 +11427,15 @@ Promise.all([
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#rightOuterJoin">QueryBuilderBase#rightOuterJoin</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -10173,7 +11480,7 @@ Promise.all([
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -10929,7 +12236,7 @@ query.then();
         <h4 class="name" id="select">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">select</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -10957,6 +12264,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#select">QueryBuilderBase#select</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -11001,7 +12317,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -11165,7 +12481,7 @@ query.then();
         <h4 class="name" id="sum">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">sum</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -11193,6 +12509,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#sum">QueryBuilderBase#sum</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -11237,7 +12562,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -11258,7 +12583,7 @@ query.then();
         <h4 class="name" id="table">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">table</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -11286,6 +12611,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#table">QueryBuilderBase#table</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -11330,7 +12664,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -11912,7 +13246,7 @@ query.then();
         <h4 class="name" id="truncate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">truncate</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -11940,6 +13274,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#truncate">QueryBuilderBase#truncate</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -11984,7 +13327,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -12005,7 +13348,7 @@ query.then();
         <h4 class="name" id="union">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">union</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -12033,6 +13376,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#union">QueryBuilderBase#union</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -12077,7 +13429,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -12098,7 +13450,7 @@ query.then();
         <h4 class="name" id="unionAll">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">unionAll</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -12126,6 +13478,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#unionAll">QueryBuilderBase#unionAll</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -12170,7 +13531,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -12645,7 +14006,7 @@ query.then();
         <h4 class="name" id="where">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">where</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -12673,6 +14034,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#where">QueryBuilderBase#where</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -12717,7 +14087,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -12738,7 +14108,7 @@ query.then();
         <h4 class="name" id="whereBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -12766,6 +14136,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereBetween">QueryBuilderBase#whereBetween</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -12810,7 +14189,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -12831,7 +14210,7 @@ query.then();
         <h4 class="name" id="whereExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -12859,6 +14238,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereExists">QueryBuilderBase#whereExists</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -12903,7 +14291,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -12924,7 +14312,7 @@ query.then();
         <h4 class="name" id="whereIn">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereIn</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -12952,6 +14340,15 @@ query.then();
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereIn">QueryBuilderBase#whereIn</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -12996,7 +14393,7 @@ query.then();
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -13017,7 +14414,7 @@ query.then();
         <h4 class="name" id="whereJsonEquals">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonEquals</span>
-          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -13032,15 +14429,15 @@ query.then();
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome')
-  .then(function (person) {
-    // oh joy! these persons have all their dogs at home!
+  .then(function (people) {
+    // oh joy! these people have all their dogs at home!
   });
 
 Person
   .query()
   .whereJsonEquals('additionalData:myDogs[0]', { name: &quot;peter&quot;})
-  .then(function (person) {
-    // these persons' first dog name is &quot;peter&quot; and the dog has no other
+  .then(function (people) {
+    // these people's first dog name is &quot;peter&quot; and the dog has no other
     // attributes, but its name
   });</code></pre>
     </div>
@@ -13092,7 +14489,7 @@ Person
 
             
 
-            <td class="description last"><p>Reference to column / jsonField.</p></td>
+            <td class="description last"><p>Reference to column / json field.</p></td>
         </tr>
 
 	
@@ -13121,7 +14518,7 @@ Person
 
             
 
-            <td class="description last"><p>Reference to column / jsonField or json object.</p></td>
+            <td class="description last"><p>Reference to column / json field or json object.</p></td>
         </tr>
 
 	
@@ -13138,6 +14535,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonEquals">QueryBuilderBase#whereJsonEquals</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -13182,7 +14588,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -13203,7 +14609,7 @@ Person
         <h4 class="name" id="whereJsonField">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonField</span>
-          <span class="signature-container"><span class="signature">(fieldExpression, operator, value)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression, operator, value)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -13339,6 +14745,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonField">QueryBuilderBase#whereJsonField</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -13382,7 +14797,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -13403,7 +14818,7 @@ Person
         <h4 class="name" id="whereJsonHasAll">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonHasAll</span>
-          <span class="signature-container"><span class="signature">(fieldExpression, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -13507,6 +14922,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonHasAll">QueryBuilderBase#whereJsonHasAll</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -13550,7 +14974,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -13571,7 +14995,7 @@ Person
         <h4 class="name" id="whereJsonHasAny">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonHasAny</span>
-          <span class="signature-container"><span class="signature">(fieldExpression, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression, keys)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -13675,6 +15099,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonHasAny">QueryBuilderBase#whereJsonHasAny</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -13718,7 +15151,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -13739,7 +15172,7 @@ Person
         <h4 class="name" id="whereJsonIsArray">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonIsArray</span>
-          <span class="signature-container"><span class="signature">(fieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -13817,6 +15250,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonIsArray">QueryBuilderBase#whereJsonIsArray</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -13860,7 +15302,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -13881,7 +15323,7 @@ Person
         <h4 class="name" id="whereJsonIsObject">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonIsObject</span>
-          <span class="signature-container"><span class="signature">(fieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -13959,6 +15401,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonIsObject">QueryBuilderBase#whereJsonIsObject</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14002,7 +15453,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -14048,6 +15499,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonNotArray">QueryBuilderBase#whereJsonNotArray</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14069,7 +15529,7 @@ Person
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonIsArray">QueryBuilder#whereJsonIsArray</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonIsArray">QueryBuilderBase#whereJsonIsArray</a></li>
 			</ul>
 	</dd>
 	
@@ -14125,6 +15585,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonNotEquals">QueryBuilderBase#whereJsonNotEquals</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14146,7 +15615,7 @@ Person
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonEquals">QueryBuilder#whereJsonEquals</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonEquals">QueryBuilderBase#whereJsonEquals</a></li>
 			</ul>
 	</dd>
 	
@@ -14202,6 +15671,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonNotObject">QueryBuilderBase#whereJsonNotObject</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14223,7 +15701,7 @@ Person
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonIsObject">QueryBuilder#whereJsonIsObject</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonIsObject">QueryBuilderBase#whereJsonIsObject</a></li>
 			</ul>
 	</dd>
 	
@@ -14279,6 +15757,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonNotSubsetOf">QueryBuilderBase#whereJsonNotSubsetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14300,7 +15787,7 @@ Person
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSubsetOf">QueryBuilder#whereJsonSubsetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSubsetOf">QueryBuilderBase#whereJsonSubsetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -14356,6 +15843,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonNotSupersetOf">QueryBuilderBase#whereJsonNotSupersetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14377,7 +15873,7 @@ Person
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSupersetOf">QueryBuilder#whereJsonSupersetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSupersetOf">QueryBuilderBase#whereJsonSupersetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -14408,7 +15904,7 @@ Person
         <h4 class="name" id="whereJsonSubsetOf">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonSubsetOf</span>
-          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -14418,7 +15914,7 @@ Person
     
     
     <div class="description">
-        <p>Where left hand json field reference is a subset of the right json value or reference.</p>
+        <p>Where left hand json field reference is a subset of the right hand json value or reference.</p>
 <p>Object and array are always their own subsets.</p>
     </div>
     
@@ -14516,6 +16012,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonSubsetOf">QueryBuilderBase#whereJsonSubsetOf</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -14537,7 +16042,7 @@ Person
 	<dt class="tag-see">See:</dt>
 	<dd class="tag-see">
 		<ul>
-			<li><a href="QueryBuilder.html#whereJsonSupersetOf">QueryBuilder#whereJsonSupersetOf</a></li>
+			<li><a href="QueryBuilderBase.html#whereJsonSupersetOf">QueryBuilderBase#whereJsonSupersetOf</a></li>
 			</ul>
 	</dd>
 	
@@ -14566,7 +16071,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -14587,7 +16092,7 @@ Person
         <h4 class="name" id="whereJsonSupersetOf">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereJsonSupersetOf</span>
-          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">(fieldExpression, jsonObjectOrFieldExpression)</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -14597,27 +16102,27 @@ Person
     
     
     <div class="description">
-        <p>Where left hand json field reference is a superset of the right json value or reference.</p>
+        <p>Where left hand json field reference is a superset of the right hand json value or reference.</p>
 <pre class="prettyprint source lang-js"><code>Person
   .query()
   .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome')
-  .then(function (person) {
-    // These persons have all or some of their dogs at home. Person might have some
+  .then(function (people) {
+    // These people have all or some of their dogs at home. Person might have some
     // additional dogs in their custody since myDogs is supreset of dogsAtHome.
   });
 
 Person
   .query()
   .whereJsonSupersetOf('additionalData:myDogs[0]', { name: &quot;peter&quot;})
-  .then(function (person) {
-    // These persons' first dog name is &quot;peter&quot;, but the dog might have
+  .then(function (people) {
+    // These people's first dog name is &quot;peter&quot;, but the dog might have
     // additional attributes as well.
   });</code></pre><p>Object and array are always their own supersets.</p>
 <p>For arrays this means that left side matches if it has all the elements<br>listed in the right hand side. e.g.</p>
 <pre class="prettyprint source"><code>[1,2,3] isSuperSetOf [2] => true
 [1,2,3] isSuperSetOf [2,1,3] => true
 [1,2,3] isSuperSetOf [2,null] => false
-[1,2,3] isSuperSetOf [] => true</code></pre><p>Not variants with jsonb operators behave in a way that they won't match rows, which does not have<br>the referred json key referred in field expression. e.g. for table</p>
+[1,2,3] isSuperSetOf [] => true</code></pre><p>The <code>not</code> variants with jsonb operators behave in a way that they won't match rows, which don't have<br>the referred json key referred in field expression. e.g. for table</p>
 <pre class="prettyprint source"><code> id |    jsonObject
 ----+--------------------------
   1 | {}
@@ -14675,7 +16180,7 @@ Person
 
             
 
-            <td class="description last"><p>Reference to column / jsonField, which is tested being superset.</p></td>
+            <td class="description last"><p>Reference to column / json field, which is tested for being a superset.</p></td>
         </tr>
 
 	
@@ -14704,7 +16209,7 @@ Person
 
             
 
-            <td class="description last"><p>to which to compare.</p></td>
+            <td class="description last"><p>To which to compare.</p></td>
         </tr>
 
 	
@@ -14721,6 +16226,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereJsonSupersetOf">QueryBuilderBase#whereJsonSupersetOf</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -14765,7 +16279,109 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="whereNot">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">whereNot</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereNot">QueryBuilderBase#whereNot</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -14786,7 +16402,7 @@ Person
         <h4 class="name" id="whereNotBetween">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotBetween</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -14814,6 +16430,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereNotBetween">QueryBuilderBase#whereNotBetween</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -14858,7 +16483,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -14879,7 +16504,7 @@ Person
         <h4 class="name" id="whereNotExists">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotExists</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -14907,6 +16532,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereNotExists">QueryBuilderBase#whereNotExists</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -14951,7 +16585,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -14972,7 +16606,7 @@ Person
         <h4 class="name" id="whereNotIn">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotIn</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -15000,6 +16634,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereNotIn">QueryBuilderBase#whereNotIn</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -15044,7 +16687,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -15065,7 +16708,7 @@ Person
         <h4 class="name" id="whereNotNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNotNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -15093,6 +16736,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereNotNull">QueryBuilderBase#whereNotNull</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -15137,7 +16789,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -15158,7 +16810,7 @@ Person
         <h4 class="name" id="whereNull">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereNull</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -15186,6 +16838,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereNull">QueryBuilderBase#whereNull</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -15230,7 +16891,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -15251,7 +16912,7 @@ Person
         <h4 class="name" id="whereRaw">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereRaw</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -15279,6 +16940,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereRaw">QueryBuilderBase#whereRaw</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -15323,7 +16993,7 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -15374,6 +17044,15 @@ Person
 	
 
 	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereRef">QueryBuilderBase#whereRef</a>
+			</li>
+		</ul>
+	</dd>
+	
 
 	
 
@@ -15419,7 +17098,7 @@ Person
         <h4 class="name" id="whereWrapped">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">whereWrapped</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
         </h4>
     
     
@@ -15447,6 +17126,15 @@ Person
 
 	
 
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#whereWrapped">QueryBuilderBase#whereWrapped</a>
+			</li>
+		</ul>
+	</dd>
 	
 
 	
@@ -15491,7 +17179,109 @@ Person
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="withSchema">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">withSchema</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {<a href="QueryBuilderBase.html">QueryBuilderBase</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>See <a href="http://knexjs.org">knex documentation</a></p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+	<dt class="inherited-from">Inherited From:</dt>
+	<dd class="inherited-from">
+		<ul class="dummy">
+			<li>
+				<a href="QueryBuilderBase.html#withSchema">QueryBuilderBase#withSchema</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
 
 
 	</dd>
@@ -15530,7 +17320,7 @@ Person
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
-		on Sat Nov 21st 2015 using the <a
+		on Sun Dec 13th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
