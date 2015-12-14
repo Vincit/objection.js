@@ -273,7 +273,48 @@ describe('RelationExpression', function () {
     });
 
     it('arguments', function () {
-      testParse('[a(arg1, \narg2, arg3), \n \n b(arg4).[c(), d(arg5, arg6), e]]', {
+      testParse('[a(arg1,arg2,arg3), b(arg4) . [c(), d(arg5 arg6), e]]', {
+        name: null,
+        args: [],
+        numChildren: 2,
+        children: {
+          a: {
+            name: 'a',
+            args: ['arg1', 'arg2', 'arg3'],
+            numChildren: 0,
+            children: {}
+          },
+          b: {
+            name: 'b',
+            args: ['arg4'],
+            numChildren: 3,
+            children: {
+              c: {
+                name: 'c',
+                args: [],
+                numChildren: 0,
+                children: {}
+              },
+              d: {
+                name: 'd',
+                args: ['arg5', 'arg6'],
+                numChildren: 0,
+                children: {}
+              },
+              e: {
+                name: 'e',
+                args: [],
+                numChildren: 0,
+                children: {}
+              }
+            }
+          }
+        }
+      });
+    });
+
+    it('should ignore whitespace', function () {
+      testParse('\n\r\t  [ a (\narg1\n  arg2,arg3), \n \n b\n(arg4) . [c(), \td (arg5 arg6), e] \r] ', {
         name: null,
         args: [],
         numChildren: 2,
