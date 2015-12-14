@@ -229,8 +229,8 @@ Person
 update "Person" set "lastName" = 'Dinosaur' where "age" > 60
 ```
 
-The `.patch()` and `.update()` method return the number of updated rows. If you want the fresly updated
-model as aresult you can use the helper method `.patchAndFetchById()` and `.updateAndFetchById()`.
+The `.patch()` and `.update()` method return the number of updated rows. If you want the freshly updated
+model as a result you can use the helper method `.patchAndFetchById()` and `.updateAndFetchById()`.
 
 ```js
 Person
@@ -867,6 +867,13 @@ test database configurations. If you don't want to run the tests against all dat
 just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
+
+## 0.3.1
+
+#### What's new
+
+ * `whereJson*` methods can now be used inside functions given to `where` methods.
+ * Added multiple missing knex methods to `QueryBuilder`.
 
 ## 0.3.0
 
