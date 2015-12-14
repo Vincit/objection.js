@@ -5,6 +5,7 @@ node_js:
   - '0.10'
   - '0.12'
   - '4'
+  - '5'
 
 before_script:
   - psql -c "create database objection_test;" -U postgres
