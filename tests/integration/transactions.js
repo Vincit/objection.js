@@ -24,7 +24,7 @@ module.exports = function (session) {
     });
 
     it('should resolve an empty transaction', function (done) {
-      transaction(Model1, Model2, function (Model1, Model2) {
+      transaction(Model1, Model2, function () {
         return {a: 1};
       }).then(function (result) {
         expect(result).to.eql({a: 1});
@@ -43,7 +43,7 @@ module.exports = function (session) {
     });
 
     it('should fail if one of the model classes is not a subclass of Model', function (done) {
-      transaction(Model1, function () {}, function (Model1, NotModel) {
+      transaction(Model1, function () {}, function () {
         return {a: 1};
       }).then(function () {
         done(new Error('should not get here'));
@@ -53,7 +53,7 @@ module.exports = function (session) {
     });
 
     it('should fail if all ModelClasses are not bound to the same knex connection', function (done) {
-      transaction(Model1, Model2.bindKnex({}), function (Model1, Model2) {
+      transaction(Model1, Model2.bindKnex({}), function () {
         return {a: 1};
       }).then(function () {
         done(new Error('should not get here'));
