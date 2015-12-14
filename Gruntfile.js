@@ -6,7 +6,7 @@ module.exports = function (grunt) {
         src: ['lib/**/*.js'],
         options: {
           destination: 'doc',
-          template : "jsdoc-template",
+          template : "jsdocTemplate",
           configure : "jsdoc.conf.json"
         }
       }

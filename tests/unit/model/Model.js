@@ -1,4 +1,4 @@
-var _ = require('lodash')
+var _ = require('lodash');
 var knex = require('knex');
 var expect = require('expect.js');
 var Model = require('../../../lib/model/Model');
