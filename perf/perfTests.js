@@ -251,6 +251,15 @@ describe('Performance tests', function () {
       }
     });
 
+    perfTest({
+      name: '16000 bindTransaction calls',
+      runCount: 16000,
+      runtimeGoal: 1000,
+      test: function () {
+        Person.bindTransaction({});
+      }
+    });
+
     after(function () {
       return Promise.delay(500);
     })
