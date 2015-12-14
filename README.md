@@ -868,6 +868,12 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.3.2
+
+#### What's new
+
+ * Improved relation expression whitespace handling.
+
 ## 0.3.1
 
 #### What's new
