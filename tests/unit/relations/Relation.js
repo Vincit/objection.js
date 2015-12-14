@@ -1,7 +1,7 @@
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
-  , Model = require('../../../lib/Model')
+  , Model = require('../../../lib/model/Model')
   , Relation = require('../../../lib/relations/Relation');
 
 describe('Relation', function () {

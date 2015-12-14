@@ -1,8 +1,8 @@
 module.exports = {
-  ModelBase: require('./lib/ModelBase'),
-  Model: require('./lib/Model'),
-  QueryBuilder: require('./lib/QueryBuilder'),
-  RelationExpression: require('./lib/RelationExpression'),
+  ModelBase: require('./lib/model/ModelBase'),
+  Model: require('./lib/model/Model'),
+  QueryBuilder: require('./lib/queryBuilder/QueryBuilder'),
+  RelationExpression: require('./lib/queryBuilder/RelationExpression'),
   ValidationError: require('./lib/ValidationError'),
 
   Relation: require('./lib/relations/Relation'),

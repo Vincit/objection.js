@@ -2,8 +2,8 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../../../lib/Model')
-  , QueryBuilder = require('../../../lib/QueryBuilder')
+  , Model = require('../../../lib/model/Model')
+  , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder')
   , ManyToManyRelation = require('../../../lib/relations/ManyToManyRelation');
 
 describe('ManyToManyRelation', function () {

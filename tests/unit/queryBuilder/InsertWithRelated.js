@@ -2,10 +2,10 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../../lib/Model')
-  , QueryBuilder = require('../../lib/QueryBuilder')
-  , InsertWithRelated = require('../../lib/InsertWithRelated')
-  , RelationExpression = require('../../lib/RelationExpression');
+  , Model = require('../../../lib/model/Model')
+  , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder')
+  , InsertWithRelated = require('../../../lib/queryBuilder/InsertWithRelated')
+  , RelationExpression = require('../../../lib/queryBuilder/RelationExpression');
 
 describe('InsertWithRelated', function () {
   var mockKnexQueryResult = [];

@@ -4,7 +4,7 @@ var _ = require('lodash');
 var utils = require('../../lib/utils');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var inheritModel = require('../../lib/inheritModel');
+var inheritModel = require('../../lib/model/inheritModel');
 var ValidationError = require('../../lib/ValidationError');
 
 module.exports = function (session) {

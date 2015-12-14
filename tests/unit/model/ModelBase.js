@@ -1,7 +1,7 @@
 var _ = require('lodash')
   , expect = require('expect.js')
-  , ModelBase = require('../../lib/ModelBase')
-  , ValidationError = require('../../lib/ValidationError');
+  , ModelBase = require('../../../lib/model/ModelBase')
+  , ValidationError = require('../../../lib/ValidationError');
 
 describe('ModelBase', function () {
 

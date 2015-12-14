@@ -1,6 +1,6 @@
 var expect = require('expect.js')
-  , ValidationError = require('../../lib/ValidationError')
-  , RelationExpression = require('../../lib/RelationExpression');
+  , ValidationError = require('../../../lib/ValidationError')
+  , RelationExpression = require('../../../lib/queryBuilder/RelationExpression');
 
 describe('RelationExpression', function () {
 

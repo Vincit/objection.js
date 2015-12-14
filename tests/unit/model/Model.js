@@ -1,8 +1,8 @@
 var _ = require('lodash')
 var knex = require('knex');
 var expect = require('expect.js');
-var Model = require('../../lib/Model');
-var QueryBuilder = require('../../lib/QueryBuilder');
+var Model = require('../../../lib/model/Model');
+var QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder');
 
 describe('Model', function () {
 
