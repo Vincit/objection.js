@@ -868,6 +868,12 @@ just comment out configurations from the `testDatabaseConfigs` list.
 
 # Changelog
 
+## 0.3.3
+
+#### What's new
+
+ * fix regression: QueryBuilder.from is broken.
+
 ## 0.3.2
 
 #### What's new
