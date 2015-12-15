@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var utils = require('../../lib/utils')
 var expect = require('expect.js');
 var Promise = require('bluebird');
 
@@ -132,6 +133,37 @@ module.exports = function (session) {
             .then(function (models) {
               expect(_.pluck(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2']);
               expect(_.pluck(models, 'model1Prop1')).to.eql(['hello 1', 'hello 1']);
+            });
+        });
+
+        it('complex nested subquery', function () {
+          return Model2
+            .query()
+            .from(function (builder) {
+              this
+                .from('model_2')
+                .select('*', function (builder) {
+                  var raw;
+
+                  if (utils.isMySql(session.knex)) {
+                    raw = Model2.raw('concat(model_2_prop_1, model_2_prop_2)');
+                  } else {
+                    raw = Model2.raw('model_2_prop_1 || model_2_prop_2');
+                  }
+
+                  builder.select(raw).as('concatProp');
+                }).as('t')
+            })
+            .where('t.concatProp', 'hejsan 310')
+            .then(function (models) {
+              expect(models).to.have.length(1);
+              expect(models[0]).to.eql({
+                idCol: 3,
+                model1Id: 1,
+                model2Prop1: 'hejsan 3',
+                model2Prop2: 10,
+                concatProp: 'hejsan 310'
+              });
             });
         });
 
