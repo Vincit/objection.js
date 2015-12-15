@@ -64,6 +64,151 @@ describe('ManyToManyRelation', function () {
     });
   });
 
+  it('should accept a join table in join.through object', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          from: 'JoinTable.ownerId',
+          to: 'JoinTable.relatedId'
+        },
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.joinTable).to.equal('JoinTable');
+    expect(relation.joinTableOwnerCol).to.equal('ownerId');
+    expect(relation.joinTableRelatedCol).to.equal('relatedId');
+  });
+
+  it('should be able to swap join.through.from and join.through.to', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'RelatedModel.ownerId',
+        through: {
+          from: 'JoinTable.relatedId',
+          to: 'JoinTable.ownerId'
+        },
+        to: 'OwnerModel.id'
+      }
+    });
+
+    expect(relation.joinTable).to.equal('JoinTable');
+    expect(relation.joinTableOwnerCol).to.equal('ownerId');
+    expect(relation.joinTableRelatedCol).to.equal('relatedId');
+  });
+
+  it('should fail if join.through.to is missing', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            from: 'JoinTable.relatedId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.through must be an object that describes the join table. For example: {from: \'JoinTable.someId\', to: \'JoinTable.someOtherId\'}');
+    });
+  });
+
+  it('should fail if join.through.from is missing', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            to: 'JoinTable.ownerId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.through must be an object that describes the join table. For example: {from: \'JoinTable.someId\', to: \'JoinTable.someOtherId\'}');
+    });
+  });
+
+  it('join.through.from should have format JoinTable.columnName', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            from: 'relatedId',
+            to: 'JoinTable.ownerId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.through.from must have format JoinTable.columnName. For example `JoinTable.someId`.');
+    });
+  });
+
+  it('join.through.to should have format JoinTable.columnName', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            from: 'JoinTable.relatedId',
+            to: 'ownerId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.through.to must have format JoinTable.columnName. For example `JoinTable.someId`.');
+    });
+  });
+
+  it('join.through `to` and `from` should point to the same table', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            from: 'JoinTable.relatedId',
+            to: 'OtherTable.ownerId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.through `from` and `to` must point to the same join table.');
+    });
+  });
+
   describe('find', function () {
 
     it('should generate a find query', function () {
@@ -263,7 +408,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
-        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\') returning "relatedId"');
 
         expect(owner.nameOfOurRelation).to.eql([
           {a: 'str1', id: 1, rid: 3},
@@ -305,7 +450,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'3\'), (\'str2\', \'4\') returning "id"');
-        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\')');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'3\'), (\'666\', \'4\') returning "relatedId"');
 
         expect(owner.nameOfOurRelation).to.eql([
           {a: 'str1', id: 1, rid: 3},
@@ -343,7 +488,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
-        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\') returning "relatedId"');
 
         expect(result).to.eql({a: 'str1', id: 1, rid: 2});
         expect(result).to.be.a(RelatedModel);
@@ -371,7 +516,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(toString);
         expect(executedQueries[0]).to.equal(toSql);
         expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str1\', \'2\') returning "id"');
-        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\')');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'2\') returning "relatedId"');
 
         expect(result).to.eql({a: 'str1', id: 1, rid: 2});
         expect(result).to.be.a(RelatedModel);
@@ -700,7 +845,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql([
-          'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\')'
+          'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\') returning "relatedId"'
         ].join(' '));
       });
     });
@@ -718,7 +863,7 @@ describe('ManyToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql(11);
-          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'11\')');
+          expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'11\') returning "relatedId"');
         });
     });
 
