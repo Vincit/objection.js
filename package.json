@@ -2,16 +2,16 @@
   "name": "objection",
   "version": "0.3.3",
   "description": "An SQL-friendly ORM for Node.js",
-  "main": "objection.js",
+  "main": "lib/objection.js",
   "license": "MIT",
   "scripts": {
-    "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
+    "build": "node build",
+    "test": "npm run build && istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
-    "perf-trace-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt",
     "test-only": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests",
     "test-bail": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail",
-    "test-trace-opt": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --trace_opt --trace_deopt",
-    "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "prepublish": "npm run build"
   },
   "author": {
     "name": "Sami Koskimäki",
@@ -37,8 +37,7 @@
   "files": [
     "README.md",
     "LICENSE",
-    "lib/*",
-    "objection.js"
+    "lib/*"
   ],
   "dependencies": {
     "bluebird": "^3.0.5",
@@ -47,13 +46,17 @@
     "tv4-formats": "^1.0.0"
   },
   "devDependencies": {
+    "babel-core": "^6.3.17",
+    "babel-preset-es2015": "^6.3.13",
     "browserify-global-shim": "^1.0.0",
     "coveralls": "^2.11.2",
     "expect.js": "^0.3.1",
+    "glob": "^6.0.1",
     "grunt": "^0.4.5",
     "grunt-jsdoc": "^1.0.0",
     "istanbul": "^0.4.0",
     "knex": "^0.9.0",
+    "mkdirp": "^0.5.1",
     "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^4.4.0",
