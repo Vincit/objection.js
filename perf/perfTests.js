@@ -252,8 +252,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '16000 bindTransaction calls',
-      runCount: 16000,
+      name: '10000 bindTransaction calls',
+      runCount: 10000,
       runtimeGoal: 1000,
       test: function () {
         Person.bindTransaction({});
