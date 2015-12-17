@@ -5,7 +5,7 @@ describe('main module', function () {
   it('should be able to load using require', function () {
     var objection = require('../');
     expect(objection.Model).to.equal(require('../lib/model/Model'));
-    expect(objection.ModelBase).to.equal(require('../lib/model/ModelBase'));
+    expect(objection.ModelBase).to.equal(require('../lib/model/ModelBase').default);
     expect(objection.QueryBuilder).to.equal(require('../lib/queryBuilder/QueryBuilder'));
     expect(objection.RelationExpression).to.equal(require('../lib/queryBuilder/RelationExpression'));
     expect(objection.ValidationError).to.equal(require('../lib/ValidationError'));

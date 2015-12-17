@@ -1,8 +1,9 @@
 'use strict';
 
+import ModelBase from './ModelBase';
+
 var _ = require('lodash')
   , utils = require('./../utils')
-  , ModelBase = require('./ModelBase')
   , QueryBuilder = require('./../queryBuilder/QueryBuilder')
   , inheritModel = require('./inheritModel')
   , RelationExpression = require('./../queryBuilder/RelationExpression')
