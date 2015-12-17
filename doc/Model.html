@@ -118,15 +118,7 @@
 						</li>
 						
 						<li>
-							<a href="global.html#parseColumn">parseColumn</a>
-						</li>
-						
-						<li>
 							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
-						</li>
-						
-						<li>
-							<a href="global.html#parseFilter">parseFilter</a>
 						</li>
 						
 						<li>
@@ -3476,7 +3468,7 @@ Person
         <h4 class="name" id="SafterInsert">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$afterInsert</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
+          <span class="signature-container"><span class="signature">(queryContext)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -3495,6 +3487,55 @@ Person
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>queryContext</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The context object of the insert query. See <a href="QueryBuilder.html#context">QueryBuilder#context</a>.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -3573,7 +3614,7 @@ Person
         <h4 class="name" id="SafterUpdate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$afterUpdate</span>
-          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
+          <span class="signature-container"><span class="signature">(opt, queryContext)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -3644,6 +3685,29 @@ Person
             
 
             <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>queryContext</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The context object of the update query. See <a href="QueryBuilder.html#context">QueryBuilder#context</a>.</p></td>
         </tr>
 
 	
@@ -3906,7 +3970,7 @@ Person
         <h4 class="name" id="SbeforeInsert">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$beforeInsert</span>
-          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
+          <span class="signature-container"><span class="signature">(queryContext)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -3925,6 +3989,55 @@ Person
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>queryContext</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The context object of the insert query. See <a href="QueryBuilder.html#context">QueryBuilder#context</a>.</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
     
     
     
@@ -4003,7 +4116,7 @@ Person
         <h4 class="name" id="SbeforeUpdate">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">$beforeUpdate</span>
-          <span class="signature-container"><span class="signature">(opt)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
+          <span class="signature-container"><span class="signature">(opt, queryContext)</span><span class="type-signature"> &rarr; {Promise|*}</span></span>
         </h4>
     
     
@@ -4074,6 +4187,29 @@ Person
             
 
             <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>queryContext</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The context object of the update query. See <a href="QueryBuilder.html#context">QueryBuilder#context</a>.</p></td>
         </tr>
 
 	
@@ -7336,7 +7472,7 @@ jennifer
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
-		on Mon Dec 14th 2015 using the <a
+		on Thu Dec 17th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
