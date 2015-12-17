@@ -1,0 +1,688 @@
+'use strict';
+
+var _ = require('lodash');
+var utils = require('../../lib/utils');
+var expect = require('expect.js');
+var inheritModel = require('../../lib/model/inheritModel');
+var mockKnexBuilder = require('../../testUtils/mockKnex');
+
+module.exports = function (session) {
+  var Model1 = session.models.Model1;
+  var Model2 = session.models.Model2;
+  var mockKnex;
+
+  // This file tests only the query context feature. Query context feature is present in
+  // so many places that it is better to test it separately rather than add tests in
+  // multiple other test sets.
+
+  describe('Query context', function () {
+
+    before(function () {
+      mockKnex = mockKnexBuilder(session.knex);
+    });
+
+    after(function () {
+      mockKnex.teardown();
+    });
+
+    beforeEach(function () {
+      return session.populate([{
+        id: 1,
+        model1Prop1: 'hello 1',
+        model1Relation1: {
+          id: 2,
+          model1Prop1: 'hello 2',
+          model1Relation1: {
+            id: 3,
+            model1Prop1: 'hello 3'
+          },
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'hejsan 1',
+            model2Prop2: 30,
+            model2Relation1: [{
+              id: 4,
+              model1Prop1: 'hello 4'
+            }]
+          }, {
+            idCol: 2,
+            model2Prop1: 'hejsan 2',
+            model2Prop2: 20
+          }]
+        }
+      }]);
+    });
+
+    beforeEach(function () {
+      mockKnex.reset();
+    });
+
+    it('should get passed to the $beforeUpdate method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$beforeUpdate = function (opt, queryContext) {
+        expect(queryContext).to.equal(context);
+        called = true;
+      };
+
+      return Model
+        .query()
+        .context(context)
+        .update({model1Prop1: 'updated'})
+        .where('id', 1)
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    it('should get passed to the $afterUpdate method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$afterUpdate = function (opt, queryContext) {
+        expect(queryContext).to.equal(context);
+        called = true;
+      };
+
+      return Model
+        .query()
+        .context(context)
+        .update({model1Prop1: 'updated'})
+        .where('id', 1)
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    it('should get passed to the $beforeInsert method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$beforeInsert = function (queryContext) {
+        expect(queryContext).to.equal(context);
+        called = true;
+      };
+
+      return Model
+        .query()
+        .context(context)
+        .insert({model1Prop1: 'new'})
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    it('should get passed to the $afterInsert method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$afterInsert = function (queryContext) {
+        expect(queryContext).to.equal(context);
+        called = true;
+      };
+
+      return Model
+        .query()
+        .context(context)
+        .insert({model1Prop1: 'new'})
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    if (utils.isPostgres(session.knex)) {
+      // The following features work on all databases. We only test against postgres
+      // so that we can use postgres specific SQL to make the tests simpler.
+
+      it('both queries started by `insertAndFetch` should share the same context', function () {
+        var queries = [];
+
+        return Model1
+          .query()
+          .insertAndFetch({model1Prop1: 'new'})
+          .context({
+            onBuild: function (builder) {
+              builder.withSchema('public');
+            },
+            runBefore: function () {
+              if (this.isExecutable()) {
+                queries.push(this.toSql());
+              }
+            }
+          })
+          .then(function (model) {
+            expect(mockKnex.executedQueries).to.eql(queries);
+            expect(mockKnex.executedQueries).to.eql([
+              'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning "id"',
+              'select * from "public"."Model1" where "Model1"."id" in (\'5\')'
+            ]);
+
+            expect(model.toJSON()).to.eql({
+              model1Prop1: 'new',
+              id: 5,
+              model1Id: null,
+              model1Prop2: null
+            });
+          });
+      });
+
+      it('both queries started by `updateAndFetchById` should share the same context', function () {
+        var queries = [];
+
+        return Model1
+          .query()
+          .updateAndFetchById(1, {model1Prop1: 'updated'})
+          .context({
+            onBuild: function (builder) {
+              builder.withSchema('public');
+            },
+            runBefore: function () {
+              if (this.isExecutable()) {
+                queries.push(this.toSql());
+              }
+            }
+          })
+          .then(function (model) {
+            expect(mockKnex.executedQueries).to.eql(queries);
+            expect(mockKnex.executedQueries).to.eql([
+              'update "public"."Model1" set "model1Prop1" = \'updated\' where "Model1"."id" = \'1\'',
+              'select * from "public"."Model1" where "Model1"."id" = \'1\''
+            ]);
+
+            expect(model.toJSON()).to.eql({
+              model1Prop1: 'updated',
+              id: 1,
+              model1Id: 2,
+              model1Prop2: null
+            });
+          });
+      });
+
+      it('all queries created by insertWithRelated should share the same context', function () {
+        var queries = [];
+
+        // We create a query with `insertWithRelated` method that causes multiple queries to be executed.
+        // We install hooks using for the context object and check that the modifications made in those
+        // hooks are present in the result. This way we can be sure that the hooks were called for all
+        // queries.
+        return Model1
+          .query()
+          .context({
+            onBuild: function (builder) {
+              builder.withSchema('public');
+              // Add a property that is created by the database engine to make sure that the result
+              // actually comes from the database.
+              if (builder.modelClass() === Model1) {
+                builder.returning(['id', Model1.raw('"model1Prop1" || \' computed1\' as computed')]);
+              } else if (builder.modelClass() === Model2) {
+                builder.returning(['id_col', Model1.raw('"model_2_prop_1" || \' computed2\' as computed')]);
+              }
+            },
+            runBefore: function () {
+              if (this.isExecutable()) {
+                queries.push(this.toSql());
+              }
+            },
+            runAfter: function (models) {
+              // Append text to the end of our computed property to make sure this function is called.
+              _.each(_.flatten([models]), function (model) {
+                model.computed += ' after';
+              });
+              return models;
+            }
+          })
+          .insertWithRelated({
+            model1Prop1: 'new 1',
+            model1Relation1: {
+              model1Prop1: 'new 2',
+              model1Relation2: [{
+                model2Prop1: 'new 3',
+                model2Relation1: [{
+                  model1Prop1: 'new 4'
+                }]
+              }]
+            }
+          })
+          .then(function (model) {
+            expect(mockKnex.executedQueries).to.eql(queries);
+            expect(mockKnex.executedQueries).to.eql([
+              'insert into "public"."Model1" ("model1Prop1") values (\'new 2\'), (\'new 4\') returning "id", "model1Prop1" || \' computed1\' as computed',
+              'insert into "public"."Model1" ("model1Id", "model1Prop1") values (\'5\', \'new 1\') returning "id", "model1Prop1" || \' computed1\' as computed',
+              'insert into "public"."model_2" ("model_1_id", "model_2_prop_1") values (\'5\', \'new 3\') returning "id_col", "model_2_prop_1" || \' computed2\' as computed',
+              'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'6\', \'3\') returning "model1Id"'
+            ]);
+
+            expect(model.$toJson()).to.eql({
+              id: 7,
+              model1Id: 5,
+              model1Prop1: "new 1",
+              computed: "new 1 computed1 after after",
+
+              model1Relation1: {
+                id: 5,
+                model1Prop1: "new 2",
+                computed: "new 2 computed1 after",
+
+                model1Relation2: [{
+                  idCol: 3,
+                  model1Id: 5,
+                  model2Prop1: "new 3",
+                  computed: "new 3 computed2 after",
+
+                  model2Relation1: [{
+                    model1Prop1: "new 4",
+                    id: 6,
+                    computed: "new 4 computed1 after"
+                  }]
+                }]
+              }
+            });
+          });
+      });
+
+      it('all queries created by a eager query should share the same context', function () {
+        var queries = [];
+
+        // We create a query with `eager` method that causes multiple queries to be executed.
+        // We install hooks using for the context object and check that the modifications made in those
+        // hooks are present in the result. This way we can be sure that the hooks were called for all
+        // queries.
+        return Model1
+          .query()
+          .context({
+            onBuild: function (builder) {
+              builder.withSchema('public');
+              // Add a property that is created by the database engine to make sure that the result
+              // actually comes from the database.
+              if (builder.modelClass() === Model1) {
+                builder.select('Model1.*', Model1.raw('"model1Prop1" || \' computed1\' as computed'));
+              } else {
+                builder.select('model_2.*', Model1.raw('"model_2_prop_1" || \' computed2\' as computed'));
+              }
+            },
+            runBefore: function () {
+              if (this.isExecutable()) {
+                queries.push(this.toSql());
+              }
+            },
+            runAfter: function (models) {
+              _.each(_.flatten([models]), function (model) {
+                model.computed += ' after';
+              });
+              return models;
+            }
+          })
+          .where('id', 1)
+          .eager('[model1Relation1.[model1Relation1, model1Relation2.model2Relation1]]')
+          .then(function (models) {
+            expect(queries).to.eql([
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "id" = \'1\'',
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (\'2\')',
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (\'3\')',
+              'select "model_2".*, "model_2_prop_1" || \' computed2\' as computed from "public"."model_2" where "model_2"."model_1_id" in (\'2\')',
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed, "Model1Model2"."model2Id" as "objectiontmpjoin" from "public"."Model1" inner join "public"."Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (\'1\', \'2\')'
+            ]);
+
+            expect(models).to.eql([{
+              id: 1,
+              model1Id: 2,
+              model1Prop1: "hello 1",
+              model1Prop2: null,
+              computed: "hello 1 computed1 after",
+              model1Relation1: {
+                id: 2,
+                model1Id: 3,
+                model1Prop1: "hello 2",
+                model1Prop2: null,
+                computed: "hello 2 computed1 after",
+                model1Relation1: {
+                  id: 3,
+                  model1Id: null,
+                  model1Prop1: "hello 3",
+                  model1Prop2: null,
+                  computed: "hello 3 computed1 after"
+                },
+                model1Relation2: [{
+                  idCol: 1,
+                  model1Id: 2,
+                  model2Prop1: "hejsan 1",
+                  model2Prop2: 30,
+                  computed: "hejsan 1 computed2 after",
+                  model2Relation1: [{
+                    id: 4,
+                    model1Id: null,
+                    model1Prop1: "hello 4",
+                    model1Prop2: null,
+                    computed: "hello 4 computed1 after"
+                  }]
+                }, {
+                  idCol: 2,
+                  model1Id: 2,
+                  model2Prop1: "hejsan 2",
+                  model2Prop2: 20,
+                  computed: "hejsan 2 computed2 after",
+                  model2Relation1: []
+                }]
+              }
+            }]);
+          });
+      });
+
+      describe('$relatedQuery', function () {
+
+        describe('one-to-one relation', function () {
+          var model2;
+          var model4;
+
+          beforeEach(function () {
+            return Model1
+              .query()
+              .whereIn('id', [2, 4])
+              .then(function (mod) {
+                model2 = _.find(mod, {id: 2});
+                model4 = _.find(mod, {id: 4});
+                mockKnex.reset();
+              });
+          });
+
+          it('both queries created by an `insert` should share the same context', function () {
+            var queries = [];
+
+            return model4
+              .$relatedQuery('model1Relation1')
+              .insert({model1Prop1: 'new'})
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                  // Add a property that is created by the database engine to make sure that the result
+                  // actually comes from the database.
+                  if (builder.modelClass() === Model1) {
+                    builder.returning(['id', Model1.raw('"model1Prop1" || \' computed1\' as computed')]);
+                  } else if (builder.modelClass() === Model2) {
+                    builder.returning(['id_col', Model1.raw('"model_2_prop_1" || \' computed2\' as computed')]);
+                  }
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function (model) {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning "id", "model1Prop1" || \' computed1\' as computed',
+                  'update "public"."Model1" set "model1Id" = \'5\' where "Model1"."id" = \'4\' returning "id", "model1Prop1" || \' computed1\' as computed'
+                ]);
+
+                expect(model.toJSON()).to.eql({
+                  "model1Prop1": "new",
+                  "id": 5,
+                  "computed": "new computed1"
+                });
+              });
+          });
+
+          it('the query created by `relate` should share the same context', function () {
+            var queries = [];
+
+            return model4
+              .$relatedQuery('model1Relation1')
+              .relate(1)
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function () {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'update "public"."Model1" set "model1Id" = \'1\' where "Model1"."id" = \'4\''
+                ]);
+
+                return session.knex('Model1').where('id', 4);
+              })
+              .then(function (rows) {
+                expect(rows[0].model1Id).to.eql(1);
+              });
+          });
+
+          it('the query created by `unrelate` should share the same context', function () {
+            var queries = [];
+
+            return model2
+              .$relatedQuery('model1Relation1')
+              .unrelate()
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function () {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'update "public"."Model1" set "model1Id" = NULL where "Model1"."id" = \'2\''
+                ]);
+
+                return session.knex('Model1').where('id', 2);
+              })
+              .then(function (rows) {
+                expect(rows[0].model1Id).to.eql(null);
+              });
+          });
+
+        });
+
+        describe('one-to-many relation', function () {
+          var model;
+          var newModel;
+
+          beforeEach(function () {
+            return Model1
+              .query()
+              .where('id', 2)
+              .first()
+              .then(function (mod) {
+                model = mod;
+                return Model2
+                  .query()
+                  .insert({model2Prop1: 'new'});
+              })
+              .then(function (newMod) {
+                newModel = newMod;
+                mockKnex.reset();
+              });
+          });
+
+          it('the query created by `relate` should share the same context', function () {
+            var queries = [];
+
+            return model
+              .$relatedQuery('model1Relation2')
+              .relate(newModel.idCol)
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function () {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'update "public"."model_2" set "model_1_id" = \'2\' where "model_2"."id_col" in (\'3\')'
+                ]);
+
+                return session.knex('model_2').where('id_col', newModel.idCol);
+              })
+              .then(function (rows) {
+                expect(rows[0].model_1_id).to.eql(2);
+              });
+          });
+
+          it('the query created by `unrelate` should share the same context', function () {
+            var queries = [];
+
+            return model
+              .$relatedQuery('model1Relation2')
+              .unrelate()
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function () {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'update "public"."model_2" set "model_1_id" = NULL where "model_2"."model_1_id" = \'2\''
+                ]);
+
+                return session.knex('model_2');
+              })
+              .then(function (rows) {
+                _.each(rows, function (row) {
+                  expect(row.model_1_id).to.equal(null);
+                });
+              });
+          });
+
+        });
+
+        describe('many-to-many relation', function () {
+          var model;
+
+          beforeEach(function () {
+            return Model2
+              .query()
+              .where('id_col', 1)
+              .first()
+              .then(function (mod) {
+                model = mod;
+                mockKnex.reset();
+              })
+          });
+
+          it('both queries created by an insert should share the same context', function () {
+            var queries = [];
+
+            return model
+              .$relatedQuery('model2Relation1')
+              .insert({model1Prop1: 'new'})
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                  // Add a property that is created by the database engine to make sure that the result
+                  // actually comes from the database.
+                  if (builder.modelClass() === Model1) {
+                    builder.returning(['id', Model1.raw('"model1Prop1" || \' computed1\' as computed')]);
+                  }
+                },
+                runBefore: function () {
+                  queries.push(this.toSql());
+                }
+              })
+              .then(function (model) {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning "id", "model1Prop1" || \' computed1\' as computed',
+                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'5\', \'1\') returning "model1Id"'
+                ]);
+
+                expect(model.toJSON()).to.eql({
+                  "model1Prop1": "new",
+                  "id": 5,
+                  "computed": "new computed1"
+                });
+              });
+          });
+
+          it('the query created by `relate` should share the same context', function () {
+            var queries = [];
+
+            return model
+              .$relatedQuery('model2Relation1')
+              .relate(1)
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function () {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'1\', \'1\') returning "model1Id"'
+                ]);
+
+                return session.knex('Model1Model2');
+              })
+              .then(function (rows) {
+                expect(_.where(rows, {model1Id: 1, model2Id: 1}).length).to.equal(1);
+              });
+          });
+
+          it('the query created by `unrelate` should share the same context', function () {
+            var queries = [];
+
+            return model
+              .$relatedQuery('model2Relation1')
+              .unrelate()
+              .where('id', 4)
+              .context({
+                onBuild: function (builder) {
+                  builder.withSchema('public');
+                },
+                runBefore: function () {
+                  if (this.isExecutable()) {
+                    queries.push(this.toSql());
+                  }
+                }
+              })
+              .then(function () {
+                expect(mockKnex.executedQueries).to.eql(queries);
+                expect(mockKnex.executedQueries).to.eql([
+                  'delete from "public"."Model1Model2" where "Model1Model2"."model2Id" = \'1\' and "Model1Model2"."model1Id" in (select "Model1"."id" from "public"."Model1" where "id" = \'4\')'
+                ]);
+
+                return session.knex('Model1Model2');
+              })
+              .then(function (rows) {
+                expect(rows).to.have.length(0);
+              });
+          });
+
+        });
+
+      });
+    }
+
+  });
+
+};
