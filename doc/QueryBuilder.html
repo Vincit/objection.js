@@ -118,15 +118,7 @@
 						</li>
 						
 						<li>
-							<a href="global.html#parseColumn">parseColumn</a>
-						</li>
-						
-						<li>
 							<a href="global.html#parseFieldExpression">parseFieldExpression</a>
-						</li>
-						
-						<li>
-							<a href="global.html#parseFilter">parseFilter</a>
 						</li>
 						
 						<li>
@@ -2260,6 +2252,184 @@
 	<dd>
 		
 <span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="context">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">context</span>
+          <span class="signature-container"><span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>|Object}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Sets/gets the query context.</p>
+<p>Some query builder methods create more than one query. The query context is an object that is<br>shared with all queries started by a query builder. You can set the context like this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .context({something: 'hello'});</code></pre><p>and access the context like this:</p>
+<pre class="prettyprint source lang-js"><code>var context = builder.context();</code></pre><p>You can set any data to the context object. You can also register QueryBuilder lifecycle methods<br>for <em>all</em> queries that share the context:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .context({
+    runBefore: function (builder) {},
+    runAfter: function (builder) {},
+    onBuild: function (builder) {}
+  });</code></pre><p>For example the <code>eager</code> method causes multiple queries to be executed from a single query builder.<br>If you wanted to make all of them use the same schema you could write this:</p>
+<pre class="prettyprint source lang-js"><code>Person
+  .query()
+  .eager('[movies, children.movies])
+  .context({
+    onBuild: function (builder) {
+      builder.withSchema('someSchema');
+    }
+  });</code></pre><p>The context is also passed to <code>$beforeInsert</code>, <code>$afterInsert</code>, <code>$beforeUpdate</code> and <code>$afterUpdate</code><br>calls that the query creates.</p>
+<p>See the methods <a href="QueryBuilder.html#runBefore">QueryBuilder#runBefore</a>, <a href="QueryBuilder.html#onBuild">QueryBuilder#onBuild</a> and<br><a href="QueryBuilder.html#runAfter">QueryBuilder#runAfter</a> for more information about the hooks.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>ctx</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+|
+
+<span class="param-type">Object</span>
 
 
 	</dd>
@@ -5187,6 +5357,104 @@ Person
 	<dd>
 		
 <span class="param-type"><a href="QueryBuilderBase.html">QueryBuilderBase</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
+        <h4 class="name" id="isExecutable">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">isExecutable</span>
+          <span class="signature-container"><span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns false if this query will never be executed.</p>
+<p>This may be true in multiple cases:</p>
+<ol>
+<li>The query is explicitly resolved or rejected using the <code>resolve</code> or <code>reject</code> methods.</li>
+<li>The query starts a different query when it is executed.</li>
+</ol>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
 
 
 	</dd>
@@ -10946,6 +11214,148 @@ query
               
 <dt>
     
+        <h4 class="name" id="resolve">
+          <span class="modifiers-container"><span class="type-signature"></span></span>
+          <span class="content">resolve</span>
+          <span class="signature-container"><span class="signature">(value)</span><span class="type-signature"> &rarr; {<a href="QueryBuilder.html">QueryBuilder</a>}</span></span>
+        </h4>
+    
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Skips the database query and &quot;fakes&quot; a result.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="QueryBuilder.html">QueryBuilder</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+            
+        
+            
+              
+<dt>
+    
         <h4 class="name" id="resultSize">
           <span class="modifiers-container"><span class="type-signature"></span></span>
           <span class="content">resultSize</span>
@@ -12349,7 +12759,7 @@ query.then();
     
     <div class="description">
         <p>Sets a custom query executor.</p>
-<p>Setting this will cause the query builder to not be executed. Instead the fully built<br>query builder is passed to the function registered using this method and the function<br>should execute some other query.</p>
+<p>Setting this will cause the query builder to not be executed. Instead the fully built<br>query builder is passed to the function registered using this method and the function<br>should return some other query to execute.</p>
     </div>
     
 
@@ -17320,7 +17730,7 @@ Person
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
-		on Mon Dec 14th 2015 using the <a
+		on Thu Dec 17th 2015 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
