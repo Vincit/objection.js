@@ -6,6 +6,7 @@ var Model = require('../../lib/model/Model');
 var expect = require('expect.js');
 
 var unhandledRejectionHandlers = [];
+
 Promise.onPossiblyUnhandledRejection(function (error) {
   if (_.isEmpty(unhandledRejectionHandlers)) {
     console.error(error.stack);

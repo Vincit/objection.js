@@ -712,6 +712,21 @@ describe('QueryBuilder', function () {
 
   describe('eager and allowEager' , function () {
 
+    it("allowEager('a').eager('a(f1)') should be ok", function (done) {
+      QueryBuilder
+        .forClass(TestModel)
+        .eager('a(f1)', {f1: _.noop})
+        .allowEager('a')
+        .then(function () {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(function (err) {
+          console.log(err.stack);
+          done(new Error('should not get here'));
+        });
+    });
+
     it("allowEager('[a, b.c.[d, e]]').eager('a') should be ok", function (done) {
       QueryBuilder
         .forClass(TestModel)
@@ -791,6 +806,7 @@ describe('QueryBuilder', function () {
           done();
         });
     });
+
   });
 
 });

@@ -1072,7 +1072,7 @@ describe('InsertWithRelated', function () {
       });
 
       insertions.push({
-        tableName: tableInsertion.tableName,
+        tableName: tableInsertion.modelClass.tableName,
         models: _.map(tableInsertion.models, function (model) {
           if (model instanceof Model) {
             return model.$toJson(true)
