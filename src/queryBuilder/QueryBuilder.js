@@ -1,5 +1,3 @@
-'use strict';
-
 import _ from 'lodash';
 import Promise from 'bluebird';
 import RelationExpression from './RelationExpression';
@@ -2144,5 +2142,6 @@ function build(builder) {
     func.call(builder, builder);
   });
 
+  // noinspection JSUnresolvedVariable
   return QueryBuilderBase.prototype.build.call(builder);
 }
