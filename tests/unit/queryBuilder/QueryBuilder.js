@@ -3,7 +3,7 @@ var _ = require('lodash')
   , expect = require('expect.js')
   , Promise = require('bluebird')
   , Model = require('../../../lib/model/Model').default
-  , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder')
+  , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder').default
   , QueryBuilderBase = require('../../../lib/queryBuilder/QueryBuilderBase')
   , RelationExpression = require('../../../lib/queryBuilder/RelationExpression');
 

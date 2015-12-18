@@ -8,7 +8,8 @@ var SRC_DIR = './src';
 var DST_DIR = './lib';
 var CP_ONLY = [SRC_DIR + '/model/inheritModel/inheritModelEs6.js'];
 var BABEL_OPT = {
-  presets: ['es2015', 'stage-0']
+  presets: ['es2015', 'stage-0'],
+  plugins: ['transform-runtime', 'babel-plugin-transform-decorators-legacy']
 };
 
 var src = glob.sync(SRC_DIR + '/**/*.js');
