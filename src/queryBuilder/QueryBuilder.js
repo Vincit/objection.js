@@ -1026,7 +1026,7 @@ QueryBuilder.prototype.build = function () {
   if (builder.isFindQuery()) {
     // If no write methods have been called at this point this query is a
     // find query and we need to call the custom find implementation.
-    builder._customImpl.find.call(builder);
+    builder._customImpl.find.call(builder, builder);
   }
 
   // We need to build the builder even if the _hooks.executor function
@@ -1056,18 +1056,18 @@ QueryBuilder.prototype._execute = function () {
   if (builder.isFindQuery()) {
     // If no write methods have been called at this point this query is a
     // find query and we need to call the custom find implementation.
-    builder._customImpl.find.call(builder);
+    builder._customImpl.find.call(builder, builder);
   }
 
   if (_.isFunction(context.runBefore)) {
     promise = promise.then(function (result) {
-      return context.runBefore.call(builder, result);
+      return context.runBefore.call(builder, result, builder);
     });
   }
 
   _.each(builder._hooks.before, function (func) {
     promise = promise.then(function (result) {
-      return func.call(builder, result);
+      return func.call(builder, result, builder);
     });
   });
 
@@ -1093,7 +1093,7 @@ QueryBuilder.prototype._execute = function () {
 
     _.each(builder._hooks.afterModelCreate, function (func) {
       promise = promise.then(function (result) {
-        return func.call(builder, result);
+        return func.call(builder, result, builder);
       });
     });
 
@@ -1105,13 +1105,13 @@ QueryBuilder.prototype._execute = function () {
 
     if (_.isFunction(context.runAfter)) {
       promise = promise.then(function (result) {
-        return context.runAfter.call(builder, result);
+        return context.runAfter.call(builder, result, builder);
       });
     }
 
     _.each(builder._hooks.after, function (func) {
       promise = promise.then(function (result) {
-        return func.call(builder, result);
+        return func.call(builder, result, builder);
       });
     });
 
@@ -1391,7 +1391,7 @@ QueryBuilder.prototype.insert = tryCallWriteMethod(function insert(modelsOrObjec
   insertion.setData(modelsOrObjects);
 
   this._calledWriteMethod = 'insert';
-  this._customImpl.insert.call(this, insertion);
+  this._customImpl.insert.call(this, insertion, this);
 
   this.runBefore(function () {
     var builder = this;
@@ -1593,7 +1593,7 @@ QueryBuilder.prototype.insertWithRelated = tryCallWriteMethod(function insertWit
   insertion.setData(modelsOrObjects, {skipValidation: true});
 
   this._calledWriteMethod = 'insert';
-  this._customImpl.insert.call(this, insertion);
+  this._customImpl.insert.call(this, insertion, this);
   this.resolve([]);
 
   this.runAfterModelCreatePushFront(function () {
@@ -1773,7 +1773,7 @@ QueryBuilder.prototype.$$updateWithOptions = tryCallWriteMethod(function $$updat
   update.setData(modelOrObject, opt);
 
   this._calledWriteMethod = method;
-  this._customImpl[method].call(this, update);
+  this._customImpl[method].call(this, update, this);
 
   this.runBefore(function () {
     return update.model().$beforeUpdate(opt, this.context());
@@ -1939,7 +1939,7 @@ QueryBuilder.prototype.patchAndFetchById = function (id, modelOrObject) {
  * @returns {QueryBuilder}
  */
 QueryBuilder.prototype.delete = tryCallWriteMethod(function del() {
-  this._customImpl.delete.call(this);
+  this._customImpl.delete.call(this, this);
   this._calledWriteMethod = 'delete';
   return this;
 });
@@ -1995,7 +1995,7 @@ QueryBuilder.prototype.relate = tryCallWriteMethod(function relate(ids) {
   }
 
   this._calledWriteMethod = 'relate';
-  var maybeIds = this._customImpl.relate.call(this, ids);
+  var maybeIds = this._customImpl.relate.call(this, ids, this);
 
   if (_.isArray(maybeIds)) {
     ids = maybeIds;
@@ -2037,7 +2037,7 @@ QueryBuilder.prototype.relate = tryCallWriteMethod(function relate(ids) {
  */
 QueryBuilder.prototype.unrelate = tryCallWriteMethod(function unrelate() {
   this._calledWriteMethod = 'unrelate';
-  this._customImpl.unrelate.call(this);
+  this._customImpl.unrelate.call(this, this);
 
   this.runAfterModelCreate(function () {
     return {};

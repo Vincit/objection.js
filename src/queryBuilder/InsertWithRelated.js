@@ -22,7 +22,7 @@ var _ = require('lodash')
  */
 function InsertWithRelated(opt) {
   // Lazy-load Model.
-  Model = Model || require('./../model/Model');
+  Model = Model || require('./../model/Model').default;
 
   this.modelClass = opt.modelClass;
   this.models = opt.models;

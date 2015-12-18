@@ -168,7 +168,7 @@ Relation.extend = function (subclassConstructor) {
  */
 Relation.prototype.setMapping = function (mapping) {
   // Avoid require loop and import here.
-  var Model = require(__dirname + '/../model/Model');
+  var Model = require(__dirname + '/../model/Model').default;
 
   if (!utils.isSubclassOf(this.ownerModelClass, Model)) {
     throw new Error('Relation\'s owner is not a subclass of Model');

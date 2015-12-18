@@ -2,7 +2,7 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../../../lib/model/Model')
+  , Model = require('../../../lib/model/Model').default
   , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder')
   , QueryBuilderBase = require('../../../lib/queryBuilder/QueryBuilderBase')
   , RelationExpression = require('../../../lib/queryBuilder/RelationExpression');
@@ -224,6 +224,40 @@ describe('QueryBuilder', function () {
       });
   });
 
+  it('should pass the query builder as `this` and parameter for the hooks', function (done) {
+    var text = '';
+
+    QueryBuilder
+      .forClass(TestModel)
+      .runBefore(function (result, builder) {
+        expect(builder).to.be.a(QueryBuilder);
+        expect(this).to.equal(builder);
+        text += 'a';
+      })
+      .onBuild(function (builder) {
+        expect(builder).to.be.a(QueryBuilder);
+        expect(this).to.equal(builder);
+        text += 'b';
+      })
+      .runAfterModelCreate(function (data, builder) {
+        expect(builder).to.be.a(QueryBuilder);
+        expect(this).to.equal(builder);
+        text += 'c';
+      })
+      .runAfter(function (data, builder) {
+        expect(builder).to.be.a(QueryBuilder);
+        expect(this).to.equal(builder);
+        text += 'd';
+      })
+      .then(function () {
+        expect(text).to.equal('abcd');
+        done();
+      })
+      .catch(function (err) {
+        done(err);
+      });
+  });
+
   it('should call run* methods in the correct order', function (done) {
     mockKnexQueryResult = 0;
 
@@ -339,7 +373,8 @@ describe('QueryBuilder', function () {
   it('should call custom find implementation defined by findImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .findImpl(function () {
+      .findImpl(function (builder) {
+        expect(builder).to.equal(this);
         this.where({a: 1});
       })
       .then(function () {
@@ -390,8 +425,9 @@ describe('QueryBuilder', function () {
   it('should call custom insert implementation defined by insertImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .insertImpl(function (insert) {
+      .insertImpl(function (insert, builder) {
         insert.model().b = 2;
+        expect(builder).to.equal(this);
         this.$$insert(insert);
       })
       .insert({a: 1})
@@ -404,8 +440,9 @@ describe('QueryBuilder', function () {
   it('should call custom update implementation defined by updateImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .updateImpl(function (update) {
+      .updateImpl(function (update, builder) {
         update.model().b = 2;
+        expect(builder).to.equal(this);
         this.$$update(update);
       })
       .update({a: 1})
@@ -418,8 +455,9 @@ describe('QueryBuilder', function () {
   it('should call custom patch implementation defined by patchImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .patchImpl(function (patch) {
+      .patchImpl(function (patch, builder) {
         patch.model().b = 2;
+        expect(builder).to.equal(this);
         this.$$update(patch);
       })
       .patch({a: 1})
@@ -432,7 +470,8 @@ describe('QueryBuilder', function () {
   it('should call custom delete implementation defined by deleteImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .deleteImpl(function () {
+      .deleteImpl(function (builder) {
+        expect(builder).to.equal(this);
         this.$$delete().where('id', 100);
       })
       .delete()
@@ -445,8 +484,9 @@ describe('QueryBuilder', function () {
   it('should call custom relate implementation defined by relateImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .relateImpl(function (relate) {
+      .relateImpl(function (relate, builder) {
         relate[0].b = 2;
+        expect(builder).to.equal(this);
         this.$$insert(relate);
       })
       .relate({a: 1})
@@ -459,7 +499,8 @@ describe('QueryBuilder', function () {
   it('should call custom unrelate implementation defined by unrelateImpl', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .unrelateImpl(function () {
+      .unrelateImpl(function (builder) {
+        expect(builder).to.equal(this);
         this.$$delete().where('id', 100);
       })
       .unrelate()
