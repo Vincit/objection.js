@@ -1,8 +1,9 @@
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
-  , Model = require('../../../lib/model/Model').default
-  , Relation = require('../../../lib/relations/Relation');
+  , objection = require('../../../')
+  , Model = objection.Model
+  , Relation = objection.Relation;
 
 describe('Relation', function () {
   var OwnerModel = null;

@@ -2,9 +2,10 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../../../lib/model/Model').default
-  , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder')
-  , OneToOneRelation = require('../../../lib/relations/OneToOneRelation');
+  , objection = require('../../../')
+  , Model = objection.Model
+  , QueryBuilder = objection.QueryBuilder
+  , OneToOneRelation = objection.OneToOneRelation;
 
 describe('OneToOneRelation', function () {
   var originalKnexQueryBuilderThen = null;

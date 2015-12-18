@@ -28,13 +28,15 @@ var _ = require('lodash');
  * @ignore
  * @constructor
  */
-function InsertionOrUpdate(QueryBuilder, ModelClass) {
-  this.QueryBuilder = QueryBuilder;
-  this.ModelClass = ModelClass;
+function InsertionOrUpdate(opt) {
+  this.QueryBuilder = opt.QueryBuilder;
+  this.ModelClass = opt.ModelClass;
 
   this._models = [];
   this._rawOrQuery = [];
   this._arrayInput = false;
+
+  this.setData(opt.modelsOrObjects, opt.modelOptions);
 }
 
 InsertionOrUpdate.prototype.model = function () {

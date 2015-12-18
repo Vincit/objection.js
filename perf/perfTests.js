@@ -2,8 +2,7 @@ var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../lib/model/Model')
-  , QueryBuilder = require('../lib/queryBuilder/QueryBuilder');
+  , Model = require('../').Model;
 
 describe('Performance tests', function () {
   var mockKnexQueryResult = [];
