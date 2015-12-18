@@ -1,5 +1,6 @@
 import ModelBase from './model/ModelBase';
 import Model from './model/Model';
+import QueryBuilderBase from './queryBuilder/QueryBuilderBase';
 import QueryBuilder from './queryBuilder/QueryBuilder';
 import RelationExpression from './queryBuilder/RelationExpression';
 import ValidationError from './ValidationError';
@@ -16,6 +17,7 @@ export {
   ModelBase,
   Model,
   QueryBuilder,
+  QueryBuilderBase,
   RelationExpression,
   ValidationError,
   Relation,
