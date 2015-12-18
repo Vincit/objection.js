@@ -1,4 +1,4 @@
-var Model = require('../../../../lib/model/Model');
+var Model = require('../../../../lib/model/Model').default;
 
 function RelatedModel() {
   Model.apply(this, arguments);

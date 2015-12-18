@@ -65,7 +65,7 @@ Relation.extend(ManyToManyRelation);
  */
 ManyToManyRelation.prototype.setMapping = function (mapping) {
   // Avoid require loop and import here.
-  var Model = require(__dirname + '/../model/Model');
+  var Model = require(__dirname + '/../model/Model').default;
 
   var retVal = Relation.prototype.setMapping.call(this, mapping);
   var errorPrefix = this.ownerModelClass.name + '.relationMappings.' + this.name;

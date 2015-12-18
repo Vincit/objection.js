@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var Promise = require('bluebird');
-var Model = require('./model/Model');
+var Model = require('./model/Model').default;
 var utils = require('./utils');
 
 /**
