@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')

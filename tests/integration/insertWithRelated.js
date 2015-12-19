@@ -4,8 +4,8 @@ var _ = require('lodash');
 var utils = require('../../lib/utils');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var transaction = require('../../lib/transaction');
-var ValidationError = require('../../lib/ValidationError');
+var transaction = require('../../').transaction;
+var ValidationError = require('../../').ValidationError;
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;

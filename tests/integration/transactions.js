@@ -1,7 +1,9 @@
+'use strict';
+
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
-var transaction = require('../../lib/transaction');
+var transaction = require('../../').transaction;
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;

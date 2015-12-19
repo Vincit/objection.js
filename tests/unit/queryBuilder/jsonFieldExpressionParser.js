@@ -1,7 +1,8 @@
+'use strict';
+
 var _ = require('lodash')
   , expect = require('expect.js')
-  , parser = require('../../../lib/queryBuilder/parsers/jsonFieldExpressionParser.js')
-  ;
+  , parser = require('../../../lib/queryBuilder/parsers/jsonFieldExpressionParser.js');
 
 describe('jsonFieldExpressionParser', function () {
 
