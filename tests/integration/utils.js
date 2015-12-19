@@ -1,9 +1,11 @@
+'use strict';
+
 var _ = require('lodash');
 var path = require('path');
 var utils = require('../../lib/utils');
 var Promise = require('bluebird');
-var Model = require('../../lib/model/Model').default;
 var expect = require('expect.js');
+var Model = require('../../').Model;
 
 var unhandledRejectionHandlers = [];
 

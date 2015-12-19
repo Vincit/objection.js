@@ -1,4 +1,4 @@
-var Model = require('../../../../lib/model/Model').default;
+var Model = require('../../../../').Model;
 
 function OwnerModel() {
   Model.apply(this, arguments);

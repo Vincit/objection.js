@@ -1,7 +1,9 @@
+'use strict';
+
 var _ = require('lodash')
   , expect = require('expect.js')
-  , ModelBase = require('../../../lib/model/ModelBase').default
-  , ValidationError = require('../../../lib/ValidationError');
+  , ModelBase = require('../../../').ModelBase
+  , ValidationError = require('../../../').ValidationError;
 
 describe('ModelBase', function () {
 

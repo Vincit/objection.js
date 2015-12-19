@@ -1,11 +1,12 @@
+'use strict';
+
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
-  , Model = require('../../../lib/model/Model').default
-  , QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder')
+  , Model = require('../../../').Model
   , InsertWithRelated = require('../../../lib/queryBuilder/InsertWithRelated')
-  , RelationExpression = require('../../../lib/queryBuilder/RelationExpression');
+  , RelationExpression = require('../../../').RelationExpression;
 
 describe('InsertWithRelated', function () {
   var mockKnexQueryResult = [];

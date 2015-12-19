@@ -1,3 +1,5 @@
+'use strict';
+
 var _ = require('lodash');
 var utils = require('../../lib/utils')
 var expect = require('expect.js');

@@ -1,6 +1,8 @@
+'use strict';
+
 var expect = require('expect.js')
-  , ValidationError = require('../../../lib/ValidationError')
-  , RelationExpression = require('../../../lib/queryBuilder/RelationExpression');
+  , ValidationError = require('../../../').ValidationError
+  , RelationExpression = require('../../../').RelationExpression;
 
 describe('RelationExpression', function () {
 

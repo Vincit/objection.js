@@ -1,9 +1,11 @@
+'use strict';
+
 var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
 var inheritModel = require('../../lib/model/inheritModel');
 var expectPartEql = require('./utils').expectPartialEqual;
-var ValidationError = require('../../lib/ValidationError');
+var ValidationError = require('../../').ValidationError;
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;

@@ -1,8 +1,10 @@
+'use strict';
+
 var _ = require('lodash');
 var knex = require('knex');
 var expect = require('expect.js');
-var Model = require('../../../lib/model/Model').default;
-var QueryBuilder = require('../../../lib/queryBuilder/QueryBuilder').default;
+var Model = require('../../../').Model;
+var QueryBuilder = require('../../../').QueryBuilder;
 
 describe('Model', function () {
 
