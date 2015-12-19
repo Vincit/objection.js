@@ -1,6 +1,4 @@
-'use strict';
-
-var _ = require('lodash');
+import _ from 'lodash';
 
 /**
  * Internal representation of insert and update data.
@@ -26,115 +24,105 @@ var _ = require('lodash');
  * finally reaches knex, the two parts are glued back together.
  *
  * @ignore
- * @constructor
  */
-function InsertionOrUpdate(opt) {
-  this.QueryBuilder = opt.QueryBuilder;
-  this.ModelClass = opt.ModelClass;
+export default class InsertionOrUpdate {
 
-  this._models = [];
-  this._rawOrQuery = [];
-  this._arrayInput = false;
+  constructor({QueryBuilder, ModelClass, modelsOrObjects, modelOptions}) {
+    this.QueryBuilder = QueryBuilder;
+    this.ModelClass = ModelClass;
 
-  this.setData(opt.modelsOrObjects, opt.modelOptions);
-}
+    this._models = [];
+    this._rawOrQuery = [];
+    this._arrayInput = false;
 
-InsertionOrUpdate.prototype.model = function () {
-  return this._models[0];
-};
-
-InsertionOrUpdate.prototype.models = function () {
-  return this._models;
-};
-
-/**
- * Returns true if the input to `setData` method was an array.
- *
- * @ignore
- * @returns {boolean}
- */
-InsertionOrUpdate.prototype.isArray = function () {
-  return this._arrayInput;
-};
-
-/**
- * Sets the actual insert/update data.
- *
- * @ignore
- * @param {Object|Array.<Object>} data
- * @param {ModelOptions} modelOptions
- */
-InsertionOrUpdate.prototype.setData = function (data, modelOptions) {
-  var self = this;
-  var knex = this.ModelClass.knex();
-  var KnexQueryBuilder = knex.client.QueryBuilder;
-  var Raw = knex.client.Raw;
-
-  // knex.QueryBuilder and knex.Raw are not documented properties.
-  // We make sure here that things break if knex changes things.
-  if (!_.isFunction(KnexQueryBuilder) || !_.isFunction(Raw)) {
-    throw new Error('knex API has changed: knex.QueryBuilder or knex.Raw constructor missing.');
+    this.setData(modelsOrObjects, modelOptions);
   }
 
-  this._models = [];
-  this._rawOrQuery = [];
-  this._arrayInput = _.isArray(data);
-
-  if (!this._arrayInput) {
-    data = _.isObject(data) ? [data] : [];
+  model() {
+    return this._models[0];
   }
 
-  // Separate raw queries and query builders from javascript primitives.
-  // The javascript primitives are converted into a Model instance and the
-  // "query" properties are stored separately.
-  _.each(data, function (obj) {
-    if (obj instanceof self.ModelClass) {
-      self._models.push(obj);
-      self._rawOrQuery.push({});
-    } else {
-      var modelJson = {};
-      var rawOrSubquery = {};
+  models() {
+    return this._models;
+  }
 
-      _.each(obj, function (value, key) {
-        if (value instanceof KnexQueryBuilder|| value instanceof Raw) {
-          rawOrSubquery[key] = value;
-        } else if (value instanceof self.QueryBuilder) {
-          rawOrSubquery[key] = value.build();
-        } else {
-          modelJson[key] = value;
-        }
-      });
+  /**
+   * Returns true if the input to `setData` method was an array.
+   *
+   * @ignore
+   * @returns {boolean}
+   */
+  isArray() {
+    return this._arrayInput;
+  }
 
-      self._models.push(self.ModelClass.fromJson(modelJson, modelOptions));
-      self._rawOrQuery.push(rawOrSubquery);
+  /**
+   * Sets the actual insert/update data.
+   *
+   * @ignore
+   * @param {(Object|Array.<Object>)} data
+   * @param {ModelOptions} modelOptions
+   */
+  setData(data, modelOptions) {
+    let knex = this.ModelClass.knex();
+    let KnexQueryBuilder = knex.client.QueryBuilder;
+    let Raw = knex.client.Raw;
+
+    // knex.QueryBuilder and knex.Raw are not documented properties.
+    // We make sure here that things break if knex changes things.
+    if (!_.isFunction(KnexQueryBuilder) || !_.isFunction(Raw)) {
+      throw new Error('knex API has changed: knex.QueryBuilder or knex.Raw constructor missing.');
     }
-  });
-};
 
-/**
- * Create an object that can be given for the knex update or insert method.
- *
- * @ignore
- * @returns {Object|Array.<Object>}
- */
-InsertionOrUpdate.prototype.toKnexInput = function () {
-  var self = this;
+    this._models = [];
+    this._rawOrQuery = [];
+    this._arrayInput = _.isArray(data);
 
-  var knexInput = _.map(this._models, function (model, i) {
-    var modelJson = model.$toDatabaseJson();
+    if (!this._arrayInput) {
+      data = _.isObject(data) ? [data] : [];
+    }
 
-    var rawOrQuery = _.mapKeys(self._rawOrQuery[i], function (value, key) {
-      return model.constructor.propertyNameToColumnName(key);
+    // Separate raw queries and query builders from javascript primitives.
+    // The javascript primitives are converted into a Model instance and the
+    // "query" properties are stored separately.
+    _.forEach(data, obj => {
+      if (obj instanceof this.ModelClass) {
+        this._models.push(obj);
+        this._rawOrQuery.push({});
+      } else {
+        let modelJson = {};
+        let rawOrSubquery = {};
+
+        _.forEach(obj, (value, key) => {
+          if (value instanceof KnexQueryBuilder|| value instanceof Raw) {
+            rawOrSubquery[key] = value;
+          } else if (value instanceof this.QueryBuilder) {
+            rawOrSubquery[key] = value.build();
+          } else {
+            modelJson[key] = value;
+          }
+        });
+
+        this._models.push(this.ModelClass.fromJson(modelJson, modelOptions));
+        this._rawOrQuery.push(rawOrSubquery);
+      }
+    });
+  }
+
+  /**
+   * Create an object that can be given for the knex update or insert method.
+   *
+   * @ignore
+   * @returns {Object|Array.<Object>}
+   */
+  toKnexInput() {
+    let knexInput = _.map(this._models, (model, i) => {
+      return _.merge(model.$toDatabaseJson(), _.mapKeys(this._rawOrQuery[i], (value, key) => {
+        return model.constructor.propertyNameToColumnName(key);
+      }));
     });
 
-    return _.merge(modelJson, rawOrQuery);
-  });
-
-  if (knexInput.length === 1) {
-    return knexInput[0];
-  } else {
-    return knexInput;
+    return knexInput.length === 1 ? knexInput[0] : knexInput;
   }
-};
+}
 
-module.exports = InsertionOrUpdate;

@@ -637,7 +637,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   /**
    * Gets the Model subclass this builder is bound to.
    *
-   * @returns {Model|QueryBuilder}
+   * @returns {Model}
    */
   modelClass() {
     return this._modelClass;
@@ -709,11 +709,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     builder._explicitResolveValue = this._explicitResolveValue;
 
     _.forEach(this._hooks, (funcs, key) => {
-      if (_.isArray(funcs)) {
-        builder._hooks[key] = funcs.slice();
-      } else {
-        builder._hooks[key] = funcs;
-      }
+      builder._hooks[key] = _.isArray(funcs) ? funcs.slice() : funcs;
     });
 
     _.forEach(this._customImpl, (impl, key) => {
@@ -836,7 +832,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {boolean}
    */
   has(methodNameRegex) {
-    return methodNameRegex.test(this._calledWriteMethod) || QueryBuilderBase.prototype.has.call(this, methodNameRegex);
+    return super.has(methodNameRegex) || methodNameRegex.test(this._calledWriteMethod);
   }
 
   /**
