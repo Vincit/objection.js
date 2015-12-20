@@ -222,6 +222,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * // --> hello 1
    * ```
    *
+   * @ignore
    * @param {function(*, QueryBuilder)} runBefore
    * @returns {QueryBuilder}
    */
@@ -266,6 +267,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * query builder is passed to the function registered using this method and the function
    * should return some other query to execute.
    *
+   * @ignore
    * @param {function(QueryBuilder)} executor
    * @returns {QueryBuilder}
    */
@@ -296,6 +298,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * });
    * ```
    *
+   * @ignore
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfterModelCreate
    * @returns {QueryBuilder}
    */
@@ -325,6 +328,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * // --> hello 1
    * ```
    *
+   * @ignore
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfterModelCreate
    * @returns {QueryBuilder}
    */
@@ -646,6 +650,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   /**
    * Returns true if none of the methods `insert`, `.update`, `patch`, `delete`, `relate` or `unrelate` has been called.
    *
+   * @ignore
    * @returns {boolean}
    */
   isFindQuery() {
@@ -1022,6 +1027,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   /**
    * Builds the query into a knex query builder.
    *
+   * @ignore
    * @returns {knex.QueryBuilder}
    *    The built knex query builder.
    */
@@ -1369,7 +1375,6 @@ export default class QueryBuilder extends QueryBuilderBase {
    * as a result. If you need batch insert on other databases you can use knex directly
    * through `YourModel.knexQuery()`.
    *
-   * @method
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    *    Objects to insert.
    *
@@ -1557,7 +1562,6 @@ export default class QueryBuilder extends QueryBuilderBase {
    * By the way, if you are using Postgres the inserts are done in batches for
    * maximum performance.
    *
-   * @method
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    *    Objects to insert.
    *
@@ -1991,7 +1995,6 @@ export default class QueryBuilder extends QueryBuilderBase {
    *   });
    * ```
    *
-   * @method
    * @returns {QueryBuilder}
    */
   @writeQueryMethod
