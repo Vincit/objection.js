@@ -42,7 +42,7 @@ var _ = require('lodash')
  * @property {Object} through
  *    Describes the join table if the models are related through one.
  *
- * @property {Model} modelClass
+ * @property {Model} through.modelClass
  *    If the there is model class available for the join table, it can be provided
  *    using this property.
  *
