@@ -1,6 +1,7 @@
-'use strict';
+import util from 'util';
 
-var util = require('util');
+// Note: babel cannot inherit from built-in types like Error.
+// that's why we use ES5 inheritance here.
 
 /**
  * Error of this class is thrown when a Model validation fails.
@@ -8,7 +9,7 @@ var util = require('util');
  * @param {Object} errors
  * @constructor
  */
-function ValidationError(errors) {
+export default function ValidationError(errors) {
   Error.call(this);
   Error.captureStackTrace(this, ValidationError);
 
@@ -31,7 +32,5 @@ function ValidationError(errors) {
 }
 
 util.inherits(ValidationError, Error);
-
-module.exports = ValidationError;
 
 

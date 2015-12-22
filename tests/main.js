@@ -9,7 +9,7 @@ describe('main module', function () {
     expect(objection.QueryBuilder).to.equal(require('../lib/queryBuilder/QueryBuilder').default);
     expect(objection.QueryBuilderBase).to.equal(require('../lib/queryBuilder/QueryBuilderBase').default);
     expect(objection.RelationExpression).to.equal(require('../lib/queryBuilder/RelationExpression').default);
-    expect(objection.ValidationError).to.equal(require('../lib/ValidationError'));
+    expect(objection.ValidationError).to.equal(require('../lib/ValidationError').default);
     expect(objection.Relation).to.equal(require('../lib/relations/Relation').default);
     expect(objection.OneToManyRelation).to.equal(require('../lib/relations/OneToManyRelation').default);
     expect(objection.OneToOneRelation).to.equal(require('../lib/relations/OneToOneRelation').default);

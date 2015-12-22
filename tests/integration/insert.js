@@ -200,7 +200,8 @@ module.exports = function (session) {
           .then(function (rows) {
             expect(_.pluck(rows, 'id').sort()).to.eql([1, 2]);
             done();
-          });
+          })
+          .catch(done);
       });
 
     });
