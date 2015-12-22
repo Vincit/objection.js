@@ -1,8 +1,6 @@
-'use strict';
-
-var _ = require('lodash')
-  , parser = require('./parsers/relationExpressionParser')
-  , ValidationError = require('./../ValidationError');
+import _ from 'lodash';
+import parser from './parsers/relationExpressionParser';
+import ValidationError from './../ValidationError';
 
 /**
  * Relation expression is a simple DSL for expressing relation trees.
@@ -61,130 +59,127 @@ var _ = require('lodash')
  *
  * In this example `children` relation had arguments `arg1` and `arg2` and `actors` relation had
  * the argument `arg3`.
- *
- * @constructor
  */
-function RelationExpression(node) {
-  node = node || {};
-  this.name = node.name || null;
-  this.args = node.args || [];
-  this.numChildren = node.numChildren || 0;
-  this.children = node.children || {};
+export default class RelationExpression {
+
+  constructor(node) {
+    node = node || {};
+    this.name = node.name || null;
+    this.args = node.args || [];
+    this.numChildren = node.numChildren || 0;
+    this.children = node.children || {};
+  }
+
+  /**
+   * Parses an expression string into a {@link RelationExpression} object.
+   *
+   * @param {String|RelationExpression} expr
+   * @returns {RelationExpression}
+   */
+  static parse(expr) {
+    if (expr instanceof RelationExpression) {
+      return expr;
+    } else if (!_.isString(expr) || _.isEmpty(expr.trim())) {
+      return new RelationExpression();
+    } else {
+      try {
+        return new RelationExpression(parser.parse(expr));
+      } catch (err) {
+        throw new ValidationError({
+          message: 'Invalid relation expression "' + expr + '"',
+          cause: err.message
+        });
+      }
+    }
+  }
+
+  /**
+   * Tests if another expression is a sub expression of this one.
+   *
+   * Expression B is a sub expression of expression A if:
+   *
+   * - A and B have the same root
+   * - And each path from root to a leaf in B can be found in A
+   *
+   * For example sub expressions of `children.[movies.actors, pets]` are:
+   *
+   * - `children`
+   * - `children.movies`
+   * - `children.pets`
+   * - `children.movies.actors`
+   * - `children.[movies, pets]`
+   * - `children.[movies.actors, pets]`
+   *
+   * @param {string|RelationExpression} expr
+   * @returns {boolean}
+   */
+  isSubExpression(expr) {
+    expr = RelationExpression.parse(expr);
+
+    if (this.isAllRecursive()) {
+      return true;
+    }
+
+    if (expr.isAllRecursive()) {
+      return this.isAllRecursive();
+    }
+
+    if (this.name !== expr.name) {
+      return false;
+    }
+
+    if (expr.isRecursive()) {
+      return this.isAllRecursive() || this.isRecursive();
+    }
+
+    return _.all(expr.children, (child, childName) => {
+      var ownSubExpression = this.childExpression(childName);
+      var subExpression = expr.childExpression(childName);
+
+      return ownSubExpression && ownSubExpression.isSubExpression(subExpression);
+    });
+  }
+
+  /**
+   * @ignore
+   * @returns {boolean}
+   */
+  isRecursive() {
+    return !!_.find(this.children, {name: '^'});
+  }
+
+  /**
+   * @ignore
+   * @returns {boolean}
+   */
+  isAllRecursive() {
+    return this.numChildren === 1 && this.children[Object.keys(this.children)[0]].name === '*';
+  }
+
+  /**
+   * @ignore
+   * @returns {RelationExpression}
+   */
+  childExpression(childName) {
+    if (this.isAllRecursive() || (this.isRecursive() && childName === this.name)) {
+      return this;
+    }
+
+    if (this.children[childName]) {
+      return new RelationExpression(this.children[childName]);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * @ignore
+   */
+  forEachChild(cb) {
+    _.each(this.children, (child, childName) => {
+      if (childName !== '*' && childName !== '^') {
+        cb(child, childName);
+      }
+    });
+  }
 }
-
-/**
- * Parses an expression string into a {@link RelationExpression} object.
- *
- * @param {String|RelationExpression} expr
- * @returns {RelationExpression}
- */
-RelationExpression.parse = function (expr) {
-  if (expr instanceof RelationExpression) {
-    return expr;
-  } else if (!_.isString(expr) || _.isEmpty(expr.trim())) {
-    return new RelationExpression();
-  } else {
-    try {
-      return new RelationExpression(parser.parse(expr));
-    } catch (err) {
-      throw new ValidationError({
-        message: 'Invalid relation expression "' + expr + '"',
-        cause: err.message
-      });
-    }
-  }
-};
-
-/**
- * Tests if another expression is a sub expression of this one.
- *
- * Expression B is a sub expression of expression A if:
- *
- * - A and B have the same root
- * - And each path from root to a leaf in B can be found in A
- *
- * For example sub expressions of `children.[movies.actors, pets]` are:
- *
- * - `children`
- * - `children.movies`
- * - `children.pets`
- * - `children.movies.actors`
- * - `children.[movies, pets]`
- * - `children.[movies.actors, pets]`
- *
- * @param {String|RelationExpression} expr
- * @returns {boolean}
- */
-RelationExpression.prototype.isSubExpression = function (expr) {
-  var self = this;
-
-  expr = RelationExpression.parse(expr);
-
-  if (this.isAllRecursive()) {
-    return true;
-  }
-
-  if (expr.isAllRecursive()) {
-    return this.isAllRecursive();
-  }
-
-  if (this.name !== expr.name) {
-    return false;
-  }
-
-  if (expr.isRecursive()) {
-    return this.isAllRecursive() || this.isRecursive();
-  }
-
-  return _.all(expr.children, function (child, childName) {
-    var ownSubExpression = self.childExpression(childName);
-    var subExpression = expr.childExpression(childName);
-
-    return ownSubExpression && ownSubExpression.isSubExpression(subExpression);
-  });
-};
-
-/**
- * @ignore
- * @returns {boolean}
- */
-RelationExpression.prototype.isRecursive = function () {
-  return !!_.find(this.children, {name: '^'});
-};
-
-/**
- * @ignore
- * @returns {boolean}
- */
-RelationExpression.prototype.isAllRecursive = function () {
-  return this.numChildren === 1 && this.children[Object.keys(this.children)[0]].name === '*';
-};
-
-/**
- * @ignore
- * @returns {RelationExpression}
- */
-RelationExpression.prototype.childExpression = function (childName) {
-  if (this.isAllRecursive() || (this.isRecursive() && childName === this.name)) {
-    return this;
-  }
-
-  if (this.children[childName]) {
-    return new RelationExpression(this.children[childName]);
-  } else {
-    return null;
-  }
-};
-
-/**
- * @ignore
- */
-RelationExpression.prototype.forEachChild = function (cb) {
-  _.each(this.children, function (child, childName) {
-    if (childName !== '*' && childName !== '^') {
-      cb(child, childName);
-    }
-  })
-};
-
-module.exports = RelationExpression;
