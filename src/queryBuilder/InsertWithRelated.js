@@ -2,7 +2,7 @@
 
 var _ = require('lodash')
   , Promise = require('bluebird')
-  , RelationExpression = require('./RelationExpression')
+  , RelationExpression = require('./RelationExpression').default
   , ManyToManyRelation = require('./../relations/ManyToManyRelation').default
   , OneToManyRelation = require('./../relations/OneToManyRelation').default
   , OneToOneRelation = require('./../relations/OneToOneRelation').default
