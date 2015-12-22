@@ -19,7 +19,7 @@ function MockKnex(knex) {
     self.executedQueries.push(this.toString());
 
     if (!_.isEmpty(self.results)) {
-      var promise = Promise.resolve(self.result.shift());
+      var promise = Promise.resolve(self.results.shift());
       return promise.then.apply(promise, arguments);
     } else {
       return self.originalThen.apply(this, arguments);
