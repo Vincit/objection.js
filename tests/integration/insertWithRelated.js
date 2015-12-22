@@ -103,7 +103,7 @@ module.exports = function (session) {
           expect(rows1).to.have.length(0);
           expect(rows2).to.have.length(0);
           done();
-        })
+        }).catch(done);
       });
 
       it('should validate models upon insertion: references in integer columns should be accepted', function () {
@@ -194,7 +194,8 @@ module.exports = function (session) {
           .catch(function (err) {
             expect(err instanceof ValidationError).to.equal(true);
             done();
-          });
+          })
+          .catch(done);
       });
 
     });

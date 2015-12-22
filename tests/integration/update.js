@@ -135,7 +135,8 @@ module.exports = function (session) {
           .then(function (rows) {
             expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
             done();
-          });
+          })
+          .catch(done);
       });
 
       it('should validate (2)', function (done) {
@@ -162,7 +163,8 @@ module.exports = function (session) {
           .then(function (rows) {
             expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
             done();
-          });
+          })
+          .catch(done);
       });
 
     });

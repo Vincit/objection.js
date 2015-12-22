@@ -210,7 +210,8 @@ module.exports = function (session) {
           .then(function (rows) {
             expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
             done();
-          });
+          })
+          .catch(done);
       });
 
       it('should skip requirement validation', function (done) {

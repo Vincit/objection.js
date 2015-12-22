@@ -6,7 +6,7 @@ var _ = require('lodash')
   , ManyToManyRelation = require('./../relations/ManyToManyRelation').default
   , OneToManyRelation = require('./../relations/OneToManyRelation').default
   , OneToOneRelation = require('./../relations/OneToOneRelation').default
-  , ValidationError = require('./../ValidationError')
+  , ValidationError = require('./../ValidationError').default
   , Model;
 
 /**
