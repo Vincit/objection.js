@@ -1,30 +1,21 @@
 var _ = require('lodash')
-  , knex = require('knex')
+  , Knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
+  , mockKnexBuilder = require('../testUtils/mockKnex')
   , Model = require('../').Model;
 
 describe('Performance tests', function () {
-  var mockKnexQueryResult = [];
-  var executedQueries = [];
   var mockKnex = null;
+  var knex = null;
 
   var Person = null;
   var Animal = null;
   var Movie = null;
 
-  beforeEach(function () {
-    mockKnexQueryResult = [];
-    executedQueries = [];
-  });
-
   before(function () {
-    mockKnex = knex({client: 'pg'});
-
-    mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
-      executedQueries.push(this.toString());
-      return Promise.resolve(mockKnexQueryResult).then(cb, ecb);
-    };
+    knex = Knex({client: 'pg'});
+    mockKnex = mockKnexBuilder(knex);
   });
 
   before(function () {
@@ -160,6 +151,10 @@ describe('Performance tests', function () {
     };
   });
 
+  beforeEach(function () {
+    mockKnex.reset();
+  });
+
   describe('Model methods (85 models in the dataset)', function () {
     var data;
 
@@ -261,7 +256,114 @@ describe('Performance tests', function () {
 
     after(function () {
       return Promise.delay(500);
-    })
+    });
+  });
+
+  describe('queries', function () {
+
+    perfTest({
+      name: '8000 `Person.query()` queries',
+      runCount: 8000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        mockKnex.results = _.map(_.range(16000), function () {
+          return _.map(_.range(10), function (idx) {
+            return {
+              firstName: 'Firstname ' + idx,
+              lastName: 'Lastname ' + idx,
+              age: idx
+            };
+          });
+        });
+
+        return Person.bindKnex(knex);
+      },
+      test: function (Person) {
+        return Person.query().where('id', 10).then(function (models) {
+          return models;
+        });
+      }
+    });
+
+    perfTest({
+      name: '8000 `person.$relatedQuery("children")` queries',
+      runCount: 8000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        mockKnex.results = _.map(_.range(16000), function () {
+          return _.map(_.range(10), function (idx) {
+            return {
+              firstName: 'Firstname ' + idx,
+              lastName: 'Lastname ' + idx,
+              age: idx
+            };
+          });
+        });
+
+        return Person.bindKnex(knex).fromJson({
+          id: 10,
+          firstName: 'Parent',
+          lastName: 'Testerson'
+        });
+      },
+      test: function (person) {
+        return person.$relatedQuery('children').then(function (models) {
+          return models;
+        });
+      }
+    });
+
+    perfTest({
+      name: '500 `Person.query().insertWithRelated()` queries',
+      runCount: 500,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        mockKnex.results = _.map(_.range(0, 50000, 10), function (idx) {
+          return _.range(idx, idx + 10);
+        });
+
+        return Person.bindKnex(knex);
+      },
+      test: function (Person) {
+        return Person.query().insertWithRelated([{
+          "#id": 'person1',
+          firstName: 'Person 1',
+          lastName: 'Person 1 Lastname',
+          age: 50,
+
+          children: [{
+            firstName: 'Child of #ref{person1.id}',
+            lastName: 'Child 1 Lastname',
+            age: 20
+          }, {
+            firstName: 'Child of #ref{person1.id}',
+            lastName: 'Child 2 Lastname',
+            age: 18
+          }],
+
+          movies: [{
+            "#id": 'movie1',
+            name: 'Movie 1'
+          }, {
+            name: 'Movie 2'
+          }]
+        }, {
+          firstName: 'Person 1',
+          lastName: 'Person 1 Lastname',
+          age: 60,
+
+          movies: [{
+            "#ref": 'movie1'
+          }]
+        }]).then(function (models) {
+          return models;
+        });
+      }
+    });
+
+    after(function () {
+      return Promise.delay(500);
+    });
   });
 
   function perfTest(opt) {
@@ -274,25 +376,34 @@ describe('Performance tests', function () {
 
       ctx = beforeTest();
       var t0 = Date.now();
-      runTest(opt, ctx);
-      var t1 = Date.now();
-      var runtime = t1 - t0;
+      return runTest(opt, ctx).then(function () {
+        var t1 = Date.now();
+        var runtime = t1 - t0;
 
-      if (runtime > opt.runtimeGoal) {
-        throw new Error('runtime ' + runtime + ' ms exceeds the runtimeGoal ' + opt.runtimeGoal + " ms");
-      }
+        if (runtime > opt.runtimeGoal) {
+          throw new Error('runtime ' + runtime + ' ms exceeds the runtimeGoal ' + opt.runtimeGoal + " ms");
+        }
 
-      Promise.delay(100).then(function () {
-        console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
+        Promise.delay(100).then(function () {
+          console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
+        });
+
+        return Promise.delay(50);
       });
-
-      return Promise.delay(50);
     });
   }
 
   function runTest(opt, ctx) {
+    var promises = [];
+
     for (var i = 0; i < opt.runCount; ++i) {
-      opt.test(ctx);
+      var maybePromise = opt.test(ctx);
+
+      if (maybePromise && _.isFunction(maybePromise.then)) {
+        promises.push(maybePromise);
+      }
     }
+
+    return Promise.all(promises);
   }
 });
