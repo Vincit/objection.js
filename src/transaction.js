@@ -1,9 +1,7 @@
-'use strict';
-
-var _ = require('lodash');
-var Promise = require('bluebird');
-var Model = require('./model/Model').default;
-var utils = require('./utils');
+import _ from 'lodash';
+import Promise from 'bluebird';
+import Model from './model/Model';
+import utils from './utils';
 
 /**
  * Starts a transaction.
@@ -63,7 +61,7 @@ var utils = require('./utils');
  *
  * ```js
  * objection.transaction(Person, function (Person) {
- *  var knex = this;
+ *  let knex = this;
  *
  *  return Person
  *    .query()
@@ -82,16 +80,16 @@ var utils = require('./utils');
  * @function transaction
  * @returns {Promise}
  */
-module.exports = function transaction() {
+export default function transaction() {
   // There must be at least one model class and the callback.
   if (arguments.length < 2) {
     return Promise.reject(new Error('objection.transaction: provide at least one Model class to bind to the transaction'));
   }
 
   // The last argument should be the callback and all other Model subclasses.
-  var callback = _.last(arguments);
-  var modelClasses = _.take(arguments, arguments.length - 1);
-  var i;
+  let callback = _.last(arguments);
+  let modelClasses = _.take(arguments, arguments.length - 1);
+  let i;
 
   for (i = 0; i < modelClasses.length; ++i) {
     if (!utils.isSubclassOf(modelClasses[i], Model)) {
@@ -99,7 +97,7 @@ module.exports = function transaction() {
     }
   }
 
-  var knex = _.first(modelClasses).knex();
+  let knex = _.first(modelClasses).knex();
   for (i = 0; i < modelClasses.length; ++i) {
     if (modelClasses[i].knex() !== knex) {
       return Promise.reject(new Error('objection.transaction: all Model subclasses must be bound to the same database'));
@@ -111,16 +109,16 @@ module.exports = function transaction() {
     callback = Promise.coroutine(callback);
   }
 
-  return knex.transaction(function (trx) {
-    for (var i = 0; i < modelClasses.length; ++i) {
+  return knex.transaction(trx => {
+    for (let i = 0; i < modelClasses.length; ++i) {
       modelClasses[i] = modelClasses[i].bindTransaction(trx);
     }
 
-    return Promise.try(function () {
+    return Promise.try(() => {
       return callback.apply(trx, modelClasses);
     });
   });
-};
+}
 
 /**
  * Starts a transaction.
@@ -131,8 +129,8 @@ module.exports = function transaction() {
  * rolling back the transaction.
  *
  * ```js
- * var Person = require('./models/Person');
- * var transaction;
+ * let Person = require('./models/Person');
+ * let transaction;
  *
  * objection.transaction.start(Person).then(function (trx) {
  *   transaction = trx;
@@ -160,8 +158,8 @@ module.exports = function transaction() {
  *
  * @returns {Promise}
  */
-module.exports.start = function (modelClassOrKnex) {
-  var knex = modelClassOrKnex;
+transaction.start = function (modelClassOrKnex) {
+  let knex = modelClassOrKnex;
 
   if (utils.isSubclassOf(modelClassOrKnex, Model)) {
     knex = modelClassOrKnex.knex();
@@ -171,10 +169,10 @@ module.exports.start = function (modelClassOrKnex) {
     return Promise.reject(new Error('objection.transaction.start: first argument must be a model class or a knex instance'));
   }
 
-  return new Promise(function (resolve) {
-    knex.transaction(function (trx) {
+  return new Promise(resolve => {
+    knex.transaction(trx => {
       resolve(trx);
-    }).catch(function () {
+    }).catch(() => {
       // Nothing to do here.
     });
   });
