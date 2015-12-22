@@ -3,9 +3,9 @@
 var _ = require('lodash')
   , Promise = require('bluebird')
   , RelationExpression = require('./RelationExpression')
-  , ManyToManyRelation = require('./../relations/ManyToManyRelation')
-  , OneToManyRelation = require('./../relations/OneToManyRelation')
-  , OneToOneRelation = require('./../relations/OneToOneRelation')
+  , ManyToManyRelation = require('./../relations/ManyToManyRelation').default
+  , OneToManyRelation = require('./../relations/OneToManyRelation').default
+  , OneToOneRelation = require('./../relations/OneToOneRelation').default
   , ValidationError = require('./../ValidationError')
   , Model;
 
