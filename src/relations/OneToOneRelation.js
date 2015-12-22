@@ -1,206 +1,185 @@
-'use strict';
-
-var _ = require('lodash')
-  , Relation = require('./Relation');
+import _ from 'lodash';
+import Relation from './Relation';
 
 /**
- * @constructor
  * @ignore
  * @extends Relation
  */
-function OneToOneRelation() {
-  Relation.apply(this, arguments);
-}
-
-Relation.extend(OneToOneRelation);
-
-/**
- * @override
- * @inheritDoc
- * @returns {QueryBuilder}
- */
-OneToOneRelation.prototype.findQuery = function (builder, ownerCol, isColumnRef) {
-  if (isColumnRef) {
-    builder.whereRef(this.fullRelatedCol(), ownerCol);
-  } else {
-    if (_.isArray(ownerCol)) {
-      builder.whereIn(this.fullRelatedCol(), _.compact(ownerCol));
+export default class OneToOneRelation extends Relation {
+  /**
+   * @override
+   * @inheritDoc
+   * @returns {QueryBuilder}
+   */
+  findQuery(builder, ownerCol, isColumnRef) {
+    if (isColumnRef) {
+      builder.whereRef(this.fullRelatedCol(), ownerCol);
     } else {
-      builder.where(this.fullRelatedCol(), ownerCol)
+      if (_.isArray(ownerCol)) {
+        builder.whereIn(this.fullRelatedCol(), _.compact(ownerCol));
+      } else {
+        builder.where(this.fullRelatedCol(), ownerCol)
+      }
     }
+
+    return builder.call(this.filter);
   }
 
-  return builder.call(this.filter);
-};
+  /**
+   * @override
+   * @inheritDoc
+   * @returns {QueryBuilder}
+   */
+  join(builder, joinMethod) {
+    joinMethod = joinMethod || 'join';
 
-/**
- * @override
- * @inheritDoc
- * @returns {QueryBuilder}
- */
-OneToOneRelation.prototype.join = function (builder, joinMethod) {
-  joinMethod = joinMethod || 'join';
+    let relatedTable = this.relatedModelClass.tableName;
+    let relatedTableAlias = this.relatedTableAlias();
 
-  var relatedTable = this.relatedModelClass.tableName;
-  var relatedTableAlias = this.relatedTableAlias();
+    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
+    let relatedCol = relatedTableAlias + '.' + this.relatedCol;
 
-  var relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
-  var relatedCol = relatedTableAlias + '.' + this.relatedCol;
+    return builder
+      [joinMethod](relatedTableAsAlias, relatedCol, this.fullOwnerCol())
+      .call(this.filter);
+  }
 
-  return builder
-    [joinMethod](relatedTableAsAlias, relatedCol, this.fullOwnerCol())
-    .call(this.filter);
-};
-
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.find = function (builder, owners) {
-  var self = this;
-
-  builder.onBuild(function (builder) {
-    var relatedIds = _.unique(_.compact(_.pluck(owners, self.ownerProp)));
-    self._makeFindQuery(builder, relatedIds);
-  });
-
-  builder.runAfterModelCreate(function (related) {
-    var relatedById = _.indexBy(related, self.relatedProp);
-
-    _.each(owners, function (owner) {
-      owner[self.name] = relatedById[owner[self.ownerProp]] || null;
+  /**
+   * @override
+   * @inheritDoc
+   */
+  find(builder, owners) {
+    builder.onBuild(builder => {
+      let relatedIds = _.unique(_.compact(_.pluck(owners, this.ownerProp)));
+      this._makeFindQuery(builder, relatedIds);
     });
 
-    return related;
-  });
-};
+    builder.runAfterModelCreate(related => {
+      let relatedById = _.indexBy(related, this.relatedProp);
 
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.insert = function (builder, owner, insertion) {
-  var self = this;
+      _.each(owners, owner => {
+        owner[this.name] = relatedById[owner[this.ownerProp]] || null;
+      });
 
-  if (insertion.models().length > 1) {
-    throw new Error('can only insert one model to a OneToOneRelation');
+      return related;
+    });
   }
 
-  builder.onBuild(function (builder) {
-    builder.$$insert(insertion);
-  });
+  /**
+   * @override
+   * @inheritDoc
+   */
+  insert(builder, owner, insertion) {
+    if (insertion.models().length > 1) {
+      throw new Error('can only insert one model to a OneToOneRelation');
+    }
 
-  builder.runAfterModelCreate(function (inserted) {
-    owner[self.ownerProp] = inserted[0][self.relatedProp];
-    owner[self.name] = inserted[0];
+    builder.onBuild(builder => {
+      builder.$$insert(insertion);
+    });
 
-    var patch = {};
-    patch[self.ownerProp] = inserted[0][self.relatedProp];
+    builder.runAfterModelCreate(inserted => {
+      owner[this.ownerProp] = inserted[0][this.relatedProp];
+      owner[this.name] = inserted[0];
 
-    return self.ownerModelClass
-      .query()
-      .childQueryOf(builder)
-      .patch(patch)
-      .where(self.ownerModelClass.getFullIdColumn(), owner.$id())
-      .return(inserted);
-  });
-};
+      let patch = {};
+      patch[this.ownerProp] = inserted[0][this.relatedProp];
 
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.update = function (builder, owner, update) {
-  var self = this;
-
-  builder.onBuild(function (builder) {
-    self._makeFindQuery(builder, owner[self.ownerProp]);
-    builder.$$update(update);
-  });
-};
-
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.patch = function (builder, owner, patch) {
-  return this.update(builder, owner, patch);
-};
-
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.delete = function (builder, owner) {
-  var self = this;
-
-  builder.onBuild(function (builder) {
-    self._makeFindQuery(builder, owner[self.ownerProp]);
-    builder.$$delete();
-  });
-};
-
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.relate = function (builder, owner, ids) {
-  var self = this;
-
-  if (ids.length > 1) {
-    throw new Error('can only relate one model to a OneToOneRelation');
+      return this.ownerModelClass
+        .query()
+        .childQueryOf(builder)
+        .patch(patch)
+        .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
+        .return(inserted);
+    });
   }
 
-  // Set a custom executor that executes a patch query.
-  builder.setQueryExecutor(function (builder) {
-    var patch = {};
-
-    patch[self.ownerProp] = ids[0];
-    owner[self.ownerProp] = ids[0];
-
-    return self.ownerModelClass
-      .query()
-      .childQueryOf(builder)
-      .patch(patch)
-      .copyFrom(builder, /where/i)
-      .where(self.ownerModelClass.getFullIdColumn(), owner.$id())
-      .runAfterModelCreate(_.constant({}));
-  });
-};
-
-/**
- * @override
- * @inheritDoc
- */
-OneToOneRelation.prototype.unrelate = function (builder, owner) {
-  var self = this;
-
-  // Set a custom executor that executes a patch query.
-  builder.setQueryExecutor(function (builder) {
-    var patch = {};
-
-    patch[self.ownerProp] = null;
-    owner[self.ownerProp] = null;
-
-    return self.ownerModelClass
-      .query()
-      .childQueryOf(builder)
-      .patch(patch)
-      .copyFrom(builder, /where/i)
-      .where(self.ownerModelClass.getFullIdColumn(), owner.$id())
-      .runAfterModelCreate(_.constant({}));
-  });
-};
-
-/**
- * @private
- */
-OneToOneRelation.prototype._makeFindQuery = function (builder, relatedIds) {
-  if ((_.isArray(relatedIds) && _.isEmpty(relatedIds)) || !relatedIds) {
-    return builder.resolve([]);
-  } else {
-    return this.findQuery(builder, relatedIds);
+  /**
+   * @override
+   * @inheritDoc
+   */
+  update(builder, owner, update) {
+    builder.onBuild(builder => {
+      this._makeFindQuery(builder, owner[this.ownerProp]);
+      builder.$$update(update);
+    });
   }
-};
 
-module.exports = OneToOneRelation;
+  /**
+   * @override
+   * @inheritDoc
+   */
+  patch(builder, owner, patch) {
+    return this.update(builder, owner, patch);
+  }
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  delete(builder, owner) {
+    builder.onBuild(builder => {
+      this._makeFindQuery(builder, owner[this.ownerProp]);
+      builder.$$delete();
+    });
+  }
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  relate(builder, owner, ids) {
+    if (ids.length > 1) {
+      throw new Error('can only relate one model to a OneToOneRelation');
+    }
+
+    builder.setQueryExecutor(builder => {
+      let patch = {};
+
+      patch[this.ownerProp] = ids[0];
+      owner[this.ownerProp] = ids[0];
+
+      return this.ownerModelClass
+        .query()
+        .childQueryOf(builder)
+        .patch(patch)
+        .copyFrom(builder, /where/i)
+        .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
+        .runAfterModelCreate(_.constant({}));
+    });
+  }
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  unrelate(builder, owner) {
+    builder.setQueryExecutor(builder => {
+      let patch = {};
+
+      patch[this.ownerProp] = null;
+      owner[this.ownerProp] = null;
+
+      return this.ownerModelClass
+        .query()
+        .childQueryOf(builder)
+        .patch(patch)
+        .copyFrom(builder, /where/i)
+        .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
+        .runAfterModelCreate(_.constant({}));
+    });
+  }
+
+  /**
+   * @private
+   */
+  _makeFindQuery(builder, relatedIds) {
+    if ((_.isArray(relatedIds) && _.isEmpty(relatedIds)) || !relatedIds) {
+      return builder.resolve([]);
+    } else {
+      return this.findQuery(builder, relatedIds);
+    }
+  }
+}
+
+

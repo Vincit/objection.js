@@ -1,8 +1,6 @@
-'use strict';
-
-var _ = require('lodash')
-  , utils = require('../utils')
-  , QueryBuilder = require('../queryBuilder/QueryBuilder');
+import _ from 'lodash';
+import utils from '../utils';
+import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 /**
  * @typedef {Object} RelationJoin
@@ -29,12 +27,12 @@ var _ = require('lodash')
  * }
  * ```
  *
- * @property {String} from
+ * @property {string} from
  *    The relation column in the owner table. Must be given with the table name.
  *    For example `Person.id`. Note that neither this nor `to` need to be foreign
  *    keys or primary keys. You can join any column to any column.
  *
- * @property {String} to
+ * @property {string} to
  *    The relation column in the related table. Must be given with the table name.
  *    For example `Movie.id`. Note that neither this nor `from` need to be foreign
  *    keys or primary keys. You can join any column to any column.
@@ -46,11 +44,11 @@ var _ = require('lodash')
  *    If the there is model class available for the join table, it can be provided
  *    using this property.
  *
- * @property {String} through.from
+ * @property {string} through.from
  *    The column that is joined to `from` property of the `RelationJoin`. For example
  *    `Person_Movie.actorId` where `Person_Movie` is the join table.
  *
- * @property {String} through.to
+ * @property {string} through.to
  *    The column that is joined to `to` property of the `RelationJoin`. For example
  *    `Person_Movie.movieId` where `Person_Movie` is the join table.
  */
@@ -58,7 +56,7 @@ var _ = require('lodash')
 /**
  * @typedef {Object} RelationMapping
  *
- * @property {Model|String} modelClass
+ * @property {Model|string} modelClass
  *    A {@link Model} subclass constructor or an absolute path to a module that exports one.
  *
  * @property {Relation} relation
@@ -78,7 +76,7 @@ var _ = require('lodash')
  *
  * This is an abstract base class and should never be instantiated.
  *
- * @param {String} relationName
+ * @param {string} relationName
  *    Name of the relation.
  *
  * @param {Model} OwnerClass
@@ -86,397 +84,397 @@ var _ = require('lodash')
  *
  * @ignore
  * @abstract
- * @constructor
  */
-function Relation(relationName, OwnerClass) {
-  /**
-   * Name of the relation.
-   *
-   * @type {String}
-   */
-  this.name = relationName;
+export default class Relation {
 
-  /**
-   * The owner class of this relation.
-   *
-   * This must be a subclass of Model.
-   *
-   * @type {Model}
-   */
-  this.ownerModelClass = OwnerClass;
+  constructor(relationName, OwnerClass) {
+    /**
+     * Name of the relation.
+     *
+     * @type {string}
+     */
+    this.name = relationName;
 
-  /**
-   * The related class.
-   *
-   * This must be a subclass of Model.
-   *
-   * @type {Model}
-   */
-  this.relatedModelClass = null;
+    /**
+     * The owner class of this relation.
+     *
+     * This must be a subclass of Model.
+     *
+     * @type {Class<Model>}
+     */
+    this.ownerModelClass = OwnerClass;
 
-  /**
-   * The relation column in the owner table.
-   *
-   * @type {String}
-   */
-  this.ownerCol = null;
+    /**
+     * The related class.
+     *
+     * This must be a subclass of Model.
+     *
+     * @type {Class<Model>}
+     */
+    this.relatedModelClass = null;
 
-  /**
-   * The relation property in the owner model.
-   *
-   * @type {String}
-   */
-  this.ownerProp = null;
+    /**
+     * The relation column in the owner table.
+     *
+     * @type {string}
+     */
+    this.ownerCol = null;
 
-  /**
-   * The relation column in the related table.
-   *
-   * @type {String}
-   */
-  this.relatedCol = null;
+    /**
+     * The relation property in the owner model.
+     *
+     * @type {string}
+     */
+    this.ownerProp = null;
 
-  /**
-   * The relation property in the related model.
-   *
-   * @type {String}
-   */
-  this.relatedProp = null;
+    /**
+     * The relation column in the related table.
+     *
+     * @type {string}
+     */
+    this.relatedCol = null;
 
-  /**
-   * Optional additional filter query.
-   *
-   * @type {function (QueryBuilder)}
-   */
-  this.filter = null;
-}
+    /**
+     * The relation property in the related model.
+     *
+     * @type {string}
+     */
+    this.relatedProp = null;
 
-/**
- * Makes the given constructor a subclass of this class.
- *
- * @param {function=} subclassConstructor
- * @return {function}
- */
-Relation.extend = function (subclassConstructor) {
-  utils.inherits(subclassConstructor, this);
-  return subclassConstructor;
-};
-
-/**
- * Constructs the instance based on a mapping data.
- *
- * @param {RelationMapping} mapping
- */
-Relation.prototype.setMapping = function (mapping) {
-  // Avoid require loop and import here.
-  var Model = require(__dirname + '/../model/Model').default;
-
-  if (!utils.isSubclassOf(this.ownerModelClass, Model)) {
-    throw new Error('Relation\'s owner is not a subclass of Model');
+    /**
+     * Optional additional filter query.
+     *
+     * @type {function (QueryBuilder)}
+     */
+    this.filter = null;
   }
 
-  var errorPrefix = this.ownerModelClass.name + '.relationMappings.' + this.name;
-
-  if (!mapping.modelClass) {
-    throw new Error(errorPrefix + '.modelClass is not defined');
+  /**
+   * Makes the given constructor a subclass of this class.
+   *
+   * @param {function=} subclassConstructor
+   * @return {function}
+   */
+  static extend(subclassConstructor) {
+    utils.inherits(subclassConstructor, this);
+    return subclassConstructor;
   }
 
-  if (_.isString(mapping.modelClass)) {
-    try {
-      // babel 6 style of exposing es6 exports to commonjs https://github.com/babel/babel/issues/2683
-      var relatedModelClassModule = require(mapping.modelClass);
-      this.relatedModelClass = utils.isSubclassOf(relatedModelClassModule.default, Model) ?
-        relatedModelClassModule.default : relatedModelClassModule;
-    } catch (err) {
-      throw new Error(errorPrefix + '.modelClass is an invalid file path to a model class.');
+  /**
+   * Constructs the instance based on a mapping data.
+   *
+   * @param {RelationMapping} mapping
+   */
+  setMapping(mapping) {
+    // Avoid require loop and import here.
+    let Model = require(__dirname + '/../model/Model').default;
+
+    if (!utils.isSubclassOf(this.ownerModelClass, Model)) {
+      throw new Error('Relation\'s owner is not a subclass of Model');
     }
 
-    if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
-      throw new Error(errorPrefix + '.modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
+    let errorPrefix = `${this.ownerModelClass.name}.relationMappings.${this.name}`;
+
+    if (!mapping.modelClass) {
+      throw new Error(errorPrefix + '.modelClass is not defined');
     }
-  } else {
-    this.relatedModelClass = mapping.modelClass;
 
-    if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
-      throw new Error(errorPrefix + '.modelClass is not a subclass of Model or a file path to a module that exports one.');
+    if (_.isString(mapping.modelClass)) {
+      try {
+        // babel 6 style of exposing es6 exports to commonjs https://github.com/babel/babel/issues/2683
+        let relatedModelClassModule = require(mapping.modelClass);
+        this.relatedModelClass = utils.isSubclassOf(relatedModelClassModule.default, Model) ?
+          relatedModelClassModule.default : relatedModelClassModule;
+      } catch (err) {
+        throw new Error(errorPrefix + '.modelClass is an invalid file path to a model class.');
+      }
+
+      if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
+        throw new Error(errorPrefix + '.modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
+      }
+    } else {
+      this.relatedModelClass = mapping.modelClass;
+
+      if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
+        throw new Error(errorPrefix + '.modelClass is not a subclass of Model or a file path to a module that exports one.');
+      }
+    }
+
+    if (!mapping.relation) {
+      throw new Error(errorPrefix + '.relation is not defined');
+    }
+
+    if (!utils.isSubclassOf(mapping.relation, Relation)) {
+      throw new Error(errorPrefix + '.relation is not a subclass of Relation');
+    }
+
+    if (!mapping.join || !_.isString(mapping.join.from) || !_.isString(mapping.join.to)) {
+      throw new Error(errorPrefix + '.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
+    }
+
+    let joinOwner = null;
+    let joinRelated = null;
+
+    let joinFrom = Relation.parseColumn(mapping.join.from);
+    let joinTo = Relation.parseColumn(mapping.join.to);
+
+    if (!joinFrom.table || !joinFrom.name) {
+      throw new Error(errorPrefix + '.join.from must have format TableName.columnName. For example `SomeTable.id`.');
+    }
+
+    if (!joinTo.table || !joinTo.name) {
+      throw new Error(errorPrefix + '.join.to must have format TableName.columnName. For example `SomeTable.id`.');
+    }
+
+    if (joinFrom.table === this.ownerModelClass.tableName) {
+      joinOwner = joinFrom;
+      joinRelated = joinTo;
+    } else if (joinTo.table === this.ownerModelClass.tableName) {
+      joinOwner = joinTo;
+      joinRelated = joinFrom;
+    } else {
+      throw new Error(errorPrefix + '.join: either `from` or `to` must point to the owner model table.');
+    }
+
+    if (joinRelated.table !== this.relatedModelClass.tableName) {
+      throw new Error(errorPrefix + '.join: either `from` or `to` must point to the related model table.');
+    }
+
+    this.ownerProp = this._propertyName(joinOwner, this.ownerModelClass);
+    this.ownerCol = joinOwner.name;
+    this.relatedProp = this._propertyName(joinRelated, this.relatedModelClass);
+    this.relatedCol = joinRelated.name;
+    this.filter = Relation.parseFilter(mapping);
+  }
+
+  /**
+   * Reference to the relation column in the owner model's table.
+   *
+   * For example: `Person.id`.
+   *
+   * @returns {string}
+   */
+  fullOwnerCol() {
+    return this.ownerModelClass.tableName + '.' + this.ownerCol;
+  }
+
+  /**
+   * Reference to the relation column in the related model's table.
+   *
+   * For example: `Movie.id`.
+   *
+   * @returns {string}
+   */
+  fullRelatedCol() {
+    return this.relatedModelClass.tableName + '.' + this.relatedCol;
+  }
+
+  /**
+   * Alias to use for the related table when joining with the owner table.
+   *
+   * For example: `Movie_rel_movies`.
+   *
+   * @returns {string}
+   */
+  relatedTableAlias() {
+    return this.relatedModelClass.tableName + '_rel_' + this.name;
+  }
+
+  /**
+   * Clones this relation.
+   *
+   * @returns {Relation}
+   */
+  clone() {
+    let relation = new this.constructor(this.name, this.ownerModelClass);
+
+    relation.relatedModelClass = this.relatedModelClass;
+    relation.ownerCol = this.ownerCol;
+    relation.ownerProp = this.ownerProp;
+    relation.relatedCol = this.relatedCol;
+    relation.relatedProp = this.relatedProp;
+    relation.filter = this.filter;
+
+    return relation;
+  }
+
+  /**
+   * Returns a clone of this relation with `relatedModelClass` and `ownerModelClass` bound to the given knex.
+   *
+   * See `Model.bindKnex`.
+   *
+   * @param knex
+   * @returns {Relation}
+   */
+  bindKnex(knex) {
+    let bound = this.clone();
+
+    bound.relatedModelClass = this.relatedModelClass.bindKnex(knex);
+    bound.ownerModelClass = this.ownerModelClass.bindKnex(knex);
+
+    return bound;
+  }
+
+  /**
+   * @protected
+   * @param {Array.<Model>} models1
+   * @param {Array.<Model>} models2
+   * @returns {Array.<Model>}
+   */
+  mergeModels(models1, models2) {
+    models1 = _.compact(models1);
+    models2 = _.compact(models2);
+    let modelsById = Object.create(null);
+
+    _.forEach(models1, function (model) {
+      modelsById[model.$id()] = model;
+    });
+
+    _.forEach(models2, function (model) {
+      modelsById[model.$id()] = model;
+    });
+
+    return _.sortBy(_.values(modelsById), function (model) {
+      return model.$id();
+    })
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {number|string} ownerCol
+   * @param {boolean} isColumnRef
+   * @returns {QueryBuilder}
+   */
+  findQuery(builder, ownerCol, isColumnRef) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {string} joinMethod
+   * @returns {QueryBuilder}
+   */
+  join(builder, joinMethod) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model|Object|Array.<Model>|Array.<Object>} owners
+   */
+  find(builder, owners) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @param {QueryBuilder} builder
+   * @param {Model|Object} owner
+   * @param {InsertionOrUpdate} insertion
+   */
+  insert(builder, owner, insertion) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model|Object} owner
+   * @param {InsertionOrUpdate} update
+   */
+  update(builder, owner, update) {
+    return builder;
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model|Object} owner
+   * @param {InsertionOrUpdate} patch
+   */
+  patch(builder, owner, patch) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model|Object} owner
+   */
+  delete(builder, owner) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model|Object} owner
+   * @param {number|string|Array.<number>|Array.<string>} ids
+   */
+  relate(builder, owner, ids) {
+    throw new Error('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model|Object} owner
+   */
+  unrelate(builder, owner) {
+    throw new Error('not implemented');
+  }
+
+  /**
+   * @private
+   */
+  _propertyName(column, modelClass) {
+    let propertyName = modelClass.columnNameToPropertyName(column.name);
+
+    if (!propertyName) {
+      throw new Error(modelClass.name +
+        '.$parseDatabaseJson probably transforms the value of the column ' + column.name + '.' +
+        ' This is a no-no because ' + column.name +
+        ' is needed in the relation ' + this.ownerModelClass.tableName + '.' + this.name);
+    }
+
+    return propertyName;
+  }
+
+  /**
+   * @protected
+   */
+  static parseFilter(mapping) {
+    if (_.isFunction(mapping.filter)) {
+      return mapping.filter;
+    } else if (_.isObject(mapping.filter)) {
+      return function (queryBuilder) {
+        queryBuilder.where(mapping.filter);
+      };
+    } else {
+      return _.noop;
     }
   }
 
-  if (!mapping.relation) {
-    throw new Error(errorPrefix + '.relation is not defined');
-  }
+  /**
+   * @protected
+   */
+  static parseColumn(column) {
+    let parts = column.split('.');
 
-  if (!utils.isSubclassOf(mapping.relation, Relation)) {
-    throw new Error(errorPrefix + '.relation is not a subclass of Relation');
-  }
-
-  if (!mapping.join || !_.isString(mapping.join.from) || !_.isString(mapping.join.to)) {
-    throw new Error(errorPrefix + '.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
-  }
-
-  var joinOwner = null;
-  var joinRelated = null;
-
-  var joinFrom = Relation.parseColumn(mapping.join.from);
-  var joinTo = Relation.parseColumn(mapping.join.to);
-
-  if (!joinFrom.table || !joinFrom.name) {
-    throw new Error(errorPrefix + '.join.from must have format TableName.columnName. For example `SomeTable.id`.');
-  }
-
-  if (!joinTo.table || !joinTo.name) {
-    throw new Error(errorPrefix + '.join.to must have format TableName.columnName. For example `SomeTable.id`.');
-  }
-
-  if (joinFrom.table === this.ownerModelClass.tableName) {
-    joinOwner = joinFrom;
-    joinRelated = joinTo;
-  } else if (joinTo.table === this.ownerModelClass.tableName) {
-    joinOwner = joinTo;
-    joinRelated = joinFrom;
-  } else {
-    throw new Error(errorPrefix + '.join: either `from` or `to` must point to the owner model table.');
-  }
-
-  if (joinRelated.table !== this.relatedModelClass.tableName) {
-    throw new Error(errorPrefix + '.join: either `from` or `to` must point to the related model table.');
-  }
-
-  this.ownerProp = this._propertyName(joinOwner, this.ownerModelClass);
-  this.ownerCol = joinOwner.name;
-  this.relatedProp = this._propertyName(joinRelated, this.relatedModelClass);
-  this.relatedCol = joinRelated.name;
-  this.filter = Relation.parseFilter(mapping);
-};
-
-/**
- * Reference to the relation column in the owner model's table.
- *
- * For example: `Person.id`.
- *
- * @returns {string}
- */
-Relation.prototype.fullOwnerCol = function () {
-  return this.ownerModelClass.tableName + '.' + this.ownerCol;
-};
-
-/**
- * Reference to the relation column in the related model's table.
- *
- * For example: `Movie.id`.
- *
- * @returns {string}
- */
-Relation.prototype.fullRelatedCol = function () {
-  return this.relatedModelClass.tableName + '.' + this.relatedCol;
-};
-
-/**
- * Alias to use for the related table when joining with the owner table.
- *
- * For example: `Movie_rel_movies`.
- *
- * @returns {string}
- */
-Relation.prototype.relatedTableAlias = function () {
-  return this.relatedModelClass.tableName + '_rel_' + this.name;
-};
-
-/**
- * Clones this relation.
- *
- * @returns {Relation}
- */
-Relation.prototype.clone = function () {
-  var clone = new this.constructor(this.name, this.ownerModelClass);
-
-  clone.relatedModelClass = this.relatedModelClass;
-  clone.ownerCol = this.ownerCol;
-  clone.ownerProp = this.ownerProp;
-  clone.relatedCol = this.relatedCol;
-  clone.relatedProp = this.relatedProp;
-  clone.filter = this.filter;
-
-  return clone;
-};
-
-/**
- * Returns a clone of this relation with `relatedModelClass` and `ownerModelClass` bound to the given knex.
- *
- * See `Model.bindKnex`.
- *
- * @param knex
- * @returns {Relation}
- */
-Relation.prototype.bindKnex = function (knex) {
-  var bound = this.clone();
-
-  bound.relatedModelClass = this.relatedModelClass.bindKnex(knex);
-  bound.ownerModelClass = this.ownerModelClass.bindKnex(knex);
-
-  return bound;
-};
-
-/**
- * @protected
- * @param {Array.<Model>} models1
- * @param {Array.<Model>} models2
- * @returns {Array.<Model>}
- */
-Relation.prototype.mergeModels = function (models1, models2) {
-  models1 = _.compact(models1);
-  models2 = _.compact(models2);
-  var modelsById = Object.create(null);
-
-  _.each(models1, function (model) {
-    modelsById[model.$id()] = model;
-  });
-
-  _.each(models2, function (model) {
-    modelsById[model.$id()] = model;
-  });
-
-  return _.sortBy(_.values(modelsById), function (model) {
-    return model.$id();
-  });
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {number|string} ownerCol
- * @param {boolean} isColumnRef
- * @returns {QueryBuilder}
- */
-Relation.prototype.findQuery = function (builder, ownerCol, isColumnRef) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {string} joinMethod
- * @returns {QueryBuilder}
- */
-Relation.prototype.join = function (builder, joinMethod) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {Model|Object|Array.<Model>|Array.<Object>} owners
- */
-Relation.prototype.find = function (builder, owners) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @param {QueryBuilder} builder
- * @param {Model|Object} owner
- * @param {InsertionOrUpdate} insertion
- */
-Relation.prototype.insert = function (builder, owner, insertion) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {Model|Object} owner
- * @param {InsertionOrUpdate} update
- */
-Relation.prototype.update = function (builder, owner, update) {
-  return builder;
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {Model|Object} owner
- * @param {InsertionOrUpdate} patch
- */
-Relation.prototype.patch = function (builder, owner, patch) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {Model|Object} owner
- */
-Relation.prototype.delete = function (builder, owner) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {Model|Object} owner
- * @param {number|string|Array.<number>|Array.<string>} ids
- */
-Relation.prototype.relate = function (builder, owner, ids) {
-  throw new Error('not implemented');
-};
-
-/* istanbul ignore next */
-/**
- * @abstract
- * @param {QueryBuilder} builder
- * @param {Model|Object} owner
- */
-Relation.prototype.unrelate = function (builder, owner) {
-  throw new Error('not implemented');
-};
-
-/**
- * @private
- */
-Relation.prototype._propertyName = function (column, modelClass) {
-  var propertyName = modelClass.columnNameToPropertyName(column.name);
-
-  if (!propertyName) {
-    throw new Error(modelClass.name +
-    '.$parseDatabaseJson probably transforms the value of the column ' + column.name + '.' +
-    ' This is a no-no because ' + column.name +
-    ' is needed in the relation ' + this.ownerModelClass.tableName + '.' + this.name);
-  }
-
-  return propertyName;
-};
-
-/**
- * @protected
- */
-Relation.parseFilter = function (mapping) {
-  if (_.isFunction(mapping.filter)) {
-    return mapping.filter;
-  } else if (_.isObject(mapping.filter)) {
-    return function (queryBuilder) {
-      queryBuilder.where(mapping.filter);
+    return {
+      table: parts[0] && parts[0].trim(),
+      name: parts[1] && parts[1].trim()
     };
-  } else {
-    return _.noop;
   }
-};
-
-/**
- * @protected
- */
-Relation.parseColumn = function (column) {
-  var parts = column.split('.');
-
-  return {
-    table: parts[0] && parts[0].trim(),
-    name: parts[1] && parts[1].trim()
-  };
-};
-
-module.exports = Relation;
+}
