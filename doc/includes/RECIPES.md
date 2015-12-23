@@ -53,13 +53,13 @@ Person.prototype.$validate = function (objectToValidate, options) {
 ```
 
 If you want to use the json schema validation but add some custom validation on top of it you can override the
-[`$beforeValidate`](#beforevalidate) and [`$afterValidate`](#aftervalidate) methods.
+[`$beforeValidate`](#_s_beforevalidate) and [`$afterValidate`](#_s_aftervalidate) methods.
 
 If you need to do validation on insert or update you can throw exceptions from the 
-[`$beforeInsert`](#beforeinsert) and [`$beforeUpdate`](#beforeupdate) methods.
+[`$beforeInsert`](#_s_beforeinsert) and [`$beforeUpdate`](#_s_beforeupdate) methods.
 
 If you don't want to use the built-in json schema validation, you can just ignore the [`jsonSchema`](#jsonschema) property. 
-It is completely optional. If you want to use some other validation library, simply override the [`$validate`](#validate)
+It is completely optional. If you want to use some other validation library, simply override the [`$validate`](#_s_validate)
 method of the model class. You need to throw a [`ValidationError`](#validationerror) when validation fails.
 
 ## Map column names to different property names
@@ -100,10 +100,10 @@ expect(jen.firstName).to.equal('Jennifer');
 Sometimes you may want to use for example snake_cased column names in database tables
 and camelCased property names in code. You can use the functions
 
-- [`$parseDatabaseJson`](#parsedatabasejson)
-- [`$formatDatabaseJson`](#formatdatabasejson)
-- [`$parseJson`](#parsejson)
-- [`$formatJson`](#formatjson)
+- [`$parseDatabaseJson`](#_s_parsedatabasejson)
+- [`$formatDatabaseJson`](#_s_formatdatabasejson)
+- [`$parseJson`](#_s_parsejson)
+- [`$formatJson`](#_s_formatjson)
 
 to convert data between database and "external" representations.
 
@@ -283,8 +283,8 @@ Person.query().upsert(person).then(function () {
 });
 ```
 
-You can extend the [`QueryBuilder`](#querybuilder) returned by [`Model.query()`](#query), [`modelInstance.$relatedQuery()`](#relatedquery)
-and [`modelInstance.$query()`](#query-2) methods by setting the model class's static [`QueryBuilder`](#querybuilder) and/or
+You can extend the [`QueryBuilder`](#querybuilder) returned by [`Model.query()`](#query), [`modelInstance.$relatedQuery()`](#_s_relatedquery)
+and [`modelInstance.$query()`](#_s_query) methods by setting the model class's static [`QueryBuilder`](#querybuilder) and/or
 [`RelatedQueryBuilder`](#relatedquerybuilder) property.
 
 If you want to set the custom query builder for all model classes you can just override the [`QueryBuilder`](#querybuilder)
