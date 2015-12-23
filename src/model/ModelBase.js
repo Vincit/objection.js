@@ -7,12 +7,12 @@ import ValidationError from '../ValidationError';
 /**
  * @typedef {Object} ModelOptions
  *
- * @property {Boolean} [patch]
+ * @property {boolean} [patch]
  *    If true the json is treated as a patch and the `required` field of the json schema is
  *    ignored in the validation. This allows us to create models with a subset of required
  *    properties for patch operations.
  *
- * @property {Boolean} [skipValidation]
+ * @property {boolean} [skipValidation]
  *    If true the json schema validation is skipped.
  */
 
@@ -480,7 +480,7 @@ export default class ModelBase {
    * console.log(_.has(json, 'lastName')); // --> false
    * ```
    *
-   * @param {string|Array.<string>|Object.<string, Boolean>} keys
+   * @param {string|Array.<string>|Object.<string, boolean>} keys
    * @returns {ModelBase} `this` for chaining.
    */
   $pick() {
@@ -593,7 +593,7 @@ export default class ModelBase {
    * this method to delete the property instead.
    *
    * @param {Object} obj
-   * @param {String} prop
+   * @param {string} prop
    */
   static omitImpl(obj, prop) {
     obj[prop] = undefined;

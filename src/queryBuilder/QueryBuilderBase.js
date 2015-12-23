@@ -202,7 +202,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -210,7 +209,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -218,7 +216,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -226,7 +223,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod('delete')
@@ -234,7 +230,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -242,7 +237,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -250,7 +244,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -258,7 +251,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -266,7 +258,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -274,7 +265,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -282,7 +272,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -290,7 +279,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -298,7 +286,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -306,7 +293,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -314,7 +300,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -322,7 +307,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -330,7 +314,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -338,7 +321,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -346,7 +328,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -354,7 +335,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -362,7 +342,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -370,7 +349,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -378,7 +356,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -386,7 +363,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -394,7 +370,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -402,7 +377,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -410,7 +384,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -418,7 +391,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -426,7 +398,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -434,7 +405,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -442,7 +412,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -450,7 +419,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -459,7 +427,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -467,7 +434,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -475,7 +441,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -483,7 +448,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -491,7 +455,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -499,7 +462,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -507,7 +469,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -515,7 +476,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -523,14 +483,12 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    */
   @knexQueryMethod()
   orWhereNotIn(...args) {}
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -538,7 +496,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -546,7 +503,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -554,7 +510,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -562,7 +517,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -570,7 +524,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -578,7 +531,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -586,7 +538,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -594,7 +545,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -602,7 +552,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -610,7 +559,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -618,7 +566,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -626,7 +573,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -634,7 +580,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -642,7 +587,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -650,7 +594,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -658,7 +601,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -666,7 +608,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -674,7 +615,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -682,7 +622,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -690,7 +629,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -698,7 +636,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -706,7 +643,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -714,7 +650,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -722,7 +657,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -730,7 +664,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -738,7 +671,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -746,7 +678,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -754,7 +685,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -762,7 +692,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
@@ -770,7 +699,6 @@ export default class QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
