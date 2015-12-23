@@ -1,0 +1,371 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>API Documentation</title>
+
+    <link href="../stylesheets/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="../stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="../javascripts/all_nosearch.js" type="text/javascript"></script>
+
+  </head>
+
+  <body class="includes includes_RECIPES">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <img src="../images/navbar.png" />
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+      <img src="../images/logo.png" />
+      <div id="toc">
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        <h1 id="recipe-book">Recipe book</h1>
+
+<h2 id="raw-queries">Raw queries</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
+  <span class="p">.</span><span class="nx">groupBy</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">childAgeSums</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>To write raw SQL queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. There are also some helper 
+methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>. The <a href="#raw"><code class="prettyprint">raw</code></a> method works just like the 
+<a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>.</p>
+
+<h2 id="change-id-column">Change id column</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'person_id'</span><span class="p">;</span>
+</code></pre>
+
+<p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.</p>
+
+<h2 id="custom-validation">Custom validation</h2>
+
+<blockquote>
+<p>Additional validation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span><span class="na">id</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span><span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<blockquote>
+<p>Replace <code class="prettyprint">jsonSchema</code> validation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$validate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">objectToValidate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// This makes revalidation possible: `someModel.$validate()`.</span>
+  <span class="nx">objectToValidate</span> <span class="o">=</span> <span class="nx">objectToValidate</span> <span class="o">||</span> <span class="k">this</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">someCustomValidator</span><span class="p">(</span><span class="nx">objectToValidate</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span><span class="na">someProp</span><span class="p">:</span> <span class="s1">'validation error message for the property'</span><span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Remember to return the input json object.</span>
+  <span class="k">return</span> <span class="nx">objectToValidate</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>If you want to use the json schema validation but add some custom validation on top of it you can override the
+<a href="#_s_beforevalidate"><code class="prettyprint">$beforeValidate</code></a> and <a href="#_s_aftervalidate"><code class="prettyprint">$afterValidate</code></a> methods.</p>
+
+<p>If you need to do validation on insert or update you can throw exceptions from the 
+<a href="#_s_beforeinsert"><code class="prettyprint">$beforeInsert</code></a> and <a href="#_s_beforeupdate"><code class="prettyprint">$beforeUpdate</code></a> methods.</p>
+
+<p>If you don&rsquo;t want to use the built-in json schema validation, you can just ignore the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> property. 
+It is completely optional. If you want to use some other validation library, simply override the <a href="#_s_validate"><code class="prettyprint">$validate</code></a>
+method of the model class. You need to throw a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> when validation fails.</p>
+
+<h2 id="map-column-names-to-different-property-names">Map column names to different property names</h2>
+
+<blockquote>
+<p>snake_case/camelCase conversion:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="c1">// This is called when an object is serialized to database format.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Call superclass implementation.</span>
+  <span class="nx">json</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">snakeCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="c1">// This is called when an object is read from database.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="c1">// Call superclass implementation.</span>
+  <span class="k">return</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre>
+
+<blockquote>
+<p>Note that even though column names are mapped when fetching / storing data, one still has to use
+correct db column names when writing queries:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">insert</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span> <span class="p">});</span>
+<span class="kd">let</span> <span class="nx">jen</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">where</span><span class="p">(</span><span class="s1">'first_name'</span><span class="p">,</span> <span class="s1">'Jennifer'</span><span class="p">);</span>
+<span class="nx">expect</span><span class="p">(</span><span class="nx">jen</span><span class="p">.</span><span class="nx">firstName</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">'Jennifer'</span><span class="p">);</span>
+</code></pre>
+
+<p>Sometimes you may want to use for example snake_cased column names in database tables
+and camelCased property names in code. You can use the functions</p>
+
+<ul>
+<li><a href="#_s_parsedatabasejson"><code class="prettyprint">$parseDatabaseJson</code></a></li>
+<li><a href="#_s_formatdatabasejson"><code class="prettyprint">$formatDatabaseJson</code></a></li>
+<li><a href="#_s_parsejson"><code class="prettyprint">$parseJson</code></a></li>
+<li><a href="#_s_formatjson"><code class="prettyprint">$formatJson</code></a></li>
+</ul>
+
+<p>to convert data between database and &ldquo;external&rdquo; representations.</p>
+
+<h2 id="paging">Paging</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">page</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 100</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Any query can be paged using the <a href="#page"><code class="prettyprint">page</code></a> or <a href="#range"><code class="prettyprint">range</code></a> method.</p>
+
+<h2 id="subqueries">Subqueries</h2>
+
+<blockquote>
+<p>Use function:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>Use <code class="prettyprint">QueryBuilder</code>:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building 
+methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places 
+you would expect. You can also pass <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> instances instead of functions.</p>
+
+<h2 id="joins">Joins</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Again, <a href="http://knexjs.org/#Builder-join">do as you would with a knex query builder</a>.</p>
+
+<h2 id="polymorphic-associations">Polymorphic associations</h2>
+<pre class="highlight javascript"><code><span class="nx">Issue</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
+    <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">},</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="s1">'Issue.id'</span><span class="p">,</span>
+      <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">PullRequest</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
+    <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'PullRequest'</span><span class="p">},</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="s1">'PullRequest.id'</span><span class="p">,</span>
+      <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<blockquote>
+<p>The <code class="prettyprint">{commentableType: &#39;Type&#39;}</code> filter adds a <code class="prettyprint">WHERE &quot;commentableType&quot; = &#39;Type&#39;</code> clause to the relation fetch
+query. It doesn&rsquo;t automatically set the type when you insert a new comment. You have to set the <code class="prettyprint">commentableType</code>
+manually:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">someIssue</span>
+  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">text</span><span class="p">:</span> <span class="s1">'blaa'</span><span class="p">,</span> <span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(...)</span>
+</code></pre>
+
+<p>Creating polymorphic associations isn&rsquo;t as easy as it could be at the moment, but it can be done using
+custom filters for relations. Let&rsquo;s assume we have tables <code class="prettyprint">Comment</code>, <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code>. Both
+<code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code> can have a list of comments. <code class="prettyprint">Comment</code> has a column <code class="prettyprint">commentableId</code> to hold
+the foreign key and <code class="prettyprint">commentableType</code> to hold the related model type. Check out the first example for
+how to create relations for this setup ➔</p>
+
+<h2 id="timestamps">Timestamps</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>You can implement the <code class="prettyprint">$beforeInsert</code> and <code class="prettyprint">$beforeUpdate</code> methods to set the timestamps. If you want to do this for all 
+your models, you can simply create common base class that implements these methods.</p>
+
+<h2 id="custom-query-builder">Custom query builder</h2>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">QueryBuilder</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">MyQueryBuilder</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">MyQueryBuilder</span><span class="p">);</span>
+
+<span class="c1">// Some custom method.</span>
+<span class="nx">MyQueryBuilder</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">upsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">model</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// Instance of this is created when you call `query()` or `$query()`.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+<span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">QueryBuilder</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">MyQueryBuilder</span> <span class="kr">extends</span> <span class="nx">QueryBuilder</span> <span class="p">{</span>
+  <span class="nx">upsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">if</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">model</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+     <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Instance of this is created when you call `query()` or `$query()`.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+<span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>Now you can do this:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">upsert</span><span class="p">(</span><span class="nx">person</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>You can extend the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> returned by <a href="#query"><code class="prettyprint">Model.query()</code></a>, <a href="#_s_relatedquery"><code class="prettyprint">modelInstance.$relatedQuery()</code></a>
+and <a href="#_s_query"><code class="prettyprint">modelInstance.$query()</code></a> methods by setting the model class&rsquo;s static <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> and/or
+<a href="#relatedquerybuilder"><code class="prettyprint">RelatedQueryBuilder</code></a> property.</p>
+
+<p>If you want to set the custom query builder for all model classes you can just override the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>
+property of the <a href="#model"><code class="prettyprint">Model</code></a> base class. A cleaner option would be to create your own Model subclass, set its <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>
+property and inherit all your models from the custom Model class.</p>
+
+<h2 id="multi-tenancy">Multi-tenancy</h2>
+<pre class="highlight javascript"><code><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Function that parses the tenant id from path, header, query parameter etc.</span>
+  <span class="c1">// and returns an instance of knex.</span>
+  <span class="kd">var</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">getDatabaseForRequest</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
+
+  <span class="nx">req</span><span class="p">.</span><span class="nx">models</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">Person</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">bindKnex</span><span class="p">(</span><span class="nx">knex</span><span class="p">),</span>
+    <span class="na">Movie</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">.</span><span class="nx">bindKnex</span><span class="p">(</span><span class="nx">knex</span><span class="p">),</span>
+    <span class="na">Animal</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">.</span><span class="nx">bindKnex</span><span class="p">(</span><span class="nx">knex</span><span class="p">)</span>
+  <span class="p">};</span>
+
+  <span class="nx">next</span><span class="p">();</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>By default, the examples guide you to setup the database connection by setting the knex object of the <a href="#model"><code class="prettyprint">Model</code></a> base
+class. This doesn&rsquo;t fly if you want to select the database based on the request as it sets the connection globally.</p>
+
+<p>If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
+<code class="prettyprint">req.models</code> hash and then <em>always</em> use the models through <code class="prettyprint">req.models</code> instead of requiring them directly. What 
+<a href="#bindknex"><code class="prettyprint">bindKnex</code></a> method actually does is that it creates an anonymous subclass of the model class and sets its 
+knex connection. That way the database connection doesn&rsquo;t change for the other requests that are currently being executed.</p>
+
+<h2 id="sql-clause-precedence-and-parentheses">SQL clause precedence and parentheses</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span><span class="nx">orWhere</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>SQL:</p>
+</blockquote>
+<pre class="highlight sql"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">and</span> <span class="p">(</span><span class="nv">"foo"</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">or</span> <span class="nv">"bar"</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+</code></pre>
+
+<p>You can add parentheses to queries by passing a function to the <a href="#where"><code class="prettyprint">where</code></a> method.</p>
+
+<h2 id="default-values">Default values</h2>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">jsonSchema</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+  <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">gender</span><span class="p">:</span> <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">enum</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Male'</span><span class="p">,</span> <span class="s1">'Female'</span><span class="p">,</span> <span class="s1">'Other'</span><span class="p">],</span> <span class="na">default</span><span class="p">:</span> <span class="s1">'Female'</span> <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>You can set the default values for properties using the <code class="prettyprint">default</code> property in <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>.</p>
+
+      </div>
+      <div class="dark-box">
+      </div>
+    </div>
+  </body>
+</html>
