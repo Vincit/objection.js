@@ -73,7 +73,7 @@ export default class RelationExpression {
   /**
    * Parses an expression string into a {@link RelationExpression} object.
    *
-   * @param {String|RelationExpression} expr
+   * @param {string|RelationExpression} expr
    * @returns {RelationExpression}
    */
   static parse(expr) {

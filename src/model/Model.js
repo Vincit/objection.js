@@ -139,7 +139,7 @@ export default class Model extends ModelBase {
   /**
    * Name of the database table of this model.
    *
-   * @type {String}
+   * @type {string}
    */
   static tableName = null;
 
@@ -148,7 +148,7 @@ export default class Model extends ModelBase {
    *
    * Defaults to 'id'.
    *
-   * @type {String}
+   * @type {string}
    */
   static idColumn = 'id';
 
@@ -157,7 +157,7 @@ export default class Model extends ModelBase {
    *
    * Defaults to '#id'.
    *
-   * @type {String}
+   * @type {string}
    */
   static uidProp = '#id';
 
@@ -166,7 +166,7 @@ export default class Model extends ModelBase {
    *
    * Defaults to '#ref'.
    *
-   * @type {String}
+   * @type {string}
    */
   static uidRefProp = '#ref';
 
@@ -207,7 +207,7 @@ export default class Model extends ModelBase {
    * // --> {name: 'Jennifer', address: '{"address":"Someroad 10","zipCode":"1234","city":"Los Angeles"}'}
    * ```
    *
-   * @type {Array.<String>}
+   * @type {Array.<string>}
    */
   static jsonAttributes = null;
 
@@ -263,7 +263,7 @@ export default class Model extends ModelBase {
    * a Model subclass constructor or an absolute path to a module that exports one. Using file paths
    * is a handy way to prevent require loops.
    *
-   * @type {Object.<String, RelationMapping>}
+   * @type {Object.<string, RelationMapping>}
    */
   static relationMappings = null;
 
@@ -519,7 +519,7 @@ export default class Model extends ModelBase {
    *   });
    * ```
    *
-   * @param {String} relationName
+   * @param {string} relationName
    *    Name of the relation.
    *
    * @returns {QueryBuilder}
@@ -590,8 +590,8 @@ export default class Model extends ModelBase {
    *
    * @see {@link RelationExpression} for more examples on relation expressions.
    *
-   * @param {String|RelationExpression} relationExpression
-   * @param {Object.<String, Function(QueryBuilder)>=} filters
+   * @param {string|RelationExpression} relationExpression
+   * @param {Object.<string, function(QueryBuilder)>=} filters
    * @returns {Promise}
    */
   $loadRelated(relationExpression, filters) {
@@ -690,7 +690,7 @@ export default class Model extends ModelBase {
   /**
    * @override
    *
-   * @param {Boolean} shallow
+   * @param {boolean} shallow
    *    If true the relations are omitted from the json.
    */
   $toJson(shallow) {
@@ -1182,7 +1182,7 @@ export default class Model extends ModelBase {
    * implemented. If `$parseDatabaseJson` is implemented it may change the id property's
    * name. This method passes the `idColumn` through `$parseDatabaseJson`.
    *
-   * @returns {String}
+   * @returns {string}
    */
   static getIdProperty() {
     let idProperty = this.columnNameToPropertyName(this.idColumn);
@@ -1199,7 +1199,7 @@ export default class Model extends ModelBase {
   /**
    * Full identifier column name like 'SomeTable.id'.
    *
-   * @returns {String}
+   * @returns {string}
    */
   static getFullIdColumn() {
     return this.tableName + '.' + this.idColumn;
@@ -1208,7 +1208,7 @@ export default class Model extends ModelBase {
   /**
    * All relations of this class.
    *
-   * @return {Object.<String, Relation>}
+   * @return {Object.<string, Relation>}
    */
   static getRelations() {
     const ModelClass = this;
@@ -1274,8 +1274,8 @@ export default class Model extends ModelBase {
    * ```
    *
    * @param {Array.<Model|Object>} $models
-   * @param {String|RelationExpression} expression
-   * @param {Object.<String, Function(QueryBuilder)>=} filters
+   * @param {string|RelationExpression} expression
+   * @param {Object.<string, function(QueryBuilder)>=} filters
    * @returns {Promise}
    */
   static loadRelated($models, expression, filters) {
@@ -1324,7 +1324,7 @@ export default class Model extends ModelBase {
    * @param {Model|Array.<Model>} models
    *    The model(s) whose relation trees to traverse.
    *
-   * @param {function(Model, Model, String)} traverser
+   * @param {function(Model, Model, string)} traverser
    *    The traverser function that is called for each model. The first argument
    *    is the model itself. If the model is in a relation of some other model
    *    the second argument is the parent model and the third argument is the
@@ -1351,7 +1351,7 @@ export default class Model extends ModelBase {
 
   /**
    * @protected
-   * @returns {Array.<String>}
+   * @returns {Array.<string>}
    */
   static $$getJsonAttributes() {
     // If the jsonAttributes property is not set, try to create it based

@@ -1450,7 +1450,6 @@ export default class QueryBuilder extends QueryBuilderBase {
    * Note that on postgresql you can just chain `.returning('*')` to the normal insert method
    * to get the same result without an additional query.
    *
-   * @method
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    *    Objects to insert.
    *
@@ -2010,7 +2009,6 @@ export default class QueryBuilder extends QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilder}
    */
   increment(propertyName, howMuch) {
@@ -2022,7 +2020,6 @@ export default class QueryBuilder extends QueryBuilderBase {
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
-   * @method
    * @returns {QueryBuilder}
    */
   decrement(propertyName, howMuch) {
