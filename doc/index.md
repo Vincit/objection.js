@@ -158,7 +158,7 @@ Tutorials:
 
 The `Person` model used in the examples is defined [here](#models).
 
-All queries are started with one of the [`Model`](#model) methods [`query`](#query), [`$query`](#query) or [`$relatedQuery`](#relatedquery).
+All queries are started with one of the [`Model`](#model) methods [`query`](#query), [`$query`](#query-2) or [`$relatedQuery`](#relatedquery).
 All these methods return a [`QueryBuilder`](#querybuilder) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder).
 
 ## Table queries
@@ -851,11 +851,31 @@ MinimalModel.tableName = 'SomeTableName';
 module.exports = MinimalModel;
 ```
 
-> Model with custom methods, json schema validation and relations. This model is used in the examples.
+> ES6:
 
 ```js
-var Model = require('objection').Model;
+const Model = require('objection').Model;
 
+class MinimalModel extends Model {
+  static get tableName() { return 'SomeTableName'; }
+}
+
+module.exports = MinimalModel;
+```
+
+> ES7:
+
+```js
+import { Model } from 'objection';
+
+export default class MinimalModel extends Model {
+  static tableName = 'SomeTableName';
+}
+```
+
+> Model with custom methods, json schema validation and relations. This model is used in the examples:
+
+```js
 function Person() {
   Model.apply(this, arguments);
 }
@@ -863,18 +883,19 @@ function Person() {
 Model.extend(Person);
 module.exports = Person;
 
-// You can add custom functionality to Models just as you would
-// to any javascript class.
+// Table name is the only required property.
+Person.tableName = 'Person';
+
+// Custom method.
 Person.prototype.fullName = function () {
   return this.firstName + ' ' + this.lastName;
 };
 
-// Table name is the only required property.
-Person.tableName = 'Person';
-
-// Optional JSON schema. This is not the database schema! Nothing is generated
-// based on this. This is only used for validation. Whenever a model instance
-// is created it is checked against this schema. http://json-schema.org/.
+// Optional JSON schema. This is not the database schema!
+// Nothing is generated based on this. This is only used
+// for validation. Whenever a model instance is created
+// it is checked against this schema.
+// http://json-schema.org/.
 Person.jsonSchema = {
   type: 'object',
   required: ['firstName', 'lastName'],
@@ -886,6 +907,12 @@ Person.jsonSchema = {
     lastName: {type: 'string', minLength: 1, maxLength: 255},
     age: {type: 'number'},
 
+    // Properties defined as objects or arrays are
+    // automatically converted to JSON strings when
+    // writing to database and back to objects and arrays
+    // when reading from database. To override this
+    // behaviour, you can override the
+    // Person.jsonAttributes property.
     address: {
       type: 'object',
       properties: {
@@ -901,9 +928,11 @@ Person.jsonSchema = {
 Person.relationMappings = {
   pets: {
     relation: Model.OneToManyRelation,
-    // The related model. This can be either a Model subclass constructor or an
-    // absolute file path to a module that exports one. We use the file path version
-    // here to prevent require loops.
+    // The related model. This can be either a Model
+    // subclass constructor or an absolute file path
+    // to a module that exports one. We use the file
+    // path version in this example to prevent require
+    // loops.
     modelClass: __dirname + '/Animal',
     join: {
       from: 'Person.id',
@@ -916,21 +945,13 @@ Person.relationMappings = {
     modelClass: __dirname + '/Movie',
     join: {
       from: 'Person.id',
-      // ManyToMany relation needs the `through` object to describe the join table.
+      // ManyToMany relation needs the `through` object
+      // to describe the join table.
       through: {
         from: 'Person_Movie.personId',
         to: 'Person_Movie.movieId'
       },
       to: 'Movie.id'
-    }
-  },
-
-  parent: {
-    relation: Model.OneToOneRelation,
-    modelClass: Person,
-    join: {
-      from: 'Person.parentId',
-      to: 'Person.id'
     }
   },
 
@@ -941,8 +962,213 @@ Person.relationMappings = {
       from: 'Person.id',
       to: 'Person.parentId'
     }
+  },
+
+  parent: {
+    relation: Model.OneToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.parentId',
+      to: 'Person.id'
+    }
   }
 };
+```
+
+> ES6:
+
+```js
+class Person extends Model {
+  // Table name is the only required property.
+  static get tableName() {
+    return 'Person';
+  }
+
+  fullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
+
+  // Optional JSON schema. This is not the database schema!
+  // Nothing is generated based on this. This is only used
+  // for validation. Whenever a model instance is created
+  // it is checked against this schema.
+  // http://json-schema.org/.
+  static get jsonSchema () {
+    return {
+      type: 'object',
+      required: ['firstName', 'lastName'],
+
+      properties: {
+        id: {type: 'integer'},
+        parentId: {type: ['integer', 'null']},
+        firstName: {type: 'string', minLength: 1, maxLength: 255},
+        lastName: {type: 'string', minLength: 1, maxLength: 255},
+        age: {type: 'number'},
+
+        // Properties defined as objects or arrays are
+        // automatically converted to JSON strings when
+        // writing to database and back to objects and arrays
+        // when reading from database. To override this
+        // behaviour, you can override the
+        // Person.jsonAttributes property.
+        address: {
+          type: 'object',
+          properties: {
+            street: {type: 'string'},
+            city: {type: 'string'},
+            zipCode: {type: 'string'}
+          }
+        }
+      }
+    };
+  }
+
+  // This object defines the relations to other models.
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.OneToManyRelation,
+        // The related model. This can be either a Model
+        // subclass constructor or an absolute file path
+        // to a module that exports one. We use the file
+        // path version here to prevent require loops.
+        modelClass: __dirname + '/Animal',
+        join: {
+          from: 'Person.id',
+          to: 'Animal.ownerId'
+        }
+      },
+
+      movies: {
+        relation: Model.ManyToManyRelation,
+        modelClass: __dirname + '/Movie',
+        join: {
+          from: 'Person.id',
+          // ManyToMany relation needs the `through` object
+          // to describe the join table.
+          through: {
+            from: 'Person_Movie.personId',
+            to: 'Person_Movie.movieId'
+          },
+          to: 'Movie.id'
+        }
+      },
+
+      children: {
+        relation: Model.OneToManyRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.id',
+          to: 'Person.parentId'
+        }
+      },
+
+      parent: {
+        relation: Model.OneToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.parentId',
+          to: 'Person.id'
+        }
+      }
+    };
+  }
+}
+```
+
+> ES7:
+
+```js
+class Person extends Model {
+  // Table name is the only required property.
+  static tableName = 'Person';
+
+  fullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
+
+  // Optional JSON schema. This is not the database schema!
+  // Nothing is generated based on this. This is only used
+  // for validation. Whenever a model instance is created
+  // it is checked against this schema.
+  // http://json-schema.org/.
+  static jsonSchema = {
+    type: 'object',
+    required: ['firstName', 'lastName'],
+
+    properties: {
+      id: {type: 'integer'},
+      parentId: {type: ['integer', 'null']},
+      firstName: {type: 'string', minLength: 1, maxLength: 255},
+      lastName: {type: 'string', minLength: 1, maxLength: 255},
+      age: {type: 'number'},
+
+      // Properties defined as objects or arrays are
+      // automatically converted to JSON strings when
+      // writing to database and back to objects and arrays
+      // when reading from database. To override this
+      // behaviour, you can override the
+      // Person.jsonAttributes property.
+      address: {
+        type: 'object',
+        properties: {
+          street: {type: 'string'},
+          city: {type: 'string'},
+          zipCode: {type: 'string'}
+        }
+      }
+    }
+  };
+
+  // This object defines the relations to other models.
+  static relationMappings = {
+    pets: {
+      relation: Model.OneToManyRelation,
+      // The related model. This can be either a Model
+      // subclass constructor or an absolute file path
+      // to a module that exports one. We use the file
+      // path version here to prevent require loops.
+      modelClass: __dirname + '/Animal',
+      join: {
+        from: 'Person.id',
+        to: 'Animal.ownerId'
+      }
+    },
+
+    movies: {
+      relation: Model.ManyToManyRelation,
+      modelClass: __dirname + '/Movie',
+      join: {
+        from: 'Person.id',
+        // ManyToMany relation needs the `through` object
+        // to describe the join table.
+        through: {
+          from: 'Person_Movie.personId',
+          to: 'Person_Movie.movieId'
+        },
+        to: 'Movie.id'
+      }
+    },
+
+    children: {
+      relation: Model.OneToManyRelation,
+      modelClass: Person,
+      join: {
+        from: 'Person.id',
+        to: 'Person.parentId'
+      }
+    },
+
+    parent: {
+      relation: Model.OneToOneRelation,
+      modelClass: Person,
+      join: {
+        from: 'Person.parentId',
+        to: 'Person.id'
+      }
+    }
+  };
+}
 ```
 
 Models are created by inheriting from the [`Model`](#model) base class. In objection.js the inheritance is done as 

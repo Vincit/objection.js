@@ -320,6 +320,8 @@ export default class ModelBase {
    * @param {ModelOptions=} options
    *    Optional options.
    *
+   * @returns {ModelBase} `this` for chaining.
+   *
    * @throws ValidationError
    *    If validation fails.
    */
@@ -347,7 +349,7 @@ export default class ModelBase {
     json = this.$parseJson(json, options);
     json = this.$validate(json, options);
 
-    this.$set(json);
+    return this.$set(json);
   }
 
   /**
@@ -357,6 +359,8 @@ export default class ModelBase {
    *
    * @param {Object} json
    *    The JSON object in database format.
+   *
+   * @returns {ModelBase} `this` for chaining.
    */
   $setDatabaseJson(json = {}) {
     json = this.$parseDatabaseJson(json);
@@ -364,6 +368,8 @@ export default class ModelBase {
     for (let key in json) {
       this[key] = json[key];
     }
+
+    return this;
   }
 
   /**
@@ -373,6 +379,7 @@ export default class ModelBase {
    * This simply sets each value in the object to this object.
    *
    * @param {Object} obj
+   * @returns {ModelBase} `this` for chaining.
    */
   $set(obj) {
     const self = this;
@@ -405,7 +412,7 @@ export default class ModelBase {
    * ```js
    * var json = person
    *   .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-   *   .$omit('lastName')
+   *   .$omit(['lastName'])
    *   .toJSON();
    *
    * console.log(_.has(json, 'lastName')); // --> false
@@ -414,13 +421,14 @@ export default class ModelBase {
    * ```js
    * var json = person
    *   .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-   *   .$omit('lastName')
+   *   .$omit({lastName: true})
    *   .toJSON();
    *
    * console.log(_.has(json, 'lastName')); // --> false
    * ```
    *
-   * @param {Array.<String>|Object.<String, Boolean>} keys
+   * @param {string|Array.<string>|Object.<string, boolean>} keys
+   * @returns {ModelBase} `this` for chaining.
    */
   $omit() {
     if (arguments.length === 1 && _.isObject(arguments[0])) {
@@ -472,7 +480,8 @@ export default class ModelBase {
    * console.log(_.has(json, 'lastName')); // --> false
    * ```
    *
-   * @param {Array.<String>|Object.<String, Boolean>} keys
+   * @param {string|Array.<string>|Object.<string, Boolean>} keys
+   * @returns {ModelBase} `this` for chaining.
    */
   $pick() {
     if (arguments.length === 1 && _.isObject(arguments[0])) {
@@ -551,6 +560,8 @@ export default class ModelBase {
    * @param {ModelOptions=} options
    *    Optional options.
    *
+   * @returns {Model}
+   *
    * @throws ValidationError
    *    If validation fails.
    */
@@ -565,6 +576,8 @@ export default class ModelBase {
    *
    * @param {Object=} json
    *    The JSON from which to create the model.
+   *
+   * @returns {Model}
    */
   static fromDatabaseJson(json) {
     var model = new this();

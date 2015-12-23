@@ -284,7 +284,7 @@ Person.query().upsert(person).then(function () {
 ```
 
 You can extend the [`QueryBuilder`](#querybuilder) returned by [`Model.query()`](#query), [`modelInstance.$relatedQuery()`](#relatedquery)
-and [`modelInstance.$query()`](#query) methods by setting the model class's static [`QueryBuilder`](#querybuilder) and/or
+and [`modelInstance.$query()`](#query-2) methods by setting the model class's static [`QueryBuilder`](#querybuilder) and/or
 [`RelatedQueryBuilder`](#relatedquerybuilder) property.
 
 If you want to set the custom query builder for all model classes you can just override the [`QueryBuilder`](#querybuilder)
@@ -316,3 +316,35 @@ If you have a different database for each tenant, a useful pattern is to add a m
 `req.models` hash and then _always_ use the models through `req.models` instead of requiring them directly. What 
 [`bindKnex`](#bindknex) method actually does is that it creates an anonymous subclass of the model class and sets its 
 knex connection. That way the database connection doesn't change for the other requests that are currently being executed.
+
+## SQL clause precedence and parentheses
+
+```js
+Person
+  .query()
+  .where('id', 1)
+  .where(function (builder) {
+    builder.where('foo', 2).orWhere('bar', 3);
+  });
+```
+
+> SQL:
+
+```sql
+select * from "Person" where "id" = 1 and ("foo" = 2 or "bar" = 3)
+```
+
+You can add parentheses to queries by passing a function to the [`where`](#where) method.
+
+## Default values
+
+```js
+Person.jsonSchema = {
+  type: 'object',
+  properties: {
+    gender: { type: 'string', enum: ['Male', 'Female', 'Other'], default: 'Female' }
+  }
+};
+```
+
+You can set the default values for properties using the `default` property in [`jsonSchema`](#jsonschema).
