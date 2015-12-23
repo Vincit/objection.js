@@ -2268,6 +2268,30 @@ Person
   });
 ```
 
+> If you want to modify the relation queries without using named filters, you can use the
+> [`context`](#context) hooks:
+
+```js
+Person
+  .query()
+  .eager('children.[pets, movies]')
+  .context({
+    onBuild: function (builder) {
+      var table = builder.modelClass().tableName;
+      // This function is called for each query.
+      if (table === 'Animal') {
+        builder.where('species', 'dog').orderBy('name');
+      } else if (table === 'Person') {
+        builder.orderBy('age');
+      }
+    }
+  })
+  .then(function (persons) {
+    console.log(persons[0].children[0].pets[0].name);
+    console.log(persons[0].children[0].movies[0].id);
+  });
+```
+
 > The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
 
 ```js
@@ -3019,7 +3043,7 @@ Type|Description
 
 ## Model
 
-> Creating models using ES5:
+> Defining a model using ES5:
 
 ```js
 function Person() {
@@ -3103,11 +3127,20 @@ Person.relationMappings = {
       from: 'Person.id',
       to: 'Person.parentId'
     }
+  },
+
+  parent: {
+    relation: Model.OneToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.parentId',
+      to: 'Person.id'
+    }
   }
 };
 ```
 
-> Creating models using ES6:
+> Defining a model using ES6:
 
 ```js
 class Person extends Model {
@@ -3189,9 +3222,109 @@ class Person extends Model {
           from: 'Person.id',
           to: 'Person.parentId'
         }
+      },
+
+      parent: {
+        relation: Model.OneToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.parentId',
+          to: 'Person.id'
+        }
       }
     };
   }
+}
+```
+
+> Defining a model using ES7:
+
+```js
+class Person extends Model {
+  // Table name is the only required property.
+  static tableName = 'Person';
+
+  // Optional JSON schema. This is not the database schema!
+  // Nothing is generated based on this. This is only used
+  // for validation. Whenever a model instance is created
+  // it is checked against this schema.
+  // http://json-schema.org/.
+  static jsonSchema = {
+    type: 'object',
+    required: ['firstName', 'lastName'],
+
+    properties: {
+      id: {type: 'integer'},
+      parentId: {type: ['integer', 'null']},
+      firstName: {type: 'string', minLength: 1, maxLength: 255},
+      lastName: {type: 'string', minLength: 1, maxLength: 255},
+      age: {type: 'number'},
+
+      // Properties defined as objects or arrays are
+      // automatically converted to JSON strings when
+      // writing to database and back to objects and arrays
+      // when reading from database. To override this
+      // behaviour, you can override the
+      // Person.jsonAttributes property.
+      address: {
+        type: 'object',
+        properties: {
+          street: {type: 'string'},
+          city: {type: 'string'},
+          zipCode: {type: 'string'}
+        }
+      }
+    }
+  };
+
+  // This object defines the relations to other models.
+  static relationMappings = {
+    pets: {
+      relation: Model.OneToManyRelation,
+      // The related model. This can be either a Model
+      // subclass constructor or an absolute file path
+      // to a module that exports one. We use the file
+      // path version here to prevent require loops.
+      modelClass: __dirname + '/Animal',
+      join: {
+        from: 'Person.id',
+        to: 'Animal.ownerId'
+      }
+    },
+
+    movies: {
+      relation: Model.ManyToManyRelation,
+      modelClass: __dirname + '/Movie',
+      join: {
+        from: 'Person.id',
+        // ManyToMany relation needs the `through` object
+        // to describe the join table.
+        through: {
+          from: 'Person_Movie.personId',
+          to: 'Person_Movie.movieId'
+        },
+        to: 'Movie.id'
+      }
+    },
+
+    children: {
+      relation: Model.OneToManyRelation,
+      modelClass: Person,
+      join: {
+        from: 'Person.id',
+        to: 'Person.parentId'
+      }
+    },
+
+    parent: {
+      relation: Model.OneToOneRelation,
+      modelClass: Person,
+      join: {
+        from: 'Person.parentId',
+        to: 'Person.id'
+      }
+    }
+  };
 }
 ```
 
@@ -3227,6 +3360,9 @@ method when you pass the model to methods like `response.json(model)`. You rarel
 By overriding the lifecycle methods, you can have different layouts for the data in database and when exposed to the
 outside world. See [this recipe](#map-column-names-to-different-property-names) for an example usage of the lifecycle 
 methods.
+
+All instance methods of models are prefixed with `$` letter so that they won't overlap with database
+properties. All properties that start with `$` are also removed from `database` and `external` layouts.
     
 ### Static properties
 
@@ -3574,7 +3710,7 @@ See [`RelationMapping`](#relationmapping)
 
 Property|Type|Description
 --------|----|-----------
-relation|function|The relation type. One of [`Model.OneToOneRelation`](#onetoonerelation), [`Model.OneToManyRelation`](#onetomanyrelation) and [`Model.ManyToManyRelation`](#manytomanyrelation).
+relation|function|The relation type. One of `Model.OneToOneRelation`, `Model.OneToManyRelation` and `Model.ManyToManyRelation`.
 modelClass|[`Model`](#model)&#124;string|Constructor of the related model class or an absolute path to a module that exports one.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
 filter|function([`QueryBuilder`](#querybuilder))|Optional filter for the relation. This is called each time the relation is fetched.
@@ -3786,9 +3922,9 @@ class Person extends Model {
 }
 ```
 
-[`QueryBuilder`](#querybuilder) subclass to use in [`query()`](#query) or [`$query()`](#query) methods.
+[`QueryBuilder`](#querybuilder) subclass to use in [`query`](#query) or [`$query`](#query-2) methods.
 
-This constructor is used whenever a query builder is created using [`query()`](#query) or [`$query()`](#query) methods.
+This constructor is used whenever a query builder is created using [`query`](#query) or [`$query`](#query-2) methods.
 You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
     
 [Usage example](#custom-query-builder).
@@ -3839,13 +3975,1331 @@ You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
     
 ### Static methods
 
+
+#### query
+
+> Read models from the database:
+
+```js
+// Get all rows.
+Person.query().then(function(allPersons) {
+  console.log('there are', allPersons.length, 'persons in the database');
+});
+
+// Example of a more complex WHERE clause. This generates:
+// SELECT * FROM "Person"
+// WHERE ("firstName" = 'Jennifer' AND "age" < 30)
+// OR ("firstName" = 'Mark' AND "age" > 30)
+Person
+  .query()
+  .where(function (builder) {
+    builder
+      .where('firstName', 'Jennifer')
+      .where('age', '<', 30);
+  })
+  .orWhere(function (builder) {
+    builder
+      .where('firstName', 'Mark')
+      .where('age', '>', 30);
+  })
+  .then(function (marksAndJennifers) {
+    console.log(marksAndJennifers);
+  });
+
+// Get a subset of rows and fetch related models
+// for each row.
+Person
+  .query()
+  .where('age', '>', 60)
+  .eager('children.children.movies')
+  .then(function (oldPeople) {
+    console.log('some old person\'s grand child has appeared in',
+      oldPeople[0].children[0].children[0].movies.length,
+      'movies');
+  });
+```
+
+> Insert models to the database:
+
+```js
+Person.query()
+  .insert({firstName: 'Sylvester', lastName: 'Stallone'})
+  .then(function (sylvester) {
+    console.log(sylvester.fullName());
+    // --> 'Sylvester Stallone'.
+  });
+
+// Batch insert. This only works on Postgresql as it is
+// the only database that returns the identifiers of
+// _all_ inserted rows. If you need to do batch inserts
+// on other databases use *knex* directly.
+// (See .knexQuery() method).
+Person
+  .query()
+  .insert([
+    {firstName: 'Arnold', lastName: 'Schwarzenegger'},
+    {firstName: 'Sylvester', lastName: 'Stallone'}
+  ])
+  .then(function (inserted) {
+    console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
+  });
+```
+
+> `update` and `patch` can be used to update models. Only difference between the mentioned methods
+> is that `update` validates the input objects using the model class's full jsonSchema and `patch`
+> ignores the `required` property of the schema. Use `update` when you want to update _all_ properties
+> of a model and `patch` when only a subset should be updated.
+
+```js
+Person
+  .query()
+  .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 35})
+  .where('id', jennifer.id)
+  .then(function (updatedJennifer) {
+    console.log('Jennifer is now', updatedJennifer.age, 'years old');
+  });
+
+// This will throw assuming that `firstName` or `lastName`
+// is a required property for a Person.
+Person.query().patch({age: 100});
+
+// This will _not_ throw.
+Person
+  .query()
+  .patch({age: 100})
+  .then(function () {
+    console.log('Everyone is now 100 years old');
+  });
+```
+
+> Models can be deleted using the delete method. Naturally the delete query can be chained with
+> any *knex* methods:
+
+```js
+Person
+  .query()
+  .delete()
+  .where('age', '>', 90)
+  .then(function () {
+    console.log('anyone over 90 is now removed from the database');
+  });
+```
+
+Creates a query builder for the model's table.
+
+See the [query examples](#query-examples) section for more examples.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|The created query builder
+
+
+
+
+#### knex
+
+> Get:
+
+```js
+var knex = Person.knex();
+```
+
+> Set:
+
+```js
+var knex = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database.db'
+  }
+});
+
+Model.knex(knex);
+knex = Model.knex();
+```
+Get/Set the knex instance for this model class.
+
+Subclasses inherit the connection. A system-wide knex instance can thus be set by calling
+`objection.Model.knex(knex)`. This works even after subclasses have been created.
+
+See [`bindKnex`](#bindknex) method if you want to use multiple databases in the same
+application.
+
+
+
+#### raw
+
+Shortcut for `Person.knex().raw(...args)`
+
+
+
+#### fn
+
+Shortcut for `Person.knex().fn`
+
+
+
+#### formatter
+
+Shortcut for `Person.knex().client.formatter()`
+
+
+
+#### knexQuery
+
+Shortcut for `Person.knex().table(Person.tableName)`
+
+
+
+
+#### bindKnex
+
+> Example:
+
+```js
+var knex1 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database1.db'
+  }
+});
+
+var knex2 = require('knex')({
+  client: 'sqlite3',
+  connection: {
+    filename: 'database2.db'
+  }
+});
+
+SomeModel.knex(null);
+
+var BoundModel1 = SomeModel.bindKnex(knex1);
+var BoundModel2 = SomeModel.bindKnex(knex2);
+
+// Throws since the knex instance is null.
+SomeModel.query().then();
+
+// Works.
+BoundModel1.query().then(function (models) {
+ console.log(models[0] instanceof SomeModel); // --> true
+ console.log(models[0] instanceof BoundModel1); // --> true
+});
+
+// Works.
+BoundModel2.query().then(function (models) {
+ console.log(models[0] instanceof SomeModel); // --> true
+ console.log(models[0] instanceof BoundModel2); // --> true
+});
+```
+
+Creates an anonymous subclass of this class that is bound to the given knex.
+
+This method can be used to bind a Model subclass to multiple databases for example in
+a multi-tenant system. See the [multi tenancy recipe](#multi-tenancy) for more info.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+knex|Knex|knex connection to bind to
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+function|The create model subclass constructor
+
+
+
+
+#### bindTransaction
+
+```js
+var Person = require('./models/Person');
+var transaction;
+
+objection.transaction.start(Person).then(function (trx) {
+  transaction = trx;
+  return Person
+    .bindTransaction(transaction)
+    .query()
+    .insert({firstName: 'Jennifer'});
+}).then(function (jennifer) {
+  return Person
+    .bindTransaction(transaction)
+    .query()
+    .patch({lastName: 'Lawrence'})
+    .where('id', jennifer.id);
+}).then(function () {
+  return transaction.commit();
+}).catch(function () {
+  return transaction.rollback();
+});
+```
+
+Alias for [`bindKnex`](#bindknex).
+
+
+
+
+#### extend
+
+```js
+Model.extend(subclassConstructor);
+```
+
+> ES5:
+
+```js
+function Person() {
+  Model.apply(this, arguments);
+}
+
+Model.extend(Person);
+```
+
+> ES6:
+
+```js
+class Person extends Model {
+
+}
+```
+
+Makes the given constructor a subclass of [`Model`](#querybuilder).
+
+This method can be used to do ES5 inheritance. If you are using ES6 or newer, you can just use the `class` and `extend`
+keywords and you don't need to call this method.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+subclassConstructor|function|The subclass's constructor.
+
+
+
+#### fromJson
+
+```js
+var person = Person.fromJson(json, opt);
+```
+
+Creates a model instance from a JSON object.
+
+The object is checked against [`jsonSchema`](#jsonschema) and an exception is thrown on failure.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object from which to create the model.
+opt|ModelOptions|Update options.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|The created model instance
+
+
+
+
+#### fromDatabaseJson
+
+```js
+var person = Person.fromDatabaseJson(row);
+```
+
+Creates a model instance from a JSON object in database format.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+row|Object|A database row.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|The created model instance
+
+
+
+#### omitImpl
+
+```js
+Person.omitImp = function (obj, prop) {
+  delete obj[prop];
+};
+```
+
+Omit implementation to use.
+
+The default just sets the property to undefined for performance reasons.
+If the slight performance drop is not an issue for you, you can override
+this method to delete the property instead.
+
+
+
+#### loadRelated
+
+```js
+var promise = Person.loadRelated(models, expression, filters);
+```
+
+> Examples:
+
+```js
+Person.loadRelated([person1, person2], 'children.pets').then(function (persons) {
+  var person1 = persons[0];
+  var person2 = persons[1];
+});
+```
+
+> Relations can be filtered by giving named filter functions as arguments to the relations:
+
+```js
+Person
+  .loadRelated([person1, person2], 'children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
+    orderByAge: function (builder) {
+      builder.orderBy('age');
+    },
+    orderByName: function (builder) {
+      builder.orderBy('name');
+    },
+    onlyDogs: function (builder) {
+      builder.where('species', 'dog');
+    }
+  })
+  .then(function (persons) {
+    console.log(persons[1].children.pets[0]);
+  });
+```
+
+Load related models for a set of models using a [`RelationExpression`](#relationexpression).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+models|Array.&lt;[`Model`](#model)&#124;Object&gt;|
+expression|string&#124;[`RelationExpression`](#relationexpression)|The relation expression
+filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional named filters
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)|
+
+
+
+
+#### traverse
+
+> There are two ways to call this method:
+
+```js
+Model.traverse(models, function (model, parentModel, relationName) {
+  doSomething(model);
+});
+```
+
+and
+
+```js
+Model.traverse(Person, models, function (person, parentModel, relationName) {
+  doSomethingForPerson(person);
+});
+```
+
+Traverses the relation tree of a list of models.
+
+Calls the callback for each related model recursively. The callback is called
+also for the input models themselves.
+
+In the second example the traverser function is only called for `Person` instances.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+filterConstructor|function|If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.
+models|[`Model`](#model)&#124;Array.&lt;[`Model`](#model)&gt;|The model(s) whose relation trees to traverse.
+traverser|function([`Model`](#model), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+
+
+
 ### Instance methods
+
+
+
+
+#### $id
+
+```js
+// Returns the id.
+var id = model.$id();
+// Sets the id.
+model.$id(100);
+```
+
+Returns or sets the identifier of a model instance.
+
+The identifier property does not have to be accessed or set using this method.
+If the identifier property is known it can be accessed or set just like any
+other property.
+
+
+
+
+#### $beforeValidate
+
+```js
+Person.prototype.$beforeValidate = function (jsonSchema, json, opt) {
+  return jsonSchema;
+}
+```
+
+This is called before validation.
+
+You can add any additional validation to this method. If validation fails, simply throw an exception and
+the query will be rejected. If you modify the `jsonSchema` argument and return it, that one will be used
+to validate the model.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+jsonSchema|Object|A deep clone of this class's jsonSchema
+json|Object|The JSON object to be validated
+opt|[`ModelOptions`](#modeloptions)|Optional options
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|The modified jsonSchema or the input jsonSchema.
+
+
+
+
+#### $validate
+
+```js
+modelInstance.$validate();
+```
+
+Validates the model instance.
+
+Calls [`$beforeValidate`](#beforevalidate) and [`$afterValidate`](#aftervalidate) methods. This method is called
+automatically from [`fromJson`](#fromjson) and [`$setJson`](#setjson) methods. This method can also be
+called explicitly when needed.
+
+##### Throws
+
+Type|Description
+----|-----------------------------
+[`ValidationError`](#validationerror)|If validation fails.
+
+
+
+
+#### $toDatabaseJson
+
+```js
+var row = modelInstance.$toDatabaseJson();
+```
+
+Exports this model as a database JSON object.
+
+This method is called internally to convert a model into a database row.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|Database row.
+
+
+
+
+#### $toJson
+
+```js
+var jsonObj = modelInstance.$toJson();
+```
+
+Exports this model as a JSON object.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|Model as a JSON object.
+
+
+
+
+#### toJSON
+
+```js
+var jsonObj = modelInstance.toJSON();
+```
+
+Exports this model as a JSON object.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|Model as a JSON object.
+
+
+
+
+#### $afterValidate
+
+```js
+Person.prototype.$afterValidate = function (json, opt) {
+
+}
+```
+
+This is called after successful validation.
+
+You can do further validation here and throw a [`ValidationError`](#validationerror) if something goes wrong.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object to be validated
+opt|[`ModelOptions`](#modeloptions)|Optional options
+
+
+
+
+#### $parseDatabaseJson
+
+```js
+Person.prototype.$parseDatabaseJson = function (json) {
+  // Remember to call the super class's implementation.
+  json = Model.prototype.$parseDatabaseJson.call(this, json);
+  return json;
+}
+```
+
+This is called when a [`Model`](#model) is created from a database JSON object.
+
+Converts the JSON object from the database format to the internal format.
+
+This function must be able to handle any subset of model's properties coming in.
+You cannot assume that some column is present in the `json` object as it depends
+on the select statement. There can also be additional columns because of joins,
+aliases etc. This method must also be prepared for null values in _any_ property
+of the `json` object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object in database format
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|The JSON object in internal format
+
+
+
+
+#### $formatDatabaseJson
+
+```js
+Person.prototype.$formatDatabaseJson = function (json) {
+  // Remember to call the super class's implementation.
+  json = Model.prototype.$formatDatabaseJson.call(this, json);
+  return json;
+}
+```
+
+This is called when a [`Model`](#model) is converted to database format.
+
+Converts the JSON object from the internal format to the database format.
+
+This function must be able to handle any subset of model's properties coming in.
+You cannot assume that some property is present in the `json` object. There can
+also be additional properties. This method must also be prepared for null values
+in _any_ property of the `json` object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object in internal format
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|The JSON object in database format
+
+
+
+
+#### $parseJson
+
+```js
+Person.prototype.$parseJson = function (json, opt) {
+  // Remember to call the super class's implementation.
+  json = Model.prototype.$parseJson.call(this, json, opt);
+  return json;
+}
+```
+
+This is called when a [`Model`](#model) is created from a JSON object.
+
+Converts the JSON object from the external format to the internal format.
+
+This function must be able to handle any subset of model's properties coming in.
+You cannot assume that some property is present in the `json` object. There can
+also be additional properties. This method must also be prepared for null values
+in _any_ property of the `json` object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object in external format
+opt|[`ModelOptions`](#modeloptions)|Optional options
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|The JSON object in internal format
+
+
+
+
+#### $formatJson
+
+```js
+Person.prototype.$formatJson = function (json) {
+  // Remember to call the super class's implementation.
+  json = Model.prototype.$formatJson.call(this, json);
+  return json;
+}
+```
+
+This is called when a [`Model`](#model) is converted to JSON.
+
+Converts the JSON object from the internal format to the external format.
+
+This function must be able to handle any subset of model's properties coming in.
+You cannot assume that some property is present in the `json` object. There can
+also be additional properties. This method must also be prepared for null values
+in _any_ property of the `json` object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object in internal format
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object|The JSON object in external format
+
+
+
+
+#### $setJson
+
+```js
+modelInstance.$setJson(json, opt);
+```
+
+Sets the values from a JSON object.
+
+Validates the JSON before setting values.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object to set
+opt|[`ModelOptions`](#modeloptions)|Optional options
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $setDatabaseJson
+
+```js
+modelInstance.$setDatabaseJson(json);
+```
+
+Sets the values from a JSON object in database format.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+json|Object|The JSON object in database format
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $set
+
+```js
+modelInstance.$set(json);
+```
+
+Sets the values from another model or object.
+
+Unlike [`$setJson`](#setjson), this doesn't call any [`$parseJson`](#parsejson) methods or validate the input.
+This simply sets each value in the object to this object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+obj|Object|
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $omit
+
+```js
+modelInstance.$omit(keys);
+```
+
+> Omits a set of properties.
+
+```js
+var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$omit('lastName')
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+```js
+var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$omit(['lastName'])
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+```js
+var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$omit({lastName: true})
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+Omits a set of properties.
+
+The selected properties are set to `undefined`. Note that this is done in-place.
+Properties are set to undefined instead of deleting them for performance reasons
+(V8 doesn't like delete).
+
+If you want to use `delete` instead of undefining, you can override the
+[`omitImpl`](#omitimpl) method.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+keys|string&#124;Array.&lt;string&gt;&#124;Object.&lt;string, boolean&gt;|keys to omit
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $pick
+
+```js
+modelInstance.$pick(keys);
+```
+
+> Omits a set of properties.
+
+```js
+var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$pick('firstName', 'age')
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+```js
+var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$pick(['firstName', 'age'])
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+```js
+var json = person
+  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .$pick({firstName: true, age: true})
+  .toJSON();
+
+console.log(_.has(json, 'lastName')); // --> false
+```
+
+Picks a set of properties.
+
+All other properties but the selected ones are set to `undefined`. Note that
+this is done in-place. Properties are set to undefined instead of deleting
+them for performance reasons (V8 doesn't like delete).
+
+If you want to use `delete` instead of undefining, you can override the
+[`omitImpl`](#omitimpl) method.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+keys|string&#124;Array.&lt;string&gt;&#124;Object.&lt;string, boolean&gt;|keys to pick
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $clone
+
+```js
+var clone = modelInstance.$clone;
+```
+
+Returns a deep copy of this model.
+
+If this object has instances of [`Model`](#model) as properties (or arrays of them)
+they are cloned using their `$clone()` method.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|Deep clone of `this`
+
+
+
+
+#### $query
+
+> Re-fetch the instance from the database:
+
+```js
+person.$query().then(function (person) {
+  console.log(person);
+});
+```
+
+> Insert a new model to database:
+
+```js
+Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennifer) {
+  console.log(jennifer.id);
+});
+```
+
+> Patch a model:
+
+```js
+person.$query().patch({lastName: 'Cooper'}).then(function (person) {
+  console.log(person.lastName); // --> 'Cooper'.
+});
+```
+
+> Delete a model.
+
+```js
+person.$query().delete().then(function () {
+  console.log('person deleted');
+});
+```
+
+Creates a query builder for this model instance.
+
+All queries built using the returned builder only affect this instance.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|query builder
+
+
+
+
+#### $relatedQuery
+
+```js
+var builder = model.$relatedQuery(relationName);
+```
+
+> Fetch all models related to a model through a relation. The fetched models are
+> also stored to the owner model's property named after the relation:
+
+```js
+jennifer.$relatedQuery('pets').then(function (pets) {
+  console.log('jennifer has', pets.length, 'pets');
+  console.log(jennifer.pets === pets); // --> true
+});
+```
+
+> The related query is just like any other query. All *knex* methods are available:
+
+```js
+jennifer
+  .$relatedQuery('pets')
+  .select('Animal.*', 'Person.name as ownerName')
+  .where('species', '=', 'dog')
+  .orWhere('breed', '=', 'cat')
+  .innerJoin('Person', 'Person.id', 'Animal.ownerId')
+  .orderBy('Animal.name')
+  .then(function (dogsAndCats) {
+    // All the dogs and cats have the owner's name "Jennifer" 
+    // joined as the `ownerName` property.
+    console.log(dogsAndCats);
+  });
+```
+
+> This inserts a new model to the database and binds it to the owner model as defined
+> by the relation:
+
+```js
+jennifer
+  .$relatedQuery('pets')
+  .insert({species: 'dog', name: 'Fluffy'})
+  .then(function (waldo) {
+    console.log(waldo.id);
+  });
+```
+
+> To add an existing model to a relation the `relate` method can be used. In this example
+> the dog `fluffy` already exists in the database but it isn't related to `jennifer` through
+> the `pets` relation. We can make the connection like this:
+
+```js
+jennifer
+  .$relatedQuery('pets')
+  .relate(fluffy.id)
+  .then(function () {
+    console.log('fluffy is now related to jennifer through pets relation');
+  });
+```
+
+> The connection can be removed using the `unrelate` method. Again, this doesn't delete the
+> related model. Only the connection is removed. For example in the case of ManyToMany relation
+> the join table entries are deleted.
+
+```js
+jennifer
+  .$relatedQuery('pets')
+  .unrelate()
+  .where('id', fluffy.id)
+  .then(function () {
+    console.log('jennifer no longer has fluffy as a pet');
+  });
+```
+
+> Related models can be deleted using the delete method. Note that in the case of ManyToManyRelation
+> the join table entries are not deleted. Naturally the delete query can be chained with any *knex*
+> methods.
+
+```js
+jennifer
+  .$relatedQuery('pets')
+  .delete()
+  .where('species', 'cat')
+  .then(function () {
+    console.log('jennifer no longer has any cats');
+  });
+```
+
+> `update` and `patch` can be used to update related models. Only difference between the mentioned
+> methods is that `update` validates the input objects using the related model class's full schema
+> and `patch` ignores the `required` property of the schema. Use `update` when you want to update
+> _all_ properties of a model and `patch` when only a subset should be updated.
+
+```js
+jennifer
+  .$relatedQuery('pets')
+  .update({species: 'dog', name: 'Fluffy the great', vaccinated: false})
+  .where('id', fluffy.id)
+  .then(function (updatedFluffy) {
+    console.log('fluffy\'s new name is', updatedFluffy.name);
+  });
+
+// This query will be rejected assuming that `name` or `species` 
+// is a required property for an Animal.
+jennifer
+  .$relatedQuery('pets')
+  .update({vaccinated: true})
+  .where('species', 'dog');
+
+// This query will succeed.
+jennifer
+  .$relatedQuery('pets')
+  .patch({vaccinated: true})
+  .where('species', 'dog')
+  .then(function () {
+    console.log('jennifer just got all her dogs vaccinated');
+  });
+```
+
+Use this to build a query that only affects the models related to this instance through a relation.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+relationName|string|The name of the relation to query.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|A query builder
+
+
+
+
+#### $loadRelated
+
+```js
+var builder = modelInstance.$loadRelated(expression, filters);
+```
+
+> Examples:
+
+```js
+jennifer.$loadRelated('[pets, children.[pets, father]]').then(function (jennifer) {
+  console.log('Jennifer has', jennifer.pets.length, 'pets');
+  console.log('Jennifer has', jennifer.children.length, 'children');
+  console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pets');
+  console.log('Jennifer had her first child with', jennifer.children[0].father.name);
+});
+```
+
+> Relations can be filtered by giving named filter functions as arguments
+> to the relations:
+
+```js
+jennifer
+  .$loadRelated('children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
+    orderByAge: function (builder) {
+      builder.orderBy('age');
+    },
+    orderByName: function (builder) {
+      builder.orderBy('name');
+    },
+    onlyDogs: function (builder) {
+      builder.where('species', 'dog');
+    }
+  })
+  .then(function (jennifer) {
+    console.log(jennifer.children.pets[0]);
+  });
+```
+
+Loads related models using a [`RelationExpression`](#relationexpression).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+expression|string&#124;[`RelationExpression`](#relationexpression)|The relation expression
+filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional named filters
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)|
+
+
+
+
+#### $traverse
+
+Shortcut for [`Model.traverse(filterConstructor, this, callback)`](#traverse-2212).
+
+
+
 
 #### $beforeInsert
 
+```js
+Person.prototype.$beforeInsert = function (queryContext) {
+
+}
+```
+
+Called before a model is inserted into the database.
+
+You can return a promise from this function if you need to do asynchronous stuff. You can
+also throw an exception to abort the insert and reject the query. This can be useful if
+you need to do insert specific validation.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the insert query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
+
 #### $afterInsert
 
-#### query
+```js
+Person.prototype.$afterInsert = function (queryContext) {
+
+}
+```
+
+Called after a model has been inserted into the database.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the insert query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
+
+#### $beforeUpdate
+
+```js
+Person.prototype.$beforeUpdate = function (opt, queryContext) {
+
+}
+```
+
+Called before a model is updated.
+
+You can return a promise from this function if you need to do asynchronous stuff. You can
+also throw an exception to abort the update and reject the query. This can be useful if
+you need to do update specific validation.
+
+This method is also called before a model is patched. Therefore all the model's properties
+may not exist. You can check if the update operation is a patch by checking the `opt.patch`
+boolean.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+opt|ModelOptions|Update options.
+queryContext|Object|The context object of the update query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
+
+#### $afterUpdate
+
+```js
+Person.prototype.$afterUpdate = function (opt, queryContext) {
+
+}
+```
+
+Called after a model is updated.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+This method is also called after a model is patched. Therefore all the model's properties
+may not exist. You can check if the update operation is a patch by checking the `opt.patch`
+boolean.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+opt|ModelOptions|Update options.
+queryContext|Object|The context object of the update query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
 
 ## transaction
 
@@ -3862,3 +5316,5 @@ object stored in it.
 ## TransactionObject
 
 ## ValidationError
+
+## ModelOptions

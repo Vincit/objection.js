@@ -714,7 +714,7 @@ export default class Model extends ModelBase {
     }
 
     return this.$$toJson(true, omit, pick);
-  };
+  }
 
   /**
    * Called before a model is inserted into the database.
