@@ -2008,8 +2008,8 @@ Sets/gets the query context.
 Some query builder methods create more than one query. The query context is an object that is
 shared with all queries started by a query builder. 
 
-The context is also passed to [`$beforeInsert`](#beforeinsert), [`$afterInsert`](#afterinsert), 
-[`$beforeUpdate`](#beforeupdate) and [`$afterUpdate`](#afterupdate) calls that the query creates.
+The context is also passed to [`$beforeInsert`](#_s_beforeinsert), [`$afterInsert`](#_s_afterinsert),
+[`$beforeUpdate`](#_s_beforeupdate) and [`$afterUpdate`](#_s_afterupdate) calls that the query creates.
 
 See the methods [`runBefore`](#runbefore), [`onBuild`](#onbuild) and [`runAfter`](#runafter)
 for more information about the hooks.
@@ -3340,22 +3340,22 @@ For the purposes of this explanation, let's define three data layouts:
 
 Whenever data is converted from on layout to another, converter methods are called:
 
-1. `database` -> [`$parseDatabaseJson`](#parsedatabasejson) -> `internal`
-2. `internal` -> [`$formatDatabaseJson`](#formatdatabasejson) -> `database`
-3. `external` -> [`$parseJson`](#parsejson) -> `internal`
-4. `internal` -> [`$formatJson`](#formatjson) -> `external`
+1. `database` -> [`$parseDatabaseJson`](#_s_parsedatabasejson) -> `internal`
+2. `internal` -> [`$formatDatabaseJson`](#_s_formatdatabasejson) -> `database`
+3. `external` -> [`$parseJson`](#_s_parsejson) -> `internal`
+4. `internal` -> [`$formatJson`](#_s_formatjson) -> `external`
 
 So for example when the results of a query are read from the database the data goes through the 
-[`$parseDatabaseJson`](#parsedatabasejson) method. When data is written to database it goes through
-the [`$formatDatabaseJson`](#formatdatabasejson) method. 
+[`$parseDatabaseJson`](#_s_parsedatabasejson) method. When data is written to database it goes through
+the [`$formatDatabaseJson`](#_s_formatdatabasejson) method. 
 
 Similarly when you give data for a query (for example [`query().insert(req.body)`](#insert)) or create a model 
-explicitly using [`Model.fromJson(obj)`](#fromjson) the [`$parseJson`](#parsejson) method is invoked. When you call 
-[`model.toJSON()`](#tojson) or [`model.$toJson()`](#tojson) the [`$formatJson`](#formatjson) is called.
+explicitly using [`Model.fromJson(obj)`](#fromjson) the [`$parseJson`](#_s_parsejson) method is invoked. When you call
+[`model.toJSON()`](#tojson) or [`model.$toJson()`](#_s_tojson) the [`$formatJson`](#_s_formatjson) is called.
 
 Note: Most libraries like [express](http://expressjs.com/en/index.html) automatically call the [`toJSON`](#tojson)
 method when you pass the model to methods like `response.json(model)`. You rarely need to call
-[`toJSON()`](#tojson)  or [`$toJson()`](#tojson) explicitly.
+[`toJSON()`](#tojson)  or [`$toJson()`](#_s_tojson) explicitly.
 
 By overriding the lifecycle methods, you can have different layouts for the data in database and when exposed to the
 outside world. See [this recipe](#map-column-names-to-different-property-names) for an example usage of the lifecycle 
@@ -3514,15 +3514,15 @@ class Person extends Model {
 
 The optional schema against which the JSON is validated.
 
-The jsonSchema can be dynamically modified in the `$beforeValidate` method.
+The jsonSchema can be dynamically modified in the [`$beforeValidate`](#_s_beforevalidate) method.
 
 Must follow http://json-schema.org specification. If null no validation is done.
 
 Read more:
 
-* [`$beforeValidate`](#beforevalidate)
-* [`$validate`](#validate)
-* [`$afterValidate`](#aftervalidate)
+* [`$beforeValidate`](#_s_beforevalidate)
+* [`$validate`](#_s_validate)
+* [`$afterValidate`](#_s_aftervalidate)
 * [`jsonAttributes`](#jsonattributes)
 * [custom validation recipe](#custom-validation)
 
@@ -3922,9 +3922,9 @@ class Person extends Model {
 }
 ```
 
-[`QueryBuilder`](#querybuilder) subclass to use in [`query`](#query) or [`$query`](#query-2) methods.
+[`QueryBuilder`](#querybuilder) subclass to use in [`query`](#query) or [`$query`](#_s_query) methods.
 
-This constructor is used whenever a query builder is created using [`query`](#query) or [`$query`](#query-2) methods.
+This constructor is used whenever a query builder is created using [`query`](#query) or [`$query`](#_s_query) methods.
 You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
     
 [Usage example](#custom-query-builder).
@@ -3962,9 +3962,9 @@ class Person extends Model {
 }
 ```
 
-[`QueryBuilder`](#querybuilder) subclass to use in [`$relatedQuery`](#relatedquery) method.
+[`QueryBuilder`](#querybuilder) subclass to use in [`$_s_relatedQuery`](#relatedquery) method.
 
-This constructor is used whenever a query builder is created using the [`$relatedQuery`](#relatedquery)  method.
+This constructor is used whenever a query builder is created using the [`$relatedQuery`](#_s_relatedquery)  method.
 You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
    
 [Usage example](#custom-query-builder).
@@ -3987,7 +3987,7 @@ Person.query().then(function(allPersons) {
 });
 
 // Example of a more complex WHERE clause. This generates:
-// SELECT * FROM "Person"
+// SELECTFROM "Person"
 // WHERE ("firstName" = 'Jennifer' AND "age" < 30)
 // OR ("firstName" = 'Mark' AND "age" > 30)
 Person
@@ -4032,7 +4032,7 @@ Person.query()
 // Batch insert. This only works on Postgresql as it is
 // the only database that returns the identifiers of
 // _all_ inserted rows. If you need to do batch inserts
-// on other databases use *knex* directly.
+// on other databases useknex* directly.
 // (See .knexQuery() method).
 Person
   .query()
@@ -4073,7 +4073,7 @@ Person
 ```
 
 > Models can be deleted using the delete method. Naturally the delete query can be chained with
-> any *knex* methods:
+> anyknex* methods:
 
 ```js
 Person
@@ -4496,8 +4496,8 @@ modelInstance.$validate();
 
 Validates the model instance.
 
-Calls [`$beforeValidate`](#beforevalidate) and [`$afterValidate`](#aftervalidate) methods. This method is called
-automatically from [`fromJson`](#fromjson) and [`$setJson`](#setjson) methods. This method can also be
+Calls [`$beforeValidate`](#_s_beforevalidate) and [`$afterValidate`](#_s_aftervalidate) methods. This method is called
+automatically from [`fromJson`](#fromjson) and [`$setJson`](#_s_setjson) methods. This method can also be
 called explicitly when needed.
 
 ##### Throws
@@ -4779,7 +4779,7 @@ modelInstance.$set(json);
 
 Sets the values from another model or object.
 
-Unlike [`$setJson`](#setjson), this doesn't call any [`$parseJson`](#parsejson) methods or validate the input.
+Unlike [`$setJson`](#_s_setjson), this doesn't call any [`$parseJson`](#_s_parsejson) methods or validate the input.
 This simply sets each value in the object to this object.
 
 ##### Arguments
@@ -4998,7 +4998,7 @@ jennifer.$relatedQuery('pets').then(function (pets) {
 });
 ```
 
-> The related query is just like any other query. All *knex* methods are available:
+> The related query is just like any other query. Allknex* methods are available:
 
 ```js
 jennifer
@@ -5055,7 +5055,7 @@ jennifer
 ```
 
 > Related models can be deleted using the delete method. Note that in the case of ManyToManyRelation
-> the join table entries are not deleted. Naturally the delete query can be chained with any *knex*
+> the join table entries are not deleted. Naturally the delete query can be chained with anyknex*
 > methods.
 
 ```js
@@ -5303,6 +5303,33 @@ Type|Description
 
 ## transaction
 
+See the section on [transaction callback](#transaction-callback)
+
+### Methods
+
+#### start
+
+See the section on [transaction object](#transaction-object)
+
+
+
+
+## TransactionObject
+
+See the section on [transaction object](#transaction-object)
+
+### Instance methods
+
+#### commit
+
+Call this method to commit the transaction.
+
+#### rollback
+
+Call this method to rollback the transaction.
+
+
+
 ## FieldExpression
 
 Json field expression to refer to jsonb columns or keys / objects inside columns.
@@ -5311,10 +5338,101 @@ e.g. `Person.jsonColumnName:details.names[1]` would refer to column
 `Person.jsonColumnName` which has `{ details: { names: ['First', 'Second', 'Last'] } }`
 object stored in it.
 
+TODO: Tell me more please!
+
+
+
+
 ## RelationExpression
 
-## TransactionObject
+> For example an expression `children.[movies.actors.[pets, children], pets]` represents a tree:
+
+```
+              children
+              (Person)
+                 |
+         -----------------
+         |               |
+       movies           pets
+      (Movie)         (Animal)
+         |
+       actors
+      (Person)
+         |
+    -----------
+    |         |
+   pets    children
+ (Animal)  (Person)
+
+```
+
+> The model classes are shown in parenthesis.
+
+> This class rarely needs to be used directly. The relation expression can be given to a bunch
+> of functions in objection.js. For example:
+
+```js
+Person
+  .query()
+  .eager('children.[movies.actors.[pets, children], pets]')
+  .then(function (persons) {
+    // All persons have the given relation tree fetched.
+    console.log(persons[0].children[0].movies[0].actors[0].pets[0].name);
+  });
+```
+
+> Relation expressions can have arguments. Arguments are listed in parenthesis after the relation names
+> like this:
+
+```js
+children(arg1, arg2).[movies.actors(arg3), pets]
+```
+
+> In this example `children` relation had arguments `arg1` and `arg2` and `actors` relation had
+> the argument `arg3`.
+
+Relation expression is a simple DSL for expressing relation trees.
+
+These are all valid relation expressions:
+
+ * `children`
+ * `children.movies`
+ * `[children, pets]`
+ * `[children.movies, pets]`
+ * `[children.[movies, pets], pets]`
+ * `[children.[movies.actors.[children, pets], pets], pets]`
+
+There are two tokens that have special meaning: `*` and `^`. `*` means "all relations recursively" and
+`^` means "this relation recursively".
+
+For example `children.*` means "relation `children` and all its relations, and all their relations and ...".
+The `*` token must be used with caution or you will end up fetching your entire database.
+
+Expression `parent.^` is equivalent to `parent.parent.parent.parent...` up to the point a relation no longer
+has results for the `parent` relation.
+
+
+
 
 ## ValidationError
 
+```js
+throw new ValidationError('any string or object');
+```
+
+Error of this class is thrown if a model validation fails.
+
+Property|Type|Description
+--------|----|-----------
+statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
+data|*|Any data passed to the constructor.
+
+
+
+
 ## ModelOptions
+
+Property|Type|Description
+--------|----|-----------
+patch|boolean|If true the json is treated as a patch and the `required` field of the json schema is ignored in the validation. This allows us to create models with a subset of required properties for patch operations.
+skipValidation|boolean|If true the json schema validation is skipped

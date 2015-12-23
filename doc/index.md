@@ -27,7 +27,7 @@ What objection.js gives you:
 
  * **An easy declarative way of [defining models](#models) and relations between them**
  * **Simple and fun way to [fetch, insert, update and delete](#query-examples) objects using the full power of SQL**
- * **Powerful mechanisms for [eager loading](#eager-queries) and [inserting](#eager-inserts) object graphs**
+ * **Powerful mechanisms for [eager loading](#eager-loading) and [inserting](#graph-inserts) object graphs**
  * **A way to [store complex documents](#documents) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
  * **Easy to use [transactions](#transactions)**
@@ -158,7 +158,7 @@ Tutorials:
 
 The `Person` model used in the examples is defined [here](#models).
 
-All queries are started with one of the [`Model`](#model) methods [`query`](#query), [`$query`](#query-2) or [`$relatedQuery`](#relatedquery).
+All queries are started with one of the [`Model`](#model) methods [`query`](#query), [`$query`](#_s_query) or [`$relatedQuery`](#_s_relatedquery).
 All these methods return a [`QueryBuilder`](#querybuilder) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder).
 
 ## Table queries
@@ -326,8 +326,8 @@ Delete queries are created by chaining the [`delete`](#delete) method to the que
 
 ## Relation queries
 
-While the static [`query`](#query) method can be used to create a query to a whole table [`$relatedQuery`](#relatedquery) 
-method can be used to query a single relation. [`$relatedQuery`](#relatedquery) returns an instance of [`QueryBuilder`](#querybuilder)
+While the static [`query`](#query) method can be used to create a query to a whole table [`$relatedQuery`](#_s_relatedquery)
+method can be used to query a single relation. [`$relatedQuery`](#_s_relatedquery) returns an instance of [`QueryBuilder`](#querybuilder)
 just like the [`query`](#query) method.
 
 ### Fetch queries
@@ -351,7 +351,7 @@ and "Animal"."ownerId" = 1
 order by "name" asc
 ```
 
-Simply call [`$relatedQuery('pets')`](#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is
+Simply call [`$relatedQuery('pets')`](#_s_relatedquery) for a model _instance_ to fetch a relation for it. The relation name is
 given as the only argument. The return value is a [`QueryBuilder`](#querybuilder) so you once again have all the query methods 
 at your disposal.
 
@@ -371,7 +371,7 @@ person
 insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
 ```
 
-Chain the [`insert`](#insert) method to the [`$relatedQuery('pets')`](#relatedquery) call to insert a related object for a model
+Chain the [`insert`](#insert) method to the [`$relatedQuery('pets')`](#_s_relatedquery) call to insert a related object for a model
 _instance_. The query inserts the new object to the related table and updates the needed tables to create the relation.
 In case of many-to-many relation a row is inserted to the join table etc.
 
@@ -394,7 +394,7 @@ See the [API documentation](#unrelate) of `unrelate` method.
 
 # Eager queries
 
-## Fetch queries
+## Eager loading
 
 > Fetch the `pets` relation for all results of a query:
 
@@ -502,9 +502,9 @@ Examples of expressions that would cause the query to be rejected:
  * `'notEvenAnExistingRelation'`
 
 In addition to the [`eager`](#eager) method, relations can be fetched using the [`loadRelated`](#loadrelated) and 
-[`$loadRelated`](#loadrelated) methods.
+[`$loadRelated`](#_s_loadrelated) methods.
 
-## Insert queries
+## Graph inserts
 
 ```js
 Person
@@ -716,6 +716,32 @@ objection.transaction.start(Person).then(function (transaction) {
 });
 ```
 
+> This becomes _a lot_ prettier using ES7:
+
+```js
+let trx = await transaction.start(Person.knex());
+
+try {
+  let jennifer = await Person
+    .bindTransaction(trx)
+    .query()
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+  let fluffy = await jennifer
+    .$relatedQuery('pets')
+    .insert({name: 'Fluffy'});
+
+  let movies = await Movie
+    .bindTransaction(trx)
+    .query()
+    .where('name', 'ilike', '%forrest%');
+
+  await trx.commit();
+} catch (err) {
+  trx.rollback();
+}
+```
+
 The second way to use transactions is to express the transaction as an object and bind model classes to the transaction
 when you use them. This way is more convenient when you need to pass the transaction to functions and services.
 
@@ -823,7 +849,7 @@ Person.query().insert({firstName: 'jennifer'}).catch(function (err) {
 [JSON schema](http://json-schema.org/) validation can be enabled by setting the [`jsonSchema`](#jsonschema) property
 of a model class. The validation is ran each time a [`Model`](#model) instance is created. 
 
-You rarely need to call [`$validate`](#validate) method explicitly, but you can do it when needed. If validation fails a 
+You rarely need to call [`$validate`](#_s_validate) method explicitly, but you can do it when needed. If validation fails a
 [`ValidationError`](#validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected 
 with an instance of [`ValidationError`](#validationerror).
 
