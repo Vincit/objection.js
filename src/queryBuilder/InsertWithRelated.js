@@ -442,10 +442,11 @@ DependencyGraph.prototype.createNonRelationDeps = function () {
 DependencyGraph.prototype.createNonRelationDepsForObject = function (obj, node, path) {
   var propRefRegex = node.modelClass.propRefRegex;
   var relations = node.modelClass.getRelations();
+  var isModel = obj instanceof Model;
   var self = this;
 
   _.each(obj, function (value, key) {
-    if (obj instanceof Model && getRelation(relations, key)) {
+    if (isModel && getRelation(relations, key)) {
       // Don't traverse the relations of model instances.
       return;
     }
