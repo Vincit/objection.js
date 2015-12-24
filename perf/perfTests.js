@@ -314,11 +314,33 @@ describe('Performance tests', function () {
     });
 
     perfTest({
+      name: '6000 `Person.query().insert()` queries',
+      runCount: 6000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        mockKnex.results = _.map(_.range(0, 16000), function (idx) {
+          return [idx];
+        });
+
+        return Person.bindKnex(knex);
+      },
+      test: function (Person) {
+        return Person.query().insert([{
+          firstName: 'Person 1',
+          lastName: 'Person 1 Lastname',
+          age: 50
+        }]).then(function (models) {
+          return models;
+        });
+      }
+    });
+
+    perfTest({
       name: '500 `Person.query().insertWithRelated()` queries',
       runCount: 500,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(0, 50000, 10), function (idx) {
+        mockKnex.results = _.map(_.range(0, 100000, 10), function (idx) {
           return _.range(idx, idx + 10);
         });
 
