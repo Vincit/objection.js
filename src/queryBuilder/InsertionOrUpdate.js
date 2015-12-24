@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import QueryBuilderBase from './QueryBuilderBase';
 
 /**
  * Internal representation of insert and update data.
@@ -27,8 +28,7 @@ import _ from 'lodash';
  */
 export default class InsertionOrUpdate {
 
-  constructor({QueryBuilder, ModelClass, modelsOrObjects, modelOptions}) {
-    this.QueryBuilder = QueryBuilder;
+  constructor({ModelClass, modelsOrObjects, modelOptions}) {
     this.ModelClass = ModelClass;
 
     this._models = [];
@@ -96,7 +96,7 @@ export default class InsertionOrUpdate {
         _.forEach(obj, (value, key) => {
           if (value instanceof KnexQueryBuilder|| value instanceof Raw) {
             rawOrSubquery[key] = value;
-          } else if (value instanceof this.QueryBuilder) {
+          } else if (value instanceof QueryBuilderBase) {
             rawOrSubquery[key] = value.build();
           } else {
             modelJson[key] = value;

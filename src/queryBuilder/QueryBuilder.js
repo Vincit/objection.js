@@ -1385,7 +1385,6 @@ export default class QueryBuilder extends QueryBuilderBase {
     const ModelClass = this._modelClass;
 
     let insertion = new InsertionOrUpdate({
-      QueryBuilder,
       ModelClass,
       modelsOrObjects
     });
@@ -1572,7 +1571,6 @@ export default class QueryBuilder extends QueryBuilderBase {
     const batchSize = utils.isPostgres(ModelClass.knex()) ? 100 : 1;
 
     let insertion = new InsertionOrUpdate({
-      QueryBuilder,
       ModelClass,
       modelsOrObjects,
       // We need to skip validation at this point because the models may contain
@@ -1754,7 +1752,6 @@ export default class QueryBuilder extends QueryBuilderBase {
     const ModelClass = this._modelClass;
 
     let update = new InsertionOrUpdate({
-      QueryBuilder,
       ModelClass,
       modelOptions,
       modelsOrObjects: modelOrObject
