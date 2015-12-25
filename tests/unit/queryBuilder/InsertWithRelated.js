@@ -5,7 +5,7 @@ var _ = require('lodash')
   , expect = require('expect.js')
   , Promise = require('bluebird')
   , Model = require('../../../').Model
-  , InsertWithRelated = require('../../../lib/queryBuilder/InsertWithRelated')
+  , InsertWithRelated = require('../../../lib/queryBuilder/InsertWithRelated').default
   , RelationExpression = require('../../../').RelationExpression;
 
 describe('InsertWithRelated', function () {

@@ -1,66 +1,245 @@
-'use strict';
-
-var _ = require('lodash')
-  , Promise = require('bluebird')
-  , RelationExpression = require('./RelationExpression').default
-  , ManyToManyRelation = require('./../relations/ManyToManyRelation').default
-  , OneToManyRelation = require('./../relations/OneToManyRelation').default
-  , OneToOneRelation = require('./../relations/OneToOneRelation').default
-  , ValidationError = require('./../ValidationError').default
-  , Model;
+import _ from 'lodash';
+import Promise from 'bluebird';
+import RelationExpression from './RelationExpression';
+import ManyToManyRelation from '../relations/ManyToManyRelation';
+import OneToManyRelation from '../relations/OneToManyRelation';
+import OneToOneRelation from '../relations/OneToOneRelation';
+import ValidationError from '../ValidationError';
+let Model;
 
 /**
  * Given an model with nested relations, finds a fast way to insert the models into
  * database so that not-null constraints are not broken.
  *
- * This class assumes that all foreign key references have a not-null constraint.
- *
- * By the way, the code in this module is ugly as hell because of stupid micro-optimizations :|
- *
- * @constructor
  * @ignore
  */
-function InsertWithRelated(opt) {
-  // Lazy-load Model.
-  Model = Model || require('./../model/Model').default;
+export default class InsertWithRelated {
 
-  this.modelClass = opt.modelClass;
-  this.models = opt.models;
-  this.allowedRelations = opt.allowedRelations || null;
-  this.graph = this._buildDependencyGraph();
-  this.done = false;
-}
+  constructor({modelClass, models, allowedRelations}) {
+    // Lazy-load Model.
+    Model = Model || require('./../model/Model').default;
 
-/**
- * @returns {DependencyGraph}
- * @private
- */
-InsertWithRelated.prototype._buildDependencyGraph = function () {
-  var graph = new DependencyGraph(this.allowedRelations);
-  graph.build(this.modelClass, this.models);
-  return graph;
-};
+    this.modelClass = modelClass;
+    this.models = models;
+    this.allowedRelations = allowedRelations || null;
+    this.done = false;
+    this.graph = this._buildDependencyGraph();
+  }
 
-InsertWithRelated.prototype.execute = function (inserter) {
-  return this.executeNextBatch(inserter);
-};
+  /**
+   * @param {function(TableInsertion)} inserter
+   * @return {Promise}
+   */
+  execute(inserter) {
+    return this._executeNextBatch(inserter);
+  }
 
-InsertWithRelated.prototype.executeNextBatch = function (inserter) {
-  var self = this;
-  var batch = this.nextBatch();
+  /**
+   * @returns {DependencyGraph}
+   * @private
+   */
+  _buildDependencyGraph() {
+    let graph = new DependencyGraph(this.allowedRelations);
+    graph.build(this.modelClass, this.models);
+    return graph;
+  }
 
-  if (!batch) {
-    // TODO turn this into a function.
-    for (var n = 0, ln = this.graph.nodes.length; n < ln; ++n) {
-      var refNode = this.graph.nodes[n];
-      var ref = getUidRef(refNode.model);
+  /**
+   * @param {function(TableInsertion)} inserter
+   * @returns {Promise}
+   * @private
+   */
+  _executeNextBatch(inserter) {
+    let batch = this._nextBatch();
+
+    if (!batch) {
+      // If we get here, we are done. All we need to do now is to finalize the object graph
+      // and return it as the final output.
+      return this._finalize();
+    }
+
+    // Insert the batch using the `inserter` function.
+    return Promise.all(_.map(batch, tableInsertion => {
+      let uids;
+
+      if (!tableInsertion.isJoinTableInsertion) {
+        // We need to omit the uid properties so that they don't get inserted
+        // into the database. Join table insertions never have uids.
+        uids = this._omitUids(tableInsertion);
+      }
+
+      return inserter(tableInsertion).then(() => {
+        if (!tableInsertion.isJoinTableInsertion) {
+          // Resolve dependencies to the inserted objects.
+          this._resolveDepsForInsertion(tableInsertion, uids);
+        }
+      });
+    })).then(() => this._executeNextBatch(inserter));
+  }
+
+  /**
+   * @private
+   * @returns {Object.<string, TableInsertion>}
+   */
+  _nextBatch() {
+    if (this.done) {
+      return null;
+    }
+
+    let batch = this._createBatch();
+
+    if (_.isEmpty(batch)) {
+      this.done = true;
+      return this._createManyToManyRelationJoinRowBatch();
+    } else {
+      this._markBatchHandled(batch);
+      return batch;
+    }
+  }
+
+  /**
+   * @private
+   * @returns {Object.<string, TableInsertion>}
+   */
+  _createBatch() {
+    let batch = Object.create(null);
+    let nodes = this.graph.nodes;
+
+    for (let n = 0, ln = nodes.length; n < ln; ++n) {
+      let node = nodes[n];
+
+      if (!node.handled && node.needs.length === node.numHandledNeeds) {
+        let tableInsertion = getTableInsertion(batch, node.modelClass.tableName);
+
+        if (!tableInsertion) {
+          tableInsertion = new TableInsertion(node.modelClass, false);
+          setTableInsertion(batch, node.modelClass.tableName, tableInsertion)
+        }
+
+        tableInsertion.models.push(node.model);
+        tableInsertion.isInputModel.push(isInputNode(this.graph.inputNodesById, node));
+      }
+    }
+
+    return batch;
+  }
+
+  /**
+   * @private
+   * @param {Object.<string, TableInsertion>} batch
+   */
+  _markBatchHandled(batch) {
+    let models = _.flatten(_.pluck(batch, 'models'));
+    let nodes = this.graph.nodesById;
+
+    for (let m = 0, lm = models.length; m < lm; ++m) {
+      let id = getUid(models[m]);
+      let node = getNode(nodes, id);
+
+      for (let nb = 0, lnb = node.isNeededBy.length; nb < lnb; ++nb) {
+        let dep = node.isNeededBy[nb];
+        dep.node.numHandledNeeds++;
+      }
+
+      node.handled = true;
+    }
+  }
+
+  /**
+   * @private
+   * @returns {Object.<string, TableInsertion>}
+   */
+  _createManyToManyRelationJoinRowBatch() {
+    let batch = Object.create(null);
+    let notUnique = Object.create(null);
+
+    for (let n = 0, ln = this.graph.nodes.length; n < ln; ++n) {
+      let node = this.graph.nodes[n];
+
+      for (let m = 0, lm = node.manyToManyConnections.length; m < lm; ++m) {
+        let conn = node.manyToManyConnections[m];
+        let tableInsertion = getTableInsertion(batch, conn.relation.joinTable);
+
+        let sourceVal = node.model[conn.relation.ownerProp];
+        let targetVal = conn.node.model[conn.relation.relatedProp];
+
+        let uniqueKey;
+
+        if (conn.relation.joinTableOwnerCol < conn.relation.joinTableRelatedCol) {
+          uniqueKey = conn.relation.joinTable + '_' + sourceVal + '_' + targetVal;
+        } else {
+          uniqueKey = conn.relation.joinTable + '_' + targetVal + '_' + sourceVal;
+        }
+
+        if (notUnique[uniqueKey]) {
+          continue;
+        }
+
+        notUnique[uniqueKey] = true;
+
+        let joinModel = {};
+        joinModel[conn.relation.joinTableOwnerProp] = sourceVal;
+        joinModel[conn.relation.joinTableRelatedProp] = targetVal;
+        joinModel = conn.relation.joinTableModelClass.fromJson(joinModel);
+
+        if (!tableInsertion) {
+          tableInsertion = new TableInsertion(conn.relation.joinTableModelClass, true);
+          setTableInsertion(batch, conn.relation.joinTable, tableInsertion)
+        }
+
+        tableInsertion.models.push(joinModel);
+        tableInsertion.isInputModel.push(false);
+      }
+    }
+
+    return batch;
+  }
+
+  /**
+   * @private
+   */
+  _omitUids(tableInsertion) {
+    let ids = _.pluck(tableInsertion.models, tableInsertion.modelClass.uidProp);
+
+    for (let m = 0, lm = tableInsertion.models.length; m < lm; ++m) {
+      tableInsertion.models[m].$omit(tableInsertion.modelClass.uidProp);
+    }
+
+    return ids;
+  }
+
+  /**
+   * @private
+   * @param {TableInsertion} tableInsertion
+   * @param {Array.<string>} uids
+   */
+  _resolveDepsForInsertion(tableInsertion, uids) {
+    for (let m = 0, lm = tableInsertion.models.length; m < lm; ++m) {
+      let node = getNode(this.graph.nodesById, uids[m]);
+      let model = tableInsertion.models[m];
+
+      for (let d = 0, ld = node.isNeededBy.length; d < ld; ++d) {
+        let dep = node.isNeededBy[d];
+        dep.resolve(model);
+      }
+    }
+  }
+
+  /**
+   * @private
+   * @return {Promise}
+   */
+  _finalize() {
+    for (let n = 0, ln = this.graph.nodes.length; n < ln; ++n) {
+      let refNode = this.graph.nodes[n];
+      let ref = getUidRef(refNode.model);
 
       if (ref) {
         // Copy all the properties to the reference nodes.
-        var actualNode = getNode(this.graph.nodesById, ref);
-        var relations = actualNode.modelClass.getRelations();
+        let actualNode = getNode(this.graph.nodesById, ref);
+        let relations = actualNode.modelClass.getRelations();
 
-        _.each(actualNode.model, function (value, key) {
+        _.each(actualNode.model, (value, key) => {
           if (!getRelation(relations, key) && !_.isFunction(value)) {
             refNode.model[key] = value;
           }
@@ -72,141 +251,7 @@ InsertWithRelated.prototype.executeNextBatch = function (inserter) {
 
     return Promise.resolve(this.models);
   }
-
-  return Promise.all(_.map(batch, function (tableInsertion) {
-    var ids;
-
-    // We need to delete the uid properties so that they don't get inserted
-    // into the database.
-    if (!tableInsertion.isJoinTableInsertion) {
-      ids = _.pluck(tableInsertion.models, tableInsertion.modelClass.uidProp);
-
-      for (var m = 0, lm = tableInsertion.models.length; m < lm; ++m) {
-        tableInsertion.models[m].$omit(tableInsertion.modelClass.uidProp);
-      }
-    }
-
-    return inserter(tableInsertion).then(function () {
-      if (tableInsertion.isJoinTableInsertion) {
-        return;
-      }
-
-      for (var m = 0, lm = tableInsertion.models.length; m < lm; ++m) {
-        var node = getNode(self.graph.nodesById, ids[m]);
-        var model = tableInsertion.models[m];
-
-        for (var d = 0, ld = node.isNeededBy.length; d < ld; ++d) {
-          var dep = node.isNeededBy[d];
-          dep.resolve(model);
-        }
-      }
-    });
-  })).then(function () {
-    return self.executeNextBatch(inserter);
-  })
-};
-
-InsertWithRelated.prototype.nextBatch = function () {
-  if (this.done) {
-    return null;
-  }
-
-  var batch = this.createBatch();
-
-  if (_.isEmpty(batch)) {
-    this.done = true;
-    return this.createManyToManyRelationJoinRowBatch();
-  } else {
-    this.markBatchHandled(batch);
-    return batch;
-  }
-};
-
-InsertWithRelated.prototype.createBatch = function () {
-  var batch = Object.create(null);
-  var nodes = this.graph.nodes;
-
-  for (var n = 0, ln = nodes.length; n < ln; ++n) {
-    var node = nodes[n];
-
-    if (!node.handled && node.needs.length === node.numHandledNeeds) {
-      var tableInsertion = getTableInsertion(batch, node.modelClass.tableName);
-
-      if (!tableInsertion) {
-        tableInsertion = new TableInsertion(node.modelClass, false);
-        setTableInsertion(batch, node.modelClass.tableName, tableInsertion)
-      }
-
-      tableInsertion.models.push(node.model);
-      tableInsertion.isInputModel.push(isInputNode(this.graph.inputNodesById, node));
-    }
-  }
-
-  return batch;
-};
-
-InsertWithRelated.prototype.markBatchHandled = function (batch) {
-  var models = _.flatten(_.pluck(batch, 'models'));
-  var nodes = this.graph.nodesById;
-
-  for (var m = 0, lm = models.length; m < lm; ++m) {
-    var id = getUid(models[m]);
-    var node = getNode(nodes, id);
-
-    for (var nb = 0, lnb = node.isNeededBy.length; nb < lnb; ++nb) {
-      var dep = node.isNeededBy[nb];
-      dep.node.numHandledNeeds++;
-    }
-
-    node.handled = true;
-  }
-};
-
-InsertWithRelated.prototype.createManyToManyRelationJoinRowBatch = function () {
-  var batch = Object.create(null);
-  var notUnique = Object.create(null);
-
-  for (var n = 0, ln = this.graph.nodes.length; n < ln; ++n) {
-    var node = this.graph.nodes[n];
-
-    for (var m = 0, lm = node.manyToManyConnections.length; m < lm; ++m) {
-      var conn = node.manyToManyConnections[m];
-      var tableInsertion = getTableInsertion(batch, conn.relation.joinTable);
-
-      var sourceVal = node.model[conn.relation.ownerProp];
-      var targetVal = conn.node.model[conn.relation.relatedProp];
-
-      var uniqueKey;
-      
-      if (conn.relation.joinTableOwnerCol < conn.relation.joinTableRelatedCol) {
-        uniqueKey = conn.relation.joinTable + '_' + sourceVal + '_' + targetVal;
-      } else {
-        uniqueKey = conn.relation.joinTable + '_' + targetVal + '_' + sourceVal;
-      }
-
-      if (notUnique[uniqueKey]) {
-        continue;
-      }
-
-      notUnique[uniqueKey] = true;
-
-      var joinModel = {};
-      joinModel[conn.relation.joinTableOwnerProp] = sourceVal;
-      joinModel[conn.relation.joinTableRelatedProp] = targetVal;
-      joinModel = conn.relation.joinTableModelClass.fromJson(joinModel);
-
-      if (!tableInsertion) {
-        tableInsertion = new TableInsertion(conn.relation.joinTableModelClass, true);
-        setTableInsertion(batch, conn.relation.joinTable, tableInsertion)
-      }
-
-      tableInsertion.models.push(joinModel);
-      tableInsertion.isInputModel.push(false);
-    }
-  }
-
-  return batch;
-};
+}
 
 function TableInsertion(modelClass, isJoinTableInsertion) {
   this.modelClass = modelClass;
@@ -249,7 +294,7 @@ function DependencyGraph(allowedRelations) {
 }
 
 DependencyGraph.prototype.build = function (modelClass, models) {
-  var self = this;
+  let self = this;
 
   this.nodesById = Object.create(null);
   this.nodes = [];
@@ -281,7 +326,7 @@ DependencyGraph.prototype.buildForModel = function (modelClass, model, parentNod
     setUid(model, '__objection_uid(' + (++this.uid) + ')__');
   }
 
-  var node = new DependencyNode(model, modelClass);
+  let node = new DependencyNode(model, modelClass);
 
   this.nodesById[node.id] = node;
   this.nodes.push(node);
@@ -322,12 +367,12 @@ DependencyGraph.prototype.buildForModel = function (modelClass, model, parentNod
 };
 
 DependencyGraph.prototype.buildForRelations = function (modelClass, model, node, allowedRelations) {
-  var relations = modelClass.getRelations();
+  let relations = modelClass.getRelations();
 
-  for (var relName in relations) {
-    var rel = getRelation(relations, relName);
-    var relModels = getRelated(model, relName);
-    var nextAllowed = null;
+  for (let relName in relations) {
+    let rel = getRelation(relations, relName);
+    let relModels = getRelated(model, relName);
+    let nextAllowed = null;
 
     if (relModels && allowedRelations instanceof RelationExpression) {
       nextAllowed = allowedRelations.childExpression(relName);
@@ -338,7 +383,7 @@ DependencyGraph.prototype.buildForRelations = function (modelClass, model, node,
     }
 
     if (_.isArray(relModels)) {
-      for (var i = 0, l = relModels.length; i < l; ++i) {
+      for (let i = 0, l = relModels.length; i < l; ++i) {
         this.buildForModel(rel.relatedModelClass, relModels[i], node, rel, nextAllowed);
       }
     } else if (relModels) {
@@ -348,7 +393,7 @@ DependencyGraph.prototype.buildForRelations = function (modelClass, model, node,
 };
 
 DependencyGraph.prototype.solveReferences = function () {
-  var refMap = Object.create(null);
+  let refMap = Object.create(null);
 
   // First merge all reference nodes into the actual node.
   this.mergeReferences(refMap);
@@ -358,23 +403,23 @@ DependencyGraph.prototype.solveReferences = function () {
 };
 
 DependencyGraph.prototype.mergeReferences = function (refMap) {
-  for (var n = 0, ln = this.nodes.length; n < ln; ++n) {
-    var refNode = this.nodes[n];
+  for (let n = 0, ln = this.nodes.length; n < ln; ++n) {
+    let refNode = this.nodes[n];
 
     if (refNode.handled) {
       continue;
     }
 
-    var ref = getUidRef(refNode.model);
+    let ref = getUidRef(refNode.model);
 
     if (ref) {
-      var actualNode = getNode(this.nodesById, ref);
+      let actualNode = getNode(this.nodesById, ref);
 
       if (!actualNode) {
         throw new ValidationError({ref: 'could not resolve reference "' + ref + '"'});
       }
 
-      var d, ld;
+      let d, ld;
 
       for (d = 0, ld = refNode.needs.length; d < ld; ++d) {
         actualNode.needs.push(refNode.needs[d]);
@@ -384,7 +429,7 @@ DependencyGraph.prototype.mergeReferences = function (refMap) {
         actualNode.isNeededBy.push(refNode.isNeededBy[d]);
       }
 
-      for (var m = 0, lm = refNode.manyToManyConnections.length; m < lm; ++m) {
+      for (let m = 0, lm = refNode.manyToManyConnections.length; m < lm; ++m) {
         actualNode.manyToManyConnections.push(refNode.manyToManyConnections[m]);
       }
 
@@ -396,9 +441,9 @@ DependencyGraph.prototype.mergeReferences = function (refMap) {
 };
 
 DependencyGraph.prototype.replaceReferenceNodes = function (refMap) {
-  for (var n = 0, ln = this.nodes.length; n < ln; ++n) {
-    var node = this.nodes[n];
-    var d, ld, dep, actualNode;
+  for (let n = 0, ln = this.nodes.length; n < ln; ++n) {
+    let node = this.nodes[n];
+    let d, ld, dep, actualNode;
 
     for (d = 0, ld = node.needs.length; d < ld; ++d) {
       dep = node.needs[d];
@@ -418,8 +463,8 @@ DependencyGraph.prototype.replaceReferenceNodes = function (refMap) {
       }
     }
 
-    for (var m = 0, lm = node.manyToManyConnections.length; m < lm; ++m) {
-      var conn = node.manyToManyConnections[m];
+    for (let m = 0, lm = node.manyToManyConnections.length; m < lm; ++m) {
+      let conn = node.manyToManyConnections[m];
       actualNode = getRefMap(refMap, conn.node.id);
 
       if (actualNode) {
@@ -430,8 +475,8 @@ DependencyGraph.prototype.replaceReferenceNodes = function (refMap) {
 };
 
 DependencyGraph.prototype.createNonRelationDeps = function () {
-  for (var n = 0, ln = this.nodes.length; n < ln; ++n) {
-    var node = this.nodes[n];
+  for (let n = 0, ln = this.nodes.length; n < ln; ++n) {
+    let node = this.nodes[n];
 
     if (!node.handled) {
       this.createNonRelationDepsForObject(node.model, node, []);
@@ -440,10 +485,10 @@ DependencyGraph.prototype.createNonRelationDeps = function () {
 };
 
 DependencyGraph.prototype.createNonRelationDepsForObject = function (obj, node, path) {
-  var propRefRegex = node.modelClass.propRefRegex;
-  var relations = node.modelClass.getRelations();
-  var isModel = obj instanceof Model;
-  var self = this;
+  let propRefRegex = node.modelClass.propRefRegex;
+  let relations = node.modelClass.getRelations();
+  let isModel = obj instanceof Model;
+  let self = this;
 
   _.each(obj, function (value, key) {
     if (isModel && getRelation(relations, key)) {
@@ -455,11 +500,11 @@ DependencyGraph.prototype.createNonRelationDepsForObject = function (obj, node, 
 
     if (_.isString(value)) {
       allMatches(propRefRegex, value, function (matchResult) {
-        var match = matchResult[0];
-        var refId = matchResult[1];
-        var refProp = matchResult[2];
-        var pathClone = path.slice();
-        var refNode = self.nodesById[refId];
+        let match = matchResult[0];
+        let refId = matchResult[1];
+        let refProp = matchResult[2];
+        let pathClone = path.slice();
+        let refNode = self.nodesById[refId];
 
         if (!refNode) {
           throw new ValidationError({ref: 'could not resolve reference "' + value + '"'});
@@ -497,10 +542,10 @@ DependencyGraph.prototype.createNonRelationDepsForObject = function (obj, node, 
 };
 
 DependencyGraph.prototype.isCyclic = function (nodes) {
-  var isCyclic = false;
+  let isCyclic = false;
 
-  for (var n = 0, ln = nodes.length; n < ln; ++n) {
-    var node = nodes[n];
+  for (let n = 0, ln = nodes.length; n < ln; ++n) {
+    let node = nodes[n];
 
     if (node.handled) {
       return;
@@ -521,8 +566,8 @@ DependencyGraph.prototype.isCyclicNode = function (node) {
     node.visited = true;
     node.recursion = true;
 
-    for (var d = 0, ld = node.needs.length; d < ld; ++d) {
-      var dep = node.needs[d];
+    for (let d = 0, ld = node.needs.length; d < ld; ++d) {
+      let dep = node.needs[d];
 
       if (!dep.node.visited && this.isCyclicNode(dep.node)) {
         return true;
@@ -537,8 +582,8 @@ DependencyGraph.prototype.isCyclicNode = function (node) {
 };
 
 DependencyGraph.prototype.clearFlags = function (nodes) {
-  for (var n = 0, ln = nodes.length; n < ln; ++n) {
-    var node = nodes[n];
+  for (let n = 0, ln = nodes.length; n < ln; ++n) {
+    let node = nodes[n];
 
     node.visited = false;
     node.recursion = false;
@@ -590,12 +635,10 @@ function isInputNode(inputNodesById, node) {
 }
 
 function allMatches(regex, str, cb) {
-  var matchResult = regex.exec(str);
+  let matchResult = regex.exec(str);
 
   while (matchResult) {
     cb(matchResult);
     matchResult = regex.exec(str);
   }
 }
-
-module.exports = InsertWithRelated;

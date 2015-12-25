@@ -1609,8 +1609,8 @@ export default class QueryBuilder extends QueryBuilderBase {
         });
 
         return Promise.all(_.flatten([
-          batchInsert(inputs, insertQuery.clone().copyFrom(builder, /returning/)),
-          batchInsert(others, insertQuery.clone())
+          batchInsert(inputs, insertQuery.clone().copyFrom(builder, /returning/), batchSize),
+          batchInsert(others, insertQuery.clone(), batchSize)
         ]));
       });
     });
@@ -1622,11 +1622,6 @@ export default class QueryBuilder extends QueryBuilderBase {
         return _.first(models) || null;
       }
     });
-
-    function batchInsert(models, queryBuilder) {
-      let batches = _.chunk(models, batchSize);
-      return _.map(batches, batch => queryBuilder.clone().insert(batch));
-    }
   }
 
   /**
@@ -2137,4 +2132,12 @@ function build(builder) {
 
   // noinspection JSUnresolvedVariable
   return QueryBuilderBase.prototype.build.call(builder);
+}
+
+/**
+ * @private
+ */
+function batchInsert(models, queryBuilder, batchSize) {
+  let batches = _.chunk(models, batchSize);
+  return _.map(batches, batch => queryBuilder.clone().insert(batch));
 }
