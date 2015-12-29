@@ -60,6 +60,17 @@ module.exports.isSubclassOf = function(Constructor, SuperConstructor) {
 
 /**
  * @ignore
+ * @param knexQueryBuilder
+ * @returns {boolean}
+ */
+module.exports.isKnexQueryBuilder = function (knexQueryBuilder) {
+  return knexQueryBuilder
+    && knexQueryBuilder.client
+    && _.isString(knexQueryBuilder.client.dialect);
+};
+
+/**
+ * @ignore
  * @param knex
  * @returns {boolean}
  */

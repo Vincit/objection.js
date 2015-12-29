@@ -1273,10 +1273,14 @@ function knexQueryMethod(overrideMethodName) {
  */
 function wrapFunctionArg(func, query) {
   return function () {
-    let context = query.internalContext();
-    let builder = new QueryBuilderBase(query._knex).internalContext(context);
-    func.call(builder, builder);
-    builder.buildInto(this);
+    if (utils.isKnexQueryBuilder(this)) {
+      let context = query.internalContext();
+      let builder = new QueryBuilderBase(query._knex).internalContext(context);
+      func.call(builder, builder);
+      builder.buildInto(this);
+    } else {
+      return func.apply(this, arguments);
+    }
   };
 }
 
