@@ -42,6 +42,7 @@ describe('integration tests', function () {
         return session.destroy();
       });
 
+      require('./misc')(session);
       require('./find')(session);
       require('./insert')(session);
       require('./insertWithRelated')(session);
