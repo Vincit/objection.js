@@ -1574,6 +1574,66 @@ Type|Description
 
 
 
+#### whereComposite
+
+```js
+var builder = queryBuilder.whereComposite(columns, operator, values);
+```
+
+```js
+builder.whereComposite(['id', 'name'], '=', [1, 'Jennifer']);
+```
+
+> This method also works with a single column - value pair:
+
+```js
+builder.whereComposite('id', 1);
+```
+
+[`where`](#where) for (possibly) composite keys.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### whereInComposite
+
+```js
+var builder = queryBuilder.whereInComposite(columns, values);
+```
+
+```js
+builder.whereInComposite(['a', 'b'], [[1, 2], [3, 4], [1, 4]]);
+```
+
+```js
+builder.whereInComposite('a', [[1], [3], [1]]);
+```
+
+```js
+builder.whereInComposite('a', [1, 3, 1]);
+```
+
+```js
+builder.whereInComposite(['a', 'b'], SomeModel.query().select('a', 'b'));
+```
+
+[`whereIn`](#wherein) for (possibly) composite keys.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### whereJsonEquals
 
 ```js
