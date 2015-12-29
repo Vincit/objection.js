@@ -240,6 +240,22 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
+  forUpdate(...args) {}
+
+
+  /**
+   * See <a href="http://knexjs.org">knex documentation</a>
+   * @returns {QueryBuilderBase}
+   */
+  @knexQueryMethod()
+  forShare(...args) {}
+
+
+  /**
+   * See <a href="http://knexjs.org">knex documentation</a>
+   * @returns {QueryBuilderBase}
+   */
+  @knexQueryMethod()
   as(...args) {}
 
   /**

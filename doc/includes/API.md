@@ -636,6 +636,32 @@ Type|Description
 
 
 
+#### forUpdate
+
+See [knex documentation](http://knexjs.org/#Builder-forUpdate)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### forShare
+
+See [knex documentation](http://knexjs.org/#Builder-forShare)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### as
 
 See [knex documentation](http://knexjs.org/#Builder-as)
@@ -1509,7 +1535,7 @@ Type|Description
 #### whereRef
 
 ```js
-var builder = whereRef.whereRef(leftRef, operator, rightRef);
+var builder = queryBuilder.whereRef(leftRef, operator, rightRef);
 ```
 
 ```js
@@ -1530,7 +1556,7 @@ Type|Description
 #### orWhereRef
 
 ```js
-var builder = whereRef.orWhereRef(leftRef, operator, rightRef);
+var builder = queryBuilder.orWhereRef(leftRef, operator, rightRef);
 ```
 
 ```js
