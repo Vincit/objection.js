@@ -500,6 +500,22 @@ export default class ModelBase {
   }
 
   /**
+   * Returns the values of the given properties as an array.
+   *
+   * @param {Array.<string>} props
+   * @return {Array.<*>}
+   */
+  $values() {
+    if (arguments.length === 0) {
+      return _.values(this);
+    } else if (arguments.length === 1 && _.isArray(arguments[0])) {
+      return _.map(arguments[0], prop => this[prop]);
+    } else {
+      return _.map(arguments, prop => this[prop]);
+    }
+  }
+
+  /**
    * Returns a deep copy of this model.
    *
    * If this object has instances of ModelBase as properties (or arrays of them)
@@ -566,7 +582,7 @@ export default class ModelBase {
    *    If validation fails.
    */
   static fromJson(json, options) {
-    var model = new this();
+    let model = new this();
     model.$setJson(json || {}, options);
     return model;
   }
@@ -580,7 +596,7 @@ export default class ModelBase {
    * @returns {Model}
    */
   static fromDatabaseJson(json) {
-    var model = new this();
+    let model = new this();
     model.$setDatabaseJson(json || {});
     return model;
   }
