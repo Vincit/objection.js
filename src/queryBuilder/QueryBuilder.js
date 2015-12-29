@@ -1418,11 +1418,15 @@ export default class QueryBuilder extends QueryBuilderBase {
             throw new Error(`the identifier column "${ModelClass.idColumn}" must be selected by the "returning" clause.`);
           }
         });
-      } else {
+      } else if (_.isArray(ret)) {
         // If the return value is not an array of models, we assume
         // it is an array of identifiers.
         _.forEach(insertion.models(), (model, idx) => {
-          model.$id(ret[idx]);
+          // Don't set the id if the model already has one. MySQL and Sqlite don't return the correct
+          // primary key value if the id is not generated in db, but given explicitly.
+          if (!model.$id()) {
+            model.$id(ret[idx]);
+          }
         });
       }
       return insertion.models();
