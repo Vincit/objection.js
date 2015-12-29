@@ -160,47 +160,178 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('whereRef should create a where clause using column references instead of values (1)', function () {
-    return QueryBuilder
-      .forClass(TestModel)
-      .whereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
-      .then(function () {
-        expect(executedQueries).to.eql([
-          'select * from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
-        ]);
-      });
-  });
+  describe('whereRef', function () {
 
-  it('whereRef should create a where clause using column references instead of values (2)', function () {
-    return QueryBuilder
-      .forClass(TestModel)
-      .whereRef('SomeTable.someColumn', '>', 'SomeOtherTable.someOtherColumn')
-      .then(function () {
-        expect(executedQueries).to.eql([
-          'select * from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
-        ]);
-      });
-  });
-
-  it('whereRef should fail with invalid operator', function () {
-    expect(function () {
-      QueryBuilder
+    it('should create a where clause using column references instead of values (1)', function () {
+      return QueryBuilder
         .forClass(TestModel)
-        .whereRef('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
-        .toString();
-    }).to.throwException();
+        .whereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
+        .then(function () {
+          expect(executedQueries).to.eql([
+            'select * from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+          ]);
+        });
+    });
+
+    it('should create a where clause using column references instead of values (2)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereRef('SomeTable.someColumn', '>', 'SomeOtherTable.someOtherColumn')
+        .then(function () {
+          expect(executedQueries).to.eql([
+            'select * from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
+          ]);
+        });
+    });
+
+    it('should fail with invalid operator', function () {
+      expect(function () {
+        QueryBuilder
+          .forClass(TestModel)
+          .whereRef('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
+          .toString();
+      }).to.throwException();
+    });
+
+    it('orWhereRef should create a where clause using column references instead of values', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .where('id', 10)
+        .orWhereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
+        .then(function () {
+          expect(executedQueries).to.eql([
+            'select * from "Model" where "id" = \'10\' or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+          ]);
+        });
+    });
+
   });
 
-  it('orWhereRef should create a where clause using column references instead of values', function () {
-    return QueryBuilder
-      .forClass(TestModel)
-      .where('id', 10)
-      .orWhereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
-      .then(function () {
-        expect(executedQueries).to.eql([
-          'select * from "Model" where "id" = \'10\' or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
-        ]);
-      });
+  describe('whereComposite', function () {
+
+    it('should create multiple where queries', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereComposite(['A.a', 'B.b'], '>', [1, 2])
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" > '1' and \"B\".\"b\" > '2'"
+          ]);
+        });
+    });
+
+    it('should fail with invalid operator', function () {
+      expect(function () {
+        QueryBuilder
+          .forClass(TestModel)
+          .whereComposite('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
+          .toString();
+      }).to.throwException();
+    });
+
+    it('operator should default to `=`', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereComposite(['A.a', 'B.b'], [1, 2])
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" = '1' and \"B\".\"b\" = '2'"
+          ]);
+        });
+    });
+
+    it('should work like a normal `where` when one column is given (1)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereComposite(['A.a'], 1)
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" = '1'"
+           ]);
+        });
+    });
+
+    it('should work like a normal `where` when one column is given (2)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereComposite('A.a', 1)
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" = '1'"
+          ]);
+        });
+    });
+
+  });
+
+  describe('whereInComposite', function () {
+
+    it('should create a where-in query for composite id and array of choices', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereInComposite(['A.a', 'B.b'], [[1, 2], [3, 4]])
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where (\"A\".\"a\", \"B\".\"b\") in (('1', '2'),('3', '4'))"
+          ]);
+        });
+    });
+
+    it('should work just like a normal where-in query if one column is given (1)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereInComposite(['A.a'], [[1], [3]])
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" in ('1', '3')"
+          ]);
+        });
+    });
+
+    it('should work just like a normal where-in query if one column is given (2)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereInComposite('A.a', [[1], [3]])
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" in ('1', '3')"
+          ]);
+        });
+    });
+
+    it('should work just like a normal where-in query if one column is given (3)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereInComposite('A.a', [1, 3])
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" in ('1', '3')"
+          ]);
+        });
+    });
+
+    it('should work just like a normal where-in query if one column is given (4)', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereInComposite('A.a', TestModel.query().select('a'))
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where \"A\".\"a\" in (select \"a\" from \"Model\")"
+          ]);
+        });
+    });
+
+    it('should create a where-in query for composite id and a subquery', function () {
+      return QueryBuilder
+        .forClass(TestModel)
+        .whereInComposite(['A.a', 'B.b'], TestModel.query().select('a', 'b'))
+        .then(function () {
+          expect(executedQueries).to.eql([
+            "select * from \"Model\" where (\"A\".\"a\",\"B\".\"b\") in (select \"a\", \"b\" from \"Model\")"
+          ]);
+        });
+    });
+
   });
 
   it('should convert array query result into Model instances', function () {

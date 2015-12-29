@@ -743,6 +743,111 @@ export default class QueryBuilderBase {
   }
 
   /**
+   * `where` for (possibly) composite keys.
+   *
+   * ```js
+   * builder.whereComposite(['id', 'name'], [1, 'Jennifer']);
+   * ```
+   *
+   * ```js
+   * builder.whereComposite('id', '=', 1);
+   * ```
+   *
+   * @param {string|Array.<string>} cols
+   * @param {string|*|Array.<*>} op
+   * @param {*|Array.<*>=} values
+   *
+   * @returns {QueryBuilderBase}
+   */
+  whereComposite(cols, op, values) {
+    if (_.isUndefined(values)) {
+      values = op;
+      op = '=';
+    }
+
+    let formatter = this._knex.client.formatter();
+    formatter.operator(op);
+
+    if (_.isString(cols) && !_.isArray(values)) {
+      return this.where(cols, op, values);
+    } else if (_.isArray(cols) && cols.length === 1 && !_.isArray(values)) {
+      return this.where(cols[0], op, values);
+    } else if (_.isArray(cols) && _.isArray(values) && cols.length === values.length) {
+      _.each(cols, (col, idx) => this.where(col, op, values[idx]));
+      return this;
+    } else {
+      throw new Error('cols and values must both be either scalars or arrays. Arrays must have the same length.');
+    }
+  }
+
+  /**
+   * `whereIn` for (possibly) composite keys.
+   *
+   *
+   * ```js
+   * builder.whereInComposite(['a', 'b'], [[1, 2], [3, 4], [1, 4]]);
+   * ```
+   *
+   * ```js
+   * builder.whereInComposite('a', [[1], [3], [1]]);
+   * ```
+   *
+   * ```js
+   * builder.whereInComposite('a', [1, 3, 1]);
+   * ```
+   *
+   * ```js
+   * builder.whereInComposite(['a', 'b'], SomeModel.query().select('a', 'b'));
+   * ```
+   *
+   * @returns {QueryBuilderBase}
+   */
+  whereInComposite(columns, values) {
+    let isCompositeKey = _.isArray(columns) && columns.length > 1;
+
+    if (isCompositeKey) {
+      if (utils.isSqlite(this._knex)) {
+        if (!_.isArray(values)) {
+          // If the `values` is not an array of values but a function or a subquery
+          // we have no way to implement this method.
+          throw new Error('sqlite doesn\'t support multi-column where in clauses');
+        }
+
+        // Sqlite doesn't support the `where in` syntax for multiple columns but
+        // we can emulate it using grouped `or` clauses.
+        return this.where(builder => {
+          _.each(values, (val) => {
+            builder.orWhere(builder => {
+              _.each(columns, (col, idx) => {
+                builder.andWhere(col, val[idx]);
+              });
+            });
+          });
+        });
+      } else {
+        if (_.isArray(values)) {
+          return this.whereIn(columns, values);
+        } else {
+          // Because of a bug in knex, we need to build the where-in query from pieces
+          // if the value is a subquery.
+          let formatter = this._knex.client.formatter();
+          let sql = '(' + _.map(columns, col => formatter.wrap(col)).join() + ')';
+          return this.whereIn(this._knex.raw(sql), values);
+        }
+      }
+    } else {
+      let col = _.isString(columns) ? columns : columns[0];
+
+      if (_.isArray(values)) {
+        values = _.compact(_.flatten(values));
+      }
+
+      // For non-composite keys we can use the normal whereIn.
+      return this.whereIn(col, values);
+    }
+  }
+
+  /**
    * Json query APIs
    */
 
@@ -1134,7 +1239,7 @@ function knexQueryMethod(overrideMethodName) {
       let context = this.internalContext();
 
       for (let i = 0, l = arguments.length; i < l; ++i) {
-        if (arguments[i] === undefined) {
+        if (_.isUndefined(arguments[i])) {
           // None of the query builder methods should accept undefined. Do nothing if
           // one of the arguments is undefined. This enables us to do things like
           // `.where('name', req.query.name)` without checking if req.query has the
