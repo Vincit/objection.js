@@ -14,6 +14,7 @@ describe('ManyToManyRelation', function () {
   var mockKnex = null;
   var OwnerModel = null;
   var RelatedModel = null;
+  var JoinModel = null;
   var relation;
   var compositeKeyRelation;
 
@@ -43,11 +44,18 @@ describe('ManyToManyRelation', function () {
       Model.apply(this, arguments);
     });
 
+    JoinModel = Model.extend(function JoinModel () {
+      Model.apply(this, arguments);
+    });
+
     OwnerModel.tableName = 'OwnerModel';
     OwnerModel.knex(mockKnex);
 
     RelatedModel.tableName = 'RelatedModel';
     RelatedModel.knex(mockKnex);
+
+    JoinModel.tableName = 'JoinModel';
+    JoinModel.knex(mockKnex);
   });
 
   beforeEach(function () {
@@ -99,6 +107,52 @@ describe('ManyToManyRelation', function () {
     expect(relation.joinTable).to.equal('JoinTable');
     expect(relation.joinTableOwnerCol).to.eql(['ownerId']);
     expect(relation.joinTableRelatedCol).to.eql(['relatedId']);
+  });
+
+  it('should accept a join model in join.through object', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          modelClass: JoinModel,
+          from: 'JoinTable.ownerId',
+          to: 'JoinTable.relatedId'
+        },
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.joinTable).to.equal('JoinTable');
+    expect(relation.joinTableOwnerCol).to.eql(['ownerId']);
+    expect(relation.joinTableRelatedCol).to.eql(['relatedId']);
+    expect(relation.joinTableModelClass).to.equal(JoinModel);
+  });
+
+  it('should accept an absolute file path to a join model in join.through object', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: ManyToManyRelation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        through: {
+          modelClass: __dirname + '/files/JoinModel',
+          from: 'JoinTable.ownerId',
+          to: 'JoinTable.relatedId'
+        },
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.joinTable).to.equal('JoinTable');
+    expect(relation.joinTableOwnerCol).to.eql(['ownerId']);
+    expect(relation.joinTableRelatedCol).to.eql(['relatedId']);
+    expect(relation.joinTableModelClass).to.equal(require('./files/JoinModel'));
   });
 
   it('should accept a composite keys in join.through object (1)', function () {
@@ -162,6 +216,50 @@ describe('ManyToManyRelation', function () {
     expect(relation.joinTable).to.equal('JoinTable');
     expect(relation.joinTableOwnerCol).to.eql(['ownerId']);
     expect(relation.joinTableRelatedCol).to.eql(['relatedId']);
+  });
+
+  it('should fail if join.through.modelClass is not a subclass of Model', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            modelClass: function () {},
+            from: 'JoinTable.relatedId',
+            to: 'JoinTable.ownerId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: Join table model class is not a subclass of Model');
+    });
+  });
+
+  it('should fail if join.through.modelClass is an invalid path', function () {
+    var relation = new ManyToManyRelation('testRelation', OwnerModel);
+
+    expect(function () {
+      relation.setMapping({
+        relation: ManyToManyRelation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'RelatedModel.ownerId',
+          through: {
+            modelClass: '/not/a/path/to/a/model',
+            from: 'JoinTable.relatedId',
+            to: 'JoinTable.ownerId'
+          },
+          to: 'OwnerModel.id'
+        }
+      });
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: Join table model class is not a subclass of Model');
+    });
   });
 
   it('should fail if join.through.to is missing', function () {

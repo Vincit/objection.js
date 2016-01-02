@@ -109,11 +109,26 @@ export default class ManyToManyRelation extends Relation {
     }
 
     if (mapping.join.through.modelClass) {
-      if (!isSubclassOf(mapping.join.through.modelClass, Model)) {
+      let modelClass = mapping.join.through.modelClass;
+
+      try {
+        if (_.isString(modelClass)) {
+          modelClass = require(modelClass);
+
+          // Compatibility with babel `export default`.
+          if (!isSubclassOf(modelClass, Model) && isSubclassOf(modelClass.default, Model)) {
+            modelClass = modelClass.default;
+          }
+        }
+      } catch (err) {
+        // Do nothing.
+      }
+
+      if (!isSubclassOf(modelClass, Model)) {
         this.throwError('Join table model class is not a subclass of Model');
       }
 
-      this.joinTableModelClass = mapping.join.through.modelClass;
+      this.joinTableModelClass = modelClass;
     } else {
       this.joinTableModelClass = inheritModel(Model);
       this.joinTableModelClass.tableName = this.joinTable;

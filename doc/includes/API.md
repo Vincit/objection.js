@@ -3272,6 +3272,9 @@ Person.relationMappings = {
       // ManyToMany relation needs the `through` object 
       // to describe the join table.
       through: {
+        // If you have a model class for the join table
+        // you need to specify it like this:
+        // modelClass: PersonMovie,
         from: 'Person_Movie.personId',
         to: 'Person_Movie.movieId'
       },
@@ -3367,6 +3370,9 @@ class Person extends Model {
           // ManyToMany relation needs the `through` object 
           // to describe the join table.
           through: {
+            // If you have a model class for the join table
+            // you need to specify it like this:
+            // modelClass: PersonMovie,
             from: 'Person_Movie.personId',
             to: 'Person_Movie.movieId'
           },
@@ -3459,6 +3465,9 @@ class Person extends Model {
         // ManyToMany relation needs the `through` object
         // to describe the join table.
         through: {
+          // If you have a model class for the join table
+          // you need to specify it like this:
+          // modelClass: PersonMovie,
           from: 'Person_Movie.personId',
           to: 'Person_Movie.movieId'
         },
@@ -3763,6 +3772,9 @@ Person.relationMappings = {
     join: {
       from: 'Person.id',
       through: {
+        // If you have a model class for the join table
+        // you need to specify it like this:
+        // modelClass: PersonMovie,
         from: 'Person_Movie.actorId',
         to: 'Person_Movie.movieId'
       },
@@ -3802,6 +3814,9 @@ class Person extends Model {
         join: {
           from: 'Person.id',
           through: {
+            // If you have a model class for the join table
+            // you need to specify it like this:
+            // modelClass: PersonMovie,
             from: 'Person_Movie.actorId',
             to: 'Person_Movie.movieId'
           },
@@ -3842,6 +3857,9 @@ class Person extends Model {
       join: {
         from: 'Person.id',
         through: {
+          // If you have a model class for the join table
+          // you need to specify it like this:
+          // modelClass: PersonMovie,
           from: 'Person_Movie.actorId',
           to: 'Person_Movie.movieId'
         },
