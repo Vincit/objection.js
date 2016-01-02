@@ -363,6 +363,54 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
 
 <p>You can set the default values for properties using the <code class="prettyprint">default</code> property in <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>.</p>
 
+<h2 id="composite-keys">Composite keys</h2>
+
+<blockquote>
+<p>Specifying a composite primary key for a model:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">,</span> <span class="s1">'dateOfBirth'</span><span class="p">];</span>
+</code></pre>
+
+<blockquote>
+<p>Specifying a relation using a composite primary key and a composite foreign key:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">'Person.firstName'</span><span class="p">,</span>
+        <span class="s1">'Person.lastName'</span><span class="p">,</span>
+        <span class="s1">'Person.dateOfBirth'</span>
+      <span class="p">],</span>
+      <span class="na">to</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">'Animal.ownerFirstName'</span><span class="p">,</span>
+        <span class="s1">'Animal.ownerLastName'</span><span class="p">,</span>
+        <span class="s1">'Animal.ownerDateOfBirth'</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>Compound keys are fully supported. Just give an array of columns where you would normally give a single column name.
+Composite primary key can be specified by setting an array of column names to the <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> of a model
+class.</p>
+
+<p>Here&rsquo;s a list of methods that may help working with composite keys:</p>
+
+<ul>
+<li><a href="#wherecomposite"><code class="prettyprint">whereComposite</code></a></li>
+<li><a href="#whereincomposite"><code class="prettyprint">whereInComposite</code></a></li>
+<li><a href="#findbyid"><code class="prettyprint">findById</code></a></li>
+<li><a href="#deletebyid"><code class="prettyprint">deleteById</code></a></li>
+<li><a href="#updateandfetchbyid"><code class="prettyprint">updateAndFetchById</code></a></li>
+<li><a href="#patchandfetchbyid"><code class="prettyprint">patchAndFetchById</code></a></li>
+<li><a href="#_s_id"><code class="prettyprint">$id</code></a></li>
+<li><a href="#_s_values"><code class="prettyprint">$values</code></a></li>
+</ul>
+
       </div>
       <div class="dark-box">
       </div>

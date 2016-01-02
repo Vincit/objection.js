@@ -976,6 +976,9 @@ with an instance of <a href="#validationerror"><code class="prettyprint">Validat
       <span class="c1">// ManyToMany relation needs the `through` object</span>
       <span class="c1">// to describe the join table.</span>
       <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// If you have a model class for the join table</span>
+        <span class="c1">// you need to specify it like this:</span>
+        <span class="c1">// modelClass: PersonMovie,</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
       <span class="p">},</span>
@@ -1075,6 +1078,9 @@ with an instance of <a href="#validationerror"><code class="prettyprint">Validat
           <span class="c1">// ManyToMany relation needs the `through` object</span>
           <span class="c1">// to describe the join table.</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you need to specify it like this:</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
             <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
             <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
           <span class="p">},</span>
@@ -1171,6 +1177,9 @@ with an instance of <a href="#validationerror"><code class="prettyprint">Validat
         <span class="c1">// ManyToMany relation needs the `through` object</span>
         <span class="c1">// to describe the join table.</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+          <span class="c1">// If you have a model class for the join table</span>
+          <span class="c1">// you need to specify it like this:</span>
+          <span class="c1">// modelClass: PersonMovie,</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
         <span class="p">},</span>
@@ -1541,6 +1550,54 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
 
 <p>You can set the default values for properties using the <code class="prettyprint">default</code> property in <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>.</p>
 
+<h2 id="composite-keys">Composite keys</h2>
+
+<blockquote>
+<p>Specifying a composite primary key for a model:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">,</span> <span class="s1">'dateOfBirth'</span><span class="p">];</span>
+</code></pre>
+
+<blockquote>
+<p>Specifying a relation using a composite primary key and a composite foreign key:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">'Person.firstName'</span><span class="p">,</span>
+        <span class="s1">'Person.lastName'</span><span class="p">,</span>
+        <span class="s1">'Person.dateOfBirth'</span>
+      <span class="p">],</span>
+      <span class="na">to</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">'Animal.ownerFirstName'</span><span class="p">,</span>
+        <span class="s1">'Animal.ownerLastName'</span><span class="p">,</span>
+        <span class="s1">'Animal.ownerDateOfBirth'</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<p>Compound keys are fully supported. Just give an array of columns where you would normally give a single column name.
+Composite primary key can be specified by setting an array of column names to the <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> of a model
+class.</p>
+
+<p>Here&rsquo;s a list of methods that may help working with composite keys:</p>
+
+<ul>
+<li><a href="#wherecomposite"><code class="prettyprint">whereComposite</code></a></li>
+<li><a href="#whereincomposite"><code class="prettyprint">whereInComposite</code></a></li>
+<li><a href="#findbyid"><code class="prettyprint">findById</code></a></li>
+<li><a href="#deletebyid"><code class="prettyprint">deleteById</code></a></li>
+<li><a href="#updateandfetchbyid"><code class="prettyprint">updateAndFetchById</code></a></li>
+<li><a href="#patchandfetchbyid"><code class="prettyprint">patchAndFetchById</code></a></li>
+<li><a href="#_s_id"><code class="prettyprint">$id</code></a></li>
+<li><a href="#_s_values"><code class="prettyprint">$values</code></a></li>
+</ul>
+
           <h1 id="api-reference">API reference</h1>
 
 <h2 id="querybuilder">QueryBuilder</h2>
@@ -1642,6 +1699,48 @@ keywords and you don&rsquo;t need to call this method.</p>
 
 <h3 id="query-building-methods">Query building methods</h3>
 
+<h4 id="findbyid">findById</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>Composite key:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">]);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>any&#124; Array.&lt;any&gt;</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="insert">insert</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">modelsOrObjects</span><span class="p">);</span>
 </code></pre>
@@ -1686,7 +1785,7 @@ the Promise is rejected with a <a href="#validationerror"><code class="prettypri
 
 <p>NOTE: The return value of the insert query <em>only</em> contains the properties given to the insert
 method plus the identifier. This is because we don&rsquo;t make an additional fetch query after
-the insert. Using postgres you can chain <a href="#returning"><code class="prettyprint">returning(&#39;&#39;)</code></a> to the query to get all properties.
+the insert. Using postgres you can chain <a href="#returning"><code class="prettyprint">returning(&#39;*&#39;)</code></a> to the query to get all properties.
 On other databases you can use the <a href="#insertandfetch"><code class="prettyprint">insertAndFetch</code></a> method.</p>
 
 <p>The batch insert only works on Postgres because Postgres is the only database engine
@@ -1731,7 +1830,7 @@ through <a href="#knexquery"><code class="prettyprint">YourModel.knexQuery()</co
 
 <p>Just like <a href="#insert"><code class="prettyprint">insert</code></a> but also fetches the model afterwards.</p>
 
-<p>Note that on postgresql you can just chain <a href="#returning"><code class="prettyprint">returning(&#39;&#39;)</code></a> to the normal insert method
+<p>Note that on postgresql you can just chain <a href="#returning"><code class="prettyprint">returning(&#39;*&#39;)</code></a> to the normal insert method
 to get the same result without an additional query.</p>
 
 <h5 id="arguments">Arguments</h5>
@@ -2168,6 +2267,60 @@ but an error isn&rsquo;t thrown if the patch object doesn&rsquo;t contain all re
 </tr>
 </tbody></table>
 
+<h4 id="deletebyid">deleteById</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">deleteById</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">deleteById</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">numberOfDeletedRows</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'removed'</span><span class="p">,</span> <span class="nx">numberOfDeletedRows</span><span class="p">,</span> <span class="s1">'people'</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>Composite key:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">deleteById</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="s1">'20'</span><span class="p">,</span> <span class="mi">46</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">numberOfDeletedRows</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'removed'</span><span class="p">,</span> <span class="nx">numberOfDeletedRows</span><span class="p">,</span> <span class="s1">'people'</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Deletes a model by id.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>any&#124;Array.&lt;any&gt;</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="relate">relate</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">relate</span><span class="p">(</span><span class="nx">ids</span><span class="p">);</span>
 </code></pre>
@@ -2294,6 +2447,42 @@ join columns to null.</p>
 <h4 id="select">select</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-select">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="forupdate">forUpdate</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-forUpdate">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="forshare">forShare</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-forShare">knex documentation</a></p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -3516,7 +3705,7 @@ join columns to null.</p>
 </tbody></table>
 
 <h4 id="whereref">whereRef</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">whereRef</span><span class="p">.</span><span class="nx">whereRef</span><span class="p">(</span><span class="nx">leftRef</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">rightRef</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereRef</span><span class="p">(</span><span class="nx">leftRef</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">rightRef</span><span class="p">);</span>
 </code></pre>
 <pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereRef</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Animal.ownerId'</span><span class="p">);</span>
 </code></pre>
@@ -3538,12 +3727,68 @@ join columns to null.</p>
 </tbody></table>
 
 <h4 id="orwhereref">orWhereRef</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">whereRef</span><span class="p">.</span><span class="nx">orWhereRef</span><span class="p">(</span><span class="nx">leftRef</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">rightRef</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">orWhereRef</span><span class="p">(</span><span class="nx">leftRef</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">rightRef</span><span class="p">);</span>
 </code></pre>
 <pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">orWhereRef</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Animal.ownerId'</span><span class="p">);</span>
 </code></pre>
 
 <p>Compares a column reference to another</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="wherecomposite">whereComposite</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereComposite</span><span class="p">(</span><span class="nx">columns</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">values</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereComposite</span><span class="p">([</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">],</span> <span class="s1">'='</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'Jennifer'</span><span class="p">]);</span>
+</code></pre>
+
+<blockquote>
+<p>This method also works with a single column - value pair:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereComposite</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</code></pre>
+
+<p><a href="#where"><code class="prettyprint">where</code></a> for (possibly) composite keys.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="whereincomposite">whereInComposite</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereInComposite</span><span class="p">(</span><span class="nx">columns</span><span class="p">,</span> <span class="nx">values</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereInComposite</span><span class="p">([</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">],</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereInComposite</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">]]);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereInComposite</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereInComposite</span><span class="p">([</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">],</span> <span class="nx">SomeModel</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">select</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">));</span>
+</code></pre>
+
+<p><a href="#wherein"><code class="prettyprint">whereIn</code></a> for (possibly) composite keys.</p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -5536,6 +5781,9 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
       <span class="c1">// ManyToMany relation needs the `through` object </span>
       <span class="c1">// to describe the join table.</span>
       <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// If you have a model class for the join table</span>
+        <span class="c1">// you need to specify it like this:</span>
+        <span class="c1">// modelClass: PersonMovie,</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
       <span class="p">},</span>
@@ -5631,6 +5879,9 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
           <span class="c1">// ManyToMany relation needs the `through` object </span>
           <span class="c1">// to describe the join table.</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you need to specify it like this:</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
             <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
             <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
           <span class="p">},</span>
@@ -5723,6 +5974,9 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
         <span class="c1">// ManyToMany relation needs the `through` object</span>
         <span class="c1">// to describe the join table.</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+          <span class="c1">// If you have a model class for the join table</span>
+          <span class="c1">// you need to specify it like this:</span>
+          <span class="c1">// modelClass: PersonMovie,</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
         <span class="p">},</span>
@@ -5986,6 +6240,8 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 
 <p>Name of the primary key column in the database table.</p>
 
+<p>Composite id can be specified by giving an array of column names.</p>
+
 <p>Defaults to &#39;id&rsquo;.</p>
 
 <h4 id="relationmappings">relationMappings</h4>
@@ -6023,6 +6279,9 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
       <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// If you have a model class for the join table</span>
+        <span class="c1">// you need to specify it like this:</span>
+        <span class="c1">// modelClass: PersonMovie,</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
       <span class="p">},</span>
@@ -6062,6 +6321,9 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you need to specify it like this:</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
             <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
             <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
           <span class="p">},</span>
@@ -6102,6 +6364,9 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+          <span class="c1">// If you have a model class for the join table</span>
+          <span class="c1">// you need to specify it like this:</span>
+          <span class="c1">// modelClass: PersonMovie,</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
         <span class="p">},</span>
@@ -6169,13 +6434,13 @@ is a handy way to prevent require loops.</p>
 </thead><tbody>
 <tr>
 <td>from</td>
-<td>string</td>
-<td>The relation column in the owner table. Must be given with the table name. For example <code class="prettyprint">Person.id</code>. Note that neither this nor <code class="prettyprint">to</code> need to be foreign keys or primary keys. You can join any column to any column.</td>
+<td>string&#124;Array.&lt;string&gt;</td>
+<td>The relation column in the owner table. Must be given with the table name. For example <code class="prettyprint">Person.id</code>. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person.a&#39;, &#39;Person.b&#39;]</code>. Note that neither this nor <code class="prettyprint">to</code> need to be foreign keys or primary keys. You can join any column to any column.</td>
 </tr>
 <tr>
 <td>to</td>
-<td>string</td>
-<td>The relation column in the related table. Must be given with the table name. For example <code class="prettyprint">Movie.id</code>. Note that neither this nor <code class="prettyprint">from</code> need to be foreign keys or primary keys. You can join any column to any column.</td>
+<td>string&#124;Array.&lt;string&gt;</td>
+<td>The relation column in the related table. Must be given with the table name. For example <code class="prettyprint">Movie.id</code>. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Movie.a&#39;, &#39;Movie.b&#39;]</code>. Note that neither this nor <code class="prettyprint">from</code> need to be foreign keys or primary keys. You can join any column to any column.</td>
 </tr>
 <tr>
 <td>through</td>
@@ -6195,13 +6460,13 @@ is a handy way to prevent require loops.</p>
 </thead><tbody>
 <tr>
 <td>from</td>
-<td>string</td>
-<td>The column that is joined to <code class="prettyprint">from</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.actorId</code> where <code class="prettyprint">Person_Movie</code> is the join table.</td>
+<td>string&#124;Array.&lt;string&gt;</td>
+<td>The column that is joined to <code class="prettyprint">from</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.actorId</code> where <code class="prettyprint">Person_Movie</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person_Movie.a&#39;, &#39;Person_Movie.b&#39;]</code>.</td>
 </tr>
 <tr>
 <td>to</td>
-<td>string</td>
-<td>The column that is joined to <code class="prettyprint">to</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.movieId</code> where <code class="prettyprint">Person_Movie</code> is the join table.</td>
+<td>string&#124;Array.&lt;string&gt;</td>
+<td>The column that is joined to <code class="prettyprint">to</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.movieId</code> where <code class="prettyprint">Person_Movie</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person_Movie.a&#39;, &#39;Person_Movie.b&#39;]</code>.</td>
 </tr>
 </tbody></table>
 
@@ -6963,10 +7228,17 @@ also for the input models themselves.</p>
 <h3 id="instance-methods">Instance methods</h3>
 
 <h4 id="id">$id</h4>
-<pre class="highlight javascript"><code><span class="c1">// Returns the id.</span>
-<span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">model</span><span class="p">.</span><span class="nx">$id</span><span class="p">();</span>
+<pre class="highlight javascript"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">$id</span><span class="p">());</span> <span class="c1">// -&gt; 100</span>
 <span class="c1">// Sets the id.</span>
 <span class="nx">model</span><span class="p">.</span><span class="nx">$id</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>Composite key</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">$id</span><span class="p">());</span> <span class="c1">// -&gt; [100, 20, 30]</span>
+<span class="c1">// Sets the id.</span>
+<span class="nx">model</span><span class="p">.</span><span class="nx">$id</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">]);</span>
 </code></pre>
 
 <p>Returns or sets the identifier of a model instance.</p>
