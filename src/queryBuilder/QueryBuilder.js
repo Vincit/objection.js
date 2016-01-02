@@ -6,7 +6,7 @@ import InsertWithRelated from './InsertWithRelated';
 import QueryBuilderBase from './QueryBuilderBase';
 import ValidationError from '../ValidationError';
 import EagerFetcher from './EagerFetcher';
-import utils from '../utils';
+import {isPostgres} from '../utils/dbUtils';
 
 /**
  * Query builder for Models.
@@ -128,6 +128,10 @@ export default class QueryBuilder extends QueryBuilderBase {
   childQueryOf(query) {
     if (query) {
       this.internalContext(query.internalContext());
+
+      if (query.has(/debug/)) {
+        this.debug();
+      }
     }
     return this;
   }
@@ -1412,7 +1416,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     this.$$callWriteMethodImpl('insert', [insertion, this]);
 
     this.runBefore((result, builder) => {
-      if (insertion.models().length > 1 && !utils.isPostgres(ModelClass.knex())) {
+      if (insertion.models().length > 1 && !isPostgres(ModelClass.knex())) {
         throw new Error('batch insert only works with Postgresql');
       } else {
         return Promise.map(insertion.models(), model => model.$beforeInsert(builder.context()));
@@ -1428,19 +1432,18 @@ export default class QueryBuilder extends QueryBuilderBase {
     });
 
     this.runAfterModelCreatePushFront(ret => {
-      // If the user specified a `returning` clause the result may already be
-      // an array of objects.
-      if (!_.isEmpty(ret) && _.isObject(ret[0])) {
+      if (!_.isArray(ret) || _.isEmpty(ret)) {
+        // Early exit if there is nothing to do.
+        return insertion.models();
+      }
+
+      // If the user specified a `returning` clause the result may already bean array of objects.
+      if (_.all(ret, _.isObject)) {
         _.forEach(insertion.models(), (model, index) => {
           model.$set(ret[index]);
-          // The returning clause must contain at least the identifier.
-          if (!model.$id()) {
-            throw new Error(`the identifier column "${ModelClass.idColumn}" must be selected by the "returning" clause.`);
-          }
         });
-      } else if (_.isArray(ret)) {
-        // If the return value is not an array of models, we assume
-        // it is an array of identifiers.
+      } else {
+        // If the return value is not an array of objects, we assume it is an array of identifiers.
         _.forEach(insertion.models(), (model, idx) => {
           // Don't set the id if the model already has one. MySQL and Sqlite don't return the correct
           // primary key value if the id is not generated in db, but given explicitly.
@@ -1449,6 +1452,7 @@ export default class QueryBuilder extends QueryBuilderBase {
           }
         });
       }
+
       return insertion.models();
     });
 
@@ -1487,9 +1491,9 @@ export default class QueryBuilder extends QueryBuilderBase {
       return ModelClass
         .query()
         .childQueryOf(builder)
-        .whereIn(ModelClass.getFullIdColumn(), _.invoke(insertedModelArray, '$id'))
+        .whereInComposite(ModelClass.getFullIdColumn(), _.map(insertedModelArray, model => model.$id()))
         .then(fetchedModels => {
-          fetchedModels = _.indexBy(fetchedModels, ModelClass.getIdProperty());
+          fetchedModels = _.indexBy(fetchedModels, (model) => model.$id());
 
           // Instead of returning the freshly fetched models, update the input
           // models with the fresh values.
@@ -1592,7 +1596,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   @writeQueryMethod
   insertWithRelated(modelsOrObjects) {
     const ModelClass = this._modelClass;
-    const batchSize = utils.isPostgres(ModelClass.knex()) ? 100 : 1;
+    const batchSize = isPostgres(ModelClass.knex()) ? 100 : 1;
 
     let insertion = new InsertionOrUpdate({
       ModelClass,
@@ -1749,7 +1753,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    *   });
    * ```
    *
-   * @param {number|string} id
+   * @param {number|string|Array.<number|string>} id
    *    The identifier of the object to update.
    *
    * @param {Model|Object=} modelOrObject
@@ -1760,7 +1764,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   updateAndFetchById(id, modelOrObject) {
     return this
       .$$updateWithOptions(modelOrObject, 'update', {}, id)
-      .where(this._modelClass.getFullIdColumn(), id);
+      .whereComposite(this._modelClass.getFullIdColumn(), id);
   }
 
   /**
@@ -1790,7 +1794,7 @@ export default class QueryBuilder extends QueryBuilderBase {
           .query()
           .first()
           .childQueryOf(builder)
-          .where(ModelClass.getFullIdColumn(), fetchId)
+          .whereComposite(ModelClass.getFullIdColumn(), fetchId)
           .then(model => model ? update.model().$set(model) : null);
       } else {
         promise = Promise.resolve(numUpdated);
@@ -1812,6 +1816,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   $$update(update) {
     let input = update;
+    let idColumn = this._modelClass.idColumn;
 
     if (update instanceof InsertionOrUpdate) {
       input = update.toKnexInput();
@@ -1820,7 +1825,13 @@ export default class QueryBuilder extends QueryBuilderBase {
     }
 
     // We never want to update the identifier.
-    delete input[this._modelClass.idColumn];
+    if (_.isArray(idColumn)) {
+      _.each(idColumn, col => {
+        delete input[col]
+      });
+    } else {
+      delete input[idColumn];
+    }
 
     return super.update(input);
   }
@@ -1900,7 +1911,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    *   });
    * ```
    *
-   * @param {number|string} id
+   * @param {number|string|Array.<number|string>} id
    *    The identifier of the object to update.
    *
    * @param {Model|Object=} modelOrObject
@@ -1911,7 +1922,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   patchAndFetchById(id, modelOrObject) {
     return this
       .$$updateWithOptions(modelOrObject, 'patch', {patch: true}, id)
-      .where(this._modelClass.getFullIdColumn(), id);
+      .whereComposite(this._modelClass.getFullIdColumn(), id);
   }
 
   /**
@@ -1995,18 +2006,42 @@ export default class QueryBuilder extends QueryBuilderBase {
    *   });
    * ```
    *
-   * @param {number|string|Array.<number|string>} ids
+   * Composite key:
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .where('id', 123)
+   *   .first()
+   *   .then(function (person) {
+   *     return person.$relatedQuery('movies').relate([50, 20, 10]);
+   *   })
+   *   .then(function () {
+   *     console.log('movie 50 is now related to person 123 through `movies` relation');
+   *   });
+   * ```
+   *
+   * Multiple models with composite key (postgres only):
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .where('id', 123)
+   *   .first()
+   *   .then(function (person) {
+   *     return person.$relatedQuery('movies').relate([[50, 20, 10], [24, 46, 12]]);
+   *   })
+   *   .then(function () {
+   *     console.log('movie 50 is now related to person 123 through `movies` relation');
+   *   });
+   * ```
+   *
+   * @param {number|string|Array.<number|string>|Array.<Array.<number|string>>} ids
    * @returns {QueryBuilder}
    */
   @writeQueryMethod
   relate(ids) {
-    let inputArray = _.isArray(ids) ? ids : [ids];
-    let maybeIds = this.$$callWriteMethodImpl('relate', [inputArray, this]);
-
-    if (_.isArray(maybeIds)) {
-      ids = maybeIds;
-    }
-
+    this.$$callWriteMethodImpl('relate', [ids, this]);
     return this.runAfterModelCreate(() => ids);
   }
 
@@ -2035,11 +2070,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   @writeQueryMethod
   unrelate() {
     this.$$callWriteMethodImpl('unrelate', [this]);
-
-    this.runAfterModelCreate(function () {
-      return {};
-    });
-
+    this.runAfterModelCreate(() => { return {}; });
     return this;
   }
 

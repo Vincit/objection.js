@@ -1,13 +1,15 @@
 import _ from 'lodash';
-import utils from '../utils';
 import Relation from './Relation';
 import inheritModel from '../model/inheritModel';
-const ownerJoinColumnAlias = 'objectiontmpjoin';;
+import { overwriteForDatabase } from '../utils/dbUtils'
+import { isSubclassOf } from '../utils/classUtils'
+const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 
 /**
  * @ignore
  * @extends Relation
  */
+@overwriteForDatabase()
 export default class ManyToManyRelation extends Relation {
 
   constructor(...args) {
@@ -23,28 +25,28 @@ export default class ManyToManyRelation extends Relation {
     /**
      * The relation column in the join table that points to the owner table.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.joinTableOwnerCol = null;
 
     /**
      * The relation property in the join model that points to the owner table.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.joinTableOwnerProp = null;
 
     /**
      * The relation column in the join table that points to the related table.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.joinTableRelatedCol = null;
 
     /**
      * The relation property in the join model that points to the related table.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.joinTableRelatedProp = null;
 
@@ -64,49 +66,48 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    */
   setMapping(mapping) {
+    let retVal = super.setMapping(mapping);
+
     // Avoid require loop and import here.
     let Model = require(__dirname + '/../model/Model').default;
 
-    let retVal = Relation.prototype.setMapping.call(this, mapping);
-    let errorPrefix = this.ownerModelClass.name + '.relationMappings.' + this.name;
-
     if (!_.isObject(mapping.join.through)) {
-      throw new Error(errorPrefix + '.join must have the `through` that describes the join table.');
+      this.throwError('join must have the `through` that describes the join table.');
     }
 
-    if (!_.isString(mapping.join.through.from) || !_.isString(mapping.join.through.to)) {
-      throw new Error(errorPrefix + '.join.through must be an object that describes the join table. For example: {from: \'JoinTable.someId\', to: \'JoinTable.someOtherId\'}');
+    if (!mapping.join.through.from || !mapping.join.through.to) {
+      this.throwError('join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}');
     }
 
-    let joinFrom = Relation.parseColumn(mapping.join.from);
-    let joinTableFrom = Relation.parseColumn(mapping.join.through.from);
-    let joinTableTo = Relation.parseColumn(mapping.join.through.to);
+    let joinFrom = this.parseReference(mapping.join.from);
+    let joinTableFrom = this.parseReference(mapping.join.through.from);
+    let joinTableTo = this.parseReference(mapping.join.through.to);
 
-    if (!joinTableFrom.table || !joinTableFrom.name) {
-      throw new Error(errorPrefix + '.join.through.from must have format JoinTable.columnName. For example `JoinTable.someId`.');
+    if (!joinTableFrom.table || _.isEmpty(joinTableFrom.columns)) {
+      this.throwError('join.through.from must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].');
     }
 
-    if (!joinTableTo.table || !joinTableTo.name) {
-      throw new Error(errorPrefix + '.join.through.to must have format JoinTable.columnName. For example `JoinTable.someId`.');
+    if (!joinTableTo.table || _.isEmpty(joinTableTo.columns)) {
+      this.throwError('join.through.to must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].');
     }
 
     if (joinTableFrom.table !== joinTableTo.table) {
-      throw new Error(errorPrefix + '.join.through `from` and `to` must point to the same join table.');
+      this.throwError('join.through `from` and `to` must point to the same join table.');
     }
 
     this.joinTable = joinTableFrom.table;
 
     if (joinFrom.table === this.ownerModelClass.tableName) {
-      this.joinTableOwnerCol = joinTableFrom.name;
-      this.joinTableRelatedCol = joinTableTo.name;
+      this.joinTableOwnerCol = joinTableFrom.columns;
+      this.joinTableRelatedCol = joinTableTo.columns;
     } else {
-      this.joinTableRelatedCol = joinTableFrom.name;
-      this.joinTableOwnerCol = joinTableTo.name;
+      this.joinTableRelatedCol = joinTableFrom.columns;
+      this.joinTableOwnerCol = joinTableTo.columns;
     }
 
     if (mapping.join.through.modelClass) {
-      if (!utils.isSubclassOf(mapping.join.through.modelClass, Model)) {
-        throw new Error('Join table model class is not a subclass of Model');
+      if (!isSubclassOf(mapping.join.through.modelClass, Model)) {
+        this.throwError('Join table model class is not a subclass of Model');
       }
 
       this.joinTableModelClass = mapping.join.through.modelClass;
@@ -118,8 +119,8 @@ export default class ManyToManyRelation extends Relation {
       this.joinTableModelClass.idColumn = this.joinTableRelatedCol;
     }
 
-    this.joinTableOwnerProp = this.joinTableModelClass.columnNameToPropertyName(this.joinTableOwnerCol);
-    this.joinTableRelatedProp = this.joinTableModelClass.columnNameToPropertyName(this.joinTableRelatedCol);
+    this.joinTableOwnerProp = this.propertyName(this.joinTableOwnerCol, this.joinTableModelClass);
+    this.joinTableRelatedProp = this.propertyName(this.joinTableRelatedCol, this.joinTableModelClass);
 
     return retVal;
   }
@@ -127,23 +128,23 @@ export default class ManyToManyRelation extends Relation {
   /**
    * Reference to the column in the join table that refers to `fullOwnerCol()`.
    *
-   * For example: `Person_Movie.actorId`.
+   * For example: [`Person_Movie.actorId`].
    *
-   * @returns {string}
+   * @returns {Array.<string>}
    */
   fullJoinTableOwnerCol() {
-    return this.joinTable + '.' + this.joinTableOwnerCol;
+    return _.map(this.joinTableOwnerCol, col => this.joinTable + '.' + col);
   }
 
   /**
    * Reference to the column in the join table that refers to `fullRelatedCol()`.
    *
-   * For example: `Person_Movie.movieId`.
+   * For example: [`Person_Movie.movieId`].
    *
-   * @returns {string}
+   * @returns {Array.<string>}
    */
   fullJoinTableRelatedCol() {
-    return this.joinTable + '.' + this.joinTableRelatedCol;
+    return _.map(this.joinTableRelatedCol, col => this.joinTable + '.' + col);
   }
 
   /**
@@ -180,9 +181,7 @@ export default class ManyToManyRelation extends Relation {
    */
   bindKnex(knex) {
     let bound = super.bindKnex(knex);
-
     bound.joinTableModelClass = this.joinTableModelClass.bindKnex(knex);
-
     return bound;
   }
 
@@ -191,16 +190,25 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    * @returns {QueryBuilder}
    */
-  findQuery(builder, ownerCol, isColumnRef) {
-    builder.join(this.joinTable, this.fullJoinTableRelatedCol(), this.fullRelatedCol());
+  findQuery(builder, ownerIds, isColumnRef) {
+    let fullRelatedCol = this.fullRelatedCol();
+
+    builder.join(this.joinTable, join => {
+      _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
+        join.on(joinTableRelatedCol, fullRelatedCol[idx]);
+      });
+    });
 
     if (isColumnRef) {
-      builder.whereRef(this.fullJoinTableOwnerCol(), ownerCol);
+      _.each(this.fullJoinTableOwnerCol(), (joinTableOwnerCol, idx) => {
+        builder.whereRef(joinTableOwnerCol, ownerIds[idx]);
+      });
     } else {
-      if (_.isArray(ownerCol)) {
-        builder.whereIn(this.fullJoinTableOwnerCol(), ownerCol);
+      if (_(ownerIds).flatten().all(id => _.isNull(id) || _.isUndefined(id))) {
+        // Nothing to fetch.
+        builder.resolve([]);
       } else {
-        builder.where(this.fullJoinTableOwnerCol(), ownerCol);
+        builder.whereInComposite(this.fullJoinTableOwnerCol(), ownerIds);
       }
     }
 
@@ -224,15 +232,23 @@ export default class ManyToManyRelation extends Relation {
     let joinTableAsAlias = joinTable + ' as ' +  joinTableAlias;
     let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
 
-    let joinTableOwnerCol = joinTableAlias + '.' + this.joinTableOwnerCol;
-    let joinTableRelatedCol = joinTableAlias + '.' + this.joinTableRelatedCol;
+    let joinTableOwnerCol = _.map(this.joinTableOwnerCol, col => joinTableAlias + '.' + col);
+    let joinTableRelatedCol = _.map(this.joinTableRelatedCol, col => joinTableAlias + '.' + col);
 
     let ownerCol = this.fullOwnerCol();
-    let relatedCol = relatedTableAlias + '.' + this.relatedCol;
+    let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
 
     return builder
-      [joinMethod](joinTableAsAlias, joinTableOwnerCol, ownerCol)
-      [joinMethod](relatedTableAsAlias, joinTableRelatedCol, relatedCol)
+      [joinMethod](joinTableAsAlias, join => {
+        _.each(joinTableOwnerCol, (joinTableOwnerCol, idx) => {
+          join.on(joinTableOwnerCol, ownerCol[idx]);
+        });
+      })
+      [joinMethod](relatedTableAsAlias, join => {
+        _.each(joinTableRelatedCol, (joinTableRelatedCol, idx) => {
+          join.on(joinTableRelatedCol, relatedCol[idx]);
+        });
+      })
       .call(this.filter);
   }
 
@@ -241,9 +257,14 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    */
   find(builder, owners) {
+    const ownerJoinColumnAlias = _.times(this.joinTableOwnerCol.length, idx => ownerJoinColumnAliasPrefix + idx);
+    const ownerJoinPropertyAlias = _.map(ownerJoinColumnAlias, alias => this.relatedModelClass.columnNameToPropertyName(alias));
+
     builder.onBuild(builder => {
-      let ownerIds = _.pluck(owners, this.ownerProp);
-      let ownerJoinColumn = this.fullJoinTableOwnerCol();
+      let ids = _(owners)
+        .map(owner => owner.$values(this.ownerProp))
+        .unique(id => id.join())
+        .value();
 
       if (!builder.has(/select/)) {
         // If the user hasn't specified a select clause, select the related model's columns.
@@ -251,21 +272,27 @@ export default class ManyToManyRelation extends Relation {
         builder.select(this.relatedModelClass.tableName + '.*');
       }
 
-      this.findQuery(builder, ownerIds).select(ownerJoinColumn + ' as ' + ownerJoinColumnAlias);
+      this.findQuery(builder, ids);
+
+      // We must select the owner join columns so that we know for which owner model the related
+      // models belong to after the requests.
+      _.each(this.fullJoinTableOwnerCol(), (fullJoinTableOwnerCol, idx) => {
+        builder.select(fullJoinTableOwnerCol + ' as ' + ownerJoinColumnAlias[idx]);
+      });
     });
 
     builder.runAfterModelCreate(related => {
-      // The ownerJoinColumnAlias column name may have been changed by the `$parseDatabaseJson`
-      // method of the related model class. We need to do the same conversion here.
-      let ownerJoinPropAlias = this.relatedModelClass.columnNameToPropertyName(ownerJoinColumnAlias);
-      let relatedByOwnerId = _.groupBy(related, ownerJoinPropAlias);
+      let relatedByOwnerId = _.groupBy(related, related => related.$values(ownerJoinPropertyAlias));
 
-      _.each(owners,owner => {
-        owner[this.name] = relatedByOwnerId[owner[this.ownerProp]] || [];
+      _.each(owners, owner => {
+        owner[this.name] = relatedByOwnerId[owner.$values(this.ownerProp)] || [];
       });
 
+      // Delete the temporary join aliases.
       _.each(related, rel => {
-        delete rel[ownerJoinPropAlias];
+        _.each(ownerJoinPropertyAlias, alias => {
+          delete rel[alias];
+        });
       });
 
       return related;
@@ -282,15 +309,15 @@ export default class ManyToManyRelation extends Relation {
     });
 
     builder.runAfterModelCreate(related => {
-      let ownerId = owner[this.ownerProp];
-      let relatedIds = _.pluck(related, this.relatedProp);
+      let ownerId = owner.$values(this.ownerProp);
+      let relatedIds = _.map(related, related => related.$values(this.relatedProp));
       let joinModels = this._createJoinModels(ownerId, relatedIds);
 
       owner[this.name] = this.mergeModels(owner[this.name], related);
 
       // Insert the join rows to the join table.
       return this.joinTableModelClass
-        .bindKnex(builder.modelClass().knex())
+        .bindKnex(builder.knex())
         .query()
         .childQueryOf(builder)
         .insert(joinModels)
@@ -304,21 +331,8 @@ export default class ManyToManyRelation extends Relation {
    */
   update(builder, owner, update) {
     builder.onBuild(builder => {
-      let idSelectQuery = this._makeFindIdQuery(builder, owner[this.ownerProp]);
-
-      builder
-        .$$update(update)
-        .whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery)
-        .call(this.filter);
+      this._selectForModify(builder, owner).$$update(update).call(this.filter);
     });
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
-  patch(builder, owner, patch) {
-    return this.update(builder, owner, patch);
   }
 
   /**
@@ -327,12 +341,7 @@ export default class ManyToManyRelation extends Relation {
    */
   delete(builder, owner) {
     builder.onBuild(builder => {
-      let idSelectQuery = this._makeFindIdQuery(builder, owner[this.ownerProp]);
-
-      builder
-        .$$delete()
-        .whereIn(this.relatedModelClass.getFullIdColumn(), idSelectQuery)
-        .call(this.filter);
+      this._selectForModify(builder, owner).$$delete().call(this.filter);
     });
   }
 
@@ -341,11 +350,13 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    */
   relate(builder, owner, ids) {
-    builder.setQueryExecutor(() => {
-      let joinModels = this._createJoinModels(owner[this.ownerProp], ids);
+    ids = this.normalizeId(ids, this.relatedProp.length);
+
+    builder.setQueryExecutor(builder => {
+      let joinModels = this._createJoinModels(owner.$values(this.ownerProp), ids);
 
       return this.joinTableModelClass
-        .bindKnex(this.ownerModelClass.knex())
+        .bindKnex(builder.knex())
         .query()
         .childQueryOf(builder)
         .insert(joinModels)
@@ -357,9 +368,12 @@ export default class ManyToManyRelation extends Relation {
    * @override
    * @inheritDoc
    */
+  @overwriteForDatabase({
+    sqlite3: 'unrelate_sqlite3'
+  })
   unrelate(builder, owner) {
     builder.setQueryExecutor(builder => {
-      let idSelectQuery = this.relatedModelClass
+      let selectRelatedColQuery = this.relatedModelClass
         .query()
         .childQueryOf(builder)
         .copyFrom(builder, /where/i)
@@ -367,12 +381,46 @@ export default class ManyToManyRelation extends Relation {
         .call(this.filter);
 
       return this.joinTableModelClass
-        .bindKnex(this.ownerModelClass.knex())
+        .bindKnex(builder.knex())
         .query()
         .childQueryOf(builder)
         .delete()
-        .where(this.fullJoinTableOwnerCol(), owner[this.ownerProp])
-        .whereIn(this.fullJoinTableRelatedCol(), idSelectQuery)
+        .whereComposite(this.fullJoinTableOwnerCol(), owner.$values(this.ownerProp))
+        .whereInComposite(this.fullJoinTableRelatedCol(), selectRelatedColQuery)
+        .runAfter(_.constant({}));
+    });
+  }
+
+  /**
+   * Special unrelate implementation for sqlite3. sqlite3 doesn't support multi-value
+   * where-in clauses. We need to use the built-in _rowid_ instead.
+   *
+   * @private
+   */
+  unrelate_sqlite3(builder, owner) {
+    builder.setQueryExecutor(builder => {
+      let ownerId = owner.$values(this.ownerProp);
+      let fullRelatedCol = this.fullRelatedCol();
+
+      let selectRelatedColQuery = this.relatedModelClass
+        .query()
+        .childQueryOf(builder)
+        .copyFrom(builder, /where/i)
+        .select(this.joinTableAlias() + '._rowid_')
+        .call(this.filter)
+        .whereComposite(this.fullJoinTableOwnerCol(), ownerId)
+        .join(this.joinTable + ' as ' + this.joinTableAlias(), join => {
+          _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
+            join.on(joinTableRelatedCol, fullRelatedCol[idx]);
+          });
+        });
+
+      return this.joinTableModelClass
+        .bindKnex(builder.knex())
+        .query()
+        .childQueryOf(builder)
+        .delete()
+        .whereIn(this.joinTable + '._rowid_', selectRelatedColQuery)
         .runAfter(_.constant({}));
     });
   }
@@ -380,13 +428,45 @@ export default class ManyToManyRelation extends Relation {
   /**
    * @private
    */
-  _makeFindIdQuery(builder, ownerId) {
-    return this.joinTableModelClass
-      .bindKnex(this.ownerModelClass.knex())
+  @overwriteForDatabase({
+    sqlite3: '_selectForModify_sqlite3'
+  })
+  _selectForModify(builder, owner) {
+    let ownerId = owner.$values(this.ownerProp);
+
+    let idQuery = this.joinTableModelClass
+      .bindKnex(builder.knex())
       .query()
       .childQueryOf(builder)
       .select(this.fullJoinTableRelatedCol())
-      .where(this.fullJoinTableOwnerCol(), ownerId);
+      .whereComposite(this.fullJoinTableOwnerCol(), ownerId);
+
+    return builder.whereInComposite(this.fullRelatedCol(), idQuery);
+  }
+
+  /**
+   * Special _selectForModify implementation for sqlite3. sqlite3 doesn't support multi-value
+   * where-in clauses. We need to use the built-in _rowid_ instead.
+   *
+   * @private
+   */
+  _selectForModify_sqlite3(builder, owner) {
+    let fullRelatedCol = this.fullRelatedCol();
+    let ownerId = owner.$values(this.ownerProp);
+
+    let idQuery = this.joinTableModelClass
+      .bindKnex(builder.knex())
+      .query()
+      .childQueryOf(builder)
+      .select(this.relatedTableAlias() + '._rowid_')
+      .whereComposite(this.fullJoinTableOwnerCol(), ownerId)
+      .join(this.relatedModelClass.tableName + ' as ' + this.relatedTableAlias(), join => {
+        _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
+          join.on(joinTableRelatedCol, fullRelatedCol[idx]);
+        });
+      });
+
+    return builder.whereInComposite(this.relatedModelClass.tableName + '._rowid_', idQuery);
   }
 
   /**
@@ -396,8 +476,13 @@ export default class ManyToManyRelation extends Relation {
     return _.map(relatedIds, relatedId => {
       let joinModel = {};
 
-      joinModel[this.joinTableOwnerProp] = ownerId;
-      joinModel[this.joinTableRelatedProp] = relatedId;
+      _.each(this.joinTableOwnerProp, (joinTableOwnerProp, idx) => {
+        joinModel[joinTableOwnerProp] = ownerId[idx];
+      });
+
+      _.each(this.joinTableRelatedProp, (joinTableRelatedProp, idx) => {
+        joinModel[joinTableRelatedProp] = relatedId[idx];
+      });
 
       return joinModel;
     });

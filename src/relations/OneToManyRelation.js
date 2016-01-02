@@ -6,61 +6,26 @@ import Relation from './Relation';
  * @extends Relation
  */
 export default class OneToManyRelation extends Relation {
-
-  /**
-   * @override
-   * @inheritDoc
-   * @returns {QueryBuilder}
-   */
-  findQuery(builder, ownerCol, isColumnRef) {
-    if (isColumnRef) {
-      builder.whereRef(this.fullRelatedCol(), ownerCol);
-    } else {
-      if (_.isArray(ownerCol)) {
-        builder.whereIn(this.fullRelatedCol(), ownerCol);
-      } else {
-        builder.where(this.fullRelatedCol(), ownerCol);
-      }
-    }
-
-    return builder.call(this.filter);
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   * @returns {QueryBuilder}
-   */
-  join(builder, joinMethod) {
-    joinMethod = joinMethod || 'join';
-
-    let relatedTable = this.relatedModelClass.tableName;
-    let relatedTableAlias = this.relatedTableAlias();
-
-    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
-    let relatedCol = relatedTableAlias + '.' + this.relatedCol;
-
-    return builder
-      [joinMethod](relatedTableAsAlias, relatedCol, this.fullOwnerCol())
-      .call(this.filter);
-  };
-
   /**
    * @override
    * @inheritDoc
    */
   find(builder, owners) {
-    let ownerIds = _.unique(_.pluck(owners, this.ownerProp));
-
     builder.onBuild(builder => {
-      this.findQuery(builder, ownerIds);
+      let ids = _(owners)
+        .map(owner => owner.$values(this.ownerProp))
+        .unique(id => id.join())
+        .value();
+
+      this.findQuery(builder, ids);
     });
 
     builder.runAfterModelCreate(related => {
-      var relatedByOwnerId = _.groupBy(related, this.relatedProp);
+      var relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
 
       _.each(owners, owner => {
-        owner[this.name] = relatedByOwnerId[owner[this.ownerProp]] || [];
+        let ownerId = owner.$values(this.ownerProp);
+        owner[this.name] = relatedByOwnerId[ownerId] || [];
       });
 
       return related;
@@ -73,7 +38,9 @@ export default class OneToManyRelation extends Relation {
    */
   insert(builder, owner, insertion) {
     _.each(insertion.models(), insert => {
-      insert[this.relatedProp] = owner[this.ownerProp];
+      _.each(this.relatedProp, (relatedProp, idx) => {
+        insert[relatedProp] = owner[this.ownerProp[idx]];
+      });
     });
 
     builder.onBuild(builder => {
@@ -90,46 +57,22 @@ export default class OneToManyRelation extends Relation {
    * @override
    * @inheritDoc
    */
-  update(builder, owner, update) {
-    builder.onBuild(builder => {
-      this.findQuery(builder, owner[this.ownerProp]);
-      builder.$$update(update);
-    });
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
-  patch(builder, owner, patch) {
-    return this.update(builder, owner, patch);
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
-  delete(builder, owner) {
-    builder.onBuild(builder => {
-      this.findQuery(builder, owner[this.ownerProp]);
-      builder.$$delete();
-    });
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
   relate(builder, owner, ids) {
-    builder.setQueryExecutor(() => {
-      var patch = relatePatch(this, owner[this.ownerProp]);
+    ids = this.normalizeId(ids, this.relatedModelClass.getIdColumnDimension());
+
+    builder.setQueryExecutor(builder => {
+      var patch = {};
+
+      _.each(this.relatedProp, (relatedProp, idx) => {
+        patch[relatedProp] = owner[this.ownerProp[idx]];
+      });
 
       return this.relatedModelClass
         .query()
         .childQueryOf(builder)
         .patch(patch)
         .copyFrom(builder, /where/i)
-        .whereIn(this.relatedModelClass.getFullIdColumn(), ids)
+        .whereInComposite(this.relatedModelClass.getFullIdColumn(), ids)
         .call(this.filter)
         .runAfter(_.constant({}));
     });
@@ -141,25 +84,20 @@ export default class OneToManyRelation extends Relation {
    */
   unrelate(builder, owner) {
     builder.setQueryExecutor(builder => {
-      var patch = relatePatch(this, null);
+      var patch = {};
+
+      _.each(this.relatedProp, relatedProp => {
+        patch[relatedProp] = null;
+      });
 
       return this.relatedModelClass
         .query()
         .childQueryOf(builder)
         .patch(patch)
         .copyFrom(builder, /where/i)
-        .where(this.fullRelatedCol(), owner[this.ownerProp])
+        .whereComposite(this.fullRelatedCol(), owner.$values(this.ownerProp))
         .call(this.filter)
         .runAfter(_.constant({}));
     });
   }
-}
-
-/**
- * @private
- */
-function relatePatch(relation, value) {
-  var patch = {};
-  patch[relation.relatedProp] = value;
-  return patch;
 }

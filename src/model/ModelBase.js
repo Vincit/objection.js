@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import tv4 from 'tv4';
 import tv4Formats from 'tv4-formats';
-import utils from '../utils';
 import ValidationError from '../ValidationError';
+import {inherits} from '../utils/classUtils';
 
 /**
  * @typedef {Object} ModelOptions
@@ -561,7 +561,7 @@ export default class ModelBase {
       throw new Error('Each ModelBase subclass constructor must have a name');
     }
 
-    utils.inherits(subclassConstructor, this);
+    inherits(subclassConstructor, this);
     return subclassConstructor;
   }
 

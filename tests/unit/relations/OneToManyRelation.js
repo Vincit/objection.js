@@ -15,6 +15,7 @@ describe('OneToManyRelation', function () {
   var OwnerModel = null;
   var RelatedModel = null;
   var relation;
+  var compositeKeyRelation;
 
   before(function () {
     mockKnex = knex({client: 'pg'});
@@ -59,6 +60,16 @@ describe('OneToManyRelation', function () {
         to: 'RelatedModel.ownerId'
       }
     });
+
+    compositeKeyRelation = new OneToManyRelation('nameOfOurRelation', OwnerModel);
+    compositeKeyRelation.setMapping({
+      modelClass: RelatedModel,
+      relation: OneToManyRelation,
+      join: {
+        from: ['OwnerModel.aid', 'OwnerModel.bid'],
+        to: ['RelatedModel.ownerAId', 'RelatedModel.ownerBId']
+      }
+    });
   });
 
   describe('find', function () {
@@ -91,6 +102,46 @@ describe('OneToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\')');
+      });
+    });
+
+    it('should generate a find query (composite key)', function () {
+      var owners = [
+        OwnerModel.fromJson({aid: 11, bid: 22}),
+        OwnerModel.fromJson({aid: 11, bid: 33})
+      ];
+
+      var expectedResult = [
+        {a: 1, ownerAId: 11, ownerBId: 22},
+        {a: 2, ownerAId: 11, ownerBId: 22},
+        {a: 3, ownerAId: 11, ownerBId: 33},
+        {a: 4, ownerAId: 11, ownerBId: 33}
+      ];
+
+      mockKnexQueryResults = [expectedResult];
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .where('name', 'Teppo')
+        .orWhere('age', '>', 60)
+        .findImpl(function () {
+          compositeKeyRelation.find(this, owners);
+        });
+
+      return builder.then(function (result) {
+        expect(result).to.have.length(4);
+        expect(result).to.eql(expectedResult);
+        expect(owners[0].nameOfOurRelation).to.eql([{a: 1, ownerAId: 11, ownerBId: 22}, {a: 2, ownerAId: 11, ownerBId: 22}]);
+        expect(owners[1].nameOfOurRelation).to.eql([{a: 3, ownerAId: 11, ownerBId: 33}, {a: 4, ownerAId: 11, ownerBId: 33}]);
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+        expect(result[2]).to.be.a(RelatedModel);
+        expect(result[3]).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'),(\'11\', \'33\'))');
       });
     });
 
@@ -238,6 +289,41 @@ describe('OneToManyRelation', function () {
       });
     });
 
+    it('should generate an insert query (composite key)', function () {
+      mockKnexQueryResults = [[1, 2]];
+
+      var owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      var related = [
+        RelatedModel.fromJson({a: 'str1'}),
+        RelatedModel.fromJson({a: 'str2'})
+      ];
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .insertImpl(function (models) {
+          compositeKeyRelation.insert(this, owner, models);
+        })
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "ownerAId", "ownerBId") values (\'str1\', \'11\', \'22\'), (\'str2\', \'11\', \'22\') returning "id"');
+
+        expect(owner.nameOfOurRelation).to.eql(result);
+        expect(result).to.eql([
+          {a: 'str1', id: 1, ownerAId: 11, ownerBId: 22},
+          {a: 'str2', id: 2, ownerAId: 11, ownerBId: 22}
+        ]);
+        expect(result[0]).to.be.a(RelatedModel);
+        expect(result[1]).to.be.a(RelatedModel);
+      });
+    });
+
     it('should accept json object array', function () {
       mockKnexQueryResults = [[1, 2]];
 
@@ -327,7 +413,32 @@ describe('OneToManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+      });
+    });
+
+    it('should generate an update query (composite key)', function () {
+      mockKnexQueryResults = [42];
+
+      var owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      var update = RelatedModel.fromJson({a: 'str1'});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .updateImpl(function (updt) {
+          compositeKeyRelation.update(this, owner, updt);
+        })
+        .update(update)
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored');
+
+      return builder.then(function (numUpdated) {
+        expect(numUpdated).to.equal(42);
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'))');
       });
     });
 
@@ -349,7 +460,7 @@ describe('OneToManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
         });
     });
 
@@ -373,7 +484,7 @@ describe('OneToManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\' and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
         });
     });
 
@@ -402,7 +513,7 @@ describe('OneToManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
       });
     });
 
@@ -433,7 +544,7 @@ describe('OneToManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
         });
     });
 
@@ -450,7 +561,7 @@ describe('OneToManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + '1' where \"RelatedModel\".\"ownerId\" = '666'");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" + '1' where \"RelatedModel\".\"ownerId\" in ('666')");
         });
     });
 
@@ -467,7 +578,7 @@ describe('OneToManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - '10' where \"RelatedModel\".\"ownerId\" = '666'");
+          expect(executedQueries[0]).to.eql("update \"RelatedModel\" set \"test\" = \"test\" - '10' where \"RelatedModel\".\"ownerId\" in ('666')");
         });
     });
 
@@ -488,7 +599,7 @@ describe('OneToManyRelation', function () {
         .select('shouldBeIgnored')
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\' and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
         });
     });
   });
@@ -514,7 +625,30 @@ describe('OneToManyRelation', function () {
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\'');
+        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+      });
+    });
+
+    it('should generate a delete query (composite key)', function () {
+      var owner = OwnerModel.fromJson({aid: 11, bid: 22});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .deleteImpl(function () {
+          compositeKeyRelation.delete(this, owner);
+        })
+        .delete()
+        .where('gender', 'male')
+        .whereNotNull('thingy')
+        .select('shouldBeIgnored');
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'))');
       });
     });
 
@@ -534,7 +668,7 @@ describe('OneToManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" = \'666\' and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
         });
     });
 
@@ -560,6 +694,27 @@ describe('OneToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "RelatedModel"."id" in (\'10\', \'20\', \'30\')');
+      });
+    });
+
+    it('should generate a relate query (composite key)', function () {
+      mockKnexQueryResults = [[5, 6, 7]];
+      var owner = OwnerModel.fromJson({aid: 11, bid: 22});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          compositeKeyRelation.relate(this, owner, ids);
+        })
+        .relate([1, 2, 3]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql([1, 2, 3]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerAId" = \'11\', "ownerBId" = \'22\' where "RelatedModel"."id" in (\'1\', \'2\', \'3\')');
       });
     });
 
@@ -602,6 +757,27 @@ describe('OneToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = NULL where "code" in (\'55\', \'66\', \'77\') and "RelatedModel"."ownerId" = \'666\'');
+      });
+    });
+
+    it('should generate a unrelate query (composite key)', function () {
+      var owner = OwnerModel.fromJson({aid: 11, bid: 22});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .unrelateImpl(function () {
+          compositeKeyRelation.unrelate(this, owner);
+        })
+        .unrelate()
+        .whereIn('code', [55, 66 ,77]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerAId" = NULL, "ownerBId" = NULL where "code" in (\'55\', \'66\', \'77\') and "RelatedModel"."ownerAId" = \'11\' and "RelatedModel"."ownerBId" = \'22\'');
       });
     });
 

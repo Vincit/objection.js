@@ -31,10 +31,10 @@ describe('Relation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('id');
-    expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('ownerId');
-    expect(relation.relatedProp).to.equal('ownerId');
+    expect(relation.ownerCol).to.eql(['id']);
+    expect(relation.ownerProp).to.eql(['id']);
+    expect(relation.relatedCol).to.eql(['ownerId']);
+    expect(relation.relatedProp).to.eql(['ownerId']);
   });
 
   it('should accept a path to a Model subclass as modelClass', function () {
@@ -51,10 +51,30 @@ describe('Relation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('id');
-    expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('ownerId');
-    expect(relation.relatedProp).to.equal('ownerId');
+    expect(relation.ownerCol).to.eql(['id']);
+    expect(relation.ownerProp).to.eql(['id']);
+    expect(relation.relatedCol).to.eql(['ownerId']);
+    expect(relation.relatedProp).to.eql(['ownerId']);
+  });
+
+  it('should accept a composite key as an array of columns', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: RelatedModel,
+      join: {
+        from: ['OwnerModel.name', 'OwnerModel.dateOfBirth'],
+        to: ['RelatedModel.ownerName', 'RelatedModel.ownerDateOfBirth']
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerCol).to.eql(['name', 'dateOfBirth']);
+    expect(relation.ownerProp).to.eql(['name', 'dateOfBirth']);
+    expect(relation.relatedCol).to.eql(['ownerName', 'ownerDateOfBirth']);
+    expect(relation.relatedProp).to.eql(['ownerName', 'ownerDateOfBirth']);
   });
 
   it('should fail if modelClass is not a subclass of Model', function () {
@@ -70,7 +90,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is not a subclass of Model or a file path to a module that exports one.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one.');
     });
   });
 
@@ -87,7 +107,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is not defined');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is not defined');
     });
   });
 
@@ -104,7 +124,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is an invalid file path to a model class.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is an invalid file path to a model class.');
     });
   });
 
@@ -121,7 +141,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
     });
   });
 
@@ -137,7 +157,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.relation is not defined');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: relation is not defined');
     });
   });
 
@@ -154,7 +174,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.relation is not a subclass of Relation');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: relation is not a subclass of Relation');
     });
   });
 
@@ -171,7 +191,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('Relation\'s owner is not a subclass of Model');
+      expect(err.message).to.equal('Relation: Relation\'s owner is not a subclass of Model');
     });
   });
 
@@ -188,7 +208,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.to must have format TableName.columnName. For example `SomeTable.id`.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].');
     });
   });
 
@@ -205,7 +225,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join: either `from` or `to` must point to the owner model table.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table.');
     });
   });
 
@@ -222,7 +242,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join.from must have format TableName.columnName. For example `SomeTable.id`.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].');
     });
   });
 
@@ -239,7 +259,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join: either `from` or `to` must point to the related model table.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the related model table.');
     });
   });
 
@@ -252,7 +272,7 @@ describe('Relation', function () {
         modelClass: RelatedModel
       });
     }).to.throwException(function (err) {
-        expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
+        expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
       });
   });
 
@@ -268,7 +288,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
     });
   });
 
@@ -284,7 +304,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
     });
   });
 
@@ -302,10 +322,10 @@ describe('Relation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('id');
-    expect(relation.ownerProp).to.equal('id');
-    expect(relation.relatedCol).to.equal('ownerId');
-    expect(relation.relatedProp).to.equal('ownerId');
+    expect(relation.ownerCol).to.eql(['id']);
+    expect(relation.ownerProp).to.eql(['id']);
+    expect(relation.relatedCol).to.eql(['ownerId']);
+    expect(relation.relatedProp).to.eql(['ownerId']);
   });
 
   it('relatedCol and ownerCol should be in database format', function () {
@@ -336,10 +356,10 @@ describe('Relation', function () {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.equal('id_col');
-    expect(relation.ownerProp).to.equal('idCol');
-    expect(relation.relatedCol).to.equal('owner-id');
-    expect(relation.relatedProp).to.equal('ownerId');
+    expect(relation.ownerCol).to.eql(['id_col']);
+    expect(relation.ownerProp).to.eql(['idCol']);
+    expect(relation.relatedCol).to.eql(['owner-id']);
+    expect(relation.relatedProp).to.eql(['ownerId']);
   });
 
 });

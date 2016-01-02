@@ -48,6 +48,7 @@ module.exports = function (session) {
         expect(rows[0]).to.eql({value: 'hello', idCol: 'someRandomId'});
       });
     });
+
   });
 
 };

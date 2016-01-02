@@ -9,56 +9,23 @@ export default class OneToOneRelation extends Relation {
   /**
    * @override
    * @inheritDoc
-   * @returns {QueryBuilder}
-   */
-  findQuery(builder, ownerCol, isColumnRef) {
-    if (isColumnRef) {
-      builder.whereRef(this.fullRelatedCol(), ownerCol);
-    } else {
-      if (_.isArray(ownerCol)) {
-        builder.whereIn(this.fullRelatedCol(), _.compact(ownerCol));
-      } else {
-        builder.where(this.fullRelatedCol(), ownerCol)
-      }
-    }
-
-    return builder.call(this.filter);
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   * @returns {QueryBuilder}
-   */
-  join(builder, joinMethod) {
-    joinMethod = joinMethod || 'join';
-
-    let relatedTable = this.relatedModelClass.tableName;
-    let relatedTableAlias = this.relatedTableAlias();
-
-    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
-    let relatedCol = relatedTableAlias + '.' + this.relatedCol;
-
-    return builder
-      [joinMethod](relatedTableAsAlias, relatedCol, this.fullOwnerCol())
-      .call(this.filter);
-  }
-
-  /**
-   * @override
-   * @inheritDoc
    */
   find(builder, owners) {
     builder.onBuild(builder => {
-      let relatedIds = _.unique(_.compact(_.pluck(owners, this.ownerProp)));
-      this._makeFindQuery(builder, relatedIds);
+      let ids = _(owners)
+        .map(owner => owner.$values(this.ownerProp))
+        .unique(id => id.join())
+        .value();
+
+      this.findQuery(builder, ids);
     });
 
     builder.runAfterModelCreate(related => {
-      let relatedById = _.indexBy(related, this.relatedProp);
+      let relatedByOwnerId = _.indexBy(related, related => related.$values(this.relatedProp));
 
       _.each(owners, owner => {
-        owner[this.name] = relatedById[owner[this.ownerProp]] || null;
+        let ownerId = owner.$values(this.ownerProp);
+        owner[this.name] = relatedByOwnerId[ownerId] || null;
       });
 
       return related;
@@ -71,7 +38,7 @@ export default class OneToOneRelation extends Relation {
    */
   insert(builder, owner, insertion) {
     if (insertion.models().length > 1) {
-      throw new Error('can only insert one model to a OneToOneRelation');
+      this.throwError('can only insert one model to a OneToOneRelation');
     }
 
     builder.onBuild(builder => {
@@ -79,17 +46,20 @@ export default class OneToOneRelation extends Relation {
     });
 
     builder.runAfterModelCreate(inserted => {
-      owner[this.ownerProp] = inserted[0][this.relatedProp];
       owner[this.name] = inserted[0];
-
       let patch = {};
-      patch[this.ownerProp] = inserted[0][this.relatedProp];
+
+      _.each(this.ownerProp, (ownerProp, idx) => {
+        let relatedValue = inserted[0][this.relatedProp[idx]];
+        owner[ownerProp] = relatedValue;
+        patch[ownerProp] = relatedValue;
+      });
 
       return this.ownerModelClass
         .query()
         .childQueryOf(builder)
         .patch(patch)
-        .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
+        .whereComposite(this.ownerModelClass.getFullIdColumn(), owner.$id())
         .return(inserted);
     });
   }
@@ -98,53 +68,27 @@ export default class OneToOneRelation extends Relation {
    * @override
    * @inheritDoc
    */
-  update(builder, owner, update) {
-    builder.onBuild(builder => {
-      this._makeFindQuery(builder, owner[this.ownerProp]);
-      builder.$$update(update);
-    });
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
-  patch(builder, owner, patch) {
-    return this.update(builder, owner, patch);
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
-  delete(builder, owner) {
-    builder.onBuild(builder => {
-      this._makeFindQuery(builder, owner[this.ownerProp]);
-      builder.$$delete();
-    });
-  }
-
-  /**
-   * @override
-   * @inheritDoc
-   */
   relate(builder, owner, ids) {
+    ids = this.normalizeId(ids, this.relatedProp.length);
+
     if (ids.length > 1) {
-      throw new Error('can only relate one model to a OneToOneRelation');
+      this.throwError('can only relate one model to a OneToOneRelation');
     }
 
     builder.setQueryExecutor(builder => {
       let patch = {};
 
-      patch[this.ownerProp] = ids[0];
-      owner[this.ownerProp] = ids[0];
+      _.each(this.ownerProp, (prop, idx) => {
+        patch[prop] = ids[0][idx];
+        owner[prop] = ids[0][idx];
+      });
 
       return this.ownerModelClass
         .query()
         .childQueryOf(builder)
         .patch(patch)
         .copyFrom(builder, /where/i)
-        .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
+        .whereComposite(this.ownerModelClass.getFullIdColumn(), owner.$id())
         .runAfterModelCreate(_.constant({}));
     });
   }
@@ -157,28 +101,19 @@ export default class OneToOneRelation extends Relation {
     builder.setQueryExecutor(builder => {
       let patch = {};
 
-      patch[this.ownerProp] = null;
-      owner[this.ownerProp] = null;
+      _.each(this.ownerProp, prop => {
+        patch[prop] = null;
+        owner[prop] = null;
+      });
 
       return this.ownerModelClass
         .query()
         .childQueryOf(builder)
         .patch(patch)
         .copyFrom(builder, /where/i)
-        .where(this.ownerModelClass.getFullIdColumn(), owner.$id())
+        .whereComposite(this.ownerModelClass.getFullIdColumn(), owner.$id())
         .runAfterModelCreate(_.constant({}));
     });
-  }
-
-  /**
-   * @private
-   */
-  _makeFindQuery(builder, relatedIds) {
-    if ((_.isArray(relatedIds) && _.isEmpty(relatedIds)) || !relatedIds) {
-      return builder.resolve([]);
-    } else {
-      return this.findQuery(builder, relatedIds);
-    }
   }
 }
 

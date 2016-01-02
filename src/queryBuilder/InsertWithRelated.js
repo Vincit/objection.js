@@ -151,7 +151,6 @@ export default class InsertWithRelated {
    */
   _createManyToManyRelationJoinRowBatch() {
     let batch = Object.create(null);
-    let notUnique = Object.create(null);
 
     for (let n = 0, ln = this.graph.nodes.length; n < ln; ++n) {
       let node = this.graph.nodes[n];
@@ -160,37 +159,46 @@ export default class InsertWithRelated {
         let conn = node.manyToManyConnections[m];
         let tableInsertion = getTableInsertion(batch, conn.relation.joinTable);
 
-        let sourceVal = node.model[conn.relation.ownerProp];
-        let targetVal = conn.node.model[conn.relation.relatedProp];
-
-        let uniqueKey;
-
-        if (conn.relation.joinTableOwnerCol < conn.relation.joinTableRelatedCol) {
-          uniqueKey = conn.relation.joinTable + '_' + sourceVal + '_' + targetVal;
-        } else {
-          uniqueKey = conn.relation.joinTable + '_' + targetVal + '_' + sourceVal;
-        }
-
-        if (notUnique[uniqueKey]) {
-          continue;
-        }
-
-        notUnique[uniqueKey] = true;
+        let sourceVal = node.model.$values(conn.relation.ownerProp);
+        let targetVal = conn.node.model.$values(conn.relation.relatedProp);
 
         let joinModel = {};
-        joinModel[conn.relation.joinTableOwnerProp] = sourceVal;
-        joinModel[conn.relation.joinTableRelatedProp] = targetVal;
-        joinModel = conn.relation.joinTableModelClass.fromJson(joinModel);
+        let knex = conn.relation.ownerModelClass.knex();
+        let modelClass = conn.relation.joinTableModelClass;
+
+        if (knex) {
+          // TODO: Because the joinTableModelClass may have been created inside ManyToManyRelation, it may not be bound. We really should not have to know about it here...
+          modelClass = modelClass.bindKnex(knex);
+        }
+
+        for (let i = 0; i < sourceVal.length; ++i) {
+          joinModel[conn.relation.joinTableOwnerProp[i]] = sourceVal[i];
+        }
+
+        for (let i = 0; i < targetVal.length; ++i) {
+          joinModel[conn.relation.joinTableRelatedProp[i]] = targetVal[i];
+        }
+
+        joinModel = modelClass.fromJson(joinModel);
 
         if (!tableInsertion) {
-          tableInsertion = new TableInsertion(conn.relation.joinTableModelClass, true);
-          setTableInsertion(batch, conn.relation.joinTable, tableInsertion)
+          tableInsertion = new TableInsertion(modelClass, true);
+          setTableInsertion(batch, modelClass.tableName, tableInsertion)
         }
 
         tableInsertion.models.push(joinModel);
         tableInsertion.isInputModel.push(false);
       }
     }
+
+    // Remove duplicates.
+    _.each(batch, tableInsertion => {
+      if (tableInsertion.models.length) {
+        let keys = _.keys(tableInsertion.models[0]);
+        tableInsertion.models = _.unique(tableInsertion.models, model => model.$values(keys).join());
+        tableInsertion.isInputModel = _.times(tableInsertion.models.length, _.constant(false));
+      }
+    });
 
     return batch;
   }
@@ -338,21 +346,29 @@ DependencyGraph.prototype.buildForModel = function (modelClass, model, parentNod
   if (rel instanceof OneToManyRelation) {
 
     node.needs.push(new Dependency(parentNode, function (model) {
-      model[rel.relatedProp] = this.node.model[rel.ownerProp];
+      for (let i = 0; i < rel.relatedProp.length; ++i) {
+        model[rel.relatedProp[i]] = this.node.model[rel.ownerProp[i]];
+      }
     }));
 
     parentNode.isNeededBy.push(new Dependency(node, function (model) {
-      this.node.model[rel.relatedProp] = model[rel.ownerProp];
+      for (let i = 0; i < rel.relatedProp.length; ++i) {
+        this.node.model[rel.relatedProp[i]] = model[rel.ownerProp[i]];
+      }
     }));
 
   } else if (rel instanceof OneToOneRelation) {
 
     node.isNeededBy.push(new Dependency(parentNode, function (model) {
-      this.node.model[rel.ownerProp] = model[rel.relatedProp];
+      for (let i = 0; i < rel.relatedProp.length; ++i) {
+        this.node.model[rel.ownerProp[i]] = model[rel.relatedProp[i]];
+      }
     }));
 
     parentNode.needs.push(new Dependency(node, function (model) {
-      model[rel.ownerProp] = this.node.model[rel.relatedProp];
+      for (let i = 0; i < rel.relatedProp.length; ++i) {
+        model[rel.ownerProp[i]] = this.node.model[rel.relatedProp[i]];
+      }
     }));
 
   } else if (rel instanceof ManyToManyRelation) {

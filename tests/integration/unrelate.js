@@ -213,7 +213,7 @@ module.exports = function (session) {
               return model
                 .$relatedQuery('model2Relation1')
                 .unrelate()
-                .where('id', 4);
+                .where('Model1.id', 4);
             })
             .then(function () {
               return session.knex('Model1Model2').orderBy('id');

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
 import Model from './model/Model';
-import utils from './utils';
+import {isSubclassOf} from './utils/classUtils';
 
 /**
  * Starts a transaction.
@@ -92,7 +92,7 @@ export default function transaction() {
   let i;
 
   for (i = 0; i < modelClasses.length; ++i) {
-    if (!utils.isSubclassOf(modelClasses[i], Model)) {
+    if (!isSubclassOf(modelClasses[i], Model)) {
       return Promise.reject(new Error('objection.transaction: all but the last argument should be Model subclasses'));
     }
   }
@@ -161,7 +161,7 @@ export default function transaction() {
 transaction.start = function (modelClassOrKnex) {
   let knex = modelClassOrKnex;
 
-  if (utils.isSubclassOf(modelClassOrKnex, Model)) {
+  if (isSubclassOf(modelClassOrKnex, Model)) {
     knex = modelClassOrKnex.knex();
   }
 

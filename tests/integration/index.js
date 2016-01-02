@@ -54,6 +54,7 @@ describe('integration tests', function () {
       require('./eager')(session);
       require('./transactions')(session);
       require('./queryContext')(session);
+      require('./compositeKeys')(session);
 
       if (knexConfig.client === 'postgres') {
         require('./jsonQueries')(session);

@@ -1,7 +1,8 @@
 import _ from 'lodash';
 import jsonFieldExpressionParser from './parsers/jsonFieldExpressionParser';
 import InsertionOrUpdate from './InsertionOrUpdate';
-import utils from '../utils';
+import {inherits} from '../utils/classUtils';
+import {isKnexQueryBuilder,  overwriteForDatabase} from '../utils/dbUtils';
 
 /**
  * Knex query builder wrapper.
@@ -12,6 +13,7 @@ import utils from '../utils';
  * @constructor
  * @ignore
  */
+@overwriteForDatabase()
 export default class QueryBuilderBase {
 
   constructor(knex) {
@@ -24,10 +26,10 @@ export default class QueryBuilderBase {
    * Makes the given constructor a subclass of this class.
    *
    * @param {function=} subclassConstructor
-   * @return {QueryBuilderBase}
+   * @return {function}
    */
   static extend(subclassConstructor) {
-    utils.inherits(subclassConstructor, this);
+    inherits(subclassConstructor, this);
     return subclassConstructor;
   }
 
@@ -41,6 +43,15 @@ export default class QueryBuilderBase {
       this._context.userContext = arguments[0];
       return this;
     }
+  }
+
+  /**
+   * Returns the knex connection passed to the constructor.
+   *
+   * @ignore
+   */
+  knex() {
+    return this._knex;
   }
 
   /**
@@ -242,14 +253,12 @@ export default class QueryBuilderBase {
   @knexQueryMethod()
   forUpdate(...args) {}
 
-
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   forShare(...args) {}
-
 
   /**
    * See <a href="http://knexjs.org">knex documentation</a>
@@ -765,18 +774,18 @@ export default class QueryBuilderBase {
       op = '=';
     }
 
-    let formatter = this._knex.client.formatter();
-    formatter.operator(op);
+    let colsIsArray = _.isArray(cols);
+    let valuesIsArray = _.isArray(values);
 
-    if (_.isString(cols) && !_.isArray(values)) {
+    if (!colsIsArray && !valuesIsArray) {
       return this.where(cols, op, values);
-    } else if (_.isArray(cols) && cols.length === 1 && !_.isArray(values)) {
+    } else if (colsIsArray && cols.length === 1 && !valuesIsArray) {
       return this.where(cols[0], op, values);
-    } else if (_.isArray(cols) && _.isArray(values) && cols.length === values.length) {
+    } else if (colsIsArray && valuesIsArray && cols.length === values.length) {
       _.each(cols, (col, idx) => this.where(col, op, values[idx]));
       return this;
     } else {
-      throw new Error('cols and values must both be either scalars or arrays. Arrays must have the same length.');
+      throw new Error('both cols and values must have same dimensions');
     }
   }
 
@@ -802,39 +811,58 @@ export default class QueryBuilderBase {
    *
    * @returns {QueryBuilderBase}
    */
+  @overwriteForDatabase({
+    sqlite3: 'whereInComposite_sqlite3'
+  })
   whereInComposite(columns, values) {
     let isCompositeKey = _.isArray(columns) && columns.length > 1;
 
     if (isCompositeKey) {
-      if (utils.isSqlite(this._knex)) {
-        if (!_.isArray(values)) {
-          // If the `values` is not an array of values but a function or a subquery
-          // we have no way to implement this method.
-          throw new Error('sqlite doesn\'t support multi-column where in clauses');
-        }
+      if (_.isArray(values)) {
+        return this.whereIn(columns, values);
+      } else {
+        // Because of a bug in knex, we need to build the where-in query from pieces
+        // if the value is a subquery.
+        let formatter = this._knex.client.formatter();
+        let sql = '(' + _.map(columns, col => formatter.wrap(col)).join() + ')';
+        return this.whereIn(this._knex.raw(sql), values);
+      }
+    } else {
+      let col = _.isString(columns) ? columns : columns[0];
 
-        // Sqlite doesn't support the `where in` syntax for multiple columns but
-        // we can emulate it using grouped `or` clauses.
-        return this.where(builder => {
-          _.each(values, (val) => {
-            builder.orWhere(builder => {
-              _.each(columns, (col, idx) => {
-                builder.andWhere(col, val[idx]);
-              });
+      if (_.isArray(values)) {
+        values = _.compact(_.flatten(values));
+      }
+
+      // For non-composite keys we can use the normal whereIn.
+      return this.whereIn(col, values);
+    }
+  }
+
+  /**
+   * @private
+   */
+  whereInComposite_sqlite3(columns, values) {
+    let isCompositeKey = _.isArray(columns) && columns.length > 1;
+
+    if (isCompositeKey) {
+      if (!_.isArray(values)) {
+        // If the `values` is not an array of values but a function or a subquery
+        // we have no way to implement this method.
+        throw new Error('sqlite doesn\'t support multi-column where in clauses');
+      }
+
+      // Sqlite doesn't support the `where in` syntax for multiple columns but
+      // we can emulate it using grouped `or` clauses.
+      return this.where(builder => {
+        _.each(values, (val) => {
+          builder.orWhere(builder => {
+            _.each(columns, (col, idx) => {
+              builder.andWhere(col, val[idx]);
             });
           });
         });
-      } else {
-        if (_.isArray(values)) {
-          return this.whereIn(columns, values);
-        } else {
-          // Because of a bug in knex, we need to build the where-in query from pieces
-          // if the value is a subquery.
-          let formatter = this._knex.client.formatter();
-          let sql = '(' + _.map(columns, col => formatter.wrap(col)).join() + ')';
-          return this.whereIn(this._knex.raw(sql), values);
-        }
-      }
+      });
     } else {
       let col = _.isString(columns) ? columns : columns[0];
 
@@ -1273,7 +1301,7 @@ function knexQueryMethod(overrideMethodName) {
  */
 function wrapFunctionArg(func, query) {
   return function () {
-    if (utils.isKnexQueryBuilder(this)) {
+    if (isKnexQueryBuilder(this)) {
       let context = query.internalContext();
       let builder = new QueryBuilderBase(query._knex).internalContext(context);
       func.call(builder, builder);
