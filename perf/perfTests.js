@@ -286,8 +286,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '8000 `person.$relatedQuery("children")` queries',
-      runCount: 8000,
+      name: '6000 `person.$relatedQuery("children")` queries',
+      runCount: 6000,
       runtimeGoal: 1000,
       beforeTest: function () {
         mockKnex.results = _.map(_.range(16000), function () {
@@ -309,6 +309,28 @@ describe('Performance tests', function () {
       test: function (person) {
         return person.$relatedQuery('children').then(function (models) {
           return models;
+        });
+      }
+    });
+
+    perfTest({
+      name: '6000 `person.$relatedQuery("movies").unrelate()` queries',
+      runCount: 6000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        mockKnex.results = _.map(_.range(16000), function () {
+          return [1];
+        });
+
+        return Person.bindKnex(knex).fromJson({
+          id: 10,
+          firstName: 'Parent',
+          lastName: 'Testerson'
+        });
+      },
+      test: function (person) {
+        return person.$relatedQuery('movies').unrelate().then(function (result) {
+          return result;
         });
       }
     });
