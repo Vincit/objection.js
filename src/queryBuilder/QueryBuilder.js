@@ -7,6 +7,7 @@ import QueryBuilderBase from './QueryBuilderBase';
 import ValidationError from '../ValidationError';
 import EagerFetcher from './EagerFetcher';
 import {isPostgres} from '../utils/dbUtils';
+import {deprecated} from '../utils/decorators';
 
 /**
  * Query builder for Models.
@@ -698,6 +699,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {function(string)=} logger
    * @returns {QueryBuilder}
    */
+  @deprecated({removedIn: '0.6.0', useInstead: 'debug()'})
   dumpSql(logger) {
     (logger || console.log)(this.toString());
     return this;

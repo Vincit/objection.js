@@ -37,3 +37,17 @@ export function memoize(target, property, descriptor) {
     };
   }
 }
+
+/**
+ * @ignore
+ */
+export function deprecated(opt) {
+  return function (target, property, descriptor) {
+    const impl = descriptor.value;
+
+    descriptor.value = function () {
+      console.warn(`method ${property} is deprecated and will be removed in version ${opt.removedIn}. Use ${opt.useInstead} instead.`);
+      return impl.apply(this, arguments);
+    };
+  };
+}
