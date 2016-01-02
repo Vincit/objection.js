@@ -3,7 +3,9 @@ import Relation from './Relation';
 import inheritModel from '../model/inheritModel';
 import { overwriteForDatabase } from '../utils/dbUtils'
 import { isSubclassOf } from '../utils/classUtils'
+
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
+const sqliteBuiltInRowId = '_rowid_';
 
 /**
  * @ignore
@@ -399,17 +401,22 @@ export default class ManyToManyRelation extends Relation {
    */
   unrelate_sqlite3(builder, owner) {
     builder.setQueryExecutor(builder => {
+      let joinTableAlias = this.joinTableAlias();
+      let joinTableAsAlias = this.joinTable + ' as ' + joinTableAlias;
+      let joinTableAliasRowId = joinTableAlias + '.' + sqliteBuiltInRowId;
+      let joinTableRowId = this.joinTable + '.' + sqliteBuiltInRowId;
+
       let ownerId = owner.$values(this.ownerProp);
       let fullRelatedCol = this.fullRelatedCol();
 
-      let selectRelatedColQuery = this.relatedModelClass
+      let selectRelatedQuery = this.relatedModelClass
         .query()
         .childQueryOf(builder)
         .copyFrom(builder, /where/i)
-        .select(this.joinTableAlias() + '._rowid_')
+        .select(joinTableAliasRowId)
         .call(this.filter)
         .whereComposite(this.fullJoinTableOwnerCol(), ownerId)
-        .join(this.joinTable + ' as ' + this.joinTableAlias(), join => {
+        .join(joinTableAsAlias, join => {
           _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
             join.on(joinTableRelatedCol, fullRelatedCol[idx]);
           });
@@ -420,7 +427,7 @@ export default class ManyToManyRelation extends Relation {
         .query()
         .childQueryOf(builder)
         .delete()
-        .whereIn(this.joinTable + '._rowid_', selectRelatedColQuery)
+        .whereIn(joinTableRowId, selectRelatedQuery)
         .runAfter(_.constant({}));
     });
   }
@@ -451,22 +458,28 @@ export default class ManyToManyRelation extends Relation {
    * @private
    */
   _selectForModify_sqlite3(builder, owner) {
+    let relatedTable = this.relatedModelClass.tableName;
+    let relatedTableAlias = this.relatedTableAlias();
+    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
+    let relatedTableAliasRowId = relatedTableAlias + '.' + sqliteBuiltInRowId;
+    let relatedTableRowId = relatedTable + '.' + sqliteBuiltInRowId;
+
     let fullRelatedCol = this.fullRelatedCol();
     let ownerId = owner.$values(this.ownerProp);
 
-    let idQuery = this.joinTableModelClass
+    let selectRelatedQuery = this.joinTableModelClass
       .bindKnex(builder.knex())
       .query()
       .childQueryOf(builder)
-      .select(this.relatedTableAlias() + '._rowid_')
+      .select(relatedTableAliasRowId)
       .whereComposite(this.fullJoinTableOwnerCol(), ownerId)
-      .join(this.relatedModelClass.tableName + ' as ' + this.relatedTableAlias(), join => {
+      .join(relatedTableAsAlias, join => {
         _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
           join.on(joinTableRelatedCol, fullRelatedCol[idx]);
         });
       });
 
-    return builder.whereInComposite(this.relatedModelClass.tableName + '._rowid_', idQuery);
+    return builder.whereInComposite(relatedTableRowId, selectRelatedQuery);
   }
 
   /**
