@@ -3,6 +3,7 @@ import tv4 from 'tv4';
 import tv4Formats from 'tv4-formats';
 import ValidationError from '../ValidationError';
 import {inherits} from '../utils/classUtils';
+import {memoize} from '../utils/decorators';
 
 /**
  * @typedef {Object} ModelOptions
@@ -110,16 +111,6 @@ export default class ModelBase {
    * @type {Object}
    */
   static jsonSchema = null;
-
-  /**
-   * @private
-   */
-  static $$colToProp = null;
-
-  /**
-   * @private
-   */
-  static $$propToCol = null;
 
   /**
    * This is called before validation.
@@ -620,14 +611,18 @@ export default class ModelBase {
    * @param {string} columnName
    * @returns {string}
    */
+  @memoize
   static columnNameToPropertyName(columnName) {
-    this.$$ensurePropNameConversionCache();
+    let model = new this();
+    let addedProps = _.keys(model.$parseDatabaseJson({}));
 
-    if (!this.$$colToProp[columnName]) {
-      this.$$cachePropNameConversion(columnNameToPropertyName(this, columnName), columnName);
-    }
+    let row = {};
+    row[columnName] = null;
 
-    return this.$$colToProp[columnName];
+    let props = _.keys(_.omit(model.$parseDatabaseJson(row), addedProps));
+    let propertyName = _.first(props);
+
+    return propertyName || null;
   }
 
   /**
@@ -635,35 +630,18 @@ export default class ModelBase {
    * @param {string} propertyName
    * @returns {string}
    */
+  @memoize
   static propertyNameToColumnName(propertyName) {
-    this.$$ensurePropNameConversionCache();
+    let model = new this();
+    let addedCols = _.keys(model.$formatDatabaseJson({}));
 
-    if (!this.$$propToCol[propertyName]) {
-      this.$$cachePropNameConversion(propertyName, propertyNameToColumnName(this, propertyName));
-    }
+    let obj = {};
+    obj[propertyName] = null;
 
-    return this.$$propToCol[propertyName];
-  }
+    let cols = _.keys(_.omit(model.$formatDatabaseJson(obj), addedCols));
+    let columnName = _.first(cols);
 
-  /**
-   * @private
-   */
-  static $$ensurePropNameConversionCache() {
-    if (!this.$$propToCol) {
-      this.$$propToCol = Object.create(null)
-    }
-
-    if (!this.$$colToProp) {
-      this.$$colToProp = Object.create(null);
-    }
-  }
-
-  /**
-   * @private
-   */
-  static $$cachePropNameConversion(propertyName, columnName) {
-    this.$$propToCol[propertyName] = columnName;
-    this.$$colToProp[columnName] = propertyName;
+    return columnName || null;
   }
 }
 
@@ -885,38 +863,6 @@ function contains(arr, value) {
     }
   }
   return false;
-}
-
-/**
- * @private
- */
-function propertyNameToColumnName(ModelClass, propertyName) {
-  let model = new ModelClass();
-  let addedCols = _.keys(model.$formatDatabaseJson({}));
-
-  let obj = {};
-  obj[propertyName] = null;
-
-  let cols = _.keys(_.omit(model.$formatDatabaseJson(obj), addedCols));
-  let columnName = _.first(cols);
-
-  return columnName || null;
-}
-
-/**
- * @private
- */
-function columnNameToPropertyName(ModelClass, columnName) {
-  let model = new ModelClass();
-  let addedProps = _.keys(model.$parseDatabaseJson({}));
-
-  let row = {};
-  row[columnName] = null;
-
-  let props = _.keys(_.omit(model.$parseDatabaseJson(row), addedProps));
-  let propertyName = _.first(props);
-
-  return propertyName || null;
 }
 
 // Add validation formats, so that for example the following schema validation works:

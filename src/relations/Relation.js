@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {inherits, isSubclassOf} from '../utils/classUtils';
+import {memoize} from '../utils/decorators';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 /**
@@ -264,6 +265,7 @@ export default class Relation {
    *
    * @returns {Array.<string>}
    */
+  @memoize
   fullOwnerCol() {
     return _.map(this.ownerCol, col => this.ownerModelClass.tableName + '.' + col);
   }
@@ -275,6 +277,7 @@ export default class Relation {
    *
    * @returns {Array.<string>}
    */
+  @memoize
   fullRelatedCol() {
     return _.map(this.relatedCol, col => this.relatedModelClass.tableName + '.' + col);
   }
@@ -286,6 +289,7 @@ export default class Relation {
    *
    * @returns {string}
    */
+  @memoize
   relatedTableAlias() {
     return this.relatedModelClass.tableName + '_rel_' + this.name;
   }

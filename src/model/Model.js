@@ -5,6 +5,7 @@ import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import ValidationError from '../ValidationError';
 import EagerFetcher from '../queryBuilder/EagerFetcher';
+import {memoize} from '../utils/decorators';
 
 import Relation from '../relations/Relation';
 import OneToOneRelation from '../relations/OneToOneRelation';
@@ -277,11 +278,6 @@ export default class Model extends ModelBase {
    * @private
    */
   static $$relations = null;
-
-  /**
-   * @private
-   */
-  static $$idProperty = null;
 
   /**
    * Returns or sets the identifier of a model instance.
@@ -1180,23 +1176,6 @@ export default class Model extends ModelBase {
   }
 
   /**
-   * Returns the name of the identifier property.
-   *
-   * The identifier property is equal to the `idColumn` if `$parseDatabaseJson` is not
-   * implemented. If `$parseDatabaseJson` is implemented it may change the id property's
-   * name. This method passes the `idColumn` through `$parseDatabaseJson`.
-   *
-   * @returns {string|Array.<string>}
-   */
-  static getIdProperty() {
-    if (!this.$$idProperty) {
-      this.$$idProperty = getIdProperty(this);
-    }
-
-    return this.$$idProperty;
-  }
-
-  /**
    * @ignore
    * @returns {number}
    */
@@ -1209,10 +1188,31 @@ export default class Model extends ModelBase {
   }
 
   /**
+   * Returns the name of the identifier property.
+   *
+   * The identifier property is equal to the `idColumn` if `$parseDatabaseJson` is not
+   * implemented. If `$parseDatabaseJson` is implemented it may change the id property's
+   * name. This method passes the `idColumn` through `$parseDatabaseJson`.
+   *
+   * @returns {string|Array.<string>}
+   */
+  @memoize
+  static getIdProperty() {
+    let ModelClass = this;
+
+    if (_.isArray(ModelClass.idColumn)) {
+      return _.map(ModelClass.idColumn, col => idColumnToIdProperty(ModelClass, col));
+    } else {
+      return idColumnToIdProperty(ModelClass, ModelClass.idColumn);
+    }
+  }
+
+  /**
    * Full identifier column name like 'SomeTable.id'.
    *
    * @returns {string|Array.<string>}
    */
+  @memoize
   static getFullIdColumn() {
     if (_.isArray(this.idColumn)) {
       return _.map(this.idColumn, col => this.tableName + '.' + col);
@@ -1445,17 +1445,6 @@ function traverseOne(model, parent, relationName, modelClass, callback) {
     if (_.has(model, relName)) {
       traverse(model[relName], model, relName, modelClass, callback);
     }
-  }
-}
-
-/**
- * @private
- */
-function getIdProperty(ModelClass) {
-  if (_.isArray(ModelClass.idColumn)) {
-    return _.map(ModelClass.idColumn, col => idColumnToIdProperty(ModelClass, col));
-  } else {
-    return idColumnToIdProperty(ModelClass, ModelClass.idColumn);
   }
 }
 
