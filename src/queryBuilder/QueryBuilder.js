@@ -1322,6 +1322,26 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
+   * Shortcut for finding a model by id.
+   *
+   * ```js
+   * Person.query().findById(1);
+   * ```
+   *
+   * Composite key:
+   *
+   * ```js
+   * Person.query().findById([1, '10']);
+   * ```
+   *
+   * @param {*|Array.<*>} id
+   * @returns {QueryBuilder}
+   */
+  findById(id) {
+    return this.whereComposite(this._modelClass.getFullIdColumn(), id).first();
+  }
+
+  /**
    * Creates an insert query.
    *
    * The inserted objects are validated against the model's `jsonSchema`. If validation fails
@@ -1924,6 +1944,26 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   del() {
     return this.delete();
+  }
+
+  /**
+   * Delete a model by id.
+   *
+   * ```js
+   * Person.query().deleteById(1);
+   * ```
+   *
+   * Composite key:
+   *
+   * ```js
+   * Person.query().deleteById([1, '2', 10]);
+   * ```
+   *
+   * @param {*|Array.<*>} id
+   * @returns {QueryBuilder}
+   */
+  deleteById(id) {
+    return this.delete().whereComposite(this._modelClass.getFullIdColumn(), id);
   }
 
   /**
