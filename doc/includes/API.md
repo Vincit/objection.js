@@ -88,6 +88,36 @@ Type|Description
 
 
 
+#### findById
+
+```js
+var builder = queryBuilder.findById(id);
+```
+
+```js
+Person.query().findById(1);
+```
+
+> Composite key:
+
+```js
+Person.query().findById([1, '10']);
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+id|*&#124;Array.<*>|
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
 
 #### insert
 
@@ -512,6 +542,49 @@ Person
 ```
 
 Creates a delete query.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### deleteById
+
+```js
+var builder = queryBuilder.deleteById(id);
+```
+
+```js
+Person
+  .query()
+  .deleteById(1)
+  .then(function (numberOfDeletedRows) {
+    console.log('removed', numberOfDeletedRows, 'people');
+  });
+```
+
+> Composite key:
+
+```js
+Person
+  .query()
+  .deleteById([10, '20', 46])
+  .then(function (numberOfDeletedRows) {
+    console.log('removed', numberOfDeletedRows, 'people');
+  });
+```
+
+Deletes a model by id.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+id|*&#124;Array.<*>|
 
 ##### Return value
 
