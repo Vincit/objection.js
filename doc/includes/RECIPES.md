@@ -348,3 +348,49 @@ Person.jsonSchema = {
 ```
 
 You can set the default values for properties using the `default` property in [`jsonSchema`](#jsonschema).
+
+## Composite keys
+
+> Specifying a composite primary key for a model:
+
+```js
+Person.idColumn = ['firstName', 'lastName', 'dateOfBirth'];
+```
+
+> Specifying a relation using a composite primary key and a composite foreign key:
+
+```js
+Person.relationMappings = {
+  pets: {
+    relation: Model.OneToOneRelation,
+    modelClass: Animal,
+    join: {
+      from: [
+        'Person.firstName',
+        'Person.lastName',
+        'Person.dateOfBirth'
+      ],
+      to: [
+        'Animal.ownerFirstName',
+        'Animal.ownerLastName',
+        'Animal.ownerDateOfBirth'
+      ]
+    }
+  }
+};
+```
+
+Compound keys are fully supported. Just give an array of columns where you would normally give a single column name.
+Composite primary key can be specified by setting an array of column names to the [`idColumn`](#idcolumn) of a model
+class.
+
+Here's a list of methods that may help working with composite keys:
+
+ * [`whereComposite`](#wherecomposite)
+ * [`whereInComposite`](#whereincomposite)
+ * [`findById`](#findbyid)
+ * [`deleteById`](#deletebyid)
+ * [`updateAndFetchById`](#updateandfetchbyid)
+ * [`patchAndFetchById`](#patchandfetchbyid)
+ * [`$id`](#_s_id)
+ * [`$values`](#_s_values)

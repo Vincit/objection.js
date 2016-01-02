@@ -108,7 +108,7 @@ Person.query().findById([1, '10']);
 
 Argument|Type|Description
 --------|----|--------------------
-id|*&#124;Array.<*>|
+id|any&#124; Array.&lt;any&gt;|
 
 ##### Return value
 
@@ -584,7 +584,7 @@ Deletes a model by id.
 
 Argument|Type|Description
 --------|----|--------------------
-id|*&#124;Array.<*>|
+id|any&#124;Array.&lt;any&gt;|
 
 ##### Return value
 
