@@ -1,8 +1,9 @@
 import _ from 'lodash';
 import Relation from './Relation';
 import inheritModel from '../model/inheritModel';
-import { overwriteForDatabase } from '../utils/dbUtils'
-import { isSubclassOf } from '../utils/classUtils'
+import {overwriteForDatabase} from '../utils/dbUtils';
+import {isSubclassOf} from '../utils/classUtils';
+import {memoize} from '../utils/decorators';
 
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 const sqliteBuiltInRowId = '_rowid_';
@@ -134,6 +135,7 @@ export default class ManyToManyRelation extends Relation {
    *
    * @returns {Array.<string>}
    */
+  @memoize
   fullJoinTableOwnerCol() {
     return _.map(this.joinTableOwnerCol, col => this.joinTable + '.' + col);
   }
@@ -145,6 +147,7 @@ export default class ManyToManyRelation extends Relation {
    *
    * @returns {Array.<string>}
    */
+  @memoize
   fullJoinTableRelatedCol() {
     return _.map(this.joinTableRelatedCol, col => this.joinTable + '.' + col);
   }
