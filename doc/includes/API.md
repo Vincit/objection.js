@@ -167,7 +167,7 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 
 NOTE: The return value of the insert query _only_ contains the properties given to the insert
 method plus the identifier. This is because we don't make an additional fetch query after
-the insert. Using postgres you can chain [`returning('')`](#returning) to the query to get all properties.
+the insert. Using postgres you can chain [`returning('*')`](#returning) to the query to get all properties.
 On other databases you can use the [`insertAndFetch`](#insertandfetch) method.
 
 The batch insert only works on Postgres because Postgres is the only database engine
@@ -199,7 +199,7 @@ var builder = queryBuilder.insertAndFetch(modelsOrObjects);
 
 Just like [`insert`](#insert) but also fetches the model afterwards.
 
-Note that on postgresql you can just chain [`returning('')`](#returning) to the normal insert method
+Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal insert method
 to get the same result without an additional query.
 
 ##### Arguments
