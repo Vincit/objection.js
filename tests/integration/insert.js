@@ -162,19 +162,6 @@ module.exports = function (session) {
               expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3]);
             });
         });
-
-        it('returning(\'someColumn\', \'someOtherColumn\') should fail if the identifier is not in the list', function (done) {
-          return Model1
-            .query()
-            .insert({model1Prop1: 'hello 3'})
-            .returning(['model1Prop1', 'model1Prop2'])
-            .then(function () {
-              done(new Error('should not get here'));
-            })
-            .catch(function (err) {
-              done();
-            });
-        });
       }
 
       it('should validate', function (done) {

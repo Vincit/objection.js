@@ -619,7 +619,7 @@ describe('QueryBuilder', function () {
     return QueryBuilder
       .forClass(TestModel)
       .relateImpl(function (relate, builder) {
-        relate[0].b = 2;
+        relate.b = 2;
         expect(builder).to.equal(this);
         this.$$insert(relate);
       })

@@ -1,6 +1,6 @@
 var util = require('util');
 var expect = require('expect.js');
-var utils = require('../../lib/utils');
+var utils = require('../../lib/utils/classUtils');
 
 describe('utils', function () {
 

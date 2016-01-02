@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import utils from '../utils';
+import {inherits, isSubclassOf} from '../utils/classUtils';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 /**
@@ -27,15 +27,18 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
  * }
  * ```
  *
- * @property {string} from
+ * @property {string|Array.<string>} from
  *    The relation column in the owner table. Must be given with the table name.
- *    For example `Person.id`. Note that neither this nor `to` need to be foreign
- *    keys or primary keys. You can join any column to any column.
+ *    For example `Person.id`. Composite key can be specified using an array of
+ *    columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to`
+ *    need to be foreign keys or primary keys. You can join any column to
+ *    any column.
  *
- * @property {string} to
+ * @property {string|Array.<string>} to
  *    The relation column in the related table. Must be given with the table name.
- *    For example `Movie.id`. Note that neither this nor `from` need to be foreign
- *    keys or primary keys. You can join any column to any column.
+ *    For example `Movie.id`. Composite key can be specified using an array of
+ *    columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from`
+ *    need to be foreign keys or primary keys. You can join any column to any column.
  *
  * @property {Object} through
  *    Describes the join table if the models are related through one.
@@ -44,13 +47,15 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
  *    If the there is model class available for the join table, it can be provided
  *    using this property.
  *
- * @property {string} through.from
+ * @property {string|Array.<string>} through.from
  *    The column that is joined to `from` property of the `RelationJoin`. For example
- *    `Person_Movie.actorId` where `Person_Movie` is the join table.
+ *    `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can
+ *    be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
  *
- * @property {string} through.to
+ * @property {string|Array.<string>} through.to
  *    The column that is joined to `to` property of the `RelationJoin`. For example
- *    `Person_Movie.movieId` where `Person_Movie` is the join table.
+ *    `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can
+ *    be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
  */
 
 /**
@@ -116,28 +121,28 @@ export default class Relation {
     /**
      * The relation column in the owner table.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.ownerCol = null;
 
     /**
      * The relation property in the owner model.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.ownerProp = null;
 
     /**
      * The relation column in the related table.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.relatedCol = null;
 
     /**
      * The relation property in the related model.
      *
-     * @type {string}
+     * @type {Array.<string>}
      */
     this.relatedProp = null;
 
@@ -156,7 +161,7 @@ export default class Relation {
    * @return {function}
    */
   static extend(subclassConstructor) {
-    utils.inherits(subclassConstructor, this);
+    inherits(subclassConstructor, this);
     return subclassConstructor;
   }
 
@@ -169,61 +174,59 @@ export default class Relation {
     // Avoid require loop and import here.
     let Model = require(__dirname + '/../model/Model').default;
 
-    if (!utils.isSubclassOf(this.ownerModelClass, Model)) {
-      throw new Error('Relation\'s owner is not a subclass of Model');
+    if (!isSubclassOf(this.ownerModelClass, Model)) {
+      this.throwError('Relation\'s owner is not a subclass of Model');
     }
 
-    let errorPrefix = `${this.ownerModelClass.name}.relationMappings.${this.name}`;
-
     if (!mapping.modelClass) {
-      throw new Error(errorPrefix + '.modelClass is not defined');
+      this.throwError('modelClass is not defined');
     }
 
     if (_.isString(mapping.modelClass)) {
       try {
         // babel 6 style of exposing es6 exports to commonjs https://github.com/babel/babel/issues/2683
         let relatedModelClassModule = require(mapping.modelClass);
-        this.relatedModelClass = utils.isSubclassOf(relatedModelClassModule.default, Model) ?
+        this.relatedModelClass = isSubclassOf(relatedModelClassModule.default, Model) ?
           relatedModelClassModule.default : relatedModelClassModule;
       } catch (err) {
-        throw new Error(errorPrefix + '.modelClass is an invalid file path to a model class.');
+        this.throwError('modelClass is an invalid file path to a model class.');
       }
 
-      if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
-        throw new Error(errorPrefix + '.modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
+      if (!isSubclassOf(this.relatedModelClass, Model)) {
+        this.throwError('modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
       }
     } else {
       this.relatedModelClass = mapping.modelClass;
 
-      if (!utils.isSubclassOf(this.relatedModelClass, Model)) {
-        throw new Error(errorPrefix + '.modelClass is not a subclass of Model or a file path to a module that exports one.');
+      if (!isSubclassOf(this.relatedModelClass, Model)) {
+        this.throwError('modelClass is not a subclass of Model or a file path to a module that exports one.');
       }
     }
 
     if (!mapping.relation) {
-      throw new Error(errorPrefix + '.relation is not defined');
+      this.throwError('relation is not defined');
     }
 
-    if (!utils.isSubclassOf(mapping.relation, Relation)) {
-      throw new Error(errorPrefix + '.relation is not a subclass of Relation');
+    if (!isSubclassOf(mapping.relation, Relation)) {
+      this.throwError('relation is not a subclass of Relation');
     }
 
-    if (!mapping.join || !_.isString(mapping.join.from) || !_.isString(mapping.join.to)) {
-      throw new Error(errorPrefix + '.join must be an object that maps the columns of the related models together. For example: {from: \'SomeTable.id\', to: \'SomeOtherTable.someModelId\'}');
+    if (!mapping.join || !mapping.join.from || !mapping.join.to) {
+      this.throwError('join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
     }
 
     let joinOwner = null;
     let joinRelated = null;
 
-    let joinFrom = Relation.parseColumn(mapping.join.from);
-    let joinTo = Relation.parseColumn(mapping.join.to);
+    let joinFrom = this.parseReference(mapping.join.from);
+    let joinTo = this.parseReference(mapping.join.to);
 
-    if (!joinFrom.table || !joinFrom.name) {
-      throw new Error(errorPrefix + '.join.from must have format TableName.columnName. For example `SomeTable.id`.');
+    if (!joinFrom.table || _.isEmpty(joinFrom.columns)) {
+      this.throwError('join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].');
     }
 
-    if (!joinTo.table || !joinTo.name) {
-      throw new Error(errorPrefix + '.join.to must have format TableName.columnName. For example `SomeTable.id`.');
+    if (!joinTo.table || _.isEmpty(joinTo.columns)) {
+      this.throwError('join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].');
     }
 
     if (joinFrom.table === this.ownerModelClass.tableName) {
@@ -233,40 +236,47 @@ export default class Relation {
       joinOwner = joinTo;
       joinRelated = joinFrom;
     } else {
-      throw new Error(errorPrefix + '.join: either `from` or `to` must point to the owner model table.');
+      this.throwError('join: either `from` or `to` must point to the owner model table.');
     }
 
     if (joinRelated.table !== this.relatedModelClass.tableName) {
-      throw new Error(errorPrefix + '.join: either `from` or `to` must point to the related model table.');
+      this.throwError('join: either `from` or `to` must point to the related model table.');
     }
 
-    this.ownerProp = this._propertyName(joinOwner, this.ownerModelClass);
-    this.ownerCol = joinOwner.name;
-    this.relatedProp = this._propertyName(joinRelated, this.relatedModelClass);
-    this.relatedCol = joinRelated.name;
-    this.filter = Relation.parseFilter(mapping);
+    this.ownerCol = joinOwner.columns;
+    this.ownerProp = this.propertyName(this.ownerCol, this.ownerModelClass);
+    this.relatedCol = joinRelated.columns;
+    this.relatedProp = this.propertyName(this.relatedCol, this.relatedModelClass);
+    this.filter = this.parseFilter(mapping);
+  }
+
+  /**
+   * Return the knex connection.
+   */
+  knex() {
+    return this.ownerModelClass.knex();
   }
 
   /**
    * Reference to the relation column in the owner model's table.
    *
-   * For example: `Person.id`.
+   * For example: [`Person.id`].
    *
-   * @returns {string}
+   * @returns {Array.<string>}
    */
   fullOwnerCol() {
-    return this.ownerModelClass.tableName + '.' + this.ownerCol;
+    return _.map(this.ownerCol, col => this.ownerModelClass.tableName + '.' + col);
   }
 
   /**
    * Reference to the relation column in the related model's table.
    *
-   * For example: `Movie.id`.
+   * For example: [`Movie.id`].
    *
-   * @returns {string}
+   * @returns {Array.<string>}
    */
   fullRelatedCol() {
-    return this.relatedModelClass.tableName + '.' + this.relatedCol;
+    return _.map(this.relatedCol, col => this.relatedModelClass.tableName + '.' + col);
   }
 
   /**
@@ -322,9 +332,10 @@ export default class Relation {
    * @returns {Array.<Model>}
    */
   mergeModels(models1, models2) {
+    let modelsById = Object.create(null);
+
     models1 = _.compact(models1);
     models2 = _.compact(models2);
-    let modelsById = Object.create(null);
 
     _.forEach(models1, function (model) {
       modelsById[model.$id()] = model;
@@ -334,84 +345,120 @@ export default class Relation {
       modelsById[model.$id()] = model;
     });
 
-    return _.sortBy(_.values(modelsById), function (model) {
-      return model.$id();
-    })
+    let models = _.values(modelsById);
+    if (models.length === 0) {
+      return [];
+    }
+
+    let modelClass = models[0].constructor;
+    let idProperty = modelClass.getIdProperty();
+    if (!_.isArray(idProperty)) {
+      idProperty = [idProperty];
+    }
+
+    return _.sortByAll(models, idProperty);
   }
 
-  /* istanbul ignore next */
   /**
-   * @abstract
    * @param {QueryBuilder} builder
-   * @param {number|string} ownerCol
-   * @param {boolean} isColumnRef
+   * @param {Array.<string>|Array.<Array.<(string|number)>>} ownerIds
+   * @param {boolean=} isColumnRef
    * @returns {QueryBuilder}
    */
-  findQuery(builder, ownerCol, isColumnRef) {
-    throw new Error('not implemented');
+  findQuery(builder, ownerIds, isColumnRef) {
+    let fullRelatedCol = this.fullRelatedCol();
+
+    if (isColumnRef) {
+      _.each(fullRelatedCol, (col, idx) => {
+        builder.whereRef(col, ownerIds[idx]);
+      });
+    } else {
+      if (_(ownerIds).flatten().all(id => _.isNull(id) || _.isUndefined(id))) {
+        // Nothing to fetch.
+        builder.resolve([]);
+      } else {
+        builder.whereInComposite(fullRelatedCol, ownerIds);
+      }
+    }
+
+    return builder.call(this.filter);
   }
 
-  /* istanbul ignore next */
   /**
-   * @abstract
    * @param {QueryBuilder} builder
-   * @param {string} joinMethod
+   * @param {string=} joinMethod
    * @returns {QueryBuilder}
    */
   join(builder, joinMethod) {
-    throw new Error('not implemented');
+    joinMethod = joinMethod || 'join';
+
+    let relatedTable = this.relatedModelClass.tableName;
+    let relatedTableAlias = this.relatedTableAlias();
+
+    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
+    let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
+    let ownerCol = this.fullOwnerCol();
+
+    return builder
+      [joinMethod](relatedTableAsAlias, join => {
+        _.each(relatedCol, (relatedCol, idx) => {
+          join.on(relatedCol, '=', ownerCol[idx]);
+        });
+      })
+      .call(this.filter);
   }
 
   /* istanbul ignore next */
   /**
    * @abstract
    * @param {QueryBuilder} builder
-   * @param {Model|Object|Array.<Model>|Array.<Object>} owners
+   * @param {Array.<Model>} owners
    */
   find(builder, owners) {
-    throw new Error('not implemented');
+    this.throwError('not implemented');
   }
 
   /* istanbul ignore next */
   /**
+   * @abstract
    * @param {QueryBuilder} builder
-   * @param {Model|Object} owner
+   * @param {Model} owner
    * @param {InsertionOrUpdate} insertion
    */
   insert(builder, owner, insertion) {
-    throw new Error('not implemented');
+    this.throwError('not implemented');
   }
 
-  /* istanbul ignore next */
   /**
-   * @abstract
    * @param {QueryBuilder} builder
-   * @param {Model|Object} owner
+   * @param {Model} owner
    * @param {InsertionOrUpdate} update
    */
   update(builder, owner, update) {
-    return builder;
+    builder.onBuild(builder => {
+      this.findQuery(builder, [owner.$values(this.ownerProp)]);
+      builder.$$update(update);
+    });
   }
 
-  /* istanbul ignore next */
   /**
-   * @abstract
    * @param {QueryBuilder} builder
-   * @param {Model|Object} owner
+   * @param {Model} owner
    * @param {InsertionOrUpdate} patch
    */
   patch(builder, owner, patch) {
-    throw new Error('not implemented');
+    return this.update(builder, owner, patch);
   }
 
-  /* istanbul ignore next */
   /**
-   * @abstract
    * @param {QueryBuilder} builder
-   * @param {Model|Object} owner
+   * @param {Model} owner
    */
   delete(builder, owner) {
-    throw new Error('not implemented');
+    builder.onBuild(builder => {
+      this.findQuery(builder, [owner.$values(this.ownerProp)]);
+      builder.$$delete();
+    });
   }
 
   /* istanbul ignore next */
@@ -419,10 +466,10 @@ export default class Relation {
    * @abstract
    * @param {QueryBuilder} builder
    * @param {Model|Object} owner
-   * @param {number|string|Array.<number>|Array.<string>} ids
+   * @param {number|string|Array.<number|string>|Array.<Array.<number|string>>} ids
    */
   relate(builder, owner, ids) {
-    throw new Error('not implemented');
+    this.throwError('not implemented');
   }
 
   /* istanbul ignore next */
@@ -432,29 +479,31 @@ export default class Relation {
    * @param {Model|Object} owner
    */
   unrelate(builder, owner) {
-    throw new Error('not implemented');
-  }
-
-  /**
-   * @private
-   */
-  _propertyName(column, modelClass) {
-    let propertyName = modelClass.columnNameToPropertyName(column.name);
-
-    if (!propertyName) {
-      throw new Error(modelClass.name +
-        '.$parseDatabaseJson probably transforms the value of the column ' + column.name + '.' +
-        ' This is a no-no because ' + column.name +
-        ' is needed in the relation ' + this.ownerModelClass.tableName + '.' + this.name);
-    }
-
-    return propertyName;
+    this.throwError('not implemented');
   }
 
   /**
    * @protected
    */
-  static parseFilter(mapping) {
+  propertyName(columns, modelClass) {
+    return _.map(columns, column => {
+      let propertyName = modelClass.columnNameToPropertyName(column);
+
+      if (!propertyName) {
+        throw new Error(modelClass.name +
+          '.$parseDatabaseJson probably transforms the value of the column ' + column + '.' +
+          ' This is a no-no because ' + column +
+          ' is needed in the relation ' + this.ownerModelClass.tableName + '.' + this.name);
+      }
+
+      return propertyName;
+    });
+  }
+
+  /**
+   * @protected
+   */
+  parseFilter(mapping) {
     if (_.isFunction(mapping.filter)) {
       return mapping.filter;
     } else if (_.isObject(mapping.filter)) {
@@ -469,12 +518,83 @@ export default class Relation {
   /**
    * @protected
    */
-  static parseColumn(column) {
-    let parts = column.split('.');
+  parseReference(ref) {
+    if (!_.isArray(ref)) {
+      ref = [ref];
+    }
+
+    let table = null;
+    let columns = [];
+
+    for (let i = 0; i < ref.length; ++i) {
+      let parts = ref[i].split('.');
+      let tableName = parts[0] && parts[0].trim();
+      let columnName = parts[1] && parts[1].trim();
+
+      if (!tableName || (table && table !== tableName) || !columnName) {
+        return {
+          table: null,
+          columns: []
+        };
+      } else {
+        table = tableName;
+      }
+
+      columns.push(columnName);
+    }
 
     return {
-      table: parts[0] && parts[0].trim(),
-      name: parts[1] && parts[1].trim()
+      table: table,
+      columns: columns
     };
+  }
+
+  /**
+   * @protected
+   */
+  normalizeId(ids, compositeLength) {
+    let isComposite = compositeLength > 1;
+
+    if (isComposite) {
+      // For composite ids these two are okay:
+      //
+      // 1. [1, 3, 4]
+      // 2. [[1, 3, 4], [4, 6, 1]]
+      //
+      if (!_.isArray(ids) || (!_.isArray(ids[0]) && ids.length !== compositeLength)) {
+        this.throwError(`Invalid composite key ${ids}`);
+      }
+
+      // Normalize to array of arrays.
+      if (!_.isArray(ids[0])) {
+        ids = [ids];
+      }
+    } else {
+      // Normalize to array of arrays.
+      if (!_.isArray(ids)) {
+        ids = [[ids]];
+      } else if (!_.isArray(ids[0])) {
+        ids = _.map(ids, id => [id]);
+      }
+    }
+
+    _.each(ids, id => {
+      if (id.length !== compositeLength) {
+        this.throwError(`Id ${id} has invalid length. Expected ${compositeLength}`)
+      }
+    });
+
+    return ids;
+  }
+
+  /**
+   * @protected
+   */
+  throwError(message) {
+    if (this.ownerModelClass && this.ownerModelClass.name && this.name) {
+      throw new Error(`${this.ownerModelClass.name}.relationMappings.${this.name}: ${message}`);
+    } else {
+      throw new Error(`${this.constructor.name}: ${message}`);
+    }
   }
 }

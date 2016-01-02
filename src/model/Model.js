@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import utils from '../utils';
 import ModelBase from './ModelBase';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 import inheritModel from './inheritModel';
@@ -146,9 +145,11 @@ export default class Model extends ModelBase {
   /**
    * Name of the primary key column in the database table.
    *
+   * Composite id can be specified by giving an array of column names.
+   *
    * Defaults to 'id'.
    *
-   * @type {string}
+   * @type {string|Array.<string>}
    */
   static idColumn = 'id';
 
@@ -278,6 +279,11 @@ export default class Model extends ModelBase {
   static $$relations = null;
 
   /**
+   * @private
+   */
+  static $$idProperty = null;
+
+  /**
    * Returns or sets the identifier of a model instance.
    *
    * ```js
@@ -302,12 +308,10 @@ export default class Model extends ModelBase {
    * @returns {*}
    */
   $id() {
-    const ModelClass = this.constructor;
-
     if (arguments.length > 0) {
-      this[ModelClass.getIdProperty()] = arguments[0];
+      return setId(this, arguments[0]);
     } else {
-      return this[ModelClass.getIdProperty()];
+      return getId(this);
     }
   }
 
@@ -364,7 +368,7 @@ export default class Model extends ModelBase {
       .findImpl((builder) => {
         builder.first();
         builder.onBuild((builder) => {
-          builder.where(ModelClass.getFullIdColumn(), this.$id());
+          builder.whereComposite(ModelClass.getFullIdColumn(), this.$id());
         });
       })
       .insertImpl((insertion, builder) => {
@@ -379,7 +383,7 @@ export default class Model extends ModelBase {
         }
 
         builder.onBuild((builder) => {
-          builder.$$update(update).where(ModelClass.getFullIdColumn(), this.$id());
+          builder.$$update(update).whereComposite(ModelClass.getFullIdColumn(), this.$id());
         });
       })
       .patchImpl((patch, builder) => {
@@ -388,12 +392,12 @@ export default class Model extends ModelBase {
         }
 
         builder.onBuild((builder) => {
-          builder.$$update(patch).where(ModelClass.getFullIdColumn(), this.$id());
+          builder.$$update(patch).whereComposite(ModelClass.getFullIdColumn(), this.$id());
         });
       })
       .deleteImpl((builder) => {
         builder.onBuild((builder) => {
-          builder.$$delete().where(ModelClass.getFullIdColumn(), this.$id());
+          builder.$$delete().whereComposite(ModelClass.getFullIdColumn(), this.$id());
         });
       })
       .relateImpl(() => {
@@ -1058,7 +1062,7 @@ export default class Model extends ModelBase {
    * ```
    *
    * @param {knex} knex
-   * @returns {Model}
+   * @returns {Constructor.<Model>}
    */
   static bindKnex(knex) {
     const ModelClass = this;
@@ -1115,7 +1119,7 @@ export default class Model extends ModelBase {
    * ```
    *
    * @param trx
-   * @returns {Model}
+   * @returns {Constructor.<Model>}
    */
   static bindTransaction(trx) {
     return this.bindKnex(trx);
@@ -1182,27 +1186,39 @@ export default class Model extends ModelBase {
    * implemented. If `$parseDatabaseJson` is implemented it may change the id property's
    * name. This method passes the `idColumn` through `$parseDatabaseJson`.
    *
-   * @returns {string}
+   * @returns {string|Array.<string>}
    */
   static getIdProperty() {
-    let idProperty = this.columnNameToPropertyName(this.idColumn);
-
-    if (!idProperty) {
-      throw new Error(this.name +
-        '.$parseDatabaseJson probably changes the value of the id column `' + this.idColumn +
-        '` which is a no-no.');
+    if (!this.$$idProperty) {
+      this.$$idProperty = getIdProperty(this);
     }
 
-    return idProperty;
+    return this.$$idProperty;
+  }
+
+  /**
+   * @ignore
+   * @returns {number}
+   */
+  static getIdColumnDimension() {
+    if (_.isArray(this.idColumn)) {
+      return this.idColumn.length;
+    } else {
+      return 1;
+    }
   }
 
   /**
    * Full identifier column name like 'SomeTable.id'.
    *
-   * @returns {string}
+   * @returns {string|Array.<string>}
    */
   static getFullIdColumn() {
-    return this.tableName + '.' + this.idColumn;
+    if (_.isArray(this.idColumn)) {
+      return _.map(this.idColumn, col => this.tableName + '.' + col);
+    } else {
+      return this.tableName + '.' + this.idColumn;
+    }
   }
 
   /**
@@ -1429,5 +1445,78 @@ function traverseOne(model, parent, relationName, modelClass, callback) {
     if (_.has(model, relName)) {
       traverse(model[relName], model, relName, modelClass, callback);
     }
+  }
+}
+
+/**
+ * @private
+ */
+function getIdProperty(ModelClass) {
+  if (_.isArray(ModelClass.idColumn)) {
+    return _.map(ModelClass.idColumn, col => idColumnToIdProperty(ModelClass, col));
+  } else {
+    return idColumnToIdProperty(ModelClass, ModelClass.idColumn);
+  }
+}
+
+/**
+ * @private
+ */
+function idColumnToIdProperty(ModelClass, idColumn) {
+  let idProperty = ModelClass.columnNameToPropertyName(idColumn);
+
+  if (!idProperty) {
+    throw new Error(ModelClass.tableName + '.$parseDatabaseJson probably changes the value of the id column `' + idColumn + '` which is a no-no.');
+  }
+
+  return idProperty;
+}
+
+/**
+ * @private
+ */
+function setId(model, id) {
+  const idProp = model.constructor.getIdProperty();
+  const isArray = _.isArray(idProp);
+
+  if (_.isArray(id)) {
+    if (isArray) {
+      if (id.length !== idProp.length) {
+        throw new Error('trying to set an invalid identifier for a model');
+      }
+
+      for (let i = 0; i < id.length; ++i) {
+        model[idProp[i]] = id[i];
+      }
+    } else {
+      if (id.length !== 1) {
+        throw new Error('trying to set an invalid identifier for a model');
+      }
+
+      model[idProp] = id[0];
+    }
+  } else {
+    if (isArray) {
+      if (idProp.length > 1) {
+        throw new Error('trying to set an invalid identifier for a model');
+      }
+
+      model[idProp[0]] = id;
+    } else {
+      model[idProp] = id;
+    }
+  }
+}
+
+/**
+ * @private
+ */
+function getId(model) {
+  const idProp = model.constructor.getIdProperty();
+
+  if (_.isArray(idProp)) {
+    return model.$values(idProp);
+  } else {
+    return model[idProp];
   }
 }

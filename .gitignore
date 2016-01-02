@@ -2,7 +2,6 @@ node_modules
 .idea
 testCoverage
 examples/*/*.db
-examples/websql/objection.js
 *.iml
 *.DS_Store
 lib

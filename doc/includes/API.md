@@ -3721,6 +3721,8 @@ class Person extends Model {
 
 Name of the primary key column in the database table.
 
+Composite id can be specified by giving an array of column names.
+
 Defaults to 'id'.
 
 
@@ -3878,16 +3880,16 @@ filter|function([`QueryBuilder`](#querybuilder))|Optional filter for the relatio
 
 Property|Type|Description
 --------|----|-----------
-from|string|The relation column in the owner table. Must be given with the table name. For example `Person.id`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column.
-to|string|The relation column in the related table. Must be given with the table name. For example `Movie.id`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column.
+from|string&#124;Array.&lt;string&gt;|The relation column in the owner table. Must be given with the table name. For example `Person.id`. Composite key can be specified using an array of columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column.
+to|string&#124;Array.&lt;string&gt;|The relation column in the related table. Must be given with the table name. For example `Movie.id`. Composite key can be specified using an array of columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column.
 through|[`RelationThrough`](#relationthrough)|Describes the join table if the models are related through one.
     
 ##### RelationThrough
 
 Property|Type|Description
 --------|----|-----------
-from|string|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table.
-to|string|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table.
+from|string&#124;Array.&lt;string&gt;|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
+to|string&#124;Array.&lt;string&gt;|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
 
 
 
@@ -4601,10 +4603,17 @@ traverser|function([`Model`](#model), string, string)|The traverser function tha
 #### $id
 
 ```js
-// Returns the id.
-var id = model.$id();
+console.log(model.$id()); // -> 100
 // Sets the id.
 model.$id(100);
+```
+
+> Composite key
+
+```js
+console.log(model.$id()); // -> [100, 20, 30]
+// Sets the id.
+model.$id([100, 20, 30]);
 ```
 
 Returns or sets the identifier of a model instance.
