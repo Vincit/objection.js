@@ -312,6 +312,24 @@ export default class Model extends ModelBase {
   }
 
   /**
+   * Shortcut to `this.constructor.knex()`.
+   *
+   * @returns {knex}
+   */
+  $knex() {
+    return this.constructor.knex();
+  }
+
+  /**
+   * Shortcut to `this.constructor.transaction()`.
+   *
+   * @returns {knex}
+   */
+  $transaction() {
+    return this.constructor.transaction();
+  }
+
+  /**
    * Creates a query builder for this model instance.
    *
    * The returned query builder has all the methods a *knex* query builder has. See
@@ -961,7 +979,7 @@ export default class Model extends ModelBase {
    * @param {knex=} knex
    *    The knex to set.
    *
-   * @returns {knex|undefined}
+   * @returns {knex}
    */
   static knex(knex) {
     if (arguments.length) {
@@ -976,6 +994,27 @@ export default class Model extends ModelBase {
 
       return modelClass && modelClass.$$knex;
     }
+  }
+
+  /**
+   * Returns the transaction this model class is bound to using `bindTransaction` methods.
+   *
+   * Handy for making sure two model class are bound to the same transaction:
+   *
+   * ```js
+   * Person
+   *   .bindTransaction(Animal.transaction())
+   *   .query()
+   *   ...
+   * ```
+   *
+   * The example above works even if `Animal` is not bound to any transaction. The
+   * `bindTransaction` call does nothing in this case.
+   *
+   * @returns {knex}
+   */
+  static transaction() {
+    return this.knex();
   }
 
   /**
@@ -1089,7 +1128,7 @@ export default class Model extends ModelBase {
   }
 
   /**
-   * Alias for bindKnex.
+   * Creates a subclass of this class that is bound to the given transaction.
    *
    * ```js
    * var Person = require('./models/Person');

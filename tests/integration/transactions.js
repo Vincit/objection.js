@@ -271,5 +271,67 @@ module.exports = function (session) {
 
     });
 
+    describe('model.$transaction() and model.$knex()', function () {
+
+      it('model.$transaction() methods should return the model\'s transaction', function (done) {
+        transaction.start(Model1).then(function (trx) {
+          return Model1
+            .bindTransaction(trx)
+            .query()
+            .insert({model1Prop1: 'test 1'});
+        }).then(function (model) {
+          return Model1
+            .bindTransaction(model.$transaction())
+            .query()
+            .insert({model1Prop1: 'test 2'});
+        }).then(function (model) {
+          return Model2
+            .bindTransaction(model.$transaction())
+            .query()
+            .insert({model2Prop1: 'test 3'});
+        }).then(function (model) {
+          return model.$transaction().rollback();
+        }).then(function () {
+          return session.knex('Model1');
+        }).then(function (rows) {
+          expect(rows).to.have.length(0);
+          return session.knex('model_2');
+        }).then(function (rows) {
+          expect(rows).to.have.length(0);
+          done();
+        }).catch(done);
+      });
+
+      it('model.$knex() methods should return the model\'s transaction', function (done) {
+        transaction.start(Model1).then(function (trx) {
+          return Model1
+            .bindTransaction(trx)
+            .query()
+            .insert({model1Prop1: 'test 1'});
+        }).then(function (model) {
+          return Model1
+            .bindTransaction(model.$knex())
+            .query()
+            .insert({model1Prop1: 'test 2'});
+        }).then(function (model) {
+          return Model2
+            .bindTransaction(model.$knex())
+            .query()
+            .insert({model2Prop1: 'test 3'});
+        }).then(function (model) {
+          return model.$knex().rollback();
+        }).then(function () {
+          return session.knex('Model1');
+        }).then(function (rows) {
+          expect(rows).to.have.length(0);
+          return session.knex('model_2');
+        }).then(function (rows) {
+          expect(rows).to.have.length(0);
+          done();
+        }).catch(done);
+      });
+
+    });
+
   });
 };
