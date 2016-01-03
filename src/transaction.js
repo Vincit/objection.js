@@ -169,11 +169,11 @@ transaction.start = function (modelClassOrKnex) {
     return Promise.reject(new Error('objection.transaction.start: first argument must be a model class or a knex instance'));
   }
 
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     knex.transaction(trx => {
       resolve(trx);
-    }).catch(() => {
-      // Nothing to do here.
+    }).catch(err => {
+      reject(err);
     });
   });
 };
