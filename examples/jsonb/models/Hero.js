@@ -21,7 +21,7 @@ Hero.jsonSchema = {
   properties: {
     id: { type: 'integer' },
     name: { type: 'string' },
-    details: { type: ['object', 'array'] },
+    details: { type: ['object', 'array', 'null'] },
     homeId: { type: 'integer' }
   }
 };

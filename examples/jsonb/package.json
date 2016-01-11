@@ -4,12 +4,12 @@
   "description": "Objection.js PostgreSQL jsonb example",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "knex migrate:rollback && knex migrate:latest && node app.js"
   },
   "author": "Mikael Lepistö",
   "license": "MIT",
   "dependencies": {
     "knex": "git+https://github.com/tgriesser/knex.git",
-    "objection": "^0.3.0"
+    "objection": "^0.3.3"
   }
 }
