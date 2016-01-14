@@ -5500,14 +5500,36 @@ Call this method to rollback the transaction.
 
 ## FieldExpression
 
-Json field expression to refer to jsonb columns or keys / objects inside columns.
+Field expressions allow one to refer to separate JSONB fields inside columns.
 
-e.g. `Person.jsonColumnName:details.names[1]` would refer to column
-`Person.jsonColumnName` which has `{ details: { names: ['First', 'Second', 'Last'] } }`
-object stored in it.
+Syntax: `<column reference>[:<json field reference>]`
 
-TODO: Tell me more please!
+e.g. `Person.jsonColumnName:details.names[1]` would refer to value `'Second'`
+in column `Person.jsonColumnName` which has
+`{ details: { names: ['First', 'Second', 'Last'] } }` object stored in it.
 
+First part `<column reference>` is compatible with column references used in
+knex e.g. `MyFancyTable.tributeToThBestColumnNameEver`.
+
+Second part describes a path to an attribute inside the referred column.
+It is optional and it always starts with colon which follows directly with
+first path element. e.g. `Table.jsonObjectColumnName:jsonFieldName` or
+`Table.jsonArrayColumn:[321]`.
+
+Syntax supports `[<key or index>]` and `.<key or index>` flavors of reference
+to json keys / array indexes:
+
+e.g. both `Table.myColumn:[1][3]` and `Table.myColumn:1.3` would access correctly
+both of the following objects `[null, [null,null,null, "I was accessed"]]` and
+`{ "1": { "3" : "I was accessed" } }`
+
+Caveats when using special characters in keys:
+
+1. `objectColumn.key` This is the most common syntax, good if you are not using dots or square brackets `[]` in your json object key name.
+2. Keys containing dots `objectColumn:[keywith.dots]` Column `{ "keywith.dots" : "I was referred" }`
+3. Keys containing square brackets `column['[]']` `{ "[]" : "This is getting ridiculous..." }`
+4. Keys containing square brackets and quotes `objectColumn:['Double."Quote".[]']` and `objectColumn:["Sinlge.'Quote'.[]"]` Column `{ "Double.\"Quote\".[]" : "I was referred",  "Sinlge.'Quote'.[]" : "Mee too!" }`
+99. Keys containing dots, square brackets, single quotes and double quotes in one json key is not currently supported
 
 
 
