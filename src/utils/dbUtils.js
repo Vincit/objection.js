@@ -17,6 +17,20 @@ export function isPostgres(knex) {
 /**
  * @ignore
  */
+export function isMySql(knex) {
+  return getDialect(knex) === 'mysql';
+}
+
+/**
+ * @ignore
+ */
+export function isSqlite(knex) {
+  return getDialect(knex) === 'sqlite3';
+}
+
+/**
+ * @ignore
+ */
 export function isKnexQueryBuilder(knexQueryBuilder) {
   return knexQueryBuilder
     && knexQueryBuilder.client

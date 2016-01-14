@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var path = require('path');
-var utils = require('../../lib/utils');
+var utils = require('../../lib/utils/dbUtils');
 var Promise = require('bluebird');
 var expect = require('expect.js');
 var Model = require('../../').Model;

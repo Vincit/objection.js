@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
-var utils = require('../../lib/utils');
+var utils = require('../../lib/utils/dbUtils');
 var expect = require('expect.js');
 var Promise = require('bluebird');
 var inheritModel = require('../../lib/model/inheritModel');
