@@ -30,7 +30,7 @@ var castleGreyskull = {
       details: {
         title: 'Master of the Universe',
         type: 'Hero',
-        quote: 'by the power of the Grayskull!',
+        quote: 'by the power of Grayskull!',
         luckyNumbers: [ 1 ]
       }
     }, {
