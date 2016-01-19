@@ -333,8 +333,12 @@ module.exports = function (session) {
         return B
           .query()
           .eager('[a(oa).b(ob), ab(oa)]', {
-            oa: builder => builder.orderBy(['id1', 'id2']),
-            ob: builder => builder.orderBy(['id3', 'id4'])
+            oa: function(builder) {
+              builder.orderBy(['id1', 'id2']);
+            },
+            ob: function (builder) {
+              builder.orderBy(['id3', 'id4']);
+            }
           })
           .then(function (models) {
             expect(models).to.eql([{
