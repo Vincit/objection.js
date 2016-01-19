@@ -4898,6 +4898,11 @@ is a handy way to prevent require loops.</p>
 <td>string&#124;Array.&lt;string&gt;</td>
 <td>The column that is joined to <code class="prettyprint">to</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.movieId</code> where <code class="prettyprint">Person_Movie</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person_Movie.a&#39;, &#39;Person_Movie.b&#39;]</code>.</td>
 </tr>
+<tr>
+<td>modelClass</td>
+<td>string&#124;ModelClass</td>
+<td>If you have a model class for the join table, you should specify it here. This is optional so you don&rsquo;t need to create a model class if you don&rsquo;t want to.</td>
+</tr>
 </tbody></table>
 
 <h4 id="jsonattributes">jsonAttributes</h4>

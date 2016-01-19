@@ -6468,6 +6468,11 @@ is a handy way to prevent require loops.</p>
 <td>string&#124;Array.&lt;string&gt;</td>
 <td>The column that is joined to <code class="prettyprint">to</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.movieId</code> where <code class="prettyprint">Person_Movie</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person_Movie.a&#39;, &#39;Person_Movie.b&#39;]</code>.</td>
 </tr>
+<tr>
+<td>modelClass</td>
+<td>string&#124;ModelClass</td>
+<td>If you have a model class for the join table, you should specify it here. This is optional so you don&rsquo;t need to create a model class if you don&rsquo;t want to.</td>
+</tr>
 </tbody></table>
 
 <h4 id="jsonattributes">jsonAttributes</h4>
@@ -8523,6 +8528,35 @@ has results for the <code class="prettyprint">parent</code> relation.</p>
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-4-0">0.4.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Query context feature. See <a href="https://github.com/Vincit/objection.js/issues/51">#51</a> and <a href="#context">these docs</a> for more info.</li>
+<li>Composite key support.</li>
+<li><a href="#findbyid">findById</a>, <a href="#deletebyid">deleteById</a>, <a href="#wherecomposite">whereComposite</a> and
+<a href="#whereincomposite">whereInComposite</a> query builder methods.</li>
+</ul>
+
+<h3 id="breaking-changes">Breaking changes</h3>
+
+<p>There shouldn&rsquo;t be any major breaking changes. We moved from ES5 to ES7 + babel in this version so there are big changes
+in the codebase. If something comes up, please open an issue.</p>
+
+<p>There are a few known corner cases that may break:</p>
+
+<ul>
+<li><p>You can now define a model for the join table of <code class="prettyprint">ManyToMany</code> relations in <code class="prettyprint">relationMappings</code>. This is optional,
+but may be needed if you already have a model for a <code class="prettyprint">ManyToMany</code> relation <em>and</em> you use <code class="prettyprint">snake_case</code>
+to <code class="prettyprint">camelCase</code> conversion for the column names. See the documentation on the <a href="#relationthrough">through</a>
+property of <a href="#relationmappings">relationMappings</a>.</p></li>
+<li><p>The repo no longer contains the actual built javascript. Only the ES7 code that is transpiled when the code is
+published to npm. Therefore you can no longer specify a git hash to package.json to use for example the
+HEAD version. We will start to publish alpha and RC versions to npm when something new and experimental
+is added to the library.</p></li>
+</ul>
 
 <h2 id="0-3-3">0.3.3</h2>
 
