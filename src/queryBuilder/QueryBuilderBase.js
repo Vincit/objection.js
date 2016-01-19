@@ -26,7 +26,7 @@ export default class QueryBuilderBase {
    * Makes the given constructor a subclass of this class.
    *
    * @param {function=} subclassConstructor
-   * @return {function}
+   * @return {Class.<QueryBuilderBase>}
    */
   static extend(subclassConstructor) {
     inherits(subclassConstructor, this);
@@ -46,15 +46,6 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Returns the knex connection passed to the constructor.
-   *
-   * @ignore
-   */
-  knex() {
-    return this._knex;
-  }
-
-  /**
    * Sets/gets the query full internal context.
    *
    * For internal use only.
@@ -68,6 +59,15 @@ export default class QueryBuilderBase {
       this._context = arguments[0];
       return this;
     }
+  }
+
+  /**
+   * Returns the knex connection passed to the constructor.
+   *
+   * @ignore
+   */
+  knex() {
+    return this._knex;
   }
 
   /**

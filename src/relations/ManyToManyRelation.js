@@ -59,7 +59,7 @@ export default class ManyToManyRelation extends Relation {
      * This can be optionally given using the `join.through.modelClass` property,
      * otherwise an anonymous model class is created in `setMapping` method.
      *
-     * @type {Class<Model>}
+     * @type {Class.<Model>}
      */
     this.joinTableModelClass = null;
   }

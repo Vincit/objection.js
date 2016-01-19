@@ -151,7 +151,7 @@ export default function transaction() {
  * });
  * ```
  *
- * @param {Model|knex} modelClassOrKnex
+ * @param {Class.<Model>|knex} modelClassOrKnex
  *    A knex instance or any model that has a knex connection set. Note that you can bind any model
  *    to the created transaction regardless of the model given to this method. This argument is used
  *    only to get a knex connection for starting the transaction.

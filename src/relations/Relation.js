@@ -44,7 +44,7 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
  * @property {Object} through
  *    Describes the join table if the models are related through one.
  *
- * @property {Model} through.modelClass
+ * @property {Class.<Model>} through.modelClass
  *    If the there is model class available for the join table, it can be provided
  *    using this property.
  *
@@ -62,7 +62,7 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
 /**
  * @typedef {Object} RelationMapping
  *
- * @property {Model|string} modelClass
+ * @property {Class.<Model>|string} modelClass
  *    A {@link Model} subclass constructor or an absolute path to a module that exports one.
  *
  * @property {Relation} relation
@@ -106,7 +106,7 @@ export default class Relation {
      *
      * This must be a subclass of Model.
      *
-     * @type {Class<Model>}
+     * @type {Class.<Model>}
      */
     this.ownerModelClass = OwnerClass;
 
@@ -115,7 +115,7 @@ export default class Relation {
      *
      * This must be a subclass of Model.
      *
-     * @type {Class<Model>}
+     * @type {Class.<Model>}
      */
     this.relatedModelClass = null;
 
@@ -159,7 +159,7 @@ export default class Relation {
    * Makes the given constructor a subclass of this class.
    *
    * @param {function=} subclassConstructor
-   * @return {function}
+   * @return {Class.<Model>}
    */
   static extend(subclassConstructor) {
     inherits(subclassConstructor, this);
