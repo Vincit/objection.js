@@ -34,7 +34,8 @@ in the codebase. You can even use things like ES7 [async/await](http://jakearchi
 using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES6](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 and [ES7](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
 
-Tutorials:
+Tutorials and blogs:
 
  * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/)
  * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
+ * [JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
