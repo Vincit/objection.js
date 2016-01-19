@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.4.0
+
+### What's new
+
+ * Query context feature. See [#51](https://github.com/Vincit/objection.js/issues/51) and [these docs](#context) for more info.
+ * Composite key support.
+ * [findById](#findbyid), [deleteById](#deletebyid), [whereComposite](#wherecomposite) and
+   [whereInComposite](#whereincomposite) query builder methods.
+
+### Breaking changes
+
+There shouldn't be any major breaking changes. We moved from ES5 to ES7 + babel in this version so there are big changes
+in the codebase. If something comes up, please open an issue.
+
+There are a few known corner cases that may break:
+
+ * You can now define a model for the join table of `ManyToMany` relations in `relationMappings`. This is optional,
+   but may be needed if you already have a model for a `ManyToMany` relation *and* you use `snake_case`
+   to `camelCase` conversion for the column names. See the documentation on the [through](#relationthrough)
+   property of [relationMappings](#relationmappings).
+
+ * The repo no longer contains the actual built javascript. Only the ES7 code that is transpiled when the code is
+   published to npm. Therefore you can no longer specify a git hash to package.json to use for example the
+   HEAD version. We will start to publish alpha and RC versions to npm when something new and experimental
+   is added to the library.
+
 ## 0.3.3
 
 ### What's new

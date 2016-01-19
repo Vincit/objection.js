@@ -2,7 +2,7 @@
 
 # [Objection.js](http://vincit.github.io/objection.js)
 
-# [Objection.js](http://vincit.github.io/objection.js) is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
+[Objection.js](http://vincit.github.io/objection.js) is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
 for [Node.js](https://nodejs.org/) that aims to stay out of your way and make it as easy as possible to use the full
 power of SQL and the underlying database engine.
 
@@ -33,6 +33,8 @@ Objection.js uses Promises and coding practices that make it ready for the futur
 in the codebase. You can even use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
 using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES6](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 and [ES7](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
+
+[Objection.js API reference](http://vincit.github.io/objection.js/#api-reference)
 
 Tutorials and blogs:
 
