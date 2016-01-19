@@ -6801,13 +6801,38 @@ boolean.</p>
 
 <h2 id="fieldexpression">FieldExpression</h2>
 
-<p>Json field expression to refer to jsonb columns or keys / objects inside columns.</p>
+<p>Field expressions allow one to refer to separate JSONB fields inside columns.</p>
 
-<p>e.g. <code class="prettyprint">Person.jsonColumnName:details.names[1]</code> would refer to column
-<code class="prettyprint">Person.jsonColumnName</code> which has <code class="prettyprint">{ details: { names: [&#39;First&#39;, &#39;Second&#39;, &#39;Last&#39;] } }</code>
-object stored in it.</p>
+<p>Syntax: <code class="prettyprint">&lt;column reference&gt;[:&lt;json field reference&gt;]</code></p>
 
-<p>TODO: Tell me more please!</p>
+<p>e.g. <code class="prettyprint">Person.jsonColumnName:details.names[1]</code> would refer to value <code class="prettyprint">&#39;Second&#39;</code>
+in column <code class="prettyprint">Person.jsonColumnName</code> which has
+<code class="prettyprint">{ details: { names: [&#39;First&#39;, &#39;Second&#39;, &#39;Last&#39;] } }</code> object stored in it.</p>
+
+<p>First part <code class="prettyprint">&lt;column reference&gt;</code> is compatible with column references used in
+knex e.g. <code class="prettyprint">MyFancyTable.tributeToThBestColumnNameEver</code>.</p>
+
+<p>Second part describes a path to an attribute inside the referred column.
+It is optional and it always starts with colon which follows directly with
+first path element. e.g. <code class="prettyprint">Table.jsonObjectColumnName:jsonFieldName</code> or
+<code class="prettyprint">Table.jsonArrayColumn:[321]</code>.</p>
+
+<p>Syntax supports <code class="prettyprint">[&lt;key or index&gt;]</code> and <code class="prettyprint">.&lt;key or index&gt;</code> flavors of reference
+to json keys / array indexes:</p>
+
+<p>e.g. both <code class="prettyprint">Table.myColumn:[1][3]</code> and <code class="prettyprint">Table.myColumn:1.3</code> would access correctly
+both of the following objects <code class="prettyprint">[null, [null,null,null, &quot;I was accessed&quot;]]</code> and
+<code class="prettyprint">{ &quot;1&quot;: { &quot;3&quot; : &quot;I was accessed&quot; } }</code></p>
+
+<p>Caveats when using special characters in keys:</p>
+
+<ol>
+<li><code class="prettyprint">objectColumn.key</code> This is the most common syntax, good if you are not using dots or square brackets <code class="prettyprint">[]</code> in your json object key name.</li>
+<li>Keys containing dots <code class="prettyprint">objectColumn:[keywith.dots]</code> Column <code class="prettyprint">{ &quot;keywith.dots&quot; : &quot;I was referred&quot; }</code></li>
+<li>Keys containing square brackets <code class="prettyprint">column[&#39;[]&#39;]</code> <code class="prettyprint">{ &quot;[]&quot; : &quot;This is getting ridiculous...&quot; }</code></li>
+<li>Keys containing square brackets and quotes <code class="prettyprint">objectColumn:[&#39;Double.&quot;Quote&quot;.[]&#39;]</code> and <code class="prettyprint">objectColumn:[&quot;Sinlge.&#39;Quote&#39;.[]&quot;]</code> Column <code class="prettyprint">{ &quot;Double.\&quot;Quote\&quot;.[]&quot; : &quot;I was referred&quot;,  &quot;Sinlge.&#39;Quote&#39;.[]&quot; : &quot;Mee too!&quot; }</code></li>
+<li>Keys containing dots, square brackets, single quotes and double quotes in one json key is not currently supported</li>
+</ol>
 
 <h2 id="relationexpression">RelationExpression</h2>
 
