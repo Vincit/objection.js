@@ -169,6 +169,21 @@ module.exports = function (session) {
             });
         });
 
+        it('subquery builder in select', function () {
+          return Model1
+            .query()
+            .select('Model1.*', Model2
+              .query()
+              .sum('model_2_prop_2')
+              .whereRef('Model1.id', 'model_2.model_1_id')
+              .as('sum'))
+            .orderBy('id')
+            .then(function (models) {
+              expect(_.pluck(models, 'id')).to.eql([1, 2]);
+              expect(_.pluck(models, 'sum')).to.eql([60, null]);
+            });
+        });
+
       });
 
     });
