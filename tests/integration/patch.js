@@ -309,7 +309,7 @@ module.exports = function (session) {
         return Model1
           .fromJson({id: 1})
           .$query()
-          .patch({model1Prop1: 'updated text'})
+          .patch({model1Prop1: 'updated text', undefinedShouldBeIgnored: undefined})
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
             return session.knex('Model1').orderBy('id');
@@ -324,6 +324,23 @@ module.exports = function (session) {
       it('should patch a model (2)', function () {
         return Model1
           .fromJson({id: 1, model1Prop1: 'updated text'})
+          .$query()
+          .patch()
+          .then(function (numUpdated) {
+            expect(numUpdated).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
+      it('omitting a field should remove it from the patch', function () {
+        return Model1
+          .fromJson({id: 1, model1Prop1: 'updated text', thisShouldBeRemoved: 1000})
+          .$omit('thisShouldBeRemoved')
           .$query()
           .patch()
           .then(function (numUpdated) {
