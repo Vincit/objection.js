@@ -215,11 +215,11 @@ how to create relations for this setup ➔
 
 ```js
 Person.prototype.$beforeInsert = function () {
-  this.createdAt = new Date().toISOString();
+  this.created_at = new Date().toISOString();
 };
 
 Person.prototype.$beforeUpdate = function () {
-  this.updatedAt = new Date().toISOString();
+  this.updated_at = new Date().toISOString();
 };
 ```
 
