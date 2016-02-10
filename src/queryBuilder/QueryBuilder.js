@@ -1328,6 +1328,167 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .joinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  joinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'join');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .innerJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  innerJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'innerJoin');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .outerJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  outerJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'outerJoin');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .leftJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  leftJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'leftJoin');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .leftOuterJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  leftOuterJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'leftOuterJoin');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .rightJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  rightJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'rightJoin');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .rightOuterJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  rightOuterJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'rightOuterJoin');
+  }
+
+  /**
+   * Joins a relation.
+   *
+   * The joined table is aliased with the relation's name.
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .fullOuterJoinRelation('pets')
+   *   .where('pets.species', 'dog');
+   * ```
+   *
+   * @param {string} relationName
+   * @returns {QueryBuilder}
+   */
+  fullOuterJoinRelation(relationName) {
+    return this.$$joinRelation(relationName, 'fullOuterJoin');
+  }
+
+  /**
+   * @private
+   */
+  $$joinRelation(relationName, joinMethod) {
+    let relation = this._modelClass.getRelation(relationName);
+    relation.join(this, joinMethod, relation.name);
+    return this;
+  }
+
+  /**
    * Shortcut for finding a model by id.
    *
    * ```js
