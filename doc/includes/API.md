@@ -982,6 +982,247 @@ Type|Description
 
 
 
+#### joinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.joinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .joinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### innerJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.innerJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .innerJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### outerJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.outerJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .outerJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### leftJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.leftJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .leftJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### leftOuterJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.leftOuterJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .leftOuterJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### rightJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.rightJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .rightJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### rightOuterJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.rightOuterJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .rightOuterJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### fullOuterJoinRelation
+
+Joins a relation. The joined table is aliased with the relation's name.
+
+```js
+var builder = queryBuilder.fullOuterJoinRelation(relationName);
+```
+
+```js
+Person
+  .query()
+  .fullOuterJoinRelation('pets')
+  .where('pets.species', 'dog');
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+
 #### where
 
 See [knex documentation](http://knexjs.org/#Builder-where)

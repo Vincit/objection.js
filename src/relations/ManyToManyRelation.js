@@ -240,15 +240,14 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    * @returns {QueryBuilder}
    */
-  join(builder, joinMethod) {
+  join(builder, joinMethod, relatedTableAlias) {
     joinMethod = joinMethod || 'join';
+    relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
 
     let joinTable = this.joinTable;
     let relatedTable = this.relatedModelClass.tableName;
 
     let joinTableAlias = this.joinTableAlias();
-    let relatedTableAlias = this.relatedTableAlias();
-
     let joinTableAsAlias = joinTable + ' as ' +  joinTableAlias;
     let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
 

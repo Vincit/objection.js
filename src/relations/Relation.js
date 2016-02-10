@@ -391,14 +391,14 @@ export default class Relation {
   /**
    * @param {QueryBuilder} builder
    * @param {string=} joinMethod
+   * @param {string=} relatedTableAlias
    * @returns {QueryBuilder}
    */
-  join(builder, joinMethod) {
+  join(builder, joinMethod, relatedTableAlias) {
     joinMethod = joinMethod || 'join';
+    relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
 
     let relatedTable = this.relatedModelClass.tableName;
-    let relatedTableAlias = this.relatedTableAlias();
-
     let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
     let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
     let ownerCol = this.fullOwnerCol();

@@ -173,7 +173,150 @@ module.exports = function (session) {
 
     });
 
+    describe('joinRelation()', function () {
+
+      before(function () {
+        return session.populate([{
+          id: 1,
+          model1Prop1: 'hello 1',
+
+          model1Relation1: {
+            id: 2,
+            model1Prop1: 'hello 2',
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'hello 3',
+
+              model1Relation1: {
+                id: 4,
+                model1Prop1: 'hello 4',
+
+                model1Relation2: [{
+                  idCol: 4,
+                  model2Prop1: 'hejsan 4'
+                }]
+              }
+            }
+          },
+
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'hejsan 1',
+
+            model2Relation1: [{
+              id: 5,
+              model1Prop1: 'hello 5'
+            }]
+          }, {
+            idCol: 2,
+            model2Prop1: 'hejsan 2',
+
+            model2Relation1: [{
+              id: 6,
+              model1Prop1: 'hello 6'
+            }, {
+              id: 7,
+              model1Prop1: 'hello 7',
+
+              model1Relation1: {
+                id: 8,
+                model1Prop1: 'hello 8'
+              },
+
+              model1Relation2: [{
+                idCol: 3,
+                model2Prop1: 'hejsan 3'
+              }]
+            }]
+          }]
+        }]);
+      });
+
+      it('should join a one to one relation', function () {
+        return Model1
+          .query()
+          .select('Model1.*', 'model1Relation1.model1Prop1 as rel_model1Prop1')
+          .joinRelation('model1Relation1')
+          .orderBy('Model1.id')
+          .then(function (models) {
+            expect(_.pluck(models, 'id')).to.eql([1, 2, 3, 7]);
+            expect(_.pluck(models, 'rel_model1Prop1')).to.eql(['hello 2', 'hello 3', 'hello 4', 'hello 8']);
+          });
+      });
+
+      it('should join a one to many relation (1)', function () {
+        return Model1
+          .query()
+          .joinRelation('model1Relation2')
+          .then(function (models) {
+            models = _.sortByAll(models, ['id', 'id_col']);
+            expect(_.pluck(models, 'id')).to.eql([1, 1, 4, 7]);
+            expect(_.pluck(models, 'id_col')).to.eql([1, 2, 4, 3]);
+          });
+      });
+
+      it('should join a one to many relation (2)', function () {
+        return Model1
+          .query()
+          .joinRelation('model1Relation2')
+          .where('model1Relation2.id_col', '<', 4)
+          .then(function (models) {
+            models = _.sortByAll(models, ['id', 'id_col']);
+            expect(_.pluck(models, 'id')).to.eql([1, 1, 7]);
+            expect(_.pluck(models, 'id_col')).to.eql([1, 2, 3]);
+          });
+      });
+
+      it('should join a many to many relation (1)', function () {
+        return Model2
+          .query()
+          .joinRelation('model2Relation1')
+          .then(function (models) {
+            models = _.sortByAll(models, ['idCol', 'id']);
+            expect(_.pluck(models, 'idCol')).to.eql([1, 2, 2]);
+            expect(_.pluck(models, 'id')).to.eql([5, 6, 7]);
+          });
+      });
+
+      it('should join a many to many relation (2)', function () {
+        return Model2
+          .query()
+          .joinRelation('model2Relation1')
+          .whereBetween('model2Relation1.id', [5, 6])
+          .then(function (models) {
+            models = _.sortByAll(models, ['idCol', 'id']);
+            expect(_.pluck(models, 'idCol')).to.eql([1, 2]);
+            expect(_.pluck(models, 'id')).to.eql([5, 6]);
+          });
+      });
+
+    });
+
     describe('.$query()', function () {
+
+      before(function () {
+        return session.populate([{
+          id: 1,
+          model1Prop1: 'hello 1',
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'hejsan 1',
+            model2Prop2: 30
+          }, {
+            idCol: 2,
+            model2Prop1: 'hejsan 2',
+            model2Prop2: 20
+          }, {
+            idCol: 3,
+            model2Prop1: 'hejsan 3',
+            model2Prop2: 10
+          }]
+        }, {
+          id: 2,
+          model1Prop1: 'hello 2'
+        }]);
+      });
 
       it('should find the model itself', function () {
         return Model1
