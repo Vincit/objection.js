@@ -19,7 +19,9 @@ export default class QueryBuilderBase {
   constructor(knex) {
     this._knex = knex;
     this._knexMethodCalls = [];
-    this._context = {};
+    this._context = {
+      userContext: {}
+    };
   }
 
   /**
@@ -46,7 +48,7 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Sets/gets the query full internal context.
+   * Sets/gets the query's internal context.
    *
    * For internal use only.
    *
@@ -126,7 +128,7 @@ export default class QueryBuilderBase {
   cloneInto(builder) {
     builder._knex = this._knex;
     builder._knexMethodCalls = this._knexMethodCalls.slice();
-    builder._context = this._context;
+    builder._context = _.clone(this._context);
   }
 
   /**
@@ -209,6 +211,38 @@ export default class QueryBuilderBase {
     });
 
     return knexBuilder;
+  }
+
+  /**
+   * @private
+   */
+  callKnexMethod(methodName, args) {
+    let internalContext = this.internalContext();
+
+    for (let i = 0, l = args.length; i < l; ++i) {
+      if (_.isUndefined(args[i])) {
+        // None of the query builder methods should accept undefined. Do nothing if
+        // one of the arguments is undefined. This enables us to do things like
+        // `.where('name', req.query.name)` without checking if req.query has the
+        // property `name`.
+        return this;
+      } else if (args[i] instanceof QueryBuilderBase) {
+        // Convert QueryBuilderBase instances into knex query builders.
+        args[i] = args[i].internalContext(internalContext).build();
+      } else if (_.isFunction(args[i])) {
+        // If an argument is a function, knex calls it with a query builder as
+        // `this` context. We call the function with a QueryBuilderBase as
+        // `this` context instead.
+        args[i] = wrapFunctionArg(args[i], this);
+      }
+    }
+
+    this._knexMethodCalls.push({
+      method: methodName,
+      args: args
+    });
+
+    return this;
   }
 
   /**
@@ -1291,35 +1325,7 @@ export default class QueryBuilderBase {
 function knexQueryMethod(overrideMethodName) {
   return function (target, methodName, descriptor) {
     descriptor.value = function () {
-      let args = new Array(arguments.length);
-      let context = this.internalContext();
-
-      for (let i = 0, l = arguments.length; i < l; ++i) {
-        if (_.isUndefined(arguments[i])) {
-          // None of the query builder methods should accept undefined. Do nothing if
-          // one of the arguments is undefined. This enables us to do things like
-          // `.where('name', req.query.name)` without checking if req.query has the
-          // property `name`.
-          return this;
-        } else if (arguments[i] instanceof QueryBuilderBase) {
-          // Convert QueryBuilderBase instances into knex query builders.
-          args[i] = arguments[i].internalContext(context).build();
-        } else if (_.isFunction(arguments[i])) {
-          // If an argument is a function, knex calls it with a query builder as
-          // `this` context. We call the function with a QueryBuilderBase as
-          // `this` context instead.
-          args[i] = wrapFunctionArg(arguments[i], this);
-        } else {
-          args[i] = arguments[i];
-        }
-      }
-
-      this._knexMethodCalls.push({
-        method: overrideMethodName || methodName,
-        args: args
-      });
-
-      return this;
+      return this.callKnexMethod(overrideMethodName || methodName, _.toArray(arguments));
     };
   };
 }

@@ -145,21 +145,23 @@ module.exports = function (session) {
         return Model1
           .query()
           .insertAndFetch({model1Prop1: 'new'})
+          // withSchema uses the context to share the schema between all queries.
+          .withSchema('public')
           .context({
             onBuild: function (builder) {
-              builder.withSchema('public');
+              builder.select('Model1.*').returning('*');
             },
-            runBefore: function () {
-              if (this.isExecutable()) {
-                queries.push(this.toSql());
+            runBefore: function (data, builder) {
+              if (builder.isExecutable()) {
+                queries.push(builder.toSql());
               }
             }
           })
           .then(function (model) {
             expect(mockKnex.executedQueries).to.eql(queries);
             expect(mockKnex.executedQueries).to.eql([
-              'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning "id"',
-              'select * from "public"."Model1" where "Model1"."id" in (\'5\')'
+              'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning *',
+              'select "Model1".* from "public"."Model1" where "Model1"."id" in (\'5\')'
             ]);
 
             expect(model.toJSON()).to.eql({
@@ -177,9 +179,11 @@ module.exports = function (session) {
         return Model1
           .query()
           .updateAndFetchById(1, {model1Prop1: 'updated'})
+          // withSchema uses the context to share the schema between all queries.
+          .withSchema('public')
           .context({
             onBuild: function (builder) {
-              builder.withSchema('public');
+              builder.select('Model1.*').returning('*');
             },
             runBefore: function () {
               if (this.isExecutable()) {
@@ -190,8 +194,8 @@ module.exports = function (session) {
           .then(function (model) {
             expect(mockKnex.executedQueries).to.eql(queries);
             expect(mockKnex.executedQueries).to.eql([
-              'update "public"."Model1" set "model1Prop1" = \'updated\' where "Model1"."id" = \'1\'',
-              'select * from "public"."Model1" where "Model1"."id" = \'1\''
+              'update "public"."Model1" set "model1Prop1" = \'updated\' where "Model1"."id" = \'1\' returning *',
+              'select "Model1".* from "public"."Model1" where "Model1"."id" = \'1\''
             ]);
 
             expect(model.toJSON()).to.eql({
@@ -212,9 +216,10 @@ module.exports = function (session) {
         // queries.
         return Model1
           .query()
+          // withSchema uses the context to share the schema between all queries.
+          .withSchema('public')
           .context({
             onBuild: function (builder) {
-              builder.withSchema('public');
               // Add a property that is created by the database engine to make sure that the result
               // actually comes from the database.
               if (builder.modelClass() === Model1) {
@@ -261,6 +266,7 @@ module.exports = function (session) {
               id: 7,
               model1Id: 5,
               model1Prop1: "new 1",
+              // TODO: why is after twice here?
               computed: "new 1 computed1 after after",
 
               model1Relation1: {
@@ -294,9 +300,10 @@ module.exports = function (session) {
         // queries.
         return Model1
           .query()
+          // withSchema uses the context to share the schema between all queries.
+          .withSchema('public')
           .context({
             onBuild: function (builder) {
-              builder.withSchema('public');
               // Add a property that is created by the database engine to make sure that the result
               // actually comes from the database.
               if (builder.modelClass() === Model1) {
@@ -396,9 +403,10 @@ module.exports = function (session) {
             return model4
               .$relatedQuery('model1Relation1')
               .insert({model1Prop1: 'new'})
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
                   // Add a property that is created by the database engine to make sure that the result
                   // actually comes from the database.
                   if (builder.modelClass() === Model1) {
@@ -434,9 +442,11 @@ module.exports = function (session) {
             return model4
               .$relatedQuery('model1Relation1')
               .relate(1)
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
+                  builder.returning('*');
                 },
                 runBefore: function () {
                   if (this.isExecutable()) {
@@ -447,7 +457,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."Model1" set "model1Id" = \'1\' where "Model1"."id" = \'4\''
+                  'update "public"."Model1" set "model1Id" = \'1\' where "Model1"."id" = \'4\' returning *'
                 ]);
 
                 return session.knex('Model1').where('id', 4);
@@ -463,9 +473,11 @@ module.exports = function (session) {
             return model2
               .$relatedQuery('model1Relation1')
               .unrelate()
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
+                  builder.returning('*');
                 },
                 runBefore: function () {
                   if (this.isExecutable()) {
@@ -476,7 +488,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."Model1" set "model1Id" = NULL where "Model1"."id" = \'2\''
+                  'update "public"."Model1" set "model1Id" = NULL where "Model1"."id" = \'2\' returning *'
                 ]);
 
                 return session.knex('Model1').where('id', 2);
@@ -515,9 +527,11 @@ module.exports = function (session) {
             return model
               .$relatedQuery('model1Relation2')
               .relate(newModel.idCol)
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
+                  builder.returning('*');
                 },
                 runBefore: function () {
                   if (this.isExecutable()) {
@@ -528,7 +542,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."model_2" set "model_1_id" = \'2\' where "model_2"."id_col" in (\'3\')'
+                  'update "public"."model_2" set "model_1_id" = \'2\' where "model_2"."id_col" in (\'3\') returning *'
                 ]);
 
                 return session.knex('model_2').where('id_col', newModel.idCol);
@@ -544,9 +558,11 @@ module.exports = function (session) {
             return model
               .$relatedQuery('model1Relation2')
               .unrelate()
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
+                  builder.returning('*');
                 },
                 runBefore: function () {
                   if (this.isExecutable()) {
@@ -557,7 +573,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."model_2" set "model_1_id" = NULL where "model_2"."model_1_id" = \'2\''
+                  'update "public"."model_2" set "model_1_id" = NULL where "model_2"."model_1_id" = \'2\' returning *'
                 ]);
 
                 return session.knex('model_2');
@@ -591,9 +607,10 @@ module.exports = function (session) {
             return model
               .$relatedQuery('model2Relation1')
               .insert({model1Prop1: 'new'})
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
                   // Add a property that is created by the database engine to make sure that the result
                   // actually comes from the database.
                   if (builder.modelClass() === Model1) {
@@ -625,9 +642,11 @@ module.exports = function (session) {
             return model
               .$relatedQuery('model2Relation1')
               .relate(1)
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
                 onBuild: function (builder) {
-                  builder.withSchema('public');
+                  builder.returning('*');
                 },
                 runBefore: function () {
                   if (this.isExecutable()) {
@@ -638,7 +657,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'1\', \'1\') returning "model1Id"'
+                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'1\', \'1\') returning *'
                 ]);
 
                 return session.knex('Model1Model2');
@@ -655,10 +674,9 @@ module.exports = function (session) {
               .$relatedQuery('model2Relation1')
               .unrelate()
               .where('id', 4)
+              // withSchema uses the context to share the schema between all queries.
+              .withSchema('public')
               .context({
-                onBuild: function (builder) {
-                  builder.withSchema('public');
-                },
                 runBefore: function () {
                   if (this.isExecutable()) {
                     queries.push(this.toSql());
