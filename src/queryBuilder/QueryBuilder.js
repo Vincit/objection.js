@@ -47,6 +47,10 @@ export default class QueryBuilder extends QueryBuilderBase {
 
     this.clearHooks();
     this.clearCustomImpl();
+
+    this.internalContext().runBefore = [];
+    this.internalContext().runAfter = [];
+    this.internalContext().onBuild = [];
   }
 
   /**
@@ -715,6 +719,13 @@ export default class QueryBuilder extends QueryBuilderBase {
     // This is a QueryBuilderBase method.
     this.cloneInto(builder);
 
+    let builderIntCtx = builder.internalContext();
+    let intCtx = this.internalContext();
+
+    builderIntCtx.runBefore = intCtx.runBefore.slice();
+    builderIntCtx.runAfter = intCtx.runAfter.slice();
+    builderIntCtx.onBuild = intCtx.onBuild.slice();
+
     builder._calledWriteMethod = this._calledWriteMethod;
     builder._explicitRejectValue = this._explicitRejectValue;
     builder._explicitResolveValue = this._explicitResolveValue;
@@ -1067,8 +1078,9 @@ export default class QueryBuilder extends QueryBuilderBase {
     // The hooks and onBuild callbacks usually modify the query and we want
     // this builder to be re-executable.
     let builder = this.clone();
-    let context = builder.context() || {};
     let promise = Promise.resolve();
+    let context = builder.context() || {};
+    let internalContext = builder.internalContext();
 
     if (builder.isFindQuery()) {
       // If no write methods have been called at this point this query is a
@@ -1076,13 +1088,9 @@ export default class QueryBuilder extends QueryBuilderBase {
       builder._customImpl.find.call(builder, builder);
     }
 
-    if (_.isFunction(context.runBefore)) {
-      promise = promise.then(result => context.runBefore.call(builder, result, builder));
-    }
-
-    _.forEach(builder._hooks.before, func => {
-      promise = promise.then(result => func.call(builder, result, builder));
-    });
+    promise = chainBuilderFuncs(promise, builder, context.runBefore);
+    promise = chainBuilderFuncs(promise, builder, internalContext.runBefore);
+    promise = chainBuilderFuncs(promise, builder, builder._hooks.before);
 
     // Resolve all before hooks before building and executing the query
     // and the rest of the hooks.
@@ -1102,21 +1110,15 @@ export default class QueryBuilder extends QueryBuilderBase {
         promise = knexBuilder.then(result => createModels(builder, result));
       }
 
-      _.forEach(builder._hooks.afterModelCreate, func => {
-        promise = promise.then(result => func.call(builder, result, builder));
-      });
+      promise = chainBuilderFuncs(promise, builder, builder._hooks.afterModelCreate);
 
       if (builder._eagerExpression) {
         promise = promise.then(models => eagerFetch(builder, models));
       }
 
-      if (_.isFunction(context.runAfter)) {
-        promise = promise.then(result => context.runAfter.call(builder, result, builder));
-      }
-
-      _.forEach(builder._hooks.after, func => {
-        promise = promise.then(result => func.call(builder, result, builder));
-      });
+      promise = chainBuilderFuncs(promise, builder, context.runAfter);
+      promise = chainBuilderFuncs(promise, builder, internalContext.runAfter);
+      promise = chainBuilderFuncs(promise, builder, builder._hooks.after);
 
       return promise;
     });
@@ -1506,6 +1508,21 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   findById(id) {
     return this.whereComposite(this._modelClass.getFullIdColumn(), id).first();
+  }
+
+  /**
+   * @override
+   * @inheritDoc
+   */
+  withSchema(schema) {
+    this.internalContext().onBuild.push((builder) => {
+      if (!builder.has(/withSchema/)) {
+        // If the builder already has a schema, don't override it.
+        builder.callKnexMethod('withSchema', [schema]);
+      }
+    });
+
+    return this;
   }
 
   /**
@@ -2353,20 +2370,17 @@ function eagerFetch(builder, $models) {
  * @private
  */
 function build(builder) {
-  var context = builder.context() || {};
+  let context = builder.context() || {};
+  let internalContext = builder.internalContext();
 
   if (!builder.has(/from|table|into/)) {
     // Set the table only if it hasn't been explicitly set yet.
     builder.table(builder._modelClass.tableName);
   }
 
-  if (_.isFunction(context.onBuild)) {
-    context.onBuild.call(builder, builder);
-  }
-
-  _.forEach(builder._hooks.onBuild, function (func) {
-    func.call(builder, builder);
-  });
+  callBuilderFuncs(builder, context.onBuild);
+  callBuilderFuncs(builder, internalContext.onBuild);
+  callBuilderFuncs(builder, builder._hooks.onBuild);
 
   // noinspection JSUnresolvedVariable
   return QueryBuilderBase.prototype.build.call(builder);
@@ -2378,4 +2392,32 @@ function build(builder) {
 function batchInsert(models, queryBuilder, batchSize) {
   let batches = _.chunk(models, batchSize);
   return _.map(batches, batch => queryBuilder.clone().insert(batch));
+}
+
+/**
+ * @private
+ */
+function callBuilderFuncs(builder, func) {
+  if (_.isFunction(func)) {
+    func.call(builder, builder);
+  } else if (_.isArray(func)) {
+    _.each(func, func => {
+      func.call(builder, builder);
+    });
+  }
+}
+
+/**
+ * @private
+ */
+function chainBuilderFuncs(promise, builder, func) {
+  if (_.isFunction(func)) {
+    promise = promise.then(result => func.call(builder, result, builder));
+  } else if (_.isArray(func)) {
+    _.each(func, func => {
+      promise = promise.then(result => func.call(builder, result, builder));
+    });
+  }
+
+  return promise;
 }
