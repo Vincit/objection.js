@@ -380,6 +380,98 @@ module.exports = function (session) {
           });
       });
 
+      it('subquery should be able to override the context (1)', function () {
+        // Disable the actual database query because we use a schema that doesn't exists.
+        mockKnex.results.push([]);
+        var queries = [];
+
+        return Model1
+          .query()
+          .withSchema('public')
+          .select(Model2.query().withSchema('someSchema').avg('model2Prop1').as('avg'))
+          .context({
+            runAfter: function (res, builder) {
+              if (builder.isExecutable()) {
+                queries.push(builder.toSql());
+              }
+            }
+          })
+          .then(function () {
+            expect(queries).to.eql(mockKnex.executedQueries);
+            expect(queries).to.eql(['select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'])
+          });
+      });
+
+      it('subquery should be able to override the context (2)', function () {
+        // Disable the actual database query because we use a schema that doesn't exists.
+        mockKnex.results.push([]);
+        var queries = [];
+
+        return Model1
+          .query()
+          .select(Model2.query().withSchema('someSchema').avg('model2Prop1').as('avg'))
+          .withSchema('public')
+          .context({
+            runAfter: function (res, builder) {
+              if (builder.isExecutable()) {
+                queries.push(builder.toSql());
+              }
+            }
+          })
+          .then(function () {
+            expect(queries).to.eql(mockKnex.executedQueries);
+            expect(queries).to.eql(['select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'])
+          });
+      });
+
+      it('subquery should be able to override the context (3)', function () {
+        // Disable the actual database query because we use a schema that doesn't exists.
+        mockKnex.results.push([]);
+        var queries = [];
+
+        return Model1
+          .query()
+          .withSchema('public')
+          .select(function (builder) {
+            builder.avg('model2Prop1').from('model_2').withSchema('someSchema').as('avg');
+          })
+          .context({
+            runAfter: function (res, builder) {
+              if (builder.isExecutable()) {
+                queries.push(builder.toSql());
+              }
+            }
+          })
+          .then(function () {
+            expect(queries).to.eql(mockKnex.executedQueries);
+            expect(queries).to.eql(['select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'])
+          });
+      });
+
+      it('subquery should be able to override the context (4)', function () {
+        // Disable the actual database query because we use a schema that doesn't exists.
+        mockKnex.results.push([]);
+        var queries = [];
+
+        return Model1
+          .query()
+          .select(function (builder) {
+            builder.avg('model2Prop1').from('model_2').withSchema('someSchema').as('avg');
+          })
+          .withSchema('public')
+          .context({
+            runAfter: function (res, builder) {
+              if (builder.isExecutable()) {
+                queries.push(builder.toSql());
+              }
+            }
+          })
+          .then(function () {
+            expect(queries).to.eql(mockKnex.executedQueries);
+            expect(queries).to.eql(['select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'])
+          });
+      });
+
       describe('$relatedQuery', function () {
 
         describe('one-to-one relation', function () {

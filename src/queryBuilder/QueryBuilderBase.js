@@ -217,8 +217,6 @@ export default class QueryBuilderBase {
    * @private
    */
   callKnexMethod(methodName, args) {
-    let internalContext = this.internalContext();
-
     for (let i = 0, l = args.length; i < l; ++i) {
       if (_.isUndefined(args[i])) {
         // None of the query builder methods should accept undefined. Do nothing if
@@ -228,7 +226,7 @@ export default class QueryBuilderBase {
         return this;
       } else if (args[i] instanceof QueryBuilderBase) {
         // Convert QueryBuilderBase instances into knex query builders.
-        args[i] = args[i].internalContext(internalContext).build();
+        args[i] = args[i].build();
       } else if (_.isFunction(args[i])) {
         // If an argument is a function, knex calls it with a query builder as
         // `this` context. We call the function with a QueryBuilderBase as
@@ -1336,8 +1334,7 @@ function knexQueryMethod(overrideMethodName) {
 function wrapFunctionArg(func, query) {
   return function () {
     if (isKnexQueryBuilder(this)) {
-      let context = query.internalContext();
-      let builder = new QueryBuilderBase(query._knex).internalContext(context);
+      let builder = new QueryBuilderBase(query._knex);
       func.call(builder, builder);
       builder.buildInto(this);
     } else {
