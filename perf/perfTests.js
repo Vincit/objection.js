@@ -286,11 +286,57 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '6000 `person.$relatedQuery("children")` queries',
-      runCount: 6000,
+      name: '4000 complex `Person.query()` queries',
+      runCount: 4000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(16000), function () {
+        mockKnex.results = _.map(_.range(8000), function () {
+          return _.map(_.range(10), function (idx) {
+            return {
+              firstName: 'Firstname ' + idx,
+              lastName: 'Lastname ' + idx,
+              age: idx
+            };
+          });
+        });
+
+        return Person.bindKnex(knex);
+      },
+      test: function (Person) {
+        var idx = 0;
+        return Person
+          .query()
+          .select('Person.*', function (builder) {
+            builder.avg('id').from('Animal').as('avgId');
+          })
+          .where(function (builder) {
+            builder.where('id', 1).orWhere(function (builder) {
+              builder.where('id', 2).andWhere('firstName', 'Jennifer');
+            });
+          })
+          .joinRelation('pets')
+          .where('pets.species', 'dog')
+          .runBefore(function () {
+            ++idx;
+          })
+          .runAfter(function () {
+            ++idx;
+          })
+          .onBuild(function (builder) {
+            builder.orderBy('pets.id');
+          })
+          .then(function (models) {
+            return models;
+          });
+      }
+    });
+
+    perfTest({
+      name: '4000 `person.$relatedQuery("children")` queries',
+      runCount: 4000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        mockKnex.results = _.map(_.range(8000), function () {
           return _.map(_.range(10), function (idx) {
             return {
               firstName: 'Firstname ' + idx,
@@ -314,11 +360,11 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '6000 `person.$relatedQuery("movies").unrelate()` queries',
-      runCount: 6000,
+      name: '4000 `person.$relatedQuery("movies").unrelate()` queries',
+      runCount: 4000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(16000), function () {
+        mockKnex.results = _.map(_.range(8000), function () {
           return [1];
         });
 
@@ -336,11 +382,11 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '6000 `Person.query().insert()` queries',
-      runCount: 6000,
+      name: '4000 `Person.query().insert()` queries',
+      runCount: 4000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(0, 16000), function (idx) {
+        mockKnex.results = _.map(_.range(0, 8000), function (idx) {
           return [idx];
         });
 
