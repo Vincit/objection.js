@@ -12,6 +12,9 @@
     "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "prepublish": "npm run build"
   },
+  "publishConfig": {
+    "tag": "next"
+  },
   "author": {
     "name": "Sami Koskimäki",
     "email": "sami.koskimaki@vincit.com",
