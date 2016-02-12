@@ -45,12 +45,12 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
-    this.clearHooks();
-    this.clearCustomImpl();
-
     this.internalContext().runBefore = [];
     this.internalContext().runAfter = [];
     this.internalContext().onBuild = [];
+
+    this.clearHooks();
+    this.clearCustomImpl();
   }
 
   /**
@@ -123,7 +123,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Should call this for all other queries a QueryBuilder starts with the "parent" query as parameter.
+   * Should call this for all other queries a QueryBuilder starts.
    *
    * For internal use only.
    *

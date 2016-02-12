@@ -356,11 +356,8 @@ export default class Relation {
 
     let modelClass = models[0].constructor;
     let idProperty = modelClass.getIdProperty();
-    if (!_.isArray(idProperty)) {
-      idProperty = [idProperty];
-    }
 
-    return _.sortByAll(models, idProperty);
+    return _.sortByAll(models, _.isArray(idProperty) ? idProperty : [idProperty]);
   }
 
   /**

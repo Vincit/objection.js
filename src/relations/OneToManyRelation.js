@@ -21,7 +21,7 @@ export default class OneToManyRelation extends Relation {
     });
 
     builder.runAfterModelCreate(related => {
-      var relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
+      let relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
 
       _.each(owners, owner => {
         let ownerId = owner.$values(this.ownerProp);
