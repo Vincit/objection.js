@@ -219,27 +219,31 @@ module.exports = function (session) {
           // withSchema uses the context to share the schema between all queries.
           .withSchema('public')
           .context({
-            onBuild: function (builder) {
-              // Add a property that is created by the database engine to make sure that the result
-              // actually comes from the database.
+            onBuild: [function (builder) {
               if (builder.modelClass() === Model1) {
+                // Add a property that is created by the database engine to make sure that the result
+                // actually comes from the database.
                 builder.returning(['id', Model1.raw('"model1Prop1" || \' computed1\' as computed')]);
-              } else if (builder.modelClass() === Model2) {
+              }
+            }, function (builder) {
+              if (builder.modelClass() == Model2) {
+                // Add a property that is created by the database engine to make sure that the result
+                // actually comes from the database.
                 builder.returning(['id_col', Model1.raw('"model_2_prop_1" || \' computed2\' as computed')]);
               }
-            },
-            runBefore: function () {
+            }],
+            runBefore: [function () {
               if (this.isExecutable()) {
                 queries.push(this.toSql());
               }
-            },
-            runAfter: function (models) {
+            }],
+            runAfter: [function (models) {
               // Append text to the end of our computed property to make sure this function is called.
               _.each(_.flatten([models]), function (model) {
                 model.computed += ' after';
               });
               return models;
-            }
+            }]
           })
           .insertWithRelated({
             model1Prop1: 'new 1',
