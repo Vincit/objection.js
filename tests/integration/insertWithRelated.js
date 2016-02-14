@@ -13,7 +13,7 @@ module.exports = function (session) {
 
   describe('Model insertWithRelated queries', function () {
     var insertion;
-    var eagerExpr = '[model1Relation1.model1Relation3, model1Relation2]';
+    var eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2]';
 
     beforeEach(function () {
       insertion = {
@@ -29,6 +29,10 @@ module.exports = function (session) {
             "#id": 'grandChild',
             model2Prop1: 'cibling2'
           }]
+        },
+
+        model1Relation1Inverse: {
+          model1Prop1: 'rootParent'
         },
 
         model1Relation2: [{
@@ -177,7 +181,7 @@ module.exports = function (session) {
         return Model1
           .query()
           .insertWithRelated(insertion)
-          .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')
+          .allowInsert(eagerExpr)
           .then(function (inserted) {
             return check(inserted, true).return(inserted);
           });
@@ -187,7 +191,7 @@ module.exports = function (session) {
         return Model1
           .query()
           .insertWithRelated(insertion)
-          .allowInsert('[model1Relation1, model1Relation2]')
+          .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')
           .then(function () {
             done(new Error('should not get here'));
           })
@@ -226,47 +230,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().insertWithRelated()', function () {
 
-      describe('one to one relation', function () {
-        var parent;
-
-        beforeEach(function () {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1'
-          }]);
-        });
-
-        beforeEach(function () {
-          return Model1
-            .query()
-            .where('id', 1)
-            .first()
-            .then(function (par) {
-              parent = par;
-            });
-        });
-
-        it('should insert a model with relations', function () {
-          return parent
-            .$relatedQuery('model1Relation1')
-            .insertWithRelated(insertion)
-            .then(function (inserted) {
-              return check(inserted, true).return(inserted);
-            })
-            .then(function (inserted) {
-              return parent
-                .$relatedQuery('model1Relation1')
-                .eager(eagerExpr)
-                .first();
-            })
-            .then(function (model) {
-              return check(model);
-            });
-        });
-
-      });
-
-      describe('one to many relation', function () {
+      describe('has many relation', function () {
         var parent;
 
         beforeEach(function () {
@@ -386,6 +350,9 @@ module.exports = function (session) {
 
       expect(model.model1Relation1.model1Prop1).to.equal('parent');
       shouldCheckHooks && checkHooks(model.model1Relation1);
+
+      expect(model.model1Relation1Inverse.model1Prop1).to.equal('rootParent');
+      shouldCheckHooks && checkHooks(model.model1Relation1Inverse);
 
       expect(model.model1Relation1.model1Relation3[0].model2Prop1).to.equal('child1');
       shouldCheckHooks && checkHooks(model.model1Relation1.model1Relation3[0]);

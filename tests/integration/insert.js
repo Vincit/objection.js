@@ -336,7 +336,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().insert()', function () {
 
-      describe('one to one relation', function () {
+      describe('belongs to one relation', function () {
         var parent1;
         var parent2;
 
@@ -437,7 +437,62 @@ module.exports = function (session) {
 
       });
 
-      describe('one to many relation', function () {
+      describe('has one relation', function () {
+        var parent1;
+        var parent2;
+
+        beforeEach(function () {
+          return session.populate([{
+            id: 1,
+            model1Prop1: 'hello 1'
+          }, {
+            id: 2,
+            model1Prop1: 'hello 3'
+          }]);
+        });
+
+        beforeEach(function () {
+          return Model1
+            .query()
+            .then(function (parents) {
+              parent1 = _.find(parents, {id: 1});
+              parent2 = _.find(parents, {id: 2});
+            });
+        });
+
+        it('should insert a related object', function () {
+          var inserted = null;
+
+          // First check that there is nothing in the relation.
+          return parent1
+            .$relatedQuery('model1Relation1Inverse')
+            .then(function (model) {
+              expect(model).to.eql([]);
+
+              return parent1
+                .$relatedQuery('model1Relation1Inverse')
+                .insert(Model1.fromJson({model1Prop1: 'test'}));
+            })
+            .then(function ($inserted) {
+              inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(true);
+              expect(inserted.$afterInsertCalled).to.equal(true);
+              expect(inserted.id).to.equal(3);
+              expect(inserted).to.be.a(Model1);
+              expect(inserted.model1Prop1).to.equal('test');
+              expect(parent1.model1Relation1Inverse).to.equal(inserted);
+              return session.knex('Model1');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(_.find(rows, {id: inserted.id}).model1Id).to.equal(parent1.id);
+              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+            });
+        });
+
+      });
+
+      describe('has many relation', function () {
         var parent1;
         var parent2;
 

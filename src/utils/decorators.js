@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 /**
  * @ignore
  */
@@ -43,11 +45,23 @@ export function memoize(target, property, descriptor) {
  */
 export function deprecated(opt) {
   return function (target, property, descriptor) {
-    const impl = descriptor.value;
+    const message = `${property} is deprecated and will be removed in version ${opt.removedIn}. Use ${opt.useInstead} instead.`;
 
-    descriptor.value = function () {
-      console.warn(`method ${property} is deprecated and will be removed in version ${opt.removedIn}. Use ${opt.useInstead} instead.`);
-      return impl.apply(this, arguments);
-    };
+    const value = descriptor.value;
+    const getter = descriptor.get;
+
+    if (_.isFunction(value)) {
+      descriptor.value = function () {
+        console.warn(message);
+        return value.apply(this, arguments);
+      };
+    }
+
+    if (_.isFunction(getter)) {
+      descriptor.get = function () {
+        console.warn(message);
+        return getter.apply(this, arguments);
+      };
+    }
   };
 }

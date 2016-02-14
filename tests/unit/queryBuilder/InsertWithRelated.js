@@ -54,7 +54,7 @@ describe('InsertWithRelated', function () {
 
     Person.relationMappings = {
       pets: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Animal,
         join: {
           from: 'Person.id',
@@ -76,7 +76,7 @@ describe('InsertWithRelated', function () {
       },
 
       children: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
           from: 'Person.id',
@@ -85,7 +85,7 @@ describe('InsertWithRelated', function () {
       },
 
       parent: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
           from: 'Person.parentId',
@@ -100,7 +100,7 @@ describe('InsertWithRelated', function () {
 
     Animal.relationMappings = {
       owner: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
           from: 'Animal.ownerId',
@@ -167,7 +167,7 @@ describe('InsertWithRelated', function () {
     })
   });
 
-  it('one-to-one relation', function () {
+  it('belongs to one relation', function () {
     var models = [{
       name: 'child',
       parent: {
@@ -195,7 +195,7 @@ describe('InsertWithRelated', function () {
     })
   });
 
-  it('one-to-many relation (1)', function () {
+  it('has many relation (1)', function () {
     var models = [{
       name: 'parent1',
       children: [{
@@ -244,7 +244,7 @@ describe('InsertWithRelated', function () {
     })
   });
 
-  it('one-to-many relation (2)', function () {
+  it('has many relation (2)', function () {
     var models = [{
       name: 'parent1',
       children: [{
@@ -294,7 +294,7 @@ describe('InsertWithRelated', function () {
     })
   });
 
-  it('many-to-many relation', function () {
+  it('many to many relation', function () {
     var models = [{
       name: 'parent1',
       movies: [{
@@ -487,7 +487,7 @@ describe('InsertWithRelated', function () {
 
   describe('#ref', function () {
 
-    it('one-to-one relation', function () {
+    it('belongs to one relation', function () {
       var models = [{
         name: 'child1',
         parent: {
@@ -524,7 +524,7 @@ describe('InsertWithRelated', function () {
       })
     });
 
-    it('one-to-many relation', function () {
+    it('has many relation', function () {
       var models = [{
         id: 1,
         "#id": 'parent1',
@@ -593,7 +593,7 @@ describe('InsertWithRelated', function () {
       })
     });
 
-    it('many-to-many relation', function () {
+    it('many to many relation', function () {
       var model = {
         "#id": 'actor1',
         name: 'actor1',

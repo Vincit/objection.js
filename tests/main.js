@@ -11,8 +11,11 @@ describe('main module', function () {
     expect(objection.RelationExpression).to.equal(require('../lib/queryBuilder/RelationExpression').default);
     expect(objection.ValidationError).to.equal(require('../lib/ValidationError').default);
     expect(objection.Relation).to.equal(require('../lib/relations/Relation').default);
-    expect(objection.OneToManyRelation).to.equal(require('../lib/relations/OneToManyRelation').default);
-    expect(objection.OneToOneRelation).to.equal(require('../lib/relations/OneToOneRelation').default);
+    expect(objection.HasManyRelation).to.equal(require('../lib/relations/HasManyRelation').default);
+    expect(objection.HasOneRelation).to.equal(require('../lib/relations/HasOneRelation').default);
+    expect(objection.BelongsToOneRelation).to.equal(require('../lib/relations/BelongsToOneRelation').default);
+    expect(objection.OneToManyRelation).to.equal(require('../lib/relations/HasManyRelation').default);
+    expect(objection.OneToOneRelation).to.equal(require('../lib/relations/BelongsToOneRelation').default);
     expect(objection.ManyToManyRelation).to.equal(require('../lib/relations/ManyToManyRelation').default);
     expect(objection.transaction).to.equal(require('../lib/transaction').default);
     expect(objection.transaction.start).to.equal(require('../lib/transaction').default.start);

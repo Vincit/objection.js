@@ -171,7 +171,7 @@ Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-jo
 ```js
 Issue.relationMappings = {
   comments: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Comment,
     filter: {commentableType: 'Issue'},
     join: {
@@ -183,7 +183,7 @@ Issue.relationMappings = {
 
 PullRequest.relationMappings = {
   comments: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Comment,
     filter: {commentableType: 'PullRequest'},
     join: {
@@ -362,7 +362,7 @@ Person.idColumn = ['firstName', 'lastName', 'dateOfBirth'];
 ```js
 Person.relationMappings = {
   pets: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: Animal,
     join: {
       from: [

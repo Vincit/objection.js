@@ -114,15 +114,23 @@ module.exports.initialize = function (opt) {
 
   Model1.relationMappings = {
     model1Relation1: {
-      relation: Model.OneToOneRelation,
+      relation: Model.BelongsToOneRelation,
       modelClass: Model1,
       join: {
         from: 'Model1.model1Id',
         to: 'Model1.id'
       }
     },
+    model1Relation1Inverse: {
+      relation: Model.HasOneRelation,
+      modelClass: Model1,
+      join: {
+        from: 'Model1.id',
+        to: 'Model1.model1Id'
+      }
+    },
     model1Relation2: {
-      relation: Model.OneToManyRelation,
+      relation: Model.HasManyRelation,
       modelClass: Model2,
       join: {
         from: 'Model1.id',
@@ -318,14 +326,14 @@ function createRows(model, ModelClass, rows) {
       return;
     }
 
-    if (relation instanceof Model.OneToOneRelation) {
+    if (relation instanceof Model.BelongsToOneRelation) {
 
       var related = relation.relatedModelClass.ensureModel(model[relationName]);
       model[relation.ownerProp] = related.$id();
 
       createRows(related, relation.relatedModelClass, rows);
 
-    } else if (relation instanceof Model.OneToManyRelation) {
+    } else if (relation instanceof Model.HasManyRelation) {
 
       _.each(model[relationName], function (relatedJson) {
         var related = relation.relatedModelClass.ensureModel(relatedJson);

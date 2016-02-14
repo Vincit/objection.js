@@ -5,11 +5,12 @@ import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import ValidationError from '../ValidationError';
 import EagerFetcher from '../queryBuilder/EagerFetcher';
-import {memoize} from '../utils/decorators';
+import {memoize, deprecated} from '../utils/decorators';
 
 import Relation from '../relations/Relation';
-import OneToOneRelation from '../relations/OneToOneRelation';
-import OneToManyRelation from '../relations/OneToManyRelation';
+import HasOneRelation from '../relations/HasOneRelation';
+import HasManyRelation from '../relations/HasManyRelation';
+import BelongsToOneRelation from '../relations/BelongsToOneRelation';
 import ManyToManyRelation from '../relations/ManyToManyRelation';
 
 /**
@@ -58,7 +59,7 @@ import ManyToManyRelation from '../relations/ManyToManyRelation';
  * // This object defines the relations to other models.
  * Person.relationMappings = {
  *   pets: {
- *     relation: Model.OneToManyRelation,
+ *     relation: Model.HasManyRelation,
  *     // The related model. This can be either a Model subclass constructor or an
  *     // absolute file path to a module that exports one. We use the file path version
  *     // here to prevent require loops.
@@ -84,7 +85,7 @@ import ManyToManyRelation from '../relations/ManyToManyRelation';
  *   },
  *
  *   children: {
- *     relation: Model.OneToManyRelation,
+ *     relation: Model.HasManyRelation,
  *     modelClass: Person,
  *     join: {
  *       from: 'Person.id',
@@ -116,18 +117,45 @@ export default class Model extends ModelBase {
   static RelatedQueryBuilder = QueryBuilder;
 
   /**
+   * one-to-one relation type.
+   *
+   * @type {HasOneRelation}
+   */
+  static HasOneRelation = HasOneRelation;
+
+  /**
+   * one-to-one relation type.
+   *
+   * @type {BelongsToOneRelation}
+   */
+  static BelongsToOneRelation = BelongsToOneRelation;
+
+  /**
+   * one-to-many relation type.
+   *
+   * @type {HasManyRelation}
+   */
+  static HasManyRelation = HasManyRelation;
+
+  /**
    * one-to-many relation type.
    *
    * @type {OneToOneRelation}
    */
-  static OneToOneRelation = OneToOneRelation;
+  @deprecated({removedIn: '0.7.0', useInstead: 'BelongsToOneRelation'})
+  static get OneToOneRelation() {
+    return BelongsToOneRelation;
+  }
 
   /**
    * one-to-many relation type.
    *
    * @type {OneToManyRelation}
    */
-  static OneToManyRelation = OneToManyRelation;
+  @deprecated({removedIn: '0.7.0', useInstead: 'HasManyRelation'})
+  static get OneToManyRelation() {
+    return HasManyRelation;
+  }
 
   /**
    * may-to-many relation type.
@@ -222,7 +250,7 @@ export default class Model extends ModelBase {
    * ```js
    * Person.relationMappings = {
    *   pets: {
-   *     relation: Model.OneToManyRelation,
+   *     relation: Model.HasManyRelation,
    *     modelClass: Animal,
    *     join: {
    *       from: 'Person.id',
@@ -231,7 +259,7 @@ export default class Model extends ModelBase {
    *   },
    *
    *   father: {
-   *     relation: Model.OneToOneRelation,
+   *     relation: Model.BelongsToOneRelation,
    *     modelClass: Person,
    *     join: {
    *       from: 'Person.fatherId',

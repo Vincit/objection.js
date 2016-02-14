@@ -66,7 +66,7 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
  *    A {@link Model} subclass constructor or an absolute path to a module that exports one.
  *
  * @property {Relation} relation
- *    A relation constructor. You can use one of Model.OneToOneRelation, Model.OneToManyRelation and
+ *    A relation constructor. You can use one of Model.BelongsToOneRelation, Model.HasOneRelation, Model.HasManyRelation and
  *    Model.ManyToManyRelation or even write your own relation type by subclassing {@link Relation}.
  *
  * @property {Object|function(QueryBuilder)} filter
@@ -409,13 +409,32 @@ export default class Relation {
       .call(this.filter);
   }
 
-  /* istanbul ignore next */
   /**
-   * @abstract
    * @param {QueryBuilder} builder
    * @param {Array.<Model>} owners
    */
   find(builder, owners) {
+    builder.onBuild(builder => {
+      let ids = _(owners)
+        .map(owner => owner.$values(this.ownerProp))
+        .unique(id => id.join())
+        .value();
+
+      this.findQuery(builder, ids);
+    });
+
+    builder.runAfterModelCreate(related => {
+      this.createRelationProp(owners, related);
+      return related;
+    });
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @protected
+   */
+  createRelationProp(owners, related) {
     this.throwError('not implemented');
   }
 

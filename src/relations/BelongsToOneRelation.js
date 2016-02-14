@@ -5,30 +5,17 @@ import Relation from './Relation';
  * @ignore
  * @extends Relation
  */
-export default class OneToOneRelation extends Relation {
+export default class BelongsToOneRelation extends Relation {
   /**
    * @override
    * @inheritDoc
    */
-  find(builder, owners) {
-    builder.onBuild(builder => {
-      let ids = _(owners)
-        .map(owner => owner.$values(this.ownerProp))
-        .unique(id => id.join())
-        .value();
+  createRelationProp(owners, related) {
+    let relatedByOwnerId = _.indexBy(related, related => related.$values(this.relatedProp));
 
-      this.findQuery(builder, ids);
-    });
-
-    builder.runAfterModelCreate(related => {
-      let relatedByOwnerId = _.indexBy(related, related => related.$values(this.relatedProp));
-
-      _.each(owners, owner => {
-        let ownerId = owner.$values(this.ownerProp);
-        owner[this.name] = relatedByOwnerId[ownerId] || null;
-      });
-
-      return related;
+    _.each(owners, owner => {
+      let ownerId = owner.$values(this.ownerProp);
+      owner[this.name] = relatedByOwnerId[ownerId] || null;
     });
   }
 
@@ -38,7 +25,7 @@ export default class OneToOneRelation extends Relation {
    */
   insert(builder, owner, insertion) {
     if (insertion.models().length > 1) {
-      this.throwError('can only insert one model to a OneToOneRelation');
+      this.throwError('can only insert one model to a BelongsToOneRelation');
     }
 
     builder.onBuild(builder => {
@@ -72,7 +59,7 @@ export default class OneToOneRelation extends Relation {
     ids = this.normalizeId(ids, this.relatedProp.length);
 
     if (ids.length > 1) {
-      this.throwError('can only relate one model to a OneToOneRelation');
+      this.throwError('can only relate one model to a BelongsToOneRelation');
     }
 
     builder.setQueryExecutor(builder => {
@@ -116,5 +103,3 @@ export default class OneToOneRelation extends Relation {
     });
   }
 }
-
-

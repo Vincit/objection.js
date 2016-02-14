@@ -3492,7 +3492,7 @@ Person.jsonSchema = {
 // This object defines the relations to other models.
 Person.relationMappings = {
   pets: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     // The related model. This can be either a Model 
     // subclass constructor or an absolute file path 
     // to a module that exports one. We use the file 
@@ -3524,7 +3524,7 @@ Person.relationMappings = {
   },
 
   children: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Person,
     join: {
       from: 'Person.id',
@@ -3533,7 +3533,7 @@ Person.relationMappings = {
   },
 
   parent: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: Person,
     join: {
       from: 'Person.parentId',
@@ -3591,7 +3591,7 @@ class Person extends Model {
   static get relationMappings() {
     return {
       pets: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         // The related model. This can be either a Model
         // subclass constructor or an absolute file path
         // to a module that exports one. We use the file 
@@ -3622,7 +3622,7 @@ class Person extends Model {
       },
 
       children: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
           from: 'Person.id',
@@ -3631,7 +3631,7 @@ class Person extends Model {
       },
 
       parent: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
           from: 'Person.parentId',
@@ -3686,7 +3686,7 @@ class Person extends Model {
   // This object defines the relations to other models.
   static relationMappings = {
     pets: {
-      relation: Model.OneToManyRelation,
+      relation: Model.HasManyRelation,
       // The related model. This can be either a Model
       // subclass constructor or an absolute file path
       // to a module that exports one. We use the file
@@ -3717,7 +3717,7 @@ class Person extends Model {
     },
 
     children: {
-      relation: Model.OneToManyRelation,
+      relation: Model.HasManyRelation,
       modelClass: Person,
       join: {
         from: 'Person.id',
@@ -3726,7 +3726,7 @@ class Person extends Model {
     },
 
     parent: {
-      relation: Model.OneToOneRelation,
+      relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
         from: 'Person.parentId',
@@ -3990,7 +3990,7 @@ function Person() {
 Model.extend(Person);
 Person.relationMappings = {
   pets: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Animal,
     join: {
       from: 'Person.id',
@@ -3999,7 +3999,7 @@ Person.relationMappings = {
   },
 
   father: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: Person,
     join: {
       from: 'Person.fatherId',
@@ -4032,7 +4032,7 @@ class Person extends Model {
   static get relationMappings() {
     return {
       pets: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Animal,
         join: {
           from: 'Person.id',
@@ -4041,7 +4041,7 @@ class Person extends Model {
       },
     
       father: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
           from: 'Person.fatherId',
@@ -4075,7 +4075,7 @@ class Person extends Model {
 class Person extends Model {
   static relationMappings = {
     pets: {
-      relation: Model.OneToManyRelation,
+      relation: Model.HasManyRelation,
       modelClass: Animal,
       join: {
         from: 'Person.id',
@@ -4084,7 +4084,7 @@ class Person extends Model {
     },
   
     father: {
-      relation: Model.OneToOneRelation,
+      relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
         from: 'Person.fatherId',
@@ -4130,7 +4130,7 @@ See [`RelationMapping`](#relationmapping)
 
 Property|Type|Description
 --------|----|-----------
-relation|function|The relation type. One of `Model.OneToOneRelation`, `Model.OneToManyRelation` and `Model.ManyToManyRelation`.
+relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
 modelClass|[`Model`](#model)&#124;string|Constructor of the related model class or an absolute path to a module that exports one.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
 filter|function([`QueryBuilder`](#querybuilder))|Optional filter for the relation. This is called each time the relation is fetched.

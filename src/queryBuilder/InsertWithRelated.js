@@ -2,8 +2,8 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import RelationExpression from './RelationExpression';
 import ManyToManyRelation from '../relations/ManyToManyRelation';
-import OneToManyRelation from '../relations/OneToManyRelation';
-import OneToOneRelation from '../relations/OneToOneRelation';
+import HasManyRelation from '../relations/HasManyRelation';
+import BelongsToOneRelation from '../relations/BelongsToOneRelation';
 import ValidationError from '../ValidationError';
 let Model;
 
@@ -343,7 +343,7 @@ DependencyGraph.prototype.buildForModel = function (modelClass, model, parentNod
     this.inputNodesById[node.id] = node;
   }
 
-  if (rel instanceof OneToManyRelation) {
+  if (rel instanceof HasManyRelation) {
 
     node.needs.push(new Dependency(parentNode, function (model) {
       for (let i = 0; i < rel.relatedProp.length; ++i) {
@@ -357,7 +357,7 @@ DependencyGraph.prototype.buildForModel = function (modelClass, model, parentNod
       }
     }));
 
-  } else if (rel instanceof OneToOneRelation) {
+  } else if (rel instanceof BelongsToOneRelation) {
 
     node.isNeededBy.push(new Dependency(parentNode, function (model) {
       for (let i = 0; i < rel.relatedProp.length; ++i) {

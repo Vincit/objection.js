@@ -953,7 +953,7 @@ Person.jsonSchema = {
 // This object defines the relations to other models.
 Person.relationMappings = {
   pets: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     // The related model. This can be either a Model
     // subclass constructor or an absolute file path
     // to a module that exports one. We use the file
@@ -985,7 +985,7 @@ Person.relationMappings = {
   },
 
   children: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Person,
     join: {
       from: 'Person.id',
@@ -994,7 +994,7 @@ Person.relationMappings = {
   },
 
   parent: {
-    relation: Model.OneToOneRelation,
+    relation: Model.BelongsToOneRelation,
     modelClass: Person,
     join: {
       from: 'Person.parentId',
@@ -1056,7 +1056,7 @@ class Person extends Model {
   static get relationMappings() {
     return {
       pets: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         // The related model. This can be either a Model
         // subclass constructor or an absolute file path
         // to a module that exports one. We use the file
@@ -1087,7 +1087,7 @@ class Person extends Model {
       },
 
       children: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
           from: 'Person.id',
@@ -1096,7 +1096,7 @@ class Person extends Model {
       },
 
       parent: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
           from: 'Person.parentId',
@@ -1155,7 +1155,7 @@ class Person extends Model {
   // This object defines the relations to other models.
   static relationMappings = {
     pets: {
-      relation: Model.OneToManyRelation,
+      relation: Model.HasManyRelation,
       // The related model. This can be either a Model
       // subclass constructor or an absolute file path
       // to a module that exports one. We use the file
@@ -1186,7 +1186,7 @@ class Person extends Model {
     },
 
     children: {
-      relation: Model.OneToManyRelation,
+      relation: Model.HasManyRelation,
       modelClass: Person,
       join: {
         from: 'Person.id',
@@ -1195,7 +1195,7 @@ class Person extends Model {
     },
 
     parent: {
-      relation: Model.OneToOneRelation,
+      relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
         from: 'Person.parentId',

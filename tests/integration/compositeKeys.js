@@ -68,7 +68,7 @@ module.exports = function (session) {
 
       A.relationMappings = {
         b: {
-          relation: Model.OneToOneRelation,
+          relation: Model.BelongsToOneRelation,
           modelClass: B,
           join: {
             from: ['A.bid3', 'A.bid4'],
@@ -91,7 +91,7 @@ module.exports = function (session) {
 
       B.relationMappings = {
         a: {
-          relation: Model.OneToManyRelation,
+          relation: Model.HasManyRelation,
           modelClass: A,
           join: {
             from: ['B.id3', 'B.id4'],
@@ -376,7 +376,7 @@ module.exports = function (session) {
           });
       });
 
-      describe('one to one relation', function () {
+      describe('belongs to one relation', function () {
 
         it('find', function () {
           return A
@@ -506,7 +506,7 @@ module.exports = function (session) {
 
       });
 
-      describe('one to many relation', function () {
+      describe('has many relation', function () {
 
         it('find', function () {
           return B

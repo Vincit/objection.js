@@ -5,30 +5,17 @@ import Relation from './Relation';
  * @ignore
  * @extends Relation
  */
-export default class OneToManyRelation extends Relation {
+export default class HasManyRelation extends Relation {
   /**
    * @override
    * @inheritDoc
    */
-  find(builder, owners) {
-    builder.onBuild(builder => {
-      let ids = _(owners)
-        .map(owner => owner.$values(this.ownerProp))
-        .unique(id => id.join())
-        .value();
+  createRelationProp(owners, related) {
+    let relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
 
-      this.findQuery(builder, ids);
-    });
-
-    builder.runAfterModelCreate(related => {
-      let relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
-
-      _.each(owners, owner => {
-        let ownerId = owner.$values(this.ownerProp);
-        owner[this.name] = relatedByOwnerId[ownerId] || [];
-      });
-
-      return related;
+    _.each(owners, owner => {
+      let ownerId = owner.$values(this.ownerProp);
+      owner[this.name] = relatedByOwnerId[ownerId] || [];
     });
   }
 
@@ -48,9 +35,16 @@ export default class OneToManyRelation extends Relation {
     });
 
     builder.runAfterModelCreate(related => {
-      owner[this.name] = this.mergeModels(owner[this.name], related);
+      this.appendRelationProp(owner, related);
       return related;
     });
+  }
+
+  /**
+   * @protected
+   */
+  appendRelationProp(owner, related) {
+    owner[this.name] = this.mergeModels(owner[this.name], related);
   }
 
   /**

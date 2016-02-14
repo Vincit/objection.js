@@ -5,9 +5,9 @@ var _ = require('lodash')
   , objection = require('../../../')
   , Model = objection.Model
   , QueryBuilder = objection.QueryBuilder
-  , OneToManyRelation = objection.OneToManyRelation;
+  , HasManyRelation = objection.HasManyRelation;
 
-describe('OneToManyRelation', function () {
+describe('HasManyRelation', function () {
   var originalKnexQueryBuilderThen = null;
   var mockKnexQueryResults = [];
   var executedQueries = [];
@@ -51,20 +51,20 @@ describe('OneToManyRelation', function () {
   });
 
   beforeEach(function () {
-    relation = new OneToManyRelation('nameOfOurRelation', OwnerModel);
+    relation = new HasManyRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
-      relation: OneToManyRelation,
+      relation: HasManyRelation,
       join: {
         from: 'OwnerModel.oid',
         to: 'RelatedModel.ownerId'
       }
     });
 
-    compositeKeyRelation = new OneToManyRelation('nameOfOurRelation', OwnerModel);
+    compositeKeyRelation = new HasManyRelation('nameOfOurRelation', OwnerModel);
     compositeKeyRelation.setMapping({
       modelClass: RelatedModel,
-      relation: OneToManyRelation,
+      relation: HasManyRelation,
       join: {
         from: ['OwnerModel.aid', 'OwnerModel.bid'],
         to: ['RelatedModel.ownerAId', 'RelatedModel.ownerBId']
@@ -802,10 +802,10 @@ describe('OneToManyRelation', function () {
   });
 
   function createFilteredRelation(filter) {
-    relation = new OneToManyRelation('nameOfOurRelation', OwnerModel);
+    relation = new HasManyRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
-      relation: OneToManyRelation,
+      relation: HasManyRelation,
       filter: filter,
       join: {
         from: 'OwnerModel.oid',

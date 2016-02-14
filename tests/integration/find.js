@@ -248,7 +248,7 @@ module.exports = function (session) {
         }]);
       });
 
-      it('should join a one to one relation', function () {
+      it('should join a belongs to one relation', function () {
         return Model1
           .query()
           .select('Model1.*', 'model1Relation1.model1Prop1 as rel_model1Prop1')
@@ -260,7 +260,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should join a one to many relation (1)', function () {
+      it('should join a has many relation (1)', function () {
         return Model1
           .query()
           .joinRelation('model1Relation2')
@@ -271,7 +271,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should join a one to many relation (2)', function () {
+      it('should join a has many relation (2)', function () {
         return Model1
           .query()
           .joinRelation('model1Relation2')
@@ -351,7 +351,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery()', function () {
 
-      describe('one to one relation', function () {
+      describe('belongs to one relation', function () {
         var parent1;
         var parent2;
 
@@ -462,7 +462,7 @@ module.exports = function (session) {
 
       });
 
-      describe('one to many relation', function () {
+      describe('has many relation', function () {
         var parent1;
         var parent2;
 

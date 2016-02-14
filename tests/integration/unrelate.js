@@ -44,7 +44,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().unrelate()', function () {
 
-      describe('one to one relation', function () {
+      describe('belongs to one relation', function () {
 
         beforeEach(function () {
           return session.populate([{
@@ -88,7 +88,7 @@ module.exports = function (session) {
 
       });
 
-      describe('one to many relation', function () {
+      describe('has many relation', function () {
 
         beforeEach(function () {
           return session.populate([{

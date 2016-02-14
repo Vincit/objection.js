@@ -89,6 +89,21 @@ module.exports = function (session) {
       expect(models[0].model1Relation2).to.equal(undefined);
     });
 
+    test('model1Relation1.model1Relation1Inverse', function (models) {
+      expect(models).to.have.length(1);
+      expect(models[0]).to.be.a(Model1);
+
+      expect(models[0].model1Relation1).to.be.a(Model1);
+      expect(models[0].model1Relation1.id).to.equal(2);
+      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
+
+      expect(models[0].model1Relation1.model1Relation1Inverse).to.be.a(Model1);
+      expect(models[0].model1Relation1.model1Relation1Inverse.id).to.equal(1);
+      expect(models[0].model1Relation1.model1Relation1Inverse.model1Prop1).to.equal('hello 1');
+
+      expect(models[0].model1Relation2).to.equal(undefined);
+    });
+
     test('model1Relation1.^', function (models) {
       expect(models).to.have.length(1);
       expect(models[0]).to.be.a(Model1);
@@ -250,29 +265,6 @@ module.exports = function (session) {
       expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
       expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1.id).to.equal(7);
       expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
-    });
-
-    test('model1Relation1.*', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-
-      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
-      expect(models[0].model1Relation1.model1Relation1.model1Prop1).to.equal('hello 3');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.id).to.equal(4);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Prop1).to.equal('hello 4');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2).to.have.length(1);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2[0].idCol).to.equal(4);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2[0].model2Prop1).to.equal('hejsan 4');
-
-      expect(models[0].model1Relation2).to.equal(undefined);
     });
 
     it('should fail if given missing filter', function (done) {

@@ -63,7 +63,7 @@ describe('Performance tests', function () {
 
     Person.relationMappings = {
       pets: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Animal,
         join: {
           from: 'Person.id',
@@ -85,7 +85,7 @@ describe('Performance tests', function () {
       },
 
       children: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
           from: 'Person.id',
@@ -112,7 +112,7 @@ describe('Performance tests', function () {
 
     Animal.relationMappings = {
       owner: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
           from: 'Animal.ownerId',

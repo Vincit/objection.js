@@ -478,7 +478,7 @@ module.exports = function (session) {
 
       describe('$relatedQuery', function () {
 
-        describe('one-to-one relation', function () {
+        describe('belongs to one relation', function () {
           var model2;
           var model4;
 
@@ -596,7 +596,7 @@ module.exports = function (session) {
 
         });
 
-        describe('one-to-many relation', function () {
+        describe('has many relation', function () {
           var model;
           var newModel;
 
@@ -683,7 +683,7 @@ module.exports = function (session) {
 
         });
 
-        describe('many-to-many relation', function () {
+        describe('many to many relation', function () {
           var model;
 
           beforeEach(function () {

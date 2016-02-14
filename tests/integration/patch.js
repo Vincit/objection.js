@@ -382,7 +382,7 @@ module.exports = function (session) {
 
     describe('.$relatedQuery().patch()', function () {
 
-      describe('one to one relation', function () {
+      describe('belongs to one relation', function () {
         var parent1;
         var parent2;
 
@@ -449,7 +449,7 @@ module.exports = function (session) {
 
       });
 
-      describe('one to many relation', function () {
+      describe('has many relation', function () {
         var parent1;
         var parent2;
 

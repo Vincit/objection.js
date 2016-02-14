@@ -14,7 +14,7 @@ describe('Model', function () {
 
     Model1.relationMappings = {
       relation1: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Model2,
         join: {
           from: 'Model1.id',
@@ -22,7 +22,7 @@ describe('Model', function () {
         }
       },
       relation2: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Model1,
         join: {
           from: 'Model1.id',
@@ -245,7 +245,7 @@ describe('Model', function () {
 
     Model.relationMappings = {
       someRelation: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Model,
         join: {
           from: 'Model.id',
@@ -265,7 +265,7 @@ describe('Model', function () {
 
     Model.relationMappings = {
       someRelation: {
-        relation: Model.OneToOneRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Model,
         join: {
           from: 'Model.id',
@@ -345,7 +345,7 @@ describe('Model', function () {
 
     Model.relationMappings = {
       someRelation: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Model,
         join: {
           from: 'Model.id',
@@ -372,7 +372,7 @@ describe('Model', function () {
 
     Model.relationMappings = {
       someRelation: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Model,
         join: {
           from: 'Model.id',
@@ -399,7 +399,7 @@ describe('Model', function () {
 
       Model1.relationMappings = {
         relation1: {
-          relation: Model.OneToManyRelation,
+          relation: Model.HasManyRelation,
           modelClass: Model2,
           join: {
             from: 'Model1.id',
@@ -407,7 +407,7 @@ describe('Model', function () {
           }
         },
         relation2: {
-          relation: Model.OneToOneRelation,
+          relation: Model.BelongsToOneRelation,
           modelClass: Model1,
           join: {
             from: 'Model1.id',
