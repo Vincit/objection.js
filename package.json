@@ -9,7 +9,7 @@
     "test": "npm run build && istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 5000 --reporter spec --recursive tests",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
     "test-bail": "mocha --slow 10 --timeout 5000 --reporter spec --recursive tests --bail",
-    "coveralls": "cat ./test-coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "prepublish": "npm run build"
   },
   "publishConfig": {
