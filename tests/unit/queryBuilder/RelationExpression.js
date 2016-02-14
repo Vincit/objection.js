@@ -375,6 +375,135 @@ describe('RelationExpression', function () {
 
   });
 
+  describe('#expressionsAtPath', function () {
+
+    it('a from a', function () {
+      testPath('a', 'a', [{
+        name: 'a',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('a from a.a', function () {
+      testPath('a.b', 'a', [{
+        name: 'a',
+        args: [],
+        numChildren: 1,
+        children: {
+          b: {
+            name: 'b',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
+      }]);
+    });
+
+    it('a.b from a', function () {
+      testPath('a', 'a.b', []);
+    });
+
+    it('a.b from a.b', function () {
+      testPath('a.b', 'a.b', [{
+        name: 'b',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('a.b from a.[b, c]', function () {
+      testPath('a.[b, c]', 'a.b', [{
+        name: 'b',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('a.[b, c] from a.[b, c]', function () {
+      testPath('a.[b, c]', 'a.[b, c]', [{
+        name: 'b',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }, {
+        name: 'c',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('a.[b, d] from a.[b, c]', function () {
+      testPath('a.[b, c]', 'a.[b, d]', [{
+        name: 'b',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('[a, b.c.d.[e, f]] from [a, b.[g, c.[d.[e, f], i], h]]', function () {
+      testPath('[a, b.[g, c.[d.[e, f], i], h]]', '[a, b.c.d.[e, f]]', [{
+        name: 'a',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }, {
+        name: 'e',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }, {
+        name: 'f',
+        args: [],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('b.c.d.[e, f] from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', function () {
+      testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d.[e, f]', [{
+        name: 'e',
+        args: ['a1'],
+        numChildren: 0,
+        children: {}
+      }, {
+        name: 'f',
+        args: ['a2'],
+        numChildren: 0,
+        children: {}
+      }]);
+    });
+
+    it('b.c.d from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', function () {
+      testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d', [{
+        name: 'd',
+        args: [],
+        numChildren: 2,
+        children: {
+          e: {
+            name: 'e',
+            args: ['a1'],
+            numChildren: 0,
+            children: {}
+          },
+          f: {
+            name: 'f',
+            args: ['a2'],
+            numChildren: 0,
+            children: {}
+          }
+        }
+      }]);
+    });
+
+  });
+
   describe('#isSubExpression', function () {
 
     // Everything is a sub expression of *.
@@ -479,6 +608,10 @@ describe('RelationExpression', function () {
 
   function testParse(str, parsed) {
     expect(RelationExpression.parse(str)).to.eql(parsed);
+  }
+
+  function testPath(str, path, expected) {
+    expect(RelationExpression.parse(str).expressionsAtPath(path)).to.eql(expected);
   }
 
   function testParseFail(str) {

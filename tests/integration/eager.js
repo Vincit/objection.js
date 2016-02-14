@@ -299,6 +299,30 @@ module.exports = function (session) {
         .catch(done);
     });
 
+    describe('QueryBuilder.filterEager', function () {
+
+      it('should filter the eager query using relation expressions as paths', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .filterEager('model1Relation2.model2Relation1', function (builder) {
+            builder.where('Model1.id', 6);
+          })
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .filterEager('model1Relation2', function (builder) {
+            builder.where('model_2_prop_1', 'hejsan 2');
+          })
+          .then(function (models) {
+            expect(models[0].model1Relation2).to.have.length(1);
+            expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 2');
+
+            expect(models[0].model1Relation2[0].model2Relation1).to.have.length(1);
+            expect(models[0].model1Relation2[0].model2Relation1[0].id).to.equal(6);
+          });
+      });
+
+    });
+
     describe('QueryBuilder.pick', function () {
 
       it('pick(properties) should pick properties recursively', function () {

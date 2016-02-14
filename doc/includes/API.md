@@ -2668,23 +2668,23 @@ Person
   });
 ```
 
-> If you want to modify the relation queries without using named filters, you can use the
-> [`context`](#context) hooks:
+> Filters can also be registered using the [`filterEager`](#filtereager) method:
 
 ```js
 Person
   .query()
   .eager('children.[pets, movies]')
-  .context({
-    onBuild: function (builder) {
-      var table = builder.modelClass().tableName;
-      // This function is called for each query.
-      if (table === 'Animal') {
-        builder.where('species', 'dog').orderBy('name');
-      } else if (table === 'Person') {
-        builder.orderBy('age');
-      }
-    }
+  .filterEager('children', function (builder) {
+    // Order children by age.
+    builder.orderBy('age');
+  })
+  .filterEager('children.[pets, movies]', function (builder) {
+    // Only select `pets` and `movies` whose id > 10 for the children.
+    builder.where('id', '>', 10);
+  })
+  .filterEager('children.movies]', function (builder) {
+    // Only select 100 first movies for the children.
+    builder.limit(100);
   })
   .then(function (persons) {
     console.log(persons[0].children[0].pets[0].name);
@@ -2761,6 +2761,76 @@ parameters of a http request.
 Argument|Type|Description
 --------|----|-------|------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The allowed eager expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### filterEager
+
+```js
+var builder = queryBuilder.filterEager(pathExpression, filterFunc);
+```
+
+Adds a filter to the eager query.
+
+The `pathExpression` is a relation expression that specifies the queries for which the filter is given.
+
+> The following query would filter out the children's pets that
+> are <= 10 years old:
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .filterEager('children.pets', builder => {
+    builder.where('age', '>', 10);
+  })
+  .then(function () {
+
+  });
+```
+
+> The path expression can have multiple targets. The next example sorts both the
+> pets and movies of the children by id:
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .filterEager('children.[pets, movies]', builder => {
+    builder.orderBy('id');
+  })
+  .then(function () {
+
+  });
+```
+
+> This example only selects movies whose name contains the word 'Predator':
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .filterEager('[children.movies, movies]', builder => {
+    builder.where('name', 'like', '%Predator%');
+  })
+  .then(function () {
+
+  });
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+pathExpression|string&#124;[`RelationExpression`](#relationexpression)|Expression that specifies the queries for which to give the filter.
+filterFunc|function([`QueryBuilder`](#querybuilder)|The filter function.
 
 ##### Return value
 

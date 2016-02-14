@@ -145,7 +145,7 @@ export default class RelationExpression {
    * @returns {boolean}
    */
   isRecursive() {
-    return !!_.find(this.children, {name: '^'});
+    return !!this.children['^'];
   }
 
   /**
@@ -153,7 +153,7 @@ export default class RelationExpression {
    * @returns {boolean}
    */
   isAllRecursive() {
-    return this.numChildren === 1 && this.children[Object.keys(this.children)[0]].name === '*';
+    return this.numChildren === 1 && !!this.children['*'];
   }
 
   /**
@@ -175,11 +175,46 @@ export default class RelationExpression {
   /**
    * @ignore
    */
+  clone() {
+    return new RelationExpression(JSON.parse(JSON.stringify(this)));
+  }
+
+  /**
+   * @ignore
+   */
   forEachChild(cb) {
     _.each(this.children, (child, childName) => {
       if (childName !== '*' && childName !== '^') {
         cb(child, childName);
       }
     });
+  }
+
+  /**
+   * @ignore
+   * @return {Array.<RelationExpression>}
+   */
+  expressionsAtPath(pathExpression) {
+    let path = RelationExpression.parse(pathExpression);
+    let expressions = [];
+    RelationExpression.expressionsAtPath(this, path, expressions);
+    return expressions;
+  }
+
+  /**
+   * @private
+   */
+  static expressionsAtPath(target, path, expressions) {
+    if (path.numChildren == 0) {
+      expressions.push(target);
+    } else {
+      _.each(path.children, child => {
+        let targetChild = target.children[child.name];
+
+        if (targetChild) {
+          this.expressionsAtPath(targetChild, child, expressions);
+        }
+      });
+    }
   }
 }

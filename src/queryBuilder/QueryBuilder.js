@@ -42,6 +42,7 @@ export default class QueryBuilder extends QueryBuilderBase {
 
     this._eagerExpression = null;
     this._eagerFilters = null;
+    this._eagerFilterExpressions = [];
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
@@ -534,6 +535,30 @@ export default class QueryBuilder extends QueryBuilderBase {
    *   });
    * ```
    *
+   * Filters can also be registered using the `filterEager` method:
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .eager('children.[pets, movies]')
+   *   .filterEager('children', function (builder) {
+   *     // Order children by age.
+   *     builder.orderBy('age');
+   *   })
+   *   .filterEager('children.[pets, movies]', function (builder) {
+   *     // Only select `pets` and `movies` whose id > 10 for the children.
+   *     builder.where('id', '>', 10);
+   *   })
+   *   .filterEager('children.movies]', function (builder) {
+   *     // Only select 100 first movies for the children.
+   *     builder.limit(100);
+   *   })
+   *   .then(function (persons) {
+   *     console.log(persons[0].children[0].pets[0].name);
+   *     console.log(persons[0].children[0].movies[0].id);
+   *   });
+   * ```
+   *
    * The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
    *
    * ```js
@@ -600,6 +625,67 @@ export default class QueryBuilder extends QueryBuilderBase {
     }
 
     checkEager(this);
+    return this;
+  }
+
+  /**
+   * Adds filters to the eager query.
+   *
+   * The `path` is a relation expression that specifies the queries for which the filter
+   * is given. For example the following query would filter out the children's pets that
+   * are <= 10 years old:
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .eager('[children.[pets, movies], movies]')
+   *   .filterEager('children.pets', builder => {
+   *     builder.where('age', '>', 10);
+   *   })
+   *   .then(function () {
+   *
+   *   });
+   * ```
+   *
+   * The path expression can have multiple targets. The next example sorts both the
+   * pets and movies of the children by id:
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .eager('[children.[pets, movies], movies]')
+   *   .filterEager('children.[pets, movies]', builder => {
+   *     builder.orderBy('id');
+   *   })
+   *   .then(function () {
+   *
+   *   });
+   * ```
+   *
+   * This example only selects movies whose name contains the word 'Predator':
+   *
+   * ```js
+   * Person
+   *   .query()
+   *   .eager('[children.[pets, movies], movies]')
+   *   .filterEager('[children.movies, movies]', builder => {
+   *     builder.where('name', 'like', '%Predator%');
+   *   })
+   *   .then(function () {
+   *
+   *   });
+   * ```
+   *
+   * @param {string|RelationExpression} path
+   * @param {function(QueryBuilder)} filter
+   * @returns {QueryBuilder}
+   */
+  filterEager(path, filter) {
+    this._eagerFilterExpressions.push({
+      path: path,
+      filter: filter
+    });
+
     return this;
   }
 
@@ -715,7 +801,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   clone() {
-    var builder = new this.constructor(this._modelClass);
+    let builder = new this.constructor(this._modelClass);
     // This is a QueryBuilderBase method.
     this.cloneInto(builder);
 
@@ -740,6 +826,7 @@ export default class QueryBuilder extends QueryBuilderBase {
 
     builder._eagerExpression = this._eagerExpression;
     builder._eagerFilters = this._eagerFilters;
+    builder._eagerFilterExpressions = this._eagerFilterExpressions.slice();
     builder._allowedEagerExpression = this._allowedEagerExpression;
     builder._allowedInsertExpression = this._allowedInsertExpression;
 
@@ -2352,11 +2439,24 @@ function createModels(builder, result) {
  */
 function eagerFetch(builder, $models) {
   if ($models instanceof builder._modelClass || (_.isArray($models) && $models[0] instanceof builder._modelClass)) {
+    let expression = builder._eagerExpression.clone();
+    let filters = _.clone(builder._eagerFilters || {});
+
+    _.each(builder._eagerFilterExpressions, (filter, idx) => {
+      let filterNodes = expression.expressionsAtPath(filter.path);
+
+      if (!_.isEmpty(filterNodes)) {
+        const filterName = `_efe${idx}_`;
+        filters[filterName] = filter.filter;
+        _.each(filterNodes, node => node.args.push(filterName));
+      }
+    });
+
     return new EagerFetcher({
       modelClass: builder._modelClass,
       models: builder._modelClass.ensureModelArray($models),
-      eager: builder._eagerExpression,
-      filters: builder._eagerFilters,
+      eager: expression,
+      filters: filters,
       rootQuery: builder
     }).fetch().then(function (models) {
       return _.isArray($models) ? models : models[0];
