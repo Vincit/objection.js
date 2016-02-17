@@ -2477,6 +2477,10 @@ function build(builder) {
     // Set the table only if it hasn't been explicitly set yet.
     builder.table(builder._modelClass.tableName);
   }
+  
+  if (builder._modelClass.schemaName) {
+    builder.withSchema(builder._modelClass.schemaName);
+  }
 
   callBuilderFuncs(builder, context.onBuild);
   callBuilderFuncs(builder, internalContext.onBuild);
