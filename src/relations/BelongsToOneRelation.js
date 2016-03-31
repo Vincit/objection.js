@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Relation from './Relation';
+import normalizeIds from '../utils/normalizeIds';
 
 /**
  * @ignore
@@ -56,7 +57,7 @@ export default class BelongsToOneRelation extends Relation {
    * @inheritDoc
    */
   relate(builder, owner, ids) {
-    ids = this.normalizeId(ids, this.relatedProp.length);
+    ids = normalizeIds(ids, this.relatedProp, {arrayOutput: true});
 
     if (ids.length > 1) {
       this.throwError('can only relate one model to a BelongsToOneRelation');

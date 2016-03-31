@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Relation from './Relation';
 import inheritModel from '../model/inheritModel';
+import normalizeIds from '../utils/normalizeIds';
 import {overwriteForDatabase} from '../utils/dbUtils';
 import {isSubclassOf} from '../utils/classUtils';
 import {memoize} from '../utils/decorators';
@@ -369,7 +370,7 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    */
   relate(builder, owner, ids) {
-    ids = this.normalizeId(ids, this.relatedProp.length);
+    ids = normalizeIds(ids, this.relatedProp, {arrayOutput: true});
 
     builder.setQueryExecutor(builder => {
       let joinModels = this._createJoinModels(owner.$values(this.ownerProp), ids);

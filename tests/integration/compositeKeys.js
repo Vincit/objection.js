@@ -632,6 +632,36 @@ module.exports = function (session) {
             });
         });
 
+        it('relate (object value)', function () {
+          return B
+            .query()
+            .findById([1, '2'])
+            .then(function (b2) {
+              return b2
+                .$relatedQuery('a')
+                .relate({id1: 1, id2: '1'});
+            })
+            .then(function () {
+              return session.knex('A').orderBy(['id1', 'id2'])
+            })
+            .then(function (rows) {
+              expect(rows).to.eql([
+                { id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '2' },
+                { id1: 1, id2: '2', aval: 'a2', bid3: 1, bid4: '1' },
+                { id1: 2, id2: '1', aval: 'a3', bid3: 1, bid4: '1' },
+                { id1: 2, id2: '2', aval: 'a4', bid3: 1, bid4: '2' },
+                { id1: 2, id2: '3', aval: 'a5', bid3: 1, bid4: '2' },
+                { id1: 3, id2: '2', aval: 'a6', bid3: 1, bid4: '2' },
+                { id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null },
+                { id1: 11, id2: '12', aval: 'a8', bid3: null, bid4: null },
+                { id1: 12, id2: '11', aval: 'a9', bid3: null, bid4: null },
+                { id1: 21, id2: '21', aval: 'a10', bid3: null, bid4: null },
+                { id1: 21, id2: '22', aval: 'a11', bid3: null, bid4: null },
+                { id1: 22, id2: '21', aval: 'a12', bid3: null, bid4: null }
+              ]);
+            });
+        });
+
         it('unrelate', function () {
           return B
             .query()

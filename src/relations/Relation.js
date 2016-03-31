@@ -572,44 +572,6 @@ export default class Relation {
   /**
    * @protected
    */
-  normalizeId(ids, compositeLength) {
-    let isComposite = compositeLength > 1;
-
-    if (isComposite) {
-      // For composite ids these two are okay:
-      //
-      // 1. [1, 3, 4]
-      // 2. [[1, 3, 4], [4, 6, 1]]
-      //
-      if (!_.isArray(ids) || (!_.isArray(ids[0]) && ids.length !== compositeLength)) {
-        this.throwError(`Invalid composite key ${ids}`);
-      }
-
-      // Normalize to array of arrays.
-      if (!_.isArray(ids[0])) {
-        ids = [ids];
-      }
-    } else {
-      // Normalize to array of arrays.
-      if (!_.isArray(ids)) {
-        ids = [[ids]];
-      } else if (!_.isArray(ids[0])) {
-        ids = _.map(ids, id => [id]);
-      }
-    }
-
-    _.each(ids, id => {
-      if (id.length !== compositeLength) {
-        this.throwError(`Id ${id} has invalid length. Expected ${compositeLength}`)
-      }
-    });
-
-    return ids;
-  }
-
-  /**
-   * @protected
-   */
   throwError(message) {
     if (this.ownerModelClass && this.ownerModelClass.name && this.name) {
       throw new Error(`${this.ownerModelClass.name}.relationMappings.${this.name}: ${message}`);

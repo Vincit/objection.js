@@ -1246,11 +1246,14 @@ export default class Model extends ModelBase {
    * @ignore
    * @returns {number}
    */
-  static getIdColumnDimension() {
-    if (_.isArray(this.idColumn)) {
-      return this.idColumn.length;
+  @memoize
+  static getIdPropertyArray() {
+    let ModelClass = this;
+
+    if (_.isArray(ModelClass.idColumn)) {
+      return _.map(ModelClass.idColumn, col => idColumnToIdProperty(ModelClass, col));
     } else {
-      return 1;
+      return [idColumnToIdProperty(ModelClass, ModelClass.idColumn)];
     }
   }
 

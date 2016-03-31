@@ -2273,37 +2273,29 @@ export default class QueryBuilder extends QueryBuilderBase {
    *   });
    * ```
    *
+   * Relate multiple (only works with postgres):
+   *
+   * ```js
+   * person
+   *   .$relatedQuery('movies')
+   *   .relate([50, 60, 70])
+   *   .then(function () {
+   *
+   *   });
+   * ```
+   *
    * Composite key:
    *
    * ```js
-   * Person
-   *   .query()
-   *   .where('id', 123)
-   *   .first()
-   *   .then(function (person) {
-   *     return person.$relatedQuery('movies').relate([50, 20, 10]);
-   *   })
+   * person
+   *   .$relatedQuery('movies')
+   *   .relate({foo: 50, bar: 20, baz: 10})
    *   .then(function () {
-   *     console.log('movie 50 is now related to person 123 through `movies` relation');
+   *
    *   });
    * ```
    *
-   * Multiple models with composite key (postgres only):
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('id', 123)
-   *   .first()
-   *   .then(function (person) {
-   *     return person.$relatedQuery('movies').relate([[50, 20, 10], [24, 46, 12]]);
-   *   })
-   *   .then(function () {
-   *     console.log('movie 50 is now related to person 123 through `movies` relation');
-   *   });
-   * ```
-   *
-   * @param {number|string|Array.<number|string>|Array.<Array.<number|string>>} ids
+   * @param {number|string|object|Array.<number|string>|Array.<Array.<number|string>>|Array.<object>} ids
    * @returns {QueryBuilder}
    */
   @writeQueryMethod

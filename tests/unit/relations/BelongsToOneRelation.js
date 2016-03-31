@@ -666,11 +666,71 @@ describe('BelongsToOneRelation', function () {
         .relateImpl(function (ids) {
           relation.relate(this, owner, ids);
         })
+        .relate(10);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql(10);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = \'10\' where "OwnerModel"."id" = \'666\'');
+      });
+    });
+
+    it('should generate a relate query (array value)', function () {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
         .relate([10]);
 
       return builder.then(function (result) {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([10]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = \'10\' where "OwnerModel"."id" = \'666\'');
+      });
+    });
+
+    it('should generate a relate query (object value)', function () {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate({rid: 10});
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({rid: 10});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedId" = \'10\' where "OwnerModel"."id" = \'666\'');
+      });
+    });
+
+    it('should generate a relate query (array of objects values)', function () {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate([{rid: 10}]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql([{rid: 10}]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -691,6 +751,26 @@ describe('BelongsToOneRelation', function () {
       return builder.then(function (result) {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([10, 20]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "OwnerModel" set "relatedAId" = \'10\', "relatedBId" = \'20\' where "OwnerModel"."id" = \'666\'');
+      });
+    });
+
+    it('should generate a relate query (composite key with object value)', function () {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          compositeKeyRelation.relate(this, owner, ids);
+        })
+        .relate({aid: 10, bid: 20});
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({aid: 10, bid: 20});
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -723,6 +803,40 @@ describe('BelongsToOneRelation', function () {
           relation.relate(this, owner, ids);
         })
         .relate([11, 12])
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          done();
+        });
+    });
+
+    it('should fail if object value doesn\'t contain the needed id', function (done) {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate({wrongId: 10})
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function () {
+          done();
+        });
+    });
+
+    it('should fail if object value doesn\'t contain the needed id (composite key)', function (done) {
+      var owner = OwnerModel.fromJson({id: 666});
+
+      QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          compositeKeyRelation.relate(this, owner, ids);
+        })
+        .relate({aid: 10, wrongId: 20})
         .then(function () {
           done(new Error('should not get here'));
         })

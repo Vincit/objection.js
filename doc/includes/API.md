@@ -614,6 +614,28 @@ Person
   });
 ```
 
+> Relate multiple (only works with postgres)
+
+```js
+person
+  .$relatedQuery('movies')
+  .relate([50, 60, 70])
+  .then(function () {
+
+  });
+```
+
+> Composite key
+
+```js
+person
+  .$relatedQuery('movies')
+  .relate({foo: 50, bar: 20, baz: 10})
+  .then(function () {
+
+  });
+```
+
 Relates an existing model to another model.
 
 This method doesn't create a new instance but only updates the foreign keys and in
@@ -625,7 +647,7 @@ On Postgres multiple models can be related by giving an array of identifiers.
 
 Argument|Type|Description
 --------|----|--------------------
-ids|Array|Identifier(s) of the model(s) to relate
+ids|number&#124;string&#124;Array&#124;Object|Identifier(s) of the model(s) to relate
 
 ##### Return value
 

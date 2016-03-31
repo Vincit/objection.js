@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Relation from './Relation';
+import normalizeIds from '../utils/normalizeIds';
 
 /**
  * @ignore
@@ -52,7 +53,7 @@ export default class HasManyRelation extends Relation {
    * @inheritDoc
    */
   relate(builder, owner, ids) {
-    ids = this.normalizeId(ids, this.relatedModelClass.getIdColumnDimension());
+    ids = normalizeIds(ids, this.relatedModelClass.getIdPropertyArray(), {arrayOutput: true});
 
     builder.setQueryExecutor(builder => {
       var patch = {};

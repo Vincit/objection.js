@@ -184,6 +184,10 @@ module.exports.initialize = function (opt) {
     populate: module.exports.populate,
     destroy: module.exports.destroy,
 
+    isPostgres: function () {
+      return utils.isPostgres(this.knex);
+    },
+
     addUnhandledRejectionHandler: function (handler) {
       unhandledRejectionHandlers.push(handler);
     },

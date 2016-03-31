@@ -11,7 +11,7 @@ module.exports = function (session) {
 
     describe('.query()', function () {
 
-      it('should reject the query', function (done) {
+      it('should reject the query because relate makes no sense in this context', function (done) {
         Model1
           .query()
           .relate(1)
@@ -27,7 +27,7 @@ module.exports = function (session) {
 
     describe('.$query()', function () {
 
-      it('should reject the query', function (done) {
+      it('should reject the query because relate makes no sense in this context', function (done) {
         Model1
           .fromJson({id: 1})
           .$query()
@@ -87,6 +87,70 @@ module.exports = function (session) {
             });
         });
 
+        it('should relate multiple', function () {
+          return model1
+            .$relatedQuery('model1Relation1')
+            .relate([model2.id])
+            .then(function () {
+              return session.knex(Model1.tableName).orderBy('id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model1Id).to.equal(model2.id);
+              expect(rows[1].model1Id).to.equal(null);
+              expect(rows[2].model1Id).to.equal(null);
+            });
+        });
+
+        it('should relate (object value)', function () {
+          return model1
+            .$relatedQuery('model1Relation1')
+            .relate({id: model2.id})
+            .then(function () {
+              return session.knex(Model1.tableName).orderBy('id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model1Id).to.equal(model2.id);
+              expect(rows[1].model1Id).to.equal(null);
+              expect(rows[2].model1Id).to.equal(null);
+            });
+        });
+
+        it('should relate (model value)', function () {
+          return model1
+            .$relatedQuery('model1Relation1')
+            .relate(model2)
+            .then(function () {
+              return session.knex(Model1.tableName).orderBy('id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model1Id).to.equal(model2.id);
+              expect(rows[1].model1Id).to.equal(null);
+              expect(rows[2].model1Id).to.equal(null);
+            });
+        });
+
+        it('should fail with invalid object value)', function (done) {
+          model1
+            .$relatedQuery('model1Relation1')
+            .relate({wrongId: model2.id})
+            .then(function () {
+              done(new Error('should not get here'));
+            })
+            .catch(function () {
+              return session.knex(Model1.tableName).orderBy('id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model1Id).to.equal(null);
+              expect(rows[1].model1Id).to.equal(null);
+              expect(rows[2].model1Id).to.equal(null);
+              done();
+            });
+        });
+
       });
 
       describe('has many relation', function () {
@@ -140,6 +204,69 @@ module.exports = function (session) {
             });
         });
 
+        it('should relate (multiple values)', function () {
+          return Model1
+            .query()
+            .where('id', 1)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model1Relation2')
+                .relate([2, 3]);
+            })
+            .then(function () {
+              return session.knex(Model2.tableName).orderBy('id_col');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model_1_id).to.equal(1);
+              expect(rows[1].model_1_id).to.equal(1);
+              expect(rows[2].model_1_id).to.equal(1);
+            });
+        });
+
+        it('should relate (object value)', function () {
+          return Model1
+            .query()
+            .where('id', 1)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model1Relation2')
+                .relate({idCol: 2});
+            })
+            .then(function () {
+              return session.knex(Model2.tableName).orderBy('id_col');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model_1_id).to.equal(1);
+              expect(rows[1].model_1_id).to.equal(1);
+              expect(rows[2].model_1_id).to.equal(3);
+            });
+        });
+
+        it('should relate (multiple object values)', function () {
+          return Model1
+            .query()
+            .where('id', 1)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model1Relation2')
+                .relate([{idCol: 2}, {idCol: 3}]);
+            })
+            .then(function () {
+              return session.knex(Model2.tableName).orderBy('id_col');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(rows[0].model_1_id).to.equal(1);
+              expect(rows[1].model_1_id).to.equal(1);
+              expect(rows[2].model_1_id).to.equal(1);
+            });
+        });
+
       });
 
       describe('many to many relation', function () {
@@ -189,6 +316,55 @@ module.exports = function (session) {
               return model
                 .$relatedQuery('model2Relation1')
                 .relate(5);
+            })
+            .then(function () {
+              return session.knex('Model1Model2').orderBy('id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(5);
+              expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+            });
+        });
+
+        if (session.isPostgres()) {
+          it('should relate (multiple values)', function () {
+            return Model2
+              .query()
+              .where('id_col', 1)
+              .first()
+              .then(function (model) {
+                return model
+                  .$relatedQuery('model2Relation1')
+                  .relate([5, 6]);
+              })
+              .then(function () {
+                return session.knex('Model1Model2').orderBy('id');
+              })
+              .then(function (rows) {
+                expect(rows).to.have.length(6);
+                expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+                expect(_.where(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+                expect(_.where(rows, {model2Id: 1, model1Id: 6})).to.have.length(1);
+                expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+                expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+                expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              });
+          });
+        }
+
+        it('should relate (object value)', function () {
+          return Model2
+            .query()
+            .where('id_col', 1)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model2Relation1')
+                .relate({id: 5});
             })
             .then(function () {
               return session.knex('Model1Model2').orderBy('id');

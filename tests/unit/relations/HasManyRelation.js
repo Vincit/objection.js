@@ -677,6 +677,27 @@ describe('HasManyRelation', function () {
   describe('relate', function () {
 
     it('should generate a relate query', function () {
+      mockKnexQueryResults = [[5]];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate(10);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql(10);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "RelatedModel"."id" in (\'10\')');
+      });
+    });
+
+    it('should generate a relate query (multiple ids)', function () {
       mockKnexQueryResults = [[5, 6, 7]];
       var owner = OwnerModel.fromJson({oid: 666});
 
@@ -694,6 +715,48 @@ describe('HasManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "RelatedModel"."id" in (\'10\', \'20\', \'30\')');
+      });
+    });
+
+    it('should generate a relate query (object value)', function () {
+      mockKnexQueryResults = [[5]];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate({id: 10});
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({id: 10});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "RelatedModel"."id" in (\'10\')');
+      });
+    });
+
+    it('should generate a relate query (array of object values)', function () {
+      mockKnexQueryResults = [[5]];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate([{id: 10}, {id: 20}]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql([{id: 10}, {id: 20}]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "ownerId" = \'666\' where "RelatedModel"."id" in (\'10\', \'20\')');
       });
     });
 

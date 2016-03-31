@@ -1,7 +1,6 @@
 'use strict';
 
 var _ = require('lodash');
-var utils = require('../../lib/utils/dbUtils');
 var expect = require('expect.js');
 var Promise = require('bluebird');
 var inheritModel = require('../../lib/model/inheritModel');
@@ -71,7 +70,7 @@ module.exports = function (session) {
           });
       });
 
-      if (utils.isPostgres(session.knex)) {
+      if (session.isPostgres()) {
         it('should accept an array', function () {
           var models = [Model1.fromJson({model1Prop1: 'hello 3'}), Model1.fromJson({model1Prop1: 'hello 4'})];
 
@@ -129,7 +128,7 @@ module.exports = function (session) {
           });
       });
 
-      if (utils.isPostgres(session.knex)) {
+      if (session.isPostgres()) {
         it('should accept a json array', function () {
           return Model1
             .query()
@@ -236,7 +235,7 @@ module.exports = function (session) {
           });
       });
 
-      if (utils.isPostgres(session.knex)) {
+      if (session.isPostgres()) {
         it('should insert and fetch an array of new models', function () {
           var model1 = Model1.fromJson({model1Prop1: 'hello 3'});
           var model2 = Model1.fromJson({model1Prop1: 'hello 4', model1Prop2: 10});
@@ -587,7 +586,7 @@ module.exports = function (session) {
             });
         });
 
-        if (utils.isPostgres(session.knex)) {
+        if (session.isPostgres()) {
           it('should accept an array', function () {
             var inserted = null;
             var originalRelated = null;
@@ -777,7 +776,7 @@ module.exports = function (session) {
             });
         });
 
-        if (utils.isPostgres(session.knex)) {
+        if (session.isPostgres()) {
 
           it('should accept an array', function () {
             var inserted = null;

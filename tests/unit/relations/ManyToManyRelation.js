@@ -1179,6 +1179,29 @@ describe('ManyToManyRelation', function () {
   describe('relate', function () {
 
     it('should generate a relate query', function () {
+      mockKnexQueryResults = [[5]];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate(10);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql(10);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\') returning "relatedId"'
+        ].join(' '));
+      });
+    });
+
+    it('should generate a relate query (array value)', function () {
       mockKnexQueryResults = [[5, 6, 7]];
       var owner = OwnerModel.fromJson({oid: 666});
 
@@ -1192,6 +1215,29 @@ describe('ManyToManyRelation', function () {
       return builder.then(function (result) {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([10, 20, 30]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'10\'), (\'666\', \'20\'), (\'666\', \'30\') returning "relatedId"'
+        ].join(' '));
+      });
+    });
+
+    it('should generate a relate query (object value)', function () {
+      mockKnexQueryResults = [[5, 6, 7]];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate([{rid: 10}, {rid: 20}, {rid: 30}]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql([{rid: 10}, {rid: 20}, {rid: 30}]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1219,6 +1265,33 @@ describe('ManyToManyRelation', function () {
       return builder.then(function (result) {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([[33, 44], [33, 55], [66, 77]]);
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'insert into "JoinTable" ("ownerAId", "ownerBId", "relatedCId", "relatedDId") values (\'11\', \'22\', \'33\', \'44\'), (\'11\', \'22\', \'33\', \'55\'), (\'11\', \'22\', \'66\', \'77\') returning "relatedCId", "relatedDId"'
+        ].join(' '));
+      });
+    });
+
+    it('should generate a relate query (composite key with object value)', function () {
+      mockKnexQueryResults = [[
+        {relatedCId: 33, relatedDId: 44},
+        {relatedCId: 33, relatedDId: 55},
+        {relatedCId: 66, relatedDId: 77}
+      ]];
+
+      var owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          compositeKeyRelation.relate(this, owner, ids);
+        })
+        .relate([{cid: 33, did: 44}, {cid: 33, did: 55}, {cid: 66, did: 77}]);
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql([{cid: 33, did: 44}, {cid: 33, did: 55}, {cid: 66, did: 77}]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
