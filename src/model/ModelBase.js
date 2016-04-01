@@ -438,6 +438,66 @@ export default class ModelBase {
   }
 
   /**
+   * Omits a set of properties from the json representation.
+   *
+   * ```js
+   * let person = Person.fromJson({firstName: 'Jennifer', lastName: 'Aniston'});
+   * person.$omitFromJson('lastName');
+   * console.log(person.toJSON()); // --> {firstName: 'Jennifer'}
+   * console.log(person); // --> {firstName: 'Jennifer', lastName: 'Aniston'}
+   * ```
+   *
+   * @ignore
+   * @param {string|Array.<string>|Object.<string, boolean>} keys
+   * @returns {ModelBase}
+   */
+  $omitFromJson() {
+    if (arguments.length === 1 && _.isObject(arguments[0])) {
+      let keys = arguments[0];
+
+      if (_.isArray(keys)) {
+        omitFromJson(this, keys, false);
+      } else {
+        omitFromJson(this, _.keys(keys), false);
+      }
+    } else {
+      omitFromJson(this, _.toArray(arguments), false);
+    }
+
+    return this;
+  }
+
+  /**
+   * Omits a set of properties from the database json representation.
+   *
+   * ```js
+   * let person = Person.fromJson({firstName: 'Jennifer', lastName: 'Aniston'});
+   * person.$omitFromDatabaseJson('lastName');
+   * console.log(person.$toDatabaseJson()); // --> {firstName: 'Jennifer'}
+   * console.log(person); // --> {firstName: 'Jennifer', lastName: 'Aniston'}
+   * ```
+   *
+   * @ignore
+   * @param {string|Array.<string>|Object.<string, boolean>} keys
+   * @returns {ModelBase}
+   */
+  $omitFromDatabaseJson() {
+    if (arguments.length === 1 && _.isObject(arguments[0])) {
+      let keys = arguments[0];
+
+      if (_.isArray(keys)) {
+        omitFromJson(this, keys, true);
+      } else {
+        omitFromJson(this, _.keys(keys), true);
+      }
+    } else {
+      omitFromJson(this, _.toArray(arguments), true);
+    }
+
+    return this;
+  }
+
+  /**
    * Picks a set of properties.
    *
    * All other properties but the selected ones are set to `undefined`. Note that
@@ -740,12 +800,7 @@ function toJsonImpl(self, createDbJson, omit, pick) {
   let json = {};
 
   _.each(self, (value, key) => {
-    if (key.charAt(0) !== '$'
-      && !_.isFunction(value)
-      && !_.isUndefined(value)
-      && (!omit || !omit[key])
-      && (!pick || pick[key])) {
-
+    if (includeInJson(self, value, key, createDbJson, omit, pick)) {
       if (_.isObject(value)) {
         json[key] = toJsonObject(value, createDbJson);
       } else {
@@ -755,6 +810,27 @@ function toJsonImpl(self, createDbJson, omit, pick) {
   });
 
   return json;
+}
+
+/**
+ * @private
+ */
+function includeInJson(self, value, key, createDbJson, omit, pick) {
+  if (createDbJson) {
+    if (self.$$omitFromDatabaseJson && self.$$omitFromDatabaseJson.indexOf(key) !== -1) {
+      return false;
+    }
+  } else {
+    if (self.$$omitFromJson && self.$$omitFromJson.indexOf(key) !== -1) {
+      return false;
+    }
+  }
+
+  return key.charAt(0) !== '$'
+    && !_.isFunction(value)
+    && !_.isUndefined(value)
+    && (!omit || !omit[key])
+    && (!pick || pick[key]);
 }
 
 /**
@@ -825,6 +901,31 @@ function omitArray(model, keys) {
       ModelClass.omitImpl(model, key);
     }
   });
+}
+
+/**
+ * @private
+ */
+function omitFromJson(model, keys, dbJson) {
+  if (dbJson) {
+    if (!model.$$omitFromDatabaseJson) {
+      Object.defineProperty(model, '$$omitFromDatabaseJson', {
+        enumerable: false,
+        value: keys.slice()
+      });
+    } else {
+      _.each(keys, key => model.$$omitFromDatabaseJson.push(key));
+    }
+  } else {
+    if (!model.$$omitFromJson) {
+      Object.defineProperty(model, '$$omitFromJson', {
+        enumerable: false,
+        value: keys.slice()
+      });
+    } else {
+      _.each(keys, key => model.$$omitFromJson.push(key));
+    }
+  }
 }
 
 /**

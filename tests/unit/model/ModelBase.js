@@ -485,6 +485,13 @@ describe('ModelBase', function () {
       expect(JSON.stringify(model)).to.equal('{"a":1,"b":2}');
     });
 
+    it('properties registered using $omitFromJson method should be removed from the json', function () {
+      var model = Model.fromJson({a: 1, b: 2, c: 3});
+      model.$omitFromJson('b', 'c');
+      expect(model.$toJson()).to.eql({a: 1});
+      expect(model).to.eql({a: 1, b: 2, c: 3});
+    });
+
   });
 
   describe('$toDatabaseJson', function () {
@@ -541,6 +548,13 @@ describe('ModelBase', function () {
       expect(output.b).to.not.equal(json.b);
       expect(output.b[0]).to.not.equal(json.b[0]);
       expect(output.d).to.not.equal(json.d);
+    });
+
+    it('properties registered using $omitFromDatabaseJson method should be removed from the json', function () {
+      var model = Model.fromJson({a: 1, b: 2, c: 3});
+      model.$omitFromDatabaseJson('b', 'c');
+      expect(model.$toDatabaseJson()).to.eql({a: 1});
+      expect(model).to.eql({a: 1, b: 2, c: 3});
     });
 
   });
