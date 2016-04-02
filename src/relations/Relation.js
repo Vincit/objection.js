@@ -441,9 +441,10 @@ export default class Relation {
     let columns = [];
 
     for (let i = 0; i < ref.length; ++i) {
-      let parts = ref[i].split('.');
-      let tableName = parts[0] && parts[0].trim();
-      let columnName = parts[1] && parts[1].trim();
+      const refItem = ref[i];
+      const ndx = refItem.lastIndexOf('.');
+      let tableName = refItem.substr(0, ndx).trim();
+      let columnName = refItem.substr(ndx + 1, refItem.length).trim();
 
       if (!tableName || (table && table !== tableName) || !columnName) {
         return {

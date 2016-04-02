@@ -362,4 +362,26 @@ describe('Relation', function () {
     expect(relation.relatedProp).to.eql(['ownerId']);
   });
 
+  it('should allow relations on tables under a schema', function () {
+    var relation = new Relation('testRelation', OwnerModel);
+    
+    OwnerModel.tableName = 'schema1.owner_model';
+    RelatedModel.tableName = 'schema2.related_model';
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'schema1.owner_model.id',
+        to: 'schema2.related_model.owner_id'
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerCol).to.eql(['id']);
+    expect(relation.ownerProp).to.eql(['id']);
+    expect(relation.relatedCol).to.eql(['owner_id']);
+    expect(relation.relatedProp).to.eql(['owner_id']);
+  })
 });
