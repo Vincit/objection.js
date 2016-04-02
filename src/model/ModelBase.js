@@ -791,25 +791,14 @@ function toJsonImpl(self, createDbJson, omit, pick) {
  * @private
  */
 function includeInJson(self, value, key, createDbJson, omit, pick) {
-  if (createDbJson) {
-    const omit = self.$omitFromDatabaseJson();
-
-    if (omit && omit.indexOf(key) !== -1) {
-      return false;
-    }
-  } else {
-    const omit = self.$omitFromJson();
-
-    if (omit && omit.indexOf(key) !== -1) {
-      return false;
-    }
-  }
+  const omitFromJson = createDbJson ? self.$omitFromDatabaseJson() : self.$omitFromJson();
 
   return key.charAt(0) !== '$'
     && !_.isFunction(value)
     && !_.isUndefined(value)
     && (!omit || !omit[key])
-    && (!pick || pick[key]);
+    && (!pick || pick[key])
+    && (!omitFromJson || omitFromJson.indexOf(key) === -1)
 }
 
 /**
