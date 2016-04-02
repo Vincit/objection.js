@@ -2,15 +2,8 @@ import _ from 'lodash';
 import Relation from './Relation';
 import normalizeIds from '../utils/normalizeIds';
 
-/**
- * @ignore
- * @extends Relation
- */
 export default class HasManyRelation extends Relation {
-  /**
-   * @override
-   * @inheritDoc
-   */
+
   createRelationProp(owners, related) {
     let relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
 
@@ -20,10 +13,6 @@ export default class HasManyRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   insert(builder, owner, insertion) {
     _.each(insertion.models(), insert => {
       _.each(this.relatedProp, (relatedProp, idx) => {
@@ -41,17 +30,10 @@ export default class HasManyRelation extends Relation {
     });
   }
 
-  /**
-   * @protected
-   */
   appendRelationProp(owner, related) {
     owner[this.name] = this.mergeModels(owner[this.name], related);
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   relate(builder, owner, ids) {
     ids = normalizeIds(ids, this.relatedModelClass.getIdPropertyArray(), {arrayOutput: true});
 
@@ -73,10 +55,6 @@ export default class HasManyRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   unrelate(builder, owner) {
     builder.setQueryExecutor(builder => {
       var patch = {};

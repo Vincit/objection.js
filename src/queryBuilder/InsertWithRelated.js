@@ -7,12 +7,6 @@ import BelongsToOneRelation from '../relations/BelongsToOneRelation';
 import ValidationError from '../ValidationError';
 let Model;
 
-/**
- * Given an model with nested relations, finds a fast way to insert the models into
- * database so that not-null constraints are not broken.
- *
- * @ignore
- */
 export default class InsertWithRelated {
 
   constructor({modelClass, models, allowedRelations}) {

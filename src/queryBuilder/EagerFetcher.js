@@ -3,9 +3,6 @@ import Promise from 'bluebird';
 import ValidationError from '../ValidationError';
 import RelationExpression from './RelationExpression';
 
-/**
- * @ignore
- */
 export default class EagerFetcher {
 
   constructor({modelClass, models, eager, filters, parent, rootQuery}) {

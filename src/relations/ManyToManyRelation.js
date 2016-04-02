@@ -10,10 +10,6 @@ import memoize from '../utils/decorators/memoize';
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 const sqliteBuiltInRowId = '_rowid_';
 
-/**
- * @ignore
- * @extends Relation
- */
 @overwriteForDatabase()
 export default class ManyToManyRelation extends Relation {
 
@@ -21,65 +17,46 @@ export default class ManyToManyRelation extends Relation {
     super(...args);
 
     /**
-     * The join table.
-     *
      * @type {string}
      */
     this.joinTable = null;
 
     /**
-     * The relation column in the join table that points to the owner table.
-     *
      * @type {Array.<string>}
      */
     this.joinTableOwnerCol = null;
 
     /**
-     * The relation property in the join model that points to the owner table.
-     *
      * @type {Array.<string>}
      */
     this.joinTableOwnerProp = null;
 
     /**
-     * The relation column in the join table that points to the related table.
-     *
      * @type {Array.<string>}
      */
     this.joinTableRelatedCol = null;
 
     /**
-     * The relation property in the join model that points to the related table.
-     *
      * @type {Array.<string>}
      */
     this.joinTableRelatedProp = null;
 
     /**
-     * The join table model class.
-     *
-     * This can be optionally given using the `join.through.modelClass` property,
-     * otherwise an anonymous model class is created in `setMapping` method.
-     *
-     * @type {Class.<Model>}
+     * @type {Constructor.<Model>}
      */
     this.joinTableModelClass = null;
 
     /**
-     * Extra columns to copy to/from join table on insert/relate.
+     * @type {Array.<string>}
      */
     this.joinTableExtraCols = null;
 
     /**
-     * Extra properties to copy to/from join table on insert/relate.
+     * @type {Array.<string>}
      */
     this.joinTableExtraProps = null;
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   setMapping(mapping) {
     let retVal = super.setMapping(mapping);
 
@@ -159,10 +136,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * Reference to the column in the join table that refers to `fullOwnerCol()`.
-   *
-   * For example: [`Person_Movie.actorId`].
-   *
    * @returns {Array.<string>}
    */
   @memoize
@@ -171,10 +144,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * Reference to the column in the join table that refers to `fullRelatedCol()`.
-   *
-   * For example: [`Person_Movie.movieId`].
-   *
    * @returns {Array.<string>}
    */
   @memoize
@@ -183,8 +152,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * References to the extra columns in the join table.
-   *
    * @returns {Array.<string>}
    */
   @memoize
@@ -193,10 +160,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * Alias to use for the join table when joining with the owner table.
-   *
-   * For example: `Person_Movie_rel_movies`.
-   *
    * @returns {string}
    */
   joinTableAlias() {
@@ -204,8 +167,7 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * @inheritDoc
-   * @override
+   * @returns {ManyToManyRelation}
    */
   clone() {
     let relation = super.clone();
@@ -223,8 +185,7 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * @inheritDoc
-   * @override
+   * @returns {ManyToManyRelation}
    */
   bindKnex(knex) {
     let bound = super.bindKnex(knex);
@@ -233,8 +194,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * @override
-   * @inheritDoc
    * @returns {QueryBuilder}
    */
   findQuery(builder, ownerIds, isColumnRef) {
@@ -263,8 +222,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * @override
-   * @inheritDoc
    * @returns {QueryBuilder}
    */
   join(builder, joinMethod, relatedTableAlias) {
@@ -298,10 +255,6 @@ export default class ManyToManyRelation extends Relation {
       .call(this.filter);
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   find(builder, owners) {
     const ownerJoinColumnAlias = _.times(this.joinTableOwnerCol.length, idx => ownerJoinColumnAliasPrefix + idx);
     const ownerJoinPropertyAlias = _.map(ownerJoinColumnAlias, alias => this.relatedModelClass.columnNameToPropertyName(alias));
@@ -350,10 +303,6 @@ export default class ManyToManyRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   insert(builder, owner, insertion) {
     this.omitExtraProps(insertion.models());
 
@@ -377,30 +326,18 @@ export default class ManyToManyRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   update(builder, owner, update) {
     builder.onBuild(builder => {
       this._selectForModify(builder, owner).$$update(update).call(this.filter);
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   delete(builder, owner) {
     builder.onBuild(builder => {
       this._selectForModify(builder, owner).$$delete().call(this.filter);
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   relate(builder, owner, ids) {
     ids = normalizeIds(ids, this.relatedProp);
 
@@ -416,10 +353,6 @@ export default class ManyToManyRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   @overwriteForDatabase({
     sqlite3: 'unrelate_sqlite3'
   })
@@ -444,9 +377,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * Special unrelate implementation for sqlite3. sqlite3 doesn't support multi-value
-   * where-in clauses. We need to use the built-in _rowid_ instead.
-   *
    * @private
    */
   unrelate_sqlite3(builder, owner) {
@@ -502,9 +432,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * Special _selectForModify implementation for sqlite3. sqlite3 doesn't support multi-value
-   * where-in clauses. We need to use the built-in _rowid_ instead.
-   *
    * @private
    */
   _selectForModify_sqlite3(builder, owner) {
@@ -532,9 +459,6 @@ export default class ManyToManyRelation extends Relation {
     return builder.whereInComposite(relatedTableRowId, selectRelatedQuery);
   }
 
-  /**
-   * @ignore
-   */
   createJoinModels(ownerId, related) {
     return _.map(related, related => {
       let joinModel = {};
@@ -557,9 +481,6 @@ export default class ManyToManyRelation extends Relation {
     });
   }
 
-  /**
-   * @ignore
-   */
   omitExtraProps(models) {
     _.each(models, model => model.$omitFromDatabaseJson(this.joinTableExtraProps));
   }

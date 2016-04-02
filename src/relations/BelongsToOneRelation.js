@@ -2,15 +2,8 @@ import _ from 'lodash';
 import Relation from './Relation';
 import normalizeIds from '../utils/normalizeIds';
 
-/**
- * @ignore
- * @extends Relation
- */
 export default class BelongsToOneRelation extends Relation {
-  /**
-   * @override
-   * @inheritDoc
-   */
+
   createRelationProp(owners, related) {
     let relatedByOwnerId = _.indexBy(related, related => related.$values(this.relatedProp));
 
@@ -20,10 +13,6 @@ export default class BelongsToOneRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   insert(builder, owner, insertion) {
     if (insertion.models().length > 1) {
       this.throwError('can only insert one model to a BelongsToOneRelation');
@@ -52,10 +41,6 @@ export default class BelongsToOneRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   relate(builder, owner, ids) {
     ids = normalizeIds(ids, this.relatedProp, {arrayOutput: true});
 
@@ -81,10 +66,6 @@ export default class BelongsToOneRelation extends Relation {
     });
   }
 
-  /**
-   * @override
-   * @inheritDoc
-   */
   unrelate(builder, owner) {
     builder.setQueryExecutor(builder => {
       let patch = {};

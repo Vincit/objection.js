@@ -4,18 +4,13 @@ import util from 'util';
 // that's why we use ES5 inheritance here.
 
 /**
- * Error of this class is thrown when a Model validation fails.
- *
  * @param {Object} errors
- * @constructor
  */
 export default function ValidationError(errors) {
   Error.call(this);
   Error.captureStackTrace(this, ValidationError);
 
   /**
-   * Any data that describes the errors.
-   *
    * @type {Object}
    */
   this.data = errors;

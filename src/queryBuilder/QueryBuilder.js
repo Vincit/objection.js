@@ -9,24 +9,6 @@ import EagerFetcher from './EagerFetcher';
 import {isPostgres} from '../utils/dbUtils';
 import deprecated from '../utils/decorators/deprecated';
 
-/**
- * Query builder for Models.
- *
- * This class is a wrapper around <a href="http://knexjs.org#Builder">knex QueryBuilder</a>.
- * QueryBuilder has all the methods a knex QueryBuilder has and more. While knex
- * QueryBuilder returns plain javascript objects, QueryBuilder returns Model
- * subclass instances.
- *
- * QueryBuilder is thenable, meaning that it can be used like a promise. You can
- * return query builder from a `.then` method of a promise and it gets chained just like
- * a normal promise would.
- *
- * The query is executed when one of its promise methods `then()`, `catch()`, `map()`,
- * `bind()` or `return()` is called.
- *
- * @constructor
- * @extends QueryBuilderBase
- */
 export default class QueryBuilder extends QueryBuilderBase {
 
   constructor(modelClass) {
@@ -55,66 +37,14 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Create QueryBuilder for a Model subclass.
-   *
    * @param {Model} modelClass
-   *    Model subclass.
+   * @returns {QueryBuilder}
    */
   static forClass(modelClass) {
     return new this(modelClass);
   }
 
   /**
-   * Sets/gets the query context.
-   *
-   * Some query builder methods create more than one query. The query context is an object that is
-   * shared with all queries started by a query builder. You can set the context like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .context({something: 'hello'});
-   * ```
-   *
-   * and access the context like this:
-   *
-   * ```js
-   * var context = builder.context();
-   * ```
-   *
-   * You can set any data to the context object. You can also register QueryBuilder lifecycle methods
-   * for _all_ queries that share the context:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .context({
-   *     runBefore: function (builder) {},
-   *     runAfter: function (builder) {},
-   *     onBuild: function (builder) {}
-   *   });
-   * ```
-   *
-   * For example the `eager` method causes multiple queries to be executed from a single query builder.
-   * If you wanted to make all of them use the same schema you could write this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('[movies, children.movies])
-   *   .context({
-   *     onBuild: function (builder) {
-   *       builder.withSchema('someSchema');
-   *     }
-   *   });
-   * ```
-   *
-   * The context is also passed to `$beforeInsert`, `$afterInsert`, `$beforeUpdate` and `$afterUpdate`
-   * calls that the query creates.
-   *
-   * See the methods {@link QueryBuilder#runBefore}, {@link QueryBuilder#onBuild} and
-   * {@link QueryBuilder#runAfter} for more information about the hooks.
-   *
    * @param {Object=} ctx
    * @returns {QueryBuilder|Object}
    */
@@ -124,11 +54,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Should call this for all other queries a QueryBuilder starts.
-   *
-   * For internal use only.
-   *
-   * @ignore
    * @param {QueryBuilderBase} query
    */
   childQueryOf(query) {
@@ -143,8 +68,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Skips the database query and "fakes" an error result.
-   *
    * @param {Error} error
    * @returns {QueryBuilder}
    */
@@ -154,8 +77,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Skips the database query and "fakes" a result.
-   *
    * @param {*} value
    * @returns {QueryBuilder}
    */
@@ -165,13 +86,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Returns false if this query will never be executed.
-   *
-   * This may be true in multiple cases:
-   *
-   * 1. The query is explicitly resolved or rejected using the `resolve` or `reject` methods.
-   * 2. The query starts a different query when it is executed.
-   *
    * @returns {boolean}
    */
   isExecutable() {
@@ -179,31 +93,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a function to be called before the database query when the builder is executed.
-   *
-   * Multiple functions can be chained like `then` methods of a promise.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .runBefore(function () {
-   *    console.log('hello 1');
-   *
-   *    return Promise.delay(10).then(function () {
-   *      console.log('hello 2');
-   *    });
-   *  })
-   *  .runBefore(function () {
-   *    console.log('hello 3');
-   *  });
-   *
-   * query.then();
-   * // --> hello 1
-   * // --> hello 2
-   * // --> hello 3
-   * ```
-   *
    * @param {function(*, QueryBuilder)} runBefore
    * @returns {QueryBuilder}
    */
@@ -213,26 +102,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Just like `runBefore` but pushes the function before any other runBefore functions.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .runBefore(function (result, queryBuilder) {
-   *    console.log('hello', result);
-   *  })
-   *  .runBeforePushFront(function () {
-   *    console.log('hello 2');
-   *    return 1;
-   *  });
-   *
-   * query.then();
-   * // --> hello 2
-   * // --> hello 1
-   * ```
-   *
-   * @ignore
    * @param {function(*, QueryBuilder)} runBefore
    * @returns {QueryBuilder}
    */
@@ -242,26 +111,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Functions registered with this method are called as the last thing before the query is executed.
-   *
-   * If you need to modify the SQL query at query build time, this is the place to do it. You shouldn't
-   * modify the query in any of the `run*` methods.
-   *
-   * Unlike the run* methods these must be synchronous. Also you should not register any run* methods
-   * from these. You should _only_ call the query building methods of the builder provided as a parameter.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .onBuild(function (builder) {
-   *    builder.where('id', 1);
-   *  })
-   *  .onBuild(function () {
-   *    builder.orWhere('id', 2);
-   *  });
-   * ```
-   *
    * @param {function(QueryBuilder)} onBuild
    * @returns {QueryBuilder}
    */
@@ -271,13 +120,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Sets a custom query executor.
-   *
-   * Setting this will cause the query builder to not be executed. Instead the fully built
-   * query builder is passed to the function registered using this method and the function
-   * should return some other query to execute.
-   *
-   * @ignore
    * @param {function(QueryBuilder)} executor
    * @returns {QueryBuilder}
    */
@@ -291,24 +133,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a function to be called after the database rows are converted to Model instances.
-   *
-   * Multiple functions can be chained like `then` methods of a promise.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .runAfterModelCreate(function (models, queryBuilder) {
-   *    models.push(Person.fromJson({firstName: 'Jennifer'}));
-   *  });
-   *
-   * query.then(function (models) {
-   *   var jennifer = models[models.length - 1];
-   * });
-   * ```
-   *
-   * @ignore
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfterModelCreate
    * @returns {QueryBuilder}
    */
@@ -318,27 +142,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Just like `runAfterModelCreate` but pushes the function before any other runAfterModelCreate functions.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .runAfterModelCreate(function (models) {
-   *    console.log('hello 1');
-   *    return models;
-   *  })
-   *  .runAfterModelCreatePushFront(function (models, queryBuilder) {
-   *    console.log('hello 2');
-   *    return models;
-   *  });
-   *
-   * query.then();
-   * // --> hello 2
-   * // --> hello 1
-   * ```
-   *
-   * @ignore
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfterModelCreate
    * @returns {QueryBuilder}
    */
@@ -348,28 +151,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a function to be called when the builder is executed.
-   *
-   * These functions are executed as the last thing before any promise handlers
-   * registered using the `then` method. Multiple functions can be chained like
-   * `then` methods of a promise.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .runAfter(function (models, queryBuilder) {
-   *    return models;
-   *  })
-   *  .runAfter(function (models, queryBuilder) {
-   *    models.push(Person.fromJson({firstName: 'Jennifer'}));
-   *  });
-   *
-   * query.then(function (models) {
-   *   var jennifer = models[models.length - 1];
-   * });
-   * ```
-   *
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfter
    * @returns {QueryBuilder}
    */
@@ -379,26 +160,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Just like `runAfter` but pushes the function before any other runAfter functions.
-   *
-   * ```js
-   * var query = Person.query();
-   *
-   * query
-   *  .runAfter(function (models) {
-   *    console.log('hello 1');
-   *    return models;
-   *  })
-   *  .runAfterPushFront(function (models, queryBuilder) {
-   *    console.log('hello 2');
-   *    return models;
-   *  });
-   *
-   * query.then();
-   * // --> hello 2
-   * // --> hello 1
-   * ```
-   *
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfter
    * @returns {QueryBuilder}
    */
@@ -408,12 +169,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom find implementation.
-   *
-   * The find implementation is executed if none of the `insert`, `update`, `patch`, `relate`
-   * etc. functions are called.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   findImpl(findImpl) {
@@ -422,11 +177,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom insert implementation.
-   *
-   * The registered method is called when `insert()` is called for a query builder.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   insertImpl(insertImpl) {
@@ -435,11 +185,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom update implementation.
-   *
-   * The registered method is called when `update()` is called for a query builder.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   updateImpl(updateImpl) {
@@ -448,11 +193,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom patch implementation.
-   *
-   * The registered method is called when `patch()` is called for a query builder.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   patchImpl(patchImpl) {
@@ -461,11 +201,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom delete implementation.
-   *
-   * The registered method is called when `delete()` is called for a query builder.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   deleteImpl(deleteImpl) {
@@ -474,9 +209,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom relate implementation.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   relateImpl(relateImpl) {
@@ -485,9 +217,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Registers a custom unrelate implementation.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   unrelateImpl(unrelateImpl) {
@@ -496,87 +225,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Fetch relations eagerly for the result rows.
-   *
-   * Example:
-   *
-   * ```js
-   * // Fetch `children` relation for each result Person and `pets` and `movies`
-   * // relations for all the children.
-   * Person
-   *   .query()
-   *   .eager('children.[pets, movies]')
-   *   .then(function (persons) {
-   *     console.log(persons[0].children[0].pets[0].name);
-   *     console.log(persons[0].children[0].movies[0].id);
-   *   });
-   * ```
-   *
-   * Relations can be filtered by giving named filter functions as arguments
-   * to the relations:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
-   *     orderByAge: function (builder) {
-   *       builder.orderBy('age')
-   *     },
-   *     orderByName: function (builder) {
-   *       builder.orderBy('name');
-   *     },
-   *     onlyDogs: function (builder) {
-   *       builder.where('species', 'dog')
-   *     }
-   *   })
-   *   .then(function (persons) {
-   *     console.log(persons[0].children[0].pets[0].name);
-   *     console.log(persons[0].children[0].movies[0].id);
-   *   });
-   * ```
-   *
-   * Filters can also be registered using the `filterEager` method:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('children.[pets, movies]')
-   *   .filterEager('children', function (builder) {
-   *     // Order children by age.
-   *     builder.orderBy('age');
-   *   })
-   *   .filterEager('children.[pets, movies]', function (builder) {
-   *     // Only select `pets` and `movies` whose id > 10 for the children.
-   *     builder.where('id', '>', 10);
-   *   })
-   *   .filterEager('children.movies]', function (builder) {
-   *     // Only select 100 first movies for the children.
-   *     builder.limit(100);
-   *   })
-   *   .then(function (persons) {
-   *     console.log(persons[0].children[0].pets[0].name);
-   *     console.log(persons[0].children[0].movies[0].id);
-   *   });
-   * ```
-   *
-   * The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('id', 1)
-   *   .eager('children.children')
-   *   .then(function (persons) {
-   *     console.log(persons[0].children.length); // --> 10
-   *     console.log(persons[0].children[9].children.length); // --> 10
-   *   });
-   * ```
-   *
-   * The person has 10 children and they all have 10 children. The query above will
-   * return 100 database rows but will generate only three database queries.
-   *
-   * See {@link RelationExpression} for more examples and documentation.
-   *
    * @param {string|RelationExpression} exp
    * @param {Object.<string, function(QueryBuilder)>=} filters
    * @returns {QueryBuilder}
@@ -594,26 +242,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Sets the allowed eager expression.
-   *
-   * Any subset of the allowed expression is accepted by `eager` method. For example setting
-   * the allowed expression to `a.b.c` expressions `a`, `a.b` and `a.b.c` are accepted by `eager`
-   * method. Setting any other expression will reject the query and cause the promise error handlers
-   * to be called.
-   *
-   * This method is useful when the eager expression comes from an untrusted source like query
-   * parameters of a http request.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .allowEager('[children.pets, movies]')
-   *   .eager(req.query.eager)
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
    * @param {string|RelationExpression} exp
    * @returns {QueryBuilder}
    */
@@ -629,53 +257,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Adds filters to the eager query.
-   *
-   * The `path` is a relation expression that specifies the queries for which the filter
-   * is given. For example the following query would filter out the children's pets that
-   * are <= 10 years old:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('[children.[pets, movies], movies]')
-   *   .filterEager('children.pets', builder => {
-   *     builder.where('age', '>', 10);
-   *   })
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
-   * The path expression can have multiple targets. The next example sorts both the
-   * pets and movies of the children by id:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('[children.[pets, movies], movies]')
-   *   .filterEager('children.[pets, movies]', builder => {
-   *     builder.orderBy('id');
-   *   })
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
-   * This example only selects movies whose name contains the word 'Predator':
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('[children.[pets, movies], movies]')
-   *   .filterEager('[children.movies, movies]', builder => {
-   *     builder.where('name', 'like', '%Predator%');
-   *   })
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
    * @param {string|RelationExpression} path
    * @param {function(QueryBuilder)} filter
    * @returns {QueryBuilder}
@@ -690,36 +271,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Sets the allowed tree of relations to insert using `insertWithRelated` method.
-   *
-   * If the model tree given to the `insertWithRelated` method isn't a subtree of the
-   * given expression, the query is rejected.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .allowInsert('[children.pets, movies]')
-   *   .insertWithRelated({
-   *     firstName: 'Sylvester',
-   *     children: [{
-   *       firstName: 'Sage',
-   *       pets: [{
-   *         name: 'Fluffy'
-   *         species: 'dog'
-   *       }, {
-   *         name: 'Scrappy',
-   *         species: 'dog'
-   *       }]
-   *     }]
-   *   })
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
-   * See methods `QueryBuilder.eager`, `QueryBuilder.allowEager` and class {@link RelationExpression} for
-   * more information on relation expressions.
-   *
    * @param {string|RelationExpression} exp
    * @returns {QueryBuilder}
    */
@@ -734,8 +285,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Gets the Model subclass this builder is bound to.
-   *
    * @returns {Model}
    */
   modelClass() {
@@ -743,9 +292,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Returns true if none of the methods `insert`, `.update`, `patch`, `delete`, `relate` or `unrelate` has been called.
-   *
-   * @ignore
    * @returns {boolean}
    */
   isFindQuery() {
@@ -753,8 +299,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Returns the SQL string.
-   *
    * @returns {string}
    */
   toString() {
@@ -762,8 +306,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Returns the SQL string.
-   *
    * @returns {string}
    */
   toSql() {
@@ -771,21 +313,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Logs the SQL string.
-   *
-   * Handy for debugging:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('firstName', 'Jennifer')
-   *   .where('age', 100)
-   *   .dumpSql()
-   *   .then(function () {
-   *     ...
-   *   });
-   * ```
-   *
    * @param {function(string)=} logger
    * @returns {QueryBuilder}
    */
@@ -796,8 +323,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Create a clone of this builder.
-   *
    * @returns {QueryBuilder}
    */
   clone() {
@@ -834,7 +359,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   clearCustomImpl() {
@@ -868,7 +392,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   clearHooks() {
@@ -884,7 +407,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   clearEager() {
@@ -894,7 +416,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   clearReject() {
@@ -903,7 +424,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   clearResolve() {
@@ -912,12 +432,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Removes query builder method calls.
-   *
    * @param {RegExp=} regex
-   *    Optional patter to that must match the method names to remove.
-   *
-   * @ignore
    * @returns {QueryBuilder}
    */
   clear(regex) {
@@ -936,7 +451,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @param {RegExp} methodNameRegex
    * @returns {boolean}
    */
@@ -945,75 +459,61 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Executes the query and returns a Promise.
-   *
    * @param {function=} successHandler
    * @param {function=} errorHandler
    * @returns {Promise}
    */
-  then(/*successHandler, errorHandler*/) {
+  then() {
     var promise = this._execute();
     return promise.then.apply(promise, arguments);
   }
 
   /**
-   * Executes the query and calls `.map(mapper)` for the returned promise.
-   *
    * @param {function} mapper
    * @returns {Promise}
    */
-  map(/*mapper*/) {
+  map() {
     var promise = this._execute();
     return promise.map.apply(promise, arguments);
   }
 
   /**
-   * Executes the query and calls `.catch(errorHandler)` for the returned promise.
-   *
    * @param {function} errorHandler
    * @returns {Promise}
    */
-  catch(/*errorHandler*/) {
+  catch() {
     var promise = this._execute();
     return promise.catch.apply(promise, arguments);
   }
 
   /**
-   * Executes the query and calls `.return(returnValue)` for the returned promise.
-   *
    * @param {*} returnValue
    * @returns {Promise}
    */
-  return(/*returnValue*/) {
+  return() {
     var promise = this._execute();
     return promise.return.apply(promise, arguments);
   }
 
   /**
-   * Executes the query and calls `.bind(context)` for the returned promise.
-   *
    * @param {*} context
    * @returns {Promise}
    */
-  bind(/*context*/) {
+  bind() {
     var promise = this._execute();
     return promise.bind.apply(promise, arguments);
   }
 
   /**
-   * Executes the query and calls `.asCallback(callback)` for the returned promise.
-   *
    * @param {function} callback
    * @returns {Promise}
    */
-  asCallback(/*callback*/) {
+  asCallback() {
     var promise = this._execute();
     return promise.asCallback.apply(promise, arguments);
   }
 
   /**
-   * Executes the query and calls `.nodeify(callback)` for the returned promise.
-   *
    * @param {function} callback
    * @returns {Promise}
    */
@@ -1023,24 +523,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Returns the amount of rows the current query would produce without `limit` and `offset` applied.
-   *
-   * Note that this executes a query (not the one we are building) and returns a Promise. Use it
-   * like this:
-   *
-   * ```js
-   * var query = Person
-   *   .query()
-   *   .where('age', '>', 20);
-   *
-   * Promise.all([
-   *   query.resultSize(),
-   *   query.offset(100).limit(50)
-   * ]).spread(function (total, models) {
-   *   ...
-   * });
-   * ```
-   *
    * @returns {Promise}
    */
   resultSize() {
@@ -1056,25 +538,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Only returns the given page of results.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('age', '>', 20)
-   *   .page(5, 100)
-   *   .then(function (result) {
-   *     console.log(result.results.length); // --> 100
-   *     console.log(result.total); // --> 3341
-   *   });
-   * ```
-   *
    * @param {number} page
-   *    The index of the page to return.
-   *
    * @param {number} pageSize
-   *    The page size.
-   *
    * @returns {QueryBuilder}
    */
   page(page, pageSize) {
@@ -1082,25 +547,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Only returns the given range of results.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('age', '>', 20)
-   *   .range(0, 100)
-   *   .then(function (result) {
-   *     console.log(result.results.length); // --> 101
-   *     console.log(result.total); // --> 3341
-   *   });
-   * ```
-   *
    * @param {number} start
-   *    The index of the first result (inclusive).
-   *
    * @param {number} end
-   *    The index of the last result (inclusive).
-   *
    * @returns {QueryBuilder}
    */
   range(start, end) {
@@ -1129,11 +577,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   };
 
   /**
-   * Builds the query into a knex query builder.
-   *
-   * @ignore
    * @returns {knex.QueryBuilder}
-   *    The built knex query builder.
    */
   build() {
     let builder = this.clone();
@@ -1157,7 +601,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @private
    * @returns {Promise}
    */
   _execute() {
@@ -1212,21 +655,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * If the result is an array, plucks a property from each object.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('age', '>', 20)
-   *   .pluck('firstName')
-   *   .then(function (firstNames) {
-   *     console.log(typeof firstNames[0]); // --> string
-   *   });
-   * ```
-   *
    * @param {string} propertyName
-   *    The name of the property to pluck.
-   *
    * @returns {QueryBuilder}
    */
   pluck(propertyName) {
@@ -1240,17 +669,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * If the result is an array, selects the first item.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .first()
-   *   .then(function (firstPerson) {
-   *     console.log(person.age);
-   *   });
-   * ```
-   *
    * @returns {QueryBuilder}
    */
   first() {
@@ -1264,47 +682,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Traverses through all models in the result, including the eagerly loaded relations.
-   *
-   * The optional first parameter can be a constructor. If given, the traverser
-   * function is only called for the models of that class.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('pets')
-   *   .traverse(function (model, parentModel, relationName) {
-   *     delete model.id;
-   *   })
-   *   .then(function (persons) {
-   *     console.log(persons[0].id); // --> undefined
-   *     console.log(persons[0].pets[0].id); // --> undefined
-   *   });
-   * ```
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('pets')
-   *   .traverse(Animal, function (animal, parentModel, relationName) {
-   *     delete animal.id;
-   *   })
-   *   .then(function (persons) {
-   *     console.log(persons[0].id); // --> 1
-   *     console.log(persons[0].pets[0].id); // --> undefined
-   *   });
-   * ```
-   *
-   * @param {Model|function} modelClass
-   *    The optional model class filter. If given, the traverser function is only
-   *    called for models of this class.
-   *
+   * @param {Constructor.<Model>=} modelClass
    * @param {function(Model, Model, string)} traverser
-   *    The traverser function that is called for each model. The first argument
-   *    is the model itself. If the model is in a relation of some other model
-   *    the second argument is the parent model and the third argument is the
-   *    name of the relation.
-   *
    * @returns {QueryBuilder}
    */
   traverse(modelClass, traverser) {
@@ -1322,33 +701,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Pick properties from result models.
-   *
-   * There are two ways to call this methods:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('pets').
-   *   .pick(['id', 'name']);
-   * ```
-   *
-   * and
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('pets')
-   *   .pick(Person, ['id', 'firstName'])
-   *   .pick(Animal, ['id', 'name']);
-   * ```
-   *
-   * The first one goes through all models (including relations) and discards all
-   * properties by `id` and `name`. The second one also traverses the whole model
-   * tree and discards all but `id` and `firstName` properties of all `Person`
-   * instances and `id` and `name` properties of all `Animal` instances.
-   *
-   * @param {Model=} modelClass
+   * @param {Constructor.<Model>=} modelClass
    * @param {Array.<string>} properties
    * @returns {QueryBuilder}
    */
@@ -1369,33 +722,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Omit properties of result models.
-   *
-   * There are two ways to call this methods:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('pets').
-   *   .omit(['parentId', 'ownerId']);
-   * ```
-   *
-   * and
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .eager('pets')
-   *   .omit(Person, ['parentId', 'age'])
-   *   .omit(Animal, ['ownerId', 'species']);
-   * ```
-   *
-   * The first one goes through all models (including relations) and omits the properties
-   * `parentId` and `ownerId`. The second one also traverses the whole model tree and
-   * omits the properties `parentId` and `age` from all `Person` instances and `ownerId`
-   * and `species` properties of all `Animal` instances.
-   *
-   * @param {Model=} modelClass
+   * @param {Constructor.<Model>=} modelClass
    * @param {Array.<string>} properties
    * @returns {QueryBuilder}
    */
@@ -1417,17 +744,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .joinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1436,17 +752,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .innerJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1455,17 +760,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .outerJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1474,17 +768,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .leftJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1493,17 +776,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .leftOuterJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1512,17 +784,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .rightJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1531,17 +792,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .rightOuterJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1550,17 +800,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Joins a relation.
-   *
-   * The joined table is aliased with the relation's name.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .fullOuterJoinRelation('pets')
-   *   .where('pets.species', 'dog');
-   * ```
-   *
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
@@ -1578,19 +817,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Shortcut for finding a model by id.
-   *
-   * ```js
-   * Person.query().findById(1);
-   * ```
-   *
-   * Composite key:
-   *
-   * ```js
-   * Person.query().findById([1, '10']);
-   * ```
-   *
-   * @param {*|Array.<*>} id
+   * @param {string|number|Array.<string|number>} id
    * @returns {QueryBuilder}
    */
   findById(id) {
@@ -1598,8 +825,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @override
-   * @inheritDoc
+   * @returns {QueryBuilder}
    */
   withSchema(schema) {
     this.internalContext().onBuild.push((builder) => {
@@ -1613,62 +839,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Creates an insert query.
-   *
-   * The inserted objects are validated against the model's `jsonSchema`. If validation fails
-   * the Promise is rejected with a `ValidationError`.
-   *
-   * NOTE: The return value of the insert query _only_ contains the properties given to the insert
-   * method plus the identifier. This is because we don't make an additional fetch query after
-   * the insert. Using postgres you can chain `.returning('*')` to the query to get all properties.
-   * On other databases you can use the `insertAndFetch` method.
-   *
-   * Examples:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-   *   .then(function (jennifer) {
-   *     console.log(jennifer.id);
-   *   });
-   * ```
-   *
-   * Batch insert (Only works on Postgres):
-   *
-   * ```js
-   * someMovie
-   *   .$relatedQuery('actors')
-   *   .insert([
-   *     {firstName: 'Jennifer', lastName: 'Lawrence'},
-   *     {firstName: 'Bradley', lastName: 'Cooper'}
-   *   ])
-   *   .then(function (actors) {
-   *     console.log(actors[0].firstName);
-   *     console.log(actors[1].firstName);
-   *   });
-   * ```
-   *
-   * You can also give raw expressions and subqueries as values like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .insert({
-   *     age: Person.query().avg('age'),
-   *     firstName: Person.raw("'Jenni' || 'fer'")
-   *   });
-   * ```
-   *
-   * The batch insert only works on Postgres because Postgres is the only database engine
-   * that returns the identifiers of _all_ inserted rows. knex supports batch inserts on
-   * other databases also, but you only get the id of the first (or last) inserted object
-   * as a result. If you need batch insert on other databases you can use knex directly
-   * through `YourModel.knexQuery()`.
-   *
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
-   *    Objects to insert.
-   *
    * @returns {QueryBuilder}
    */
   @writeQueryMethod
@@ -1739,14 +910,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Just like `insert` but also fetches the model afterwards.
-   *
-   * Note that on postgresql you can just chain `.returning('*')` to the normal insert method
-   * to get the same result without an additional query.
-   *
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
-   *    Objects to insert.
-   *
    * @returns {QueryBuilder}
    */
   insertAndFetch(modelsOrObjects) {
@@ -1774,90 +938,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Insert models with relations.
-   *
-   * You can insert any asyclic graph of models like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .insertWithRelated({
-   *     firstName: 'Sylvester',
-   *     lastName: 'Stallone',
-   *
-   *     children: [{
-   *       firstName: 'Sage',
-   *       lastName: 'Stallone',
-   *
-   *       pets: [{
-   *         name: 'Fluffy',
-   *         species: 'dog'
-   *       }]
-   *     }]
-   *   });
-   * ```
-   *
-   * The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create
-   * relationships between them as defined in the `relationMappings` of the models.
-   *
-   * If you need to refer to the same model in multiple places you can use the
-   * special properties `#id` and `#ref` like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .insertWithRelated([{
-   *     firstName: 'Jennifer',
-   *     lastName: 'Lawrence',
-   *
-   *     movies: [{
-   *       "#id": 'Silver Linings Playbook'
-   *       name: 'Silver Linings Playbook',
-   *       duration: 122
-   *     }]
-   *   }, {
-   *     firstName: 'Bradley',
-   *     lastName: 'Cooper',
-   *
-   *     movies: [{
-   *       "#ref": 'Silver Linings Playbook'
-   *     }]
-   *   }]);
-   * ```
-   *
-   * The query above will insert only one movie (the 'Silver Linings Playbook') but
-   * both 'Jennifer' and 'Bradley' will have the movie related to them through the
-   * many-to-many relation `movies`.
-   *
-   * You can refer to the properties of other models in the graph using expressions
-   * of format `#ref{<id>.<property>}` for example:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .insertWithRelated([{
-   *     "#id": 'jenniLaw',
-   *     firstName: 'Jennifer',
-   *     lastName: 'Lawrence',
-   *
-   *     pets: [{
-   *       name: "I am the dog of #ref{jenniLaw.firstName} #ref{jenniLaw.lastName}",
-   *       species: 'dog'
-   *     }]
-   *   }]);
-   * ```
-   *
-   * The query above will insert a pet named `I am the dog of Jennifer Lawrence` for Jennifer.
-   *
-   * See the `allowInsert` method if you need to limit which relations can be inserted using
-   * this method to avoid security issues.
-   *
-   * By the way, if you are using Postgres the inserts are done in batches for
-   * maximum performance.
-   *
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
-   *    Objects to insert.
-   *
    * @returns {QueryBuilder}
    */
   @writeQueryMethod
@@ -1920,7 +1001,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   $$insert(insertion) {
@@ -1944,44 +1024,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Creates an update query.
-   *
-   * The update object is validated against the model's `jsonSchema`. If validation fails
-   * the Promise is rejected with a `ValidationError`.
-   *
-   * This method is meant for updating _whole_ objects with all required properties. If you
-   * want to update a subset of properties use the `patch()` method.
-   *
-   * NOTE: The return value of the query will be the number of affected rows. If you want
-   * the updated row as a result, you may want to use the `updateAndFetchById` method.
-   *
-   * Examples:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-   *   .where('id', 134)
-   *   .then(function (numberOfAffectedRows) {
-   *     console.log(numberOfAffectedRows);
-   *   });
-   * ```
-   *
-   * You can also give raw expressions and subqueries as values like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .update({
-   *     firstName: Person.raw("'Jenni' || 'fer'"),
-   *     lastName: 'Lawrence',
-   *     age: Person.query().avg('age')
-   *   });
-   * ```
-   *
    * @param {Model|Object=} modelOrObject
-   *    The update object.
-   *
    * @returns {QueryBuilder}
    */
   update(modelOrObject) {
@@ -1989,43 +1032,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Updates a single model by id and fetches it from the database afterwards.
-   *
-   * The update object is validated against the model's `jsonSchema`. If validation fails
-   * the Promise is rejected with a `ValidationError`.
-   *
-   * This method is meant for updating _whole_ objects with all required properties. If you
-   * want to update a subset of properties use the `patchAndFetchById()` method.
-   *
-   * Examples:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .updateAndFetchById(134, {firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-   *   .then(function (updatedModel) {
-   *     console.log(updatedModel.firstName);
-   *   });
-   * ```
-   *
-   * You can also give raw expressions and subqueries as values like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .updateAndFetchById(134, {
-   *     firstName: Person.raw("'Jenni' || 'fer'"),
-   *     lastName: 'Lawrence',
-   *     age: Person.query().avg('age')
-   *   });
-   * ```
-   *
    * @param {number|string|Array.<number|string>} id
-   *    The identifier of the object to update.
-   *
    * @param {Model|Object=} modelOrObject
-   *    The update object.
-   *
    * @returns {QueryBuilder}
    */
   updateAndFetchById(id, modelOrObject) {
@@ -2078,7 +1086,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   $$update(update) {
@@ -2104,43 +1111,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Creates an patch query.
-   *
-   * The patch object is validated against the model's `jsonSchema` _but_ the `required` property
-   * of the `jsonSchema` is ignored. This way the properties in the patch object are still validated
-   * but an error isn't thrown if the patch object doesn't contain all required properties.
-   *
-   * If validation fails the Promise is rejected with a `ValidationError`.
-   *
-   * NOTE: The return value of the query will be the number of affected rows. If you want
-   * the updated row as a result, you may want to use the `patchAndFetchById` method.
-   *
-   * Examples:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .patch({age: 24})
-   *   .where('id', 134)
-   *   .then(function (numberOfAffectedRows) {
-   *     console.log(numberOfAffectedRows);
-   *   });
-   * ```
-   *
-   * You can also give raw expressions and subqueries as values like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .patch({
-   *     age: Person.query().avg('age'),
-   *     firstName: Person.raw("'Jenni' || 'fer'")
-   *   });
-   * ```
-   *
    * @param {Model|Object=} modelOrObject
-   *    The patch object.
-   *
    * @returns {QueryBuilder}
    */
   patch(modelOrObject) {
@@ -2148,42 +1119,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Patches a single model by id and fetches it from the database afterwards.
-   *
-   * The patch object is validated against the model's `jsonSchema` _but_ the `required` property
-   * of the `jsonSchema` is ignored. This way the properties in the patch object are still validated
-   * but an error isn't thrown if the patch object doesn't contain all required properties.
-   *
-   * If validation fails the Promise is rejected with a `ValidationError`.
-   *
-   * Examples:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .patchAndFetchById(134, {age: 24})
-   *   .then(function (updatedModel) {
-   *     console.log(updatedModel.firstName);
-   *   });
-   * ```
-   *
-   * You can also give raw expressions and subqueries as values like this:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .patchAndFetchById(134, {
-   *     age: Person.query().avg('age'),
-   *     firstName: Person.raw("'Jenni' || 'fer'")
-   *   });
-   * ```
-   *
    * @param {number|string|Array.<number|string>} id
-   *    The identifier of the object to update.
-   *
    * @param {Model|Object=} modelOrObject
-   *    The update object.
-   *
    * @returns {QueryBuilder}
    */
   patchAndFetchById(id, modelOrObject) {
@@ -2193,20 +1130,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Creates a delete query.
-   *
-   * Examples:
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .delete()
-   *   .where('age', '>', 100)
-   *   .then(function (numberOfDeletedRows) {
-   *     console.log('removed', numberOfDeletedRows, 'people');
-   *   });
-   * ```
-   *
    * @returns {QueryBuilder}
    */
   @writeQueryMethod
@@ -2216,8 +1139,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Alias for delete.
-   *
    * @returns {QueryBuilder}
    */
   del() {
@@ -2225,19 +1146,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Delete a model by id.
-   *
-   * ```js
-   * Person.query().deleteById(1);
-   * ```
-   *
-   * Composite key:
-   *
-   * ```js
-   * Person.query().deleteById([1, '2', 10]);
-   * ```
-   *
-   * @param {*|Array.<*>} id
+   * @param {number|string|Array.<number|string>} id
    * @returns {QueryBuilder}
    */
   deleteById(id) {
@@ -2245,7 +1154,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @ignore
    * @returns {QueryBuilder}
    */
   $$delete() {
@@ -2253,48 +1161,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Relates an existing model to another model.
-   *
-   * This method doesn't create a new instance but only updates the foreign keys and in
-   * the case of ManyToMany relation, creates a join row to the join table.
-   *
-   * On Postgres multiple models can be related by giving an array of identifiers.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('id', 123)
-   *   .first()
-   *   .then(function (person) {
-   *     return person.$relatedQuery('movies').relate(50);
-   *   })
-   *   .then(function () {
-   *     console.log('movie 50 is now related to person 123 through `movies` relation');
-   *   });
-   * ```
-   *
-   * Relate multiple (only works with postgres):
-   *
-   * ```js
-   * person
-   *   .$relatedQuery('movies')
-   *   .relate([50, 60, 70])
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
-   * Composite key:
-   *
-   * ```js
-   * person
-   *   .$relatedQuery('movies')
-   *   .relate({foo: 50, bar: 20, baz: 10})
-   *   .then(function () {
-   *
-   *   });
-   * ```
-   *
    * @param {number|string|object|Array.<number|string>|Array.<Array.<number|string>>|Array.<object>} ids
    * @returns {QueryBuilder}
    */
@@ -2305,25 +1171,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * Removes a connection between two models.
-   *
-   * Doesn't delete the models. Only removes the connection. For ManyToMany relations this
-   * deletes the join column from the join table. For other relation types this sets the
-   * join columns to null.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .where('id', 123)
-   *   .first()
-   *   .then(function (person) {
-   *     return person.$relatedQuery('movies').unrelate().where('id', 50);
-   *   })
-   *   .then(function () {
-   *     console.log('movie 50 is no longer related to person 123 through `movies` relation');
-   *   });
-   * ```
-   *
    * @returns {QueryBuilder}
    */
   @writeQueryMethod
@@ -2334,7 +1181,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilder}
    */
   increment(propertyName, howMuch) {
@@ -2345,7 +1191,6 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilder}
    */
   decrement(propertyName, howMuch) {
@@ -2364,16 +1209,10 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 }
 
-/**
- * @private
- */
 function writeQueryMethod(target, property, descriptor) {
   descriptor.value = tryCallWriteMethod(descriptor.value);
 }
 
-/**
- * @private
- */
 function tryCallWriteMethod(func) {
   return function () {
     if (this._calledWriteMethod) {
@@ -2394,9 +1233,6 @@ function tryCallWriteMethod(func) {
   };
 }
 
-/**
- * @private
- */
 function checkEager(builder) {
   if (builder._eagerExpression && builder._allowedEagerExpression) {
     if (!builder._allowedEagerExpression.isSubExpression(builder._eagerExpression)) {
@@ -2405,9 +1241,6 @@ function checkEager(builder) {
   }
 }
 
-/**
- * @private
- */
 function createModels(builder, result) {
   if (_.isNull(result) || _.isUndefined(result)) {
     return null;
@@ -2426,9 +1259,6 @@ function createModels(builder, result) {
   return result;
 }
 
-/**
- * @private
- */
 function eagerFetch(builder, $models) {
   if ($models instanceof builder._modelClass || (_.isArray($models) && $models[0] instanceof builder._modelClass)) {
     let expression = builder._eagerExpression.clone();
@@ -2458,9 +1288,6 @@ function eagerFetch(builder, $models) {
   }
 }
 
-/**
- * @private
- */
 function build(builder) {
   let context = builder.context() || {};
   let internalContext = builder.internalContext();
@@ -2478,17 +1305,11 @@ function build(builder) {
   return QueryBuilderBase.prototype.build.call(builder);
 }
 
-/**
- * @private
- */
 function batchInsert(models, queryBuilder, batchSize) {
   let batches = _.chunk(models, batchSize);
   return _.map(batches, batch => queryBuilder.clone().insert(batch));
 }
 
-/**
- * @private
- */
 function callBuilderFuncs(builder, func) {
   if (_.isFunction(func)) {
     func.call(builder, builder);
@@ -2499,9 +1320,6 @@ function callBuilderFuncs(builder, func) {
   }
 }
 
-/**
- * @private
- */
 function chainBuilderFuncs(promise, builder, func) {
   if (_.isFunction(func)) {
     promise = promise.then(result => func.call(builder, result, builder));

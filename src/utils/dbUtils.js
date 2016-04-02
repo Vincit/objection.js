@@ -2,46 +2,28 @@ import _ from 'lodash';
 
 const OVERWRITE_FOR_DATABASE_KEY = `@overwriteForDatabase`;
 
-/**
- * @ignore
- */
 export function getDialect(knex) {
   return knex.client.dialect;
 }
 
-/**
- * @ignore
- */
 export function isPostgres(knex) {
   return getDialect(knex) === 'postgresql';
 }
 
-/**
- * @ignore
- */
 export function isMySql(knex) {
   return getDialect(knex) === 'mysql';
 }
 
-/**
- * @ignore
- */
 export function isSqlite(knex) {
   return getDialect(knex) === 'sqlite3';
 }
 
-/**
- * @ignore
- */
 export function isKnexQueryBuilder(knexQueryBuilder) {
   return knexQueryBuilder
     && knexQueryBuilder.client
     && _.isString(knexQueryBuilder.client.dialect);
 }
 
-/**
- * @ignore
- */
 export function overwriteForDatabase(input) {
   // If there is no input or if the input is a function, we assume that the
   // decorator was applied to a class instead of a method.
@@ -63,9 +45,6 @@ export function overwriteForDatabase(input) {
   }
 }
 
-/**
- * @ignore
- */
 function overwriteForDatabaseClass(getKnex) {
   return function (constructor) {
     if (constructor[OVERWRITE_FOR_DATABASE_KEY]) {
@@ -81,9 +60,6 @@ function overwriteForDatabaseClass(getKnex) {
   };
 }
 
-/**
- * @ignore
- */
 function overwriteForDatabaseMethod(input) {
   return function (target, property, descriptor) {
     const methodNameByDialect = input;

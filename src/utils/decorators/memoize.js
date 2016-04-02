@@ -1,9 +1,6 @@
 import _ from 'lodash';
 import {createHiddenDataGetter, createHiddenDataSetter} from '../hiddenData';
 
-/**
- * @ignore
- */
 export default function memoize(target, property, descriptor) {
   const cacheProp = 'memoized' + _.capitalize(property);
   const impl = descriptor.value;

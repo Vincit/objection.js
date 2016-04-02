@@ -5,161 +5,75 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 /**
  * @typedef {Object} RelationJoin
- *
- * An object literal that describes how two tables are related to one another. For example:
- *
- * ```js
- * {
- *   from: 'Animal.ownerId',
- *   to: 'Person.id'
- * }
- * ```
- *
- * or in the case of a many-to-many relation:
- *
- * ```js
- * {
- *   from: 'Person.id',
- *   through: {
- *     from: 'Person_Movie.actorId',
- *     to: 'Person_Movie.movieId'
- *   },
- *   to: 'Movie.id'
- * }
- * ```
- *
+
  * @property {string|Array.<string>} from
- *    The relation column in the owner table. Must be given with the table name.
- *    For example `Person.id`. Composite key can be specified using an array of
- *    columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to`
- *    need to be foreign keys or primary keys. You can join any column to
- *    any column.
- *
  * @property {string|Array.<string>} to
- *    The relation column in the related table. Must be given with the table name.
- *    For example `Movie.id`. Composite key can be specified using an array of
- *    columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from`
- *    need to be foreign keys or primary keys. You can join any column to any column.
- *
  * @property {Object} through
- *    Describes the join table if the models are related through one.
- *
- * @property {Class.<Model>} through.modelClass
- *    If the there is model class available for the join table, it can be provided
- *    using this property.
- *
+ * @property {Constructor.<Model>} through.modelClass
  * @property {string|Array.<string>} through.from
- *    The column that is joined to `from` property of the `RelationJoin`. For example
- *    `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can
- *    be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
- *
  * @property {string|Array.<string>} through.to
- *    The column that is joined to `to` property of the `RelationJoin`. For example
- *    `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can
- *    be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
+ * @property {Array.<string>} through.extra
  */
 
 /**
  * @typedef {Object} RelationMapping
  *
  * @property {Class.<Model>|string} modelClass
- *    A {@link Model} subclass constructor or an absolute path to a module that exports one.
- *
  * @property {Relation} relation
- *    A relation constructor. You can use one of Model.BelongsToOneRelation, Model.HasOneRelation, Model.HasManyRelation and
- *    Model.ManyToManyRelation or even write your own relation type by subclassing {@link Relation}.
- *
  * @property {Object|function(QueryBuilder)} filter
- *    Additional filter for the relation. It can be either a hash of {column: 'value'} pairs or
- *    a function that takes a QueryBuilder as a parameter.
- *
  * @property {RelationJoin} [join]
- *    An object that describes how the two models are related.
  */
 
 /**
- * Represents a relation between two `Model` subclasses.
- *
- * This is an abstract base class and should never be instantiated.
- *
- * @param {string} relationName
- *    Name of the relation.
- *
- * @param {Model} OwnerClass
- *    The Model subclass that owns this relation.
- *
- * @ignore
  * @abstract
  */
 export default class Relation {
 
   constructor(relationName, OwnerClass) {
     /**
-     * Name of the relation.
-     *
      * @type {string}
      */
     this.name = relationName;
 
     /**
-     * The owner class of this relation.
-     *
-     * This must be a subclass of Model.
-     *
-     * @type {Class.<Model>}
+     * @type {Constructor.<Model>}
      */
     this.ownerModelClass = OwnerClass;
 
     /**
-     * The related class.
-     *
-     * This must be a subclass of Model.
-     *
-     * @type {Class.<Model>}
+     * @type {Constructor.<Model>}
      */
     this.relatedModelClass = null;
 
     /**
-     * The relation column in the owner table.
-     *
      * @type {Array.<string>}
      */
     this.ownerCol = null;
 
     /**
-     * The relation property in the owner model.
-     *
      * @type {Array.<string>}
      */
     this.ownerProp = null;
 
     /**
-     * The relation column in the related table.
-     *
      * @type {Array.<string>}
      */
     this.relatedCol = null;
 
     /**
-     * The relation property in the related model.
-     *
      * @type {Array.<string>}
      */
     this.relatedProp = null;
 
     /**
-     * Optional additional filter query.
-     *
      * @type {function (QueryBuilder)}
      */
     this.filter = null;
   }
 
   /**
-   * Makes the given constructor a subclass of this class.
-   *
    * @param {function=} subclassConstructor
-   * @return {Class.<Model>}
+   * @return {Constructor.<Model>}
    */
   static extend(subclassConstructor) {
     inherits(subclassConstructor, this);
@@ -167,8 +81,6 @@ export default class Relation {
   }
 
   /**
-   * Constructs the instance based on a mapping data.
-   *
    * @param {RelationMapping} mapping
    */
   setMapping(mapping) {
@@ -252,17 +164,13 @@ export default class Relation {
   }
 
   /**
-   * Return the knex connection.
+   * @returns {knex}
    */
   knex() {
     return this.ownerModelClass.knex();
   }
 
   /**
-   * Reference to the relation column in the owner model's table.
-   *
-   * For example: [`Person.id`].
-   *
    * @returns {Array.<string>}
    */
   @memoize
@@ -271,10 +179,6 @@ export default class Relation {
   }
 
   /**
-   * Reference to the relation column in the related model's table.
-   *
-   * For example: [`Movie.id`].
-   *
    * @returns {Array.<string>}
    */
   @memoize
@@ -283,10 +187,6 @@ export default class Relation {
   }
 
   /**
-   * Alias to use for the related table when joining with the owner table.
-   *
-   * For example: `Movie_rel_movies`.
-   *
    * @returns {string}
    */
   @memoize
@@ -295,8 +195,6 @@ export default class Relation {
   }
 
   /**
-   * Clones this relation.
-   *
    * @returns {Relation}
    */
   clone() {
@@ -313,11 +211,7 @@ export default class Relation {
   }
 
   /**
-   * Returns a clone of this relation with `relatedModelClass` and `ownerModelClass` bound to the given knex.
-   *
-   * See `Model.bindKnex`.
-   *
-   * @param knex
+   * @param {knex} knex
    * @returns {Relation}
    */
   bindKnex(knex) {

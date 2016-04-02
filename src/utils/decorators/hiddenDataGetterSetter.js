@@ -1,8 +1,5 @@
 import {createHiddenDataGetter, createHiddenDataSetter} from '../hiddenData';
 
-/**
- * @ignore
- */
 export default function hiddenDataGetterSetter(propName) {
   const getHiddenData = createHiddenDataGetter(propName);
   const setHiddenData = createHiddenDataSetter(propName);

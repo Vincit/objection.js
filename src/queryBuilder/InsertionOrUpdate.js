@@ -47,9 +47,6 @@ export default class InsertionOrUpdate {
   }
 
   /**
-   * Returns true if the input to `setData` method was an array.
-   *
-   * @ignore
    * @returns {boolean}
    */
   isArray() {
@@ -57,9 +54,6 @@ export default class InsertionOrUpdate {
   }
 
   /**
-   * Sets the actual insert/update data.
-   *
-   * @ignore
    * @param {(Object|Array.<Object>)} data
    * @param {ModelOptions} modelOptions
    */
@@ -110,9 +104,6 @@ export default class InsertionOrUpdate {
   }
 
   /**
-   * Create an object that can be given for the knex update or insert method.
-   *
-   * @ignore
    * @returns {Object|Array.<Object>}
    */
   toKnexInput() {

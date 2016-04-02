@@ -5,13 +5,8 @@ import {inherits} from '../utils/classUtils';
 import {isKnexQueryBuilder,  overwriteForDatabase} from '../utils/dbUtils';
 
 /**
- * Knex query builder wrapper.
- *
  * This class is a thin wrapper around knex query builder. This class allows us to add our own
  * query builder methods without monkey patching knex query builder.
- *
- * @constructor
- * @ignore
  */
 @overwriteForDatabase()
 export default class QueryBuilderBase {
@@ -25,10 +20,8 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Makes the given constructor a subclass of this class.
-   *
    * @param {function=} subclassConstructor
-   * @return {Class.<QueryBuilderBase>}
+   * @return {Constructor.<QueryBuilderBase>}
    */
   static extend(subclassConstructor) {
     inherits(subclassConstructor, this);
@@ -49,10 +42,6 @@ export default class QueryBuilderBase {
 
   /**
    * Sets/gets the query's internal context.
-   *
-   * For internal use only.
-   *
-   * @ignore
    */
   internalContext() {
     if (arguments.length === 0) {
@@ -64,27 +53,13 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Returns the knex connection passed to the constructor.
-   *
-   * @ignore
+   * @returns {knex}
    */
   knex() {
     return this._knex;
   }
 
   /**
-   * Calls the given function immediately and passes `this` as an argument.
-   *
-   * Handy for chaining conditional stuff:
-   *
-   * ```js
-   * new QueryBuilderBase().call(function (builder) {
-   *   if (someCondition) {
-   *     builder.where('something', someValue);
-   *   }
-   * });
-   * ```
-   *
    * @param {function} func
    * @returns {QueryBuilderBase}
    */
@@ -94,8 +69,6 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Returns the SQL string.
-   *
    * @returns {string}
    */
   toString() {
@@ -103,8 +76,6 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Returns the SQL string.
-   *
    * @returns {string}
    */
   toSql() {
@@ -112,8 +83,6 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Create a clone of this builder.
-   *
    * @returns {QueryBuilderBase}
    */
   clone() {
@@ -132,13 +101,7 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Removes query builder method calls.
-   *
    * @param {RegExp=} methodNameRegex
-   *    Optional patter to that must match the method names to remove.
-   *    If not given, all calls are removed.
-   *
-   * @ignore
    */
   clear(methodNameRegex) {
     if (methodNameRegex) {
@@ -153,15 +116,8 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Copy query builder method calls from another query builder.
-   *
    * @param {QueryBuilderBase} queryBuilder
-   *    The builder to copy from.
-   *
    * @param {RegExp} methodNameRegex
-   *    Optional regular expression to filter which method calls are copied.
-   *
-   * @ignore
    */
   copyFrom(queryBuilder, methodNameRegex) {
     var self = this;
@@ -176,11 +132,8 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Returns true if the builder has a call to a method whose name matches the `methodNameRegex`.
-   *
    * @param {RegExp} methodNameRegex
-   *
-   * @ignore
+   * @returns {boolean}
    */
   has(methodNameRegex) {
     return _.any(this._knexMethodCalls, call => {
@@ -189,12 +142,8 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Builds the query into a knex query builder.
-   *
-   * @returns {knex.QueryBuilder}
-   *    The built knex query builder.
-   *
    * @protected
+   * @returns {knex.QueryBuilder}
    */
   build() {
     return this.buildInto(this._knex.queryBuilder());
@@ -244,560 +193,463 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   insert(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   update(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   delete(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod('delete')
   del(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   select(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   forUpdate(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   forShare(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   as(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   columns(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   column(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   from(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   fromJS(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   into(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   withSchema(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   table(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   distinct(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   join(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   joinRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   innerJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   leftJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   leftOuterJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   rightJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   rightOuterJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   outerJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   fullOuterJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   crossJoin(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   where(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   andWhere(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhere(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereNot(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereNot(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereWrapped(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   havingWrapped(...args) {}
 
-
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereExists(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereExists(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereNotExists(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereNotExists(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereIn(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereIn(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereNotIn(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    */
   @knexQueryMethod()
   orWhereNotIn(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereNull(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereNull(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereNotNull(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereNotNull(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereBetween(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   whereNotBetween(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereBetween(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orWhereNotBetween(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   groupBy(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   groupByRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orderBy(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orderByRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   union(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   unionAll(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   having(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   havingRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orHaving(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   orHavingRaw(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   offset(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   limit(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   count(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   countDistinct(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   min(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   max(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   sum(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   avg(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   avgDistinct(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   debug(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   returning(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   truncate(...args) {}
 
   /**
-   * See <a href="http://knexjs.org">knex documentation</a>
    * @returns {QueryBuilderBase}
    */
   @knexQueryMethod()
   connection(...args) {}
 
   /**
-   * Compares a column reference to another
-   *
-   * ```js
-   * builder.whereRef('Person.id', '=', 'Animal.ownerId');
-   * ```
+   * @returns {QueryBuilderBase}
    */
   whereRef(lhs, op, rhs) {
     return this._whereRef('and', lhs, op, rhs);
   }
 
   /**
-   * Compares a column reference to another
-   *
-   * ```js
-   * builder.orWhereRef('Person.id', '=', 'Animal.ownerId');
-   * ```
+   * @returns {QueryBuilderBase}
    */
   orWhereRef(lhs, op, rhs) {
     return this._whereRef('or', lhs, op, rhs);
   }
 
   /**
-   * `where` for (possibly) composite keys.
-   *
-   * ```js
-   * builder.whereComposite(['id', 'name'], [1, 'Jennifer']);
-   * ```
-   *
-   * ```js
-   * builder.whereComposite('id', '=', 1);
-   * ```
-   *
-   * @param {string|Array.<string>} cols
-   * @param {string|*|Array.<*>} op
-   * @param {*|Array.<*>=} values
-   *
    * @returns {QueryBuilderBase}
    */
   whereComposite(cols, op, values) {
@@ -822,25 +674,6 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * `whereIn` for (possibly) composite keys.
-   *
-   *
-   * ```js
-   * builder.whereInComposite(['a', 'b'], [[1, 2], [3, 4], [1, 4]]);
-   * ```
-   *
-   * ```js
-   * builder.whereInComposite('a', [[1], [3], [1]]);
-   * ```
-   *
-   * ```js
-   * builder.whereInComposite('a', [1, 3, 1]);
-   * ```
-   *
-   * ```js
-   * builder.whereInComposite(['a', 'b'], SomeModel.query().select('a', 'b'));
-   * ```
-   *
    * @returns {QueryBuilderBase}
    */
   @overwriteForDatabase({
@@ -951,33 +784,8 @@ export default class QueryBuilderBase {
     */
 
   /**
-   * Where jsonb field reference equals jsonb object or other field reference.
-   *
-   * Also supports having field expression in both sides of equality.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome')
-   *   .then(function (people) {
-   *     // oh joy! these people have all their dogs at home!
-   *   });
-   *
-   * Person
-   *   .query()
-   *   .whereJsonEquals('additionalData:myDogs[0]', { name: "peter"})
-   *   .then(function (people) {
-   *     // these people's first dog name is "peter" and the dog has no other
-   *     // attributes, but its name
-   *   });
-   * ```
-   *
    * @param {FieldExpression} fieldExpression
-   *    Reference to column / json field.
-   *
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
-   *    Reference to column / json field or json object.
-   *
    * @returns {QueryBuilderBase}
    */
   whereJsonEquals(fieldExpression, jsonObjectOrFieldExpression) {
@@ -985,87 +793,29 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonEquals}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonEquals(fieldExpression, jsonObjectOrFieldExpression) {
     return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "=", jsonObjectOrFieldExpression);
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonEquals}
+   * @returns {QueryBuilderBase}
    */
   whereJsonNotEquals(fieldExpression, jsonObjectOrFieldExpression) {
     return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonEquals}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonNotEquals(fieldExpression, jsonObjectOrFieldExpression) {
     return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "!=", jsonObjectOrFieldExpression);
   }
 
   /**
-   * Where left hand json field reference is a superset of the right hand json value or reference.
-   *
-   * ```js
-   * Person
-   *   .query()
-   *   .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome')
-   *   .then(function (people) {
-   *     // These people have all or some of their dogs at home. Person might have some
-   *     // additional dogs in their custody since myDogs is superset of dogsAtHome.
-   *   });
-   *
-   * Person
-   *   .query()
-   *   .whereJsonSupersetOf('additionalData:myDogs[0]', { name: "peter"})
-   *   .then(function (people) {
-   *     // These people's first dog name is "peter", but the dog might have
-   *     // additional attributes as well.
-   *   });
-   * ```
-   *
-   * Object and array are always their own supersets.
-   *
-   * For arrays this means that left side matches if it has all the elements
-   * listed in the right hand side. e.g.
-   *
-   * ```
-   * [1,2,3] isSuperSetOf [2] => true
-   * [1,2,3] isSuperSetOf [2,1,3] => true
-   * [1,2,3] isSuperSetOf [2,null] => false
-   * [1,2,3] isSuperSetOf [] => true
-   * ```
-   *
-   * The `not` variants with jsonb operators behave in a way that they won't match rows, which don't have
-   * the referred json key referred in field expression. e.g. for table
-   *
-   * ```
-   *  id |    jsonObject
-   * ----+--------------------------
-   *   1 | {}
-   *   2 | NULL
-   *   3 | {"a": 1}
-   *   4 | {"a": 1, "b": 2}
-   *   5 | {"a": ['3'], "b": ['3']}
-   * ```
-   *
-   * query:
-   *
-   * ```js
-   * builder.whereJsonNotEquals("jsonObject:a", "jsonObject:b")
-   * ```
-   *
-   * Returns only the row `4` which has keys `a` and `b` and `a` != `b`, but it won't return any rows which
-   * does not have `jsonObject.a` or `jsonObject.b`.
-   *
    * @param {FieldExpression} fieldExpression
-   *    Reference to column / json field, which is tested for being a superset.
-   *
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
-   *    To which to compare.
-   *
    * @returns {QueryBuilderBase}
    */
   whereJsonSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {
@@ -1073,33 +823,27 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonSupersetOf}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {
     return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", jsonObjectOrFieldExpression);
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonSupersetOf}
+   * @returns {QueryBuilderBase}
    */
   whereJsonNotSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {
     return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonSupersetOf}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonNotSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {
     return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "@>", jsonObjectOrFieldExpression, 'not');
   }
 
   /**
-   * Where left hand json field reference is a subset of the right hand json value or reference.
-   *
-   * Object and array are always their own subsets.
-   *
-   * @see {@link QueryBuilderBase#whereJsonSupersetOf}
-   *
    * @param {FieldExpression} fieldExpression
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
@@ -1109,29 +853,27 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonSubsetOf}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {
     return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression);
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonSubsetOf}
+   * @returns {QueryBuilderBase}
    */
   whereJsonNotSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {
     return whereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonSubsetOf}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonNotSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {
     return orWhereJsonbRefOnLeftJsonbValOrRefOnRight(this, fieldExpression, "<@", jsonObjectOrFieldExpression, 'not');
   }
 
   /**
-   * Where json field reference is an array.
-   *
    * @param {FieldExpression} fieldExpression
    * @returns {QueryBuilderBase}
    */
@@ -1140,15 +882,14 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonIsArray}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonIsArray(fieldExpression) {
     return this.orWhereJsonSupersetOf(fieldExpression, []);
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonIsArray}
-   * @note Also returns rows where `fieldExpression` does not exist.
+   * @returns {QueryBuilderBase}
    */
   whereJsonNotArray(fieldExpression) {
     let knex = this._knex;
@@ -1163,8 +904,7 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonIsArray}
-   * @note Also returns rows where `fieldExpression` does not exist.
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonNotArray(fieldExpression) {
     let knex = this._knex;
@@ -1178,8 +918,6 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Where json field reference is an object.
-   *
    * @param {FieldExpression} fieldExpression
    * @returns {QueryBuilderBase}
    */
@@ -1188,15 +926,14 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonIsObject}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonIsObject(fieldExpression) {
     return this.orWhereJsonSupersetOf(fieldExpression, {});
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonIsObject}
-   * @note Also returns rows where `fieldExpression` does not exist.
+   * @returns {QueryBuilderBase}
    */
   whereJsonNotObject(fieldExpression) {
     let knex = this._knex;
@@ -1210,8 +947,7 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonIsObject}
-   * @note Also returns rows where `fieldExpression` does not exist.
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonNotObject(fieldExpression) {
     let knex = this._knex;
@@ -1225,10 +961,8 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * Where any of given strings is found from json object key(s) or array items.
-   *
    * @param {FieldExpression} fieldExpression
-   * @param {string|Array.<string>} keys Strings that are looked from object or array.
+   * @param {string|Array.<string>} keys
    * @returns {QueryBuilderBase}
    */
   whereJsonHasAny(fieldExpression, keys) {
@@ -1236,17 +970,15 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonHasAny}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonHasAny(fieldExpression, keys) {
     return orWhereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?|', keys);
   }
 
   /**
-   * Where all of given strings are found from json object key(s) or array items.
-   *
    * @param {FieldExpression} fieldExpression
-   * @param {string|Array.<string>} keys Strings that are looked from object or array.
+   * @param {string|Array.<string>} keys
    * @returns {QueryBuilderBase}
    */
   whereJsonHasAll(fieldExpression, keys) {
@@ -1254,29 +986,16 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonHasAll}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonHasAll(fieldExpression, keys) {
     return orWhereJsonFieldRightStringArrayOnLeft(this, fieldExpression, '?&', keys);
   }
 
   /**
-   * Where referred json field value casted to same type with value fulfill given operand.
-   *
-   * Value may be number, string, null, boolean and referred json field is converted
-   * to TEXT, NUMERIC or BOOLEAN sql type for comparison.
-   *
-   * If left hand field does not exist rows appear IS null so if one needs to get only
-   * rows, which has key and it's value is null one may use e.g.
-   * `.whereJsonSupersetOf("column", { field: null })` or check is key exist and
-   * then `.whereJsonField('column:field', 'IS', null)`
-   *
-   * For testing against objects or arrays one should see tested with whereJsonEqual,
-   * whereJsonSupersetOf and whereJsonSubsetOf methods.
-   *
-   * @param {FieldExpression} fieldExpression Expression pointing to certain value.
-   * @param {string} operator SQL comparator usually `<`, `>`, `<>`, `=` or `!=`
-   * @param {boolean|Number|string|null} value Value to which field is compared to.
+   * @param {FieldExpression} fieldExpression
+   * @param {string} operator
+   * @param {boolean|Number|string|null} value
    * @returns {QueryBuilderBase}
    */
   whereJsonField(fieldExpression, operator, value) {
@@ -1285,7 +1004,7 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @see {@link QueryBuilderBase#whereJsonField}
+   * @returns {QueryBuilderBase}
    */
   orWhereJsonField(fieldExpression, operator, value) {
     let query = whereJsonFieldQuery(this._knex, fieldExpression, operator, value);
@@ -1317,9 +1036,6 @@ export default class QueryBuilderBase {
   }
 }
 
-/**
- * @private
- */
 function knexQueryMethod(overrideMethodName) {
   return function (target, methodName, descriptor) {
     descriptor.value = function () {
@@ -1328,9 +1044,6 @@ function knexQueryMethod(overrideMethodName) {
   };
 }
 
-/**
- * @private
- */
 function wrapFunctionArg(func, query) {
   return function () {
     if (isKnexQueryBuilder(this)) {
@@ -1343,31 +1056,6 @@ function wrapFunctionArg(func, query) {
   };
 }
 
-/**
- * Parses a objection.js json field expression into a postgres jsonb field reference.
- *
- * For example, assume we have this object stored in the column `jsonColumn` of a table `Table`:
- *
- * ```
- * {obj: { "key.with.dots": [{"key": { "0": { me : [ "I was referred" ] } } } ] } }
- * ```
- *
- * We can refer to the value "I was referred" using the following field expression:
- *
- * ```
- * Table.jsonColumn:obj[key.with.dots][0].key.0.me[0]
- * ```
- *
- * Since Postgresql #>{field,0,field2,...} operator does not make difference if
- * reference is string or a number, one can actually use also jsonArray.0 notation
- * to refer index of an array. Like wise one can use object[123] notation to refer
- * key of an object { "123" : null }.
- *
- * @private
- * @param {string} expression
- * @param {boolean} extractAsText Return text instead of jsonb object (useful for type casting).
- * @returns {string} postgres json reference.
- */
 function parseFieldExpression(expression, extractAsText) {
   let parsed = jsonFieldExpressionParser.parse(expression);
   let jsonRefs = _(parsed.access).pluck('ref').value().join(",");
@@ -1376,47 +1064,16 @@ function parseFieldExpression(expression, extractAsText) {
   return `"${middleQuotedColumnName}"${extractor}'{${jsonRefs}}'`;
 }
 
-/**
- * Where jsonb reference on left hand side is compared to jsonb value or reference on the right hand side.
- *
- * Converts left and right hand values to PostgreSQL acceptable format and add user chosen
- * operator between left and right hand expressions.
- *
- * ```javascript
- * whereJsonbRefOnLeftJsonbValOrRefOnRight(queryBuilder, "ModelJson.jsonObject:objectField", "<@", { key: 1 })
- * ```
- *
- * ```sql
- * select * from "ModelJson" where ("ModelJson"."jsonObject"#>'{objectField}')::jsonb <@ '{\"key\":\ 1}'::jsonb
- * ```
- *
- * @private
- * @param {QueryBuilderBase} builder
- * @param {FieldExpression} fieldExpression Reference to column / jsonField.
- * @param {string} operator operator to apply.
- * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression Reference to column / jsonField or json object.
- * @param {string=} queryPrefix string prepended to query e.g. 'not'. Space after string added implicitly.
- * @returns {QueryBuilderBase}
- */
 function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
   let queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix);
   return builder.whereRaw.apply(builder, queryParams);
 }
 
-/**
- * @private
- * @see {@link whereJsonbRefOnLeftJsonbValOrRefOnRight} for documentation.
- */
 function orWhereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
   let queryParams = whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix);
   return builder.orWhereRaw.apply(builder, queryParams);
 }
 
-/**
- * @private
- * @see {@link whereJsonbRefOnLeftJsonbValOrRefOnRight} for documentation.
- * @return {Array} Parameters for whereRaw call.
- */
 function whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, operator, jsonObjectOrFieldExpression, queryPrefix) {
   let fieldReference = parseFieldExpression(fieldExpression);
 
@@ -1438,40 +1095,14 @@ function whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(fieldExpression, 
   throw new Error("Invalid right hand expression.");
 }
 
-/**
- * Where field expression on left side and string or an array of strings on right hand side.
- *
- * ```javascript
- * whereJsonFieldRightStringArrayOnLeft(queryBuilder, "ModelJson.jsonObject:a", "?&",  ["1","2"])
- * ```
- *
- * ```sql
- * select * from "ModelJson" where "ModelJson"."jsonObject"#>'{a}' ?& array['1','2']
- * ```
- *
- * @private
- * @param {QueryBuilderBase} builder
- * @param {FieldExpression} fieldExpression
- * @param {string} operator
- * @param {Array.<string>} keys
- * @returns {QueryBuilderBase}
- */
 function whereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
   return builder.whereRaw(whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys));
 }
 
-/**
- * @private
- * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
- */
 function orWhereJsonFieldRightStringArrayOnLeft(builder, fieldExpression, operator, keys) {
   return builder.orWhereRaw(whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys));
 }
 
-/**
- * @private
- * @see {@link whereJsonFieldRightStringArrayOnLeft} for documentation.
- */
 function whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, operator, keys) {
   let knex = builder._knex;
   let fieldReference = parseFieldExpression(fieldExpression);
@@ -1490,10 +1121,6 @@ function whereJsonFieldRightStringArrayOnLeftQuery(builder, fieldExpression, ope
   return `${fieldReference} ${operator.replace('?', '\\?')} ${rightHandExpression}`;
 }
 
-/**
- * @private
- * @see {@link QueryBuilderBase#whereJsonField} for documentation.
- */
 function whereJsonFieldQuery(knex, fieldExpression, operator, value) {
   let fieldReference = parseFieldExpression(fieldExpression, true);
   let normalizedOperator = normalizeOperator(knex, operator);
@@ -1517,12 +1144,6 @@ function whereJsonFieldQuery(knex, fieldExpression, operator, value) {
   return `(${fieldReference})${cast} ${normalizedOperator} ${escapedValue}`;
 }
 
-/**
- * @private
- * @param knex
- * @param {string} operator
- * @returns {string}
- */
 function normalizeOperator(knex, operator) {
   let trimmedLowerCase = operator.trim().toLowerCase();
 

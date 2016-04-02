@@ -8,7 +8,6 @@ import _ from 'lodash';
  *
  * This function is taken from Babel transpiler.
  *
- * @ignore
  * @param {Object} subClass
  * @param {Object} superClass
  */
@@ -36,7 +35,6 @@ export function inherits(subClass, superClass) {
 /**
  * Tests if a constructor function inherits another constructor function.
  *
- * @ignore
  * @param {Object} Constructor
  * @param {Object} SuperConstructor
  * @returns {boolean}
