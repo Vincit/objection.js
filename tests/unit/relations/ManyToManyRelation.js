@@ -67,7 +67,8 @@ describe('ManyToManyRelation', function () {
         from: 'OwnerModel.oid',
         through: {
           from: "JoinTable.ownerId",
-          to: "JoinTable.relatedId"
+          to: "JoinTable.relatedId",
+          extra: ['extra1', 'extra2']
         },
         to: 'RelatedModel.rid'
       }
@@ -395,7 +396,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal([
-          'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin0"',
+          'select "RelatedModel".*, "JoinTable"."extra1", "JoinTable"."extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
           'where "name" = \'Teppo\'',
@@ -480,7 +481,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal([
-          'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin0"',
+          'select "RelatedModel".*, "JoinTable"."extra1", "JoinTable"."extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
           'where "name" = \'Teppo\'',
@@ -810,6 +811,80 @@ describe('ManyToManyRelation', function () {
 
         expect(result).to.eql({a: 'str1', id: 1, rid: 2});
         expect(result).to.be.a(RelatedModel);
+      });
+    });
+
+    it('should insert extra properties to join table', function () {
+      mockKnexQueryResults = [[1, 2]];
+
+      var owner = OwnerModel.fromJson({oid: 666});
+      var related = RelatedModel.fromJson({a: 'str2', rid: 4, extra1: 'extraVal1', extra2: 'extraVal2'});
+
+      owner.nameOfOurRelation = [
+        RelatedModel.fromJson({a: 'str0', id: 3})
+      ];
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .insertImpl(function (insertion) {
+          relation.insert(this, owner, insertion);
+        })
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str2\', \'4\') returning "id"');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("extra1", "extra2", "ownerId", "relatedId") values (\'extraVal1\', \'extraVal2\', \'666\', \'4\') returning "relatedId"');
+
+        expect(_.invoke(owner.nameOfOurRelation, 'toJSON')).to.eql([
+          {a: 'str2', id: 1, rid: 4, extra1: 'extraVal1', extra2: 'extraVal2'},
+          {a: 'str0', id: 3}
+        ]);
+
+        expect(result).to.be.a(RelatedModel);
+        expect(result.toJSON()).to.eql({a: 'str2', id: 1, rid: 4, extra1: 'extraVal1', extra2: 'extraVal2'});
+      });
+    });
+
+    it('should insert extra properties to join table (not all)', function () {
+      mockKnexQueryResults = [[1, 2]];
+
+      var owner = OwnerModel.fromJson({oid: 666});
+      var related = RelatedModel.fromJson({a: 'str2', rid: 4, extra2: 'extraVal2'});
+
+      owner.nameOfOurRelation = [
+        RelatedModel.fromJson({a: 'str0', id: 3})
+      ];
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .insertImpl(function (insertion) {
+          relation.insert(this, owner, insertion);
+        })
+        .insert(related);
+
+      var toString = builder.toString();
+      var toSql = builder.toSql();
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries[0]).to.equal(toString);
+        expect(executedQueries[0]).to.equal(toSql);
+        expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str2\', \'4\') returning "id"');
+        expect(executedQueries[1]).to.equal('insert into "JoinTable" ("extra2", "ownerId", "relatedId") values (\'extraVal2\', \'666\', \'4\') returning "relatedId"');
+
+        expect(_.invoke(owner.nameOfOurRelation, 'toJSON')).to.eql([
+          {a: 'str2', id: 1, rid: 4, extra2: 'extraVal2'},
+          {a: 'str0', id: 3}
+        ]);
+
+        expect(result).to.be.a(RelatedModel);
+        expect(result.toJSON()).to.eql({a: 'str2', id: 1, rid: 4, extra2: 'extraVal2'});
       });
     });
 
@@ -1316,6 +1391,29 @@ describe('ManyToManyRelation', function () {
           expect(result).to.eql(11);
           expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (\'666\', \'11\') returning "relatedId"');
         });
+    });
+
+    it('should also insert extra properties', function () {
+      mockKnexQueryResults = [[5]];
+      var owner = OwnerModel.fromJson({oid: 666});
+
+      var builder = QueryBuilder
+        .forClass(RelatedModel)
+        .relateImpl(function (ids) {
+          relation.relate(this, owner, ids);
+        })
+        .relate({rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar'});
+
+      return builder.then(function (result) {
+        expect(executedQueries).to.have.length(1);
+        expect(result).to.eql({rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar'});
+
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql([
+          'insert into "JoinTable" ("extra2", "ownerId", "relatedId") values (\'foo\', \'666\', \'10\') returning "relatedId"'
+        ].join(' '));
+      });
     });
 
   });

@@ -144,7 +144,8 @@ module.exports.initialize = function (opt) {
         from: 'Model1.id',
         through: {
           from: 'Model1Model2.model1Id',
-          to: 'Model1Model2.model2Id'
+          to: 'Model1Model2.model2Id',
+          extra: ['extra1', 'extra2']
         },
         to: 'model_2.id_col'
       }
@@ -159,7 +160,8 @@ module.exports.initialize = function (opt) {
         from: 'model_2.id_col',
         through: {
           from: 'Model1Model2.model2Id',
-          to: 'Model1Model2.model1Id'
+          to: 'Model1Model2.model1Id',
+          extra: ['extra3']
         },
         to: 'Model1.id'
       }
@@ -219,6 +221,9 @@ module.exports.createDb = function () {
     })
     .createTable('Model1Model2', function (table) {
       table.bigincrements('id').primary();
+      table.string('extra1');
+      table.string('extra2');
+      table.string('extra3');
       table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE');
       table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE');
     })
@@ -237,13 +242,7 @@ module.exports.destroy = function () {
 };
 
 module.exports.populate = function (data) {
-  var insert = {};
-  var models = this.models;
   var session = this;
-
-  _.each(data, function (jsonModel) {
-    createRows(jsonModel, models.Model1, insert);
-  });
 
   return session.knex('Model1Model2').delete()
     .then(function () {
@@ -253,16 +252,14 @@ module.exports.populate = function (data) {
       return session.knex('model_2').delete();
     })
     .then(function () {
+      return session.models.Model1.query().insertWithRelated(data);
+    })
+    .then(function () {
       return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).each(function (table) {
-        var rows = insert[table] || [];
+        var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
 
-        if (_.isEmpty(rows)) {
-          return;
-        }
-
-        return session.knex(table).insert(rows).then(function () {
-          var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
-          var maxId = _.max(_.pluck(rows, idCol));
+        return session.knex(table).max(idCol).then(function (res) {
+          var maxId = parseInt(res[0][_.keys(res[0])[0]], 10);
 
           // Reset sequence.
           if (utils.isSqlite(session.knex)) {
@@ -271,7 +268,7 @@ module.exports.populate = function (data) {
             }
           } else if (utils.isPostgres(session.knex)) {
             if (maxId && _.isFinite(maxId)) {
-              return session.knex.raw('ALTER SEQUENCE "' + table  + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
+              return session.knex.raw('ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
             }
           } else if (utils.isMySql(session.knex)) {
             if (maxId && _.isFinite(maxId)) {
@@ -284,10 +281,7 @@ module.exports.populate = function (data) {
       });
     })
     .then(function () {
-      return {
-        rows: insert,
-        tree: data
-      };
+      return data;
     });
 };
 
@@ -320,58 +314,6 @@ module.exports.expectPartialEqual = function expectPartialEqual(result, partial)
     throw new Error('result and partial must both be arrays or objects');
   }
 };
-
-function createRows(model, ModelClass, rows) {
-  var relations = ModelClass.getRelations();
-  model = ModelClass.ensureModel(model);
-
-  _.each(relations, function (relation, relationName) {
-    if (!_.has(model, relationName)) {
-      return;
-    }
-
-    if (relation instanceof Model.BelongsToOneRelation) {
-
-      var related = relation.relatedModelClass.ensureModel(model[relationName]);
-      model[relation.ownerProp] = related.$id();
-
-      createRows(related, relation.relatedModelClass, rows);
-
-    } else if (relation instanceof Model.HasManyRelation) {
-
-      _.each(model[relationName], function (relatedJson) {
-        var related = relation.relatedModelClass.ensureModel(relatedJson);
-        related[relation.relatedProp] = model.$id();
-
-        createRows(related, relation.relatedModelClass, rows);
-      });
-
-    } else if (relation instanceof Model.ManyToManyRelation) {
-      var joinTable = [
-        _.capitalize(_.camelCase(ModelClass.tableName)),
-        _.capitalize(_.camelCase(relation.relatedModelClass.tableName))
-      ].sort().join('');
-
-      _.each(model[relationName], function (relatedJson) {
-        var joinRow = {};
-        var related = relation.relatedModelClass.ensureModel(relatedJson);
-
-        joinRow[relation.joinTableRelatedCol] = related.$id();
-        joinRow[relation.joinTableOwnerCol] = model.$id();
-
-        rows[joinTable] = rows[joinTable] || [];
-        rows[joinTable].push(joinRow);
-
-        createRows(related, relation.relatedModelClass, rows);
-      });
-    } else {
-      throw new Error('unsupported relation type');
-    }
-  });
-
-  rows[ModelClass.tableName] = rows[ModelClass.tableName] || [];
-  rows[ModelClass.tableName].push(model.$toDatabaseJson());
-}
 
 function convertPostgresBigIntegersToNumber() {
   var pgTypes;

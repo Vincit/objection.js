@@ -160,6 +160,23 @@ Person
   });
 ```
 
+> Fields marked as `extras` for many-to-many relations in [`relationMappings`](#relationmappings) are automatically
+> written to the join table instead of the target table. The `someExtra` field in the following example is written
+> to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
+
+```js
+someMovie
+  .$relatedQuery('actors')
+  .insert({
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+    someExtra: "I'll be written to the join table"
+  })
+  .then(function (jennifer) {
+
+  });
+```
+
 Creates an insert query.
 
 The inserted objects are validated against the model's [`jsonSchema`](#jsonschema). If validation fails
@@ -636,10 +653,26 @@ person
   });
 ```
 
+> Fields marked as `extras` for many-to-many relations in [`relationMappings`](#relationmappings) are automatically
+> written to the join table. The `someExtra` field in the following example is written to the join table if the
+> `extra` array of the relation mapping contains the string `'someExtra'`.
+
+```js
+someMovie
+  .$relatedQuery('actors')
+  .relate({
+    id: 50,
+    someExtra: "I'll be written to the join table"
+  })
+  .then(function () {
+
+  });
+```
+
 Relates an existing model to another model.
 
 This method doesn't create a new instance but only updates the foreign keys and in
-the case of ManyToMany relation, creates a join row to the join table.
+the case of many-to-many relation, creates a join row to the join table.
 
 On Postgres multiple models can be related by giving an array of identifiers.
 
@@ -3605,11 +3638,20 @@ Person.relationMappings = {
       // ManyToMany relation needs the `through` object 
       // to describe the join table.
       through: {
-        // If you have a model class for the join table
-        // you need to specify it like this:
-        // modelClass: PersonMovie,
-        from: 'Person_Movie.personId',
+        from: 'Person_Movie.actorId',
         to: 'Person_Movie.movieId'
+
+        // If you have a model class for the join table
+        // you can specify it like this:
+        //
+        // modelClass: PersonMovie,
+
+        // Columns listed here are automatically joined
+        // to the related models on read and written to
+        // the join table instead of the related table
+        // on insert.
+        //
+        // extra: ['someExtra']
       },
       to: 'Movie.id'
     }
@@ -3703,11 +3745,20 @@ class Person extends Model {
           // ManyToMany relation needs the `through` object 
           // to describe the join table.
           through: {
-            // If you have a model class for the join table
-            // you need to specify it like this:
-            // modelClass: PersonMovie,
-            from: 'Person_Movie.personId',
+            from: 'Person_Movie.actorId',
             to: 'Person_Movie.movieId'
+
+            // If you have a model class for the join table
+            // you can specify it like this:
+            //
+            // modelClass: PersonMovie,
+
+            // Columns listed here are automatically joined
+            // to the related models on read and written to
+            // the join table instead of the related table
+            // on insert.
+            //
+            // extra: ['someExtra']
           },
           to: 'Movie.id'
         }
@@ -3798,11 +3849,20 @@ class Person extends Model {
         // ManyToMany relation needs the `through` object
         // to describe the join table.
         through: {
-          // If you have a model class for the join table
-          // you need to specify it like this:
-          // modelClass: PersonMovie,
-          from: 'Person_Movie.personId',
+          from: 'Person_Movie.actorId',
           to: 'Person_Movie.movieId'
+
+          // If you have a model class for the join table
+          // you can specify it like this:
+          //
+          // modelClass: PersonMovie,
+
+          // Columns listed here are automatically joined
+          // to the related models on read and written to
+          // the join table instead of the related table
+          // on insert.
+          //
+          // extra: ['someExtra']
         },
         to: 'Movie.id'
       }
@@ -4105,11 +4165,20 @@ Person.relationMappings = {
     join: {
       from: 'Person.id',
       through: {
-        // If you have a model class for the join table
-        // you need to specify it like this:
-        // modelClass: PersonMovie,
         from: 'Person_Movie.actorId',
         to: 'Person_Movie.movieId'
+
+        // If you have a model class for the join table
+        // you can specify it like this:
+        //
+        // modelClass: PersonMovie,
+
+        // Columns listed here are automatically joined
+        // to the related models on read and written to
+        // the join table instead of the related table
+        // on insert.
+        //
+        // extra: ['someExtra']
       },
       to: 'Movie.id'
     }
@@ -4147,11 +4216,20 @@ class Person extends Model {
         join: {
           from: 'Person.id',
           through: {
-            // If you have a model class for the join table
-            // you need to specify it like this:
-            // modelClass: PersonMovie,
             from: 'Person_Movie.actorId',
             to: 'Person_Movie.movieId'
+
+            // If you have a model class for the join table
+            // you can specify it like this:
+            //
+            // modelClass: PersonMovie,
+
+            // Columns listed here are automatically joined
+            // to the related models on read and written to
+            // the join table instead of the related table
+            // on insert.
+            //
+            // extra: ['someExtra']
           },
           to: 'Movie.id'
         }
@@ -4190,11 +4268,20 @@ class Person extends Model {
       join: {
         from: 'Person.id',
         through: {
-          // If you have a model class for the join table
-          // you need to specify it like this:
-          // modelClass: PersonMovie,
           from: 'Person_Movie.actorId',
           to: 'Person_Movie.movieId'
+
+          // If you have a model class for the join table
+          // you can specify it like this:
+          //
+          // modelClass: PersonMovie,
+
+          // Columns listed here are automatically joined
+          // to the related models on read and written to
+          // the join table instead of the related table
+          // on insert.
+          //
+          // extra: ['someExtra']
         },
         to: 'Movie.id'
       }
@@ -4242,6 +4329,7 @@ Property|Type|Description
 from|string&#124;Array.&lt;string&gt;|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
 to|string&#124;Array.&lt;string&gt;|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
 modelClass|string&#124;ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
+extra|Array.&lt;string&gt;|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert.
 
 
 

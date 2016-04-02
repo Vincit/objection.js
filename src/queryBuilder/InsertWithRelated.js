@@ -159,10 +159,7 @@ export default class InsertWithRelated {
         let conn = node.manyToManyConnections[m];
         let tableInsertion = getTableInsertion(batch, conn.relation.joinTable);
 
-        let sourceVal = node.model.$values(conn.relation.ownerProp);
-        let targetVal = conn.node.model.$values(conn.relation.relatedProp);
-
-        let joinModel = {};
+        let ownerProp = node.model.$values(conn.relation.ownerProp);
         let knex = conn.relation.ownerModelClass.knex();
         let modelClass = conn.relation.joinTableModelClass;
 
@@ -171,15 +168,8 @@ export default class InsertWithRelated {
           modelClass = modelClass.bindKnex(knex);
         }
 
-        for (let i = 0; i < sourceVal.length; ++i) {
-          joinModel[conn.relation.joinTableOwnerProp[i]] = sourceVal[i];
-        }
-
-        for (let i = 0; i < targetVal.length; ++i) {
-          joinModel[conn.relation.joinTableRelatedProp[i]] = targetVal[i];
-        }
-
-        joinModel = modelClass.fromJson(joinModel);
+        let joinModel = conn.relation.createJoinModels(ownerProp, [conn.node.model]);
+        joinModel = modelClass.fromJson(joinModel[0]);
 
         if (!tableInsertion) {
           tableInsertion = new TableInsertion(modelClass, true);
@@ -291,6 +281,7 @@ function Dependency(node, resolve) {
 function ManyToManyConnection(node, relation) {
   this.node = node;
   this.relation = relation;
+  relation.omitExtraProps([node.model]);
 }
 
 function DependencyGraph(allowedRelations) {

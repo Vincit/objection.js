@@ -357,6 +357,8 @@ at your disposal.
 
 ### Insert queries
 
+> Insert a pet for a person:
+
 ```js
 // `person` is an instance of `Person` model.
 person
@@ -369,6 +371,26 @@ person
 
 ```sql
 insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
+```
+
+> If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in
+> the `extra` array of the `through` object in [`relationMappings`](#relationmappings) (see the examples behind the link).
+> For example, if you specified an array `extra: ['someExtra']` in `relationMappings` then `someExtra` is written to
+> the join table in the following example:
+
+```js
+// `person` is an instance of `Person` model.
+person
+  .$relatedQuery('movies')
+  .insert({name: 'The room', someExtra: 'foo'})
+  .then(function (movie) {
+
+  });
+```
+
+```sql
+insert into "Movie" ("name") values ('The room')
+insert into "Person_Movie" ("movieId", "personId", "someExtra") values (14, 25, 'foo')
 ```
 
 Chain the [`insert`](#insert) method to the [`$relatedQuery('pets')`](#_s_relatedquery) call to insert a related object for a model

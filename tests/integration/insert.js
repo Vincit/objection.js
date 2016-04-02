@@ -862,6 +862,38 @@ module.exports = function (session) {
 
         }
 
+        it('should insert extra properties to the join table', function () {
+          var inserted = null;
+          var originalRelated = null;
+
+          return parent1
+            .$relatedQuery('model2Relation1')
+            .then(function (models) {
+              originalRelated = models;
+              expect(models).to.have.length(1);
+              return parent1
+                .$relatedQuery('model2Relation1')
+                .insert(Model1.fromJson({model1Prop1: 'test', extra3: 'foo'}));
+            })
+            .then(function ($inserted) {
+              inserted = $inserted;
+              expect(inserted.id).to.equal(5);
+              expect(inserted.model1Prop1).to.equal('test');
+              expect(inserted.extra3).to.equal('foo');
+              expect(parent1.model2Relation1).to.eql(_.flatten([originalRelated, inserted]));
+              return session.knex('Model1');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(5);
+              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              return session.knex('Model1Model2');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(3);
+              expect(_.where(rows, {model1Id: inserted.id, model2Id: parent1.idCol, extra3: inserted.extra3})).to.have.length(1);
+            });
+        });
+
       });
 
     });

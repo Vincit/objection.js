@@ -674,7 +674,8 @@ module.exports = function (session) {
               model2Relation1: [{
                 id: 6,
                 model1Prop1: 'blaa 4',
-                model1Prop2: 3
+                model1Prop2: 3,
+                extra3: 'extra 4'
               }, {
                 id: 7,
                 model1Prop1: 'blaa 5',
@@ -682,7 +683,8 @@ module.exports = function (session) {
               }, {
                 id: 8,
                 model1Prop1: 'blaa 6',
-                model1Prop2: 1
+                model1Prop2: 1,
+                extra3: 'extra 6'
               }]
             }]
           }]);
@@ -708,11 +710,13 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
                 expect(_.pluck(related, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3']);
+                expect(_.pluck(related, 'extra3').sort()).to.eql([null, null, null]);
                 expect(related[0]).to.eql({
                   id: 3,
                   model1Id: null,
                   model1Prop1: 'blaa 1',
-                  model1Prop2: 6
+                  model1Prop2: 6,
+                  extra3: null
                 });
               }),
             parent2
@@ -724,11 +728,13 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
                 expect(_.pluck(related, 'model1Prop1').sort()).to.eql(['blaa 4', 'blaa 5', 'blaa 6']);
+                expect(_.pluck(related, 'extra3').sort()).to.eql(['extra 4', 'extra 6', null]);
                 expect(related[0]).to.eql({
                   id: 6,
                   model1Id: null,
                   model1Prop1: 'blaa 4',
-                  model1Prop2: 3
+                  model1Prop2: 3,
+                  extra3: 'extra 4'
                 });
               })
           ]);
@@ -747,6 +753,21 @@ module.exports = function (session) {
               expect(models[0]).to.be.a(Model2);
               expect(models[0].idCol).to.equal(2);
             });
+        });
+
+        it('should be able to filter using extra columns', function () {
+          return parent2
+            .$relatedQuery('model2Relation1')
+            .where('extra3', 'extra 6')
+            .then(function (related) {
+              expect(related).to.eql([{
+                id: 8,
+                model1Id: null,
+                model1Prop1: 'blaa 6',
+                model1Prop2: 1,
+                extra3: 'extra 6'
+              }]);
+            })
         });
 
         // This doesn't belong here, but there is no better place at the moment.

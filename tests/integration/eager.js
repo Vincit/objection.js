@@ -43,10 +43,12 @@ module.exports = function (session) {
 
           model2Relation1: [{
             id: 5,
-            model1Prop1: 'hello 5'
+            model1Prop1: 'hello 5',
+            extra3: 'extra 5'
           }, {
             id: 6,
             model1Prop1: 'hello 6',
+            extra3: 'extra 6',
 
             model1Relation1: {
               id: 7,
@@ -231,6 +233,8 @@ module.exports = function (session) {
       expect(models[0].model1Relation2[1].model2Relation1[1].id).to.equal(6);
       expect(models[0].model1Relation2[1].model2Relation1[0].model1Prop1).to.equal('hello 5');
       expect(models[0].model1Relation2[1].model2Relation1[1].model1Prop1).to.equal('hello 6');
+      expect(models[0].model1Relation2[1].model2Relation1[0].extra3).to.equal('extra 5');
+      expect(models[0].model1Relation2[1].model2Relation1[1].extra3).to.equal('extra 6');
     });
 
     test('[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]', function (models) {
@@ -413,10 +417,12 @@ module.exports = function (session) {
                 idCol: 2,
                 model2Relation1: [{
                   id: 5,
+                  extra3: 'extra 5',
                   model1Relation1: null,
                   model1Relation2: []
                 }, {
                   id: 6,
+                  extra3: 'extra 6',
                   model1Relation1: {
                     id: 7
                   },
@@ -447,10 +453,12 @@ module.exports = function (session) {
                 idCol: 2,
                 model2Relation1: [{
                   id: 5,
+                  extra3: 'extra 5',
                   model1Relation1: null,
                   model1Relation2: []
                 }, {
                   id: 6,
+                  extra3: 'extra 6',
                   model1Relation1: {
                     id: 7
                   },

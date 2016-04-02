@@ -27,7 +27,10 @@ module.exports = function (session) {
             "#ref": 'child1'
           }, {
             "#id": 'grandChild',
-            model2Prop1: 'cibling2'
+            model2Prop1: 'cibling2',
+            // These should go to the join table.
+            extra1: 'extraVal1',
+            extra2: 'extraVal2'
           }]
         },
 
@@ -358,6 +361,8 @@ module.exports = function (session) {
       shouldCheckHooks && checkHooks(model.model1Relation1.model1Relation3[0]);
 
       expect(model.model1Relation1.model1Relation3[1].model2Prop1).to.equal('cibling2');
+      expect(model.model1Relation1.model1Relation3[1].extra1).to.equal('extraVal1');
+      expect(model.model1Relation1.model1Relation3[1].extra2).to.equal('extraVal2');
       shouldCheckHooks && checkHooks(model.model1Relation1.model1Relation3[1]);
 
       expect(model.model1Relation2[0].model2Prop1).to.equal('child1');

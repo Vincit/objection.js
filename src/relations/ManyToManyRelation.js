@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Relation from './Relation';
+import ModelBase from '../model/ModelBase';
 import inheritModel from '../model/inheritModel';
 import normalizeIds from '../utils/normalizeIds';
 import {overwriteForDatabase} from '../utils/dbUtils';
@@ -63,6 +64,16 @@ export default class ManyToManyRelation extends Relation {
      * @type {Class.<Model>}
      */
     this.joinTableModelClass = null;
+
+    /**
+     * Extra columns to copy to/from join table on insert/relate.
+     */
+    this.joinTableExtraCols = null;
+
+    /**
+     * Extra properties to copy to/from join table on insert/relate.
+     */
+    this.joinTableExtraProps = null;
   }
 
   /**
@@ -86,6 +97,7 @@ export default class ManyToManyRelation extends Relation {
     let joinFrom = this.parseReference(mapping.join.from);
     let joinTableFrom = this.parseReference(mapping.join.through.from);
     let joinTableTo = this.parseReference(mapping.join.through.to);
+    let joinTableExtra = mapping.join.through.extra || [];
 
     if (!joinTableFrom.table || _.isEmpty(joinTableFrom.columns)) {
       this.throwError('join.through.from must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].');
@@ -100,6 +112,7 @@ export default class ManyToManyRelation extends Relation {
     }
 
     this.joinTable = joinTableFrom.table;
+    this.joinTableExtraCols = joinTableExtra;
 
     if (joinFrom.table === this.ownerModelClass.tableName) {
       this.joinTableOwnerCol = joinTableFrom.columns;
@@ -140,6 +153,7 @@ export default class ManyToManyRelation extends Relation {
 
     this.joinTableOwnerProp = this.propertyName(this.joinTableOwnerCol, this.joinTableModelClass);
     this.joinTableRelatedProp = this.propertyName(this.joinTableRelatedCol, this.joinTableModelClass);
+    this.joinTableExtraProps = this.propertyName(this.joinTableExtraCols, this.joinTableModelClass);
 
     return retVal;
   }
@@ -169,6 +183,16 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
+   * References to the extra columns in the join table.
+   *
+   * @returns {Array.<string>}
+   */
+  @memoize
+  fullJoinTableExtraCols() {
+    return _.map(this.joinTableExtraCols, col => this.joinTable + '.' + col);
+  }
+
+  /**
    * Alias to use for the join table when joining with the owner table.
    *
    * For example: `Person_Movie_rel_movies`.
@@ -192,6 +216,8 @@ export default class ManyToManyRelation extends Relation {
     relation.joinTableRelatedCol = this.joinTableRelatedCol;
     relation.joinTableRelatedProp = this.joinTableRelatedProp;
     relation.joinTableModelClass = this.joinTableModelClass;
+    relation.joinTableExtraCols = this.joinTableExtraCols;
+    relation.joinTableExtraProps = this.joinTableExtraProps;
 
     return relation;
   }
@@ -290,6 +316,11 @@ export default class ManyToManyRelation extends Relation {
         // If the user hasn't specified a select clause, select the related model's columns.
         // If we don't do this we also get the join table's columns.
         builder.select(this.relatedModelClass.tableName + '.*');
+
+        // Also select all extra columns.
+        _.each(this.fullJoinTableExtraCols(), col => {
+          builder.select(col);
+        });
       }
 
       this.findQuery(builder, ids);
@@ -324,14 +355,15 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    */
   insert(builder, owner, insertion) {
+    this.omitExtraProps(insertion.models());
+
     builder.onBuild(builder => {
       builder.$$insert(insertion);
     });
 
     builder.runAfterModelCreate(related => {
       let ownerId = owner.$values(this.ownerProp);
-      let relatedIds = _.map(related, related => related.$values(this.relatedProp));
-      let joinModels = this._createJoinModels(ownerId, relatedIds);
+      let joinModels = this.createJoinModels(ownerId, related);
 
       owner[this.name] = this.mergeModels(owner[this.name], related);
 
@@ -370,10 +402,10 @@ export default class ManyToManyRelation extends Relation {
    * @inheritDoc
    */
   relate(builder, owner, ids) {
-    ids = normalizeIds(ids, this.relatedProp, {arrayOutput: true});
+    ids = normalizeIds(ids, this.relatedProp);
 
     builder.setQueryExecutor(builder => {
-      let joinModels = this._createJoinModels(owner.$values(this.ownerProp), ids);
+      let joinModels = this.createJoinModels(owner.$values(this.ownerProp), ids);
 
       return this.joinTableModelClass
         .bindKnex(builder.knex())
@@ -501,10 +533,10 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * @private
+   * @ignore
    */
-  _createJoinModels(ownerId, relatedIds) {
-    return _.map(relatedIds, relatedId => {
+  createJoinModels(ownerId, related) {
+    return _.map(related, related => {
       let joinModel = {};
 
       _.each(this.joinTableOwnerProp, (joinTableOwnerProp, idx) => {
@@ -512,10 +544,23 @@ export default class ManyToManyRelation extends Relation {
       });
 
       _.each(this.joinTableRelatedProp, (joinTableRelatedProp, idx) => {
-        joinModel[joinTableRelatedProp] = relatedId[idx];
+        joinModel[joinTableRelatedProp] = related[this.relatedProp[idx]];
+      });
+
+      _.each(this.joinTableExtraProps, extraProp => {
+        if (!_.isUndefined(related[extraProp])) {
+          joinModel[extraProp] = related[extraProp];
+        }
       });
 
       return joinModel;
     });
+  }
+
+  /**
+   * @ignore
+   */
+  omitExtraProps(models) {
+    _.each(models, model => model.$omitFromDatabaseJson(this.joinTableExtraProps));
   }
 }

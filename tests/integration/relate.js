@@ -379,6 +379,29 @@ module.exports = function (session) {
             });
         });
 
+        it('should relate with extra properties', function () {
+          return Model2
+            .query()
+            .where('id_col', 1)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model2Relation1')
+                .relate({id: 5, extra3: 'foobar'});
+            })
+            .then(function () {
+              return session.knex('Model1Model2').orderBy('id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(5);
+              expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 1, model1Id: 5, extra3: 'foobar'})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+              expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+            });
+        });
+
       });
 
     });
