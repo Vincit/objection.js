@@ -5,7 +5,8 @@ import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import ValidationError from '../ValidationError';
 import EagerFetcher from '../queryBuilder/EagerFetcher';
-import {memoize, deprecated} from '../utils/decorators';
+import deprecated from '../utils/decorators/deprecated';
+import memoize from '../utils/decorators/memoize';
 
 import Relation from '../relations/Relation';
 import HasOneRelation from '../relations/HasOneRelation';
@@ -736,7 +737,7 @@ export default class Model extends ModelBase {
   /**
    * @override
    *
-   * @param {boolean} shallow
+   * @param {boolean=} shallow
    *    If true the relations are omitted from the json.
    */
   $toJson(shallow) {

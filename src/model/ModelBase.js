@@ -2,8 +2,9 @@ import _ from 'lodash';
 import tv4 from 'tv4';
 import tv4Formats from 'tv4-formats';
 import ValidationError from '../ValidationError';
+import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
 import {inherits} from '../utils/classUtils';
-import {memoize} from '../utils/decorators';
+import memoize from '../utils/decorators/memoize';
 
 /**
  * @typedef {Object} ModelOptions
@@ -442,60 +443,34 @@ export default class ModelBase {
    *
    * ```js
    * let person = Person.fromJson({firstName: 'Jennifer', lastName: 'Aniston'});
-   * person.$omitFromJson('lastName');
+   * person.$omitFromJson(['lastName']);
    * console.log(person.toJSON()); // --> {firstName: 'Jennifer'}
    * console.log(person); // --> {firstName: 'Jennifer', lastName: 'Aniston'}
    * ```
    *
    * @ignore
-   * @param {string|Array.<string>|Object.<string, boolean>} keys
-   * @returns {ModelBase}
+   * @param {Array.<string>=} keys
+   * @returns {Array.<string>}
    */
-  $omitFromJson() {
-    if (arguments.length === 1 && _.isObject(arguments[0])) {
-      let keys = arguments[0];
-
-      if (_.isArray(keys)) {
-        omitFromJson(this, keys, false);
-      } else {
-        omitFromJson(this, _.keys(keys), false);
-      }
-    } else {
-      omitFromJson(this, _.toArray(arguments), false);
-    }
-
-    return this;
-  }
+  @hiddenDataGetterSetter('omitFromJson')
+  $omitFromJson(keys) {}
 
   /**
    * Omits a set of properties from the database json representation.
    *
    * ```js
    * let person = Person.fromJson({firstName: 'Jennifer', lastName: 'Aniston'});
-   * person.$omitFromDatabaseJson('lastName');
+   * person.$omitFromDatabaseJson(['lastName']);
    * console.log(person.$toDatabaseJson()); // --> {firstName: 'Jennifer'}
    * console.log(person); // --> {firstName: 'Jennifer', lastName: 'Aniston'}
    * ```
    *
    * @ignore
-   * @param {string|Array.<string>|Object.<string, boolean>} keys
-   * @returns {ModelBase}
+   * @param {Array.<string>=} keys
+   * @returns {Array.<string>}
    */
-  $omitFromDatabaseJson() {
-    if (arguments.length === 1 && _.isObject(arguments[0])) {
-      let keys = arguments[0];
-
-      if (_.isArray(keys)) {
-        omitFromJson(this, keys, true);
-      } else {
-        omitFromJson(this, _.keys(keys), true);
-      }
-    } else {
-      omitFromJson(this, _.toArray(arguments), true);
-    }
-
-    return this;
-  }
+  @hiddenDataGetterSetter('omitFromDatabaseJson')
+  $omitFromDatabaseJson(keys) {}
 
   /**
    * Picks a set of properties.
@@ -817,11 +792,15 @@ function toJsonImpl(self, createDbJson, omit, pick) {
  */
 function includeInJson(self, value, key, createDbJson, omit, pick) {
   if (createDbJson) {
-    if (self.$$omitFromDatabaseJson && self.$$omitFromDatabaseJson.indexOf(key) !== -1) {
+    const omit = self.$omitFromDatabaseJson();
+
+    if (omit && omit.indexOf(key) !== -1) {
       return false;
     }
   } else {
-    if (self.$$omitFromJson && self.$$omitFromJson.indexOf(key) !== -1) {
+    const omit = self.$omitFromJson();
+
+    if (omit && omit.indexOf(key) !== -1) {
       return false;
     }
   }
@@ -901,31 +880,6 @@ function omitArray(model, keys) {
       ModelClass.omitImpl(model, key);
     }
   });
-}
-
-/**
- * @private
- */
-function omitFromJson(model, keys, dbJson) {
-  if (dbJson) {
-    if (!model.$$omitFromDatabaseJson) {
-      Object.defineProperty(model, '$$omitFromDatabaseJson', {
-        enumerable: false,
-        value: keys.slice()
-      });
-    } else {
-      _.each(keys, key => model.$$omitFromDatabaseJson.push(key));
-    }
-  } else {
-    if (!model.$$omitFromJson) {
-      Object.defineProperty(model, '$$omitFromJson', {
-        enumerable: false,
-        value: keys.slice()
-      });
-    } else {
-      _.each(keys, key => model.$$omitFromJson.push(key));
-    }
-  }
 }
 
 /**

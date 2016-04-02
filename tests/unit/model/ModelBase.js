@@ -487,7 +487,7 @@ describe('ModelBase', function () {
 
     it('properties registered using $omitFromJson method should be removed from the json', function () {
       var model = Model.fromJson({a: 1, b: 2, c: 3});
-      model.$omitFromJson('b', 'c');
+      model.$omitFromJson(['b', 'c']);
       expect(model.$toJson()).to.eql({a: 1});
       expect(model).to.eql({a: 1, b: 2, c: 3});
     });
@@ -552,7 +552,7 @@ describe('ModelBase', function () {
 
     it('properties registered using $omitFromDatabaseJson method should be removed from the json', function () {
       var model = Model.fromJson({a: 1, b: 2, c: 3});
-      model.$omitFromDatabaseJson('b', 'c');
+      model.$omitFromDatabaseJson(['b', 'c']);
       expect(model.$toDatabaseJson()).to.eql({a: 1});
       expect(model).to.eql({a: 1, b: 2, c: 3});
     });

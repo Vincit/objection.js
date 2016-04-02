@@ -7,7 +7,7 @@ import QueryBuilderBase from './QueryBuilderBase';
 import ValidationError from '../ValidationError';
 import EagerFetcher from './EagerFetcher';
 import {isPostgres} from '../utils/dbUtils';
-import {deprecated} from '../utils/decorators';
+import deprecated from '../utils/decorators/deprecated';
 
 /**
  * Query builder for Models.

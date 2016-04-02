@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {inherits, isSubclassOf} from '../utils/classUtils';
-import {memoize} from '../utils/decorators';
+import memoize from '../utils/decorators/memoize';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 /**

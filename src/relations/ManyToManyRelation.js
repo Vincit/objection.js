@@ -5,7 +5,7 @@ import inheritModel from '../model/inheritModel';
 import normalizeIds from '../utils/normalizeIds';
 import {overwriteForDatabase} from '../utils/dbUtils';
 import {isSubclassOf} from '../utils/classUtils';
-import {memoize} from '../utils/decorators';
+import memoize from '../utils/decorators/memoize';
 
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 const sqliteBuiltInRowId = '_rowid_';
