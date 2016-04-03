@@ -18,7 +18,7 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
 /**
  * @typedef {Object} RelationMapping
  *
- * @property {Class.<Model>|string} modelClass
+ * @property {Constructor.<Model>|string} modelClass
  * @property {Relation} relation
  * @property {Object|function(QueryBuilder)} filter
  * @property {RelationJoin} [join]

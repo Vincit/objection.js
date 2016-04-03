@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import jsonFieldExpressionParser from './parsers/jsonFieldExpressionParser';
-import InsertionOrUpdate from './InsertionOrUpdate';
 import {inherits} from '../utils/classUtils';
 import {isKnexQueryBuilder,  overwriteForDatabase} from '../utils/dbUtils';
 

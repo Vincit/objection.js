@@ -69,6 +69,55 @@ module.exports = function (session) {
           });
       });
 
+      it('should accept raw sql and subqueries', function () {
+        return Model1
+          .query()
+          .insertWithRelated([{
+            model1Prop1: '10'
+          }, {
+            model1Prop1: '50'
+          }])
+          .then(function () {
+            return Model1
+              .query()
+              .insertWithRelated({
+                model1Prop1: Model1.raw("40 + 2"),
+
+                model1Relation2: [{
+                  "#id": 'child1',
+                  model2Prop1: Model1.query().min('model1Prop1')
+                }, {
+                  model2Prop1: Model1.knex().from('Model1').max('model1Prop1')
+                }]
+              });
+          })
+          .then(function (inserted) {
+            expect(inserted.toJSON()).to.eql({
+              id: 3,
+              model1Relation2: [
+                { model1Id: 3, idCol: 1 },
+                { model1Id: 3, idCol: 2 }
+              ]
+            });
+
+            return Model1.query().eager('model1Relation2').where('id', inserted.id);
+          })
+          .then(function (inserted) {
+            _.sortBy(inserted[0].model1Relation2, 'idCol');
+
+            expect(inserted[0]).to.eql({
+              id: 3,
+              model1Id: null,
+              model1Prop1: '42',
+              model1Prop2: null,
+              model1Relation2: [
+                { idCol: 1, model1Id: 3, model2Prop1: '10', model2Prop2: null },
+                { idCol: 2, model1Id: 3, model2Prop1: '50', model2Prop2: null }
+              ]
+            });
+          });
+      });
+
       it('should validate models upon insertion', function (done) {
         insertion.model1Relation1.model1Prop1 = 666;
 

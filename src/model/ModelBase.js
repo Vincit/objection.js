@@ -3,6 +3,7 @@ import tv4 from 'tv4';
 import tv4Formats from 'tv4-formats';
 import ValidationError from '../ValidationError';
 import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
+import splitQueryProps from '../utils/splitQueryProps';
 import {inherits} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
 
@@ -148,10 +149,20 @@ export default class ModelBase {
       json = mergeWithDefaults(this.constructor.jsonSchema, json);
     }
 
-    json = this.$parseJson(json, options);
-    json = this.$validate(json, options);
+    // If the json contains query properties like, knex Raw queries or knex/objection query
+    // builders, we need to split those off into a separate object. This object will b
+    // joined back in the $toDatabaseJson method.
+    const split = splitQueryProps(this.constructor, json);
 
-    return this.$set(json);
+    if (split.query) {
+      // Stash the query properties for later use in $toDatabaseJson method.
+      this.$stashedQueryProps(split.query);
+    }
+
+    split.json = this.$parseJson(split.json, options);
+    split.json = this.$validate(split.json, options);
+
+    return this.$set(split.json);
   }
 
   /**
@@ -185,6 +196,27 @@ export default class ModelBase {
   }
 
   /**
+   * @param {Array.<string>=} keys
+   * @returns {Array.<string>}
+   */
+  @hiddenDataGetterSetter('omitFromJson')
+  $omitFromJson(keys) {}
+
+  /**
+   * @param {Array.<string>=} keys
+   * @returns {Array.<string>}
+   */
+  @hiddenDataGetterSetter('omitFromDatabaseJson')
+  $omitFromDatabaseJson(keys) {}
+
+  /**
+   * @param {Object=} queryProps
+   * @returns {Object}
+   */
+  @hiddenDataGetterSetter('stashedQueryProps')
+  $stashedQueryProps(queryProps) {}
+
+  /**
    * @param {string|Array.<string>|Object.<string, boolean>} keys
    * @returns {ModelBase}
    */
@@ -203,20 +235,6 @@ export default class ModelBase {
 
     return this;
   }
-
-  /**
-   * @param {Array.<string>=} keys
-   * @returns {Array.<string>}
-   */
-  @hiddenDataGetterSetter('omitFromJson')
-  $omitFromJson(keys) {}
-
-  /**
-   * @param {Array.<string>=} keys
-   * @returns {Array.<string>}
-   */
-  @hiddenDataGetterSetter('omitFromDatabaseJson')
-  $omitFromDatabaseJson(keys) {}
 
   /**
    * @param {string|Array.<string>|Object.<string, boolean>} keys
@@ -441,11 +459,28 @@ function parseValidationError(report) {
   return new ValidationError(errorHash);
 }
 
-function toJsonImpl(self, createDbJson, omit, pick) {
+function toJsonImpl(model, createDbJson, omit, pick) {
   let json = {};
 
-  _.each(self, (value, key) => {
-    if (includeInJson(self, value, key, createDbJson, omit, pick)) {
+  const omitFromJson = createDbJson
+    ? model.$omitFromDatabaseJson()
+    : model.$omitFromJson();
+
+  if (createDbJson) {
+    // If creating a database json object, restore the query properties.
+    _.each(model.$stashedQueryProps(), (query, key) => {
+      json[key] = query;
+    });
+  }
+
+  _.each(model, (value, key) => {
+    if (key.charAt(0) !== '$'
+      && !_.isFunction(value)
+      && !_.isUndefined(value)
+      && (!omit || !omit[key])
+      && (!pick || pick[key])
+      && (!omitFromJson || !contains(omitFromJson, key))) {
+
       if (_.isObject(value)) {
         json[key] = toJsonObject(value, createDbJson);
       } else {
@@ -455,17 +490,6 @@ function toJsonImpl(self, createDbJson, omit, pick) {
   });
 
   return json;
-}
-
-function includeInJson(self, value, key, createDbJson, omit, pick) {
-  const omitFromJson = createDbJson ? self.$omitFromDatabaseJson() : self.$omitFromJson();
-
-  return key.charAt(0) !== '$'
-    && !_.isFunction(value)
-    && !_.isUndefined(value)
-    && (!omit || !omit[key])
-    && (!pick || pick[key])
-    && (!omitFromJson || omitFromJson.indexOf(key) === -1)
 }
 
 function toJsonObject(value, createDbJson) {

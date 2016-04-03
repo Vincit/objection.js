@@ -1007,8 +1007,10 @@ export default class QueryBuilder extends QueryBuilderBase {
     let input = insertion;
 
     if (insertion instanceof InsertionOrUpdate) {
-      input = insertion.toKnexInput();
-    } else if (_.isArray(insertion)) {
+      insertion = insertion.models();
+    }
+
+    if (_.isArray(insertion)) {
       input = _.map(insertion, obj => {
         if (_.isFunction(obj.$toDatabaseJson)) {
           return obj.$toDatabaseJson();
@@ -1093,12 +1095,15 @@ export default class QueryBuilder extends QueryBuilderBase {
     let idColumn = this._modelClass.idColumn;
 
     if (update instanceof InsertionOrUpdate) {
-      input = update.toKnexInput();
-    } else if (_.isFunction(update.$toDatabaseJson)) {
+      update = update.model();
+    }
+
+    if (_.isFunction(update.$toDatabaseJson)) {
       input = update.$toDatabaseJson();
     }
 
     // We never want to update the identifier.
+    // TODO: Maybe we do?
     if (_.isArray(idColumn)) {
       _.each(idColumn, col => {
         delete input[col]
