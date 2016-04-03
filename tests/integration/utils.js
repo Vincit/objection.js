@@ -190,6 +190,10 @@ module.exports.initialize = function (opt) {
       return utils.isPostgres(this.knex);
     },
 
+    isMySql: function () {
+      return utils.isMySql(this.knex);
+    },
+
     addUnhandledRejectionHandler: function (handler) {
       unhandledRejectionHandlers.push(handler);
     },
@@ -255,7 +259,7 @@ module.exports.populate = function (data) {
       return session.models.Model1.query().insertWithRelated(data);
     })
     .then(function () {
-      return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).each(function (table) {
+      return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).map(function (table) {
         var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
 
         return session.knex(table).max(idCol).then(function (res) {

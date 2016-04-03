@@ -150,7 +150,7 @@ export default class ModelBase {
     }
 
     // If the json contains query properties like, knex Raw queries or knex/objection query
-    // builders, we need to split those off into a separate object. This object will b
+    // builders, we need to split those off into a separate object. This object will be
     // joined back in the $toDatabaseJson method.
     const split = splitQueryProps(this.constructor, json);
 
@@ -501,6 +501,8 @@ function toJsonObject(value, createDbJson) {
     } else {
       return value.$toJson();
     }
+  } else if (Buffer.isBuffer(value)) {
+    return value;
   } else {
     return _.cloneDeep(value);
   }
@@ -515,6 +517,8 @@ function cloneObject(value) {
     return cloneArray(value);
   } else if (value instanceof ModelBase) {
     return value.$clone();
+  } else if (Buffer.isBuffer(value)) {
+    return new Buffer(value);
   } else {
     return _.cloneDeep(value);
   }
