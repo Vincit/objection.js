@@ -3,6 +3,7 @@
 var _ = require('lodash');
 var path = require('path');
 var utils = require('../../lib/utils/dbUtils');
+var transaction = require('../../').transaction;
 var Promise = require('bluebird');
 var expect = require('expect.js');
 var Model = require('../../').Model;
@@ -248,39 +249,41 @@ module.exports.destroy = function () {
 module.exports.populate = function (data) {
   var session = this;
 
-  return session.knex('Model1Model2').delete()
-    .then(function () {
-      return session.knex('Model1').delete();
-    })
-    .then(function () {
-      return session.knex('model_2').delete();
-    })
-    .then(function () {
-      return session.models.Model1.query().insertWithRelated(data);
-    })
-    .then(function () {
-      return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).map(function (table) {
-        var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
+  return transaction(session.models.Model1, function (Model1) {
+    var trx = Model1.knex();
 
-        return session.knex(table).max(idCol).then(function (res) {
-          var maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
+    return Promise.all([
+        trx('Model1Model2').delete(),
+        trx('Model1').delete(),
+        trx('model_2').delete()
+      ])
+      .then(function () {
+        return Model1.query().insertWithRelated(data);
+      })
+      .then(function () {
+        return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).map(function (table) {
+          var idCol = (_.find(session.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
 
-          // Reset sequence.
-          if (utils.isSqlite(session.knex)) {
-            return session.knex.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
-          } else if (utils.isPostgres(session.knex)) {
-            return session.knex.raw('ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
-          } else if (utils.isMySql(session.knex)) {
-            return session.knex.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
-          } else {
-            throw new Error('sequence truncate not implemented for the given database');
-          }
+          return trx(table).max(idCol).then(function (res) {
+            var maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
+
+            // Reset sequence.
+            if (utils.isSqlite(trx)) {
+              return trx.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
+            } else if (utils.isPostgres(trx)) {
+              return trx.raw('ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
+            } else if (utils.isMySql(trx)) {
+              return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
+            } else {
+              throw new Error('sequence truncate not implemented for the given database');
+            }
+          });
         });
+      })
+      .then(function () {
+        return data;
       });
-    })
-    .then(function () {
-      return data;
-    });
+  });
 };
 
 /**
