@@ -515,6 +515,7 @@ module.exports = function (session) {
           return Promise.all([
             parent1
               .$relatedQuery('model1Relation2')
+              .orderBy('id_col')
               .then(function (related) {
                 expect(related.length).to.equal(3);
                 expect(parent1.model1Relation2).to.eql(related);
@@ -531,6 +532,7 @@ module.exports = function (session) {
               }),
             parent2
               .$relatedQuery('model1Relation2')
+              .orderBy('id_col')
               .then(function (related) {
                 expect(related.length).to.equal(3);
                 expect(parent2.model1Relation2).to.eql(related);
@@ -703,6 +705,7 @@ module.exports = function (session) {
           return Promise.all([
             parent1
               .$relatedQuery('model2Relation1')
+              .orderBy('id')
               .then(function (related) {
                 expect(related.length).to.equal(3);
                 expect(parent1.model2Relation1).to.eql(related);
@@ -721,6 +724,7 @@ module.exports = function (session) {
               }),
             parent2
               .$relatedQuery('model2Relation1')
+              .orderBy('id')
               .then(function (related) {
                 expect(related.length).to.equal(3);
                 expect(parent2.model2Relation1).to.eql(related);
