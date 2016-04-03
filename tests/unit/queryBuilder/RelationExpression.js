@@ -505,8 +505,6 @@ describe('RelationExpression', function () {
   });
 
   describe('#isSubExpression', function () {
-
-    // Everything is a sub expression of *.
     testSubExpression('*', 'a');
     testSubExpression('*', '[a, b]');
     testSubExpression('*', 'a.b');
@@ -531,19 +529,16 @@ describe('RelationExpression', function () {
     testNotSubExpression('a.*', '*');
     testNotSubExpression('a.[b.*, c]', 'a.[b.c.d, c.d]');
 
-    // * in sub expression requires * in expression.
     testSubExpression('a.b.*', 'a.b.*');
     testNotSubExpression('a.b.*', '*');
     testNotSubExpression('a.b.*', 'a.*');
     testNotSubExpression('a.b.*', 'a.[b.*, c]');
 
-    // Equal.
     testSubExpression('a', 'a');
     testSubExpression('a.b', 'a.b');
     testSubExpression('a.b.[c, d]', 'a.b.[c, d]');
     testSubExpression('[a.b.[c, d], e]', '[a.b.[c, d], e]');
 
-    // Subs.
     testSubExpression('a.b', 'a');
     testNotSubExpression('a', 'a.b');
 
@@ -577,8 +572,14 @@ describe('RelationExpression', function () {
     testNotSubExpression('[a.b.[c, d.e], b]', 'a.b.[c, d, e]');
     testNotSubExpression('[a.b.[c, d.e], b]', 'a.b.[c, d.[e, f]]');
 
-    // EagerType.Recursive.
     testSubExpression('a.^', 'a.^');
+    testSubExpression('a.^', 'a.^100');
+    testSubExpression('a.^3', 'a.^3');
+    testSubExpression('a.^3', 'a.^2');
+    testSubExpression('a.^3', 'a.^1');
+    testSubExpression('a.^3', 'a.a.a');
+    testSubExpression('a.^3', 'a.a');
+    testSubExpression('a.^3', 'a');
     testSubExpression('a.^', 'a.a');
     testSubExpression('a.^', 'a.a.^');
     testSubExpression('a.^', 'a.a.a');
@@ -603,7 +604,10 @@ describe('RelationExpression', function () {
     testNotSubExpression('[a.^, b.[c.^, d]]', '[c, b]');
     testNotSubExpression('[a.^, b.[c.^, d]]', '[c, b]');
     testNotSubExpression('[a.^, b.[c.^, d]]', 'b.c.d');
-
+    testNotSubExpression('a.^', 'a.[b, ^, c]');
+    testNotSubExpression('a.^3', 'a.^');
+    testNotSubExpression('a.^3', 'a.^4');
+    testNotSubExpression('a.^3', 'a.a.a.a');
   });
 
   function testParse(str, parsed) {

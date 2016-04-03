@@ -2765,9 +2765,8 @@ Person
 
 Fetch relations eagerly for the result rows.
 
-See the [eager queries](#eager-queries) section for more examples.
-
-See the `hooks` of [`context`](#context) method for an alternative way to filter the relations.
+See the [eager queries](#eager-queries) section for more examples and [`RelationExpression`](#relationexpression)
+for more info on the relation expression language.
 
 ##### Arguments
 
@@ -6038,7 +6037,8 @@ For example `children.*` means "relation `children` and all its relations, and a
 The `*` token must be used with caution or you will end up fetching your entire database.
 
 Expression `parent.^` is equivalent to `parent.parent.parent.parent...` up to the point a relation no longer
-has results for the `parent` relation.
+has results for the `parent` relation. The recursion can be limited to certain depth by giving the depth after
+the `^` character. For example `parent.^3` is equal to `parent.parent.parent`.
 
 
 

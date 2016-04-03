@@ -463,7 +463,33 @@ Person
   });
 ```
 
-> Relations can be filtered using named filters like this:
+> Limit recursion to 3 levels:
+
+```js
+Person
+  .query()
+  .eager('[pets, children.^3]')
+  .then(function (people) {
+    console.log(people[0].children[0].children[0].children[0].firstName);
+  });
+```
+
+> Relations can be filtered using the [`filterEager`](#filtereager) method:
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .filterEager('children.pets', builder => {
+    // Only select pets older than 10 years old for children.
+    builder.where('age', '>', 10);
+  })
+  .then(function () {
+
+  });
+```
+
+> Relations can also be filtered using named filters like this:
 
 ```js
 Person

@@ -2,14 +2,23 @@ import _ from 'lodash';
 import parser from './parsers/relationExpressionParser';
 import ValidationError from './../ValidationError';
 
+const RECURSIVE_REGEX = /^\^(\d*)$/;
+const ALL_RECURSIVE_REGEX = /^\*$/;
+
 export default class RelationExpression {
 
-  constructor(node) {
+  constructor(node, recursionDepth) {
     node = node || {};
+
     this.name = node.name || null;
     this.args = node.args || [];
     this.numChildren = node.numChildren || 0;
     this.children = node.children || {};
+
+    Object.defineProperty(this, 'recursionDepth', {
+      enumerable: false,
+      value: recursionDepth || 0
+    });
   }
 
   /**
@@ -52,8 +61,10 @@ export default class RelationExpression {
       return false;
     }
 
-    if (expr.isRecursive()) {
-      return this.isAllRecursive() || this.isRecursive();
+    const maxRecursionDepth = expr.maxRecursionDepth();
+
+    if (maxRecursionDepth > 0) {
+      return this.isAllRecursive() || this.maxRecursionDepth() >= maxRecursionDepth;
     }
 
     return _.all(expr.children, (child, childName) => {
@@ -65,25 +76,43 @@ export default class RelationExpression {
   }
 
   /**
-   * @returns {boolean}
+   * @returns {number}
    */
-  isRecursive() {
-    return !!this.children['^'];
+  maxRecursionDepth() {
+    if (this.numChildren !== 1) {
+      return 0;
+    }
+
+    return _.map(this.children, (val, key) => {
+      const rec = RECURSIVE_REGEX.exec(key);
+
+      if (rec) {
+        const maxDepth = rec[1];
+
+        if (maxDepth) {
+          return parseInt(maxDepth, 10);
+        } else {
+          return Number.POSITIVE_INFINITY;
+        }
+      } else {
+        return 0;
+      }
+    })[0];
   }
 
   /**
    * @returns {boolean}
    */
   isAllRecursive() {
-    return this.numChildren === 1 && !!this.children['*'];
+    return this.numChildren === 1 && _.all(this.children, (val, key) => ALL_RECURSIVE_REGEX.test(key));
   }
 
   /**
    * @returns {RelationExpression}
    */
   childExpression(childName) {
-    if (this.isAllRecursive() || (this.isRecursive() && childName === this.name)) {
-      return this;
+    if (this.isAllRecursive() || (childName === this.name && this.recursionDepth < this.maxRecursionDepth() - 1)) {
+      return new RelationExpression(this, this.recursionDepth + 1);
     }
 
     if (this.children[childName]) {
@@ -92,7 +121,6 @@ export default class RelationExpression {
       return null;
     }
   }
-
 
   /**
    * @returns {RelationExpression}
@@ -103,7 +131,7 @@ export default class RelationExpression {
 
   forEachChild(cb) {
     _.each(this.children, (child, childName) => {
-      if (childName !== '*' && childName !== '^') {
+      if (!ALL_RECURSIVE_REGEX.test(childName) && !RECURSIVE_REGEX.test(childName)) {
         cb(child, childName);
       }
     });
