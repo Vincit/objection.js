@@ -46,7 +46,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
 
@@ -65,8 +65,8 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.where(rows, {id: 1000, model1Prop1: 'hello 3'})).to.have.length(1);
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.filter(rows, {id: 1000, model1Prop1: 'hello 3'})).to.have.length(1);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
 
@@ -84,13 +84,13 @@ module.exports = function (session) {
               expect(inserted[0].$afterInsertCalled).to.equal(true);
               expect(inserted[1].$beforeInsertCalled).to.equal(true);
               expect(inserted[1].$afterInsertCalled).to.equal(true);
-              expect(_.pluck(inserted, 'id').sort()).to.eql([3, 4]);
-              expect(_.pluck(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
+              expect(_.map(inserted, 'id').sort()).to.eql([3, 4]);
+              expect(_.map(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
               return session.knex(Model1.tableName);
             })
             .then(function (rows) {
-              expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
-              expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3, 4]);
+              expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
+              expect(_.map(rows, 'id').sort()).to.eql([1, 2, 3, 4]);
             });
         });
       }
@@ -106,7 +106,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
 
@@ -123,7 +123,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'test 2']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'test 2']);
             expect(_.find(rows, {id: 3, model1Prop1: 'test 2'}).model1Prop2).to.equal(13);
           });
       });
@@ -136,13 +136,13 @@ module.exports = function (session) {
             .then(function (inserted) {
               expect(inserted[0]).to.be.a(Model1);
               expect(inserted[1]).to.be.a(Model1);
-              expect(_.pluck(inserted, 'id').sort()).to.eql([3, 4]);
-              expect(_.pluck(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
+              expect(_.map(inserted, 'id').sort()).to.eql([3, 4]);
+              expect(_.map(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
               return session.knex(Model1.tableName);
             })
             .then(function (rows) {
-              expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
-              expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3, 4]);
+              expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
+              expect(_.map(rows, 'id').sort()).to.eql([1, 2, 3, 4]);
             });
         });
 
@@ -157,8 +157,8 @@ module.exports = function (session) {
               return session.knex(Model1.tableName);
             })
             .then(function (rows) {
-              expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
-              expect(_.pluck(rows, 'id').sort()).to.eql([1, 2, 3]);
+              expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+              expect(_.map(rows, 'id').sort()).to.eql([1, 2, 3]);
             });
         });
       }
@@ -184,7 +184,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'id').sort()).to.eql([1, 2]);
+            expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
             done();
           })
           .catch(done);
@@ -231,7 +231,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
 
@@ -271,7 +271,7 @@ module.exports = function (session) {
               return session.knex(Model1.tableName);
             })
             .then(function (rows) {
-              expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
+              expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3', 'hello 4']);
             });
         });
       }
@@ -304,7 +304,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
 
@@ -327,7 +327,7 @@ module.exports = function (session) {
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
 
@@ -739,7 +739,7 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(3);
-              expect(_.where(rows, {model1Id: inserted.id, model2Id: parent1.idCol})).to.have.length(1);
+              expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol})).to.have.length(1);
             });
         });
 
@@ -772,7 +772,7 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(3);
-              expect(_.where(rows, {model1Id: inserted.id, model2Id: parent1.idCol})).to.have.length(1);
+              expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol})).to.have.length(1);
             });
         });
 
@@ -814,8 +814,8 @@ module.exports = function (session) {
               })
               .then(function (rows) {
                 expect(rows).to.have.length(4);
-                expect(_.where(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})).to.have.length(1);
-                expect(_.where(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})).to.have.length(1);
+                expect(_.filter(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})).to.have.length(1);
+                expect(_.filter(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})).to.have.length(1);
               });
           });
 
@@ -855,8 +855,8 @@ module.exports = function (session) {
               })
               .then(function (rows) {
                 expect(rows).to.have.length(4);
-                expect(_.where(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})).to.have.length(1);
-                expect(_.where(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})).to.have.length(1);
+                expect(_.filter(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})).to.have.length(1);
+                expect(_.filter(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})).to.have.length(1);
               });
           });
 
@@ -890,7 +890,7 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(3);
-              expect(_.where(rows, {model1Id: inserted.id, model2Id: parent1.idCol, extra3: inserted.extra3})).to.have.length(1);
+              expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol, extra3: inserted.extra3})).to.have.length(1);
             });
         });
 

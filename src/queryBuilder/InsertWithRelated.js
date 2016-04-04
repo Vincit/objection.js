@@ -123,7 +123,7 @@ export default class InsertWithRelated {
    * @param {Object.<string, TableInsertion>} batch
    */
   _markBatchHandled(batch) {
-    let models = _.flatten(_.pluck(batch, 'models'));
+    let models = _.flatten(_.map(batch, 'models'));
     let nodes = this.graph.nodesById;
 
     for (let m = 0, lm = models.length; m < lm; ++m) {
@@ -179,7 +179,7 @@ export default class InsertWithRelated {
     _.each(batch, tableInsertion => {
       if (tableInsertion.models.length) {
         let keys = _.keys(tableInsertion.models[0]);
-        tableInsertion.models = _.unique(tableInsertion.models, model => model.$values(keys).join());
+        tableInsertion.models = _.uniqBy(tableInsertion.models, model => model.$values(keys).join());
         tableInsertion.isInputModel = _.times(tableInsertion.models.length, _.constant(false));
       }
     });
@@ -191,7 +191,7 @@ export default class InsertWithRelated {
    * @private
    */
   _omitUids(tableInsertion) {
-    let ids = _.pluck(tableInsertion.models, tableInsertion.modelClass.uidProp);
+    let ids = _.map(tableInsertion.models, tableInsertion.modelClass.uidProp);
 
     for (let m = 0, lm = tableInsertion.models.length; m < lm; ++m) {
       tableInsertion.models[m].$omit(tableInsertion.modelClass.uidProp);

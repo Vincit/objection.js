@@ -661,7 +661,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   pluck(propertyName) {
     return this.runAfter(result => {
       if (_.isArray(result)) {
-        return _.pluck(result, propertyName);
+        return _.map(result, propertyName);
       } else {
         return result;
       }
@@ -876,7 +876,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       }
 
       // If the user specified a `returning` clause the result may already bean array of objects.
-      if (_.all(ret, _.isObject)) {
+      if (_.every(ret, _.isObject)) {
         _.forEach(insertion.models(), (model, index) => {
           model.$set(ret[index]);
         });
@@ -924,7 +924,7 @@ export default class QueryBuilder extends QueryBuilderBase {
         .childQueryOf(builder)
         .whereInComposite(ModelClass.getFullIdColumn(), _.map(insertedModelArray, model => model.$id()))
         .then(fetchedModels => {
-          fetchedModels = _.indexBy(fetchedModels, (model) => model.$id());
+          fetchedModels = _.keyBy(fetchedModels, (model) => model.$id());
 
           // Instead of returning the freshly fetched models, update the input
           // models with the fresh values.

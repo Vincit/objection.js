@@ -831,7 +831,7 @@ module.exports = function (session) {
             })
             .spread(function (a, ab) {
               expect(a).to.eql(aOld);
-              expect(ab).to.eql(_.sortByAll(abOld.concat([{ aid1: 1, aid2: '2', bid3: 1, bid4: '2' }]), ['bid3', 'bid4', 'aid1', 'aid2']));
+              expect(ab).to.eql(_.sortBy(abOld.concat([{ aid1: 1, aid2: '2', bid3: 1, bid4: '2' }]), ['bid3', 'bid4', 'aid1', 'aid2']));
             });
         });
 

@@ -5,7 +5,7 @@ import normalizeIds from '../utils/normalizeIds';
 export default class BelongsToOneRelation extends Relation {
 
   createRelationProp(owners, related) {
-    let relatedByOwnerId = _.indexBy(related, related => related.$values(this.relatedProp));
+    let relatedByOwnerId = _.keyBy(related, related => related.$values(this.relatedProp));
 
     _.each(owners, owner => {
       let ownerId = owner.$values(this.ownerProp);

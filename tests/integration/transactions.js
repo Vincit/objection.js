@@ -82,7 +82,7 @@ module.exports = function (session) {
         return session.knex('Model1');
       }).then(function (rows) {
         expect(rows).to.have.length(2);
-        expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+        expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
         return session.knex('model_2');
       }).then(function (rows) {
         expect(rows).to.have.length(1);
@@ -188,7 +188,7 @@ module.exports = function (session) {
           return session.knex('Model1');
         }).then(function (rows) {
           expect(rows).to.have.length(2);
-          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+          expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
           return session.knex('model_2');
         }).then(function (rows) {
           expect(rows).to.have.length(1);
@@ -221,7 +221,7 @@ module.exports = function (session) {
           return session.knex('Model1');
         }).then(function (rows) {
           expect(rows).to.have.length(2);
-          expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+          expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
           return session.knex('model_2');
         }).then(function (rows) {
           expect(rows).to.have.length(1);

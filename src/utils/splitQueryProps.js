@@ -10,7 +10,7 @@ export default function (ModelClass, obj) {
     QueryBuilderBase = require('../queryBuilder/QueryBuilderBase').default;
   }
 
-  const needsSplit = _.any(obj, value => isQueryProp);
+  const needsSplit = _.some(obj, value => isQueryProp);
 
   if (needsSplit) {
     return split(obj);

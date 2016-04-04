@@ -6,7 +6,7 @@ var Promise = require('bluebird');
 var Model = require('../../').Model;
 
 function expectIdsEqual(resultArray, expectedIds) {
-  expectArraysEqual(_(resultArray).pluck('id').sort().value(), expectedIds);
+  expectArraysEqual(_(resultArray).map('id').sort().value(), expectedIds);
 }
 
 function expectArraysEqual(arr1, arr2) {

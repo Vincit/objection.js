@@ -118,7 +118,7 @@ describe('jsonFieldExpressionParser', function () {
 function testParsing(expr, expected) {
   it(expr, function () {
     var result = parser.parse(expr);
-    var resultArray = [result.columnName].concat(_.pluck(result.access, 'ref'));
+    var resultArray = [result.columnName].concat(_.map(result.access, 'ref'));
     expect(JSON.stringify(resultArray)).to.eql(JSON.stringify(expected));
   });
 }

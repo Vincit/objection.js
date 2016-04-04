@@ -4,7 +4,7 @@ import HasManyRelation from './HasManyRelation';
 export default class HasOneRelation extends HasManyRelation {
 
   createRelationProp(owners, related) {
-    let relatedByOwnerId = _.indexBy(related, related => related.$values(this.relatedProp));
+    let relatedByOwnerId = _.keyBy(related, related => related.$values(this.relatedProp));
 
     _.each(owners, owner => {
       let ownerId = owner.$values(this.ownerProp);

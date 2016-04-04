@@ -251,7 +251,7 @@ export default class Relation {
     let modelClass = models[0].constructor;
     let idProperty = modelClass.getIdProperty();
 
-    return _.sortByAll(models, _.isArray(idProperty) ? idProperty : [idProperty]);
+    return _.sortBy(models, _.isArray(idProperty) ? idProperty : [idProperty]);
   }
 
   /**
@@ -268,7 +268,7 @@ export default class Relation {
         builder.whereRef(col, ownerIds[idx]);
       });
     } else {
-      if (_(ownerIds).flatten().all(id => _.isNull(id) || _.isUndefined(id))) {
+      if (_(ownerIds).flatten().every(id => _.isNull(id) || _.isUndefined(id))) {
         // Nothing to fetch.
         builder.resolve([]);
       } else {
@@ -311,7 +311,7 @@ export default class Relation {
     builder.onBuild(builder => {
       let ids = _(owners)
         .map(owner => owner.$values(this.ownerProp))
-        .unique(id => id.join())
+        .uniqBy(id => id.join())
         .value();
 
       this.findQuery(builder, ids);

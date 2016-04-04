@@ -422,7 +422,7 @@ module.exports = function (session) {
 
       return knex(Model2.tableName).then(function (rows) {
         // Check that the reference model was only inserted once.
-        expect(_.where(rows, {model_2_prop_1: 'child1'})).to.have.length(1);
+        expect(_.filter(rows, {model_2_prop_1: 'child1'})).to.have.length(1);
       });
     }
 

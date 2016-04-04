@@ -67,7 +67,7 @@ export default class RelationExpression {
       return this.isAllRecursive() || this.maxRecursionDepth() >= maxRecursionDepth;
     }
 
-    return _.all(expr.children, (child, childName) => {
+    return _.every(expr.children, (child, childName) => {
       var ownSubExpression = this.childExpression(childName);
       var subExpression = expr.childExpression(childName);
 
@@ -104,7 +104,7 @@ export default class RelationExpression {
    * @returns {boolean}
    */
   isAllRecursive() {
-    return this.numChildren === 1 && _.all(this.children, (val, key) => ALL_RECURSIVE_REGEX.test(key));
+    return this.numChildren === 1 && _.every(this.children, (val, key) => ALL_RECURSIVE_REGEX.test(key));
   }
 
   /**

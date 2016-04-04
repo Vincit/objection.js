@@ -42,17 +42,17 @@ module.exports = function (session) {
           .then(function (models) {
             expect(models[0]).to.be.a(Model1);
             expect(models[1]).to.be.a(Model1);
-            expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
-            expect(_.pluck(models, 'id').sort()).to.eql([1, 2]);
+            expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
+            expect(_.map(models, 'id').sort()).to.eql([1, 2]);
             return Model2.query();
           })
           .then(function (models) {
             expect(models[0]).to.be.a(Model2);
             expect(models[1]).to.be.a(Model2);
             expect(models[2]).to.be.a(Model2);
-            expect(_.pluck(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2', 'hejsan 3']);
-            expect(_.pluck(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
-            expect(_.pluck(models, 'idCol').sort()).to.eql([1, 2, 3]);
+            expect(_.map(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2', 'hejsan 3']);
+            expect(_.map(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
+            expect(_.map(models, 'idCol').sort()).to.eql([1, 2, 3]);
           });
       });
 
@@ -65,7 +65,7 @@ module.exports = function (session) {
             expect(result.results[0]).to.be.a(Model2);
             expect(result.results[1]).to.be.a(Model2);
             expect(result.total === 3).to.equal(true);
-            expect(_.pluck(result.results, 'model2Prop2')).to.eql([20, 10]);
+            expect(_.map(result.results, 'model2Prop2')).to.eql([20, 10]);
           });
       });
 
@@ -77,7 +77,7 @@ module.exports = function (session) {
           .then(function (result) {
             expect(result.results[0]).to.be.a(Model2);
             expect(result.total === 3).to.equal(true);
-            expect(_.pluck(result.results, 'model2Prop2')).to.eql([10]);
+            expect(_.map(result.results, 'model2Prop2')).to.eql([10]);
           });
       });
 
@@ -90,9 +90,9 @@ module.exports = function (session) {
             .then(function (models) {
               expect(models[0]).to.be.a(Model2);
               // Test that only the selected columns were returned.
-              expect(_.unique(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql(['idCol', 'model2Prop2']);
-              expect(_.pluck(models, 'idCol').sort()).to.eql([1, 2, 3]);
-              expect(_.pluck(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
+              expect(_.uniq(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql(['idCol', 'model2Prop2']);
+              expect(_.map(models, 'idCol').sort()).to.eql([1, 2, 3]);
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
             });
         });
 
@@ -101,7 +101,7 @@ module.exports = function (session) {
             .query()
             .where('model_2_prop_2', '>', 15)
             .then(function (models) {
-              expect(_.pluck(models, 'model2Prop2').sort()).to.eql([20, 30]);
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20, 30]);
             });
         });
 
@@ -111,7 +111,7 @@ module.exports = function (session) {
             .where('model_2_prop_2', '>', 15)
             .orderBy('model_2_prop_2')
             .then(function (models) {
-              expect(_.pluck(models, 'model2Prop2')).to.eql([20, 30]);
+              expect(_.map(models, 'model2Prop2')).to.eql([20, 30]);
             });
         });
 
@@ -133,8 +133,8 @@ module.exports = function (session) {
             .where('model_2_prop_2', '>', 15)
             .join('Model1', 'model_2.model_1_id', 'Model1.id')
             .then(function (models) {
-              expect(_.pluck(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2']);
-              expect(_.pluck(models, 'model1Prop1')).to.eql(['hello 1', 'hello 1']);
+              expect(_.map(models, 'model2Prop1').sort()).to.eql(['hejsan 1', 'hejsan 2']);
+              expect(_.map(models, 'model1Prop1')).to.eql(['hello 1', 'hello 1']);
             });
         });
 
@@ -179,8 +179,8 @@ module.exports = function (session) {
               .as('sum'))
             .orderBy('id')
             .then(function (models) {
-              expect(_.pluck(models, 'id')).to.eql([1, 2]);
-              expect(_.pluck(models, 'sum')).to.eql([60, null]);
+              expect(_.map(models, 'id')).to.eql([1, 2]);
+              expect(_.map(models, 'sum')).to.eql([60, null]);
             });
         });
 
@@ -255,8 +255,8 @@ module.exports = function (session) {
           .joinRelation('model1Relation1')
           .orderBy('Model1.id')
           .then(function (models) {
-            expect(_.pluck(models, 'id')).to.eql([1, 2, 3, 7]);
-            expect(_.pluck(models, 'rel_model1Prop1')).to.eql(['hello 2', 'hello 3', 'hello 4', 'hello 8']);
+            expect(_.map(models, 'id')).to.eql([1, 2, 3, 7]);
+            expect(_.map(models, 'rel_model1Prop1')).to.eql(['hello 2', 'hello 3', 'hello 4', 'hello 8']);
           });
       });
 
@@ -265,9 +265,9 @@ module.exports = function (session) {
           .query()
           .joinRelation('model1Relation2')
           .then(function (models) {
-            models = _.sortByAll(models, ['id', 'id_col']);
-            expect(_.pluck(models, 'id')).to.eql([1, 1, 4, 7]);
-            expect(_.pluck(models, 'id_col')).to.eql([1, 2, 4, 3]);
+            models = _.sortBy(models, ['id', 'id_col']);
+            expect(_.map(models, 'id')).to.eql([1, 1, 4, 7]);
+            expect(_.map(models, 'id_col')).to.eql([1, 2, 4, 3]);
           });
       });
 
@@ -277,9 +277,9 @@ module.exports = function (session) {
           .joinRelation('model1Relation2')
           .where('model1Relation2.id_col', '<', 4)
           .then(function (models) {
-            models = _.sortByAll(models, ['id', 'id_col']);
-            expect(_.pluck(models, 'id')).to.eql([1, 1, 7]);
-            expect(_.pluck(models, 'id_col')).to.eql([1, 2, 3]);
+            models = _.sortBy(models, ['id', 'id_col']);
+            expect(_.map(models, 'id')).to.eql([1, 1, 7]);
+            expect(_.map(models, 'id_col')).to.eql([1, 2, 3]);
           });
       });
 
@@ -288,9 +288,9 @@ module.exports = function (session) {
           .query()
           .joinRelation('model2Relation1')
           .then(function (models) {
-            models = _.sortByAll(models, ['idCol', 'id']);
-            expect(_.pluck(models, 'idCol')).to.eql([1, 2, 2]);
-            expect(_.pluck(models, 'id')).to.eql([5, 6, 7]);
+            models = _.sortBy(models, ['idCol', 'id']);
+            expect(_.map(models, 'idCol')).to.eql([1, 2, 2]);
+            expect(_.map(models, 'id')).to.eql([5, 6, 7]);
           });
       });
 
@@ -300,9 +300,9 @@ module.exports = function (session) {
           .joinRelation('model2Relation1')
           .whereBetween('model2Relation1.id', [5, 6])
           .then(function (models) {
-            models = _.sortByAll(models, ['idCol', 'id']);
-            expect(_.pluck(models, 'idCol')).to.eql([1, 2]);
-            expect(_.pluck(models, 'id')).to.eql([5, 6]);
+            models = _.sortBy(models, ['idCol', 'id']);
+            expect(_.map(models, 'idCol')).to.eql([1, 2]);
+            expect(_.map(models, 'id')).to.eql([5, 6]);
           });
       });
 
@@ -337,7 +337,7 @@ module.exports = function (session) {
         return Model1
           .query()
           .then(function (models) {
-            expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
+            expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
             models[0].model1Prop1 = 'blaa';
             return models[0].$query();
           })
@@ -405,7 +405,7 @@ module.exports = function (session) {
             .join(Model1.query())
             .then(function (models) {
               expect(models).to.have.length(2);
-              expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['hello 2', 'hello 4']);
+              expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 2', 'hello 4']);
             });
         });
 
@@ -418,7 +418,7 @@ module.exports = function (session) {
               .then(function (related) {
                 expect(related.length).to.equal(1);
                 expect(related[0]).to.be.a(Model1);
-                expect(_.unique(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
+                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
               });
           });
 
@@ -522,7 +522,7 @@ module.exports = function (session) {
                 expect(related[0]).to.be.a(Model2);
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
-                expect(_.pluck(related, 'model2Prop1').sort()).to.eql(['text 1', 'text 2', 'text 3']);
+                expect(_.map(related, 'model2Prop1').sort()).to.eql(['text 1', 'text 2', 'text 3']);
                 expect(related[0]).to.eql({
                   idCol: 1,
                   model1Id: parent1.id,
@@ -539,7 +539,7 @@ module.exports = function (session) {
                 expect(related[0]).to.be.a(Model2);
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
-                expect(_.pluck(related, 'model2Prop1').sort()).to.eql(['text 4', 'text 5', 'text 6']);
+                expect(_.map(related, 'model2Prop1').sort()).to.eql(['text 4', 'text 5', 'text 6']);
                 expect(related[0]).to.eql({
                   idCol: 4,
                   model1Id: parent2.id,
@@ -557,7 +557,7 @@ module.exports = function (session) {
             .join(Model1.query())
             .then(function (models) {
               expect(models).to.have.length(6);
-              expect(_.pluck(models, 'model_2_prop_1').sort()).to.eql(['text 1', 'text 2', 'text 3', 'text 4', 'text 5', 'text 6']);
+              expect(_.map(models, 'model_2_prop_1').sort()).to.eql(['text 1', 'text 2', 'text 3', 'text 4', 'text 5', 'text 6']);
             });
         });
 
@@ -572,8 +572,8 @@ module.exports = function (session) {
                 expect(related[0]).to.be.a(Model2);
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
-                expect(_.pluck(related, 'idCol').sort()).to.eql([1, 2, 3]);
-                expect(_.unique(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['idCol']);
+                expect(_.map(related, 'idCol').sort()).to.eql([1, 2, 3]);
+                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['idCol']);
               });
           });
 
@@ -582,7 +582,7 @@ module.exports = function (session) {
               .$relatedQuery('model1Relation2')
               .where('model_2_prop_2', '=', '2')
               .then(function (related) {
-                expect(_.pluck(related, 'model2Prop2')).to.eql([2]);
+                expect(_.map(related, 'model2Prop2')).to.eql([2]);
               });
           });
 
@@ -594,7 +594,7 @@ module.exports = function (session) {
               })
               .orderBy('model_2_prop_2')
               .then(function (related) {
-                expect(_.pluck(related, 'model2Prop2')).to.eql([1, 3]);
+                expect(_.map(related, 'model2Prop2')).to.eql([1, 3]);
               });
           });
 
@@ -712,8 +712,8 @@ module.exports = function (session) {
                 expect(related[0]).to.be.a(Model1);
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
-                expect(_.pluck(related, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3']);
-                expect(_.pluck(related, 'extra3').sort()).to.eql([null, null, null]);
+                expect(_.map(related, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3']);
+                expect(_.map(related, 'extra3').sort()).to.eql([null, null, null]);
                 expect(related[0]).to.eql({
                   id: 3,
                   model1Id: null,
@@ -731,8 +731,8 @@ module.exports = function (session) {
                 expect(related[0]).to.be.a(Model1);
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
-                expect(_.pluck(related, 'model1Prop1').sort()).to.eql(['blaa 4', 'blaa 5', 'blaa 6']);
-                expect(_.pluck(related, 'extra3').sort()).to.eql(['extra 4', 'extra 6', null]);
+                expect(_.map(related, 'model1Prop1').sort()).to.eql(['blaa 4', 'blaa 5', 'blaa 6']);
+                expect(_.map(related, 'extra3').sort()).to.eql(['extra 4', 'extra 6', null]);
                 expect(related[0]).to.eql({
                   id: 6,
                   model1Id: null,
@@ -781,7 +781,7 @@ module.exports = function (session) {
             .join(Model2.query())
             .then(function (models) {
               expect(models).to.have.length(6);
-              expect(_.pluck(models, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3', 'blaa 4', 'blaa 5', 'blaa 6']);
+              expect(_.map(models, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3', 'blaa 4', 'blaa 5', 'blaa 6']);
             });
         });
 
@@ -796,8 +796,8 @@ module.exports = function (session) {
                 expect(related[0]).to.be.a(Model1);
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
-                expect(_.pluck(related, 'id').sort()).to.eql([3, 4, 5]);
-                expect(_.unique(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
+                expect(_.map(related, 'id').sort()).to.eql([3, 4, 5]);
+                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
               });
           });
 
@@ -806,7 +806,7 @@ module.exports = function (session) {
               .$relatedQuery('model2Relation1')
               .where('model1Prop2', '=', '2')
               .then(function (related) {
-                expect(_.pluck(related, 'model1Prop2')).to.eql([2]);
+                expect(_.map(related, 'model1Prop2')).to.eql([2]);
               });
           });
 
@@ -818,7 +818,7 @@ module.exports = function (session) {
               })
               .orderBy('model1Prop2')
               .then(function (related) {
-                expect(_.pluck(related, 'model1Prop2')).to.eql([1, 3]);
+                expect(_.map(related, 'model1Prop2')).to.eql([1, 3]);
               });
           });
 

@@ -210,7 +210,7 @@ export default class ManyToManyRelation extends Relation {
         builder.whereRef(joinTableOwnerCol, ownerIds[idx]);
       });
     } else {
-      if (_(ownerIds).flatten().all(id => _.isNull(id) || _.isUndefined(id))) {
+      if (_(ownerIds).flatten().every(id => _.isNull(id) || _.isUndefined(id))) {
         // Nothing to fetch.
         builder.resolve([]);
       } else {
@@ -262,7 +262,7 @@ export default class ManyToManyRelation extends Relation {
     builder.onBuild(builder => {
       let ids = _(owners)
         .map(owner => owner.$values(this.ownerProp))
-        .unique(id => id.join())
+        .uniqBy(id => id.join())
         .value();
 
       if (!builder.has(/select/)) {
@@ -482,6 +482,8 @@ export default class ManyToManyRelation extends Relation {
   }
 
   omitExtraProps(models) {
-    _.each(models, model => model.$omitFromDatabaseJson(this.joinTableExtraProps));
+    if (!_.isEmpty(this.joinTableExtraProps)) {
+      _.each(models, model => model.$omitFromDatabaseJson(this.joinTableExtraProps));
+    }
   }
 }

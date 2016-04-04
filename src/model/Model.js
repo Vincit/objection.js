@@ -613,14 +613,14 @@ export default class Model extends ModelBase {
         var types = _.compact(ensureArray(prop.type));
 
         if (types.length === 0 && _.isArray(prop.anyOf)) {
-          types = _.flattenDeep(_.pluck(prop.anyOf, 'type'));
+          types = _.flattenDeep(_.map(prop.anyOf, 'type'));
         }
 
         if (types.length === 0 && _.isArray(prop.oneOf)) {
-          types = _.flattenDeep(_.pluck(prop.oneOf, 'type'));
+          types = _.flattenDeep(_.map(prop.oneOf, 'type'));
         }
 
-        if (_.contains(types, 'object') || _.contains(types, 'array')) {
+        if (_.includes(types, 'object') || _.includes(types, 'array')) {
           this.jsonAttributes.push(propName);
         }
       });

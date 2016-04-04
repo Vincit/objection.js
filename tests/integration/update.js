@@ -133,7 +133,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
             done();
           })
           .catch(done);
@@ -161,7 +161,7 @@ module.exports = function (session) {
             return session.knex(Model1.tableName);
           })
           .then(function (rows) {
-            expect(_.pluck(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
             done();
           })
           .catch(done);

@@ -52,14 +52,14 @@ export default function (ids, expectedProperties, opt) {
         ids = _.map(ids, ensureObject);
       } else {
         // 3.
-        ids = _.map(ids, item => _.object(expectedProperties, [item]));
+        ids = _.map(ids, item => _.zipObject(expectedProperties, [item]));
       }
     } else if (_.isObject(ids)) {
       // 2.
       ids = [ids];
     } else {
       // 1.
-      ids = [_.object(expectedProperties, [ids])];
+      ids = [_.zipObject(expectedProperties, [ids])];
     }
   }
 
@@ -87,7 +87,7 @@ function convertIdArrayToObject(ids, expectedProperties) {
     throw new Error(`composite identifier ${JSON.stringify(ids)} should have ${expectedProperties.length} values`);
   }
 
-  return _.object(expectedProperties, ids);
+  return _.zipObject(expectedProperties, ids);
 }
 
 function ensureObject(ids) {

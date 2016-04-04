@@ -322,11 +322,11 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(5);
-              expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
             });
         });
 
@@ -346,12 +346,12 @@ module.exports = function (session) {
               })
               .then(function (rows) {
                 expect(rows).to.have.length(6);
-                expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-                expect(_.where(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-                expect(_.where(rows, {model2Id: 1, model1Id: 6})).to.have.length(1);
-                expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-                expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-                expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+                expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+                expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+                expect(_.filter(rows, {model2Id: 1, model1Id: 6})).to.have.length(1);
+                expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+                expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+                expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
               });
           });
         }
@@ -371,11 +371,11 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(5);
-              expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
             });
         });
 
@@ -394,11 +394,11 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(5);
-              expect(_.where(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 1, model1Id: 5, extra3: 'foobar'})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-              expect(_.where(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 5, extra3: 'foobar'})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
             });
         });
 

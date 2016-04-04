@@ -759,7 +759,7 @@ module.exports = function (session) {
                 return session.knex('Model1Model2');
               })
               .then(function (rows) {
-                expect(_.where(rows, {model1Id: 1, model2Id: 1}).length).to.equal(1);
+                expect(_.filter(rows, {model1Id: 1, model2Id: 1}).length).to.equal(1);
               });
           });
 

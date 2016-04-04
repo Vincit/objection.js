@@ -135,7 +135,7 @@ export default class QueryBuilderBase {
    * @returns {boolean}
    */
   has(methodNameRegex) {
-    return _.any(this._knexMethodCalls, call => {
+    return _.some(this._knexMethodCalls, call => {
       return methodNameRegex.test(call.method);
     });
   }
@@ -1057,7 +1057,7 @@ function wrapFunctionArg(func, query) {
 
 function parseFieldExpression(expression, extractAsText) {
   let parsed = jsonFieldExpressionParser.parse(expression);
-  let jsonRefs = _(parsed.access).pluck('ref').value().join(",");
+  let jsonRefs = _(parsed.access).map('ref').value().join(",");
   let extractor = extractAsText ? '#>>' : '#>';
   let middleQuotedColumnName = parsed.columnName.split('.').join('"."');
   return `"${middleQuotedColumnName}"${extractor}'{${jsonRefs}}'`;

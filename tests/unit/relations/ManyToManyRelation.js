@@ -841,7 +841,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str2\', \'4\') returning "id"');
         expect(executedQueries[1]).to.equal('insert into "JoinTable" ("extra1", "extra2", "ownerId", "relatedId") values (\'extraVal1\', \'extraVal2\', \'666\', \'4\') returning "relatedId"');
 
-        expect(_.invoke(owner.nameOfOurRelation, 'toJSON')).to.eql([
+        expect(_.invokeMap(owner.nameOfOurRelation, 'toJSON')).to.eql([
           {a: 'str2', id: 1, rid: 4, extra1: 'extraVal1', extra2: 'extraVal2'},
           {a: 'str0', id: 3}
         ]);
@@ -878,7 +878,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal('insert into "RelatedModel" ("a", "rid") values (\'str2\', \'4\') returning "id"');
         expect(executedQueries[1]).to.equal('insert into "JoinTable" ("extra2", "ownerId", "relatedId") values (\'extraVal2\', \'666\', \'4\') returning "relatedId"');
 
-        expect(_.invoke(owner.nameOfOurRelation, 'toJSON')).to.eql([
+        expect(_.invokeMap(owner.nameOfOurRelation, 'toJSON')).to.eql([
           {a: 'str2', id: 1, rid: 4, extra2: 'extraVal2'},
           {a: 'str0', id: 3}
         ]);
