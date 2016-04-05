@@ -19,6 +19,7 @@ export function isSqlite(knex) {
 }
 
 export function isKnexQueryBuilder(knexQueryBuilder) {
+  // TODO: Use something safer
   return knexQueryBuilder
     && knexQueryBuilder.client
     && _.isString(knexQueryBuilder.client.dialect);

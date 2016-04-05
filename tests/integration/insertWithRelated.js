@@ -92,6 +92,8 @@ module.exports = function (session) {
               });
           })
           .then(function (inserted) {
+            inserted.model1Relation2 = _.sortBy(inserted.model1Relation2, 'idCol');
+
             expect(inserted.toJSON()).to.eql({
               id: 3,
               model1Relation2: [
@@ -103,7 +105,7 @@ module.exports = function (session) {
             return Model1.query().eager('model1Relation2').where('id', inserted.id);
           })
           .then(function (inserted) {
-            _.sortBy(inserted[0].model1Relation2, 'idCol');
+            inserted[0].model1Relation2 = _.sortBy(inserted[0].model1Relation2, 'idCol');
 
             expect(inserted[0]).to.eql({
               id: 3,

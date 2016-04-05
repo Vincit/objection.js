@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
+import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
 import InsertionOrUpdate from './InsertionOrUpdate';
 import InsertWithRelated from './InsertWithRelated';
@@ -12,7 +13,7 @@ import deprecated from '../utils/decorators/deprecated';
 export default class QueryBuilder extends QueryBuilderBase {
 
   constructor(modelClass) {
-    super(modelClass.knex());
+    super(modelClass.knex(), QueryBuilderContext);
 
     this._modelClass = modelClass;
     this._calledWriteMethod = null;
@@ -28,10 +29,6 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
-    this.internalContext().runBefore = [];
-    this.internalContext().runAfter = [];
-    this.internalContext().onBuild = [];
-
     this.clearHooks();
     this.clearCustomImpl();
   }
@@ -45,16 +42,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @param {Object=} ctx
-   * @returns {QueryBuilder|Object}
-   */
-  context(...args) {
-    // This implementation is here just so that we can document it.
-    return super.context(...args);
-  }
-
-  /**
    * @param {QueryBuilderBase} query
+   * @returns {QueryBuilder}
    */
   childQueryOf(query) {
     if (query) {
@@ -329,13 +318,6 @@ export default class QueryBuilder extends QueryBuilderBase {
     let builder = new this.constructor(this._modelClass);
     // This is a QueryBuilderBase method.
     this.cloneInto(builder);
-
-    let builderIntCtx = builder.internalContext();
-    let intCtx = this.internalContext();
-
-    builderIntCtx.runBefore = intCtx.runBefore.slice();
-    builderIntCtx.runAfter = intCtx.runAfter.slice();
-    builderIntCtx.onBuild = intCtx.onBuild.slice();
 
     builder._calledWriteMethod = this._calledWriteMethod;
     builder._explicitRejectValue = this._explicitRejectValue;
@@ -828,10 +810,9 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   withSchema(schema) {
-    this.internalContext().onBuild.push((builder) => {
+    this.internalContext().onBuild.push(builder => {
       if (!builder.has(/withSchema/)) {
-        // If the builder already has a schema, don't override it.
-        builder.callKnexMethod('withSchema', [schema]);
+        builder.callKnexQueryBuilderMethod('withSchema', [schema]);
       }
     });
 
