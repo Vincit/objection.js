@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import jsonApi from './postgresJsonApi';
-import QueryBuilderMethod from '../QueryBuilderMethod';
+import ArgumentQueryBuilderMethod from '../ArgumentQueryBuilderMethod';
 
-export default class WhereJsonPostgresMethod extends QueryBuilderMethod {
+export default class WhereJsonPostgresMethod extends ArgumentQueryBuilderMethod {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);

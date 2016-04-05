@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import QueryBuilderMethod from './QueryBuilderMethod';
+import ArgumentQueryBuilderMethod from './ArgumentQueryBuilderMethod';
 
-export default class WhereInCompositeMethod extends QueryBuilderMethod {
+export default class WhereInCompositeMethod extends ArgumentQueryBuilderMethod {
 
   onBuild(knexBuilder) {
     this.whereInComposite(knexBuilder, this.args[0], this.args[1]);

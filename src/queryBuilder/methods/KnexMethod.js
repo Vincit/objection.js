@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import QueryBuilderMethod from './QueryBuilderMethod';
+import ArgumentQueryBuilderMethod from './ArgumentQueryBuilderMethod';
 
-export default class KnexMethod extends QueryBuilderMethod {
+export default class KnexMethod extends ArgumentQueryBuilderMethod {
 
   onBuild(builder) {
     if (_.isFunction(builder[this.name])) {

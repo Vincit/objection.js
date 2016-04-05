@@ -85,8 +85,10 @@ module.exports = function (session) {
 
                 model1Relation2: [{
                   "#id": 'child1',
+                  idCol: 100,
                   model2Prop1: Model1.query().min('model1Prop1')
                 }, {
+                  idCol: 101,
                   model2Prop1: Model1.knex().from('Model1').max('model1Prop1')
                 }]
               });
@@ -97,8 +99,8 @@ module.exports = function (session) {
             expect(inserted.toJSON()).to.eql({
               id: 3,
               model1Relation2: [
-                { model1Id: 3, idCol: 1 },
-                { model1Id: 3, idCol: 2 }
+                { model1Id: 3, idCol: 100 },
+                { model1Id: 3, idCol: 101 }
               ]
             });
 
@@ -113,8 +115,8 @@ module.exports = function (session) {
               model1Prop1: '42',
               model1Prop2: null,
               model1Relation2: [
-                { idCol: 1, model1Id: 3, model2Prop1: '10', model2Prop2: null },
-                { idCol: 2, model1Id: 3, model2Prop1: '50', model2Prop2: null }
+                { idCol: 100, model1Id: 3, model2Prop1: '10', model2Prop2: null },
+                { idCol: 101, model1Id: 3, model2Prop1: '50', model2Prop2: null }
               ]
             });
           });

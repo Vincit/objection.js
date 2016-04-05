@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import QueryBuilderMethod from './QueryBuilderMethod';
+import ArgumentQueryBuilderMethod from './ArgumentQueryBuilderMethod';
 
-export default class WhereCompositeMethod extends QueryBuilderMethod {
+export default class WhereCompositeMethod extends ArgumentQueryBuilderMethod {
 
   onBuild(knexBuilder) {
     if (this.args.length === 2) {

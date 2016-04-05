@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import jsonApi from './postgresJsonApi';
-import QueryBuilderMethod from '../QueryBuilderMethod';
+import ArgumentQueryBuilderMethod from '../ArgumentQueryBuilderMethod';
 
-export default class WhereJsonNotObjectPostgresMethod extends QueryBuilderMethod {
+export default class WhereJsonNotObjectPostgresMethod extends ArgumentQueryBuilderMethod {
 
   onBuild(knexBuilder) {
     this.whereJsonNotObject(knexBuilder, this.args[0]);
