@@ -183,7 +183,7 @@ describe('Performance tests', function () {
         });
       },
       test: function (persons) {
-        _.invoke(persons, '$toJson');
+        _.invokeMap(persons, '$toJson');
       }
     });
 
@@ -197,7 +197,7 @@ describe('Performance tests', function () {
         });
       },
       test: function (persons) {
-        _.invoke(persons, '$toDatabaseJson');
+        _.invokeMap(persons, '$toDatabaseJson');
       }
     });
 
@@ -211,7 +211,7 @@ describe('Performance tests', function () {
         });
       },
       test: function (persons) {
-        _.invoke(persons, '$clone');
+        _.invokeMap(persons, '$clone');
       }
     });
 
