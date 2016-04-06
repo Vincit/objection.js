@@ -174,6 +174,7 @@ export default class QueryBuilderBase {
     builder._knex = this._knex;
     builder._methodCalls = this._methodCalls.slice();
     builder._context = this._context.clone();
+    
     return builder;
   }
 
@@ -188,9 +189,8 @@ export default class QueryBuilderBase {
    * @protected
    */
   buildInto(knexBuilder) {
-    _.each(this._methodCalls, method => {
-      method.onBuild(knexBuilder);
-    });
+    _.each(this._methodCalls, method => method.onBeforeBuild(this));
+    _.each(this._methodCalls, method => method.onBuild(knexBuilder, this));
 
     return knexBuilder;
   }

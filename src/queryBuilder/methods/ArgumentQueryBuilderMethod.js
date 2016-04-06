@@ -10,11 +10,6 @@ export default class ArgumentQueryBuilderMethod extends QueryBuilderMethod {
     this.args = null;
   }
 
-  /**
-   * @param {QueryBuilderBase} builder
-   * @param {Array.<*>} args
-   * @returns {boolean}
-   */
   call(builder, args) {
     if (!wrapArgs(args, builder.knex())) {
       return false;

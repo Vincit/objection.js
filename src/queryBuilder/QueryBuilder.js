@@ -274,7 +274,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
-   * @returns {Model}
+   * @returns {Constructor.<Model>}
    */
   modelClass() {
     return this._modelClass;

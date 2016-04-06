@@ -5,7 +5,7 @@ import {isKnexQueryBuilder} from '../../utils/dbUtils';
 export default class QueryBuilderMethod {
 
   /**
-   * @param {QueryBuilderBase} builder
+   * @param {QueryBuilder} builder
    * @param {string} name
    * @param {Object} opt
    */
@@ -13,6 +13,7 @@ export default class QueryBuilderMethod {
     this.name = name;
     this.opt = opt || {};
     this.knex = builder.knex();
+    this.isWriteMethod = false;
   }
 
   /**
@@ -30,7 +31,7 @@ export default class QueryBuilderMethod {
   }
 
   /**
-   * @param {QueryBuilderBase} builder
+   * @param {QueryBuilder} builder
    * @param {Array.<*>} args
    * @returns {boolean}
    */
@@ -39,7 +40,7 @@ export default class QueryBuilderMethod {
   }
 
   /**
-   * @param {QueryBuilderBase} builder
+   * @param {QueryBuilder} builder
    * @returns {boolean}
    */
   onCall(builder) {
@@ -47,9 +48,33 @@ export default class QueryBuilderMethod {
   }
 
   /**
-   * @param {QueryBuilder} knexBuilder
+   * @param {QueryBuilder} builder
+   * @param {*} result
+   * @returns {Promise|*}
    */
-  onBuild(knexBuilder) {
-    // Do nothing by default.
+  onBefore(builder, result) {}
+
+  /**
+   * @returns {boolean}
+   */
+  hasOnBefore() {
+    return this.onBefore !== QueryBuilderMethod.prototype.onBefore;
   }
+
+  onAfterModelCreateFront(builder, result) {}
+
+  onAfterModelCreate(builder, result) {}
+
+  onAfter(builder, result) {}
+
+  /**
+   * @param {QueryBuilder} builder
+   */
+  onBeforeBuild(builder) {}
+
+  /**
+   * @param {QueryBuilder} knexBuilder
+   * @param {QueryBuilder} builder
+   */
+  onBuild(knexBuilder, builder) {}
 }
