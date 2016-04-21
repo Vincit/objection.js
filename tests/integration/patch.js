@@ -47,9 +47,9 @@ module.exports = function (session) {
           .where('id', '=', 2)
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
-            expect(model.$beforeUpdateCalled).to.equal(true);
+            expect(model.$beforeUpdateCalled).to.equal(1);
             expect(model.$beforeUpdateOptions).to.eql({patch: true});
-            expect(model.$afterUpdateCalled).to.equal(true);
+            expect(model.$afterUpdateCalled).to.equal(1);
             expect(model.$afterUpdateOptions).to.eql({patch: true});
             return session.knex('Model1').orderBy('id');
           })

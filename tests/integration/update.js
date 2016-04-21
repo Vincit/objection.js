@@ -47,8 +47,8 @@ module.exports = function (session) {
           .where('id', '=', 2)
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
-            expect(model.$beforeUpdateCalled).to.equal(true);
-            expect(model.$afterUpdateCalled).to.equal(true);
+            expect(model.$beforeUpdateCalled).to.equal(1);
+            expect(model.$afterUpdateCalled).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {
@@ -258,8 +258,8 @@ module.exports = function (session) {
           .update()
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
-            expect(model.$beforeUpdateCalled).to.equal(true);
-            expect(model.$afterUpdateCalled).to.equal(true);
+            expect(model.$beforeUpdateCalled).to.equal(1);
+            expect(model.$afterUpdateCalled).to.equal(1);
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {

@@ -56,21 +56,21 @@ module.exports.initialize = function (opt) {
   Model1.prototype.$beforeInsert = function () {
     var self = this;
     return Promise.delay(5).then(function () {
-      self.$beforeInsertCalled = true;
+      inc(self, '$beforeInsertCalled');
     });
   };
 
   Model1.prototype.$afterInsert = function () {
     var self = this;
     return Promise.delay(1).then(function () {
-      self.$afterInsertCalled = true;
+      inc(self, '$afterInsertCalled');
     });
   };
 
   Model1.prototype.$beforeUpdate = function (options) {
     var self = this;
     return Promise.delay(5).then(function () {
-      self.$beforeUpdateCalled = true;
+      inc(self, '$beforeUpdateCalled');
       self.$beforeUpdateOptions = options;
     });
   };
@@ -78,7 +78,7 @@ module.exports.initialize = function (opt) {
   Model1.prototype.$afterUpdate = function (options) {
     var self = this;
     return Promise.delay(1).then(function () {
-      self.$afterUpdateCalled = true;
+      inc(self, '$afterUpdateCalled');
       self.$afterUpdateOptions = options;
     });
   };
@@ -86,21 +86,21 @@ module.exports.initialize = function (opt) {
   Model2.prototype.$beforeInsert = function () {
     var self = this;
     return Promise.delay(5).then(function () {
-      self.$beforeInsertCalled = true;
+      inc(self, '$beforeInsertCalled');
     });
   };
 
   Model2.prototype.$afterInsert = function () {
     var self = this;
     return Promise.delay(1).then(function () {
-      self.$afterInsertCalled = true;
+      inc(self, '$afterInsertCalled');
     });
   };
 
   Model2.prototype.$beforeUpdate = function (options) {
     var self = this;
     return Promise.delay(5).then(function () {
-      self.$beforeUpdateCalled = true;
+      inc(self, '$beforeUpdateCalled');
       self.$beforeUpdateOptions = options;
     });
   };
@@ -108,7 +108,7 @@ module.exports.initialize = function (opt) {
   Model2.prototype.$afterUpdate = function (options) {
     var self = this;
     return Promise.delay(1).then(function () {
-      self.$afterUpdateCalled = true;
+      inc(self, '$afterUpdateCalled');
       self.$afterUpdateOptions = options;
     });
   };
@@ -337,5 +337,13 @@ function convertPostgresBigIntegersToNumber() {
       }
       return number;
     });
+  }
+}
+
+function inc(obj, key) {
+  if (!_.has(obj, key)) {
+    obj[key] = 1;
+  } else {
+    obj[key]++;
   }
 }

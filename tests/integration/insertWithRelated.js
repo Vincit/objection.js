@@ -431,8 +431,8 @@ module.exports = function (session) {
     }
 
     function checkHooks(model) {
-      expect(model.$beforeInsertCalled).to.equal(true);
-      expect(model.$afterInsertCalled).to.equal(true);
+      expect(model.$beforeInsertCalled).to.equal(1);
+      expect(model.$afterInsertCalled).to.equal(1);
     }
 
   });
