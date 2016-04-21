@@ -12,8 +12,11 @@ export default class WhereJsonFieldPostgresMethod extends ArgumentQueryBuilderMe
     this.sql = null;
   }
 
-  onCall(builder) {
+  call(builder, args) {
+    super.call(builder, args);
+
     this.sql = jsonApi.whereJsonFieldQuery(builder.knex(), this.args[0], this.args[1], this.args[2]);
+
     return true;
   }
 

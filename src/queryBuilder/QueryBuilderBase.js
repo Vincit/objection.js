@@ -25,17 +25,17 @@ export default class QueryBuilderBase {
   constructor(knex, QueryBuilderContext) {
     /**
      * @type {knex}
-     * @private
+     * @protected
      */
     this._knex = knex;
     /**
      * @type {Array.<QueryBuilderMethod>}
-     * @private
+     * @protected
      */
     this._methodCalls = [];
     /**
      * @type {QueryBuilderContextBase}
-     * @private
+     * @protected
      */
     this._context = new (QueryBuilderContext || QueryBuilderContextBase)();
   }
@@ -143,7 +143,7 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
    callQueryBuilderMethod(method, args) {
-    if (method.call(this, args)) {
+    if (method.call(this, args || [])) {
       this._methodCalls.push(method);
     }
 
@@ -163,18 +163,18 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   clone() {
-    return this.cloneInto(new this.constructor(this._knex));
+    return this.baseCloneInto(new this.constructor(this._knex));
   }
 
   /**
    * @protected
    * @returns {QueryBuilderBase}
    */
-  cloneInto(builder) {
+  baseCloneInto(builder) {
     builder._knex = this._knex;
     builder._methodCalls = this._methodCalls.slice();
     builder._context = this._context.clone();
-    
+
     return builder;
   }
 

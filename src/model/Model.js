@@ -3,25 +3,32 @@ import ModelBase from './ModelBase';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
+import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
 import ValidationError from '../ValidationError';
 import EagerFetcher from '../queryBuilder/EagerFetcher';
 import deprecated from '../utils/decorators/deprecated';
 import memoize from '../utils/decorators/memoize';
 
 import Relation from '../relations/Relation';
-import HasOneRelation from '../relations/HasOneRelation';
-import HasManyRelation from '../relations/HasManyRelation';
-import BelongsToOneRelation from '../relations/BelongsToOneRelation';
-import ManyToManyRelation from '../relations/ManyToManyRelation';
+import HasOneRelation from '../relations/hasOne/HasOneRelation';
+import HasManyRelation from '../relations/hasMany/HasManyRelation';
+import ManyToManyRelation from '../relations/manyToMany/ManyToManyRelation';
+import BelongsToOneRelation from '../relations/belongsToOne/BelongsToOneRelation';
+
+import InstanceFindMethod from '../queryBuilder/methods/InstanceFindMethod';
+import InstanceInsertMethod from '../queryBuilder/methods/InstanceInsertMethod';
+import InstanceUpdateMethod from '../queryBuilder/methods/InstanceUpdateMethod';
+import InstanceDeleteMethod from '../queryBuilder/methods/InstanceDeleteMethod';
 
 export default class Model extends ModelBase {
 
   static QueryBuilder = QueryBuilder;
   static RelatedQueryBuilder = QueryBuilder;
+
   static HasOneRelation = HasOneRelation;
-  static BelongsToOneRelation = BelongsToOneRelation;
   static HasManyRelation = HasManyRelation;
   static ManyToManyRelation = ManyToManyRelation;
+  static BelongsToOneRelation = BelongsToOneRelation;
 
   @deprecated({removedIn: '0.7.0', useInstead: 'BelongsToOneRelation'})
   static get OneToOneRelation() {
@@ -74,15 +81,10 @@ export default class Model extends ModelBase {
   static $$knex = null;
 
   /**
-   * @private
-   */
-  static $$relations = null;
-
-  /**
    * @param {string|number|Array.<string|number>=} id
    * @returns {string|number|Array.<string|number>}
    */
-  $id() {
+  $id(id) {
     if (arguments.length > 0) {
       return setId(this, arguments[0]);
     } else {
@@ -112,45 +114,25 @@ export default class Model extends ModelBase {
 
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
-      .findImpl((builder) => {
-        builder.first();
-        builder.onBuild((builder) => {
-          builder.whereComposite(ModelClass.getFullIdColumn(), this.$id());
-        });
+      .findMethodFactory(builder => {
+        return new InstanceFindMethod(builder, 'find', {instance: this});
       })
-      .insertImpl((insertion, builder) => {
-        insertion.setData(this);
-        builder.onBuild((builder) => {
-          builder.$$insert(insertion);
-        });
+      .insertMethodFactory(builder => {
+        return new InstanceInsertMethod(builder, 'insert', {instance: this});
       })
-      .updateImpl((update, builder) => {
-        if (!update.model()) {
-          update.setData(this);
-        }
-
-        builder.onBuild((builder) => {
-          builder.$$update(update).whereComposite(ModelClass.getFullIdColumn(), this.$id());
-        });
+      .updateMethodFactory(builder => {
+        return new InstanceUpdateMethod(builder, 'update', {instance: this});
       })
-      .patchImpl((patch, builder) => {
-        if (!patch.model()) {
-          patch.setData(this);
-        }
-
-        builder.onBuild((builder) => {
-          builder.$$update(patch).whereComposite(ModelClass.getFullIdColumn(), this.$id());
-        });
+      .patchMethodFactory(builder => {
+        return new InstanceUpdateMethod(builder, 'patch', {instance: this, modelOptions: {patch: true}});
       })
-      .deleteImpl((builder) => {
-        builder.onBuild((builder) => {
-          builder.$$delete().whereComposite(ModelClass.getFullIdColumn(), this.$id());
-        });
+      .deleteMethodFactory(builder => {
+        return new InstanceDeleteMethod(builder, 'delete', {instance: this});
       })
-      .relateImpl(() => {
+      .relateMethodFactory(() => {
         throw new Error('`relate` makes no sense in this context');
       })
-      .unrelateImpl(() => {
+      .unrelateMethodFactory(() => {
         throw new Error('`unrelate` makes no sense in this context');
       });
   }
@@ -165,26 +147,26 @@ export default class Model extends ModelBase {
 
     return ModelClass.RelatedQueryBuilder
       .forClass(ModelClass)
-      .findImpl((builder) => {
-        relation.find(builder, [this]);
+      .findMethodFactory(builder => {
+        return relation.find(builder, [this]);
       })
-      .insertImpl((insert, builder) => {
-        relation.insert(builder, this, insert);
+      .insertMethodFactory(builder => {
+        return relation.insert(builder, this);
       })
-      .updateImpl((update, builder) => {
-        relation.update(builder, this, update);
+      .updateMethodFactory(builder => {
+        return relation.update(builder, this);
       })
-      .patchImpl((patch, builder) => {
-        relation.patch(builder, this, patch);
+      .patchMethodFactory(builder => {
+        return relation.patch(builder, this);
       })
-      .deleteImpl((builder) => {
-        relation.delete(builder, this);
+      .deleteMethodFactory(builder => {
+        return relation.delete(builder, this);
       })
-      .relateImpl((ids, builder) => {
-        relation.relate(builder, this, ids);
+      .relateMethodFactory(builder => {
+        return relation.relate(builder, this);
       })
-      .unrelateImpl((builder) => {
-        relation.unrelate(builder, this);
+      .unrelateMethodFactory(builder => {
+        return relation.unrelate(builder, this);
       });
   }
 
@@ -333,10 +315,10 @@ export default class Model extends ModelBase {
 
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
-      .relateImpl(() => {
+      .relateMethodFactory(() => {
         throw new Error('`relate` makes no sense in this context');
       })
-      .unrelateImpl(() => {
+      .unrelateMethodFactory(() => {
         throw new Error('`unrelate` makes no sense in this context');
       });
   }
@@ -421,10 +403,11 @@ export default class Model extends ModelBase {
     BoundModelClass.knex(knex);
     knex.$$objection.boundModels[ModelClass.tableName] = BoundModelClass;
 
-    BoundModelClass.$$relations = _.reduce(ModelClass.getRelations(), (relations, relation, relationName) => {
+    // Bind all relations also.
+    BoundModelClass.relations(_.reduce(ModelClass.getRelations(), (relations, relation, relationName) => {
       relations[relationName] = relation.bindKnex(knex);
       return relations;
-    }, Object.create(null));
+    }, Object.create(null)));
 
     return BoundModelClass;
   }
@@ -484,17 +467,26 @@ export default class Model extends ModelBase {
   }
 
   /**
-   * @returns {number}
+   * @returns {Array.<string>}
+   */
+  @memoize
+  static getIdColumnArray() {
+    let ModelClass = this;
+
+    if (_.isArray(ModelClass.idColumn)) {
+      return ModelClass.idColumn;
+    } else {
+      return [ModelClass.idColumn];
+    }
+  }
+
+  /**
+   * @returns {Array.<string>}
    */
   @memoize
   static getIdPropertyArray() {
     let ModelClass = this;
-
-    if (_.isArray(ModelClass.idColumn)) {
-      return _.map(ModelClass.idColumn, col => idColumnToIdProperty(ModelClass, col));
-    } else {
-      return [idColumnToIdProperty(ModelClass, ModelClass.idColumn)];
-    }
+    return _.map(ModelClass.getIdColumnArray(), col => idColumnToIdProperty(ModelClass, col));
   }
 
   /**
@@ -524,21 +516,30 @@ export default class Model extends ModelBase {
   }
 
   /**
+   * @private
+   */
+  @hiddenDataGetterSetter('relations')
+  static relations(relations) {}
+
+  /**
    * @return {Object.<string, Relation>}
    */
   static getRelations() {
-    const ModelClass = this;
+    let relations = this.relations();
 
-    if (!this.$$relations) {
-      // Lazy-load the relations to prevent require loops.
-      this.$$relations = _.reduce(this.relationMappings, (relations, mapping, relationName) => {
+    if (!relations) {
+      const ModelClass = this;
+
+      relations = _.reduce(this.relationMappings, (relations, mapping, relationName) => {
         relations[relationName] = new mapping.relation(relationName, ModelClass);
         relations[relationName].setMapping(mapping);
         return relations;
       }, Object.create(null));
+
+      this.relations(relations);
     }
 
-    return this.$$relations;
+    return relations;
   }
 
   /**

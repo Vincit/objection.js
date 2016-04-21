@@ -140,14 +140,13 @@ module.exports = function (session) {
               done(new Error('should not get here'));
             })
             .catch(function () {
-              return session.knex(Model1.tableName).orderBy('id');
-            })
-            .then(function (rows) {
-              expect(rows).to.have.length(3);
-              expect(rows[0].model1Id).to.equal(null);
-              expect(rows[1].model1Id).to.equal(null);
-              expect(rows[2].model1Id).to.equal(null);
-              done();
+              return session.knex(Model1.tableName).orderBy('id').then(function (rows) {
+                expect(rows).to.have.length(3);
+                expect(rows[0].model1Id).to.equal(null);
+                expect(rows[1].model1Id).to.equal(null);
+                expect(rows[2].model1Id).to.equal(null);
+                done();
+              });
             });
         });
 

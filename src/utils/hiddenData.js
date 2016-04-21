@@ -8,18 +8,14 @@ export function createHiddenDataGetter(propName) {
 
 export function createHiddenDataSetter(propName) {
   return new Function('obj', 'data', `
-    var hiddenData = obj.${HIDDEN_DATA};
-
-    if (typeof hiddenData !== 'object') {
-      hiddenData = Object.create(null);
-
+    if (!obj.hasOwnProperty("${HIDDEN_DATA}")) {
       Object.defineProperty(obj, "${HIDDEN_DATA}", {
         enumerable: false,
         writable: false,
-        value: hiddenData
+        value: Object.create(null)
       });
     }
 
-    hiddenData.${propName} = data;
+    obj.${HIDDEN_DATA}.${propName} = data;
   `);
 }

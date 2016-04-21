@@ -12,8 +12,11 @@ export default class WhereJsonHasPostgresMethod extends ArgumentQueryBuilderMeth
     this.sql = null;
   }
 
-  onCall(builder) {
+  call(builder, args) {
+    super.call(builder, args);
+
     this.sql = jsonApi.whereJsonFieldRightStringArrayOnLeftQuery(builder, this.args[0], this.opt.operator, this.args[1]);
+
     return true;
   }
 

@@ -1,16 +1,24 @@
 import _ from 'lodash';
-import Relation from './Relation';
-import ModelBase from '../model/ModelBase';
-import inheritModel from '../model/inheritModel';
-import normalizeIds from '../utils/normalizeIds';
-import {overwriteForDatabase} from '../utils/dbUtils';
-import {isSubclassOf} from '../utils/classUtils';
-import memoize from '../utils/decorators/memoize';
+import Relation from '../Relation';
+import ModelBase from '../../model/ModelBase';
+import inheritModel from '../../model/inheritModel';
+import normalizeIds from '../../utils/normalizeIds';
+import {isSqlite} from '../../utils/dbUtils';
+import {isSubclassOf} from '../../utils/classUtils';
+import memoize from '../../utils/decorators/memoize';
 
-const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
+import ManyToManyFindMethod from './ManyToManyFindMethod';
+import ManyToManyInsertMethod from './ManyToManyInsertMethod';
+import ManyToManyRelateMethod from './ManyToManyRelateMethod';
+import ManyToManyUnrelateMethod from './ManyToManyUnrelateMethod';
+import ManyToManyUnrelateSqliteMethod from './ManyToManyUnrelateSqliteMethod';
+import ManyToManyUpdateMethod from './ManyToManyUpdateMethod';
+import ManyToManyUpdateSqliteMethod from './ManyToManyUpdateSqliteMethod';
+import ManyToManyDeleteMethod from './ManyToManyDeleteMethod';
+import ManyToManyDeleteSqliteMethod from './ManyToManyDeleteSqliteMethod';
+
 const sqliteBuiltInRowId = '_rowid_';
 
-@overwriteForDatabase()
 export default class ManyToManyRelation extends Relation {
 
   constructor(...args) {
@@ -61,7 +69,7 @@ export default class ManyToManyRelation extends Relation {
     let retVal = super.setMapping(mapping);
 
     // Avoid require loop and import here.
-    let Model = require(__dirname + '/../model/Model').default;
+    let Model = require(__dirname + '/../../model/Model').default;
 
     if (!_.isObject(mapping.join.through)) {
       this.throwError('join must have the `through` that describes the join table.');
@@ -256,169 +264,85 @@ export default class ManyToManyRelation extends Relation {
   }
 
   find(builder, owners) {
-    const ownerJoinColumnAlias = _.times(this.joinTableOwnerCol.length, idx => ownerJoinColumnAliasPrefix + idx);
-    const ownerJoinPropertyAlias = _.map(ownerJoinColumnAlias, alias => this.relatedModelClass.columnNameToPropertyName(alias));
-
-    builder.onBuild(builder => {
-      let ids = _(owners)
-        .map(owner => owner.$values(this.ownerProp))
-        .uniqBy(id => id.join())
-        .value();
-
-      if (!builder.has(/select/)) {
-        // If the user hasn't specified a select clause, select the related model's columns.
-        // If we don't do this we also get the join table's columns.
-        builder.select(this.relatedModelClass.tableName + '.*');
-
-        // Also select all extra columns.
-        _.each(this.fullJoinTableExtraCols(), col => {
-          builder.select(col);
-        });
-      }
-
-      this.findQuery(builder, ids);
-
-      // We must select the owner join columns so that we know for which owner model the related
-      // models belong to after the requests.
-      _.each(this.fullJoinTableOwnerCol(), (fullJoinTableOwnerCol, idx) => {
-        builder.select(fullJoinTableOwnerCol + ' as ' + ownerJoinColumnAlias[idx]);
-      });
-    });
-
-    builder.runAfterModelCreate(related => {
-      let relatedByOwnerId = _.groupBy(related, related => related.$values(ownerJoinPropertyAlias));
-
-      _.each(owners, owner => {
-        owner[this.name] = relatedByOwnerId[owner.$values(this.ownerProp)] || [];
-      });
-
-      // Delete the temporary join aliases.
-      _.each(related, rel => {
-        _.each(ownerJoinPropertyAlias, alias => {
-          delete rel[alias];
-        });
-      });
-
-      return related;
+    return new ManyToManyFindMethod(builder, 'find', {
+      relation: this,
+      owners: owners
     });
   }
 
-  insert(builder, owner, insertion) {
-    this.omitExtraProps(insertion.models());
-
-    builder.onBuild(builder => {
-      builder.$$insert(insertion);
-    });
-
-    builder.runAfterModelCreate(related => {
-      let ownerId = owner.$values(this.ownerProp);
-      let joinModels = this.createJoinModels(ownerId, related);
-
-      owner[this.name] = this.mergeModels(owner[this.name], related);
-
-      // Insert the join rows to the join table.
-      return this.joinTableModelClass
-        .bindKnex(builder.knex())
-        .query()
-        .childQueryOf(builder)
-        .insert(joinModels)
-        .return(related);
+  insert(builder, owner) {
+    return new ManyToManyInsertMethod(builder, 'insert', {
+      relation: this,
+      owner: owner
     });
   }
 
-  update(builder, owner, update) {
-    builder.onBuild(builder => {
-      this._selectForModify(builder, owner).$$update(update).call(this.filter);
-    });
+  update(builder, owner) {
+    if (isSqlite(builder.knex())) {
+      return new ManyToManyUpdateSqliteMethod(builder, 'update', {
+        relation: this,
+        owner: owner
+      });
+    } else {
+      return new ManyToManyUpdateMethod(builder, 'update', {
+        relation: this,
+        owner: owner
+      });
+    }
+  }
+
+  patch(builder, owner) {
+    if (isSqlite(builder.knex())) {
+      return new ManyToManyUpdateSqliteMethod(builder, 'patch', {
+        relation: this,
+        owner: owner,
+        modelOptions: {patch: true}
+      });
+    } else {
+      return new ManyToManyUpdateMethod(builder, 'patch', {
+        relation: this,
+        owner: owner,
+        modelOptions: {patch: true}
+      });
+    }
   }
 
   delete(builder, owner) {
-    builder.onBuild(builder => {
-      this._selectForModify(builder, owner).$$delete().call(this.filter);
+    if (isSqlite(builder.knex())) {
+      return new ManyToManyDeleteSqliteMethod(builder, 'delete', {
+        relation: this,
+        owner: owner
+      });
+    } else {
+      return new ManyToManyDeleteMethod(builder, 'delete', {
+        relation: this,
+        owner: owner
+      });
+    }
+  }
+
+  relate(builder, owner) {
+    return new ManyToManyRelateMethod(builder, 'relate', {
+      relation: this,
+      owner: owner
     });
   }
 
-  relate(builder, owner, ids) {
-    ids = normalizeIds(ids, this.relatedProp);
-
-    builder.setQueryExecutor(builder => {
-      let joinModels = this.createJoinModels(owner.$values(this.ownerProp), ids);
-
-      return this.joinTableModelClass
-        .bindKnex(builder.knex())
-        .query()
-        .childQueryOf(builder)
-        .insert(joinModels)
-        .runAfter(_.constant({}));
-    });
-  }
-
-  @overwriteForDatabase({
-    sqlite3: 'unrelate_sqlite3'
-  })
   unrelate(builder, owner) {
-    builder.setQueryExecutor(builder => {
-      let selectRelatedColQuery = this.relatedModelClass
-        .query()
-        .childQueryOf(builder)
-        .copyFrom(builder, /where/i)
-        .select(this.fullRelatedCol())
-        .call(this.filter);
-
-      return this.joinTableModelClass
-        .bindKnex(builder.knex())
-        .query()
-        .childQueryOf(builder)
-        .delete()
-        .whereComposite(this.fullJoinTableOwnerCol(), owner.$values(this.ownerProp))
-        .whereInComposite(this.fullJoinTableRelatedCol(), selectRelatedColQuery)
-        .runAfter(_.constant({}));
-    });
+    if (isSqlite(builder.knex())) {
+      return new ManyToManyUnrelateSqliteMethod(builder, 'unrelate', {
+        relation: this,
+        owner: owner
+      });
+    } else {
+      return new ManyToManyUnrelateMethod(builder, 'unrelate', {
+        relation: this,
+        owner: owner
+      });
+    }
   }
 
-  /**
-   * @private
-   */
-  unrelate_sqlite3(builder, owner) {
-    builder.setQueryExecutor(builder => {
-      let joinTableAlias = this.joinTableAlias();
-      let joinTableAsAlias = this.joinTable + ' as ' + joinTableAlias;
-      let joinTableAliasRowId = joinTableAlias + '.' + sqliteBuiltInRowId;
-      let joinTableRowId = this.joinTable + '.' + sqliteBuiltInRowId;
-
-      let ownerId = owner.$values(this.ownerProp);
-      let fullRelatedCol = this.fullRelatedCol();
-
-      let selectRelatedQuery = this.relatedModelClass
-        .query()
-        .childQueryOf(builder)
-        .copyFrom(builder, /where/i)
-        .select(joinTableAliasRowId)
-        .call(this.filter)
-        .whereComposite(this.fullJoinTableOwnerCol(), ownerId)
-        .join(joinTableAsAlias, join => {
-          _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
-            join.on(joinTableRelatedCol, fullRelatedCol[idx]);
-          });
-        });
-
-      return this.joinTableModelClass
-        .bindKnex(builder.knex())
-        .query()
-        .childQueryOf(builder)
-        .delete()
-        .whereIn(joinTableRowId, selectRelatedQuery)
-        .runAfter(_.constant({}));
-    });
-  }
-
-  /**
-   * @private
-   */
-  @overwriteForDatabase({
-    sqlite3: '_selectForModify_sqlite3'
-  })
-  _selectForModify(builder, owner) {
+  selectForModify(builder, owner) {
     let ownerId = owner.$values(this.ownerProp);
 
     let idQuery = this.joinTableModelClass
@@ -431,10 +355,7 @@ export default class ManyToManyRelation extends Relation {
     return builder.whereInComposite(this.fullRelatedCol(), idQuery);
   }
 
-  /**
-   * @private
-   */
-  _selectForModify_sqlite3(builder, owner) {
+  selectForModifySqlite(builder, owner) {
     let relatedTable = this.relatedModelClass.tableName;
     let relatedTableAlias = this.relatedTableAlias();
     let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;

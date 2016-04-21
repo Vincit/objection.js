@@ -36,14 +36,6 @@ export default class QueryBuilderMethod {
    * @returns {boolean}
    */
   call(builder, args) {
-    return this.onCall(builder);
-  }
-
-  /**
-   * @param {QueryBuilder} builder
-   * @returns {boolean}
-   */
-  onCall(builder) {
     return true;
   }
 
@@ -61,11 +53,19 @@ export default class QueryBuilderMethod {
     return this.onBefore !== QueryBuilderMethod.prototype.onBefore;
   }
 
-  onAfterModelCreateFront(builder, result) {}
+  /**
+   * @param {QueryBuilder} builder
+   * @param {*} result
+   * @returns {Promise|*}
+   */
+  onBeforeBack(builder, result) {}
 
-  onAfterModelCreate(builder, result) {}
-
-  onAfter(builder, result) {}
+  /**
+   * @returns {boolean}
+   */
+  hasOnBeforeBack() {
+    return this.onBeforeBack !== QueryBuilderMethod.prototype.onBeforeBack;
+  }
 
   /**
    * @param {QueryBuilder} builder
@@ -73,8 +73,77 @@ export default class QueryBuilderMethod {
   onBeforeBuild(builder) {}
 
   /**
+   * @returns {boolean}
+   */
+  hasOnBeforeBuild() {
+    return this.onBeforeBuild !== QueryBuilderMethod.prototype.onBeforeBuild;
+  }
+
+  /**
    * @param {QueryBuilder} knexBuilder
    * @param {QueryBuilder} builder
    */
   onBuild(knexBuilder, builder) {}
+
+  /**
+   * @returns {boolean}
+   */
+  hasOnBuild() {
+    return this.onBuild !== QueryBuilderMethod.prototype.onBuild;
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @param {*} result
+   * @returns {Promise|*}
+   */
+  onAfterModelCreateFront(builder, result) {}
+
+  /**
+   * @returns {boolean}
+   */
+  hasOnAfterModelCreateFront() {
+    return this.onAfterModelCreateFront !== QueryBuilderMethod.prototype.onAfterModelCreateFront;
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @param {*} result
+   * @returns {Promise|*}
+   */
+  onAfterModelCreate(builder, result) {}
+
+  /**
+   * @returns {boolean}
+   */
+  hasOnAfterModelCreate() {
+    return this.onAfterModelCreate !== QueryBuilderMethod.prototype.onAfterModelCreate;
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @param {*} result
+   * @returns {Promise|*}
+   */
+  onAfter(builder, result) {}
+
+  /**
+   * @returns {boolean}
+   */
+  hasOnAfter() {
+    return this.onAfter !== QueryBuilderMethod.prototype.onAfter;
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @returns {Promise|*}
+   */
+  queryExecutor(builder) {}
+
+  /**
+   * @returns {boolean}
+   */
+  hasQueryExecutor() {
+    return this.queryExecutor !== QueryBuilderMethod.prototype.queryExecutor;
+  }
 }

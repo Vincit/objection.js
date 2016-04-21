@@ -8,7 +8,7 @@ export default function queryBuilderMethod(input, name) {
     const methodName = name || property;
 
     if (_.isFunction(input) || _.isArray(input)) {
-      descriptor.value = function () {
+      descriptor.value = function decorator$queryBuilderMethod() {
         const args = new Array(arguments.length);
 
         // Don't turn this into a function. This needs to be inline for V8 to optimize this.
@@ -22,7 +22,7 @@ export default function queryBuilderMethod(input, name) {
         return this.callQueryBuilderMethod(method, args);
       };
     } else {
-      descriptor.value = function () {
+      descriptor.value = function decorator$queryBuilderMethodWithDialect() {
         const args = new Array(arguments.length);
 
         // Don't turn this into a function. This needs to be inline for V8 to optimize this.

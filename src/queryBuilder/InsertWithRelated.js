@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
 import RelationExpression from './RelationExpression';
-import ManyToManyRelation from '../relations/ManyToManyRelation';
-import HasManyRelation from '../relations/HasManyRelation';
-import BelongsToOneRelation from '../relations/BelongsToOneRelation';
+import ManyToManyRelation from '../relations/manyToMany/ManyToManyRelation';
+import HasManyRelation from '../relations/hasMany/HasManyRelation';
+import BelongsToOneRelation from '../relations/belongsToOne/BelongsToOneRelation';
 import ValidationError from '../ValidationError';
 let Model;
 

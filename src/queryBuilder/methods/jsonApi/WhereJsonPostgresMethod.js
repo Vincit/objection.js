@@ -12,7 +12,9 @@ export default class WhereJsonPostgresMethod extends ArgumentQueryBuilderMethod 
     this.rawArgs = null;
   }
 
-  onCall(builder) {
+  call(builder, args) {
+    super.call(builder, args);
+
     this.rawArgs = jsonApi.whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams(
       this.args[0],
       this.opt.operator,

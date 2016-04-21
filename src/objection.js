@@ -2,14 +2,15 @@ import ModelBase from './model/ModelBase';
 import Model from './model/Model';
 import QueryBuilderBase from './queryBuilder/QueryBuilderBase';
 import QueryBuilder from './queryBuilder/QueryBuilder';
+import QueryBuilderMethod from './queryBuilder/methods/QueryBuilderMethod'
 import RelationExpression from './queryBuilder/RelationExpression';
 import ValidationError from './ValidationError';
 
 import Relation from './relations/Relation';
-import HasOneRelation from './relations/HasOneRelation';
-import HasManyRelation from './relations/HasManyRelation';
-import BelongsToOneRelation from './relations/BelongsToOneRelation';
-import ManyToManyRelation from './relations/ManyToManyRelation';
+import HasOneRelation from './relations/hasOne/HasOneRelation';
+import HasManyRelation from './relations/hasMany/HasManyRelation';
+import BelongsToOneRelation from './relations/belongsToOne/BelongsToOneRelation';
+import ManyToManyRelation from './relations/manyToMany/ManyToManyRelation';
 
 import transaction from './transaction';
 import Promise from 'bluebird';
@@ -19,6 +20,7 @@ export {
   Model,
   QueryBuilder,
   QueryBuilderBase,
+  QueryBuilderMethod,
   RelationExpression,
   ValidationError,
   Relation,

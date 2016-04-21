@@ -82,8 +82,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .findImpl(function () {
-          relation.find(this, [owner]);
+        .findMethodFactory(function (builder) {
+          return relation.find(builder, [owner]);
         });
 
       return builder.then(function (result) {
@@ -114,8 +114,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .findImpl(function () {
-          compositeKeyRelation.find(this, owners);
+        .findMethodFactory(function (builder) {
+          return compositeKeyRelation.find(builder, owners);
         });
 
       return builder.then(function (result) {
@@ -148,8 +148,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .findImpl(function () {
-          relation.find(this, owners);
+        .findMethodFactory(function (builder) {
+          return relation.find(builder, owners);
         });
 
       return builder.then(function (result) {
@@ -174,8 +174,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .findImpl(function () {
-          relation.find(this, [owner]);
+        .findMethodFactory(function (builder) {
+          return relation.find(builder, [owner]);
         })
         .select('name');
 
@@ -201,8 +201,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .findImpl(function () {
-          relation.find(this, [owner]);
+        .findMethodFactory(function (builder) {
+          return relation.find(builder, [owner]);
         });
 
       return builder.then(function (result) {
@@ -229,8 +229,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .findImpl(function () {
-          relation.find(this, [owner]);
+        .findMethodFactory(function (builder) {
+          return relation.find(builder, [owner]);
         });
 
       return builder.then(function (result) {
@@ -258,8 +258,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory(function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -288,8 +288,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          compositeKeyRelation.insert(this, owner, models);
+        .insertMethodFactory(function (builder) {
+          return compositeKeyRelation.insert(builder, owner);
         })
         .insert(related);
 
@@ -319,8 +319,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory(function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related)
         .then(function (result) {
@@ -342,8 +342,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory(function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related)
         .then(function (result) {
@@ -365,8 +365,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory(function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related)
         .then(function (result) {
@@ -388,11 +388,11 @@ describe('BelongsToOneRelation', function () {
 
       QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory(function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related)
-        .then(function (result) {
+        .then(function () {
           done(new Error('should not get here'));
         })
         .catch(function () {
@@ -412,8 +412,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
+        .updateMethodFactory(function (builder) {
+          return relation.update(builder, owner);
         })
         .update(update);
 
@@ -434,8 +434,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          compositeKeyRelation.update(this, owner, updt);
+        .updateMethodFactory(function (builder) {
+          return compositeKeyRelation.update(builder, owner);
         })
         .update(update);
 
@@ -456,8 +456,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
+        .updateMethodFactory(function (builder) {
+          return relation.update(builder, owner);
         })
         .update(update)
         .then(function (numUpdates) {
@@ -475,8 +475,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
+        .updateMethodFactory(function (builder) {
+          return relation.update(builder, owner);
         })
         .update(update)
         .then(function () {
@@ -497,8 +497,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory(function (builder) {
+          return relation.patch(builder, owner);
         })
         .patch(patch);
       
@@ -528,8 +528,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory(function (builder) {
+          return relation.patch(builder, owner);
         })
         .patch(patch)
         .then(function (numUpdates) {
@@ -545,8 +545,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory(function (builder) {
+          return relation.patch(builder, owner);
         })
         .increment('test', 1)
         .then(function (numUpdates) {
@@ -562,8 +562,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory(function (builder) {
+          return relation.patch(builder, owner);
         })
         .decrement('test', 10)
         .then(function (numUpdates) {
@@ -582,8 +582,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (patch) {
-          relation.patch(this, owner, patch);
+        .patchMethodFactory(function (builder) {
+          return relation.patch(builder, owner);
         })
         .patch(update)
         .then(function (numUpdates) {
@@ -602,8 +602,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .deleteImpl(function () {
-          relation.delete(this, owner);
+        .deleteMethodFactory(function (builder) {
+          return relation.delete(builder, owner);
         })
         .delete();
 
@@ -622,8 +622,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .deleteImpl(function () {
-          compositeKeyRelation.delete(this, owner);
+        .deleteMethodFactory(function (builder) {
+          return compositeKeyRelation.delete(builder, owner);
         })
         .delete();
 
@@ -638,13 +638,13 @@ describe('BelongsToOneRelation', function () {
     });
 
     it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100})
+      createFilteredRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .deleteImpl(function () {
-          relation.delete(this, owner);
+        .deleteMethodFactory(function (builder) {
+          return relation.delete(builder, owner);
         })
         .delete()
         .then(function (result) {
@@ -663,8 +663,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate(10);
 
@@ -683,8 +683,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate([10]);
 
@@ -703,8 +703,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate({rid: 10});
 
@@ -723,8 +723,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate([{rid: 10}]);
 
@@ -743,8 +743,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          compositeKeyRelation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return compositeKeyRelation.relate(builder, owner);
         })
         .relate([10, 20]);
 
@@ -763,8 +763,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          compositeKeyRelation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return compositeKeyRelation.relate(builder, owner);
         })
         .relate({aid: 10, bid: 20});
 
@@ -783,8 +783,8 @@ describe('BelongsToOneRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate(11)
         .then(function (result) {
@@ -799,8 +799,8 @@ describe('BelongsToOneRelation', function () {
 
       QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate([11, 12])
         .then(function () {
@@ -816,8 +816,8 @@ describe('BelongsToOneRelation', function () {
 
       QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate({wrongId: 10})
         .then(function () {
@@ -833,8 +833,8 @@ describe('BelongsToOneRelation', function () {
 
       QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          compositeKeyRelation.relate(this, owner, ids);
+        .relateMethodFactory(function (builder) {
+          return compositeKeyRelation.relate(builder, owner);
         })
         .relate({aid: 10, wrongId: 20})
         .then(function () {
@@ -854,8 +854,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .unrelateImpl(function () {
-          relation.unrelate(this, owner);
+        .unrelateMethodFactory(function (builder) {
+          return relation.unrelate(builder, owner);
         })
         .unrelate()
         .whereIn('code', [55, 66 ,77]);
@@ -875,8 +875,8 @@ describe('BelongsToOneRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .unrelateImpl(function () {
-          compositeKeyRelation.unrelate(this, owner);
+        .unrelateMethodFactory(function (builder) {
+          return compositeKeyRelation.unrelate(builder, owner);
         })
         .unrelate()
         .whereIn('code', [55, 66 ,77]);

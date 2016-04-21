@@ -16,7 +16,7 @@ export default class ArgumentQueryBuilderMethod extends QueryBuilderMethod {
     }
 
     this.args = args;
-    return super.call(builder, this.args);
+    return true;
   }
 }
 

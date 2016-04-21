@@ -381,8 +381,8 @@ describe('ManyToManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findImpl(function (builder) {
-          relation.find(builder, [owner]);
+        .findMethodFactory (function (builder) {
+          return relation.find(builder, [owner]);
         });
 
       return builder.then(function (result) {
@@ -419,8 +419,8 @@ describe('ManyToManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findImpl(function (builder) {
-          compositeKeyRelation.find(builder, [owner]);
+        .findMethodFactory (function (builder) {
+          return compositeKeyRelation.find(builder, [owner]);
         });
 
       return builder.then(function (result) {
@@ -463,8 +463,8 @@ describe('ManyToManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findImpl(function () {
-          relation.find(this, owners);
+        .findMethodFactory(function () {
+          return relation.find(this, owners);
         });
 
       return builder.then(function (result) {
@@ -510,8 +510,8 @@ describe('ManyToManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findImpl(function () {
-          compositeKeyRelation.find(this, owners);
+        .findMethodFactory(function () {
+          return compositeKeyRelation.find(this, owners);
         });
 
       return builder.then(function (result) {
@@ -552,8 +552,8 @@ describe('ManyToManyRelation', function () {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .select('name')
-        .findImpl(function () {
-          relation.find(this, [owner]);
+        .findMethodFactory(function () {
+          return relation.find(this, [owner]);
         });
 
       return builder.then(function (result) {
@@ -592,8 +592,8 @@ describe('ManyToManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findImpl(function () {
-          relation.find(this, [owner]);
+        .findMethodFactory(function () {
+          return relation.find(this, [owner]);
         });
 
       return builder.then(function (result) {
@@ -637,8 +637,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (insertion) {
-          relation.insert(this, owner, insertion);
+        .insertMethodFactory (function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -686,8 +686,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (insertion) {
-          compositeKeyRelation.insert(this, owner, insertion);
+        .insertMethodFactory (function (builder) {
+          return compositeKeyRelation.insert(builder, owner);
         })
         .insert(related);
 
@@ -728,8 +728,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory (function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -766,8 +766,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory (function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -794,8 +794,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (models) {
-          relation.insert(this, owner, models);
+        .insertMethodFactory (function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -826,8 +826,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (insertion) {
-          relation.insert(this, owner, insertion);
+        .insertMethodFactory (function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -863,8 +863,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertImpl(function (insertion) {
-          relation.insert(this, owner, insertion);
+        .insertMethodFactory (function (builder) {
+          return relation.insert(builder, owner);
         })
         .insert(related);
 
@@ -900,8 +900,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
+        .updateMethodFactory (function (builder) {
+          return relation.update(builder, owner);
         })
         .update(update)
         .where('gender', 'male')
@@ -932,8 +932,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          compositeKeyRelation.update(this, owner, updt);
+        .updateMethodFactory (function (builder) {
+          return compositeKeyRelation.update(builder, owner);
         })
         .update(update)
         .where('gender', 'male')
@@ -964,8 +964,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
+        .updateMethodFactory (function (builder) {
+          return relation.update(builder, owner);
         })
         .update(update)
         .where('gender', 'male')
@@ -992,8 +992,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .updateImpl(function (updt) {
-          relation.update(this, owner, updt);
+        .updateMethodFactory (function (builder) {
+          return relation.update(builder, owner);
         })
         .update(update)
         .where('gender', 'male')
@@ -1025,8 +1025,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory (function (builder) {
+          return relation.patch(builder, owner);
         })
         .patch(patch)
         .where('gender', 'male')
@@ -1067,8 +1067,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory (function (builder) {
+          return relation.patch(builder, owner);
         })
         .patch(patch)
         .where('gender', 'male')
@@ -1093,8 +1093,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory (function (builder) {
+          return relation.patch(builder, owner);
         })
         .increment('test', 1)
         .then(function () {
@@ -1113,8 +1113,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (ptch) {
-          relation.patch(this, owner, ptch);
+        .patchMethodFactory (function (builder) {
+          return relation.patch(builder, owner);
         })
         .decrement('test', 10)
         .then(function () {
@@ -1136,8 +1136,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchImpl(function (patch) {
-          relation.patch(this, owner, patch);
+        .patchMethodFactory (function (builder) {
+          return relation.patch(builder, owner);
         })
         .patch(patch)
         .where('gender', 'male')
@@ -1166,8 +1166,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .deleteImpl(function () {
-          relation.delete(this, owner);
+        .deleteMethodFactory(function (builder) {
+          return relation.delete(builder, owner);
         })
         .delete()
         .where('gender', 'male')
@@ -1196,8 +1196,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .deleteImpl(function () {
-          compositeKeyRelation .delete(this, owner);
+        .deleteMethodFactory(function (builder) {
+          return compositeKeyRelation .delete(builder, owner);
         })
         .delete()
         .where('gender', 'male')
@@ -1227,8 +1227,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .deleteImpl(function () {
-          relation.delete(this, owner);
+        .deleteMethodFactory(function (builder) {
+          return relation.delete(builder, owner);
         })
         .delete()
         .where('gender', 'male')
@@ -1259,8 +1259,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate(10);
 
@@ -1282,8 +1282,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate([10, 20, 30]);
 
@@ -1305,8 +1305,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate([{rid: 10}, {rid: 20}, {rid: 30}]);
 
@@ -1332,8 +1332,8 @@ describe('ManyToManyRelation', function () {
       var owner = OwnerModel.fromJson({aid: 11, bid: 22});
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          compositeKeyRelation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return compositeKeyRelation.relate(builder, owner);
         })
         .relate([[33, 44], [33, 55], [66, 77]]);
 
@@ -1359,8 +1359,8 @@ describe('ManyToManyRelation', function () {
       var owner = OwnerModel.fromJson({aid: 11, bid: 22});
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          compositeKeyRelation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return compositeKeyRelation.relate(builder, owner);
         })
         .relate([{cid: 33, did: 44}, {cid: 33, did: 55}, {cid: 66, did: 77}]);
 
@@ -1382,8 +1382,8 @@ describe('ManyToManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate(11)
         .then(function (result) {
@@ -1399,8 +1399,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateImpl(function (ids) {
-          relation.relate(this, owner, ids);
+        .relateMethodFactory (function (builder) {
+          return relation.relate(builder, owner);
         })
         .relate({rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar'});
 
@@ -1426,8 +1426,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .unrelateImpl(function () {
-          relation.unrelate(this, owner);
+        .unrelateMethodFactory(function (builder) {
+          return relation.unrelate(builder, owner);
         })
         .unrelate()
         .whereIn('code', [55, 66 ,77]);
@@ -1454,8 +1454,8 @@ describe('ManyToManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .unrelateImpl(function () {
-          compositeKeyRelation.unrelate(this, owner);
+        .unrelateMethodFactory(function (builder) {
+          return compositeKeyRelation.unrelate(builder, owner);
         })
         .unrelate()
         .whereIn('code', [55, 66 ,77])

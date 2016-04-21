@@ -38,8 +38,8 @@ module.exports = function (session) {
       .createTable('ModelJson', function (table) {
         table.bigincrements('id').primary();
         table.string('name');
-        table.json('jsonObject', true);
-        table.json('jsonArray', true);
+        table.jsonb('jsonObject');
+        table.jsonb('jsonArray');
       });
   });
 

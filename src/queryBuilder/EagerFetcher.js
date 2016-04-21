@@ -51,8 +51,9 @@ export default class EagerFetcher {
   _fetchRelation(relation, nextEager) {
     let ModelClass = relation.relatedModelClass;
     let queryBuilder = ModelClass.RelatedQueryBuilder.forClass(ModelClass).childQueryOf(this.rootQuery);
+    let queryMethod = relation.find(queryBuilder, this.models);
 
-    relation.find(queryBuilder, this.models);
+    queryBuilder.callQueryBuilderMethod(queryMethod, []);
 
     _.each(nextEager.args, filterName => {
       let filter = this.filters[filterName];

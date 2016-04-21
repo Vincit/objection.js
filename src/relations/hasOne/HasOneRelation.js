@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import HasManyRelation from './HasManyRelation';
+import HasManyRelation from '../hasMany/HasManyRelation';
 
 export default class HasOneRelation extends HasManyRelation {
 

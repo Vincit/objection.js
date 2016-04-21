@@ -1,7 +1,11 @@
 import _ from 'lodash';
-import {inherits, isSubclassOf} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
+import {inherits, isSubclassOf} from '../utils/classUtils';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
+
+import RelationFindMethod from './RelationFindMethod';
+import RelationUpdateMethod from './RelationUpdateMethod';
+import RelationDeleteMethod from './RelationDeleteMethod';
 
 /**
  * @typedef {Object} RelationJoin
@@ -198,7 +202,7 @@ export default class Relation {
    * @returns {Relation}
    */
   clone() {
-    let relation = new this.constructor(this.name, this.ownerModelClass);
+    const relation = new this.constructor(this.name, this.ownerModelClass);
 
     relation.relatedModelClass = this.relatedModelClass;
     relation.ownerCol = this.ownerCol;
@@ -206,6 +210,7 @@ export default class Relation {
     relation.relatedCol = this.relatedCol;
     relation.relatedProp = this.relatedProp;
     relation.filter = this.filter;
+
 
     return relation;
   }
@@ -215,43 +220,12 @@ export default class Relation {
    * @returns {Relation}
    */
   bindKnex(knex) {
-    let bound = this.clone();
+    const bound = this.clone();
 
     bound.relatedModelClass = this.relatedModelClass.bindKnex(knex);
     bound.ownerModelClass = this.ownerModelClass.bindKnex(knex);
 
     return bound;
-  }
-
-  /**
-   * @protected
-   * @param {Array.<Model>} models1
-   * @param {Array.<Model>} models2
-   * @returns {Array.<Model>}
-   */
-  mergeModels(models1, models2) {
-    let modelsById = Object.create(null);
-
-    models1 = _.compact(models1);
-    models2 = _.compact(models2);
-
-    _.forEach(models1, function (model) {
-      modelsById[model.$id()] = model;
-    });
-
-    _.forEach(models2, function (model) {
-      modelsById[model.$id()] = model;
-    });
-
-    let models = _.values(modelsById);
-    if (models.length === 0) {
-      return [];
-    }
-
-    let modelClass = models[0].constructor;
-    let idProperty = modelClass.getIdProperty();
-
-    return _.sortBy(models, _.isArray(idProperty) ? idProperty : [idProperty]);
   }
 
   /**
@@ -261,7 +235,7 @@ export default class Relation {
    * @returns {QueryBuilder}
    */
   findQuery(builder, ownerIds, isColumnRef) {
-    let fullRelatedCol = this.fullRelatedCol();
+    const fullRelatedCol = this.fullRelatedCol();
 
     if (isColumnRef) {
       _.each(fullRelatedCol, (col, idx) => {
@@ -289,10 +263,10 @@ export default class Relation {
     joinMethod = joinMethod || 'join';
     relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
 
-    let relatedTable = this.relatedModelClass.tableName;
-    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
-    let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
-    let ownerCol = this.fullOwnerCol();
+    const relatedTable = this.relatedModelClass.tableName;
+    const relatedTableAsAlias = `${relatedTable} as ${relatedTableAlias}`;
+    const relatedCol = _.map(this.relatedCol, col => `${relatedTableAlias}.${col}`);
+    const ownerCol = this.fullOwnerCol();
 
     return builder
       [joinMethod](relatedTableAsAlias, join => {
@@ -303,24 +277,86 @@ export default class Relation {
       .call(this.filter);
   }
 
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model} owner
+   * @returns {QueryBuilderMethod}
+   */
+  insert(builder, owner) {
+    this.throwError('not implemented');
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @param {Model} owner
+   * @returns {QueryBuilderMethod}
+   */
+  update(builder, owner) {
+    return new RelationUpdateMethod(builder, 'update', {
+      relation: this,
+      owner: owner
+    });
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @param {Model} owner
+   * @returns {QueryBuilderMethod}
+   */
+  patch(builder, owner) {
+    return new RelationUpdateMethod(builder, 'patch', {
+      relation: this,
+      owner: owner,
+      modelOptions: {patch: true}
+    });
+  }
+
   /**
    * @param {QueryBuilder} builder
    * @param {Array.<Model>} owners
+   * @returns {QueryBuilderMethod}
    */
   find(builder, owners) {
-    builder.onBuild(builder => {
-      let ids = _(owners)
-        .map(owner => owner.$values(this.ownerProp))
-        .uniqBy(id => id.join())
-        .value();
-
-      this.findQuery(builder, ids);
+    return new RelationFindMethod(builder, 'find', {
+      relation: this,
+      owners: owners
     });
+  }
 
-    builder.runAfterModelCreate(related => {
-      this.createRelationProp(owners, related);
-      return related;
+  /**
+   * @param {QueryBuilder} builder
+   * @param {Model} owner
+   * @returns {QueryBuilderMethod}
+   */
+  delete(builder, owner) {
+    return new RelationDeleteMethod(builder, 'delete', {
+      relation: this,
+      owner: owner
     });
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model} owner
+   * @returns {QueryBuilderMethod}
+   */
+  relate(builder, owner) {
+    this.throwError('not implemented');
+  }
+
+  /* istanbul ignore next */
+  /**
+   * @abstract
+   * @param {QueryBuilder} builder
+   * @param {Model} owner
+   * @returns {QueryBuilderMethod}
+   */
+  unrelate(builder, owner) {
+    this.throwError('not implemented');
   }
 
   /* istanbul ignore next */
@@ -329,70 +365,6 @@ export default class Relation {
    * @protected
    */
   createRelationProp(owners, related) {
-    this.throwError('not implemented');
-  }
-
-  /* istanbul ignore next */
-  /**
-   * @abstract
-   * @param {QueryBuilder} builder
-   * @param {Model} owner
-   * @param {InsertionOrUpdate} insertion
-   */
-  insert(builder, owner, insertion) {
-    this.throwError('not implemented');
-  }
-
-  /**
-   * @param {QueryBuilder} builder
-   * @param {Model} owner
-   * @param {InsertionOrUpdate} update
-   */
-  update(builder, owner, update) {
-    builder.onBuild(builder => {
-      this.findQuery(builder, [owner.$values(this.ownerProp)]);
-      builder.$$update(update);
-    });
-  }
-
-  /**
-   * @param {QueryBuilder} builder
-   * @param {Model} owner
-   * @param {InsertionOrUpdate} patch
-   */
-  patch(builder, owner, patch) {
-    return this.update(builder, owner, patch);
-  }
-
-  /**
-   * @param {QueryBuilder} builder
-   * @param {Model} owner
-   */
-  delete(builder, owner) {
-    builder.onBuild(builder => {
-      this.findQuery(builder, [owner.$values(this.ownerProp)]);
-      builder.$$delete();
-    });
-  }
-
-  /* istanbul ignore next */
-  /**
-   * @abstract
-   * @param {QueryBuilder} builder
-   * @param {Model|Object} owner
-   * @param {number|string|Array.<number|string>|Array.<Array.<number|string>>} ids
-   */
-  relate(builder, owner, ids) {
-    this.throwError('not implemented');
-  }
-
-  /* istanbul ignore next */
-  /**
-   * @abstract
-   * @param {QueryBuilder} builder
-   * @param {Model|Object} owner
-   */
-  unrelate(builder, owner) {
     this.throwError('not implemented');
   }
 
@@ -462,6 +434,34 @@ export default class Relation {
       table: table,
       columns: columns
     };
+  }
+
+  /**
+   * @protected
+   */
+  mergeModels(models1, models2) {
+    let modelsById = Object.create(null);
+
+    models1 = _.compact(models1);
+    models2 = _.compact(models2);
+
+    _.forEach(models1, function (model) {
+      modelsById[model.$id()] = model;
+    });
+
+    _.forEach(models2, function (model) {
+      modelsById[model.$id()] = model;
+    });
+
+    let models = _.values(modelsById);
+    if (models.length === 0) {
+      return [];
+    }
+
+    let modelClass = models[0].constructor;
+    let idProperty = modelClass.getIdProperty();
+
+    return _.sortBy(models, _.isArray(idProperty) ? idProperty : [idProperty]);
   }
 
   /**
