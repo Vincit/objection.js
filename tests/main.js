@@ -8,7 +8,7 @@ describe('main module', function () {
     expect(objection.ModelBase).to.equal(require('../lib/model/ModelBase').default);
     expect(objection.QueryBuilder).to.equal(require('../lib/queryBuilder/QueryBuilder').default);
     expect(objection.QueryBuilderBase).to.equal(require('../lib/queryBuilder/QueryBuilderBase').default);
-    expect(objection.QueryBuilderMethod).to.equal(require('../lib/queryBuilder/methods/QueryBuilderMethod').default);
+    expect(objection.QueryBuilderOperation).to.equal(require('../lib/queryBuilder/operations/QueryBuilderOperation').default);
     expect(objection.RelationExpression).to.equal(require('../lib/queryBuilder/RelationExpression').default);
     expect(objection.ValidationError).to.equal(require('../lib/ValidationError').default);
     expect(objection.Relation).to.equal(require('../lib/relations/Relation').default);

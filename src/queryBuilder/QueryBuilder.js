@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
-import queryBuilderMethod from './decorators/queryBuilderMethod';
+import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
 import QueryBuilderBase from './QueryBuilderBase';
@@ -8,18 +8,18 @@ import ValidationError from '../ValidationError';
 import EagerFetcher from './EagerFetcher';
 import deprecated from '../utils/decorators/deprecated';
 
-import DeleteMethod from './methods/DeleteMethod';
-import UpdateMethod from './methods/UpdateMethod';
-import InsertMethod from './methods/InsertMethod';
+import DeleteOperation from './operations/DeleteOperation';
+import UpdateOperation from './operations/UpdateOperation';
+import InsertOperation from './operations/InsertOperation';
 
-import InsertWithRelatedMethod from './methods/InsertWithRelatedMethod';
-import InsertAndFetchMethod from './methods/InsertAndFetchMethod';
-import UpdateAndFetchMethod from './methods/UpdateAndFetchMethod';
-import QueryBuilderMethod from './methods/QueryBuilderMethod';
-import JoinRelationMethod from './methods/JoinRelationMethod';
-import RunBeforeMethod from './methods/RunBeforeMethod';
-import RunAfterMethod from './methods/RunAfterMethod';
-import OnBuildMethod from './methods/OnBuildMethod';
+import InsertWithRelatedOperation from './operations/InsertWithRelatedOperation';
+import InsertAndFetchOperation from './operations/InsertAndFetchOperation';
+import UpdateAndFetchOperation from './operations/UpdateAndFetchOperation';
+import QueryBuilderOperation from './operations/QueryBuilderOperation';
+import JoinRelationOperation from './operations/JoinRelationOperation';
+import RunBeforeOperation from './operations/RunBeforeOperation';
+import RunAfterOperation from './operations/RunAfterOperation';
+import OnBuildOperation from './operations/OnBuildOperation';
 
 export default class QueryBuilder extends QueryBuilderBase {
 
@@ -36,13 +36,13 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
-    this._findMethodFactory = builder => new QueryBuilderMethod(builder, 'find');
-    this._insertMethodFactory = builder => new InsertMethod(builder, 'insert');
-    this._updateMethodFactory = builder => new UpdateMethod(builder, 'update');
-    this._patchMethodFactory = builder => new UpdateMethod(builder, 'patch', {modelOptions: {patch: true}});
-    this._relateMethodFactory = builder => new QueryBuilderMethod(builder, 'relate');
-    this._unrelateMethodFactory = builder => new QueryBuilderMethod(builder, 'unrelate');
-    this._deleteMethodFactory = builder => new DeleteMethod(builder, 'delete');
+    this._findOperationFactory = builder => new QueryBuilderOperation(builder, 'find');
+    this._insertOperationFactory = builder => new InsertOperation(builder, 'insert');
+    this._updateOperationFactory = builder => new UpdateOperation(builder, 'update');
+    this._patchOperationFactory = builder => new UpdateOperation(builder, 'patch', {modelOptions: {patch: true}});
+    this._relateOperationFactory = builder => new QueryBuilderOperation(builder, 'relate');
+    this._unrelateOperationFactory = builder => new QueryBuilderOperation(builder, 'unrelate');
+    this._deleteOperationFactory = builder => new DeleteOperation(builder, 'delete');
   }
 
   /**
@@ -87,7 +87,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {boolean}
    */
   isExecutable() {
-    const hasExecutor = !!this._queryExecutorMethod();
+    const hasExecutor = !!this._queryExecutorOperation();
     return !this._explicitRejectValue && !this._explicitResolveValue && !hasExecutor;
   }
 
@@ -95,83 +95,83 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {function(*, QueryBuilder)} runBefore
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod(RunBeforeMethod)
+  @queryBuilderOperation(RunBeforeOperation)
   runBefore(runBefore) {}
 
   /**
    * @param {function(QueryBuilder)} onBuild
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod(OnBuildMethod)
+  @queryBuilderOperation(OnBuildOperation)
   onBuild(onBuild) {}
 
   /**
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfter
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod(RunAfterMethod)
+  @queryBuilderOperation(RunAfterOperation)
   runAfter(runAfter) {}
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  findMethodFactory(factory) {
-    this._findMethodFactory = factory;
+  findOperationFactory(factory) {
+    this._findOperationFactory = factory;
     return this;
   }
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  insertMethodFactory(factory) {
-    this._insertMethodFactory = factory;
+  insertOperationFactory(factory) {
+    this._insertOperationFactory = factory;
     return this;
   }
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  updateMethodFactory(factory) {
-    this._updateMethodFactory = factory;
+  updateOperationFactory(factory) {
+    this._updateOperationFactory = factory;
     return this;
   }
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  patchMethodFactory(factory) {
-    this._patchMethodFactory = factory;
+  patchOperationFactory(factory) {
+    this._patchOperationFactory = factory;
     return this;
   }
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  deleteMethodFactory(factory) {
-    this._deleteMethodFactory = factory;
+  deleteOperationFactory(factory) {
+    this._deleteOperationFactory = factory;
     return this;
   }
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  relateMethodFactory(factory) {
-    this._relateMethodFactory = factory;
+  relateOperationFactory(factory) {
+    this._relateOperationFactory = factory;
     return this;
   }
 
   /**
-   * @param {function(QueryBuilder):QueryBuilderMethod} factory
+   * @param {function(QueryBuilder):QueryBuilderOperation} factory
    * @returns {QueryBuilder}
    */
-  unrelateMethodFactory(factory) {
-    this._unrelateMethodFactory = factory;
+  unrelateOperationFactory(factory) {
+    this._unrelateOperationFactory = factory;
     return this;
   }
 
@@ -246,7 +246,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {boolean}
    */
   isFindQuery() {
-    return !_.some(this._methodCalls, method => method.isWriteMethod) && !this._explicitRejectValue;
+    return !_.some(this._operations, method => method.isWriteOperation) && !this._explicitRejectValue;
   }
 
   /**
@@ -289,13 +289,13 @@ export default class QueryBuilder extends QueryBuilderBase {
     builder._allowedEagerExpression = this._allowedEagerExpression;
     builder._allowedInsertExpression = this._allowedInsertExpression;
 
-    builder._findMethodFactory = this._findMethodFactory;
-    builder._insertMethodFactory = this._insertMethodFactory;
-    builder._updateMethodFactory = this._updateMethodFactory;
-    builder._patchMethodFactory = this._patchMethodFactory;
-    builder._relateMethodFactory = this._relateMethodFactory;
-    builder._unrelateMethodFactory = this._unrelateMethodFactory;
-    builder._deleteMethodFactory = this._deleteMethodFactory;
+    builder._findOperationFactory = this._findOperationFactory;
+    builder._insertOperationFactory = this._insertOperationFactory;
+    builder._updateOperationFactory = this._updateOperationFactory;
+    builder._patchOperationFactory = this._patchOperationFactory;
+    builder._relateOperationFactory = this._relateOperationFactory;
+    builder._unrelateOperationFactory = this._unrelateOperationFactory;
+    builder._deleteOperationFactory = this._deleteOperationFactory;
 
     return builder;
   }
@@ -450,19 +450,19 @@ export default class QueryBuilder extends QueryBuilderBase {
     let builder = this.clone();
 
     if (builder.isFindQuery()) {
-      // If no write methods have been called at this point this query is a
+      // If no write operations have been called at this point this query is a
       // find query and we need to call the custom find implementation.
-      builder._callFindMethod();
+      builder._callFindOperation();
     }
 
-    // We need to build the builder even if the _hooks.executor function
-    // has been defined so that the onBuild hooks get called.
+    // We need to build the builder even if a query executor operation
+    // has been called so that the onBuild hooks get called.
     let knexBuilder = build(builder);
-    let queryExecutorMethod = builder._queryExecutorMethod();
+    let queryExecutorOperation = builder._queryExecutorOperation();
 
-    if (queryExecutorMethod) {
+    if (queryExecutorOperation) {
       // If the query executor is set, we build the builder that it returns.
-      return queryExecutorMethod.queryExecutor(builder).build();
+      return queryExecutorOperation.queryExecutor(builder).build();
     } else {
       return knexBuilder;
     }
@@ -470,10 +470,10 @@ export default class QueryBuilder extends QueryBuilderBase {
 
   /**
    * @private
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
-  _queryExecutorMethod() {
-    let executors = _.filter(this._methodCalls, method => method.hasQueryExecutor());
+  _queryExecutorOperation() {
+    let executors = _.filter(this._operations, method => method.hasQueryExecutor());
 
     if (executors.length > 1) {
       throw new Error('there can only be one method call that implements queryExecutor()');
@@ -485,8 +485,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   /**
    * @private
    */
-  _callFindMethod() {
-    this.callQueryBuilderMethod(this._findMethodFactory(this), []);
+  _callFindOperation() {
+    this.callQueryBuilderOperation(this._findOperationFactory(this), []);
   }
 
   /**
@@ -495,23 +495,21 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   _execute() {
     // Take a clone so that we don't modify this instance during execution.
-    // The hooks and onBuild callbacks usually modify the query and we want
-    // this builder to be re-executable.
     let builder = this.clone();
     let promise = Promise.resolve();
     let context = builder.context() || {};
     let internalContext = builder.internalContext();
 
     if (builder.isFindQuery()) {
-      // If no write methods have been called at this point this query is a
+      // If no write operations have been called at this point this query is a
       // find query and we need to call the custom find implementation.
-      builder._callFindMethod();
+      builder._callFindOperation();
     }
 
-    promise = chainBeforeMethods(promise, builder, builder._methodCalls);
-    promise = chainBeforeBackMethods(promise, builder, builder._methodCalls);
+    promise = chainBeforeOperations(promise, builder, builder._operations);
     promise = chainHooks(promise, builder, context.runBefore);
     promise = chainHooks(promise, builder, internalContext.runBefore);
+    promise = chainBeforeInternalOperations(promise, builder, builder._operations);
 
     // Resolve all before hooks before building and executing the query
     // and the rest of the hooks.
@@ -519,21 +517,21 @@ export default class QueryBuilder extends QueryBuilderBase {
       // We need to build the builder even if the _explicit(Resolve|Reject)Value or _hooks.executor
       // has been defined so that the onBuild hooks get called.
       let knexBuilder = build(builder);
-      let queryExecutorMethod = builder._queryExecutorMethod();
+      let queryExecutorOperation = builder._queryExecutorOperation();
       let promise;
 
       if (builder._explicitRejectValue) {
         promise = Promise.reject(builder._explicitRejectValue);
       } else if (builder._explicitResolveValue) {
         promise = Promise.resolve(builder._explicitResolveValue);
-      } else if (queryExecutorMethod) {
-        promise = queryExecutorMethod.queryExecutor(builder);
+      } else if (queryExecutorOperation) {
+        promise = queryExecutorOperation.queryExecutor(builder);
       } else {
         promise = knexBuilder.then(result => createModels(builder, result));
       }
 
-      promise = chainAfterModelCreateFrontMethods(promise, builder, builder._methodCalls);
-      promise = chainAfterModelCreateMethods(promise, builder, builder._methodCalls);
+      promise = chainAfterQueryOperations(promise, builder, builder._operations);
+      promise = chainAfterIntenralOperations(promise, builder, builder._operations);
 
       if (builder._eagerExpression) {
         promise = promise.then(models => eagerFetch(builder, models));
@@ -541,7 +539,7 @@ export default class QueryBuilder extends QueryBuilderBase {
 
       promise = chainHooks(promise, builder, context.runAfter);
       promise = chainHooks(promise, builder, internalContext.runAfter);
-      promise = chainAfterMethods(promise, builder, builder._methodCalls);
+      promise = chainAfterOperations(promise, builder, builder._operations);
 
       return promise;
     });
@@ -638,56 +636,56 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'join'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'join'}])
   joinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'innerJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'innerJoin'}])
   innerJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'outerJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'outerJoin'}])
   outerJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'leftJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'leftJoin'}])
   leftJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'leftOuterJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'leftOuterJoin'}])
   leftOuterJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'rightJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'rightJoin'}])
   rightJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'rightOuterJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'rightOuterJoin'}])
   rightOuterJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderMethod([JoinRelationMethod, {joinMethod: 'fullOuterJoin'}])
+  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'fullOuterJoin'}])
   fullOuterJoinRelation(relationName) {}
 
   /**
@@ -704,7 +702,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   withSchema(schema) {
     this.internalContext().onBuild.push(builder => {
       if (!builder.has(/withSchema/)) {
-        builder.callKnexQueryBuilderMethod('withSchema', [schema]);
+        builder.callKnexQueryBuilderOperation('withSchema', [schema]);
       }
     });
 
@@ -716,7 +714,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   debug() {
     this.internalContext().onBuild.push(builder => {
-      builder.callKnexQueryBuilderMethod('debug', []);
+      builder.callKnexQueryBuilderOperation('debug', []);
     });
 
     return this;
@@ -726,46 +724,46 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   insert(modelsOrObjects) {
-    const insertMethod = this._insertMethodFactory(this);
-    return this.callQueryBuilderMethod(insertMethod, [modelsOrObjects]);
+    const insertOperation = this._insertOperationFactory(this);
+    return this.callQueryBuilderOperation(insertOperation, [modelsOrObjects]);
   }
 
   /**
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   insertAndFetch(modelsOrObjects) {
-    const insertAndFetchMethod = new InsertAndFetchMethod(this, 'insertAndFetch', {
-      delegate: this._insertMethodFactory(this)
+    const insertAndFetchOperation = new InsertAndFetchOperation(this, 'insertAndFetch', {
+      delegate: this._insertOperationFactory(this)
     });
 
-    return this.callQueryBuilderMethod(insertAndFetchMethod, [modelsOrObjects]);
+    return this.callQueryBuilderOperation(insertAndFetchOperation, [modelsOrObjects]);
   }
 
   /**
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   insertWithRelated(modelsOrObjects) {
-    const insertWithRelatedMethod = new InsertWithRelatedMethod(this, 'insertWithRelated', {
-      delegate: this._insertMethodFactory(this)
+    const insertWithRelatedOperation = new InsertWithRelatedOperation(this, 'insertWithRelated', {
+      delegate: this._insertOperationFactory(this)
     });
 
-    return this.callQueryBuilderMethod(insertWithRelatedMethod, [modelsOrObjects]);
+    return this.callQueryBuilderOperation(insertWithRelatedOperation, [modelsOrObjects]);
   }
 
   /**
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   update(modelOrObject) {
-    const updateMethod = this._updateMethodFactory(this);
-    return this.callQueryBuilderMethod(updateMethod, [modelOrObject]);
+    const updateOperation = this._updateOperationFactory(this);
+    return this.callQueryBuilderOperation(updateOperation, [modelOrObject]);
   }
 
   /**
@@ -773,23 +771,23 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   updateAndFetchById(id, modelOrObject) {
-    const updateAndFetch = new UpdateAndFetchMethod(this, 'updateAndFetch', {
-      delegate: this._updateMethodFactory(this)
+    const updateAndFetch = new UpdateAndFetchOperation(this, 'updateAndFetch', {
+      delegate: this._updateOperationFactory(this)
     });
 
-    return this.callQueryBuilderMethod(updateAndFetch, [id, modelOrObject]);
+    return this.callQueryBuilderOperation(updateAndFetch, [id, modelOrObject]);
   }
 
   /**
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   patch(modelOrObject) {
-    const patchMethod = this._patchMethodFactory(this);
-    return this.callQueryBuilderMethod(patchMethod, [modelOrObject]);
+    const patchOperation = this._patchOperationFactory(this);
+    return this.callQueryBuilderOperation(patchOperation, [modelOrObject]);
   }
 
   /**
@@ -797,22 +795,22 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   patchAndFetchById(id, modelOrObject) {
-    const patchAndFetch = new UpdateAndFetchMethod(this, 'patchAndFetch', {
-      delegate: this._patchMethodFactory(this)
+    const patchAndFetch = new UpdateAndFetchOperation(this, 'patchAndFetch', {
+      delegate: this._patchOperationFactory(this)
     });
 
-    return this.callQueryBuilderMethod(patchAndFetch, [id, modelOrObject]);
+    return this.callQueryBuilderOperation(patchAndFetch, [id, modelOrObject]);
   }
 
   /**
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   delete() {
-    const deleteMethod = this._deleteMethodFactory(this);
-    return this.callQueryBuilderMethod(deleteMethod, []);
+    const deleteOperation = this._deleteOperationFactory(this);
+    return this.callQueryBuilderOperation(deleteOperation, []);
   }
 
   /**
@@ -834,19 +832,19 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {number|string|object|Array.<number|string>|Array.<Array.<number|string>>|Array.<object>} ids
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   relate(ids) {
-    const relateMethod = this._relateMethodFactory(this);
-    return this.callQueryBuilderMethod(relateMethod, [ids]);
+    const relateOperation = this._relateOperationFactory(this);
+    return this.callQueryBuilderOperation(relateOperation, [ids]);
   }
 
   /**
    * @returns {QueryBuilder}
    */
-  @writeQueryMethod
+  @writeQueryOperation
   unrelate() {
-    const unrelateMethod = this._unrelateMethodFactory(this);
-    return this.callQueryBuilderMethod(unrelateMethod, []);
+    const unrelateOperation = this._unrelateOperationFactory(this);
+    return this.callQueryBuilderOperation(unrelateOperation, []);
   }
 
   /**
@@ -870,10 +868,10 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 }
 
-function writeQueryMethod(target, property, descriptor) {
+function writeQueryOperation(target, property, descriptor) {
   const func = descriptor.value;
 
-  descriptor.value = function decorator$writeQueryMethod() {
+  descriptor.value = function decorator$writeQueryOperation() {
     if (!this.isFindQuery()) {
       return this.reject(new Error('Double call to a write method. ' +
         'You can only call one of the write methods ' +
@@ -984,7 +982,7 @@ function chainHooks(promise, builder, func) {
   return promise;
 }
 
-function chainBeforeMethods(promise, builder, methods) {
+function chainBeforeOperations(promise, builder, methods) {
   return promiseChain(promise, methods, (res, method) => {
     return method.onBefore(builder, res);
   }, method => {
@@ -992,23 +990,23 @@ function chainBeforeMethods(promise, builder, methods) {
   });
 }
 
-function chainBeforeBackMethods(promise, builder, methods) {
+function chainBeforeInternalOperations(promise, builder, methods) {
   return promiseChain(promise, methods, (res, method) => {
-    return method.onBeforeBack(builder, res);
+    return method.onBeforeInternal(builder, res);
   }, method => {
-    return method.hasOnBeforeBack();
+    return method.hasOnBeforeInternal();
   });
 }
 
-function chainAfterModelCreateFrontMethods(promise, builder, methods) {
+function chainAfterQueryOperations(promise, builder, methods) {
   return promiseChain(promise, methods, (res, method) => {
-    return method.onAfterModelCreateFront(builder, res);
+    return method.onAfterQuery(builder, res);
   }, method => {
-    return method.hasOnAfterModelCreateFront();
+    return method.hasOnAfterQuery();
   });
 }
 
-function chainAfterMethods(promise, builder, methods) {
+function chainAfterOperations(promise, builder, methods) {
   return promiseChain(promise, methods, (res, method) => {
     return method.onAfter(builder, res);
   }, method => {
@@ -1016,11 +1014,11 @@ function chainAfterMethods(promise, builder, methods) {
   });
 }
 
-function chainAfterModelCreateMethods(promise, builder, methods) {
+function chainAfterIntenralOperations(promise, builder, methods) {
   return promiseChain(promise, methods, (res, method) => {
-    return method.onAfterModelCreate(builder, res);
+    return method.onAfterInternal(builder, res);
   }, method => {
-    return method.hasOnAfterModelCreate();
+    return method.hasOnAfterInternal();
   });
 }
 

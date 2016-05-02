@@ -7,15 +7,15 @@ import {isSqlite} from '../../utils/dbUtils';
 import {isSubclassOf} from '../../utils/classUtils';
 import memoize from '../../utils/decorators/memoize';
 
-import ManyToManyFindMethod from './ManyToManyFindMethod';
-import ManyToManyInsertMethod from './ManyToManyInsertMethod';
-import ManyToManyRelateMethod from './ManyToManyRelateMethod';
-import ManyToManyUnrelateMethod from './ManyToManyUnrelateMethod';
-import ManyToManyUnrelateSqliteMethod from './ManyToManyUnrelateSqliteMethod';
-import ManyToManyUpdateMethod from './ManyToManyUpdateMethod';
-import ManyToManyUpdateSqliteMethod from './ManyToManyUpdateSqliteMethod';
-import ManyToManyDeleteMethod from './ManyToManyDeleteMethod';
-import ManyToManyDeleteSqliteMethod from './ManyToManyDeleteSqliteMethod';
+import ManyToManyFindOperation from './ManyToManyFindOperation';
+import ManyToManyInsertOperation from './ManyToManyInsertOperation';
+import ManyToManyRelateOperation from './ManyToManyRelateOperation';
+import ManyToManyUnrelateOperation from './ManyToManyUnrelateOperation';
+import ManyToManyUnrelateSqliteOperation from './ManyToManyUnrelateSqliteOperation';
+import ManyToManyUpdateOperation from './ManyToManyUpdateOperation';
+import ManyToManyUpdateSqliteOperation from './ManyToManyUpdateSqliteOperation';
+import ManyToManyDeleteOperation from './ManyToManyDeleteOperation';
+import ManyToManyDeleteSqliteOperation from './ManyToManyDeleteSqliteOperation';
 
 const sqliteBuiltInRowId = '_rowid_';
 
@@ -232,8 +232,8 @@ export default class ManyToManyRelation extends Relation {
   /**
    * @returns {QueryBuilder}
    */
-  join(builder, joinMethod, relatedTableAlias) {
-    joinMethod = joinMethod || 'join';
+  join(builder, joinOperation, relatedTableAlias) {
+    joinOperation = joinOperation || 'join';
     relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
 
     let joinTable = this.joinTable;
@@ -250,12 +250,12 @@ export default class ManyToManyRelation extends Relation {
     let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
 
     return builder
-      [joinMethod](joinTableAsAlias, join => {
+      [joinOperation](joinTableAsAlias, join => {
         _.each(joinTableOwnerCol, (joinTableOwnerCol, idx) => {
           join.on(joinTableOwnerCol, ownerCol[idx]);
         });
       })
-      [joinMethod](relatedTableAsAlias, join => {
+      [joinOperation](relatedTableAsAlias, join => {
         _.each(joinTableRelatedCol, (joinTableRelatedCol, idx) => {
           join.on(joinTableRelatedCol, relatedCol[idx]);
         });
@@ -264,14 +264,14 @@ export default class ManyToManyRelation extends Relation {
   }
 
   find(builder, owners) {
-    return new ManyToManyFindMethod(builder, 'find', {
+    return new ManyToManyFindOperation(builder, 'find', {
       relation: this,
       owners: owners
     });
   }
 
   insert(builder, owner) {
-    return new ManyToManyInsertMethod(builder, 'insert', {
+    return new ManyToManyInsertOperation(builder, 'insert', {
       relation: this,
       owner: owner
     });
@@ -279,12 +279,12 @@ export default class ManyToManyRelation extends Relation {
 
   update(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUpdateSqliteMethod(builder, 'update', {
+      return new ManyToManyUpdateSqliteOperation(builder, 'update', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyUpdateMethod(builder, 'update', {
+      return new ManyToManyUpdateOperation(builder, 'update', {
         relation: this,
         owner: owner
       });
@@ -293,13 +293,13 @@ export default class ManyToManyRelation extends Relation {
 
   patch(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUpdateSqliteMethod(builder, 'patch', {
+      return new ManyToManyUpdateSqliteOperation(builder, 'patch', {
         relation: this,
         owner: owner,
         modelOptions: {patch: true}
       });
     } else {
-      return new ManyToManyUpdateMethod(builder, 'patch', {
+      return new ManyToManyUpdateOperation(builder, 'patch', {
         relation: this,
         owner: owner,
         modelOptions: {patch: true}
@@ -309,12 +309,12 @@ export default class ManyToManyRelation extends Relation {
 
   delete(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyDeleteSqliteMethod(builder, 'delete', {
+      return new ManyToManyDeleteSqliteOperation(builder, 'delete', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyDeleteMethod(builder, 'delete', {
+      return new ManyToManyDeleteOperation(builder, 'delete', {
         relation: this,
         owner: owner
       });
@@ -322,7 +322,7 @@ export default class ManyToManyRelation extends Relation {
   }
 
   relate(builder, owner) {
-    return new ManyToManyRelateMethod(builder, 'relate', {
+    return new ManyToManyRelateOperation(builder, 'relate', {
       relation: this,
       owner: owner
     });
@@ -330,12 +330,12 @@ export default class ManyToManyRelation extends Relation {
 
   unrelate(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUnrelateSqliteMethod(builder, 'unrelate', {
+      return new ManyToManyUnrelateSqliteOperation(builder, 'unrelate', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyUnrelateMethod(builder, 'unrelate', {
+      return new ManyToManyUnrelateOperation(builder, 'unrelate', {
         relation: this,
         owner: owner
       });

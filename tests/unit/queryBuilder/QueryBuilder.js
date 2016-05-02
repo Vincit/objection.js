@@ -8,7 +8,7 @@ var _ = require('lodash')
   , Model = objection.Model
   , QueryBuilder = objection.QueryBuilder
   , QueryBuilderBase = objection.QueryBuilderBase
-  , QueryBuilderMethod = objection.QueryBuilderMethod
+  , QueryBuilderOperation = objection.QueryBuilderOperation
   , RelationExpression = objection.RelationExpression;
 
 describe('QueryBuilder', function () {
@@ -468,12 +468,12 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom find implementation defined by findMethodFactory', function () {
+  it('should call custom find implementation defined by findOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .findMethodFactory(function (builder) {
+      .findOperationFactory(function (builder) {
         expect(builder).to.equal(this);
-        return createFindMethod(builder, {a: 1});
+        return createFindOperation(builder, {a: 1});
       })
       .then(function () {
         expect(executedQueries).to.have.length(1);
@@ -481,11 +481,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should not call custom find implementation defined by findMethodFactory if insert is called', function () {
+  it('should not call custom find implementation defined by findOperationFactory if insert is called', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .findMethodFactory(function (builder) {
-        return createFindMethod(builder, {a: 1});
+      .findOperationFactory(function (builder) {
+        return createFindOperation(builder, {a: 1});
       })
       .insert({a: 1})
       .then(function () {
@@ -494,11 +494,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should not call custom find implementation defined by findMethodFactory if update is called', function () {
+  it('should not call custom find implementation defined by findOperationFactory if update is called', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .findMethodFactory(function () {
-        return createFindMethod(builder, {a: 1});
+      .findOperationFactory(function () {
+        return createFindOperation(builder, {a: 1});
       })
       .update({a: 1})
       .then(function () {
@@ -507,11 +507,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should not call custom find implementation defined by findMethodFactory if delete is called', function () {
+  it('should not call custom find implementation defined by findOperationFactory if delete is called', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .findMethodFactory(function () {
-        return createFindMethod(builder, {a: 1});
+      .findOperationFactory(function () {
+        return createFindOperation(builder, {a: 1});
       })
       .delete()
       .then(function () {
@@ -520,11 +520,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom insert implementation defined by insertMethodFactory', function () {
+  it('should call custom insert implementation defined by insertOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .insertMethodFactory(function (builder) {
-        return createInsertMethod(builder, {b: 2});
+      .insertOperationFactory(function (builder) {
+        return createInsertOperation(builder, {b: 2});
       })
       .insert({a: 1})
       .then(function () {
@@ -533,11 +533,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom update implementation defined by updateMethodFactory', function () {
+  it('should call custom update implementation defined by updateOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .updateMethodFactory(function (builder) {
-        return createUpdateMethod(builder, {b: 2});
+      .updateOperationFactory(function (builder) {
+        return createUpdateOperation(builder, {b: 2});
       })
       .update({a: 1})
       .then(function () {
@@ -546,11 +546,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom patch implementation defined by patchMethodFactory', function () {
+  it('should call custom patch implementation defined by patchOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .patchMethodFactory(function (builder) {
-        return createUpdateMethod(builder, {b: 2});
+      .patchOperationFactory(function (builder) {
+        return createUpdateOperation(builder, {b: 2});
       })
       .patch({a: 1})
       .then(function () {
@@ -559,11 +559,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom delete implementation defined by deleteMethodFactory', function () {
+  it('should call custom delete implementation defined by deleteOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .deleteMethodFactory(function (builder) {
-        return createDeleteMethod(builder, {id: 100});
+      .deleteOperationFactory(function (builder) {
+        return createDeleteOperation(builder, {id: 100});
       })
       .delete()
       .then(function () {
@@ -572,11 +572,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom relate implementation defined by relateMethodFactory', function () {
+  it('should call custom relate implementation defined by relateOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .relateMethodFactory(function (builder) {
-        return createInsertMethod(builder, {b: 2});
+      .relateOperationFactory(function (builder) {
+        return createInsertOperation(builder, {b: 2});
       })
       .relate({a: 1})
       .then(function () {
@@ -585,11 +585,11 @@ describe('QueryBuilder', function () {
       });
   });
 
-  it('should call custom unrelate implementation defined by unrelateMethodFactory', function () {
+  it('should call custom unrelate implementation defined by unrelateOperationFactory', function () {
     return QueryBuilder
       .forClass(TestModel)
-      .unrelateMethodFactory(function (builder) {
-        return createDeleteMethod(builder, {id: 100});
+      .unrelateOperationFactory(function (builder) {
+        return createDeleteOperation(builder, {id: 100});
       })
       .unrelate()
       .then(function () {
@@ -601,8 +601,8 @@ describe('QueryBuilder', function () {
   it('should be able to execute same query multiple times', function () {
     var query = QueryBuilder
       .forClass(TestModel)
-      .updateMethodFactory(function (builder) {
-        return createUpdateMethod(builder, {b: 2});
+      .updateOperationFactory(function (builder) {
+        return createUpdateOperation(builder, {b: 2});
       })
       .where('test', '<', 100)
       .update({a: 1});
@@ -686,10 +686,10 @@ describe('QueryBuilder', function () {
     expect(QueryBuilder.forClass(TestModel).isFindQuery()).to.equal(true);
     expect(QueryBuilder.forClass(TestModel).insert().isFindQuery()).to.equal(false);
     expect(QueryBuilder.forClass(TestModel).update().isFindQuery()).to.equal(false);
-    expect(QueryBuilder.forClass(TestModel).patchMethodFactory(function (builder) { return createUpdateMethod(builder, {}); }).patch().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).patchOperationFactory(function (builder) { return createUpdateOperation(builder, {}); }).patch().isFindQuery()).to.equal(false);
     expect(QueryBuilder.forClass(TestModel).delete().isFindQuery()).to.equal(false);
-    expect(QueryBuilder.forClass(TestModel).relateMethodFactory(function (builder) { return createUpdateMethod(builder, {}); }).relate(1).isFindQuery()).to.equal(false);
-    expect(QueryBuilder.forClass(TestModel).unrelateMethodFactory(function (builder) { return createUpdateMethod(builder, {}); }).unrelate().isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).relateOperationFactory(function (builder) { return createUpdateOperation(builder, {}); }).relate(1).isFindQuery()).to.equal(false);
+    expect(QueryBuilder.forClass(TestModel).unrelateOperationFactory(function (builder) { return createUpdateOperation(builder, {}); }).unrelate().isFindQuery()).to.equal(false);
   });
 
   it('update() should call $beforeUpdate on the model', function (done) {
@@ -939,8 +939,8 @@ describe('QueryBuilder', function () {
 
 });
 
-function createFindMethod(builder, whereObj) {
-  var method = new QueryBuilderMethod(builder, "find");
+function createFindOperation(builder, whereObj) {
+  var method = new QueryBuilderOperation(builder, "find");
 
   method.onBuild = function (knexBuilder) {
     knexBuilder.where(whereObj);
@@ -949,9 +949,9 @@ function createFindMethod(builder, whereObj) {
   return method;
 }
 
-function createInsertMethod(builder, mergeWithModel) {
-  var method = new QueryBuilderMethod(builder, "insert");
-  method.isWriteMethod = true;
+function createInsertOperation(builder, mergeWithModel) {
+  var method = new QueryBuilderOperation(builder, "insert");
+  method.isWriteOperation = true;
 
   method.call = function (builder, args) {
     this.model = args[0];
@@ -966,9 +966,9 @@ function createInsertMethod(builder, mergeWithModel) {
   return method;
 }
 
-function createUpdateMethod(builder, mergeWithModel) {
-  var method = new QueryBuilderMethod(builder, "update");
-  method.isWriteMethod = true;
+function createUpdateOperation(builder, mergeWithModel) {
+  var method = new QueryBuilderOperation(builder, "update");
+  method.isWriteOperation = true;
 
   method.call = function (builder, args) {
     this.model = args[0];
@@ -983,9 +983,9 @@ function createUpdateMethod(builder, mergeWithModel) {
   return method;
 }
 
-function createDeleteMethod(builder, whereObj) {
-  var method = new QueryBuilderMethod(builder, "delete");
-  method.isWriteMethod = true;
+function createDeleteOperation(builder, whereObj) {
+  var method = new QueryBuilderOperation(builder, "delete");
+  method.isWriteOperation = true;
 
   method.onBuild = function (knexBuilder) {
     knexBuilder.delete().where(whereObj);

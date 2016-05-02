@@ -3,9 +3,9 @@ import memoize from '../utils/decorators/memoize';
 import {inherits, isSubclassOf} from '../utils/classUtils';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 
-import RelationFindMethod from './RelationFindMethod';
-import RelationUpdateMethod from './RelationUpdateMethod';
-import RelationDeleteMethod from './RelationDeleteMethod';
+import RelationFindOperation from './RelationFindOperation';
+import RelationUpdateOperation from './RelationUpdateOperation';
+import RelationDeleteOperation from './RelationDeleteOperation';
 
 /**
  * @typedef {Object} RelationJoin
@@ -255,12 +255,12 @@ export default class Relation {
 
   /**
    * @param {QueryBuilder} builder
-   * @param {string=} joinMethod
+   * @param {string=} joinOperation
    * @param {string=} relatedTableAlias
    * @returns {QueryBuilder}
    */
-  join(builder, joinMethod, relatedTableAlias) {
-    joinMethod = joinMethod || 'join';
+  join(builder, joinOperation, relatedTableAlias) {
+    joinOperation = joinOperation || 'join';
     relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
 
     const relatedTable = this.relatedModelClass.tableName;
@@ -269,7 +269,7 @@ export default class Relation {
     const ownerCol = this.fullOwnerCol();
 
     return builder
-      [joinMethod](relatedTableAsAlias, join => {
+      [joinOperation](relatedTableAsAlias, join => {
         _.each(relatedCol, (relatedCol, idx) => {
           join.on(relatedCol, '=', ownerCol[idx]);
         });
@@ -282,7 +282,7 @@ export default class Relation {
    * @abstract
    * @param {QueryBuilder} builder
    * @param {Model} owner
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   insert(builder, owner) {
     this.throwError('not implemented');
@@ -291,10 +291,10 @@ export default class Relation {
   /**
    * @param {QueryBuilder} builder
    * @param {Model} owner
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   update(builder, owner) {
-    return new RelationUpdateMethod(builder, 'update', {
+    return new RelationUpdateOperation(builder, 'update', {
       relation: this,
       owner: owner
     });
@@ -303,10 +303,10 @@ export default class Relation {
   /**
    * @param {QueryBuilder} builder
    * @param {Model} owner
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   patch(builder, owner) {
-    return new RelationUpdateMethod(builder, 'patch', {
+    return new RelationUpdateOperation(builder, 'patch', {
       relation: this,
       owner: owner,
       modelOptions: {patch: true}
@@ -316,10 +316,10 @@ export default class Relation {
   /**
    * @param {QueryBuilder} builder
    * @param {Array.<Model>} owners
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   find(builder, owners) {
-    return new RelationFindMethod(builder, 'find', {
+    return new RelationFindOperation(builder, 'find', {
       relation: this,
       owners: owners
     });
@@ -328,10 +328,10 @@ export default class Relation {
   /**
    * @param {QueryBuilder} builder
    * @param {Model} owner
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   delete(builder, owner) {
-    return new RelationDeleteMethod(builder, 'delete', {
+    return new RelationDeleteOperation(builder, 'delete', {
       relation: this,
       owner: owner
     });
@@ -342,7 +342,7 @@ export default class Relation {
    * @abstract
    * @param {QueryBuilder} builder
    * @param {Model} owner
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   relate(builder, owner) {
     this.throwError('not implemented');
@@ -353,7 +353,7 @@ export default class Relation {
    * @abstract
    * @param {QueryBuilder} builder
    * @param {Model} owner
-   * @returns {QueryBuilderMethod}
+   * @returns {QueryBuilderOperation}
    */
   unrelate(builder, owner) {
     this.throwError('not implemented');

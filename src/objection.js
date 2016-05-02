@@ -2,7 +2,7 @@ import ModelBase from './model/ModelBase';
 import Model from './model/Model';
 import QueryBuilderBase from './queryBuilder/QueryBuilderBase';
 import QueryBuilder from './queryBuilder/QueryBuilder';
-import QueryBuilderMethod from './queryBuilder/methods/QueryBuilderMethod'
+import QueryBuilderOperation from './queryBuilder/operations/QueryBuilderOperation'
 import RelationExpression from './queryBuilder/RelationExpression';
 import ValidationError from './ValidationError';
 
@@ -20,7 +20,7 @@ export {
   Model,
   QueryBuilder,
   QueryBuilderBase,
-  QueryBuilderMethod,
+  QueryBuilderOperation,
   RelationExpression,
   ValidationError,
   Relation,

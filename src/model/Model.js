@@ -15,10 +15,10 @@ import HasManyRelation from '../relations/hasMany/HasManyRelation';
 import ManyToManyRelation from '../relations/manyToMany/ManyToManyRelation';
 import BelongsToOneRelation from '../relations/belongsToOne/BelongsToOneRelation';
 
-import InstanceFindMethod from '../queryBuilder/methods/InstanceFindMethod';
-import InstanceInsertMethod from '../queryBuilder/methods/InstanceInsertMethod';
-import InstanceUpdateMethod from '../queryBuilder/methods/InstanceUpdateMethod';
-import InstanceDeleteMethod from '../queryBuilder/methods/InstanceDeleteMethod';
+import InstanceFindOperation from '../queryBuilder/operations/InstanceFindOperation';
+import InstanceInsertOperation from '../queryBuilder/operations/InstanceInsertOperation';
+import InstanceUpdateOperation from '../queryBuilder/operations/InstanceUpdateOperation';
+import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOperation';
 
 export default class Model extends ModelBase {
 
@@ -114,25 +114,25 @@ export default class Model extends ModelBase {
 
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
-      .findMethodFactory(builder => {
-        return new InstanceFindMethod(builder, 'find', {instance: this});
+      .findOperationFactory(builder => {
+        return new InstanceFindOperation(builder, 'find', {instance: this});
       })
-      .insertMethodFactory(builder => {
-        return new InstanceInsertMethod(builder, 'insert', {instance: this});
+      .insertOperationFactory(builder => {
+        return new InstanceInsertOperation(builder, 'insert', {instance: this});
       })
-      .updateMethodFactory(builder => {
-        return new InstanceUpdateMethod(builder, 'update', {instance: this});
+      .updateOperationFactory(builder => {
+        return new InstanceUpdateOperation(builder, 'update', {instance: this});
       })
-      .patchMethodFactory(builder => {
-        return new InstanceUpdateMethod(builder, 'patch', {instance: this, modelOptions: {patch: true}});
+      .patchOperationFactory(builder => {
+        return new InstanceUpdateOperation(builder, 'patch', {instance: this, modelOptions: {patch: true}});
       })
-      .deleteMethodFactory(builder => {
-        return new InstanceDeleteMethod(builder, 'delete', {instance: this});
+      .deleteOperationFactory(builder => {
+        return new InstanceDeleteOperation(builder, 'delete', {instance: this});
       })
-      .relateMethodFactory(() => {
+      .relateOperationFactory(() => {
         throw new Error('`relate` makes no sense in this context');
       })
-      .unrelateMethodFactory(() => {
+      .unrelateOperationFactory(() => {
         throw new Error('`unrelate` makes no sense in this context');
       });
   }
@@ -147,25 +147,25 @@ export default class Model extends ModelBase {
 
     return ModelClass.RelatedQueryBuilder
       .forClass(ModelClass)
-      .findMethodFactory(builder => {
+      .findOperationFactory(builder => {
         return relation.find(builder, [this]);
       })
-      .insertMethodFactory(builder => {
+      .insertOperationFactory(builder => {
         return relation.insert(builder, this);
       })
-      .updateMethodFactory(builder => {
+      .updateOperationFactory(builder => {
         return relation.update(builder, this);
       })
-      .patchMethodFactory(builder => {
+      .patchOperationFactory(builder => {
         return relation.patch(builder, this);
       })
-      .deleteMethodFactory(builder => {
+      .deleteOperationFactory(builder => {
         return relation.delete(builder, this);
       })
-      .relateMethodFactory(builder => {
+      .relateOperationFactory(builder => {
         return relation.relate(builder, this);
       })
-      .unrelateMethodFactory(builder => {
+      .unrelateOperationFactory(builder => {
         return relation.unrelate(builder, this);
       });
   }
@@ -315,10 +315,10 @@ export default class Model extends ModelBase {
 
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
-      .relateMethodFactory(() => {
+      .relateOperationFactory(() => {
         throw new Error('`relate` makes no sense in this context');
       })
-      .unrelateMethodFactory(() => {
+      .unrelateOperationFactory(() => {
         throw new Error('`unrelate` makes no sense in this context');
       });
   }

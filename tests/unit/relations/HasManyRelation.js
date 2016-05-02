@@ -87,7 +87,7 @@ describe('HasManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findMethodFactory(function (builder) {
+        .findOperationFactory(function (builder) {
           return relation.find(builder, [owner]);
         });
 
@@ -124,7 +124,7 @@ describe('HasManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findMethodFactory(function (builder) {
+        .findOperationFactory(function (builder) {
           return compositeKeyRelation.find(builder, owners);
         });
 
@@ -164,7 +164,7 @@ describe('HasManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findMethodFactory(function (builder) {
+        .findOperationFactory(function (builder) {
           return relation.find(builder, owners);
         });
 
@@ -199,7 +199,7 @@ describe('HasManyRelation', function () {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .select('name')
-        .findMethodFactory(function (builder) {
+        .findOperationFactory(function (builder) {
           return relation.find(builder, [owner]);
         });
 
@@ -232,7 +232,7 @@ describe('HasManyRelation', function () {
         .forClass(RelatedModel)
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
-        .findMethodFactory(function (builder) {
+        .findOperationFactory(function (builder) {
           return relation.find(builder, [owner]);
         });
 
@@ -265,7 +265,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertMethodFactory(function (builder) {
+        .insertOperationFactory(function (builder) {
           return relation.insert(builder, owner);
         })
         .insert(related);
@@ -300,7 +300,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .insertMethodFactory(function (builder) {
+        .insertOperationFactory(function (builder) {
           return compositeKeyRelation.insert(builder, owner);
         })
         .insert(related);
@@ -332,7 +332,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .insertMethodFactory(function (builder) {
+        .insertOperationFactory(function (builder) {
           return relation.insert(builder, owner);
         })
         .insert(related)
@@ -356,7 +356,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .insertMethodFactory(function (builder) {
+        .insertOperationFactory(function (builder) {
           return relation.insert(builder, owner);
         })
         .insert(related)
@@ -376,7 +376,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .insertMethodFactory(function (builder) {
+        .insertOperationFactory(function (builder) {
           return relation.insert(builder, owner);
         })
         .insert(related)
@@ -400,7 +400,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .updateMethodFactory(function (builder) {
+        .updateOperationFactory(function (builder) {
           return relation.update(builder, owner);
         })
         .update(update)
@@ -425,7 +425,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .updateMethodFactory(function (builder) {
+        .updateOperationFactory(function (builder) {
           return compositeKeyRelation.update(builder, owner);
         })
         .update(update)
@@ -450,7 +450,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .updateMethodFactory(function (builder) {
+        .updateOperationFactory(function (builder) {
           return relation.update(builder, owner);
         })
         .update(update)
@@ -474,7 +474,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .updateMethodFactory(function (builder) {
+        .updateOperationFactory(function (builder) {
           return relation.update(builder, owner);
         })
         .update(update)
@@ -500,7 +500,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .patchMethodFactory(function (builder) {
+        .patchOperationFactory(function (builder) {
           return relation.patch(builder, owner);
         })
         .patch(patch)
@@ -534,7 +534,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchMethodFactory(function (builder) {
+        .patchOperationFactory(function (builder) {
           return relation.patch(builder, owner);
         })
         .patch(patch)
@@ -554,7 +554,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchMethodFactory(function (builder) {
+        .patchOperationFactory(function (builder) {
           return relation.patch(builder, owner);
         })
         .increment('test', 1)
@@ -571,7 +571,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchMethodFactory(function (builder) {
+        .patchOperationFactory(function (builder) {
           return relation.patch(builder, owner);
         })
         .decrement('test', 10)
@@ -590,7 +590,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .patchMethodFactory(function (builder) {
+        .patchOperationFactory(function (builder) {
           return relation.patch(builder, owner);
         })
         .patch(patch)
@@ -611,7 +611,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .deleteMethodFactory(function (builder) {
+        .deleteOperationFactory(function (builder) {
           return relation.delete(builder, owner);
         })
         .delete()
@@ -634,7 +634,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .deleteMethodFactory(function (builder) {
+        .deleteOperationFactory(function (builder) {
           return compositeKeyRelation.delete(builder, owner);
         })
         .delete()
@@ -658,7 +658,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .deleteMethodFactory(function (builder) {
+        .deleteOperationFactory(function (builder) {
           return relation.delete(builder, owner);
         })
         .delete()
@@ -682,7 +682,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateMethodFactory(function (builder) {
+        .relateOperationFactory(function (builder) {
           return relation.relate(builder, owner);
         })
         .relate(10);
@@ -703,7 +703,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateMethodFactory(function (builder) {
+        .relateOperationFactory(function (builder) {
           return relation.relate(builder, owner);
         })
         .relate([10, 20, 30]);
@@ -724,7 +724,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateMethodFactory(function (builder) {
+        .relateOperationFactory(function (builder) {
           return relation.relate(builder, owner);
         })
         .relate({id: 10});
@@ -745,7 +745,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateMethodFactory(function (builder) {
+        .relateOperationFactory(function (builder) {
           return relation.relate(builder, owner);
         })
         .relate([{id: 10}, {id: 20}]);
@@ -766,7 +766,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .relateMethodFactory(function (builder) {
+        .relateOperationFactory(function (builder) {
           return compositeKeyRelation.relate(builder, owner);
         })
         .relate([1, 2, 3]);
@@ -787,7 +787,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .relateMethodFactory(function (builder) {
+        .relateOperationFactory(function (builder) {
           return relation.relate(builder, owner);
         })
         .relate(11)
@@ -807,7 +807,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .unrelateMethodFactory(function (builder) {
+        .unrelateOperationFactory(function (builder) {
           return relation.unrelate(builder, owner);
         })
         .unrelate()
@@ -828,7 +828,7 @@ describe('HasManyRelation', function () {
 
       var builder = QueryBuilder
         .forClass(RelatedModel)
-        .unrelateMethodFactory(function (builder) {
+        .unrelateOperationFactory(function (builder) {
           return compositeKeyRelation.unrelate(builder, owner);
         })
         .unrelate()
@@ -850,7 +850,7 @@ describe('HasManyRelation', function () {
 
       return QueryBuilder
         .forClass(RelatedModel)
-        .unrelateMethodFactory(function (builder) {
+        .unrelateOperationFactory(function (builder) {
           return relation.unrelate(builder, owner);
         })
         .unrelate()

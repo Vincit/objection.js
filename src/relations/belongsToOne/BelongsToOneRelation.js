@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import Relation from '../Relation';
 
-import BelongsToOneInsertMethod from './BelongsToOneInsertMethod';
-import BelongsToOneRelateMethod from './BelongsToOneRelateMethod';
-import BelongsToOneUnrelateMethod from './BelongsToOneUnrelateMethod';
+import BelongsToOneInsertOperation from './BelongsToOneInsertOperation';
+import BelongsToOneRelateOperation from './BelongsToOneRelateOperation';
+import BelongsToOneUnrelateOperation from './BelongsToOneUnrelateOperation';
 
 export default class BelongsToOneRelation extends Relation {
 
@@ -17,21 +17,21 @@ export default class BelongsToOneRelation extends Relation {
   }
 
   insert(builder, owner) {
-    return new BelongsToOneInsertMethod(builder, 'insert', {
+    return new BelongsToOneInsertOperation(builder, 'insert', {
       relation: this,
       owner: owner
     });
   }
 
   relate(builder, owner) {
-    return new BelongsToOneRelateMethod(builder, 'relate', {
+    return new BelongsToOneRelateOperation(builder, 'relate', {
       relation: this,
       owner: owner
     });
   }
 
   unrelate(builder, owner) {
-    return new BelongsToOneUnrelateMethod(builder, 'unrelate', {
+    return new BelongsToOneUnrelateOperation(builder, 'unrelate', {
       relation: this,
       owner: owner
     });

@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import Relation from '../Relation';
 
-import HasManyInsertMethod from './HasManyInsertMethod';
-import HasManyRelateMethod from './HasManyRelateMethod';
-import HasManyUnrelateMethod from './HasManyUnrelateMethod';
+import HasManyInsertOperation from './HasManyInsertOperation';
+import HasManyRelateOperation from './HasManyRelateOperation';
+import HasManyUnrelateOperation from './HasManyUnrelateOperation';
 
 export default class HasManyRelation extends Relation {
 
@@ -21,21 +21,21 @@ export default class HasManyRelation extends Relation {
   }
 
   insert(builder, owner) {
-    return new HasManyInsertMethod(builder, 'insert', {
+    return new HasManyInsertOperation(builder, 'insert', {
       relation: this,
       owner: owner
     });
   }
 
   relate(builder, owner) {
-    return new HasManyRelateMethod(builder, 'relate', {
+    return new HasManyRelateOperation(builder, 'relate', {
       relation: this,
       owner: owner
     });
   }
 
   unrelate(builder, owner) {
-    return new HasManyUnrelateMethod(builder, 'unrelate', {
+    return new HasManyUnrelateOperation(builder, 'unrelate', {
       relation: this,
       owner: owner
     });
