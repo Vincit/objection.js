@@ -8,6 +8,10 @@ import ValidationError from '../ValidationError';
 import EagerFetcher from './EagerFetcher';
 import deprecated from '../utils/decorators/deprecated';
 
+import DeleteMethod from './methods/DeleteMethod';
+import UpdateMethod from './methods/UpdateMethod';
+import InsertMethod from './methods/InsertMethod';
+
 import InsertWithRelatedMethod from './methods/InsertWithRelatedMethod';
 import InsertAndFetchMethod from './methods/InsertAndFetchMethod';
 import UpdateAndFetchMethod from './methods/UpdateAndFetchMethod';
@@ -16,10 +20,6 @@ import JoinRelationMethod from './methods/JoinRelationMethod';
 import RunBeforeMethod from './methods/RunBeforeMethod';
 import RunAfterMethod from './methods/RunAfterMethod';
 import OnBuildMethod from './methods/OnBuildMethod';
-
-import DeleteMethod from './methods/DeleteMethod';
-import UpdateMethod from './methods/UpdateMethod';
-import InsertMethod from './methods/InsertMethod';
 
 export default class QueryBuilder extends QueryBuilderBase {
 
@@ -473,7 +473,13 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilderMethod}
    */
   _queryExecutorMethod() {
-    return _.find(this._methodCalls, method => method.hasQueryExecutor());
+    let executors = _.filter(this._methodCalls, method => method.hasQueryExecutor());
+
+    if (executors.length > 1) {
+      throw new Error('there can only be one method call that implements queryExecutor()');
+    }
+
+    return executors[0];
   }
 
   /**
