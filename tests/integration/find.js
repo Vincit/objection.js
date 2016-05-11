@@ -322,6 +322,42 @@ module.exports = function (session) {
           });
       });
 
+      it('should disable alias with option alias = false', function () {
+        return Model1
+          .query()
+          .joinRelation('model1Relation2', {alias: false})
+          .where('model_2.id_col', '<', 4)
+          .then(function (models) {
+            models = _.sortBy(models, ['id', 'id_col']);
+            expect(_.map(models, 'id')).to.eql([1, 1, 7]);
+            expect(_.map(models, 'id_col')).to.eql([1, 2, 3]);
+          });
+      });
+
+      it('should use relation name as alias with option alias = true', function () {
+        return Model1
+          .query()
+          .joinRelation('model1Relation2', {alias: true})
+          .where('model1Relation2.id_col', '<', 4)
+          .then(function (models) {
+            models = _.sortBy(models, ['id', 'id_col']);
+            expect(_.map(models, 'id')).to.eql([1, 1, 7]);
+            expect(_.map(models, 'id_col')).to.eql([1, 2, 3]);
+          });
+      });
+
+      it('should use custom alias with option alias = string', function () {
+        return Model1
+          .query()
+          .joinRelation('model1Relation2', {alias: 'fooBarBaz'})
+          .where('fooBarBaz.id_col', '<', 4)
+          .then(function (models) {
+            models = _.sortBy(models, ['id', 'id_col']);
+            expect(_.map(models, 'id')).to.eql([1, 1, 7]);
+            expect(_.map(models, 'id_col')).to.eql([1, 2, 3]);
+          });
+      });
+
     });
 
     describe('.$query()', function () {
