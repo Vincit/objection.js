@@ -48,10 +48,11 @@ in the codebase. You can even use things like ES7 [async/await](http://jakearchi
 using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES6](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 and [ES7](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
 
-Tutorials:
+Blog posts and tutorials:
 
- * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/)
+ * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/) (objection.js was originally called moron.js)
  * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
+ * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
 
 # Installation
 
@@ -149,10 +150,11 @@ that uses [Babel](https://babeljs.io/) for ES7 --> ES5 transpiling.
 
 Also check out our [API reference](#api-reference) and [recipe book](#recipe-book).
 
-Tutorials:
+Blog posts and tutorials:
 
- * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/)
+ * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/) (objection.js was originally called moron.js)
  * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
+ * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
 
 # Query examples
 
@@ -552,6 +554,8 @@ Examples of expressions that would cause the query to be rejected:
 In addition to the [`eager`](#eager) method, relations can be fetched using the [`loadRelated`](#loadrelated) and 
 [`$loadRelated`](#_s_loadrelated) methods.
 
+You can read more about eager queries from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
+
 ## Graph inserts
 
 ```js
@@ -639,6 +643,8 @@ works like [`allowEager`](#allowinsert).
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to
 be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all
 inserted rows and not just the first or the last one.
+
+You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
 
 # Transactions
 

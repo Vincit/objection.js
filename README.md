@@ -38,8 +38,8 @@ Shortcuts:
  * [Objection.js API reference](http://vincit.github.io/objection.js/#api-reference)
  * [Changelog](http://vincit.github.io/objection.js/#changelog)
 
-Tutorials and blogs:
+Blog posts and tutorials:
 
- * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/)
+ * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/) (objection.js was originally called moron.js)
  * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
- * [JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
+ * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
