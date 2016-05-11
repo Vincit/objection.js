@@ -11,7 +11,7 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
   }
 
   call(builder, args) {
-    if (!wrapArgs(args, builder.knex())) {
+    if (!wrapArgs(args, builder.knex(), this.opt)) {
       return false;
     }
 
@@ -20,9 +20,9 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
   }
 }
 
-function wrapArgs(args, knex) {
+function wrapArgs(args, knex, opt) {
   for (let i = 0, l = args.length; i < l; ++i) {
-    if (_.isUndefined(args[i])) {
+    if (!opt.acceptUndefinedArgs && _.isUndefined(args[i])) {
       // None of the query builder methods should accept undefined. Do nothing if
       // one of the arguments is undefined. This enables us to do things like
       // `.where('name', req.query.name)` without checking if req.query has the
@@ -33,8 +33,8 @@ function wrapArgs(args, knex) {
       args[i] = args[i].build();
     } else if (_.isFunction(args[i])) {
       // If an argument is a function, knex calls it with a query builder as
-      // `this` context. We call the function with a QueryBuilderBase as
-      // `this` context instead.
+      // first argument (and as `this` context). We wrap the query builder into
+      // a QueryBuilderBase instance.
       args[i] = wrapFunctionArg(args[i], knex);
     }
   }
@@ -45,12 +45,29 @@ function wrapArgs(args, knex) {
 function wrapFunctionArg(func, knex) {
   return function () {
     if (isKnexQueryBuilder(this)) {
+      const knexQueryBuilder = this;
+
       // Wrap knex query builder into a QueryBuilderBase so that we can use
       // our extended query builder in nested queries.
-      const builder = new QueryBuilderBase(knex);
-      func.call(builder, builder);
-      builder.buildInto(this);
+      const wrappedQueryBuilder = new QueryBuilderBase(knex);
+
+      if (arguments.length > 1) {
+        const args = new Array(arguments.length);
+        args[0] = wrappedQueryBuilder;
+
+        for (let i = 1, l = arguments.length; i < l; ++i) {
+          args[i] = arguments[i];
+        }
+
+        func.apply(wrappedQueryBuilder, args);
+      } else {
+        func.call(wrappedQueryBuilder, wrappedQueryBuilder);
+      }
+
+      wrappedQueryBuilder.buildInto(knexQueryBuilder);
     } else {
+      // This case is for function argument `join` operation and other methods that
+      // Don't take a query builder as the first parameter.
       return func.apply(this, arguments);
     }
   };

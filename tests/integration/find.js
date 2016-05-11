@@ -4,6 +4,7 @@ var _ = require('lodash');
 var utils = require('../../lib/utils/dbUtils');
 var expect = require('expect.js');
 var Promise = require('bluebird');
+var QueryBuilderBase = require('../../').QueryBuilderBase;
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
@@ -181,6 +182,21 @@ module.exports = function (session) {
             .then(function (models) {
               expect(_.map(models, 'id')).to.eql([1, 2]);
               expect(_.map(models, 'sum')).to.eql([60, null]);
+            });
+        });
+
+        it('.modify()', function () {
+          return Model2
+            .query()
+            .modify(function (builder, arg1, arg2, arg3) {
+              expect(builder).to.be.a(QueryBuilderBase);
+              expect(arg1).to.equal('foo');
+              expect(arg2).to.equal(undefined);
+              expect(arg3).to.equal(10);
+              builder.where('model_2_prop_1', '>=', 'hejsan 2')
+            }, 'foo', undefined, 10)
+            .then(function (models) {
+              expect(_.map(models, 'model2Prop1').sort()).to.eql(['hejsan 2', 'hejsan 3'])
             });
         });
 

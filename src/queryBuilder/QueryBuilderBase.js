@@ -655,6 +655,24 @@ export default class QueryBuilderBase {
   /**
    * @returns {QueryBuilderBase}
    */
+  @queryBuilderOperation(KnexOperation)
+  options(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  columnInfo(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation([KnexOperation, {acceptUndefinedArgs: true}])
+  modify(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
   @queryBuilderOperation([WhereRefOperation, {bool: 'and'}])
   whereRef(lhs, op, rhs) {}
 
