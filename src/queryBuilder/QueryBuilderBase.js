@@ -632,6 +632,48 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   @queryBuilderOperation(KnexOperation)
+  increment(...args) {}
+  
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  decrement(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  pluck(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  first(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  modify(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  columnInfo(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  options(...args) {}
+  
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
   debug(...args) {}
 
   /**
