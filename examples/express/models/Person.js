@@ -1,4 +1,6 @@
 var Model = require('objection').Model;
+var Animal = require('./Animal')
+var Movie = require('./Movie')
 
 /**
  * @extends Model
@@ -42,11 +44,10 @@ Person.jsonSchema = {
 // This object defines the relations to other models.
 Person.relationMappings = {
   pets: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     // The related model. This can be either a Model subclass constructor or an
-    // absolute file path to a module that exports one. We use the file path version
-    // here to prevent require loops.
-    modelClass: __dirname + '/Animal',
+    // absolute file path to a module that exports one.
+    modelClass: Animal,
     join: {
       from: 'Person.id',
       to: 'Animal.ownerId'
@@ -55,7 +56,7 @@ Person.relationMappings = {
 
   movies: {
     relation: Model.ManyToManyRelation,
-    modelClass: __dirname + '/Movie',
+    modelClass: Movie,
     join: {
       from: 'Person.id',
       // ManyToMany relation needs the `through` object to describe the join table.
@@ -68,7 +69,7 @@ Person.relationMappings = {
   },
 
   children: {
-    relation: Model.OneToManyRelation,
+    relation: Model.HasManyRelation,
     modelClass: Person,
     join: {
       from: 'Person.id',

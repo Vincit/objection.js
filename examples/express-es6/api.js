@@ -10,7 +10,7 @@ module.exports = function (app) {
   app.post('/persons', function* (req, res) {
     const person = yield Person
       .query()
-      .insert(req.body);
+      .insertAndFetch(req.body);
 
     res.send(person);
   });
@@ -38,7 +38,17 @@ module.exports = function (app) {
       .eager(req.query.eager)
       .where('age', '>=', req.query.minAge)
       .where('age', '<', req.query.maxAge)
-      .where('firstName', 'like', req.query.firstName);
+      .where('firstName', 'like', req.query.firstName)
+      .orderBy('firstName')
+      .filterEager('pets', function (builder) {
+        // Order eagerly loaded pets by name.
+        builder.orderBy('name')
+      })
+      .filterEager('children.pets', function (builder) {
+        // Only fetch dogs for children.
+        builder.where('species', 'dog')
+      })
+      .then(function (persons) { res.send(persons); })
       
     res.send(persons);
   });
@@ -48,8 +58,7 @@ module.exports = function (app) {
   app.delete('/persons/:id', function* (req, res) {
     yield Person
       .query()
-      .delete()
-      .where('id', req.params.id);
+      .deleteById(req.params.id);
       
     res.send({});
   });
@@ -59,8 +68,7 @@ module.exports = function (app) {
   app.post('/persons/:id/children', function* (req, res) {
     const person = yield Person
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
     
     if (!person) { 
       throwNotFound(); 
@@ -78,8 +86,7 @@ module.exports = function (app) {
   app.post('/persons/:id/pets', function* (req, res) {
     const person = yield Person
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
       
     if (!person) { 
       throwNotFound(); 
@@ -98,8 +105,7 @@ module.exports = function (app) {
   app.get('/persons/:id/pets', function* (req, res) {
     const person = yield Person
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
       
     if (!person) {
       throwNotFound(); 
@@ -123,8 +129,7 @@ module.exports = function (app) {
     const movie = yield transaction(Person, function* (Person) {
       const person = yield Person
         .query()
-        .where('id', req.params.id)
-        .first();
+        .findById(req.params.id);
 
       if (!person) {
         throwNotFound();
@@ -143,8 +148,7 @@ module.exports = function (app) {
   app.post('/movies/:id/actors', function* (req, res) {
     const movie = yield Movie
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
       
     if (!movie) {
       throwNotFound();
@@ -162,8 +166,7 @@ module.exports = function (app) {
   app.get('/movies/:id/actors', function* (req, res) {
     const movie = yield Movie
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
     
     if (!movie) {
       throwNotFound();
@@ -175,6 +178,7 @@ module.exports = function (app) {
   });
 };
 
+// The error thrown by this function is handled in the error handler middleware in app.js.
 function throwNotFound() {
   const error = new Error();
   error.statusCode = 404;

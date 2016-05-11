@@ -28,7 +28,8 @@ monkeyPatchRouteMethods(app);
 // Register our REST API.
 registerApi(app);
 
-// Error handling.
+// Error handling. The `ValidionError` instances thrown by objection.js have a `statusCode`
+// property that is sent as the status code of the response.
 app.use(function (err, req, res, next) {
   if (err) {
     res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});

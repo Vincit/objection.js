@@ -8,7 +8,7 @@ module.exports = function (app) {
   app.post('/persons', function (req, res, next) {
     Person
       .query()
-      .insert(req.body)
+      .insertAndFetch(req.body)
       .then(function (person) { res.send(person); })
       .catch(next);
   });
@@ -37,6 +37,15 @@ module.exports = function (app) {
       .where('age', '>=', req.query.minAge)
       .where('age', '<', req.query.maxAge)
       .where('firstName', 'like', req.query.firstName)
+      .orderBy('firstName')
+      .filterEager('pets', function (builder) {
+        // Order eagerly loaded pets by name.
+        builder.orderBy('name')
+      })
+      .filterEager('children.pets', function (builder) {
+        // Only fetch dogs for children.
+        builder.where('species', 'dog')
+      })
       .then(function (persons) { res.send(persons); })
       .catch(next);
   });
@@ -46,8 +55,7 @@ module.exports = function (app) {
   app.delete('/persons/:id', function (req, res, next) {
     Person
       .query()
-      .delete()
-      .where('id', req.params.id)
+      .deleteById(req.params.id)
       .then(function () { res.send({}); })
       .catch(next);
   });
@@ -57,8 +65,7 @@ module.exports = function (app) {
   app.post('/persons/:id/children', function (req, res, next) {
     Person
       .query()
-      .where('id', req.params.id)
-      .first()
+      .findById(req.params.id)
       .then(function (person) {
         if (!person) { throwNotFound(); }
         return person
@@ -74,8 +81,7 @@ module.exports = function (app) {
   app.post('/persons/:id/pets', function (req, res, next) {
     Person
       .query()
-      .where('id', req.params.id)
-      .first()
+      .findById(req.params.id)
       .then(function (person) {
         if (!person) { throwNotFound(); }
         return person
@@ -92,8 +98,7 @@ module.exports = function (app) {
   app.get('/persons/:id/pets', function (req, res, next) {
     Person
       .query()
-      .where('id', req.params.id)
-      .first()
+      .findById(req.params.id)
       .then(function (person) {
         if (!person) { throwNotFound(); }
         // We don't need to check for the existence of the query parameters.
@@ -115,8 +120,7 @@ module.exports = function (app) {
     objection.transaction(Person, function (Person) {
       return Person
         .query()
-        .where('id', req.params.id)
-        .first()
+        .findById(req.params.id)
         .then(function (person) {
           if (!person) { throwNotFound(); }
           return person
@@ -133,8 +137,7 @@ module.exports = function (app) {
   app.post('/movies/:id/actors', function (req, res, next) {
     Movie
       .query()
-      .where('id', req.params.id)
-      .first()
+      .findById(req.params.id)
       .then(function (movie) {
         if (!movie) { throwNotFound(); }
         return movie
@@ -150,8 +153,7 @@ module.exports = function (app) {
   app.get('/movies/:id/actors', function (req, res, next) {
     Movie
       .query()
-      .where('id', req.params.id)
-      .first()
+      .findById(req.params.id)
       .then(function (movie) {
         if (!movie) { throwNotFound(); }
         return movie.$relatedQuery('actors');
@@ -162,6 +164,7 @@ module.exports = function (app) {
 
 };
 
+// The error thrown by this function is handled in the error handler middleware in app.js.
 function throwNotFound() {
   var error = new Error();
   error.statusCode = 404;

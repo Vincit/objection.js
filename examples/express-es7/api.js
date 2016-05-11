@@ -57,8 +57,7 @@ export default function (app) {
   app.post('/persons/:id/children', async function (req, res) {
     const person = await Person
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
     
     if (!person) { 
       throwNotFound(); 
@@ -76,8 +75,7 @@ export default function (app) {
   app.post('/persons/:id/pets', async function (req, res) {
     const person = await Person
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
       
     if (!person) { 
       throwNotFound(); 
@@ -96,8 +94,7 @@ export default function (app) {
   app.get('/persons/:id/pets', async function (req, res) {
     const person = await Person
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
       
     if (!person) {
       throwNotFound(); 
@@ -121,8 +118,7 @@ export default function (app) {
     const movie = await objection.transaction(Person, async function (Person) {
       const person = await Person
         .query()
-        .where('id', req.params.id)
-        .first();
+        .findById(req.params.id);
 
       if (!person) {
         throwNotFound();
@@ -141,8 +137,7 @@ export default function (app) {
   app.post('/movies/:id/actors', async function (req, res) {
     const movie = await Movie
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
       
     if (!movie) {
       throwNotFound();
@@ -160,8 +155,7 @@ export default function (app) {
   app.get('/movies/:id/actors', async function (req, res) {
     const movie = await Movie
       .query()
-      .where('id', req.params.id)
-      .first();
+      .findById(req.params.id);
     
     if (!movie) {
       throwNotFound();
@@ -173,6 +167,7 @@ export default function (app) {
   });
 };
 
+// The error thrown by this function is handled in the error handler middleware in app.js.
 function throwNotFound() {
   const error = new Error();
   error.statusCode = 404;

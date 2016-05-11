@@ -1,6 +1,8 @@
 'use strict';
 
 const Model = require('objection').Model;
+const Animal = require('./Animal');
+const Movie = require('./Movie');
 
 class Person extends Model {
   // Table name is the only required property.
@@ -39,11 +41,10 @@ class Person extends Model {
   static get relationMappings() {
     return {
       pets: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         // The related model. This can be either a Model subclass constructor or an
-        // absolute file path to a module that exports one. We use the file path version
-        // here to prevent require loops.
-        modelClass: __dirname + '/Animal',
+        // absolute file path to a module that exports one.
+        modelClass: Animal,
         join: {
           from: 'Person.id',
           to: 'Animal.ownerId'
@@ -52,7 +53,7 @@ class Person extends Model {
 
       movies: {
         relation: Model.ManyToManyRelation,
-        modelClass: __dirname + '/Movie',
+        modelClass: Movie,
         join: {
           from: 'Person.id',
           // ManyToMany relation needs the `through` object to describe the join table.
@@ -65,7 +66,7 @@ class Person extends Model {
       },
 
       children: {
-        relation: Model.OneToManyRelation,
+        relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
           from: 'Person.id',
