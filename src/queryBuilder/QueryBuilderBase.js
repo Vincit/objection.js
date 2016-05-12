@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import {inherits} from '../utils/classUtils';
+import deprecated from '../utils/decorators/deprecated'
 
 import QueryBuilderContextBase from './QueryBuilderContextBase';
 
@@ -92,8 +93,24 @@ export default class QueryBuilderBase {
    * @param {function} func
    * @returns {QueryBuilderBase}
    */
+  @deprecated({removedIn: '0.7.0', useInstead: 'modify'})
   call(func) {
     func.call(this, this);
+    return this;
+  }
+
+  /**
+   * @param {function} func
+   * @returns {QueryBuilderBase}
+   */
+  modify(func) {
+    if (arguments.length === 1) {
+      func.call(this, this);
+    } else {
+      let args = _.toArray(arguments);
+      args[0] = this;
+      func.apply(this, args);
+    }
 
     return this;
   }
@@ -663,12 +680,6 @@ export default class QueryBuilderBase {
    */
   @queryBuilderOperation(KnexOperation)
   columnInfo(...args) {}
-
-  /**
-   * @returns {QueryBuilderBase}
-   */
-  @queryBuilderOperation([KnexOperation, {acceptUndefinedArgs: true}])
-  modify(...args) {}
 
   /**
    * @returns {QueryBuilderBase}

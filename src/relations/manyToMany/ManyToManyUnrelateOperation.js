@@ -17,7 +17,7 @@ export default class ManyToManyUnrelateOperation extends QueryBuilderOperation {
       .childQueryOf(builder)
       .copyFrom(builder, /where/i)
       .select(this.relation.fullRelatedCol())
-      .call(this.relation.filter);
+      .modify(this.relation.filter);
 
     return this.relation.joinTableModelClass
       .bindKnex(builder.knex())

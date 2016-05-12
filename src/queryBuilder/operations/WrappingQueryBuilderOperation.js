@@ -11,7 +11,7 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
   }
 
   call(builder, args) {
-    if (!wrapArgs(args, builder.knex(), this.opt)) {
+    if (!wrapArgs(args, builder.knex())) {
       return false;
     }
 
@@ -20,9 +20,9 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
   }
 }
 
-function wrapArgs(args, knex, opt) {
+function wrapArgs(args, knex) {
   for (let i = 0, l = args.length; i < l; ++i) {
-    if (!opt.acceptUndefinedArgs && _.isUndefined(args[i])) {
+    if (_.isUndefined(args[i])) {
       // None of the query builder methods should accept undefined. Do nothing if
       // one of the arguments is undefined. This enables us to do things like
       // `.where('name', req.query.name)` without checking if req.query has the
@@ -46,24 +46,11 @@ function wrapFunctionArg(func, knex) {
   return function () {
     if (isKnexQueryBuilder(this)) {
       const knexQueryBuilder = this;
-
       // Wrap knex query builder into a QueryBuilderBase so that we can use
       // our extended query builder in nested queries.
       const wrappedQueryBuilder = new QueryBuilderBase(knex);
 
-      if (arguments.length > 1) {
-        const args = new Array(arguments.length);
-        args[0] = wrappedQueryBuilder;
-
-        for (let i = 1, l = arguments.length; i < l; ++i) {
-          args[i] = arguments[i];
-        }
-
-        func.apply(wrappedQueryBuilder, args);
-      } else {
-        func.call(wrappedQueryBuilder, wrappedQueryBuilder);
-      }
-
+      func.call(wrappedQueryBuilder, wrappedQueryBuilder);
       wrappedQueryBuilder.buildInto(knexQueryBuilder);
     } else {
       // This case is for function argument `join` operation and other methods that

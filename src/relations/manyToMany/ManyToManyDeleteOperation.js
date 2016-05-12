@@ -12,6 +12,6 @@ export default class ManyToManyDeleteOperation extends DeleteOperation {
 
   onBeforeBuild(builder) {
     super.onBeforeBuild(builder);
-    this.relation.selectForModify(builder, this.owner).call(this.relation.filter);
+    this.relation.selectForModify(builder, this.owner).modify(this.relation.filter);
   }
 }

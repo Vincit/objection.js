@@ -226,7 +226,7 @@ export default class ManyToManyRelation extends Relation {
       }
     }
 
-    return builder.call(this.filter);
+    return builder.modify(this.filter);
   }
 
   /**
@@ -260,7 +260,7 @@ export default class ManyToManyRelation extends Relation {
           join.on(joinTableRelatedCol, relatedCol[idx]);
         });
       })
-      .call(this.filter);
+      .modify(this.filter);
   }
 
   find(builder, owners) {

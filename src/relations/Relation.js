@@ -250,7 +250,7 @@ export default class Relation {
       }
     }
 
-    return builder.call(this.filter);
+    return builder.modify(this.filter);
   }
 
   /**
@@ -274,7 +274,7 @@ export default class Relation {
           join.on(relatedCol, '=', ownerCol[idx]);
         });
       })
-      .call(this.filter);
+      .modify(this.filter);
   }
 
   /* istanbul ignore next */

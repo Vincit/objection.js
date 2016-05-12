@@ -33,7 +33,7 @@ export default class HasManyRelateOperation extends QueryBuilderOperation {
       .patch(patch)
       .copyFrom(builder, /where/i)
       .whereInComposite(this.relation.relatedModelClass.getFullIdColumn(), this.ids)
-      .call(this.relation.filter);
+      .modify(this.relation.filter);
   }
 
   onAfterInternal() {

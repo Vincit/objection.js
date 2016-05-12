@@ -27,7 +27,7 @@ export default class ManyToManyUnrelateSqliteOperation extends QueryBuilderOpera
       .childQueryOf(builder)
       .copyFrom(builder, /where/i)
       .select(joinTableAliasRowId)
-      .call(this.relation.filter)
+      .modify(this.relation.filter)
       .whereComposite(this.relation.fullJoinTableOwnerCol(), ownerId)
       .join(joinTableAsAlias, join => {
         _.each(this.relation.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {

@@ -1901,6 +1901,32 @@ Type|Description
 
 
 
+#### modify
+
+See [knex documentation](http://knexjs.org/#Builder-modify)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### columnInfo
+
+See [knex documentation](http://knexjs.org/#Builder-columnInfo)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### whereRef
 
 ```js

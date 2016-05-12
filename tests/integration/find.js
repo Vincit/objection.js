@@ -186,10 +186,11 @@ module.exports = function (session) {
         });
 
         it('.modify()', function () {
-          return Model2
-            .query()
-            .modify(function (builder, arg1, arg2, arg3) {
-              expect(builder).to.be.a(QueryBuilderBase);
+          var builder = Model2.query();
+
+          return builder
+            .modify(function (modifyBuilder, arg1, arg2, arg3) {
+              expect(modifyBuilder).to.equal(builder);
               expect(arg1).to.equal('foo');
               expect(arg2).to.equal(undefined);
               expect(arg3).to.equal(10);

@@ -45,7 +45,7 @@ describe('QueryBuilder', function () {
     var builder = QueryBuilder.forClass(TestModel);
     var called = false;
 
-    builder.call(function (b) {
+    builder.modify(function (b) {
       called = true;
       expect(b === builder).to.equal(true);
       expect(this === builder).to.equal(true);
