@@ -1,7 +1,8 @@
 import _ from 'lodash';
+import KnexQueryBuilder from 'knex/lib/query/builder'
 
 export function getDialect(knex) {
-  return knex.client.dialect;
+  return (knex && knex.client && knex.client.dialect) || null;
 }
 
 export function isPostgres(knex) {
@@ -17,8 +18,5 @@ export function isSqlite(knex) {
 }
 
 export function isKnexQueryBuilder(knexQueryBuilder) {
-  // TODO: Use something safer
-  return knexQueryBuilder
-    && knexQueryBuilder.client
-    && _.isString(knexQueryBuilder.client.dialect);
+  return knexQueryBuilder instanceof KnexQueryBuilder;
 }

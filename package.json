@@ -49,6 +49,9 @@
     "tv4": "^1.1.9",
     "tv4-formats": "^1.0.2"
   },
+  "peerDependencies": {
+    "knex": ">= 0.8.0 < 0.11.0"
+  },
   "devDependencies": {
     "babel-core": "^6.3.17",
     "babel-plugin-transform-decorators-legacy": "^1.3.3",
