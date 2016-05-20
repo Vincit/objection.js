@@ -312,14 +312,6 @@ describe('Model', function () {
     expect(Model.ensureModelArray(null)).to.eql([]);
   });
 
-  it('ensureModelArray should throw if an instance of another model is given in the array', function () {
-    var Model1 = modelClass('Model1');
-    var Model2 = modelClass('Model2');
-    expect(function () {
-      Model1.ensureModelArray([Model2.fromJson({})]);
-    }).to.throwException();
-  });
-
   it('loadRelated should throw if an invalid expression is given', function () {
     var Model = modelClass('Model1');
     expect(function () {

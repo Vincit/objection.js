@@ -434,8 +434,6 @@ export default class Model extends ModelBase {
 
     if (model instanceof ModelClass) {
       return model;
-    } else if (model instanceof Model) {
-      throw new Error('model is already an instance of another Model');
     } else {
       return ModelClass.fromJson(model, options);
     }

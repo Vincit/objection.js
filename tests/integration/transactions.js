@@ -171,6 +171,22 @@ module.exports = function (session) {
 
     });
 
+    it('bound model class should accept unbound model instances', function (done) {
+      var unboundModel = Model1.fromJson({model1Prop1: '123'});
+
+      transaction(Model1, function (Model1) {
+        return Model1.query().insert(unboundModel);
+      }).then(function (inserted) {
+        expect(inserted.model1Prop1).to.equal('123');
+        return session.knex('Model1');
+      }).then(function (rows) {
+        expect(rows).to.have.length(1);
+        expect(rows[0].model1Prop1).to.equal('123');
+        done();
+      }).catch(done);
+
+    });
+
     describe('transaction.start()', function () {
 
       it('should commit transaction when the commit method is called', function (done) {

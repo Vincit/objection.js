@@ -136,7 +136,7 @@ export default class QueryBuilderOperation {
 
   /**
    * @param {QueryBuilder} builder
-   * @returns {Promise|*}
+   * @returns {QueryBuilder}
    */
   queryExecutor(builder) {}
 
