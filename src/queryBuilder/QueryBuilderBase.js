@@ -155,13 +155,13 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @param {QueryBuilderOperation} method
+   * @param {QueryBuilderOperation} operation
    * @param {Array.<*>} args
    * @returns {QueryBuilderBase}
    */
-   callQueryBuilderOperation(method, args) {
-    if (method.call(this, args || [])) {
-      this._operations.push(method);
+   callQueryBuilderOperation(operation, args) {
+    if (operation.call(this, args || [])) {
+      this._operations.push(operation);
     }
 
     return this;

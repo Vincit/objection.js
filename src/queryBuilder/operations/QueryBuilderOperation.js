@@ -27,7 +27,7 @@ export default class QueryBuilderOperation {
    * @returns {knex.Raw}
    */
   raw() {
-    return this.knex.raw.apply(this._knex, arguments);
+    return this.knex.raw.apply(this.knex, arguments);
   }
 
   /**
