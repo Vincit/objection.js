@@ -50,7 +50,7 @@
     "tv4-formats": "^1.0.2"
   },
   "peerDependencies": {
-    "knex": ">= 0.8.0 < 0.11.0"
+    "knex": ">= 0.8.0 <= 0.11.5"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",
@@ -82,7 +82,7 @@
     "grunt": "^0.4.5",
     "grunt-jsdoc": "^1.0.0",
     "istanbul": "^0.4.0",
-    "knex": "^0.10.0",
+    "knex": "^0.11.5",
     "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^4.4.0",
