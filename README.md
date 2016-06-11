@@ -2,6 +2,8 @@
 
 # [Objection.js](http://vincit.github.io/objection.js)
 
+[![Join the chat at https://gitter.im/Vincit/objection.js](https://badges.gitter.im/Vincit/objection.js.svg)](https://gitter.im/Vincit/objection.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [Objection.js](http://vincit.github.io/objection.js) is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
 for [Node.js](https://nodejs.org/) that aims to stay out of your way and make it as easy as possible to use the full
 power of SQL and the underlying database engine.
