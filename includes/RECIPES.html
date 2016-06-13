@@ -193,7 +193,7 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 <h2 id="polymorphic-associations">Polymorphic associations</h2>
 <pre class="highlight javascript"><code><span class="nx">Issue</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
     <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">},</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
@@ -205,7 +205,7 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 
 <span class="nx">PullRequest</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
     <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'PullRequest'</span><span class="p">},</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
@@ -235,11 +235,11 @@ how to create relations for this setup ➔</p>
 
 <h2 id="timestamps">Timestamps</h2>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">createdAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">created_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
 <span class="p">};</span>
 
 <span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">updatedAt</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">updated_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
 <span class="p">};</span>
 </code></pre>
 
@@ -376,7 +376,7 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="p">[</span>

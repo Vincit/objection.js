@@ -30,6 +30,22 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="0-5-0">0.5.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><a href="#joinrelation">joinRelation</a> family of query builder methods.</li>
+<li><code class="prettyprint">HasOneRelation</code> for creating inverse one-to-one relations.</li>
+<li>Relations have been renamed <code class="prettyprint">OneToOneRelation</code> &ndash;&gt; <code class="prettyprint">BelongsToOneRelation</code>, <code class="prettyprint">OneToManyRelation</code> &ndash;&gt; <code class="prettyprint">HasManyRelation</code>.
+The old names work, but have been deprecated.</li>
+<li><a href="#withschema">withSchema</a> now works as expected and sets the schema of all queries executed by the query builder the
+method is called for.</li>
+<li><a href="#filtereager">filterEager</a> method for better eager query filtering.</li>
+<li><a href="#relationmappings">extra properties</a> feature for selecting/inserting columns from/to the join table in many-to-many relations.</li>
+<li>Eager query recursion depth can be controlled like so: <code class="prettyprint">parent.^5</code>.</li>
+</ul>
+
 <h2 id="0-4-0">0.4.0</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>

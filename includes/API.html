@@ -208,6 +208,23 @@ keywords and you don&rsquo;t need to call this method.</p>
   <span class="p">});</span>
 </code></pre>
 
+<blockquote>
+<p>Fields marked as <code class="prettyprint">extras</code> for many-to-many relations in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a> are automatically
+written to the join table instead of the target table. The <code class="prettyprint">someExtra</code> field in the following example is written
+to the join table if the <code class="prettyprint">extra</code> array of the relation mapping contains the string <code class="prettyprint">&#39;someExtra&#39;</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">someMovie</span>
+  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'actors'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
+    <span class="na">someExtra</span><span class="p">:</span> <span class="s2">"I'll be written to the join table"</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
 <p>Creates an insert query.</p>
 
 <p>The inserted objects are validated against the model&rsquo;s <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>. If validation fails
@@ -766,10 +783,48 @@ but an error isn&rsquo;t thrown if the patch object doesn&rsquo;t contain all re
   <span class="p">});</span>
 </code></pre>
 
+<blockquote>
+<p>Relate multiple (only works with postgres)</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">person</span>
+  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'movies'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">relate</span><span class="p">([</span><span class="mi">50</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">70</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>Composite key</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">person</span>
+  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'movies'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">relate</span><span class="p">({</span><span class="na">foo</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="na">bar</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="na">baz</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>Fields marked as <code class="prettyprint">extras</code> for many-to-many relations in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a> are automatically
+written to the join table. The <code class="prettyprint">someExtra</code> field in the following example is written to the join table if the
+<code class="prettyprint">extra</code> array of the relation mapping contains the string <code class="prettyprint">&#39;someExtra&#39;</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">someMovie</span>
+  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'actors'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">relate</span><span class="p">({</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="na">someExtra</span><span class="p">:</span> <span class="s2">"I'll be written to the join table"</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
 <p>Relates an existing model to another model.</p>
 
 <p>This method doesn&rsquo;t create a new instance but only updates the foreign keys and in
-the case of ManyToMany relation, creates a join row to the join table.</p>
+the case of many-to-many relation, creates a join row to the join table.</p>
 
 <p>On Postgres multiple models can be related by giving an array of identifiers.</p>
 
@@ -784,7 +839,7 @@ the case of ManyToMany relation, creates a join row to the join table.</p>
 </thead><tbody>
 <tr>
 <td>ids</td>
-<td>Array</td>
+<td>number&#124;string&#124;Array&#124;Object</td>
 <td>Identifier(s) of the model(s) to relate</td>
 </tr>
 </tbody></table>
@@ -1255,6 +1310,382 @@ join columns to null.</p>
 <h4 id="crossjoin">crossJoin</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-crossJoin">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="joinrelation">joinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="innerjoinrelation">innerJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">innerJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">innerJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="outerjoinrelation">outerJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">outerJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">outerJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="leftjoinrelation">leftJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">leftJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">leftJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="leftouterjoinrelation">leftOuterJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">leftOuterJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">leftOuterJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="rightjoinrelation">rightJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">rightJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">rightJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="rightouterjoinrelation">rightOuterJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">rightOuterJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">rightOuterJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="fullouterjoinrelation">fullOuterJoinRelation</h4>
+
+<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
+object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">fullOuterJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">fullOuterJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+</tr>
+<tr>
+<td>opt</td>
+<td>object</td>
+<td>Optional options.</td>
+</tr>
+</tbody></table>
 
 <h5 id="return-value">Return value</h5>
 
@@ -2119,6 +2550,42 @@ join columns to null.</p>
 <h4 id="connection">connection</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-connection">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="modify">modify</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-modify">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="columninfo">columnInfo</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-columnInfo">knex documentation</a></p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -3101,22 +3568,22 @@ to the relations:</p>
 </code></pre>
 
 <blockquote>
-<p>If you want to modify the relation queries without using named filters, you can use the
-<a href="#context"><code class="prettyprint">context</code></a> hooks:</p>
+<p>Filters can also be registered using the <a href="#filtereager"><code class="prettyprint">filterEager</code></a> method:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">context</span><span class="p">({</span>
-    <span class="na">onBuild</span><span class="p">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">table</span> <span class="o">=</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">modelClass</span><span class="p">().</span><span class="nx">tableName</span><span class="p">;</span>
-      <span class="c1">// This function is called for each query.</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">table</span> <span class="o">===</span> <span class="s1">'Animal'</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">).</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
-      <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">table</span> <span class="o">===</span> <span class="s1">'Person'</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
+  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Order children by age.</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Only select `pets` and `movies` whose id &gt; 10 for the children.</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.movies]'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Only select 100 first movies for the children.</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
   <span class="p">})</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
@@ -3144,9 +3611,8 @@ return 100 database rows but will generate only three database queries.</p>
 
 <p>Fetch relations eagerly for the result rows.</p>
 
-<p>See the <a href="#eager-queries">eager queries</a> section for more examples.</p>
-
-<p>See the <code class="prettyprint">hooks</code> of <a href="#context"><code class="prettyprint">context</code></a> method for an alternative way to filter the relations.</p>
+<p>See the <a href="#eager-queries">eager queries</a> section for more examples and <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a>
+for more info on the relation expression language.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -3218,6 +3684,93 @@ parameters of a http request.</p>
 <td>relationExpression</td>
 <td>string&#124;<a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a></td>
 <td>The allowed eager expression</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="filtereager">filterEager</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="nx">pathExpression</span><span class="p">,</span> <span class="nx">filterFunc</span><span class="p">);</span>
+</code></pre>
+
+<p>Adds a filter to the eager query.</p>
+
+<p>The <code class="prettyprint">pathExpression</code> is a relation expression that specifies the queries for which the filter is given.</p>
+
+<blockquote>
+<p>The following query would filter out the children&rsquo;s pets that
+are &lt;= 10 years old:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.pets'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>The path expression can have multiple targets. The next example sorts both the
+pets and movies of the children by id:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>This example only selects movies whose name contains the word &#39;Predator&rsquo;:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'[children.movies, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'%Predator%'</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>pathExpression</td>
+<td>string&#124;<a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a></td>
+<td>Expression that specifies the queries for which to give the filter.</td>
+</tr>
+<tr>
+<td>filterFunc</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td>The filter function.</td>
 </tr>
 </tbody></table>
 
@@ -3421,6 +3974,26 @@ section about <a href="#eager-queries">eager queries</a> for more information on
 <tr>
 <td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
 <td>Clone of the query builder</td>
+</tr>
+</tbody></table>
+
+<h4 id="execute">execute</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">execute</span><span class="p">();</span>
+</code></pre>
+
+<p>Executes the query and returns a Promise.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="http://bluebirdjs.com/docs/getting-started.html"><code class="prettyprint">Promise</code></a></td>
+<td>Promise the will be resolved with the result of the query.</td>
 </tr>
 </tbody></table>
 
@@ -4190,7 +4763,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 <span class="c1">// This object defines the relations to other models.</span>
 <span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
     <span class="c1">// The related model. This can be either a Model </span>
     <span class="c1">// subclass constructor or an absolute file path </span>
     <span class="c1">// to a module that exports one. We use the file </span>
@@ -4211,18 +4784,27 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
       <span class="c1">// ManyToMany relation needs the `through` object </span>
       <span class="c1">// to describe the join table.</span>
       <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-        <span class="c1">// If you have a model class for the join table</span>
-        <span class="c1">// you need to specify it like this:</span>
-        <span class="c1">// modelClass: PersonMovie,</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+        <span class="c1">// If you have a model class for the join table</span>
+        <span class="c1">// you can specify it like this:</span>
+        <span class="c1">//</span>
+        <span class="c1">// modelClass: PersonMovie,</span>
+
+        <span class="c1">// Columns listed here are automatically joined</span>
+        <span class="c1">// to the related models on read and written to</span>
+        <span class="c1">// the join table instead of the related table</span>
+        <span class="c1">// on insert.</span>
+        <span class="c1">//</span>
+        <span class="c1">// extra: ['someExtra']</span>
       <span class="p">},</span>
       <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
     <span class="p">}</span>
   <span class="p">},</span>
 
   <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
@@ -4231,7 +4813,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
   <span class="p">},</span>
 
   <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
@@ -4289,7 +4871,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="c1">// The related model. This can be either a Model</span>
         <span class="c1">// subclass constructor or an absolute file path</span>
         <span class="c1">// to a module that exports one. We use the file </span>
@@ -4309,18 +4891,27 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
           <span class="c1">// ManyToMany relation needs the `through` object </span>
           <span class="c1">// to describe the join table.</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="c1">// If you have a model class for the join table</span>
-            <span class="c1">// you need to specify it like this:</span>
-            <span class="c1">// modelClass: PersonMovie,</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
             <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you can specify it like this:</span>
+            <span class="c1">//</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
+
+            <span class="c1">// Columns listed here are automatically joined</span>
+            <span class="c1">// to the related models on read and written to</span>
+            <span class="c1">// the join table instead of the related table</span>
+            <span class="c1">// on insert.</span>
+            <span class="c1">//</span>
+            <span class="c1">// extra: ['someExtra']</span>
           <span class="p">},</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
       <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
@@ -4329,7 +4920,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
       <span class="p">},</span>
 
       <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
@@ -4384,7 +4975,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
   <span class="c1">// This object defines the relations to other models.</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
       <span class="c1">// The related model. This can be either a Model</span>
       <span class="c1">// subclass constructor or an absolute file path</span>
       <span class="c1">// to a module that exports one. We use the file</span>
@@ -4404,18 +4995,27 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
         <span class="c1">// ManyToMany relation needs the `through` object</span>
         <span class="c1">// to describe the join table.</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-          <span class="c1">// If you have a model class for the join table</span>
-          <span class="c1">// you need to specify it like this:</span>
-          <span class="c1">// modelClass: PersonMovie,</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+          <span class="c1">// If you have a model class for the join table</span>
+          <span class="c1">// you can specify it like this:</span>
+          <span class="c1">//</span>
+          <span class="c1">// modelClass: PersonMovie,</span>
+
+          <span class="c1">// Columns listed here are automatically joined</span>
+          <span class="c1">// to the related models on read and written to</span>
+          <span class="c1">// the join table instead of the related table</span>
+          <span class="c1">// on insert.</span>
+          <span class="c1">//</span>
+          <span class="c1">// extra: ['someExtra']</span>
         <span class="p">},</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
       <span class="p">}</span>
     <span class="p">},</span>
 
     <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
@@ -4424,7 +5024,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
     <span class="p">},</span>
 
     <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
@@ -4686,7 +5286,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
 <span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
   <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
@@ -4695,7 +5295,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
   <span class="p">},</span>
 
   <span class="na">father</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
     <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
@@ -4709,11 +5309,20 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
     <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
       <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-        <span class="c1">// If you have a model class for the join table</span>
-        <span class="c1">// you need to specify it like this:</span>
-        <span class="c1">// modelClass: PersonMovie,</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+        <span class="c1">// If you have a model class for the join table</span>
+        <span class="c1">// you can specify it like this:</span>
+        <span class="c1">//</span>
+        <span class="c1">// modelClass: PersonMovie,</span>
+
+        <span class="c1">// Columns listed here are automatically joined</span>
+        <span class="c1">// to the related models on read and written to</span>
+        <span class="c1">// the join table instead of the related table</span>
+        <span class="c1">// on insert.</span>
+        <span class="c1">//</span>
+        <span class="c1">// extra: ['someExtra']</span>
       <span class="p">},</span>
       <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
     <span class="p">}</span>
@@ -4728,7 +5337,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
@@ -4737,7 +5346,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
       <span class="p">},</span>
 
       <span class="na">father</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
@@ -4751,11 +5360,20 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="c1">// If you have a model class for the join table</span>
-            <span class="c1">// you need to specify it like this:</span>
-            <span class="c1">// modelClass: PersonMovie,</span>
             <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
             <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you can specify it like this:</span>
+            <span class="c1">//</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
+
+            <span class="c1">// Columns listed here are automatically joined</span>
+            <span class="c1">// to the related models on read and written to</span>
+            <span class="c1">// the join table instead of the related table</span>
+            <span class="c1">// on insert.</span>
+            <span class="c1">//</span>
+            <span class="c1">// extra: ['someExtra']</span>
           <span class="p">},</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
         <span class="p">}</span>
@@ -4771,7 +5389,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToManyRelation</span><span class="p">,</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
@@ -4780,7 +5398,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
     <span class="p">},</span>
 
     <span class="na">father</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">OneToOneRelation</span><span class="p">,</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
@@ -4794,11 +5412,20 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-          <span class="c1">// If you have a model class for the join table</span>
-          <span class="c1">// you need to specify it like this:</span>
-          <span class="c1">// modelClass: PersonMovie,</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+          <span class="c1">// If you have a model class for the join table</span>
+          <span class="c1">// you can specify it like this:</span>
+          <span class="c1">//</span>
+          <span class="c1">// modelClass: PersonMovie,</span>
+
+          <span class="c1">// Columns listed here are automatically joined</span>
+          <span class="c1">// to the related models on read and written to</span>
+          <span class="c1">// the join table instead of the related table</span>
+          <span class="c1">// on insert.</span>
+          <span class="c1">//</span>
+          <span class="c1">// extra: ['someExtra']</span>
         <span class="p">},</span>
         <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
       <span class="p">}</span>
@@ -4834,7 +5461,7 @@ is a handy way to prevent require loops.</p>
 <tr>
 <td>relation</td>
 <td>function</td>
-<td>The relation type. One of <code class="prettyprint">Model.OneToOneRelation</code>, <code class="prettyprint">Model.OneToManyRelation</code> and <code class="prettyprint">Model.ManyToManyRelation</code>.</td>
+<td>The relation type. One of <code class="prettyprint">Model.BelongsToOneRelation</code>, <code class="prettyprint">Model.HasOneRelation</code>, <code class="prettyprint">Model.HasManyRelation</code> and <code class="prettyprint">Model.ManyToManyRelation</code>.</td>
 </tr>
 <tr>
 <td>modelClass</td>
@@ -4902,6 +5529,11 @@ is a handy way to prevent require loops.</p>
 <td>modelClass</td>
 <td>string&#124;ModelClass</td>
 <td>If you have a model class for the join table, you should specify it here. This is optional so you don&rsquo;t need to create a model class if you don&rsquo;t want to.</td>
+</tr>
+<tr>
+<td>extra</td>
+<td>Array.&lt;string&gt;</td>
+<td>Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert.</td>
 </tr>
 </tbody></table>
 
@@ -6909,7 +7541,8 @@ the argument <code class="prettyprint">arg3</code>.</p>
 The <code class="prettyprint">*</code> token must be used with caution or you will end up fetching your entire database.</p>
 
 <p>Expression <code class="prettyprint">parent.^</code> is equivalent to <code class="prettyprint">parent.parent.parent.parent...</code> up to the point a relation no longer
-has results for the <code class="prettyprint">parent</code> relation.</p>
+has results for the <code class="prettyprint">parent</code> relation. The recursion can be limited to certain depth by giving the depth after
+the <code class="prettyprint">^</code> character. For example <code class="prettyprint">parent.^3</code> is equal to <code class="prettyprint">parent.parent.parent</code>.</p>
 
 <h2 id="validationerror">ValidationError</h2>
 <pre class="highlight javascript"><code><span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">(</span><span class="s1">'any string or object'</span><span class="p">);</span>
