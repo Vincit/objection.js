@@ -85,6 +85,12 @@ describe('QueryBuilder', function () {
     return promise;
   });
 
+  it('should return a promise from .execute method', function () {
+    var promise = QueryBuilder.forClass(TestModel).execute();
+    expect(promise).to.be.a(Promise);
+    return promise;
+  });
+
   it('should return a promise from .map method', function () {
     var promise = QueryBuilder.forClass(TestModel).map(_.identity);
     expect(promise).to.be.a(Promise);

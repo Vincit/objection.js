@@ -1039,10 +1039,11 @@ Type|Description
 
 #### joinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.joinRelation(relationName);
+var builder = queryBuilder.joinRelation(relationName, opt);
 ```
 
 ```js
@@ -1057,6 +1058,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1069,10 +1071,11 @@ Type|Description
 
 #### innerJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.innerJoinRelation(relationName);
+var builder = queryBuilder.innerJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1087,6 +1090,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1099,10 +1103,11 @@ Type|Description
 
 #### outerJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.outerJoinRelation(relationName);
+var builder = queryBuilder.outerJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1117,6 +1122,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1129,10 +1135,11 @@ Type|Description
 
 #### leftJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.leftJoinRelation(relationName);
+var builder = queryBuilder.leftJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1147,6 +1154,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1159,10 +1167,11 @@ Type|Description
 
 #### leftOuterJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.leftOuterJoinRelation(relationName);
+var builder = queryBuilder.leftOuterJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1177,6 +1186,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1189,10 +1199,11 @@ Type|Description
 
 #### rightJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.rightJoinRelation(relationName);
+var builder = queryBuilder.rightJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1207,6 +1218,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1219,10 +1231,11 @@ Type|Description
 
 #### rightOuterJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.rightOuterJoinRelation(relationName);
+var builder = queryBuilder.rightOuterJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1237,6 +1250,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -1249,10 +1263,11 @@ Type|Description
 
 #### fullOuterJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name.
+Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
+object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
 
 ```js
-var builder = queryBuilder.fullOuterJoinRelation(relationName);
+var builder = queryBuilder.fullOuterJoinRelation(relationName, opt);
 ```
 
 ```js
@@ -1267,6 +1282,7 @@ Person
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
+opt|object|Optional options.
 
 ##### Return value
 
@@ -3070,6 +3086,24 @@ Create a clone of this builder.
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|Clone of the query builder
+
+
+
+
+
+#### execute
+
+```js
+var promise = queryBuilder.execute();
+```
+
+Executes the query and returns a Promise.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)|Promise the will be resolved with the result of the query.
 
 
 

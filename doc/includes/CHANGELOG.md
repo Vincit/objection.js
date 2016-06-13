@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.0 
+
+### What's new
+
+* [joinRelation](#joinrelation) family of query builder methods.
+* `HasOneRelation` for creating inverse one-to-one relations.
+* Relations have been renamed `OneToOneRelation` --> `BelongsToOneRelation`, `OneToManyRelation` --> `HasManyRelation`.
+  The old names work, but have been deprecated.
+* [withSchema](#withschema) now works as expected and sets the schema of all queries executed by the query builder the
+  method is called for.
+* [filterEager](#filtereager) method for better eager query filtering.
+* [extra properties](#relationmappings) feature for selecting/inserting columns from/to the join table in many-to-many relations.
+* Eager query recursion depth can be controlled like so: `parent.^5`.
+
 ## 0.4.0
 
 ### What's new
