@@ -49,8 +49,7 @@ export default class EagerFetcher {
   }
 
   _fetchRelation(relation, nextEager) {
-    let ModelClass = relation.relatedModelClass;
-    let queryBuilder = ModelClass.RelatedQueryBuilder.forClass(ModelClass).childQueryOf(this.rootQuery);
+    let queryBuilder = relation.ownerModelClass.RelatedQueryBuilder.forClass(relation.relatedModelClass).childQueryOf(this.rootQuery);
     let operation = relation.find(queryBuilder, this.models);
 
     queryBuilder.callQueryBuilderOperation(operation, []);
