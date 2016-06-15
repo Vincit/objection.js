@@ -345,18 +345,21 @@ module.exports = function (session) {
               model1Prop1: "hello 1",
               model1Prop2: null,
               computed: "hello 1 computed1 after",
+              $afterGetCalled: 1,
               model1Relation1: {
                 id: 2,
                 model1Id: 3,
                 model1Prop1: "hello 2",
                 model1Prop2: null,
                 computed: "hello 2 computed1 after",
+                $afterGetCalled: 1,
                 model1Relation1: {
                   id: 3,
                   model1Id: null,
                   model1Prop1: "hello 3",
                   model1Prop2: null,
-                  computed: "hello 3 computed1 after"
+                  computed: "hello 3 computed1 after",
+                  $afterGetCalled: 1
                 },
                 model1Relation2: [{
                   idCol: 1,
@@ -364,12 +367,14 @@ module.exports = function (session) {
                   model2Prop1: "hejsan 1",
                   model2Prop2: 30,
                   computed: "hejsan 1 computed2 after",
+                  $afterGetCalled: 1,
                   model2Relation1: [{
                     id: 4,
                     model1Id: null,
                     model1Prop1: "hello 4",
                     model1Prop2: null,
-                    computed: "hello 4 computed1 after"
+                    computed: "hello 4 computed1 after",
+                    $afterGetCalled: 1
                   }]
                 }, {
                   idCol: 2,
@@ -377,7 +382,8 @@ module.exports = function (session) {
                   model2Prop1: "hejsan 2",
                   model2Prop2: 20,
                   computed: "hejsan 2 computed2 after",
-                  model2Relation1: []
+                  model2Relation1: [],
+                  $afterGetCalled: 1
                 }]
               }
             }]);

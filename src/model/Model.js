@@ -295,17 +295,23 @@ export default class Model extends ModelBase {
 
   /**
    * @param {ModelOptions} opt
-   * @param {Object} queryContext
+   * @param {QueryBuilderContext} queryContext
    * @returns {Promise|*}
    */
   $beforeUpdate(opt, queryContext) {}
 
   /**
    * @param {ModelOptions} opt
-   * @param {Object} queryContext
+   * @param {QueryBuilderContext} queryContext
    * @returns {Promise|*}
    */
   $afterUpdate(opt, queryContext) {}
+
+  /**
+   * @param {QueryBuilderContext} queryContext
+   * @returns {Promise|*}
+   */
+  $afterGet(queryContext) {}
 
   /**
    * @returns {QueryBuilder}

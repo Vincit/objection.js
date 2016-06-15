@@ -5967,6 +5967,45 @@ Type|Description
 
 
 
+#### $afterGet
+
+```js
+Person.prototype.$afterGet = function (queryContext) {
+
+}
+```
+
+> ES6
+
+```js
+class Person extends Model {
+  $afterGet(queryContext) {
+
+  }
+}
+```
+
+Called after a model is fetched.
+
+This method is _not_ called for insert, update or delete operations.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the update query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
+
 ## transaction
 
 See the section on [transaction callback](#transaction-callback)

@@ -1,6 +1,6 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
+import FindOperation from './FindOperation';
 
-export default class InstanceFindOperation extends QueryBuilderOperation {
+export default class InstanceFindOperation extends FindOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);

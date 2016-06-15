@@ -703,6 +703,10 @@ describe('QueryBuilder', function () {
       this.c = 'beforeUpdate';
     };
 
+    TestModel.prototype.$afterGet = function () {
+      throw new Error('$afterGet should not be called');
+    };
+
     var model = TestModel.fromJson({a: 10, b: 'test'});
     QueryBuilder
       .forClass(TestModel)
@@ -723,6 +727,10 @@ describe('QueryBuilder', function () {
       });
     };
 
+    TestModel.prototype.$afterGet = function () {
+      throw new Error('$afterGet should not be called');
+    };
+
     var model = TestModel.fromJson({a: 10, b: 'test'});
     QueryBuilder
       .forClass(TestModel)
@@ -738,6 +746,10 @@ describe('QueryBuilder', function () {
   it('patch() should call $beforeUpdate on the model', function (done) {
     TestModel.prototype.$beforeUpdate = function () {
       this.c = 'beforeUpdate';
+    };
+
+    TestModel.prototype.$afterGet = function () {
+      throw new Error('$afterGet should not be called');
     };
 
     var model = TestModel.fromJson({a: 10, b: 'test'});
@@ -760,6 +772,10 @@ describe('QueryBuilder', function () {
       });
     };
 
+    TestModel.prototype.$afterGet = function () {
+      throw new Error('$afterGet should not be called');
+    };
+
     var model = TestModel.fromJson({a: 10, b: 'test'})
     QueryBuilder
       .forClass(TestModel)
@@ -775,6 +791,10 @@ describe('QueryBuilder', function () {
   it('insert() should call $beforeInsert on the model', function (done) {
     TestModel.prototype.$beforeInsert = function () {
       this.c = 'beforeInsert';
+    };
+
+    TestModel.prototype.$afterGet = function () {
+      throw new Error('$afterGet should not be called');
     };
 
     QueryBuilder
@@ -796,12 +816,113 @@ describe('QueryBuilder', function () {
       });
     };
 
+    TestModel.prototype.$afterGet = function () {
+      throw new Error('$afterGet should not be called');
+    };
+
     QueryBuilder
       .forClass(TestModel)
       .insert({a: 10, b: 'test'})
       .then(function (model) {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (\'10\', \'test\', \'beforeInsert\') returning "id"');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('should call $afterGet on the model if no write operation is specified', function (done) {
+    mockKnexQueryResult = [{
+      a: 1
+    }, {
+      a: 2
+    }];
+
+    TestModel.prototype.$afterGet = function (context) {
+      this.b = this.a * 2 + context.x;
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .context({x: 10})
+      .then(function (models) {
+        expect(models[0]).to.be.a(TestModel);
+        expect(models[1]).to.be.a(TestModel);
+        expect(models).to.eql([{
+          a: 1,
+          b: 12
+        }, {
+          a: 2,
+          b: 14
+        }]);
+        done();
+      })
+      .catch(done);
+  });
+
+  it('should call $afterGet on the model if no write operation is specified (async)', function (done) {
+    mockKnexQueryResult = [{
+      a: 1
+    }, {
+      a: 2
+    }];
+
+    TestModel.prototype.$afterGet = function (context) {
+      var self = this;
+      return Promise.delay(10).then(function () {
+        self.b = self.a * 2 + context.x;
+      });
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .context({x: 10})
+      .then(function (models) {
+        expect(models[0]).to.be.a(TestModel);
+        expect(models[1]).to.be.a(TestModel);
+        expect(models).to.eql([{
+          a: 1,
+          b: 12
+        }, {
+          a: 2,
+          b: 14
+        }]);
+        done();
+      })
+      .catch(done);
+  });
+
+  it('should call $afterGet before any `runAfter` hooks', function (done) {
+    mockKnexQueryResult = [{
+      a: 1
+    }, {
+      a: 2
+    }];
+
+    TestModel.prototype.$afterGet = function (context) {
+      var self = this;
+      return Promise.delay(10).then(function () {
+        self.b = self.a * 2 + context.x;
+      });
+    };
+
+    QueryBuilder
+      .forClass(TestModel)
+      .context({x: 10})
+      .runAfter(function (result, builder) {
+        builder.context().x = 666;
+        return result;
+      })
+      .then(function (models) {
+        expect(models[0]).to.be.a(TestModel);
+        expect(models[1]).to.be.a(TestModel);
+        expect(models).to.eql([{
+          a: 1,
+          b: 12
+        }, {
+          a: 2,
+          b: 14
+        }]);
         done();
       })
       .catch(done);

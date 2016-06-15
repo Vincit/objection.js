@@ -83,6 +83,13 @@ module.exports.initialize = function (opt) {
     });
   };
 
+  Model1.prototype.$afterGet = function () {
+    var self = this;
+    return Promise.delay(1).then(function () {
+      inc(self, '$afterGetCalled');
+    });
+  };
+
   Model2.prototype.$beforeInsert = function () {
     var self = this;
     return Promise.delay(5).then(function () {
@@ -110,6 +117,13 @@ module.exports.initialize = function (opt) {
     return Promise.delay(1).then(function () {
       inc(self, '$afterUpdateCalled');
       self.$afterUpdateOptions = options;
+    });
+  };
+
+  Model2.prototype.$afterGet = function () {
+    var self = this;
+    return Promise.delay(1).then(function () {
+      inc(self, '$afterGetCalled');
     });
   };
 

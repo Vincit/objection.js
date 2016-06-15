@@ -90,10 +90,11 @@ module.exports = function (session) {
             .select('model_2.id_col', 'model_2_prop_2')
             .then(function (models) {
               expect(models[0]).to.be.a(Model2);
-              // Test that only the selected columns were returned.
-              expect(_.uniq(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql(['idCol', 'model2Prop2']);
+              // Test that only the selected columns (and stuff set by the $afterGet hook)  were returned.
+              expect(_.uniq(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql(['$afterGetCalled', 'idCol', 'model2Prop2']);
               expect(_.map(models, 'idCol').sort()).to.eql([1, 2, 3]);
               expect(_.map(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
+              expect(_.map(models, '$afterGetCalled').sort()).to.eql([1, 1, 1]);
             });
         });
 
@@ -165,7 +166,8 @@ module.exports = function (session) {
                 model1Id: 1,
                 model2Prop1: 'hejsan 3',
                 model2Prop2: 10,
-                concatProp: 'hejsan 310'
+                concatProp: 'hejsan 310',
+                $afterGetCalled: 1
               });
             });
         });
@@ -446,7 +448,8 @@ module.exports = function (session) {
                 id: 2,
                 model1Id: null,
                 model1Prop1: 'hello 2',
-                model1Prop2: null
+                model1Prop2: null,
+                $afterGetCalled: 1
               });
             });
         });
@@ -471,7 +474,7 @@ module.exports = function (session) {
               .then(function (related) {
                 expect(related.length).to.equal(1);
                 expect(related[0]).to.be.a(Model1);
-                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
+                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['$afterGetCalled', 'id']);
               });
           });
 
@@ -506,7 +509,8 @@ module.exports = function (session) {
                   model1Id: null,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  parentProp1: 'hello 1'
+                  parentProp1: 'hello 1',
+                  $afterGetCalled: 1
                 });
               });
           });
@@ -580,7 +584,8 @@ module.exports = function (session) {
                   idCol: 1,
                   model1Id: parent1.id,
                   model2Prop1: 'text 1',
-                  model2Prop2: 6
+                  model2Prop2: 6,
+                  $afterGetCalled: 1
                 });
               }),
             parent2
@@ -597,7 +602,8 @@ module.exports = function (session) {
                   idCol: 4,
                   model1Id: parent2.id,
                   model2Prop1: 'text 4',
-                  model2Prop2: 3
+                  model2Prop2: 3,
+                  $afterGetCalled: 1
                 });
               })
           ]);
@@ -626,7 +632,7 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
                 expect(_.map(related, 'idCol').sort()).to.eql([1, 2, 3]);
-                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['idCol']);
+                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['$afterGetCalled', 'idCol']);
               });
           });
 
@@ -686,7 +692,8 @@ module.exports = function (session) {
                   model1Id: parent2.id,
                   model2Prop1: 'text 6',
                   model2Prop2: 1,
-                  parentProp1: parent2.model1Prop1
+                  parentProp1: parent2.model1Prop1,
+                  $afterGetCalled: 1
                 });
               });
           });
@@ -772,7 +779,8 @@ module.exports = function (session) {
                   model1Id: null,
                   model1Prop1: 'blaa 1',
                   model1Prop2: 6,
-                  extra3: null
+                  extra3: null,
+                  $afterGetCalled: 1
                 });
               }),
             parent2
@@ -791,7 +799,8 @@ module.exports = function (session) {
                   model1Id: null,
                   model1Prop1: 'blaa 4',
                   model1Prop2: 3,
-                  extra3: 'extra 4'
+                  extra3: 'extra 4',
+                  $afterGetCalled: 1
                 });
               })
           ]);
@@ -822,7 +831,8 @@ module.exports = function (session) {
                 model1Id: null,
                 model1Prop1: 'blaa 6',
                 model1Prop2: 1,
-                extra3: 'extra 6'
+                extra3: 'extra 6',
+                $afterGetCalled: 1
               }]);
             })
         });
@@ -850,7 +860,7 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
                 expect(_.map(related, 'id').sort()).to.eql([3, 4, 5]);
-                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['id']);
+                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['$afterGetCalled', 'id']);
               });
           });
 

@@ -114,9 +114,10 @@ module.exports = function (session) {
               model1Id: null,
               model1Prop1: '42',
               model1Prop2: null,
+              $afterGetCalled: 1,
               model1Relation2: [
-                { idCol: 100, model1Id: 3, model2Prop1: '10', model2Prop2: null },
-                { idCol: 101, model1Id: 3, model2Prop1: '50', model2Prop2: null }
+                { idCol: 100, model1Id: 3, model2Prop1: '10', model2Prop2: null, $afterGetCalled: 1},
+                { idCol: 101, model1Id: 3, model2Prop1: '50', model2Prop2: null, $afterGetCalled: 1}
               ]
             });
           });

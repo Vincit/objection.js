@@ -8,6 +8,7 @@ import ValidationError from '../ValidationError';
 import EagerFetcher from './EagerFetcher';
 import deprecated from '../utils/decorators/deprecated';
 
+import FindOperation from './operations/FindOperation';
 import DeleteOperation from './operations/DeleteOperation';
 import UpdateOperation from './operations/UpdateOperation';
 import InsertOperation from './operations/InsertOperation';
@@ -36,7 +37,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
-    this._findOperationFactory = builder => new QueryBuilderOperation(builder, 'find');
+    this._findOperationFactory = builder => new FindOperation(builder, 'find');
     this._insertOperationFactory = builder => new InsertOperation(builder, 'insert');
     this._updateOperationFactory = builder => new UpdateOperation(builder, 'update');
     this._patchOperationFactory = builder => new UpdateOperation(builder, 'patch', {modelOptions: {patch: true}});
@@ -541,7 +542,9 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @private
    */
   _callFindOperation() {
-    this.callQueryBuilderOperation(this._findOperationFactory(this), []);
+    if (!this.has(FindOperation)) {
+      this.callQueryBuilderOperation(this._findOperationFactory(this), [], /* pushFront = */ true);
+    }
   }
 
   /**

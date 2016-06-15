@@ -1,15 +1,5 @@
 import Promise from 'bluebird';
 
-export function containsPromise(arr) {
-  for (let i = 0, l = arr.length; i < l; ++i) {
-    if (isPromise(arr[i])) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 export function isPromise(obj) {
   return obj && (typeof obj === 'object') && (typeof obj.then === 'function');
 }
@@ -27,14 +17,6 @@ export function afterReturn(obj, returnValue) {
     return obj.return(returnValue);
   } else {
     return returnValue;
-  }
-}
-
-export function afterAllReturn(arr, value) {
-  if (containsPromise(arr)) {
-    return Promise.all(arr).return(value);
-  } else {
-    return value;
   }
 }
 

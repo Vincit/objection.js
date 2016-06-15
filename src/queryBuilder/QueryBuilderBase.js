@@ -145,23 +145,34 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @param {RegExp} methodNameRegex
+   * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector
    * @returns {boolean}
    */
-  has(methodNameRegex) {
-    return _.some(this._operations, method => {
-      return methodNameRegex.test(method.name);
-    });
+  has(operationSelector) {
+    if (_.isRegExp(operationSelector)) {
+      return _.some(this._operations, operation => {
+        return operationSelector.test(operation.name);
+      });
+    } else {
+      return _.some(this._operations, operation => {
+        return operation instanceof operationSelector;
+      });
+    }
   }
 
   /**
    * @param {QueryBuilderOperation} operation
    * @param {Array.<*>} args
+   * @param {Boolean=} pushFront
    * @returns {QueryBuilderBase}
    */
-   callQueryBuilderOperation(operation, args) {
+   callQueryBuilderOperation(operation, args, pushFront) {
     if (operation.call(this, args || [])) {
-      this._operations.push(operation);
+      if (pushFront) {
+        this._operations.splice(0, 0, operation);
+      } else {
+        this._operations.push(operation);
+      }
     }
 
     return this;

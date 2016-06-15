@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+### What's new
+
+* [$afterGet](#afterget) hook.
+
 ## 0.5.0 
 
 ### What's new

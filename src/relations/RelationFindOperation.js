@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import QueryBuilderOperation from '../queryBuilder/operations/QueryBuilderOperation';
+import FindOperation from '../queryBuilder/operations/FindOperation';
 
-export default class RelationFindOperation extends QueryBuilderOperation {
+export default class RelationFindOperation extends FindOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);
