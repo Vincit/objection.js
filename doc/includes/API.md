@@ -5995,7 +5995,7 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [`context`](#context).
+queryContext|Object|The context object of the get query. See [`context`](#context).
 
 ##### Return value
 
