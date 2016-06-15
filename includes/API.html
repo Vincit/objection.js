@@ -7412,6 +7412,58 @@ boolean.</p>
 </tr>
 </tbody></table>
 
+<h4 id="afterget">$afterGet</h4>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterGet</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Called after a model is fetched.</p>
+
+<p>This method is <em>not</em> called for insert, update or delete operations.</p>
+
+<p>You can return a promise from this function if you need to do asynchronous stuff.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>queryContext</td>
+<td>Object</td>
+<td>The context object of the update query. See <a href="#context"><code class="prettyprint">context</code></a>.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="http://bluebirdjs.com/docs/getting-started.html"><code class="prettyprint">Promise</code></a>&#124;*</td>
+<td></td>
+</tr>
+</tbody></table>
+
 <h2 id="transaction">transaction</h2>
 
 <p>See the section on <a href="#transaction-callback">transaction callback</a></p>
