@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -82,7 +82,7 @@
     "grunt": "^0.4.5",
     "grunt-jsdoc": "^1.0.0",
     "istanbul": "^0.4.0",
-    "knex": "^0.11.5",
+    "knex": "^0.11.7",
     "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^4.4.0",
