@@ -50,7 +50,7 @@
     "tv4-formats": "^1.0.2"
   },
   "peerDependencies": {
-    "knex": ">= 0.8.0 <= 0.11.5"
+    "knex": ">= 0.8.0 <= 0.11.7"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",
