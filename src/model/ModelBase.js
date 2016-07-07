@@ -340,7 +340,7 @@ export default class ModelBase {
    * @param {string} prop
    */
   static omitImpl(obj, prop) {
-    obj[prop] = undefined;
+    delete obj[prop];
   }
 
   /**
