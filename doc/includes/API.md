@@ -5622,8 +5622,8 @@ Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(function (jennif
 > Patch a model:
 
 ```js
-person.$query().patch({lastName: 'Cooper'}).then(function (person) {
-  console.log(person.lastName); // --> 'Cooper'.
+person.$query().patch({lastName: 'Cooper'}).then(function () {
+  console.log('person updated');
 });
 ```
 

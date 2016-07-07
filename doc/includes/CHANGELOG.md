@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3
+
+### What's new
+
+* ES6 promise compatibility fixes.
+
 ## 0.5.1
 
 ### What's new

@@ -14,7 +14,7 @@ export function after(obj, func) {
 
 export function afterReturn(obj, returnValue) {
   if (isPromise(obj)) {
-    return obj.return(returnValue);
+    return obj.then(() => returnValue);
   } else {
     return returnValue;
   }
