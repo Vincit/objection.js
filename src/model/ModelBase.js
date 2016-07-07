@@ -355,8 +355,8 @@ export default class ModelBase {
     let row = {};
     row[columnName] = null;
 
-    let props = _.keys(_.omit(model.$parseDatabaseJson(row), addedProps));
-    let propertyName = _.first(props);
+    let props = _.keys(model.$parseDatabaseJson(row));
+    let propertyName = _.first(_.difference(props, addedProps));
 
     return propertyName || null;
   }
@@ -373,8 +373,8 @@ export default class ModelBase {
     let obj = {};
     obj[propertyName] = null;
 
-    let cols = _.keys(_.omit(model.$formatDatabaseJson(obj), addedCols));
-    let columnName = _.first(cols);
+    let cols = _.keys(model.$formatDatabaseJson(obj));
+    let columnName = _.first(_.difference(cols, addedCols));
 
     return columnName || null;
   }
