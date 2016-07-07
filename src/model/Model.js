@@ -3,6 +3,7 @@ import ModelBase from './ModelBase';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
+import {inheritHiddenData} from '../utils/hiddenData';
 import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
 import ValidationError from '../ValidationError';
 import EagerFetcher from '../queryBuilder/EagerFetcher';
@@ -405,6 +406,11 @@ export default class Model extends ModelBase {
 
     // Create a new subclass of this class.
     let BoundModelClass = inheritModel(ModelClass);
+
+    // The bound model is equal to the source model in every way. We want to copy
+    // the hidden data as-is from the source so that we don't get the performance
+    // penalty of calculating all memoized etc. values again.
+    inheritHiddenData(ModelClass, BoundModelClass);
 
     BoundModelClass.knex(knex);
     knex.$$objection.boundModels[ModelClass.tableName] = BoundModelClass;
