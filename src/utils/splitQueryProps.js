@@ -10,27 +10,19 @@ export default function (ModelClass, obj) {
     QueryBuilderBase = require('../queryBuilder/QueryBuilderBase').default;
   }
 
-  const needsSplit = _.some(obj, value => isQueryProp);
+  const needsSplit = _.some(obj, value => {
+    return value instanceof KnexQueryBuilder || value instanceof QueryBuilderBase || value instanceof KnexRaw;
+  });
 
   if (needsSplit) {
     return split(obj);
   } else {
-    return {
-      json: obj,
-      query: null
-    };
+    return {json: obj, query: null};
   }
 }
 
-function isQueryProp(value) {
-  return value instanceof KnexQueryBuilder || value instanceof QueryBuilderBase || value instanceof KnexRaw;
-}
-
 function split(obj) {
-  let ret = {
-    json: {},
-    query: {}
-  };
+  let ret = {json: {}, query: {}};
 
   _.each(obj, (value, key) => {
     if (value instanceof KnexQueryBuilder || value instanceof KnexRaw) {
