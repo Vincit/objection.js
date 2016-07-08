@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import DelegateOperation from './DelegateOperation';
-import InsertWithRelated from '../InsertWithRelated';
 import {afterReturn} from '../../utils/promiseUtils';
 import {isPostgres} from '../../utils/dbUtils';
 

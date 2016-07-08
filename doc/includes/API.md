@@ -389,6 +389,56 @@ Type|Description
 
 
 
+#### updateAndFetch
+
+```js
+var builder = queryBuilder.updateAndFetch(modelOrObject);
+```
+
+```js
+person
+  .$query()
+  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .then(function (updatedModel) {
+    console.log(updatedModel.firstName);
+  });
+```
+
+> You can also give raw expressions and subqueries as values like this:
+
+```js
+person
+  .$query()
+  .updateAndFetch({
+    firstName: Person.raw("'Jenni' || 'fer'"),
+    lastName: 'Lawrence',
+    age: Person.query().avg('age')
+  });
+```
+
+Updates a single model and fetches it from the database afterwards. This only works with instance queries
+started with [`$query()`](#_s_query) method.
+
+The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
+the Promise is rejected with a [`ValidationError`](#validationerror).
+
+This method is meant for updating _whole_ objects with all required properties. If you
+want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelOrObject|Object&#124;[`Model`](#model)|The update object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
 
 #### updateAndFetchById
 
@@ -492,6 +542,8 @@ Type|Description
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
 
+
+
 #### patchAndFetchById
 
 ```js
@@ -539,6 +591,54 @@ Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
+
+
+#### patchAndFetch
+
+```js
+var builder = queryBuilder.patchAndFetch(modelOrObject);
+```
+
+```js
+person
+  .$query()
+  .patchAndFetch({age: 24})
+  .then(function (updatedModel) {
+    console.log(updatedModel.firstName);
+  });
+```
+
+> You can also give raw expressions and subqueries as values like this:
+
+```js
+person
+  .$query()
+  .patchAndFetch({
+    age: Person.query().avg('age'),
+    firstName: Person.raw("'Jenni' || 'fer'")
+  });
+```
+
+Patches a single model and fetches it from the database afterwards. This only works with instance queries
+started with [`$query()`](#_s_query) method.
+
+The patch object is validated against the model's [`jsonSchema`](#jsonschema) _but_ the `required` property
+of the [`jsonSchema`](#jsonschema) is ignored. This way the properties in the patch object are still validated
+but an error isn't thrown if the patch object doesn't contain all required properties.
+
+If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelOrObject|Object&#124;[`Model`](#model)|The patch object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
 
 

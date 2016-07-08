@@ -769,6 +769,25 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
+   * @param {Model|Object=} modelOrObject
+   * @returns {QueryBuilder}
+   */
+  @writeQueryOperation
+  updateAndFetch(modelOrObject) {
+    const delegateOperation = this._updateOperationFactory(this);
+
+    if (!(delegateOperation.instance instanceof this._modelClass)) {
+      throw new Error('updateAndFetch can only be called for instance operations');
+    }
+
+    const updateAndFetch = new UpdateAndFetchOperation(this, 'updateAndFetch', {
+      delegate: delegateOperation
+    });
+
+    return this.callQueryBuilderOperation(updateAndFetch, [delegateOperation.instance.$id(), modelOrObject]);
+  }
+
+  /**
    * @param {number|string|Array.<number|string>} id
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
@@ -790,6 +809,25 @@ export default class QueryBuilder extends QueryBuilderBase {
   patch(modelOrObject) {
     const patchOperation = this._patchOperationFactory(this);
     return this.callQueryBuilderOperation(patchOperation, [modelOrObject]);
+  }
+
+  /**
+   * @param {Model|Object=} modelOrObject
+   * @returns {QueryBuilder}
+   */
+  @writeQueryOperation
+  patchAndFetch(modelOrObject) {
+    const delegateOperation = this._patchOperationFactory(this);
+
+    if (!(delegateOperation.instance instanceof this._modelClass)) {
+      throw new Error('patchAndFetch can only be called for instance operations');
+    }
+
+    const patchAndFetch = new UpdateAndFetchOperation(this, 'patchAndFetch', {
+      delegate: delegateOperation
+    });
+
+    return this.callQueryBuilderOperation(patchAndFetch, [delegateOperation.instance.$id(), modelOrObject]);
   }
 
   /**

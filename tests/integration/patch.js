@@ -382,6 +382,41 @@ module.exports = function (session) {
 
     });
 
+    describe('.$query().patchAndFetch()', function () {
+
+      beforeEach(function () {
+        return session.populate([{
+          id: 1,
+          model1Prop1: 'hello 1'
+        }, {
+          id: 2,
+          model1Prop1: 'hello 2'
+        }]);
+      });
+
+      it('should patch and fetch a model', function () {
+        var model = Model1.fromJson({id: 1});
+
+        return model
+          .$query()
+          .patchAndFetch({model1Prop2: 10, undefinedShouldBeIgnored: undefined})
+          .then(function (updated) {
+            expect(updated.id).to.equal(1);
+            expect(updated.model1Id).to.equal(null);
+            expect(updated.model1Prop1).to.equal('hello 1');
+            expect(updated.model1Prop2).to.equal(10);
+            expectPartEql(model, {id: 1, model1Prop1: 'hello 1', model1Prop2: 10, model1Id: null});
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1', model1Prop2: 10});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2', model1Prop2: null});
+          });
+      });
+
+    });
+
     describe('.$relatedQuery().patch()', function () {
 
       describe('belongs to one relation', function () {
