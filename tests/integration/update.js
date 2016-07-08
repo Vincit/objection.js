@@ -235,12 +235,14 @@ module.exports = function (session) {
       });
 
       it('should update a model (1)', function () {
-        return Model1
-          .fromJson({id: 1})
+        var model = Model1.fromJson({id: 1});
+
+        return model
           .$query()
           .update({model1Prop1: 'updated text'})
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
+            expect(model.model1Prop1).to.eql('updated text');
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {

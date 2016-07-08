@@ -306,12 +306,14 @@ module.exports = function (session) {
       });
 
       it('should patch a model (1)', function () {
-        return Model1
-          .fromJson({id: 1})
+        var model = Model1.fromJson({id: 1});
+
+        return model
           .$query()
           .patch({model1Prop1: 'updated text', undefinedShouldBeIgnored: undefined})
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
+            expect(model.model1Prop1).to.equal('updated text');
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {

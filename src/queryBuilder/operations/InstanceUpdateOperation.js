@@ -21,4 +21,9 @@ export default class InstanceUpdateOperation extends UpdateOperation {
     super.onBeforeBuild(builder);
     builder.whereComposite(builder.modelClass().getFullIdColumn(), this.instance.$id());
   }
+
+  onAfterInternal(builder, numUpdated) {
+    this.instance.$set(this.model);
+    return super.onAfterInternal(builder, numUpdated);
+  }
 }
