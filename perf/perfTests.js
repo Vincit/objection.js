@@ -3,7 +3,18 @@ var _ = require('lodash')
   , expect = require('expect.js')
   , Promise = require('bluebird')
   , mockKnexBuilder = require('../testUtils/mockKnex')
+  , mockMochaFactory = require('./mockMocha')
   , Model = require('../').Model;
+
+if (typeof describe == 'undefined') {
+  global.mockMocha = mockMochaFactory();
+  global.describe = global.mockMocha.describe;
+  global.before = global.mockMocha.before;
+  global.beforeEach = global.mockMocha.beforeEach;
+  global.after = global.mockMocha.after;
+  global.afterEach = global.mockMocha.afterEach;
+  global.it = global.mockMocha.it;
+}
 
 describe('Performance tests', function () {
   var mockKnex = null;
@@ -216,8 +227,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '32000 traverse calls for the dataset',
-      runCount: 32000,
+      name: '16000 traverse calls for the dataset',
+      runCount: 16000,
       runtimeGoal: 1000,
       beforeTest: function () {
         return _.map(data, function (person) {
@@ -457,7 +468,7 @@ describe('Performance tests', function () {
   });
 
   function perfTest(opt) {
-    it(opt.name + ' [goal ' + opt.runtimeGoal + ' ms]', function () {
+    (opt.only ? it.only : it)(opt.name + ' [goal ' + opt.runtimeGoal + ' ms]', function () {
       var beforeTest = opt.beforeTest || _.noop;
 
       var ctx = beforeTest();
@@ -474,11 +485,7 @@ describe('Performance tests', function () {
           throw new Error('runtime ' + runtime + ' ms exceeds the runtimeGoal ' + opt.runtimeGoal + " ms");
         }
 
-        Promise.delay(100).then(function () {
-          console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
-        });
-
-        return Promise.delay(50);
+        console.log('      runtime: ' + runtime + ' ms, ' + (runtime / opt.runCount).toFixed(3) + ' ms / run');
       });
     });
   }
@@ -497,3 +504,9 @@ describe('Performance tests', function () {
     return Promise.all(promises);
   }
 });
+
+if (global.mockMocha) {
+  global.mockMocha.run();
+}
+
+

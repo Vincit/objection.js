@@ -5,3 +5,4 @@ examples/*/*.db
 *.iml
 *.DS_Store
 lib
+profiling
