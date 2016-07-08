@@ -106,9 +106,26 @@ describe('ModelBase', function () {
     it('should validate if jsonSchema is defined', function () {
       Model.jsonSchema = {
         required: ['a'],
+        additionalProperties: false,
         properties: {
           a: {type: 'string'},
-          b: {type: 'number'}
+          b: {type: 'number'},
+          c: {
+            type: 'object',
+            properties: {
+              d: {type: 'string'},
+              e: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  properties: {
+                    f: {type: 'number'}
+                  }
+                }
+              }
+            }
+          }
         }
       };
 
@@ -116,9 +133,16 @@ describe('ModelBase', function () {
         Model.fromJson({a: 'str', b: 1});
       }).not.to.throwException();
 
-      // b is not required.
       expect(function () {
         Model.fromJson({a: 'str'});
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson({a: 'a', c: {d: 'test'}});
+      }).not.to.throwException();
+
+      expect(function () {
+        Model.fromJson({a: 'a', c: {d: 'test', e: [{f: 1}]}});
       }).not.to.throwException();
 
       expect(function () {
@@ -134,6 +158,34 @@ describe('ModelBase', function () {
       }).to.throwException(function (exp) {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('a');
+      });
+
+      expect(function () {
+        Model.fromJson({a: 'a', additional: 1});
+      }).to.throwException(function (exp) {
+        expect(exp).to.be.a(ValidationError);
+        expect(exp.data).to.have.property('additional');
+      });
+
+      expect(function () {
+        Model.fromJson({a: 'a', c: {d: 10}});
+      }).to.throwException(function (exp) {
+        expect(exp).to.be.a(ValidationError);
+        expect(exp.data).to.have.property('c.d');
+      });
+
+      expect(function () {
+        Model.fromJson({a: 'a', c: {d: 'test', e: [{f: 'not a number'}]}});
+      }).to.throwException(function (exp) {
+        expect(exp).to.be.a(ValidationError);
+        expect(exp.data).to.have.property('c.e[0].f');
+      });
+
+      expect(function () {
+        Model.fromJson({a: 'a', c: {d: 'test', e: [{additional: true}]}});
+      }).to.throwException(function (exp) {
+        expect(exp).to.be.a(ValidationError);
+        expect(exp.data).to.have.property('c.e[0]');
       });
 
     });

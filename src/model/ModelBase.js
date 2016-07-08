@@ -1,11 +1,13 @@
 import _ from 'lodash';
-import tv4 from 'tv4';
-import tv4Formats from 'tv4-formats';
+import Ajv from 'ajv';
 import ValidationError from '../ValidationError';
 import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
 import splitQueryProps from '../utils/splitQueryProps';
 import {inherits} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
+
+const ajv = new Ajv({allErrors: true, validateSchema: false, ownProperties: true});
+const ajvCache = Object.create(null);
 
 /**
  * @typedef {Object} ModelOptions
@@ -52,11 +54,11 @@ export default class ModelBase {
       jsonSchema = this.$beforeValidate(jsonSchema, json, options);
     }
 
-    let report = tryValidate(jsonSchema, json, options);
-    let validationError = parseValidationError(report);
+    let validator =  ModelClass.jsonSchemaValidator(jsonSchema, options.patch);
+    validator(json);
 
-    if (validationError) {
-      throw validationError;
+    if (validator.errors) {
+      throw parseValidationError(validator.errors);
     }
 
     this.$afterValidate(json, options);
@@ -184,11 +186,9 @@ export default class ModelBase {
    * @returns {ModelBase}
    */
   $set(obj) {
-    const self = this;
-
     _.each(obj, (value, key) => {
       if (key.charAt(0) !== '$' && !_.isFunction(value)) {
-        self[key] = value;
+        this[key] = value;
       }
     });
 
@@ -284,6 +284,18 @@ export default class ModelBase {
       }
     });
 
+    if (this.$omitFromDatabaseJson()) {
+      clone.$omitFromDatabaseJson(this.$omitFromDatabaseJson());
+    }
+
+    if (this.$omitFromJson()) {
+      clone.$omitFromJson(this.$omitFromJson());
+    }
+
+    if (this.$stashedQueryProps()) {
+      clone.$stashedQueryProps(this.$stashedQueryProps());
+    }
+
     return clone;
   }
 
@@ -341,6 +353,43 @@ export default class ModelBase {
    */
   static omitImpl(obj, prop) {
     delete obj[prop];
+  }
+
+  /**
+   * @param {Object} jsonSchema
+   * @param {boolean} skipRequired
+   * @returns {function}
+   */
+  static jsonSchemaValidator(jsonSchema, skipRequired) {
+    skipRequired = !!skipRequired;
+
+    if (jsonSchema === this.jsonSchema) {
+      return this.defaultJsonSchemaValidator(skipRequired);
+    } else {
+      let key = JSON.stringify(jsonSchema);
+      let validators = ajvCache[key];
+
+      if (!validators) {
+        validators = {};
+        ajvCache[key] = validators;
+      }
+
+      let validator = validators[skipRequired];
+      if (!validator) {
+        validator = compileJsonSchemaValidator(jsonSchema, skipRequired);
+        validators[skipRequired] = validator;
+      }
+
+      return validator;
+    }
+  }
+
+  /**
+   * @returns {function}
+   */
+  @memoize
+  static defaultJsonSchemaValidator(skipRequired) {
+    return compileJsonSchemaValidator(this.jsonSchema, skipRequired);
   }
 
   /**
@@ -412,43 +461,25 @@ function mergeWithDefaults(jsonSchema, json) {
   }
 }
 
-function tryValidate(jsonSchema, json, options) {
-  let required;
-
-  try {
-    if (options.patch) {
-      required = jsonSchema.required;
-      jsonSchema.required = [];
-    }
-
-    return tv4.validateMultiple(json, jsonSchema);
-  } finally {
-    if (options.patch) {
-      jsonSchema.required = required;
-    }
-  }
-}
-
-function parseValidationError(report) {
+function parseValidationError(errors) {
   let errorHash = {};
   let index = 0;
 
-  if (report.errors.length === 0) {
-    return null;
-  }
+  for (let i = 0; i < errors.length; ++i) {
+    let error = errors[i];
+    let key = error.dataPath.substring(1);
 
-  for (let i = 0; i < report.errors.length; ++i) {
-    let error = report.errors[i];
-    let key = error.dataPath.split('/').slice(1).join('.');
-
-    // Hack: The dataPath is empty for failed 'required' validations. We parse
-    // the property name from the error message.
-    if (!key && error.message.substring(0, 26) === 'Missing required property:') {
-      key = error.message.split(':')[1].trim();
+    if (!key) {
+      let match = /should have required property '(.+)'/.exec(error.message);
+      if (match && match.length > 1) {
+        key = match[1];
+      }
     }
 
-    // If the validation failed because of extra properties, the key is an empty string. We
-    // still want a unique error in the hash for each failure.
+    if (!key && error.params && error.params.additionalProperty) {
+      key = error.params.additionalProperty;
+    }
+
     if (!key) {
       key = (index++).toString();
     }
@@ -577,6 +608,19 @@ function contains(arr, value) {
   return false;
 }
 
-// Add validation formats, so that for example the following schema validation works:
-// createTime: {type: 'string', format: 'date-time'}
-tv4.addFormat(tv4Formats);
+function compileJsonSchemaValidator(jsonSchema, skipRequired) {
+  let origRequired;
+
+  try {
+    if (skipRequired) {
+      origRequired = jsonSchema.required;
+      jsonSchema.required = [];
+    }
+
+    return ajv.compile(jsonSchema);
+  } finally {
+    if (skipRequired) {
+      jsonSchema.required = origRequired;
+    }
+  }
+}

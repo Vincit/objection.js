@@ -50,6 +50,34 @@ module.exports = function (session) {
           });
       });
 
+      it('should insert new model (additionalProperties = false)', function () {
+        var Mod = inheritModel(Model1);
+
+        Mod.jsonSchema = {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            model1Prop1: {type: 'string'},
+            model2Prop2: {type: 'number'}
+          }
+        };
+
+        return Mod
+          .query()
+          .insert({model1Prop1: 'hello 3'})
+          .then(function (inserted) {
+            expect(inserted).to.be.a(Mod);
+            expect(inserted.$beforeInsertCalled).to.equal(1);
+            expect(inserted.$afterInsertCalled).to.equal(1);
+            expect(inserted.id).to.eql(3);
+            expect(inserted.model1Prop1).to.equal('hello 3');
+            return session.knex(Model1.tableName);
+          })
+          .then(function (rows) {
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
       it('should insert new model with identifier', function () {
         var model = Model1.fromJson({id: 1000, model1Prop1: 'hello 3'});
 

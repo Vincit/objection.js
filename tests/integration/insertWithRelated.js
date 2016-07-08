@@ -6,6 +6,7 @@ var expect = require('expect.js');
 var Promise = require('bluebird');
 var transaction = require('../../').transaction;
 var ValidationError = require('../../').ValidationError;
+var inheritModel = require('../../lib/model/inheritModel');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;
@@ -67,6 +68,44 @@ module.exports = function (session) {
           .then(function (model) {
             return check(model);
           });
+      });
+
+      describe('jsonSchema: additionalProperties = false', function () {
+        var origSchema;
+
+        before(function () {
+          origSchema = Model1.jsonSchema;
+          Model1.jsonSchema = {
+            type: 'object',
+            additionalProperties: false,
+            properties: {
+              model1Prop1: {type: 'string'},
+              model1Prop2: {type: 'number'},
+              model1Id: {type: 'number'}
+            }
+          }
+        });
+
+        after(function () {
+          Model1.jsonSchema = origSchema;
+        });
+
+        it('should insert a model with relations', function () {
+          return Model1
+            .query()
+            .insertWithRelated(insertion)
+            .then(function (inserted) {
+              return check(inserted, true).return(inserted);
+            })
+            .then(function (inserted) {
+              expect(inserted).to.not.have.property('model1Prop2');
+              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+            })
+            .then(function (model) {
+              return check(model);
+            });
+        });
+
       });
 
       it('should accept raw sql and subqueries', function () {

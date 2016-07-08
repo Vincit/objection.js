@@ -195,6 +195,14 @@ export default class Model extends ModelBase {
     return this;
   }
 
+  $validate(json = this, options = {}) {
+    if (json instanceof Model) {
+      return super.$validate(json.$toJson(true), options);
+    } else {
+      return super.$validate(json, options);
+    }
+  }
+
   $parseDatabaseJson(json) {
     const ModelClass = this.constructor;
     const jsonAttr = ModelClass.$$getJsonAttributes();
