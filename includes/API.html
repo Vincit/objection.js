@@ -6975,8 +6975,8 @@ they are cloned using their <code class="prettyprint">$clone()</code> method.</p
 <blockquote>
 <p>Patch a model:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">patch</span><span class="p">({</span><span class="na">lastName</span><span class="p">:</span> <span class="s1">'Cooper'</span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">person</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// --&gt; 'Cooper'.</span>
+<pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">patch</span><span class="p">({</span><span class="na">lastName</span><span class="p">:</span> <span class="s1">'Cooper'</span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'person updated'</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
 
