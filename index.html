@@ -2115,6 +2115,68 @@ the updated row as a result, you may want to use the <a href="#updateandfetchbyi
 </tr>
 </tbody></table>
 
+<h4 id="updateandfetch">updateAndFetch</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">updateAndFetch</span><span class="p">(</span><span class="nx">modelOrObject</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">person</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">updateAndFetch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span> <span class="na">age</span><span class="p">:</span> <span class="mi">24</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">updatedModel</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">updatedModel</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>You can also give raw expressions and subqueries as values like this:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">person</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">updateAndFetch</span><span class="p">({</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
+    <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Updates a single model and fetches it from the database afterwards. This only works with instance queries
+started with <a href="#_s_query"><code class="prettyprint">$query()</code></a> method.</p>
+
+<p>The update object is validated against the model&rsquo;s <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>. If validation fails
+the Promise is rejected with a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
+
+<p>This method is meant for updating <em>whole</em> objects with all required properties. If you
+want to update a subset of properties use the <a href="#patchandfetch"><code class="prettyprint">patchAndFetch</code></a> method.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>modelOrObject</td>
+<td>Object&#124;<a href="#model"><code class="prettyprint">Model</code></a></td>
+<td>The update object</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="updateandfetchbyid">updateAndFetchById</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">updateAndFetchById</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">modelOrObject</span><span class="p">);</span>
 </code></pre>
@@ -2289,6 +2351,67 @@ but an error isn&rsquo;t thrown if the patch object doesn&rsquo;t contain all re
 <td>string&#124;number</td>
 <td>Identifier of the model to update</td>
 </tr>
+<tr>
+<td>modelOrObject</td>
+<td>Object&#124;<a href="#model"><code class="prettyprint">Model</code></a></td>
+<td>The patch object</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="patchandfetch">patchAndFetch</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">patchAndFetch</span><span class="p">(</span><span class="nx">modelOrObject</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">person</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patchAndFetch</span><span class="p">({</span><span class="na">age</span><span class="p">:</span> <span class="mi">24</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">updatedModel</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">updatedModel</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>You can also give raw expressions and subqueries as values like this:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">person</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patchAndFetch</span><span class="p">({</span>
+    <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">),</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Patches a single model and fetches it from the database afterwards. This only works with instance queries
+started with <a href="#_s_query"><code class="prettyprint">$query()</code></a> method.</p>
+
+<p>The patch object is validated against the model&rsquo;s <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> <em>but</em> the <code class="prettyprint">required</code> property
+of the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> is ignored. This way the properties in the patch object are still validated
+but an error isn&rsquo;t thrown if the patch object doesn&rsquo;t contain all required properties.</p>
+
+<p>If validation fails the Promise is rejected with a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
 <tr>
 <td>modelOrObject</td>
 <td>Object&#124;<a href="#model"><code class="prettyprint">Model</code></a></td>
@@ -9267,6 +9390,17 @@ the <code class="prettyprint">^</code> character. For example <code class="prett
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-5-4">0.5.4</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>bugfix: insertWithRelated now works with <code class="prettyprint">additionalProperties = false</code> in <code class="prettyprint">jsonSchema</code></li>
+<li>Add updateAndFetch and patchAndFetch methods for <code class="prettyprint">$query</code></li>
+<li>bugfix: afterGet was not called for nested models in eager query</li>
+<li>Use ajv instad of tv4 for json schema validation</li>
+</ul>
 
 <h2 id="0-5-3">0.5.3</h2>
 
