@@ -5,7 +5,6 @@ import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
 import QueryBuilderBase from './QueryBuilderBase';
 import ValidationError from '../ValidationError';
-import EagerFetcher from './EagerFetcher';
 import deprecated from '../utils/decorators/deprecated';
 
 import FindOperation from './operations/FindOperation';
@@ -18,6 +17,7 @@ import InsertAndFetchOperation from './operations/InsertAndFetchOperation';
 import UpdateAndFetchOperation from './operations/UpdateAndFetchOperation';
 import QueryBuilderOperation from './operations/QueryBuilderOperation';
 import JoinRelationOperation from './operations/JoinRelationOperation';
+import EagerFetchOperation from './operations/EagerFetchOperation';
 import RunBeforeOperation from './operations/RunBeforeOperation';
 import RunAfterOperation from './operations/RunAfterOperation';
 import OnBuildOperation from './operations/OnBuildOperation';
@@ -32,7 +32,6 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._explicitResolveValue = null;
 
     this._eagerExpression = null;
-    this._eagerFilters = null;
     this._eagerFilterExpressions = [];
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
@@ -183,10 +182,13 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   eager(exp, filters) {
     this._eagerExpression = exp || null;
-    this._eagerFilters = filters || null;
 
     if (_.isString(this._eagerExpression)) {
       this._eagerExpression = RelationExpression.parse(this._eagerExpression);
+    }
+
+    if (_.isObject(filters)) {
+      this._eagerExpression.filters = filters;
     }
 
     checkEager(this);
@@ -285,8 +287,8 @@ export default class QueryBuilder extends QueryBuilderBase {
     builder._explicitResolveValue = this._explicitResolveValue;
 
     builder._eagerExpression = this._eagerExpression;
-    builder._eagerFilters = this._eagerFilters;
     builder._eagerFilterExpressions = this._eagerFilterExpressions.slice();
+
     builder._allowedEagerExpression = this._allowedEagerExpression;
     builder._allowedInsertExpression = this._allowedInsertExpression;
 
@@ -306,7 +308,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   clearEager() {
     this._eagerExpression = null;
-    this._eagerFilters = null;
+    this._eagerFilterExpressions = [];
     return this;
   }
 
@@ -485,6 +487,10 @@ export default class QueryBuilder extends QueryBuilderBase {
       builder._callFindOperation();
     }
 
+    if (builder._eagerExpression) {
+      builder._callEagerFetchOperation();
+    }
+
     promise = chainBeforeOperations(promise, builder, builder._operations);
     promise = chainHooks(promise, builder, context.runBefore);
     promise = chainHooks(promise, builder, internalContext.runBefore);
@@ -511,11 +517,6 @@ export default class QueryBuilder extends QueryBuilderBase {
 
       promise = chainAfterQueryOperations(promise, builder, builder._operations);
       promise = chainAfterInternalOperations(promise, builder, builder._operations);
-
-      if (builder._eagerExpression) {
-        promise = promise.then(models => eagerFetch(builder, models));
-      }
-
       promise = chainHooks(promise, builder, context.runAfter);
       promise = chainHooks(promise, builder, internalContext.runAfter);
       promise = chainAfterOperations(promise, builder, builder._operations);
@@ -544,6 +545,18 @@ export default class QueryBuilder extends QueryBuilderBase {
   _callFindOperation() {
     if (!this.has(FindOperation)) {
       this.callQueryBuilderOperation(this._findOperationFactory(this), [], /* pushFront = */ true);
+    }
+  }
+
+  /**
+   * @private
+   */
+  _callEagerFetchOperation() {
+    if (!this.has(EagerFetchOperation) && this._eagerExpression) {
+      this.callQueryBuilderOperation(new EagerFetchOperation(this, "eager"), [
+        this._eagerExpression,
+        this._eagerFilterExpressions
+      ]);
     }
   }
 
@@ -953,35 +966,6 @@ function createModels(builder, result) {
   }
 
   return result;
-}
-
-function eagerFetch(builder, $models) {
-  if ($models instanceof builder._modelClass || (_.isArray($models) && $models[0] instanceof builder._modelClass)) {
-    let expression = builder._eagerExpression.clone();
-    let filters = _.clone(builder._eagerFilters || {});
-
-    _.each(builder._eagerFilterExpressions, (filter, idx) => {
-      let filterNodes = expression.expressionsAtPath(filter.path);
-
-      if (!_.isEmpty(filterNodes)) {
-        const filterName = `_efe${idx}_`;
-        filters[filterName] = filter.filter;
-        _.each(filterNodes, node => node.args.push(filterName));
-      }
-    });
-
-    return new EagerFetcher({
-      modelClass: builder._modelClass,
-      models: builder._modelClass.ensureModelArray($models),
-      eager: expression,
-      filters: filters,
-      rootQuery: builder
-    }).fetch().then(function (models) {
-      return _.isArray($models) ? models : models[0];
-    });
-  } else {
-    return $models;
-  }
 }
 
 function build(builder) {

@@ -11,8 +11,9 @@ var _ = require('lodash')
   , QueryBuilderOperation = objection.QueryBuilderOperation
   , RelationExpression = objection.RelationExpression;
 
-describe('QueryBuilder', function () {
-  var mockKnexQueryResult = [];
+describe('QueryBuilder fuck fuckj', function () {
+  var mockKnexQueryResults = [];
+  var mockKnexQueryResultIndex = 0;
   var executedQueries = [];
   var mockKnex = null;
   var TestModel = null;
@@ -21,12 +22,13 @@ describe('QueryBuilder', function () {
     mockKnex = knex({client: 'pg'});
     mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
       executedQueries.push(this.toString());
-      return Promise.resolve(mockKnexQueryResult).then(cb, ecb);
+      return Promise.resolve(mockKnexQueryResults[mockKnexQueryResultIndex++] || []).then(cb, ecb);
     };
   });
 
   beforeEach(function () {
-    mockKnexQueryResult = [];
+    mockKnexQueryResults = [];
+    mockKnexQueryResultIndex = 0;
     executedQueries = [];
 
     TestModel = Model.extend(function TestModel() {
@@ -69,12 +71,12 @@ describe('QueryBuilder', function () {
   });
 
   it('should call the callback passed to .then after execution', function (done) {
-    mockKnexQueryResult = [{a: 1}, {a: 2}];
+    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
     // Make sure the callback is called by not returning a promise from the test.
     // Instead call the `done` function so that the test times out if the callback
     // is not called.
     QueryBuilder.forClass(TestModel).then(function (result) {
-      expect(result).to.eql(mockKnexQueryResult);
+      expect(result).to.eql(mockKnexQueryResults[0]);
       done();
     }).catch(done);
   });
@@ -110,17 +112,17 @@ describe('QueryBuilder', function () {
   });
 
   it('should pass node-style values to the asCallback method', function (done) {
-    mockKnexQueryResult = [{a: 1}, {a: 2}];
+    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
     QueryBuilder.forClass(TestModel).asCallback(function (err, models) {
-      expect(models).to.eql(mockKnexQueryResult);
+      expect(models).to.eql(mockKnexQueryResults[0]);
       done();
     });
   });
 
   it('should pass node-style values to the nodeify method', function (done) {
-    mockKnexQueryResult = [{a: 1}, {a: 2}];
+    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
     QueryBuilder.forClass(TestModel).nodeify(function (err, models) {
-      expect(models).to.eql(mockKnexQueryResult);
+      expect(models).to.eql(mockKnexQueryResults[0]);
       done();
     });
   });
@@ -342,7 +344,7 @@ describe('QueryBuilder', function () {
   });
 
   it('should convert array query result into Model instances', function () {
-    mockKnexQueryResult = [{a: 1}, {a: 2}];
+    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
 
     return QueryBuilder
       .forClass(TestModel)
@@ -350,12 +352,12 @@ describe('QueryBuilder', function () {
         expect(result).to.have.length(2);
         expect(result[0]).to.be.a(TestModel);
         expect(result[1]).to.be.a(TestModel);
-        expect(result).to.eql(mockKnexQueryResult);
+        expect(result).to.eql(mockKnexQueryResults[0]);
       });
   });
 
   it('should convert an object query result into a Model instance', function () {
-    mockKnexQueryResult = {a: 1};
+    mockKnexQueryResults = [{a: 1}];
 
     return QueryBuilder
       .forClass(TestModel)
@@ -400,7 +402,7 @@ describe('QueryBuilder', function () {
   });
 
   it('should call run* methods in the correct order', function (done) {
-    mockKnexQueryResult = 0;
+    mockKnexQueryResults = [0];
 
     // Again call `done` instead of returning a promise just to make sure the final
     // `.then` callback is called. (I'm paranoid).
@@ -408,16 +410,16 @@ describe('QueryBuilder', function () {
       .forClass(TestModel)
 
       .runBefore(function () {
-        expect(mockKnexQueryResult).to.equal(0);
-        return ++mockKnexQueryResult;
+        expect(mockKnexQueryResults[0]).to.equal(0);
+        return ++mockKnexQueryResults[0];
       })
       .runBefore(function () {
-        expect(mockKnexQueryResult).to.equal(1);
-        return Promise.delay(1).return(++mockKnexQueryResult);
+        expect(mockKnexQueryResults[0]).to.equal(1);
+        return Promise.delay(1).return(++mockKnexQueryResults[0]);
       })
       .runBefore(function () {
-        expect(mockKnexQueryResult).to.equal(2);
-        ++mockKnexQueryResult;
+        expect(mockKnexQueryResults[0]).to.equal(2);
+        ++mockKnexQueryResults[0];
       })
 
       .runAfter(function (res) {
@@ -636,7 +638,7 @@ describe('QueryBuilder', function () {
   });
 
   it('resultSize should create and execute a query that returns the size of the query', function (done) {
-    mockKnexQueryResult = [{count: 123}];
+    mockKnexQueryResults = [[{count: 123}]];
     QueryBuilder
       .forClass(TestModel)
       .where('test', 100)
@@ -653,7 +655,7 @@ describe('QueryBuilder', function () {
   });
 
   it('range should return a range and the total count', function (done) {
-    mockKnexQueryResult = [{count: 123}];
+    mockKnexQueryResults = [[{count: 123}], [{a: 1}]];
     QueryBuilder
       .forClass(TestModel)
       .where('test', 100)
@@ -664,14 +666,14 @@ describe('QueryBuilder', function () {
         expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = \'100\') as temp');
         expect(executedQueries[1]).to.equal('select * from "Model" where "test" = \'100\' order by "order" asc limit \'101\' offset \'100\'');
         expect(res.total).to.equal(123);
-        expect(res.results).to.eql(mockKnexQueryResult);
+        expect(res.results).to.eql(mockKnexQueryResults[1]);
         done();
       })
       .catch(done);
   });
 
   it('page should return a page and the total count', function (done) {
-    mockKnexQueryResult = [{count: 123}];
+    mockKnexQueryResults = [[{count: 123}], [{a: 1}]];
     QueryBuilder
       .forClass(TestModel)
       .where('test', 100)
@@ -682,7 +684,7 @@ describe('QueryBuilder', function () {
         expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = \'100\') as temp');
         expect(executedQueries[1]).to.equal('select * from "Model" where "test" = \'100\' order by "order" asc limit \'100\' offset \'1000\'');
         expect(res.total).to.equal(123);
-        expect(res.results).to.eql(mockKnexQueryResult);
+        expect(res.results).to.eql(mockKnexQueryResults[1]);
         done();
       })
       .catch(done);
@@ -832,11 +834,11 @@ describe('QueryBuilder', function () {
   });
 
   it('should call $afterGet on the model if no write operation is specified', function (done) {
-    mockKnexQueryResult = [{
+    mockKnexQueryResults = [[{
       a: 1
     }, {
       a: 2
-    }];
+    }]];
 
     TestModel.prototype.$afterGet = function (context) {
       this.b = this.a * 2 + context.x;
@@ -861,11 +863,11 @@ describe('QueryBuilder', function () {
   });
 
   it('should call $afterGet on the model if no write operation is specified (async)', function (done) {
-    mockKnexQueryResult = [{
+    mockKnexQueryResults = [[{
       a: 1
     }, {
       a: 2
-    }];
+    }]];
 
     TestModel.prototype.$afterGet = function (context) {
       var self = this;
@@ -893,11 +895,11 @@ describe('QueryBuilder', function () {
   });
 
   it('should call $afterGet before any `runAfter` hooks', function (done) {
-    mockKnexQueryResult = [{
+    mockKnexQueryResults = [[{
       a: 1
     }, {
       a: 2
-    }];
+    }]];
 
     TestModel.prototype.$afterGet = function (context) {
       var self = this;
@@ -942,15 +944,16 @@ describe('QueryBuilder', function () {
       .forClass(TestModel)
       .eager('a(f).b', {
         f: _.noop
-      });
+      })
+      .filterEager('a', _.noop);
 
     expect(builder._eagerExpression).to.be.a(RelationExpression);
-    expect(builder._eagerFilters).to.have.property('f');
+    expect(builder._eagerFilterExpressions).to.have.length(1);
 
     builder.clearEager();
 
     expect(builder._eagerExpression).to.equal(null);
-    expect(builder._eagerFilters).to.equal(null);
+    expect(builder._eagerFilterExpressions).to.have.length(0);
   });
 
   it('clearReject() should clear remove explicit rejection', function () {
@@ -1117,7 +1120,11 @@ describe('QueryBuilder', function () {
       M1.RelatedQueryBuilder = M1RelatedBuilder;
       M2.RelatedQueryBuilder = M2RelatedBuilder;
 
-      mockKnexQueryResult = [{id: 1, m1Id: 2, m3Id: 3}];
+      mockKnexQueryResults = [
+        [{id: 1, m1Id: 2, m3Id: 3}],
+        [{id: 1, m1Id: 2, m3Id: 3}],
+        [{id: 1, m1Id: 2, m3Id: 3}]
+      ];
 
       var filter1Check = false;
       var filter2Check = false;
@@ -1140,6 +1147,93 @@ describe('QueryBuilder', function () {
 
           expect(filter1Check).to.equal(true);
           expect(filter2Check).to.equal(true);
+
+          done();
+        })
+        .catch(done);
+    });
+
+    it("$afterGet should be called after relations have been fetched", function (done) {
+      var M1 = Model.extend(function M1() {
+        Model.apply(this, arguments);
+      });
+
+      M1.prototype.$afterGet = function () {
+        this.ids = _.map(this.someRel, 'id');
+      };
+
+      M1.tableName = 'M1';
+      M1.knex(mockKnex);
+
+      M1.relationMappings = {
+        someRel: {
+          relation: Model.HasManyRelation,
+          modelClass: M1,
+          join: {
+            from: 'M1.id',
+            to: 'M1.m1Id'
+          }
+        }
+      };
+
+      mockKnexQueryResults = [
+        [{id: 1}, {id: 2}],
+        [{id: 3, m1Id: 1}, {id: 4, m1Id: 1}, {id: 5, m1Id: 2}, {id: 6, m1Id: 2}],
+        [{id: 7, m1Id: 3}, {id: 8, m1Id: 3}, {id: 9, m1Id: 4}, {id: 10, m1Id: 4},  {id: 11, m1Id: 5}, {id: 12, m1Id: 5},  {id: 13, m1Id: 6}, {id: 14, m1Id: 6}]
+      ];
+
+      QueryBuilder
+        .forClass(M1)
+        .eager('someRel.someRel')
+        .then(function (x) {
+          expect(executedQueries).to.eql([
+            'select * from "M1"',
+            'select * from "M1" where "M1"."m1Id" in (\'1\', \'2\')',
+            'select * from "M1" where "M1"."m1Id" in (\'3\', \'4\', \'5\', \'6\')'
+          ]);
+
+          expect(x).to.eql([{
+            "id": 1,
+            "ids": [3, 4],
+            "someRel": [{
+              "id": 3,
+              "m1Id": 1,
+              "ids": [7, 8],
+              "someRel": [
+                {"id": 7, "m1Id": 3, "ids": []},
+                {"id": 8, "m1Id": 3, "ids": []}
+              ]
+            }, {
+              "id": 4,
+              "m1Id": 1,
+              "ids": [9, 10],
+              "someRel": [
+                {"id": 9, "m1Id": 4, "ids": []},
+                {"id": 10, "m1Id": 4, "ids": []}
+              ]
+            }]
+          },
+          {
+            "id": 2,
+            "ids": [5, 6],
+            "someRel": [{
+              "id": 5,
+              "m1Id": 2,
+              "ids": [11, 12],
+              "someRel": [
+                {"id": 11, "m1Id": 5, "ids": []},
+                {"id": 12, "m1Id": 5, "ids": []}
+              ]
+            }, {
+              "id": 6,
+              "m1Id": 2,
+              "ids": [13, 14],
+              "someRel": [
+                {"id": 13, "m1Id": 6, "ids": []},
+                {"id": 14, "m1Id": 6, "ids": []}
+              ]
+            }]
+          }]);
 
           done();
         })

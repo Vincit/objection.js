@@ -6,7 +6,6 @@ import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
 import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
 import ValidationError from '../ValidationError';
-import EagerFetcher from '../queryBuilder/EagerFetcher';
 import deprecated from '../utils/decorators/deprecated';
 import memoize from '../utils/decorators/memoize';
 
@@ -580,18 +579,13 @@ export default class Model extends ModelBase {
    * @returns {Promise}
    */
   static loadRelated($models, expression, filters) {
-    if (!(expression instanceof RelationExpression)) {
-      expression = RelationExpression.parse(expression);
-    }
-
-    return new EagerFetcher({
-      modelClass: this,
-      models: this.ensureModelArray($models),
-      eager: expression,
-      filters: filters
-    }).fetch().then(function (models) {
-      return _.isArray($models) ? models : models[0];
-    });
+    return this
+      .query()
+      .resolve(this.ensureModelArray($models))
+      .eager(expression, filters)
+      .then(function (models) {
+        return _.isArray($models) ? models : models[0];
+      });
   }
 
   /**
