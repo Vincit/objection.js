@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.4
+
+### What's new
+
+* bugfix: insertWithRelated now works with `additionalProperties = false` in `jsonSchema`
+* Add updateAndFetch and patchAndFetch methods for `$query`
+* bugfix: afterGet was not called for nested models in eager query
+* Use ajv instad of tv4 for json schema validation
+
 ## 0.5.3
 
 ### What's new

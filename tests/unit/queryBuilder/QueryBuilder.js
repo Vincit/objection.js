@@ -11,7 +11,7 @@ var _ = require('lodash')
   , QueryBuilderOperation = objection.QueryBuilderOperation
   , RelationExpression = objection.RelationExpression;
 
-describe('QueryBuilder fuck fuckj', function () {
+describe('QueryBuilder', function () {
   var mockKnexQueryResults = [];
   var mockKnexQueryResultIndex = 0;
   var executedQueries = [];
