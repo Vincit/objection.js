@@ -7325,6 +7325,95 @@ as single database rows.</p>
 <p>If this property is left unset all properties declared as objects or arrays in the
 <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> are implicitly added to this list.</p>
 
+<h4 id="virtualattributes">virtualAttributes</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">virtualAttributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'fullName'</span><span class="p">,</span> <span class="s1">'isFemale'</span><span class="p">];</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fullName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">Object</span><span class="p">.</span><span class="nx">defineProperty</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">,</span> <span class="s2">"isFemale"</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">get</span><span class="p">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">gender</span> <span class="o">===</span> <span class="s1">'female'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">fromJson</span><span class="p">({</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Aniston'</span><span class="p">,</span>
+  <span class="na">gender</span><span class="p">:</span> <span class="s1">'female'</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">());</span>
+<span class="c1">// --&gt; {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">virtualAttributes</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">'fullName'</span><span class="p">,</span> <span class="s1">'isFemale'</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">firstName</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">}</span><span class="err">`</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">get</span> <span class="nx">isFemale</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">gender</span> <span class="o">===</span> <span class="s1">'female'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">fromJson</span><span class="p">({</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Aniston'</span><span class="p">,</span>
+  <span class="na">gender</span><span class="p">:</span> <span class="s1">'female'</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">());</span>
+<span class="c1">// --&gt; {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">virtualAttributes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'fullName'</span><span class="p">,</span> <span class="s1">'isFemale'</span><span class="p">];</span>
+
+  <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="err">`</span><span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">firstName</span><span class="p">}</span> <span class="nx">$</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">}</span><span class="err">`</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">get</span> <span class="nx">isFemale</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">gender</span> <span class="o">===</span> <span class="s1">'female'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">fromJson</span><span class="p">({</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Aniston'</span><span class="p">,</span>
+  <span class="na">gender</span><span class="p">:</span> <span class="s1">'female'</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">());</span>
+<span class="c1">// --&gt; {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}</span>
+</code></pre>
+
+<p>Getters and methods listed here are serialized with real properties when <code class="prettyprint">toJSON</code> is called.</p>
+
+<p>The virtual values are not written to database. Only the &ldquo;external&rdquo; JSON format will contain them.</p>
+
 <h4 id="uidprop">uidProp</h4>
 
 <blockquote>
@@ -9390,6 +9479,14 @@ the <code class="prettyprint">^</code> character. For example <code class="prett
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-5-5">0.5.5</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><a href="#virtualattributes">Virtual attributes</a></li>
+</ul>
 
 <h2 id="0-5-4">0.5.4</h2>
 
