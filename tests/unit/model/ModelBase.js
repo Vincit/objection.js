@@ -751,6 +751,54 @@ describe('ModelBase', function () {
 
   });
 
+  describe('virtualAttributes', function () {
+    var Model;
+
+    beforeEach(function () {
+      Model = createModelClass();
+    });
+
+    it('should include getters', function () {
+      Object.defineProperty(Model.prototype, "foo", {
+        get: function () {
+          return this.a + this.b;
+        }
+      });
+
+      Object.defineProperty(Model.prototype, "bar", {
+        get: function () {
+          return this.a + this.b;
+        }
+      });
+
+      Model.virtualAttributes = ['foo'];
+
+      expect(Model.fromJson({a: 100, b: 10}).toJSON()).to.eql({
+        a: 100,
+        b: 10,
+        foo: 110
+      })
+    });
+
+    it('should include methods', function () {
+      Model.prototype.foo = function () {
+        return this.a + this.b;
+      };
+
+      Model.prototype.bar = function () {
+        return this.a + this.b;
+      };
+
+      Model.virtualAttributes = ['foo'];
+
+      expect(Model.fromJson({a: 100, b: 10}).toJSON()).to.eql({
+        a: 100,
+        b: 10,
+        foo: 110
+      })
+    });
+  });
+
   function createModelClass(proto, staticStuff) {
     function Model() {
       ModelBase.apply(this, arguments);

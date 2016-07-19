@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.5
+
+### What's new
+
+* [Virtual attributes](#virtualattributes)
+
 ## 0.5.4
 
 ### What's new

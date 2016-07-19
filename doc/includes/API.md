@@ -4535,6 +4535,97 @@ If this property is left unset all properties declared as objects or arrays in t
 
 
 
+#### virtualAttributes
+
+> ES5:
+
+```js
+function Person() {
+  Model.apply(this, arguments);
+}
+
+Model.extend(Person);
+
+Person.virtualAttributes = ['fullName', 'isFemale'];
+
+Person.prototype.fullName = function () {
+  return this.firstName + ' ' + this.lastName;
+}
+
+Object.defineProperty(Person.prototype, "isFemale", {
+  get: function () {
+    return this.gender === 'female';
+  }
+});
+
+var person = Person.fromJson({
+  firstName: 'Jennifer',
+  lastName: 'Aniston',
+  gender: 'female'
+});
+
+console.log(person.toJSON());
+// --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
+```
+
+> ES6:
+
+```js
+class Person extends Model {
+  static get virtualAttributes() {
+    return ['fullName', 'isFemale'];
+  }
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  get isFemale() {
+    return this.gender === 'female';
+  }
+}
+
+var person = Person.fromJson({
+  firstName: 'Jennifer',
+  lastName: 'Aniston',
+  gender: 'female'
+});
+
+console.log(person.toJSON());
+// --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
+```
+
+> ES7:
+
+```js
+class Person extends Model {
+  static virtualAttributes = ['fullName', 'isFemale'];
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  get isFemale() {
+    return this.gender === 'female';
+  }
+}
+
+var person = Person.fromJson({
+  firstName: 'Jennifer',
+  lastName: 'Aniston',
+  gender: 'female'
+});
+
+console.log(person.toJSON());
+// --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
+```
+
+Getters and methods listed here are serialized with real properties when `toJSON` is called.
+
+The virtual values are not written to database. Only the "external" JSON format will contain them.
+
+
+
 
 #### uidProp
 

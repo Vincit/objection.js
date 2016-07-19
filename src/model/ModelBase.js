@@ -24,6 +24,11 @@ export default class ModelBase {
   static jsonSchema = null;
 
   /**
+   * @type {Array.<string>}
+   */
+  static virtualAttributes = null;
+
+  /**
    * @param {Object} jsonSchema
    * @param {Object} json
    * @param {ModelOptions=} options
@@ -505,22 +510,38 @@ function toJsonImpl(model, createDbJson, omit, pick) {
   }
 
   _.each(model, (value, key) => {
-    if (key.charAt(0) !== '$'
-      && !_.isFunction(value)
-      && !_.isUndefined(value)
-      && (!omit || !omit[key])
-      && (!pick || pick[key])
-      && (!omitFromJson || !contains(omitFromJson, key))) {
-
-      if (_.isObject(value)) {
-        json[key] = toJsonObject(value, createDbJson);
-      } else {
-        json[key] = value;
-      }
-    }
+    assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson);
   });
 
+  if (!createDbJson && model.constructor.virtualAttributes) {
+    _.each(model.constructor.virtualAttributes, key => {
+      let value = model[key];
+
+      if (_.isFunction(value)) {
+        value = value.call(model);
+      }
+
+      assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson);
+    });
+  }
+
   return json;
+}
+
+function assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson) {
+  if (key.charAt(0) !== '$'
+    && !_.isFunction(value)
+    && !_.isUndefined(value)
+    && (!omit || !omit[key])
+    && (!pick || pick[key])
+    && (!omitFromJson || !contains(omitFromJson, key))) {
+
+    if (_.isObject(value)) {
+      json[key] = toJsonObject(value, createDbJson);
+    } else {
+      json[key] = value;
+    }
+  }
 }
 
 function toJsonObject(value, createDbJson) {
