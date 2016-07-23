@@ -191,7 +191,7 @@ export default class ModelBase {
    * @returns {ModelBase}
    */
   $set(obj) {
-    _.each(obj, (value, key) => {
+    _.forOwn(obj, (value, key) => {
       if (key.charAt(0) !== '$' && !_.isFunction(value)) {
         this[key] = value;
       }
@@ -281,7 +281,7 @@ export default class ModelBase {
   $clone() {
     const clone = new this.constructor();
 
-    _.each(this, (value, key) => {
+    _.forOwn(this, (value, key) => {
       if (_.isObject(value)) {
         clone[key] = cloneObject(value);
       } else {
@@ -504,12 +504,12 @@ function toJsonImpl(model, createDbJson, omit, pick) {
 
   if (createDbJson) {
     // If creating a database json object, restore the query properties.
-    _.each(model.$stashedQueryProps(), (query, key) => {
+    _.forOwn(model.$stashedQueryProps(), (query, key) => {
       json[key] = query;
     });
   }
 
-  _.each(model, (value, key) => {
+  _.forOwn(model, (value, key) => {
     assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson);
   });
 
@@ -583,7 +583,7 @@ function cloneArray(value) {
 function omitObject(model, keyObj) {
   const ModelClass = model.constructor;
 
-  _.each(keyObj, (value, key) => {
+  _.forOwn(keyObj, (value, key) => {
     if (value && key.charAt(0) !== '$' && _.has(model, key)) {
       ModelClass.omitImpl(model, key);
     }
@@ -603,7 +603,7 @@ function omitArray(model, keys) {
 function pickObject(model, keyObj) {
   const ModelClass = model.constructor;
 
-  _.each(model, (value, key) => {
+  _.forOwn(model, (value, key) => {
     if (key.charAt(0) !== '$' && !keyObj[key]) {
       ModelClass.omitImpl(model, key);
     }
@@ -613,7 +613,7 @@ function pickObject(model, keyObj) {
 function pickArray(model, keys) {
   const ModelClass = model.constructor;
 
-  _.each(model, (value, key) => {
+  _.forOwn(model, (value, key) => {
     if (key.charAt(0) !== '$' && !contains(keys, key)) {
       ModelClass.omitImpl(model, key);
     }

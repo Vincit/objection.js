@@ -622,7 +622,7 @@ export default class Model extends ModelBase {
     if (!this.jsonAttributes && this.jsonSchema) {
       this.jsonAttributes = [];
 
-      _.each(this.jsonSchema.properties, (prop, propName) => {
+      _.forOwn(this.jsonSchema.properties, (prop, propName) => {
         var types = _.compact(ensureArray(prop.type));
 
         if (types.length === 0 && _.isArray(prop.anyOf)) {

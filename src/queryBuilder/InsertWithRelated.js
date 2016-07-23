@@ -176,7 +176,7 @@ export default class InsertWithRelated {
     }
 
     // Remove duplicates.
-    _.each(batch, tableInsertion => {
+    _.forOwn(batch, tableInsertion => {
       if (tableInsertion.models.length) {
         let keys = _.keys(tableInsertion.models[0]);
         tableInsertion.models = _.uniqBy(tableInsertion.models, model => model.$values(keys).join());
@@ -231,7 +231,7 @@ export default class InsertWithRelated {
         let actualNode = getNode(this.graph.nodesById, ref);
         let relations = actualNode.modelClass.getRelations();
 
-        _.each(actualNode.model, (value, key) => {
+        _.forOwn(actualNode.model, (value, key) => {
           if (!getRelation(relations, key) && !_.isFunction(value)) {
             refNode.model[key] = value;
           }
@@ -491,7 +491,7 @@ DependencyGraph.prototype.createNonRelationDepsForObject = function (obj, node, 
   let isModel = obj instanceof Model;
   let self = this;
 
-  _.each(obj, function (value, key) {
+  _.forOwn(obj, function (value, key) {
     if (isModel && getRelation(relations, key)) {
       // Don't traverse the relations of model instances.
       return;

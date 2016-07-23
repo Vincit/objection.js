@@ -108,4 +108,42 @@ module.exports = function (session) {
     });
   }
 
+  describe('model with `length` property', function () {
+    var TestModel;
+
+    before(function () {
+      return session.knex.schema
+        .dropTableIfExists('model_with_length_test')
+        .createTable('model_with_length_test', function (table) {
+          table.increments('id');
+          table.integer('length');
+        });
+    });
+
+    after(function () {
+      return session.knex.schema.dropTableIfExists('model_with_length_test');
+    });
+
+    before(function () {
+      TestModel = function TestModel() {
+        Model.apply(this, arguments);
+      };
+
+      Model.extend(TestModel);
+
+      TestModel.tableName = 'model_with_length_test';
+      TestModel.knex(session.knex);
+    });
+
+    it('should insert', function () {
+      return TestModel.query().insert({length: 10}).then(function (model) {
+        expect(model).to.eql({id: 1, length: 10});
+        return session.knex(TestModel.tableName);
+      }).then(function (rows) {
+        expect(rows.length).to.equal(1);
+        expect(rows[0]).to.eql({id: 1, length: 10});
+      });
+    });
+  });
+
 };

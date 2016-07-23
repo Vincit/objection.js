@@ -144,7 +144,7 @@ export default class RelationExpression {
   }
 
   forEachChild(cb) {
-    _.each(this.children, (child, childName) => {
+    _.forOwn(this.children, (child, childName) => {
       if (!ALL_RECURSIVE_REGEX.test(childName) && !RECURSIVE_REGEX.test(childName)) {
         cb(child, childName);
       }
@@ -191,7 +191,7 @@ export default class RelationExpression {
     if (path.numChildren == 0) {
       expressions.push(target);
     } else {
-      _.each(path.children, child => {
+      _.forOwn(path.children, child => {
         let targetChild = target.children[child.name];
 
         if (targetChild) {

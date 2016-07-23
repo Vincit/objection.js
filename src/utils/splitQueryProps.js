@@ -24,7 +24,7 @@ export default function (ModelClass, obj) {
 function split(obj) {
   let ret = {json: {}, query: {}};
 
-  _.each(obj, (value, key) => {
+  _.forOwn(obj, (value, key) => {
     if (value instanceof KnexQueryBuilder || value instanceof KnexRaw) {
       ret.query[key] = value;
     } else if (value instanceof QueryBuilderBase) {

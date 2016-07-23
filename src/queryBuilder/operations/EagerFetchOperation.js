@@ -39,7 +39,7 @@ export default class EagerFetchOperation extends QueryBuilderOperation {
       }
     });
 
-    _.each(builder.modelClass().getRelations(), relation => {
+    _.forOwn(builder.modelClass().getRelations(), relation => {
       let childExpression = this.expression.childExpression(relation.name);
 
       if (childExpression) {
