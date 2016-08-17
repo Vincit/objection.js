@@ -101,7 +101,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\')');
+        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."ownerId" in (\'666\') and "name" = \'Teppo\' or "age" > \'60\'');
       });
     });
 
@@ -141,7 +141,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'),(\'11\', \'33\'))');
+        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'),(\'11\', \'33\')) and "name" = \'Teppo\' or "age" > \'60\'');
       });
     });
 
@@ -181,7 +181,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\', \'667\')');
+        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."ownerId" in (\'666\', \'667\') and "name" = \'Teppo\' or "age" > \'60\'');
       });
     });
 
@@ -213,7 +213,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select "name" from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\')');
+        expect(executedQueries[0]).to.equal('select "name" from "RelatedModel" where "RelatedModel"."ownerId" in (\'666\') and "name" = \'Teppo\' or "age" > \'60\'');
       });
     });
 
@@ -246,7 +246,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "name" = \'Teppo\' or "age" > \'60\' and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'foo\'');
+        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'foo\' and "name" = \'Teppo\' or "age" > \'60\'');
       });
     });
 
@@ -413,7 +413,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."ownerId" in (\'666\') and "gender" = \'male\' and "thingy" is not null');
       });
     });
 
@@ -438,7 +438,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'))');
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\')) and "gender" = \'male\' and "thingy" is not null');
       });
     });
 
@@ -460,7 +460,7 @@ describe('HasManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."ownerId" in (\'666\') and "gender" = \'male\' and "thingy" is not null');
         });
     });
 
@@ -484,7 +484,7 @@ describe('HasManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\' and "gender" = \'male\' and "thingy" is not null');
         });
     });
 
@@ -513,7 +513,7 @@ describe('HasManyRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+        expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."ownerId" in (\'666\') and "gender" = \'male\' and "thingy" is not null');
       });
     });
 
@@ -544,7 +544,7 @@ describe('HasManyRelation', function () {
         .then(function (numUpdated) {
           expect(numUpdated).to.equal(42);
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."ownerId" in (\'666\') and "gender" = \'male\' and "thingy" is not null');
         });
     });
 
@@ -599,7 +599,7 @@ describe('HasManyRelation', function () {
         .select('shouldBeIgnored')
         .then(function () {
           expect(executedQueries).to.have.length(1);
-          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql('update "RelatedModel" set "a" = \'str1\' where "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\' and "gender" = \'male\' and "thingy" is not null');
         });
     });
   });
@@ -625,7 +625,7 @@ describe('HasManyRelation', function () {
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\')');
+        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "RelatedModel"."ownerId" in (\'666\') and "gender" = \'male\' and "thingy" is not null');
       });
     });
 
@@ -648,7 +648,7 @@ describe('HasManyRelation', function () {
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\'))');
+        expect(executedQueries[0]).to.eql('delete from "RelatedModel" where ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((\'11\', \'22\')) and "gender" = \'male\' and "thingy" is not null');
       });
     });
 
@@ -668,7 +668,7 @@ describe('HasManyRelation', function () {
         .then(function (result) {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
-          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "gender" = \'male\' and "thingy" is not null and "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\'');
+          expect(executedQueries[0]).to.eql('delete from "RelatedModel" where "RelatedModel"."ownerId" in (\'666\') and "someColumn" = \'100\' and "gender" = \'male\' and "thingy" is not null');
         });
     });
 

@@ -968,6 +968,43 @@ describe('QueryBuilder', function () {
     expect(builder._explicitRejectValue).to.equal(null);
   });
 
+  it("joinRelation should add join clause to correct place", function (done) {
+    var M1 = Model.extend(function M1() {
+      Model.apply(this, arguments);
+    });
+
+    M1.tableName = 'M1';
+    M1.knex(mockKnex);
+
+    var M2 = Model.extend(function M2() {
+      Model.apply(this, arguments);
+    });
+
+    M2.tableName = 'M2';
+    M2.knex(mockKnex);
+
+    M2.relationMappings = {
+      m1: {
+        relation: Model.HasManyRelation,
+        modelClass: M1,
+        join: {
+          from: 'M2.id',
+          to: 'M1.m2Id'
+        }
+      }
+    };
+
+    M2
+      .query()
+      .joinRelation('m1', {alias: 'm'})
+      .join('M1', 'M1.id', 'M2.m1Id')
+      .then(function () {
+        expect(executedQueries[0]).to.equal('select * from "M2" inner join "M1" as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"');
+        done();
+      })
+      .catch(done);
+  });
+
   describe('eager and allowEager' , function () {
 
     it("allowEager('a').eager('a(f1)') should be ok", function (done) {

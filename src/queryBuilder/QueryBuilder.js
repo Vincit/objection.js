@@ -717,7 +717,9 @@ export default class QueryBuilder extends QueryBuilderBase {
   withSchema(schema) {
     this.internalContext().onBuild.push(builder => {
       if (!builder.has(/withSchema/)) {
-        builder.callKnexQueryBuilderOperation('withSchema', [schema]);
+        // Need to push this operation to the front because knex doesn't use the
+        // schema for operations called before `withSchema`.
+        builder.callKnexQueryBuilderOperation('withSchema', [schema], true);
       }
     });
 

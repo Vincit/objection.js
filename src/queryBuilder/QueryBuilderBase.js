@@ -183,8 +183,8 @@ export default class QueryBuilderBase {
    * @param {Array.<*>} args
    * @returns {QueryBuilderBase}
    */
-  callKnexQueryBuilderOperation(methodName, args) {
-    return this.callQueryBuilderOperation(new KnexOperation(this, methodName), args);
+  callKnexQueryBuilderOperation(methodName, args, pushFront) {
+    return this.callQueryBuilderOperation(new KnexOperation(this, methodName), args, pushFront);
   }
 
   /**
@@ -217,8 +217,28 @@ export default class QueryBuilderBase {
    * @protected
    */
   buildInto(knexBuilder) {
-    _.each(this._operations, method => method.onBeforeBuild(this));
-    _.each(this._operations, method => method.onBuild(knexBuilder, this));
+    let i = 0;
+
+    while (i < this._operations.length) {
+      let op = this._operations[i];
+      let ln = this._operations.length;
+
+      op.onBeforeBuild(this);
+      // onBeforeBuild may call methods that add more operations. If the
+      // this was the case, move the operations to be executed next.
+      if (ln != this._operations.length) {
+        let newOps = this._operations.splice(ln, this._operations.length - ln);
+        this._operations.splice(i + 1, 0, ...newOps);
+      }
+
+      ++i;
+    }
+
+    // onBuild operations should never add new operations. They should only call
+    // methods on the knex query builder.
+    for (i = 0; i < this._operations.length; ++i) {
+      this._operations[i].onBuild(knexBuilder, this)
+    }
 
     return knexBuilder;
   }

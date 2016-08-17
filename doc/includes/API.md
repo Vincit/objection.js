@@ -4969,6 +4969,7 @@ var knex = require('knex')({
 Model.knex(knex);
 knex = Model.knex();
 ```
+
 Get/Set the knex instance for this model class.
 
 Subclasses inherit the connection. A system-wide knex instance can thus be set by calling
@@ -6032,6 +6033,20 @@ Type|Description
 #### $traverse
 
 Shortcut for [`Model.traverse(filterConstructor, this, callback)`](#traverse-2212).
+
+
+
+
+#### $knex
+
+Shortcut for [`return this.constructor.knex()`](#knex).
+
+
+
+
+#### $transaction
+
+Shortcut for [`return this.constructor.knex()`](#knex).
 
 
 

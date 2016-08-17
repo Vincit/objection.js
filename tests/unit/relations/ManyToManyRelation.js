@@ -399,9 +399,9 @@ describe('ManyToManyRelation', function () {
           'select "RelatedModel".*, "JoinTable"."extra1", "JoinTable"."extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-          'where "name" = \'Teppo\'',
-          'or "age" > \'60\'',
-          'and "JoinTable"."ownerId" in (\'666\')'
+          'where "JoinTable"."ownerId" in (\'666\')',
+          'and "name" = \'Teppo\'',
+          'or "age" > \'60\''
         ].join(' '));
       });
     });
@@ -437,9 +437,9 @@ describe('ManyToManyRelation', function () {
           'select "RelatedModel".*, "JoinTable"."ownerAId" as "objectiontmpjoin0", "JoinTable"."ownerBId" as "objectiontmpjoin1"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedCId" = "RelatedModel"."cid" and "JoinTable"."relatedDId" = "RelatedModel"."did"',
-          'where "name" = \'Teppo\'',
-          'or "age" > \'60\'',
-          'and ("JoinTable"."ownerAId", "JoinTable"."ownerBId") in ((\'11\', \'22\'))'
+          'where ("JoinTable"."ownerAId", "JoinTable"."ownerBId") in ((\'11\', \'22\'))',
+          'and "name" = \'Teppo\'',
+          'or "age" > \'60\''
         ].join(' '));
       });
     });
@@ -484,9 +484,9 @@ describe('ManyToManyRelation', function () {
           'select "RelatedModel".*, "JoinTable"."extra1", "JoinTable"."extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-          'where "name" = \'Teppo\'',
-          'or "age" > \'60\'',
-          'and "JoinTable"."ownerId" in (\'666\', \'667\')'
+          'where "JoinTable"."ownerId" in (\'666\', \'667\')',
+          'and "name" = \'Teppo\'',
+          'or "age" > \'60\''
         ].join(' '));
       });
     });
@@ -531,9 +531,9 @@ describe('ManyToManyRelation', function () {
           'select "RelatedModel".*, "JoinTable"."ownerAId" as "objectiontmpjoin0", "JoinTable"."ownerBId" as "objectiontmpjoin1"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedCId" = "RelatedModel"."cid" and "JoinTable"."relatedDId" = "RelatedModel"."did"',
-          'where "name" = \'Teppo\'',
-          'or "age" > \'60\'',
-          'and ("JoinTable"."ownerAId", "JoinTable"."ownerBId") in ((\'11\', \'22\'),(\'11\', \'33\'))'
+          'where ("JoinTable"."ownerAId", "JoinTable"."ownerBId") in ((\'11\', \'22\'),(\'11\', \'33\'))',
+          'and "name" = \'Teppo\'',
+          'or "age" > \'60\''
         ].join(' '));
       });
     });
@@ -567,12 +567,12 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal([
-          'select "name", "JoinTable"."ownerId" as "objectiontmpjoin0"',
+          'select "JoinTable"."ownerId" as "objectiontmpjoin0", "name"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-          'where "name" = \'Teppo\'',
-          'or "age" > \'60\'',
-          'and "JoinTable"."ownerId" in (\'666\')'
+          'where "JoinTable"."ownerId" in (\'666\')',
+          'and "name" = \'Teppo\'',
+          'or "age" > \'60\''
         ].join(' '));
       });
     });
@@ -610,10 +610,10 @@ describe('ManyToManyRelation', function () {
           'select "RelatedModel".*, "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
-          'where "name" = \'Teppo\'',
-          'or "age" > \'60\'',
-          'and "JoinTable"."ownerId" in (\'666\')',
-          'and "someColumn" = \'100\''
+          'where "JoinTable"."ownerId" in (\'666\')',
+          'and "someColumn" = \'100\'',
+          'and "name" = \'Teppo\'',
+          'or "age" > \'60\''
         ].join(' '));
       });
     });
@@ -915,11 +915,10 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql([
           'update "RelatedModel" set "a" = \'str1\'',
-          'where "gender" = \'male\' and',
-          '"thingy" is not null and',
-          '"RelatedModel"."rid" in',
-            '(select "JoinTable"."relatedId" from "JoinTable"',
-            'where "JoinTable"."ownerId" = \'666\')'
+          'where "RelatedModel"."rid" in',
+          '(select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')',
+          'and "gender" = \'male\'',
+          'and "thingy" is not null'
         ].join(' '));
       });
     });
@@ -947,11 +946,11 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql([
           'update "RelatedModel" set "a" = \'str1\'',
-          'where "gender" = \'male\'',
-          'and "thingy" is not null',
-          'and ("RelatedModel"."cid","RelatedModel"."did") in',
+          'where ("RelatedModel"."cid","RelatedModel"."did") in',
             '(select "JoinTable"."relatedCId", "JoinTable"."relatedDId" from "JoinTable"',
-            'where "JoinTable"."ownerAId" = \'11\' and "JoinTable"."ownerBId" = \'22\')'
+            'where "JoinTable"."ownerAId" = \'11\' and "JoinTable"."ownerBId" = \'22\')',
+          'and "gender" = \'male\'',
+          'and "thingy" is not null'
         ].join(' '));
       });
     });
@@ -976,11 +975,11 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "gender" = \'male\' and',
-            '"thingy" is not null and',
-            '"RelatedModel"."rid" in',
+            'where "RelatedModel"."rid" in',
               '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
+              'where "JoinTable"."ownerId" = \'666\')',
+            'and "gender" = \'male\'',
+            'and "thingy" is not null'
           ].join(' '));
         });
     });
@@ -1003,12 +1002,12 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "gender" = \'male\'',
-            'and "thingy" is not null and',
-            '"RelatedModel"."rid" in',
+            'where "RelatedModel"."rid" in',
               '(select "JoinTable"."relatedId" from "JoinTable"',
               'where "JoinTable"."ownerId" = \'666\')',
-            'and "someColumn" = \'100\''
+            'and "someColumn" = \'100\'',
+            'and "gender" = \'male\'',
+            'and "thingy" is not null'
           ].join(' '));
         });
     });
@@ -1040,11 +1039,9 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql([
           'update "RelatedModel" set "a" = \'str1\'',
-          'where "gender" = \'male\' and',
-          '"thingy" is not null and',
-          '"RelatedModel"."rid" in',
-            '(select "JoinTable"."relatedId" from "JoinTable"',
-            'where "JoinTable"."ownerId" = \'666\')'
+          'where "RelatedModel"."rid" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')',
+          'and "gender" = \'male\'',
+          'and "thingy" is not null'
         ].join(' '));
       });
     });
@@ -1079,11 +1076,9 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "gender" = \'male\' and',
-            '"thingy" is not null and',
-            '"RelatedModel"."rid" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')'
+            'where "RelatedModel"."rid" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')',
+            'and "gender" = \'male\'',
+            'and "thingy" is not null'
           ].join(' '));
         });
     });
@@ -1147,12 +1142,10 @@ describe('ManyToManyRelation', function () {
           expect(executedQueries).to.have.length(1);
           expect(executedQueries[0]).to.eql([
             'update "RelatedModel" set "a" = \'str1\'',
-            'where "gender" = \'male\'',
-            'and "thingy" is not null and',
-            '"RelatedModel"."rid" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')',
-            'and "someColumn" = \'100\''
+            'where "RelatedModel"."rid" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')',
+            'and "someColumn" = \'100\'',
+            'and "gender" = \'male\'',
+            'and "thingy" is not null'
           ].join(' '));
         });
     });
@@ -1182,11 +1175,9 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql([
           'delete from "RelatedModel"',
-          'where "gender" = \'male\'',
-          'and "thingy" is not null',
-          'and "RelatedModel"."rid" in',
-            '(select "JoinTable"."relatedId" from "JoinTable"',
-            'where "JoinTable"."ownerId" = \'666\')'
+          'where "RelatedModel"."rid" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')',
+          'and "gender" = \'male\'',
+          'and "thingy" is not null'
         ].join(' '));
       });
     });
@@ -1212,11 +1203,9 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql([
           'delete from "RelatedModel"',
-          'where "gender" = \'male\'',
-          'and "thingy" is not null',
-          'and ("RelatedModel"."cid","RelatedModel"."did") in',
-            '(select "JoinTable"."relatedCId", "JoinTable"."relatedDId" from "JoinTable"',
-            'where "JoinTable"."ownerAId" = \'11\' and "JoinTable"."ownerBId" = \'22\')'
+          'where ("RelatedModel"."cid","RelatedModel"."did") in (select "JoinTable"."relatedCId", "JoinTable"."relatedDId" from "JoinTable" where "JoinTable"."ownerAId" = \'11\' and "JoinTable"."ownerBId" = \'22\')',
+          'and "gender" = \'male\'',
+          'and "thingy" is not null'
         ].join(' '));
       });
     });
@@ -1239,12 +1228,10 @@ describe('ManyToManyRelation', function () {
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql([
             'delete from "RelatedModel"',
-            'where "gender" = \'male\'',
+            'where "RelatedModel"."rid" in (select "JoinTable"."relatedId" from "JoinTable" where "JoinTable"."ownerId" = \'666\')',
+            'and "someColumn" = \'100\'',
+            'and "gender" = \'male\'',
             'and "thingy" is not null',
-            'and "RelatedModel"."rid" in',
-              '(select "JoinTable"."relatedId" from "JoinTable"',
-              'where "JoinTable"."ownerId" = \'666\')',
-            'and "someColumn" = \'100\''
           ].join(' '));
         });
     });
