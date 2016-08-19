@@ -2871,21 +2871,21 @@ Person
   });
 ```
 
-> Filters can also be registered using the [`filterEager`](#filtereager) method:
+> Filters can also be registered using the [`modifyEager`](#modifyeager) method:
 
 ```js
 Person
   .query()
   .eager('children.[pets, movies]')
-  .filterEager('children', function (builder) {
+  .modifyEager('children', function (builder) {
     // Order children by age.
     builder.orderBy('age');
   })
-  .filterEager('children.[pets, movies]', function (builder) {
+  .modifyEager('children.[pets, movies]', function (builder) {
     // Only select `pets` and `movies` whose id > 10 for the children.
     builder.where('id', '>', 10);
   })
-  .filterEager('children.movies]', function (builder) {
+  .modifyEager('children.movies]', function (builder) {
     // Only select 100 first movies for the children.
     builder.limit(100);
   })
@@ -2973,15 +2973,15 @@ Type|Description
 
 
 
-#### filterEager
+#### modifyEager
 
 ```js
-var builder = queryBuilder.filterEager(pathExpression, filterFunc);
+var builder = queryBuilder.modifyEager(pathExpression, modifier);
 ```
 
-Adds a filter to the eager query.
+Can be used to modify the eager queries.
 
-The `pathExpression` is a relation expression that specifies the queries for which the filter is given.
+The `pathExpression` is a relation expression that specifies the queries for which the modifier is given.
 
 > The following query would filter out the children's pets that
 > are <= 10 years old:
@@ -2990,7 +2990,7 @@ The `pathExpression` is a relation expression that specifies the queries for whi
 Person
   .query()
   .eager('[children.[pets, movies], movies]')
-  .filterEager('children.pets', builder => {
+  .modifyEager('children.pets', builder => {
     builder.where('age', '>', 10);
   })
   .then(function () {
@@ -3005,7 +3005,7 @@ Person
 Person
   .query()
   .eager('[children.[pets, movies], movies]')
-  .filterEager('children.[pets, movies]', builder => {
+  .modifyEager('children.[pets, movies]', builder => {
     builder.orderBy('id');
   })
   .then(function () {
@@ -3019,7 +3019,7 @@ Person
 Person
   .query()
   .eager('[children.[pets, movies], movies]')
-  .filterEager('[children.movies, movies]', builder => {
+  .modifyEager('[children.movies, movies]', builder => {
     builder.where('name', 'like', '%Predator%');
   })
   .then(function () {
@@ -3032,7 +3032,7 @@ Person
 Argument|Type|Description
 --------|----|-------|------------
 pathExpression|string&#124;[`RelationExpression`](#relationexpression)|Expression that specifies the queries for which to give the filter.
-filterFunc|function([`QueryBuilder`](#querybuilder)|The filter function.
+modifier|function([`QueryBuilder`](#querybuilder)|The modifier function.
 
 ##### Return value
 
@@ -3040,6 +3040,12 @@ Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
+
+
+
+#### filterEager
+
+Alias for [modifyEager](#modifyeager).
 
 
 

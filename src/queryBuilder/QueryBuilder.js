@@ -212,16 +212,20 @@ export default class QueryBuilder extends QueryBuilderBase {
 
   /**
    * @param {string|RelationExpression} path
-   * @param {function(QueryBuilder)} filter
+   * @param {function(QueryBuilder)} modifier
    * @returns {QueryBuilder}
    */
-  filterEager(path, filter) {
+  modifyEager(path, modifier) {
     this._eagerFilterExpressions.push({
       path: path,
-      filter: filter
+      filter: modifier
     });
 
     return this;
+  }
+
+  filterEager(...args) {
+    return this.modifyEager(...args);
   }
 
   /**

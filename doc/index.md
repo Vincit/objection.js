@@ -476,13 +476,13 @@ Person
   });
 ```
 
-> Relations can be filtered using the [`filterEager`](#filtereager) method:
+> Relations can be filtered using the [`modifyEager`](#modifyeager) method:
 
 ```js
 Person
   .query()
   .eager('[children.[pets, movies], movies]')
-  .filterEager('children.pets', builder => {
+  .modifyEager('children.pets', builder => {
     // Only select pets older than 10 years old for children.
     builder.where('age', '>', 10);
   })

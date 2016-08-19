@@ -329,13 +329,13 @@ module.exports = function (session) {
         .catch(done);
     });
 
-    describe('QueryBuilder.filterEager', function () {
+    describe('QueryBuilder.modifyEager', function () {
 
       it('should filter the eager query using relation expressions as paths', function () {
         return Model1
           .query()
           .where('id', 1)
-          .filterEager('model1Relation2.model2Relation1', function (builder) {
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
             builder.where('Model1.id', 6);
           })
           .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
@@ -365,7 +365,7 @@ module.exports = function (session) {
           .filterEager('model1Relation2', function (builder) {
             builder.orderBy('id_col');
           })
-          .filterEager('model1Relation2.model2Relation1', function (builder) {
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
             builder.orderBy('id');
           })
           .then(function (model) {
@@ -405,7 +405,7 @@ module.exports = function (session) {
           .filterEager('model1Relation2', function (builder) {
             builder.orderBy('id_col');
           })
-          .filterEager('model1Relation2.model2Relation1', function (builder) {
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
             builder.orderBy('id');
           })
           .then(function (model) {
@@ -448,7 +448,7 @@ module.exports = function (session) {
           .filterEager('model1Relation2', function (builder) {
             builder.orderBy('id_col');
           })
-          .filterEager('model1Relation2.model2Relation1', function (builder) {
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
             builder.orderBy('id');
           })
           .then(function (model) {
@@ -490,7 +490,7 @@ module.exports = function (session) {
           .filterEager('model1Relation2', function (builder) {
             builder.orderBy('id_col');
           })
-          .filterEager('model1Relation2.model2Relation1', function (builder) {
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
             builder.orderBy('id');
           })
           .then(function (model) {
