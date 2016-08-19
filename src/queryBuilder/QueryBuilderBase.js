@@ -260,6 +260,21 @@ export default class QueryBuilderBase {
   /**
    * @returns {QueryBuilderBase}
    */
+  skipUndefined() {
+    this.internalContext().skipUndefined = true;
+    return this;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  shouldSkipUndefined() {
+    return !!this.internalContext().skipUndefined;
+  }
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
   @queryBuilderOperation(KnexOperation)
   insert(...args) {}
 

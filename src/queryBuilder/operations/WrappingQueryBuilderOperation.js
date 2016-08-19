@@ -11,35 +11,36 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
   }
 
   call(builder, args) {
-    if (!wrapArgs(args, builder.knex())) {
-      return false;
+    const skipUndefined = builder.shouldSkipUndefined();
+    const knex = builder.knex();
+
+    for (let i = 0, l = args.length; i < l; ++i) {
+      if (_.isUndefined(args[i])) {
+        if (skipUndefined) {
+          return false;
+        } else {
+          throw new Error(`undefined passed as argument #${l} for '${this.name}' operation`)
+        }
+      } else if (args[i] instanceof QueryBuilderBase) {
+        // Convert QueryBuilderBase instances into knex query builders.
+        args[i] = args[i].build();
+      } else if (_.isArray(args[i])) {
+        if (skipUndefined) {
+          args[i] = _.filter(args[i], it => !_.isUndefined(it));
+        } else if (_.includes(args[i], undefined)) {
+          throw new Error(`undefined passed as an item in argument #${l} for '${this.name}' operation`)
+        }
+      } else if (_.isFunction(args[i])) {
+        // If an argument is a function, knex calls it with a query builder as
+        // first argument (and as `this` context). We wrap the query builder into
+        // a QueryBuilderBase instance.
+        args[i] = wrapFunctionArg(args[i], knex);
+      }
     }
 
     this.args = args;
     return true;
   }
-}
-
-function wrapArgs(args, knex) {
-  for (let i = 0, l = args.length; i < l; ++i) {
-    if (_.isUndefined(args[i])) {
-      // None of the query builder methods should accept undefined. Do nothing if
-      // one of the arguments is undefined. This enables us to do things like
-      // `.where('name', req.query.name)` without checking if req.query has the
-      // property `name`.
-      return false;
-    } else if (args[i] instanceof QueryBuilderBase) {
-      // Convert QueryBuilderBase instances into knex query builders.
-      args[i] = args[i].build();
-    } else if (_.isFunction(args[i])) {
-      // If an argument is a function, knex calls it with a query builder as
-      // first argument (and as `this` context). We wrap the query builder into
-      // a QueryBuilderBase instance.
-      args[i] = wrapFunctionArg(args[i], knex);
-    }
-  }
-
-  return true;
 }
 
 function wrapFunctionArg(func, knex) {

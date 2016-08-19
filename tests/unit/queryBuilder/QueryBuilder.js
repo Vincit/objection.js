@@ -1005,6 +1005,92 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
+  it('undefined values as query builder method arguments should raise an exception', function () {
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .where('id', undefined)
+    }).to.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .orWhere('id', '<', undefined)
+    }).to.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .orWhere('id', undefined, 10)
+    }).to.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .deleteById(undefined)
+    }).to.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .delete()
+        .whereIn('id', undefined)
+    }).to.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .delete()
+        .whereIn('id', [1, undefined, 3])
+    }).to.throwException();
+  });
+
+  it('undefined values as query builder method arguments should be ignored if `skipUndefined` is called', function () {
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .skipUndefined()
+        .where('id', undefined)
+    }).to.not.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .skipUndefined()
+        .orWhere('id', '<', undefined)
+    }).to.not.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .skipUndefined()
+        .orWhere('id', undefined, 10)
+    }).to.not.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .skipUndefined()
+        .deleteById(undefined)
+    }).to.not.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .skipUndefined()
+        .delete()
+        .whereIn('id', undefined)
+    }).to.not.throwException();
+
+    expect(function () {
+      QueryBuilder
+        .forClass(TestModel)
+        .skipUndefined()
+        .delete()
+        .whereIn('id', [1, undefined, 3])
+    }).to.not.throwException();
+  });
+
   describe('eager and allowEager' , function () {
 
     it("allowEager('a').eager('a(f1)') should be ok", function (done) {
