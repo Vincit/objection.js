@@ -12,6 +12,6 @@ export default class ManyToManyUpdateSqliteOperation extends UpdateOperation {
 
   onBeforeBuild(builder) {
     super.onBeforeBuild(builder);
-    this.relation.selectForModifySqlite(builder, this.owner).modify(this.relation.filter);
+    this.relation.selectForModifySqlite(builder, this.owner).modify(this.relation.modify);
   }
 }

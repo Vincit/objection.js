@@ -25,7 +25,7 @@ export default class HasManyUnrelateOperation extends QueryBuilderOperation {
       .patch(patch)
       .copyFrom(builder, /where/i)
       .whereComposite(this.relation.fullRelatedCol(), this.owner.$values(this.relation.ownerProp))
-      .modify(this.relation.filter);
+      .modify(this.relation.modify);
   }
 
   onAfterInternal() {

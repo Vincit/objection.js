@@ -4483,7 +4483,8 @@ Property|Type|Description
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
 modelClass|[`Model`](#model)&#124;string|Constructor of the related model class or an absolute path to a module that exports one.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
-filter|function([`QueryBuilder`](#querybuilder))|Optional filter for the relation. This is called each time the relation is fetched.
+modify|function([`QueryBuilder`](#querybuilder))|Optional modifier for the relation query. This is called each time the relation is fetched.
+filter|function([`QueryBuilder`](#querybuilder))|Alias for modify.
 
 ##### RelationJoin
 

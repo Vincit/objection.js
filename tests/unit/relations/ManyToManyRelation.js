@@ -577,8 +577,8 @@ describe('ManyToManyRelation', function () {
       });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
 
       var owner = OwnerModel.fromJson({oid: 666});
       var expectedResult = [
@@ -984,8 +984,8 @@ describe('ManyToManyRelation', function () {
         });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
       var update = RelatedModel.fromJson({a: 'str1'});
 
@@ -1123,8 +1123,8 @@ describe('ManyToManyRelation', function () {
         });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
 
       var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
@@ -1210,8 +1210,8 @@ describe('ManyToManyRelation', function () {
       });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
 
       return QueryBuilder
@@ -1408,7 +1408,7 @@ describe('ManyToManyRelation', function () {
   describe('unrelate', function () {
 
     it('should generate a unrelate query', function () {
-      createFilteredRelation({someColumn: 100});
+      createModifiedRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
 
       var builder = QueryBuilder
@@ -1468,12 +1468,12 @@ describe('ManyToManyRelation', function () {
 
   });
 
-  function createFilteredRelation(filter) {
+  function createModifiedRelation(modify) {
     relation = new ManyToManyRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
       relation: ManyToManyRelation,
-      filter: filter,
+      modify: modify,
       join: {
         from: 'OwnerModel.oid',
         through: {

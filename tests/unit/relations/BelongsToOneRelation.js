@@ -192,8 +192,8 @@ describe('BelongsToOneRelation', function () {
       });
     });
 
-    it('should apply the filter (object)', function () {
-      createFilteredRelation({filterCol: 100});
+    it('should apply the modifier (object)', function () {
+      createModifiedRelation({filterCol: 100});
 
       var expectedResult = [{id: 1, a: 10, rid: 1}];
       mockKnexQueryResults = [expectedResult];
@@ -218,8 +218,8 @@ describe('BelongsToOneRelation', function () {
       });
     });
 
-    it('should apply the filter (function)', function () {
-      createFilteredRelation(function (query) {
+    it('should apply the modifier (function)', function () {
+      createModifiedRelation(function (query) {
         query.where('name', 'Jennifer');
       });
 
@@ -467,8 +467,8 @@ describe('BelongsToOneRelation', function () {
         });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 'foo'});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 'foo'});
 
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = RelatedModel.fromJson({a: 'str1'});
@@ -573,9 +573,9 @@ describe('BelongsToOneRelation', function () {
         });
     });
 
-    it('should apply the filter', function () {
+    it('should apply the modifier', function () {
       mockKnexQueryResults = [42];
-      createFilteredRelation({someColumn: 'foo'});
+      createModifiedRelation({someColumn: 'foo'});
 
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
       var update = RelatedModel.fromJson({a: 'str1'});
@@ -637,8 +637,8 @@ describe('BelongsToOneRelation', function () {
       });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({id: 666, relatedId: 2});
 
       return QueryBuilder
@@ -893,12 +893,12 @@ describe('BelongsToOneRelation', function () {
 
   });
 
-  function createFilteredRelation(filter) {
+  function createModifiedRelation(modifier) {
     relation = new BelongsToOneRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
       relation: BelongsToOneRelation,
-      filter: filter,
+      modify: modifier,
       join: {
         from: 'OwnerModel.relatedId',
         to: 'RelatedModel.rid'

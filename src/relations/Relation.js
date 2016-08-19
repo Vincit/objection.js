@@ -24,6 +24,7 @@ import RelationDeleteOperation from './RelationDeleteOperation';
  *
  * @property {Constructor.<Model>|string} modelClass
  * @property {Relation} relation
+ * @property {Object|function(QueryBuilder)} modify
  * @property {Object|function(QueryBuilder)} filter
  * @property {RelationJoin} [join]
  */
@@ -72,7 +73,7 @@ export default class Relation {
     /**
      * @type {function (QueryBuilder)}
      */
-    this.filter = null;
+    this.modify = null;
   }
 
   /**
@@ -164,7 +165,7 @@ export default class Relation {
     this.ownerProp = this.propertyName(this.ownerCol, this.ownerModelClass);
     this.relatedCol = joinRelated.columns;
     this.relatedProp = this.propertyName(this.relatedCol, this.relatedModelClass);
-    this.filter = this.parseFilter(mapping);
+    this.modify = this.parseModify(mapping);
   }
 
   /**
@@ -209,7 +210,7 @@ export default class Relation {
     relation.ownerProp = this.ownerProp;
     relation.relatedCol = this.relatedCol;
     relation.relatedProp = this.relatedProp;
-    relation.filter = this.filter;
+    relation.modify = this.modify;
 
 
     return relation;
@@ -250,7 +251,7 @@ export default class Relation {
       }
     }
 
-    return builder.modify(this.filter);
+    return builder.modify(this.modify);
   }
 
   /**
@@ -274,7 +275,7 @@ export default class Relation {
           join.on(relatedCol, '=', ownerCol[idx]);
         });
       })
-      .modify(this.filter);
+      .modify(this.modify);
   }
 
   /* istanbul ignore next */
@@ -389,12 +390,14 @@ export default class Relation {
   /**
    * @protected
    */
-  parseFilter(mapping) {
-    if (_.isFunction(mapping.filter)) {
-      return mapping.filter;
-    } else if (_.isObject(mapping.filter)) {
+  parseModify(mapping) {
+    let modify = mapping.modify || mapping.filter;
+
+    if (_.isFunction(modify)) {
+      return modify;
+    } else if (_.isObject(modify)) {
       return function (queryBuilder) {
-        queryBuilder.where(mapping.filter);
+        queryBuilder.where(modify);
       };
     } else {
       return _.noop;

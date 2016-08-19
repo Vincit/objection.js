@@ -217,8 +217,8 @@ describe('HasManyRelation', function () {
       });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 'foo'});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 'foo'});
 
       var owner = OwnerModel.fromJson({oid: 666});
       var expectedResult = [
@@ -464,10 +464,10 @@ describe('HasManyRelation', function () {
         });
     });
 
-    it('should apply the filter', function () {
+    it('should apply the modifier', function () {
       mockKnexQueryResults = [42];
 
-      createFilteredRelation({someColumn: 100});
+      createModifiedRelation({someColumn: 100});
 
       var owner = OwnerModel.fromJson({oid: 666});
       var update = RelatedModel.fromJson({a: 'str1'});
@@ -582,8 +582,8 @@ describe('HasManyRelation', function () {
         });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
 
       var owner = OwnerModel.fromJson({oid: 666});
       var patch = RelatedModel.fromJson({a: 'str1'});
@@ -652,8 +652,8 @@ describe('HasManyRelation', function () {
       });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
 
       return QueryBuilder
@@ -844,8 +844,8 @@ describe('HasManyRelation', function () {
       });
     });
 
-    it('should apply the filter', function () {
-      createFilteredRelation({someColumn: 100});
+    it('should apply the modifier', function () {
+      createModifiedRelation({someColumn: 100});
       var owner = OwnerModel.fromJson({oid: 666});
 
       return QueryBuilder
@@ -864,11 +864,13 @@ describe('HasManyRelation', function () {
 
   });
 
-  function createFilteredRelation(filter) {
+  function createModifiedRelation(filter) {
     relation = new HasManyRelation('nameOfOurRelation', OwnerModel);
     relation.setMapping({
       modelClass: RelatedModel,
       relation: HasManyRelation,
+      // Use filter here on purpose instead of `modify`. Other relation tests test the `modify`
+      // here we test the `filter` alias.
       filter: filter,
       join: {
         from: 'OwnerModel.oid',
