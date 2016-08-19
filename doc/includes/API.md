@@ -234,10 +234,10 @@ Type|Description
 
 
 
-#### insertWithRelated
+#### insertGraph
 
 ```js
-var builder = queryBuilder.insertWithRelated(graph);
+var builder = queryBuilder.insertGraph(graph);
 ```
 
 > You can insert any asyclic graph of models like this:
@@ -245,7 +245,7 @@ var builder = queryBuilder.insertWithRelated(graph);
 ```js
 Person
   .query()
-  .insertWithRelated({
+  .insertGraph({
     firstName: 'Sylvester',
     lastName: 'Stallone',
 
@@ -270,7 +270,7 @@ Person
 ```js
 Person
   .query()
-  .insertWithRelated([{
+  .insertGraph([{
     firstName: 'Jennifer',
     lastName: 'Lawrence',
 
@@ -299,7 +299,7 @@ Person
 ```js
 Person
   .query()
-  .insertWithRelated([{
+  .insertGraph([{
     "#id": 'jenniLaw',
     firstName: 'Jennifer',
     lastName: 'Lawrence',
@@ -332,6 +332,12 @@ Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
+
+
+
+#### insertWithRelated
+
+Alias for [insertGraph](#insertgraph).
 
 
 
@@ -3047,7 +3053,7 @@ var builder = queryBuilder.allowInsert(relationExpression);
 Person
   .query()
   .allowInsert('[children.pets, movies]')
-  .insertWithRelated({
+  .insertGraph({
     firstName: 'Sylvester',
     children: [{
       firstName: 'Sage',
@@ -3065,9 +3071,9 @@ Person
   });
 ```
 
-Sets the allowed tree of relations to insert using [`insertWithRelated`](#insertwithrelated) method.
+Sets the allowed tree of relations to insert using [`insertGraph`](#insertgraph) method.
 
-If the model tree given to the [`insertWithRelated`](#insertwithrelated) method isn't a subtree of the
+If the model tree given to the [`insertGraph`](#insertgraph) method isn't a subtree of the
 given expression, the query is rejected.
 
 See methods [`eager`](#eager), [`allowEager`](#alloweager), [`RelationExpression`](#relationexpression) and the

@@ -261,7 +261,7 @@ Person
 insert into "Person" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 ```
 
-Insert queries are created by chaining the [`insert`](#insert) method to the query. See the [`insertWithRelated`](#insertwithrelated) method
+Insert queries are created by chaining the [`insert`](#insert) method to the query. See the [`insertGraph`](#insertgraph) method
 for inserting whole object graphs.
 
 ### Update queries
@@ -561,7 +561,7 @@ You can read more about eager queries from [this blog post](https://www.vincit.f
 ```js
 Person
   .query()
-  .insertWithRelated({
+  .insertGraph({
     firstName: 'Sylvester',
     lastName: 'Stallone',
 
@@ -578,7 +578,7 @@ Person
 ```
 
 > The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined 
-> in the [`relationMappings`](#relationmappings) of the models. Technically [`insertWithRelated`](#insertwithrelated) 
+> in the [`relationMappings`](#relationmappings) of the models. Technically [`insertGraph`](#insertgraph)
 > builds a dependency graph from the object graph and inserts the models that don't depend on any other models until 
 > the whole graph is inserted.
 
@@ -587,7 +587,7 @@ Person
 ```js
 Person
   .query()
-  .insertWithRelated([{
+  .insertGraph([{
     firstName: 'Jennifer',
     lastName: 'Lawrence',
 
@@ -609,7 +609,7 @@ Person
 > The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have 
 > the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format
 > or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily
-> [`insertWithRelated`](#insertwithrelated) detects them and rejects the query with a clear error message.
+> [`insertGraph`](#insertgraph) detects them and rejects the query with a clear error message.
 
 > You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}` 
 > as long as the reference doesn't create a circular dependency. For example:
@@ -617,7 +617,7 @@ Person
 ```js
 Person
   .query()
-  .insertWithRelated([{
+  .insertGraph([{
     "#id": 'jenniLaw',
     firstName: 'Jennifer',
     lastName: 'Lawrence',
@@ -633,11 +633,11 @@ Person
 > within a string, the references are replaced with the referred values inside the string. If the reference string
 > contains nothing but the reference, the referred value is copied to it's place preserving its type.
 
-Arbitrary relation graphs can be inserted using the [`insertWithRelated`](#insertwithrelated) method. This is best explained using
+Arbitrary relation graphs can be inserted using the [`insertGraph`](#insertgraph) method. This is best explained using
 examples, so check them out ➔.
 
 See the [`allowInsert`](#allowinsert) method if you need to limit  which relations can be inserted using 
-[`insertWithRelated`](#insertwithrelated)cmethod to avoid security issues. [`allowInsert`](#allowinsert) 
+[`insertGraph`](#insertgraph) method to avoid security issues. [`allowInsert`](#allowinsert)
 works like [`allowEager`](#allowinsert).
 
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to

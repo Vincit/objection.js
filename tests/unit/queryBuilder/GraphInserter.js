@@ -5,10 +5,10 @@ var _ = require('lodash')
   , expect = require('expect.js')
   , Promise = require('bluebird')
   , Model = require('../../../').Model
-  , InsertWithRelated = require('../../../lib/queryBuilder/InsertWithRelated').default
+  , GraphInserter = require('../../../lib/queryBuilder/GraphInserter').default
   , RelationExpression = require('../../../').RelationExpression;
 
-describe('InsertWithRelated', function () {
+describe('GraphInserter', function () {
   var mockKnexQueryResult = [];
   var executedQueries = [];
   var mockKnex = null;
@@ -1044,7 +1044,7 @@ describe('InsertWithRelated', function () {
         insertOpt.allowedRelations = RelationExpression.parse(opt.allowedRelations);
       }
 
-      return new InsertWithRelated(insertOpt);
+      return new GraphInserter(insertOpt);
     }
 
     var inserter;

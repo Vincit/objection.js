@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import DelegateOperation from './DelegateOperation';
-import InsertWithRelated from '../InsertWithRelated';
+import GraphInserter from '../GraphInserter';
 import {isPostgres} from '../../utils/dbUtils';
 
-export default class InsertWithRelatedOperation extends DelegateOperation {
+export default class InsertGraphOperation extends DelegateOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);
@@ -54,7 +54,7 @@ export default class InsertWithRelatedOperation extends DelegateOperation {
     const ModelClass = builder.modelClass();
     const batchSize = isPostgres(ModelClass.knex()) ? 100 : 1;
 
-    let inserter = new InsertWithRelated({
+    let inserter = new GraphInserter({
       modelClass: ModelClass,
       models: this.models,
       allowedRelations: builder._allowedInsertExpression || null

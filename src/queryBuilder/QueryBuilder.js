@@ -12,11 +12,11 @@ import DeleteOperation from './operations/DeleteOperation';
 import UpdateOperation from './operations/UpdateOperation';
 import InsertOperation from './operations/InsertOperation';
 
-import InsertWithRelatedOperation from './operations/InsertWithRelatedOperation';
 import InsertAndFetchOperation from './operations/InsertAndFetchOperation';
 import UpdateAndFetchOperation from './operations/UpdateAndFetchOperation';
 import QueryBuilderOperation from './operations/QueryBuilderOperation';
 import JoinRelationOperation from './operations/JoinRelationOperation';
+import InsertGraphOperation from './operations/InsertGraphOperation';
 import EagerFetchOperation from './operations/EagerFetchOperation';
 import RunBeforeOperation from './operations/RunBeforeOperation';
 import RunAfterOperation from './operations/RunAfterOperation';
@@ -765,12 +765,16 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   @writeQueryOperation
-  insertWithRelated(modelsOrObjects) {
-    const insertWithRelatedOperation = new InsertWithRelatedOperation(this, 'insertWithRelated', {
+  insertGraph(modelsOrObjects) {
+    const insertGraphOperation = new InsertGraphOperation(this, 'insertGraph', {
       delegate: this._insertOperationFactory(this)
     });
 
-    return this.callQueryBuilderOperation(insertWithRelatedOperation, [modelsOrObjects]);
+    return this.callQueryBuilderOperation(insertGraphOperation, [modelsOrObjects]);
+  }
+
+  insertWithRelated(...args) {
+    return this.insertGraph(...args);
   }
 
   /**

@@ -272,7 +272,7 @@ module.exports.populate = function (data) {
         trx('model_2').delete()
       ])
       .then(function () {
-        return Model1.query().insertWithRelated(data);
+        return Model1.query().insertGraph(data);
       })
       .then(function () {
         return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).map(function (table) {

@@ -7,7 +7,7 @@ import BelongsToOneRelation from '../relations/belongsToOne/BelongsToOneRelation
 import ValidationError from '../ValidationError';
 let Model;
 
-export default class InsertWithRelated {
+export default class GraphInserter {
 
   constructor({modelClass, models, allowedRelations}) {
     // Lazy-load Model.

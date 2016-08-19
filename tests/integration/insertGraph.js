@@ -12,7 +12,7 @@ module.exports = function (session) {
   var Model1 = session.models.Model1;
   var Model2 = session.models.Model2;
 
-  describe('Model insertWithRelated queries', function () {
+  describe('Model insertGraph queries', function () {
     var insertion;
     var eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2]';
 
@@ -48,13 +48,29 @@ module.exports = function (session) {
       };
     });
 
-    describe('.query().insertWithRelated()', function () {
+    describe('.query().insertGraph()', function () {
 
       beforeEach(function () {
         return session.populate([]);
       });
 
       it('should insert a model with relations', function () {
+        return Model1
+          .query()
+          .insertGraph(insertion)
+          .then(function (inserted) {
+            return check(inserted, true).return(inserted);
+          })
+          .then(function (inserted) {
+            expect(inserted).to.not.have.property('model1Prop2');
+            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+          })
+          .then(function (model) {
+            return check(model);
+          });
+      });
+
+      it('should have alias `insertWithRelated`', function () {
         return Model1
           .query()
           .insertWithRelated(insertion)
@@ -93,7 +109,7 @@ module.exports = function (session) {
         it('should insert a model with relations', function () {
           return Model1
             .query()
-            .insertWithRelated(insertion)
+            .insertGraph(insertion)
             .then(function (inserted) {
               return check(inserted, true).return(inserted);
             })
@@ -111,7 +127,7 @@ module.exports = function (session) {
       it('should accept raw sql and subqueries', function () {
         return Model1
           .query()
-          .insertWithRelated([{
+          .insertGraph([{
             model1Prop1: '10'
           }, {
             model1Prop1: '50'
@@ -119,7 +135,7 @@ module.exports = function (session) {
           .then(function () {
             return Model1
               .query()
-              .insertWithRelated({
+              .insertGraph({
                 model1Prop1: Model1.raw("40 + 2"),
 
                 model1Relation2: [{
@@ -188,7 +204,7 @@ module.exports = function (session) {
             }
           };
 
-          return Model1.query().insertWithRelated(insertion);
+          return Model1.query().insertGraph(insertion);
         }).then(function () {
           done(new Error('should not get here'));
         }).catch(function (err) {
@@ -232,7 +248,7 @@ module.exports = function (session) {
 
           return Model1
             .query()
-            .insertWithRelated(insertion)
+            .insertGraph(insertion)
             .then(function (inserted) {
               return check(inserted, true).return(inserted);
             })
@@ -250,7 +266,7 @@ module.exports = function (session) {
         it('query building methods should be applied to the root models', function () {
           return Model1
             .query()
-            .insertWithRelated(insertion)
+            .insertGraph(insertion)
             .returning('*')
             .then(function (inserted) {
               return check(inserted, true).return(inserted);
@@ -267,7 +283,7 @@ module.exports = function (session) {
 
     });
 
-    describe('.query().insertWithRelated().allowRelated()', function () {
+    describe('.query().insertGraph().allowRelated()', function () {
 
       beforeEach(function () {
         return session.populate([]);
@@ -276,7 +292,7 @@ module.exports = function (session) {
       it('should allow insert when the allowed relation expression is a superset', function () {
         return Model1
           .query()
-          .insertWithRelated(insertion)
+          .insertGraph(insertion)
           .allowInsert(eagerExpr)
           .then(function (inserted) {
             return check(inserted, true).return(inserted);
@@ -286,7 +302,7 @@ module.exports = function (session) {
       it('should not allow insert when the allowed relation expression is not a superset', function (done) {
         return Model1
           .query()
-          .insertWithRelated(insertion)
+          .insertGraph(insertion)
           .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')
           .then(function () {
             done(new Error('should not get here'));
@@ -300,7 +316,7 @@ module.exports = function (session) {
 
     });
 
-    describe('.$query().insertWithRelated()', function () {
+    describe('.$query().insertGraph()', function () {
 
       beforeEach(function () {
         return session.populate([]);
@@ -310,7 +326,7 @@ module.exports = function (session) {
         return Model1
           .fromJson(insertion)
           .$query()
-          .insertWithRelated()
+          .insertGraph()
           .then(function (inserted) {
             return check(inserted, true).return(inserted);
           })
@@ -324,7 +340,7 @@ module.exports = function (session) {
 
     });
 
-    describe('.$relatedQuery().insertWithRelated()', function () {
+    describe('.$relatedQuery().insertGraph()', function () {
 
       describe('has many relation', function () {
         var parent;
@@ -356,7 +372,7 @@ module.exports = function (session) {
         it('should insert a model with relations', function () {
           return parent
             .$relatedQuery('model1Relation2')
-            .insertWithRelated(insertion)
+            .insertGraph(insertion)
             .then(function (inserted) {
               return check(inserted.model2Relation1[0], true);
             })
@@ -409,7 +425,7 @@ module.exports = function (session) {
         it('should insert a model with relations', function () {
           return parent
             .$relatedQuery('model1Relation3')
-            .insertWithRelated(insertion)
+            .insertGraph(insertion)
             .then(function (inserted) {
               return check(inserted.model2Relation1[0], true);
             })
