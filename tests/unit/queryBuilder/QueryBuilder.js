@@ -56,20 +56,6 @@ describe('QueryBuilder', function () {
     expect(called).to.equal(true);
   });
 
-  it('dumpSql() should dump the contents of toString() to a logger', function () {
-    var logCalled = false;
-    var builder = QueryBuilder.forClass(TestModel);
-
-    builder
-      .where('a', 10)
-      .dumpSql(function (str) {
-        logCalled = true;
-        expect(str).to.equal(builder.toString());
-      });
-
-    expect(logCalled).to.equal(true);
-  });
-
   it('should call the callback passed to .then after execution', function (done) {
     mockKnexQueryResults = [[{a: 1}, {a: 2}]];
     // Make sure the callback is called by not returning a promise from the test.
