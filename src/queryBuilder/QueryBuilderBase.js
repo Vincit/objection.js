@@ -82,7 +82,7 @@ export default class QueryBuilderBase {
    */
   knex(knex) {
     if (arguments.length === 0) {
-      return this._knex;
+      return this._context.knex || this._knex;
     } else {
       this._knex = knex;
       return this;
@@ -191,7 +191,7 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   clone() {
-    return this.baseCloneInto(new this.constructor(this._knex));
+    return this.baseCloneInto(new this.constructor(this.knex()));
   }
 
   /**
@@ -210,7 +210,7 @@ export default class QueryBuilderBase {
    * @returns {knex.QueryBuilder}
    */
   build() {
-    return this.buildInto(this._knex.queryBuilder());
+    return this.buildInto(this.knex().queryBuilder());
   }
 
   /**
@@ -261,7 +261,7 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   skipUndefined() {
-    this.internalContext().skipUndefined = true;
+    this._context.skipUndefined = true;
     return this;
   }
 
@@ -269,7 +269,16 @@ export default class QueryBuilderBase {
    * @returns {boolean}
    */
   shouldSkipUndefined() {
-    return !!this.internalContext().skipUndefined;
+    return this._context.skipUndefined;
+  }
+
+  /**
+   * @param {Transaction} trx
+   * @returns {QueryBuilderBase}
+   */
+  transacting(trx) {
+    this._context.knex = trx || null;
+    return this;
   }
 
   /**

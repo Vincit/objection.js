@@ -3151,32 +3151,47 @@ string|The SQL this query builder will build
 
 
 
-#### dumpSql
+
+#### skipUndefined
 
 ```js
-var builder = queryBuilder.dumpSql(logger);
+var builder = queryBuilder.skipUndefined();
 ```
 
-> Handy for debugging:
+If this method is called for a builder then undefined values passed to the query builder methods don't cause
+an exception but are ignored instead.
+
+> For example the following query will return all `Person` rows if `req.query.firstName` is `undefined`.
 
 ```js
 Person
   .query()
-  .where('firstName', 'Jennifer')
-  .where('age', 100)
-  .dumpSql()
-  .then(function () {
-    ...
-  });
+  .skipUndefined()
+  .where('firstName', req.query.firstName)
 ```
 
-Logs the SQL string.
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining
+
+
+
+
+#### transacting
+
+```js
+var builder = queryBuilder.transacting(transaction);
+```
+
+Sets the transaction for a query.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------|------------
-looger|function(string)|console.log|The logger function to use
+transaction|object|A transaction object
 
 ##### Return value
 
@@ -4850,7 +4865,7 @@ Person.query().then(function(allPersons) {
 });
 
 // Example of a more complex WHERE clause. This generates:
-// SELECTFROM "Person"
+// SELECT FROM "Person"
 // WHERE ("firstName" = 'Jennifer' AND "age" < 30)
 // OR ("firstName" = 'Mark' AND "age" > 30)
 Person
@@ -4936,7 +4951,7 @@ Person
 ```
 
 > Models can be deleted using the delete method. Naturally the delete query can be chained with
-> anyknex* methods:
+> any knex* methods:
 
 ```js
 Person
@@ -4951,6 +4966,12 @@ Person
 Creates a query builder for the model's table.
 
 See the [query examples](#query-examples) section for more examples.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+transaction|object|Optional transaction for the query.
 
 ##### Return value
 
@@ -5844,6 +5865,12 @@ Creates a query builder for this model instance.
 
 All queries built using the returned builder only affect this instance.
 
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+transaction|object|Optional transaction for the query.
+
 ##### Return value
 
 Type|Description
@@ -5977,6 +6004,7 @@ Use this to build a query that only affects the models related to this instance 
 Argument|Type|Description
 --------|----|-------------------
 relationName|string|The name of the relation to query.
+transaction|object|Optional transaction for the query.
 
 ##### Return value
 

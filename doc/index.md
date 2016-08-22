@@ -677,8 +677,8 @@ objection.transaction(Person, Animal, function (Person, Animal) {
 });
 ```
 
-> You only need to give the [`transaction`](#transaction) function the model classes you use explicitly. All the related model classes
-> are implicitly bound to the same transaction.
+> You only need to give the [`transaction`](#transaction) function the model classes you use explicitly. All the
+> related model classes are implicitly bound to the same transaction:
 
 ```js
 objection.transaction(Person, function (Person) {
@@ -702,8 +702,8 @@ objection.transaction(Person, function (Person) {
 });
 ```
 
-> The only way you can mess up with the transactions is if you _explicitly_ start a query using a model class that is not
-> bound to the transaction:
+> The only way you can mess up with the transactions is if you _explicitly_ start a query using a model class
+> that is not bound to the transaction:
 
 ```js
 var Person = require('./models/Person');
@@ -725,26 +725,67 @@ objection.transaction(Person, function (Person) {
 });
 ```
 
+> The transaction object is always passed as the last argument to the callback:
+
+```js
+objection.transaction(Person, function (Person, trx) {
+  // `trx` is the knex transaction object.
+  // It can be passed to `transacting`, `query` etc.
+  // methods, or used as a knex query builder.
+
+  var q1 = trx('Person').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+  var q2 = Animal.query(trx).insert({name: 'Scrappy'});
+  var q3 = Animal.query().transacting(trx).insert({name: 'Fluffy'});
+
+  return Promise.all([q1, q2, q3]);
+
+}).spread(function (jennifer, scrappy, fluffy) {
+  console.log('Jennifer, Scrappy and Fluffy were successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong. Jennifer, Scrappy and Fluffy were not inserted');
+});
+```
+
+> If you only pass a knex instance to the `transaction` function, only the transaction object
+> is passed to the callback:
+
+```js
+objection.transaction(Person.knex(), function (trx) {
+
+  // `trx` is the knex transaction object.
+  // It can be passed to `transacting`, `query` etc.
+  // methods, or used as a knex query builder.
+  return trx('Person').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+}).then(function (jennifer) {
+  console.log('Jennifer was successfully inserted');
+}).catch(function (err) {
+  console.log('Something went wrong');
+});
+```
+
 The first way to work with transactions is to perform all operations inside one callback using the
-[`objection.transaction`](#transaction) function. The beauty of this method is that you don't need to pass a transaction object to each 
-query explicitly as long as you start all queries using the bound model classes that are passed to the transaction 
-callback as arguments.
+[`objection.transaction`](#transaction) function. The beauty of this method is that you don't need to pass a transaction
+object to each query explicitly as long as you start all queries using the "bound" model classes that are passed to the
+transaction callback as arguments.
 
 Transactions are started by calling the [`objection.transaction`](#transaction) function. Give all the models you want to use 
-in the transaction as parameters to the [`transaction`](#transaction) function. The model classes are bound to a newly created 
-transaction and passed to the callback function. Inside this callback, all queries started through them take part in 
-the same transaction.
+in the transaction as parameters to the [`transaction`](#transaction) function. New copies of the model constructors
+are created that are bound to a newly created transaction and passed to the callback function. Inside this callback, all
+queries started through them take part in the same transaction.
 
-The transaction is committed if the returned Promise is resolved successfully. If the returned Promise is rejected
-the transaction is rolled back.
+The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise
+is rejected the transaction is rolled back.
 
 ## Transaction object
+
+> Transaction object can be used with `bindTransaction`:
 
 ```js
 var trx;
 // You need to pass some model (any model with a knex connection)
 // or the knex connection itself to the start method.
-objection.transaction.start(Person).then(function (transaction) {
+objection.transaction.start(Person.knex()).then(function (transaction) {
   trx = transaction;
   return Person
     .bindTransaction(trx)
@@ -770,6 +811,37 @@ objection.transaction.start(Person).then(function (transaction) {
 });
 ```
 
+> Or the transaction can be given to each query explicitly:
+
+```js
+var trx;
+// You need to pass some model (any model with a knex connection)
+// or the knex connection itself to the start method.
+objection.transaction.start(Person.knex()).then(function (transaction) {
+  trx = transaction;
+  return Person
+    .query(trx)
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+}).then(function (jennifer) {
+  // Unlike with `bindTransaction` jennifer is not bound to
+  // the transaction and we need to pass the `trx` to each query.
+  return jennifer
+    .$relatedQuery('pets', trx)
+    .insert({name: 'Fluffy'});
+}).then(function () {
+  // This is equivalent to `.query(trx)`
+  return Movie
+    .query()
+    .transacting(trx)
+    .where('name', 'ilike', '%forrest%');
+}).then(function (movies) {
+  console.log(movies);
+  return trx.commit();
+}).catch(function () {
+  return trx.rollback();
+});
+```
+
 > This becomes _a lot_ prettier using ES7:
 
 ```js
@@ -777,17 +849,15 @@ let trx = await transaction.start(Person.knex());
 
 try {
   let jennifer = await Person
-    .bindTransaction(trx)
-    .query()
+    .query(trx)
     .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
 
   let fluffy = await jennifer
-    .$relatedQuery('pets')
+    .$relatedQuery('pets', trx)
     .insert({name: 'Fluffy'});
 
   let movies = await Movie
-    .bindTransaction(trx)
-    .query()
+    .query(trx)
     .where('name', 'ilike', '%forrest%');
 
   await trx.commit();
@@ -796,13 +866,13 @@ try {
 }
 ```
 
-The second way to use transactions is to express the transaction as an object and bind model classes to the transaction
-when you use them. This way is more convenient when you need to pass the transaction to functions and services.
+The second way to use transactions is to express the transaction as an object and bind model classes or queries to the
+transaction when you use them. This way is more convenient when you need to pass the transaction to functions and services.
 
 The transaction object can be created using the [`objection.transaction.start`](#start) method. You need to remember to 
 call either the [`commit`](#commit) or [`rollback`](#rollback) method of the transaction object.
 
-## Detailed explanation
+## Detailed explanation of `bindTransaction`
 
 > Now that you have an idea how the [`bindTransaction`](#bindtransaction) works you should see that the previous example could
 > also be implemented like this:
@@ -837,9 +907,9 @@ objection.transaction.start(Person).then(function (transaction) {
 > which is pretty much what the [`objection.transaction`](#transaction) function does.
 
 To understand what is happening in the above examples you need to know how [`bindTransaction`](#bindtransaction) method works.
-[`bindTransaction`](#bindtransaction) actually returns an anonymous subclass of the model class you call it for and sets the
-transaction's database connection as that class's database connection. This way all queries started through
-that anonymous class use the same connection and take part in the same transaction. If we didn't create a
+[`bindTransaction`](#bindtransaction) actually returns an anonymous subclass (a copy) of the model class you call it
+for and sets the transaction's database connection as that class's database connection. This way all queries started
+through that anonymous class use the same connection and take part in the same transaction. If we didn't create a
 subclass and just set the original model's database connection, all query chains running in parallel would
 suddenly jump into the same transaction and things would go terribly wrong.
 

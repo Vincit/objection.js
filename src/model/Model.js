@@ -107,13 +107,15 @@ export default class Model extends ModelBase {
   }
 
   /**
+   * @param {Transaction=} trx
    * @returns {QueryBuilder}
    */
-  $query() {
+  $query(trx) {
     const ModelClass = this.constructor;
 
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
+      .transacting(trx)
       .findOperationFactory(builder => {
         return new InstanceFindOperation(builder, 'find', {instance: this});
       })
@@ -139,14 +141,16 @@ export default class Model extends ModelBase {
 
   /**
    * @param {string} relationName
+   * @param {Transaction=} trx
    * @returns {QueryBuilder}
    */
-  $relatedQuery(relationName) {
+  $relatedQuery(relationName, trx) {
     const relation = this.constructor.getRelation(relationName);
     const ModelClass = relation.relatedModelClass;
 
     return ModelClass.RelatedQueryBuilder
       .forClass(ModelClass)
+      .transacting(trx)
       .findOperationFactory(builder => {
         return relation.find(builder, [this]);
       })
@@ -322,13 +326,15 @@ export default class Model extends ModelBase {
   $afterGet(queryContext) {}
 
   /**
+   * @param {Transaction=} trx
    * @returns {QueryBuilder}
    */
-  static query() {
+  static query(trx) {
     const ModelClass = this;
 
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
+      .transacting(trx)
       .relateOperationFactory(() => {
         throw new Error('`relate` makes no sense in this context');
       })

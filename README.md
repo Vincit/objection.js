@@ -36,7 +36,7 @@ using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES6](htt
 and [ES7](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
 
 Shortcuts:
- * [Objection.js API reference](http://vincit.github.io/objection.js/#api-reference)
+ * [API reference](http://vincit.github.io/objection.js/#api-reference)
  * [Changelog](http://vincit.github.io/objection.js/#changelog)
 
 Blog posts and tutorials:
