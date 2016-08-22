@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import path from 'path';
 import memoize from '../utils/decorators/memoize';
 import {inherits, isSubclassOf} from '../utils/classUtils';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
@@ -100,26 +101,7 @@ export default class Relation {
       this.throwError('modelClass is not defined');
     }
 
-    if (_.isString(mapping.modelClass)) {
-      try {
-        // babel 6 style of exposing es6 exports to commonjs https://github.com/babel/babel/issues/2683
-        let relatedModelClassModule = require(mapping.modelClass);
-        this.relatedModelClass = isSubclassOf(relatedModelClassModule.default, Model) ?
-          relatedModelClassModule.default : relatedModelClassModule;
-      } catch (err) {
-        this.throwError('modelClass is an invalid file path to a model class.');
-      }
-
-      if (!isSubclassOf(this.relatedModelClass, Model)) {
-        this.throwError('modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
-      }
-    } else {
-      this.relatedModelClass = mapping.modelClass;
-
-      if (!isSubclassOf(this.relatedModelClass, Model)) {
-        this.throwError('modelClass is not a subclass of Model or a file path to a module that exports one.');
-      }
-    }
+    this.relatedModelClass = this.resolveModel(Model, mapping.modelClass, 'modelClass');
 
     if (!mapping.relation) {
       this.throwError('relation is not defined');
@@ -465,6 +447,62 @@ export default class Relation {
     let idProperty = modelClass.getIdProperty();
 
     return _.sortBy(models, _.isArray(idProperty) ? idProperty : [idProperty]);
+  }
+
+  /**
+   * @protected
+   */
+  resolveModel(Model, modelClass, logPrefix) {
+    const requireModel = (path) => {
+      let ModelClass;
+
+      try {
+        // babel 6 style of exposing es6 exports to commonjs https://github.com/babel/babel/issues/2683
+        let module = require(path);
+
+        ModelClass = isSubclassOf(module.default, Model)
+          ? module.default
+          : module;
+      } catch (err) {
+        return null;
+      }
+
+      if (!isSubclassOf(ModelClass, Model)) {
+        return null;
+      }
+
+      return ModelClass;
+    };
+
+    if (_.isString(modelClass)) {
+      let ModelClass = null;
+
+      if (path.isAbsolute(modelClass)) {
+        ModelClass = requireModel(modelClass);
+      } else {
+        // If the path is not a absolute, try the modelPaths of the owner model class.
+        _.each(this.ownerModelClass.modelPaths, modelPath => {
+          ModelClass = requireModel(path.join(modelPath, modelClass));
+
+          if (isSubclassOf(ModelClass, Model)) {
+            // Break the loop.
+            return false;
+          }
+        });
+      }
+
+      if (!isSubclassOf(ModelClass, Model)) {
+        this.throwError(`${logPrefix}: ${modelClass} is an invalid file path to a model class`);
+      }
+
+      return ModelClass;
+    } else {
+      if (!isSubclassOf(modelClass, Model)) {
+        this.throwError(`${logPrefix} is not a subclass of Model or a file path to a module that exports one.`);
+      }
+
+      return modelClass;
+    }
   }
 
   /**

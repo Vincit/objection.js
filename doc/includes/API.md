@@ -4316,6 +4316,49 @@ Defaults to 'id'.
 
 
 
+
+#### modelPaths
+
+> ES5:
+
+```js
+function Person() {
+  Model.apply(this, arguments);
+}
+
+Model.extend(Person);
+Person.modelPaths = [__dirname];
+```
+
+> ES6:
+
+```js
+class Person extends Model {
+  static get modelPaths() {
+    return [__dirname];
+  }
+}
+```
+
+> ES7:
+
+```js
+class Person extends Model {
+  static modelPaths = [__dirname];
+}
+```
+
+A list of paths from which to search for models for relations.
+
+A model class can be defined for a relation in [`relationMappings`](#relationmappings) as
+
+1. A model class constructor
+2. An absolute path to a module that exports a model class
+3. A path relative to one of the paths in `modelPaths` array.
+
+
+
+
 #### relationMappings
 
 > ES5:
@@ -4485,9 +4528,13 @@ models are associated. Note that neither of these columns need to be primary key
 columns. In the case of ManyToManyRelation also the join table needs to be defined. This is
 done using the `through` object.
 
-The `modelClass` passed to the relation mappings is the class of the related model. It can be either
-a Model subclass constructor or an absolute path to a module that exports one. Using file paths
-is a handy way to prevent require loops.
+The `modelClass` passed to the relation mappings is the class of the related model. It can be one of the following:
+
+1. A model class constructor
+2. An absolute path to a module that exports a model class
+3. A path relative to one of the paths in [`modelPaths`](#modelpaths) array.
+
+The file path versions are handy for avoiding require loops.
 
 See [`RelationMapping`](#relationmapping)
 
@@ -4496,7 +4543,7 @@ See [`RelationMapping`](#relationmapping)
 Property|Type|Description
 --------|----|-----------
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
-modelClass|[`Model`](#model)&#124;string|Constructor of the related model class or an absolute path to a module that exports one.
+modelClass|[`Model`](#model)&#124;string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [`modelPaths`](#modelpaths) that exports a model class.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
 modify|function([`QueryBuilder`](#querybuilder))|Optional modifier for the relation query. This is called each time the relation is fetched.
 filter|function([`QueryBuilder`](#querybuilder))|Alias for modify.

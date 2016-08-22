@@ -237,7 +237,7 @@ describe('ManyToManyRelation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: Join table model class is not a subclass of Model');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join.through.modelClass is not a subclass of Model or a file path to a module that exports one.');
     });
   });
 
@@ -259,7 +259,7 @@ describe('ManyToManyRelation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: Join table model class is not a subclass of Model');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join.through.modelClass: /not/a/path/to/a/model is an invalid file path to a model class');
     });
   });
 

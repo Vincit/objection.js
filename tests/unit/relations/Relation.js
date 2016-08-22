@@ -57,6 +57,27 @@ describe('Relation', function () {
     expect(relation.relatedProp).to.eql(['ownerId']);
   });
 
+  it('should accept a relative path to a Model subclass as modelClass (resolved using Model.modelPaths', function () {
+    OwnerModel.modelPaths = [__dirname + '/files/'];
+    var relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: 'RelatedModel',
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerCol).to.eql(['id']);
+    expect(relation.ownerProp).to.eql(['id']);
+    expect(relation.relatedCol).to.eql(['ownerId']);
+    expect(relation.relatedProp).to.eql(['ownerId']);
+  });
+
   it('should accept a composite key as an array of columns', function () {
     var relation = new Relation('testRelation', OwnerModel);
 
@@ -124,7 +145,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is an invalid file path to a model class.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass: blaa is an invalid file path to a model class');
     });
   });
 
@@ -141,7 +162,7 @@ describe('Relation', function () {
         }
       });
     }).to.throwException(function (err) {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is a valid path to a module, but the module doesn\'t export a Model subclass.');
+      expect(/^OwnerModel\.relationMappings\.testRelation: modelClass: (.+)\/InvalidModel is an invalid file path to a model class$/.test(err.message)).to.equal(true);
     });
   });
 

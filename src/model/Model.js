@@ -76,6 +76,11 @@ export default class Model extends ModelBase {
   static relationMappings = null;
 
   /**
+   * @type {Array.<string>}
+   */
+  static modelPaths = [];
+
+  /**
    * @private
    */
   static $$knex = null;
