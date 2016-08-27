@@ -174,8 +174,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '400 fromJson calls for the dataset (34000 individual models)',
-      runCount: 400,
+      name: `1600 fromJson calls for the dataset (${1600 * 85} individual models)`,
+      runCount: 1600,
       runtimeGoal: 1000,
       test: function () {
         _.each(data, function (data) {
@@ -185,8 +185,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '2000 $toJson calls for the dataset (160000 individual models)',
-      runCount: 2000,
+      name: `6000 $toJson calls for the dataset (${6000 * 85} individual models)`,
+      runCount: 6000,
       runtimeGoal: 1000,
       beforeTest: function () {
         return _.map(data, function (person) {
@@ -199,8 +199,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '4000 $toDatabaseJson calls for the dataset (100000 individual models)',
-      runCount: 4000,
+      name: `12000 $toDatabaseJson calls for the dataset (${12000 * 25} individual models)`,
+      runCount: 12000,
       runtimeGoal: 1000,
       beforeTest: function () {
         return _.map(data, function (person) {
@@ -213,8 +213,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '2000 $clone calls for the dataset (160000 individual models)',
-      runCount: 2000,
+      name: `10000 $clone calls for the dataset (${10000 * 85} individual models)`,
+      runCount: 10000,
       runtimeGoal: 1000,
       beforeTest: function () {
         return _.map(data, function (person) {
@@ -227,8 +227,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '16000 traverse calls for the dataset',
-      runCount: 16000,
+      name: '20000 traverse calls for the dataset',
+      runCount: 20000,
       runtimeGoal: 1000,
       beforeTest: function () {
         return _.map(data, function (person) {
@@ -257,28 +257,25 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '10000 bindTransaction calls',
-      runCount: 10000,
+      name: '12000 bindTransaction calls',
+      runCount: 12000,
       runtimeGoal: 1000,
       test: function () {
         Person.bindTransaction({});
       }
     });
-
-    after(function () {
-      return Promise.delay(500);
-    });
   });
 
   describe('queries', function () {
+    const RESULT_SIZE = 10;
 
     perfTest({
-      name: '8000 `Person.query()` queries',
-      runCount: 8000,
+      name: '5000 `Person.query()` queries',
+      runCount: 5000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(16000), function () {
-          return _.map(_.range(10), function (idx) {
+        mockKnex.results = _.map(_.range(10000), function () {
+          return _.map(_.range(RESULT_SIZE), function (idx) {
             return {
               firstName: 'Firstname ' + idx,
               lastName: 'Lastname ' + idx,
@@ -297,12 +294,12 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '4000 complex `Person.query()` queries',
-      runCount: 4000,
+      name: '2000 complex `Person.query()` queries',
+      runCount: 2000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(8000), function () {
-          return _.map(_.range(10), function (idx) {
+        mockKnex.results = _.map(_.range(4000), function () {
+          return _.map(_.range(RESULT_SIZE), function (idx) {
             return {
               firstName: 'Firstname ' + idx,
               lastName: 'Lastname ' + idx,
@@ -348,7 +345,7 @@ describe('Performance tests', function () {
       runtimeGoal: 1000,
       beforeTest: function () {
         mockKnex.results = _.map(_.range(8000), function () {
-          return _.map(_.range(10), function (idx) {
+          return _.map(_.range(RESULT_SIZE), function (idx) {
             return {
               firstName: 'Firstname ' + idx,
               lastName: 'Lastname ' + idx,
@@ -371,11 +368,11 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '4000 `person.$relatedQuery("movies").unrelate()` queries',
-      runCount: 4000,
+      name: '3000 `person.$relatedQuery("movies").unrelate()` queries',
+      runCount: 3000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(8000), function () {
+        mockKnex.results = _.map(_.range(6000), function () {
           return [1];
         });
 
@@ -393,11 +390,11 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '4000 `Person.query().insert()` queries',
-      runCount: 4000,
+      name: '5000 `Person.query().insert()` queries',
+      runCount: 5000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(0, 8000), function (idx) {
+        mockKnex.results = _.map(_.range(0, 10000), function (idx) {
           return [idx];
         });
 
@@ -415,12 +412,12 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '500 `Person.query().insertWithRelated()` queries',
-      runCount: 500,
+      name: '400 `Person.query().insertWithRelated()` queries',
+      runCount: 400,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(0, 100000, 10), function (idx) {
-          return _.range(idx, idx + 10);
+        mockKnex.results = _.map(_.range(0, 10000 * RESULT_SIZE, RESULT_SIZE), function (idx) {
+          return _.range(idx, idx + RESULT_SIZE);
         });
 
         return Person.bindKnex(knex);
@@ -460,10 +457,6 @@ describe('Performance tests', function () {
           return models;
         });
       }
-    });
-
-    after(function () {
-      return Promise.delay(500);
     });
   });
 

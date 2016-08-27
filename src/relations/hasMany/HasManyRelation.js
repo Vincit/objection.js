@@ -8,10 +8,10 @@ import HasManyUnrelateOperation from './HasManyUnrelateOperation';
 export default class HasManyRelation extends Relation {
 
   createRelationProp(owners, related) {
-    let relatedByOwnerId = _.groupBy(related, related => related.$values(this.relatedProp));
+    let relatedByOwnerId = _.groupBy(related, related => related.$propKey(this.relatedProp));
 
     _.each(owners, owner => {
-      let ownerId = owner.$values(this.ownerProp);
+      let ownerId = owner.$propKey(this.ownerProp);
       owner[this.name] = relatedByOwnerId[ownerId] || [];
     });
   }
@@ -41,3 +41,4 @@ export default class HasManyRelation extends Relation {
     });
   }
 }
+

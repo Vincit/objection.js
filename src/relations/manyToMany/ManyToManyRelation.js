@@ -1,10 +1,7 @@
 import _ from 'lodash';
 import Relation from '../Relation';
-import ModelBase from '../../model/ModelBase';
 import inheritModel from '../../model/inheritModel';
-import normalizeIds from '../../utils/normalizeIds';
 import {isSqlite} from '../../utils/dbUtils';
-import {isSubclassOf} from '../../utils/classUtils';
 import memoize from '../../utils/decorators/memoize';
 
 import ManyToManyFindOperation from './ManyToManyFindOperation';

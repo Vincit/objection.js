@@ -425,28 +425,33 @@ export default class Relation {
    * @protected
    */
   mergeModels(models1, models2) {
-    let modelsById = Object.create(null);
+    let modelClass;
 
     models1 = _.compact(models1);
     models2 = _.compact(models2);
 
-    _.forEach(models1, function (model) {
-      modelsById[model.$id()] = model;
-    });
-
-    _.forEach(models2, function (model) {
-      modelsById[model.$id()] = model;
-    });
-
-    let models = _.values(modelsById);
-    if (models.length === 0) {
+    if (_.isEmpty(models1) && _.isEmpty(models2)) {
       return [];
     }
 
-    let modelClass = models[0].constructor;
-    let idProperty = modelClass.getIdProperty();
+    if (!_.isEmpty(models1)) {
+      modelClass = models1[0].constructor;
+    } else {
+      modelClass = models2[0].constructor;
+    }
 
-    return _.sortBy(models, _.isArray(idProperty) ? idProperty : [idProperty]);
+    let idProperty = modelClass.getIdPropertyArray();
+    let modelsById = Object.create(null);
+
+    _.each(models1, model => {
+      modelsById[model.$propKey(idProperty)] = model;
+    });
+
+    _.each(models2, model => {
+      modelsById[model.$propKey(idProperty)] = model;
+    });
+
+    return _.sortBy(_.values(modelsById), idProperty);
   }
 
   /**

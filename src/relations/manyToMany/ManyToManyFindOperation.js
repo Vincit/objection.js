@@ -47,10 +47,10 @@ export default class ManyToManyFindOperation extends FindOperation {
   }
 
   onAfterInternal(builder, related) {
-    let relatedByOwnerId = _.groupBy(related, related => related.$values(this.ownerJoinPropertyAlias));
+    let relatedByOwnerId = _.groupBy(related, related => related.$propKey(this.ownerJoinPropertyAlias));
 
     _.each(this.owners, owner => {
-      owner[this.relation.name] = relatedByOwnerId[owner.$values(this.relation.ownerProp)] || [];
+      owner[this.relation.name] = relatedByOwnerId[owner.$propKey(this.relation.ownerProp)] || [];
     });
 
     // Delete the temporary join aliases.

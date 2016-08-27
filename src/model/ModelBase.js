@@ -276,6 +276,27 @@ export default class ModelBase {
   }
 
   /**
+   * @param {Array.<string>} props
+   * @return {string}
+   */
+  $propKey(props) {
+    switch (props.length) {
+      case 1: return this[props[0]] + '';
+      case 2: return this[props[0]] + ',' + this[props[1]];
+      case 3: return this[props[0]] + ',' + this[props[1]] + ',' + this[props[2]];
+      default: {
+        let key = '';
+
+        for (let i = 0, l = props.length; i < l; ++i) {
+          key += this[props[i]] + ((i < props.length - 1) ? ',' : '');
+        }
+
+        return key;
+      }
+    }
+  }
+
+  /**
    * @return {ModelBase}
    */
   $clone() {
@@ -496,24 +517,37 @@ function parseValidationError(errors) {
 }
 
 function toJsonImpl(model, createDbJson, omit, pick) {
-  let json = {};
-
-  const omitFromJson = createDbJson
-    ? model.$omitFromDatabaseJson()
-    : model.$omitFromJson();
-
   if (createDbJson) {
-    // If creating a database json object, restore the query properties.
-    _.forOwn(model.$stashedQueryProps(), (query, key) => {
-      json[key] = query;
-    });
+    return toDatabaseJsonImpl(model, omit, pick);
+  } else {
+    return toExternalJsonImpl(model, omit, pick);
   }
+}
 
-  _.forOwn(model, (value, key) => {
-    assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson);
+function toDatabaseJsonImpl(model, omit, pick) {
+  let json = {};
+  const omitFromJson = model.$omitFromDatabaseJson();
+
+  _.forOwn(model.$stashedQueryProps(), (query, key) => {
+    json[key] = query;
   });
 
-  if (!createDbJson && model.constructor.virtualAttributes) {
+  _.forOwn(model, (value, key) => {
+    assignJsonValue(json, key, value, omit, pick, omitFromJson, true);
+  });
+
+  return json;
+}
+
+function toExternalJsonImpl(model, omit, pick) {
+  let json = {};
+  const omitFromJson = model.$omitFromJson();
+
+  _.forOwn(model, (value, key) => {
+    assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
+  });
+
+  if (model.constructor.virtualAttributes) {
     _.each(model.constructor.virtualAttributes, key => {
       let value = model[key];
 
@@ -521,7 +555,7 @@ function toJsonImpl(model, createDbJson, omit, pick) {
         value = value.call(model);
       }
 
-      assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson);
+      assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
     });
   }
 
