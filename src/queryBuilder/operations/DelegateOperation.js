@@ -52,6 +52,14 @@ export default class DelegateOperation extends QueryBuilderOperation {
     return this.onBuild !== DelegateOperation.prototype.onBuild || this.delegate.hasOnBuild();
   }
 
+  onRawResult(builder, result) {
+    return this.delegate.onRawResult(builder, result);
+  }
+
+  hasOnRawResult() {
+    return this.onRawResult !== DelegateOperation.prototype.onRawResult || this.delegate.hasOnRawResult();
+  }
+
   onAfterQuery(builder, result) {
     return this.delegate.onAfterQuery(builder, result);
   }

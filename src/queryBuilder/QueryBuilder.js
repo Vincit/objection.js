@@ -506,7 +506,8 @@ export default class QueryBuilder extends QueryBuilderBase {
       } else if (queryExecutorOperation) {
         promise = queryExecutorOperation.queryExecutor(builder);
       } else {
-        promise = knexBuilder.then(result => createModels(builder, result));
+        promise = chainRawResultOperations(knexBuilder, builder, builder._operations);
+        promise = promise.then(result => createModels(builder, result));
       }
 
       promise = chainAfterQueryOperations(promise, builder, builder._operations);
@@ -984,16 +985,6 @@ function build(builder) {
   return builder.buildInto(knexBuilder);
 }
 
-function callOnBuildHooks(builder, func) {
-  if (_.isFunction(func)) {
-    func.call(builder, builder);
-  } else if (_.isArray(func)) {
-    _.each(func, func => {
-      func.call(builder, builder);
-    });
-  }
-}
-
 function chainHooks(promise, builder, func) {
   if (_.isFunction(func)) {
     promise = promise.then(result => func.call(builder, result, builder));
@@ -1006,56 +997,42 @@ function chainHooks(promise, builder, func) {
   return promise;
 }
 
-function chainBeforeOperations(promise, builder, methods) {
-  return promiseChain(promise, methods, (res, method) => {
-    return method.onBefore(builder, res);
-  }, method => {
-    return method.hasOnBefore();
-  });
+function callOnBuildHooks(builder, func) {
+  if (_.isFunction(func)) {
+    func.call(builder, builder);
+  } else if (_.isArray(func)) {
+    _.each(func, func => {
+      func.call(builder, builder);
+    });
+  }
 }
 
-function chainBeforeInternalOperations(promise, builder, methods) {
-  return promiseChain(promise, methods, (res, method) => {
-    return method.onBeforeInternal(builder, res);
-  }, method => {
-    return method.hasOnBeforeInternal();
-  });
-}
+function createHookCaller(hook) {
+  const hasMethod = 'has' + _.upperFirst(hook);
 
-function chainAfterQueryOperations(promise, builder, methods) {
-  return promiseChain(promise, methods, (res, method) => {
-    return method.onAfterQuery(builder, res);
-  }, method => {
-    return method.hasOnAfterQuery();
-  });
-}
+  // Compile the caller function for (measured) performance boost.
+  const caller = new Function('promise', 'builder', 'op', `
+    if (op.${hasMethod}()) {
+      return promise.then(function (result) {
+        return op.${hook}(builder, result);
+      });
+    } else {
+      return promise;
+    }
+  `);
 
-function chainAfterOperations(promise, builder, methods) {
-  return promiseChain(promise, methods, (res, method) => {
-    return method.onAfter(builder, res);
-  }, method => {
-    return method.hasOnAfter();
-  });
-}
-
-function chainAfterInternalOperations(promise, builder, methods) {
-  return promiseChain(promise, methods, (res, method) => {
-    return method.onAfterInternal(builder, res);
-  }, method => {
-    return method.hasOnAfterInternal();
-  });
-}
-
-function promiseChain(promise, items, call, has) {
-  _.each(items, item => {
-    if (!has(item)) {
-      return;
+  return (promise, builder, operations) => {
+    for (let i = 0, l = operations.length; i < l; ++i) {
+      promise = caller(promise, builder, operations[i]);
     }
 
-    promise = promise.then(res => {
-      return call(res, item);
-    });
-  });
-
-  return promise;
+    return promise;
+  };
 }
+
+let chainBeforeOperations = createHookCaller('onBefore');
+let chainBeforeInternalOperations = createHookCaller('onBeforeInternal');
+let chainRawResultOperations = createHookCaller('onRawResult');
+let chainAfterQueryOperations = createHookCaller('onAfterQuery');
+let chainAfterInternalOperations = createHookCaller('onAfterInternal');
+let chainAfterOperations = createHookCaller('onAfter');

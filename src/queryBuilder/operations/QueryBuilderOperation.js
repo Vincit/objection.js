@@ -1,7 +1,3 @@
-import _ from 'lodash';
-import QueryBuilderBase from '../QueryBuilderBase';
-import {isKnexQueryBuilder} from '../../utils/dbUtils';
-
 export default class QueryBuilderOperation {
 
   /**
@@ -90,6 +86,22 @@ export default class QueryBuilderOperation {
    */
   hasOnBuild() {
     return this.onBuild !== QueryBuilderOperation.prototype.onBuild;
+  }
+
+  /**
+   * @param {QueryBuilder} builder
+   * @param {*} result
+   * @returns {*}
+   */
+  onRawResult(builder, result) {
+    return rows;
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  hasOnRawResult() {
+    return this.onRawResult !== QueryBuilderOperation.prototype.onRawResult;
   }
 
   /**
