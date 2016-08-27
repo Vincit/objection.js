@@ -9,18 +9,19 @@ export default class InsertAndFetchOperation extends DelegateOperation {
 
     return after(maybePromise, insertedModels => {
       let insertedModelArray = _.isArray(insertedModels) ? insertedModels : [insertedModels];
+      let idProps = builder.modelClass().getIdPropertyArray();
 
       return builder.modelClass()
         .query()
         .childQueryOf(builder)
         .whereInComposite(builder.modelClass().getFullIdColumn(), _.map(insertedModelArray, model => model.$id()))
         .then(fetchedModels => {
-          fetchedModels = _.keyBy(fetchedModels, model => model.$id());
+          fetchedModels = _.keyBy(fetchedModels, model => model.$propKey(idProps));
 
           // Instead of returning the freshly fetched models, update the input
           // models with the fresh values.
           _.each(insertedModelArray, insertedModel => {
-            insertedModel.$set(fetchedModels[insertedModel.$id()]);
+            insertedModel.$set(fetchedModels[insertedModel.$propKey(idProps)]);
           });
 
           return insertedModels;

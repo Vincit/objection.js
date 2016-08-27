@@ -4,6 +4,7 @@ export default class DelegateOperation extends QueryBuilderOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);
+
     this.delegate = opt.delegate;
     this.isWriteOperation = this.delegate.isWriteOperation;
   }

@@ -1,7 +1,5 @@
-import _ from 'lodash';
 import DelegateOperation from './DelegateOperation';
 import {afterReturn} from '../../utils/promiseUtils';
-import {isPostgres} from '../../utils/dbUtils';
 
 export default class UpdateAndFetchOperation extends DelegateOperation {
 

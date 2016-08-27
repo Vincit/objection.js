@@ -15,11 +15,11 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
     const knex = builder.knex();
 
     for (let i = 0, l = args.length; i < l; ++i) {
-      if (_.isUndefined(args[i])) {
+      if (args[i] === undefined) {
         if (skipUndefined) {
           return false;
         } else {
-          throw new Error(`undefined passed as argument #${l} for '${this.name}' operation`)
+          throw new Error(`undefined passed as argument #${l} for '${this.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
         }
       } else if (args[i] instanceof QueryBuilderBase) {
         // Convert QueryBuilderBase instances into knex query builders.
@@ -28,9 +28,9 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
         if (skipUndefined) {
           args[i] = _.filter(args[i], it => !_.isUndefined(it));
         } else if (_.includes(args[i], undefined)) {
-          throw new Error(`undefined passed as an item in argument #${l} for '${this.name}' operation`)
+          throw new Error(`undefined passed as an item in argument #${l} for '${this.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
         }
-      } else if (_.isFunction(args[i])) {
+      } else if (typeof args[i] === 'function') {
         // If an argument is a function, knex calls it with a query builder as
         // first argument (and as `this` context). We wrap the query builder into
         // a QueryBuilderBase instance.

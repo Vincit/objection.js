@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Model from '../../model/Model';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {afterReturn, mapAfterAllReturn} from '../../utils/promiseUtils';
 
@@ -17,7 +18,10 @@ export default class FindOperation extends QueryBuilderOperation {
 }
 
 function callAfterGet(builder, model, result) {
-  if (_.isObject(model) && _.isFunction(model.$afterGet)) {
+  if (model !== null
+      && typeof model === 'object'
+      && typeof model.$afterGet === 'function'
+      && model.$afterGet !== Model.prototype.$afterGet) {
     return afterReturn(model.$afterGet(builder.context()), result);
   } else {
     return result;

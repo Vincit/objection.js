@@ -5,7 +5,6 @@ import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
 import QueryBuilderBase from './QueryBuilderBase';
 import ValidationError from '../ValidationError';
-import deprecated from '../utils/decorators/deprecated';
 
 import FindOperation from './operations/FindOperation';
 import DeleteOperation from './operations/DeleteOperation';

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class RunBeforeOperation extends QueryBuilderOperation {

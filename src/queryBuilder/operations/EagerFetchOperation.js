@@ -2,7 +2,6 @@ import _ from 'lodash';
 import {Promise} from 'knex';
 import ValidationError from '../../ValidationError'
 import QueryBuilderOperation from './QueryBuilderOperation';
-import {afterReturn, mapAfterAllReturn} from '../../utils/promiseUtils';
 
 export default class EagerFetchOperation extends QueryBuilderOperation {
 

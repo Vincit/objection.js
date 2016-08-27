@@ -5,7 +5,6 @@ import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
 import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
-import ValidationError from '../ValidationError';
 import deprecated from '../utils/decorators/deprecated';
 import memoize from '../utils/decorators/memoize';
 

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-export default function (ids, expectedProperties, opt) {
+export default function normalizeIds(ids, expectedProperties, opt) {
   opt = opt || {};
 
   if (!_.isArray(expectedProperties)) {

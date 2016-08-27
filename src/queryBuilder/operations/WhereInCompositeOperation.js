@@ -4,31 +4,48 @@ import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
 export default class WhereInCompositeOperation extends WrappingQueryBuilderOperation {
 
   onBuild(knexBuilder) {
-    this.whereInComposite(knexBuilder, this.args[0], this.args[1]);
+    this.build(knexBuilder, this.args[0], this.args[1]);
   }
 
-  whereInComposite(knexBuilder, columns, values) {
+  build(knexBuilder, columns, values) {
     let isCompositeKey = _.isArray(columns) && columns.length > 1;
 
     if (isCompositeKey) {
-      if (_.isArray(values)) {
-        return knexBuilder.whereIn(columns, values);
-      } else {
-        // Because of a bug in knex, we need to build the where-in query from pieces
-        // if the value is a subquery.
-        let sql = '(' + _.map(columns, col => this.formatter().wrap(col)).join() + ')';
-        knexBuilder.whereIn(this.raw(sql), values);
-      }
+      this.buildComposite(knexBuilder, columns, values);
     } else {
-      let col = _.isString(columns) ? columns : columns[0];
-
-      if (_.isArray(values)) {
-        values = _.compact(_.flatten(values));
-      }
-
-      // For non-composite keys we can use the normal whereIn.
-      knexBuilder.whereIn(col, values);
+      this.buildNonComposite(knexBuilder, columns, values);
     }
+  }
+
+  buildComposite(knexBuilder, columns, values) {
+    if (_.isArray(values)) {
+      this.buildCompositeValue(knexBuilder, columns, values);
+    } else {
+      this.buildCompositeSubquery(knexBuilder, columns, values);
+    }
+  }
+
+  buildCompositeValue(knexBuilder, columns, values) {
+    knexBuilder.whereIn(columns, values);
+  }
+
+  buildCompositeSubquery(knexBuilder, columns, subquery) {
+    let formatter = this.formatter();
+    let sql = '(' + _.map(columns, col => formatter.wrap(col)).join(',') + ')';
+
+    knexBuilder.whereIn(this.raw(sql), subquery);
+  }
+
+  buildNonComposite(knexBuilder, columns, values) {
+    let col = _.isString(columns) ? columns : columns[0];
+
+    if (_.isArray(values)) {
+      values = _.compact(_.flatten(values));
+    } else {
+      values = [values];
+    }
+
+    knexBuilder.whereIn(col, values);
   }
 }
 

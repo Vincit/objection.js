@@ -5,15 +5,15 @@ export default class WhereCompositeOperation extends WrappingQueryBuilderOperati
 
   onBuild(knexBuilder) {
     if (this.args.length === 2) {
-      this.whereComposite(knexBuilder, this.args[0], '=', this.args[1]);
+      this.build(knexBuilder, this.args[0], '=', this.args[1]);
     } else if (this.args.length === 3) {
-      this.whereComposite(knexBuilder, this.args[0], this.args[1], this.args[2]);
+      this.build(knexBuilder, this.args[0], this.args[1], this.args[2]);
     } else {
       throw new Error(`invalid number of arguments ${this.args.length}`);
     }
   }
 
-  whereComposite(knexBuilder, cols, op, values) {
+  build(knexBuilder, cols, op, values) {
     const colsIsArray = _.isArray(cols);
     const valuesIsArray = _.isArray(values);
 
