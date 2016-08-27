@@ -45,7 +45,6 @@
   "dependencies": {
     "ajv": "^4.1.5",
     "babel-runtime": "^6.6.1",
-    "bluebird": "^3.3.4",
     "lodash": "^4.7.0"
   },
   "peerDependencies": {

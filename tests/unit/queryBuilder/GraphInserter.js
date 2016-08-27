@@ -3,7 +3,7 @@
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
-  , Promise = require('bluebird')
+  , Promise = require('knex').Promise
   , Model = require('../../../').Model
   , GraphInserter = require('../../../lib/queryBuilder/GraphInserter').default
   , RelationExpression = require('../../../').RelationExpression;

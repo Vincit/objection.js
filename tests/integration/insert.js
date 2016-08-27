@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var expect = require('expect.js');
-var Promise = require('bluebird');
+var Promise = require('knex').Promise;
 var inheritModel = require('../../lib/model/inheritModel');
 var ValidationError = require('../../').ValidationError;
 

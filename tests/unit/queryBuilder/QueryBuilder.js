@@ -3,7 +3,7 @@
 var _ = require('lodash')
   , knex = require('knex')
   , expect = require('expect.js')
-  , Promise = require('bluebird')
+  , Promise = require('knex').Promise
   , objection = require('../../../')
   , Model = objection.Model
   , QueryBuilder = objection.QueryBuilder

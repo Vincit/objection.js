@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Promise from 'bluebird';
+import {Promise} from 'knex';
 import ValidationError from '../../ValidationError'
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {afterReturn, mapAfterAllReturn} from '../../utils/promiseUtils';

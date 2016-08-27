@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var expect = require('expect.js');
-var Promise = require('bluebird');
+var Promise = require('knex').Promise;
 var transaction = require('../../').transaction;
 
 module.exports = function (session) {

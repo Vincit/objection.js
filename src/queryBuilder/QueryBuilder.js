@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Promise from 'bluebird';
+import {Promise} from 'knex';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';

@@ -4,7 +4,7 @@ var _ = require('lodash');
 var path = require('path');
 var utils = require('../../lib/utils/dbUtils');
 var transaction = require('../../').transaction;
-var Promise = require('bluebird');
+var Promise = require('knex').Promise;
 var expect = require('expect.js');
 var Model = require('../../').Model;
 

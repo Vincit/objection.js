@@ -20,7 +20,7 @@ describe('main module', function () {
     expect(objection.ManyToManyRelation).to.equal(require('../lib/relations/manyToMany/ManyToManyRelation').default);
     expect(objection.transaction).to.equal(require('../lib/transaction').default);
     expect(objection.transaction.start).to.equal(require('../lib/transaction').default.start);
-    expect(objection.Promise).to.equal(require('bluebird'));
+    expect(objection.Promise).to.equal(require('knex').Promise);
   });
 
 });

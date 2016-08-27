@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Promise from 'bluebird';
+import {Promise} from 'knex';
 import RelationExpression from './RelationExpression';
 import ManyToManyRelation from '../relations/manyToMany/ManyToManyRelation';
 import HasManyRelation from '../relations/hasMany/HasManyRelation';

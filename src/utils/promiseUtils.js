@@ -1,4 +1,4 @@
-import Promise from 'bluebird';
+import {Promise} from 'knex';
 
 export function isPromise(obj) {
   return obj && (typeof obj === 'object') && (typeof obj.then === 'function');
