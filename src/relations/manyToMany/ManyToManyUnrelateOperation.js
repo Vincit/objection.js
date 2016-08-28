@@ -20,7 +20,6 @@ export default class ManyToManyUnrelateOperation extends QueryBuilderOperation {
       .modify(this.relation.modify);
 
     return this.relation.joinTableModelClass
-      .bindKnex(builder.knex())
       .query()
       .childQueryOf(builder)
       .delete()

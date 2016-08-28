@@ -170,14 +170,7 @@ export default class GraphInserter {
         let tableInsertion = batch[conn.relation.joinTable];
 
         let ownerProp = node.model.$values(conn.relation.ownerProp);
-        let knex = conn.relation.ownerModelClass.knex();
         let modelClass = conn.relation.joinTableModelClass;
-
-        if (knex) {
-          // TODO: Because the joinTableModelClass may have been created inside ManyToManyRelation, it may not be bound. We really should not have to know about it here...
-          modelClass = modelClass.bindKnex(knex);
-        }
-
         let joinModel = conn.relation.createJoinModels(ownerProp, [conn.node.model])[0];
 
         if (conn.refNode) {
@@ -251,7 +244,7 @@ export default class GraphInserter {
   _finalize() {
     for (let n = 0, ln = this.graph.nodes.length; n < ln; ++n) {
       let refNode = this.graph.nodes[n];
-      let ref = refNode.model[refNode.model.constructor.uidRefProp];
+      let ref = refNode.model[refNode.modelClass.uidRefProp];
 
       if (ref) {
         // Copy all the properties to the reference nodes.

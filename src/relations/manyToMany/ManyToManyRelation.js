@@ -47,11 +47,6 @@ export default class ManyToManyRelation extends Relation {
     this.joinTableRelatedProp = null;
 
     /**
-     * @type {Constructor.<Model>}
-     */
-    this.joinTableModelClass = null;
-
-    /**
      * @type {Array.<string>}
      */
     this.joinTableExtraCols = null;
@@ -60,6 +55,11 @@ export default class ManyToManyRelation extends Relation {
      * @type {Array.<string>}
      */
     this.joinTableExtraProps = null;
+
+    /**
+     * @type {Constructor.<Model>}
+     */
+    this._joinTableModelClass = null;
   }
 
   setMapping(mapping) {
@@ -105,18 +105,18 @@ export default class ManyToManyRelation extends Relation {
     }
 
     if (mapping.join.through.modelClass) {
-      this.joinTableModelClass = this.resolveModel(Model, mapping.join.through.modelClass, 'join.through.modelClass');
+      this._joinTableModelClass = this.resolveModel(Model, mapping.join.through.modelClass, 'join.through.modelClass');
     } else {
-      this.joinTableModelClass = inheritModel(Model);
-      this.joinTableModelClass.tableName = this.joinTable;
+      this._joinTableModelClass = inheritModel(Model);
+      this._joinTableModelClass.tableName = this.joinTable;
       // We cannot know if the join table has a primary key. Therefore we set some
       // known column as the idColumn so that inserts will work.
-      this.joinTableModelClass.idColumn = this.joinTableRelatedCol;
+      this._joinTableModelClass.idColumn = this.joinTableRelatedCol;
     }
 
-    this.joinTableOwnerProp = this.propertyName(this.joinTableOwnerCol, this.joinTableModelClass);
-    this.joinTableRelatedProp = this.propertyName(this.joinTableRelatedCol, this.joinTableModelClass);
-    this.joinTableExtraProps = this.propertyName(this.joinTableExtraCols, this.joinTableModelClass);
+    this.joinTableOwnerProp = this.propertyName(this.joinTableOwnerCol, this._joinTableModelClass);
+    this.joinTableRelatedProp = this.propertyName(this.joinTableRelatedCol, this._joinTableModelClass);
+    this.joinTableExtraProps = this.propertyName(this.joinTableExtraCols, this._joinTableModelClass);
 
     return retVal;
   }
@@ -153,6 +153,19 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
+   * @type {Constructor.<Model>}
+   */
+  get joinTableModelClass() {
+    const knex = this.ownerModelClass.knex();
+
+    if (knex) {
+      return this._joinTableModelClass.bindKnex(knex);
+    } else {
+      return this._joinTableModelClass;
+    }
+  }
+
+  /**
    * @returns {ManyToManyRelation}
    */
   clone() {
@@ -163,9 +176,9 @@ export default class ManyToManyRelation extends Relation {
     relation.joinTableOwnerProp = this.joinTableOwnerProp;
     relation.joinTableRelatedCol = this.joinTableRelatedCol;
     relation.joinTableRelatedProp = this.joinTableRelatedProp;
-    relation.joinTableModelClass = this.joinTableModelClass;
     relation.joinTableExtraCols = this.joinTableExtraCols;
     relation.joinTableExtraProps = this.joinTableExtraProps;
+    relation._joinTableModelClass = this._joinTableModelClass;
 
     return relation;
   }
@@ -175,7 +188,7 @@ export default class ManyToManyRelation extends Relation {
    */
   bindKnex(knex) {
     let bound = super.bindKnex(knex);
-    bound.joinTableModelClass = this.joinTableModelClass.bindKnex(knex);
+    bound._joinTableModelClass = this._joinTableModelClass.bindKnex(knex);
     return bound;
   }
 
@@ -324,7 +337,6 @@ export default class ManyToManyRelation extends Relation {
     let ownerId = owner.$values(this.ownerProp);
 
     let idQuery = this.joinTableModelClass
-      .bindKnex(builder.knex())
       .query()
       .childQueryOf(builder)
       .select(this.fullJoinTableRelatedCol())
@@ -344,7 +356,6 @@ export default class ManyToManyRelation extends Relation {
     let ownerId = owner.$values(this.ownerProp);
 
     let selectRelatedQuery = this.joinTableModelClass
-      .bindKnex(builder.knex())
       .query()
       .childQueryOf(builder)
       .select(relatedTableAliasRowId)

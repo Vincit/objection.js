@@ -30,7 +30,6 @@ export default class ManyToManyInsertOperation extends InsertOperation {
 
       // Insert the join rows to the join table.
       return this.relation.joinTableModelClass
-        .bindKnex(builder.knex())
         .query()
         .childQueryOf(builder)
         .insert(joinModels)
