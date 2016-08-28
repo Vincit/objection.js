@@ -5,7 +5,7 @@ var _ = require('lodash')
   , expect = require('expect.js')
   , Promise = require('knex').Promise
   , Model = require('../../../').Model
-  , GraphInserter = require('../../../lib/queryBuilder/GraphInserter').default
+  , GraphInserter = require('../../../lib/queryBuilder/graphInserter/GraphInserter').default
   , RelationExpression = require('../../../').RelationExpression;
 
 describe('GraphInserter', function () {

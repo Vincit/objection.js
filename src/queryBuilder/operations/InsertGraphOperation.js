@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import {Promise} from 'knex';
 import DelegateOperation from './DelegateOperation';
-import GraphInserter from '../GraphInserter';
+import GraphInserter from '../graphInserter/GraphInserter';
 import {isPostgres} from '../../utils/dbUtils';
 
 export default class InsertGraphOperation extends DelegateOperation {
