@@ -487,7 +487,7 @@ export default class Relation {
     if (_.isString(modelClass)) {
       let ModelClass = null;
 
-      if (path.isAbsolute(modelClass)) {
+      if (isAbsolutePath(modelClass)) {
         ModelClass = requireModel(modelClass);
       } else {
         // If the path is not a absolute, try the modelPaths of the owner model class.
@@ -525,4 +525,8 @@ export default class Relation {
       throw new Error(`${this.constructor.name}: ${message}`);
     }
   }
+}
+
+function isAbsolutePath(pth) {
+  return path.normalize(pth + '/') === path.normalize(path.resolve(pth) + '/');
 }
