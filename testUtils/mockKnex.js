@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var Knex = require('knex');
-var Promise = require('bluebird');
+var Promise = require('knex').Promise;
 
 module.exports = function (knex) {
   return new MockKnex(knex);
