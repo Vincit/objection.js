@@ -178,8 +178,20 @@ export default class GraphInserter {
           modelClass = modelClass.bindKnex(knex);
         }
 
-        let joinModel = conn.relation.createJoinModels(ownerProp, [conn.node.model]);
-        joinModel = modelClass.fromJson(joinModel[0]);
+        let joinModel = conn.relation.createJoinModels(ownerProp, [conn.node.model])[0];
+
+        if (conn.refNode) {
+          // Also take extra properties from the referring model, it there was one.
+          for (let k = 0, lk = conn.relation.joinTableExtraProps.length; k < lk; ++k) {
+            let extraProp = conn.relation.joinTableExtraProps[k];
+
+            if (!_.isUndefined(conn.refNode.model[extraProp])) {
+              joinModel[extraProp] = conn.refNode.model[extraProp];
+            }
+          }
+        }
+
+        joinModel = modelClass.fromJson(joinModel);
 
         if (!tableInsertion) {
           tableInsertion = new TableInsertion(modelClass, true);

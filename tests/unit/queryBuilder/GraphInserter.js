@@ -68,6 +68,7 @@ describe('GraphInserter', function () {
         join: {
           from: 'Person.id',
           through: {
+            extra: ['role'],
             from: 'Person_Movie.personId',
             to: 'Person_Movie.movieId'
           },
@@ -663,6 +664,81 @@ describe('GraphInserter', function () {
             "movieId": 4
           }]
         }]
+      })
+    });
+
+    it('many to many relation with extra properties in #ref', function () {
+      var model = {
+        "#id": 'actor1',
+        name: 'actor1',
+        movies: [{
+          "#id": 'movie1',
+          name: 'movie1',
+          actors: [{
+            "#ref": 'actor1',
+          }, {
+            name: 'actor2',
+            parent: {
+              name: 'actor3',
+              movies: [{
+                "#ref": 'movie1',
+                role: 'Henchman #136'
+              }, {
+                "#ref": 'movie2'
+              }]
+            }
+          }]
+        }, {
+          "#id": 'movie2',
+          name: 'movie2'
+        }]
+      };
+
+      return test({
+        modelClass: Person,
+        models: model,
+        expectedInsertions: [{
+          "tableName": "Person",
+          "models": [{
+            "name": "actor1"
+          }, {
+            "name": "actor3"
+          }]
+        }, {
+          "tableName": "Movie",
+          "models": [{
+            "name": "movie1"
+          }, {
+            "name": "movie2"
+          }]
+        },
+          {
+            "tableName": "Person",
+            "models": [{
+              "name": "actor2",
+              "parentId": 2
+            }]
+          },
+          {
+            "tableName": "Person_Movie",
+            "models": [{
+              "personId": 1,
+              "movieId": 3
+            }, {
+              "personId": 1,
+              "movieId": 4
+            }, {
+              "movieId": 3,
+              "personId": 5
+            }, {
+              "personId": 2,
+              "movieId": 3,
+              "role": 'Henchman #136'
+            }, {
+              "personId": 2,
+              "movieId": 4
+            }]
+          }]
       })
     });
 

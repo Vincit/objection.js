@@ -7,6 +7,11 @@ export default class ManyToManyConnection {
     this.node = node;
 
     /**
+     * @type {DependencyNode}
+     */
+    this.refNode = null;
+
+    /**
      * @type {Relation}
      */
     this.relation = relation;

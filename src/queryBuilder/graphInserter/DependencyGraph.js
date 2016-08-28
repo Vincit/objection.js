@@ -145,13 +145,13 @@ export default class DependencyGraph {
         continue;
       }
 
-      let ref = refNode.model[refNode.model.constructor.uidRefProp];
+      let ref = refNode.model[refNode.modelClass.uidRefProp];
 
       if (ref) {
         let actualNode = this.nodesById[ref];
 
         if (!actualNode) {
-          throw new ValidationError({ref: 'could not resolve reference "' + ref + '"'});
+          throw new ValidationError({ref: `could not resolve reference "${ref}"`});
         }
 
         let d, ld;
@@ -202,6 +202,7 @@ export default class DependencyGraph {
         actualNode = refMap[conn.node.id];
 
         if (actualNode) {
+          conn.refNode = conn.node;
           conn.node = actualNode;
         }
       }
@@ -236,7 +237,6 @@ export default class DependencyGraph {
           let match = matchResult[0];
           let refId = matchResult[1];
           let refProp = matchResult[2];
-          let pathClone = path.slice();
           let refNode = this.nodesById[refId];
 
           if (!refNode) {
@@ -247,13 +247,13 @@ export default class DependencyGraph {
             // If the match is the whole string, replace the value with the resolved value.
             // This means that the value will have the same type as the resolved value
             // (date, number, etc).
-            node.needs.push(new ReplaceValueDependency(refNode, pathClone, refProp, false));
-            refNode.isNeededBy.push(new ReplaceValueDependency(node, pathClone, refProp, true));
+            node.needs.push(new ReplaceValueDependency(refNode, path, refProp, false));
+            refNode.isNeededBy.push(new ReplaceValueDependency(node, path, refProp, true));
           } else {
             // If the match is inside a string, replace the reference inside the string with
             // the resolved value.
-            node.needs.push(new InterpolateValueDependency(refNode, pathClone, refProp, match, false));
-            refNode.isNeededBy.push(new InterpolateValueDependency(node, pathClone, refProp, match, true));
+            node.needs.push(new InterpolateValueDependency(refNode, path, refProp, match, false));
+            refNode.isNeededBy.push(new InterpolateValueDependency(node, path, refProp, match, true));
           }
         });
       } else if (_.isObject(value)) {

@@ -9,7 +9,7 @@ export default class InterpolateValueDependency extends Dependency {
     /**
      * @type {Array.<string>}
      */
-    this.path = path;
+    this.path = path.slice();
 
     /**
      * @type {string}
