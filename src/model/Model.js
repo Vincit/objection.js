@@ -80,6 +80,11 @@ export default class Model extends ModelBase {
   static modelPaths = [];
 
   /**
+   * @type {boolean}
+   */
+  static pickJsonSchemaProperties = true;
+
+  /**
    * @private
    */
   static $$knex = null;
@@ -287,14 +292,12 @@ export default class Model extends ModelBase {
    */
   $toDatabaseJson() {
     const jsonSchema = this.constructor.getJsonSchema();
-    const pick = jsonSchema && jsonSchema.properties;
-    let omit;
 
-    if (!pick) {
-      omit = this.constructor.getRelations();
+    if (jsonSchema && this.constructor.pickJsonSchemaProperties) {
+      return this.$$toJson(true, null, jsonSchema.properties);
+    } else {
+      return this.$$toJson(true, this.constructor.getRelations(), null);
     }
-
-    return this.$$toJson(true, omit, pick);
   }
 
   /**

@@ -94,6 +94,46 @@ describe('Model', function () {
     expect(json.prop4).to.eql({also: 'this'});
   });
 
+  it('if pickJsonSchemaProperties = false, should select all properties even if jsonSchema is defined', function () {
+    var Model = modelClass('Model');
+
+    Model.jsonSchema = {
+      type: 'object',
+      properties: {
+        prop1: {type: 'number'},
+        prop2: {type: 'string'}
+      }
+    };
+
+    Model.pickJsonSchemaProperties = false;
+
+    var model = Model.fromJson({
+      prop1: 10,
+      prop2: '10',
+      prop3: 'should not be removed',
+      prop4: {also: 'this'}
+    });
+
+    var json = model.$toDatabaseJson();
+
+    expect(json.prop1).to.equal(10);
+    expect(json.prop2).to.equal('10');
+    expect(json.prop3).to.equal('should not be removed');
+    expect(json.prop4).to.eql({also: 'this'});
+
+    expect(model.prop1).to.equal(10);
+    expect(model.prop2).to.equal('10');
+    expect(model.prop3).to.equal('should not be removed');
+    expect(model.prop4).to.eql({also: 'this'});
+
+    json = model.$toJson();
+
+    expect(json.prop1).to.equal(10);
+    expect(json.prop2).to.equal('10');
+    expect(json.prop3).to.equal('should not be removed');
+    expect(json.prop4).to.eql({also: 'this'});
+  });
+
   it('should convert objects to json based on jsonSchema type', function () {
     var Model = modelClass('Model');
 

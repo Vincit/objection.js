@@ -4813,7 +4813,45 @@ Regular expression for parsing a reference to a property.
 
 Defaults to `/#ref{([^\.]+)\.([^}]+)}/g`.
     
-    
+
+
+#### pickJsonSchemaProperties
+
+> ES5:
+
+```js
+function Person() {
+  Model.apply(this, arguments);
+}
+
+Model.extend(Person);
+Person.pickJsonSchemaProperties = false;
+```
+
+> ES6:
+
+```js
+class Person extends Model {
+  static get pickJsonSchemaProperties() {
+    return false;
+  }
+}
+```
+
+> ES7:
+
+```js
+class Person extends Model {
+  static pickJsonSchemaProperties = false;
+}
+```
+
+If this is true (the default) only properties in `jsonSchema` are picked when inserting or updating a row
+in the database. To pick all properties, set this to true.
+
+Defaults to true.
+
+
    
 
 #### QueryBuilder
