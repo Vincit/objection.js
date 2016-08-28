@@ -204,6 +204,13 @@ module.exports = function (session) {
             }
           };
 
+          // Clear the memoized schema.
+          Model1.$$hiddenData.memoizedGetJsonSchema = undefined;
+          Model2.$$hiddenData.memoizedGetJsonSchema = undefined;
+
+          expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
+          expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
+
           return Model1.query().insertGraph(insertion);
         }).then(function () {
           done(new Error('should not get here'));
@@ -245,6 +252,13 @@ module.exports = function (session) {
               model2Prop2: {type: 'integer'}
             }
           };
+
+          // Clear the memoized schema.
+          Model1.$$hiddenData.memoizedGetJsonSchema = undefined;
+          Model2.$$hiddenData.memoizedGetJsonSchema = undefined;
+
+          expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
+          expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
 
           return Model1
             .query()

@@ -40,14 +40,14 @@ export default class ModelBase {
   }
 
   /**
-   * @throws {ValidationError}
    * @param {Object=} json
    * @param {ModelOptions=} options
+   * @throws {ValidationError}
    * @return {Object}
    */
   $validate(json = this, options = {}) {
     const ModelClass = this.constructor;
-    let jsonSchema = ModelClass.jsonSchema;
+    let jsonSchema = ModelClass.getJsonSchema();
 
     if (!jsonSchema || options.skipValidation) {
       return json;
@@ -59,7 +59,7 @@ export default class ModelBase {
       jsonSchema = this.$beforeValidate(jsonSchema, json, options);
     }
 
-    let validator =  ModelClass.jsonSchemaValidator(jsonSchema, options.patch);
+    let validator =  ModelClass.getJsonSchemaValidator(jsonSchema, options.patch);
     validator(json);
 
     if (validator.errors) {
@@ -153,7 +153,7 @@ export default class ModelBase {
     }
 
     if (!options.patch) {
-      json = mergeWithDefaults(this.constructor.jsonSchema, json);
+      json = mergeWithDefaults(this.constructor.getJsonSchema(), json);
     }
 
     // If the json contains query properties like, knex Raw queries or knex/objection query
@@ -381,16 +381,24 @@ export default class ModelBase {
     delete obj[prop];
   }
 
+  @memoize
+  static getJsonSchema() {
+    // Memoized getter in case jsonSchema is a getter property. This is
+    // common in ES6.
+    return this.jsonSchema;
+  }
+
   /**
    * @param {Object} jsonSchema
    * @param {boolean} skipRequired
    * @returns {function}
    */
-  static jsonSchemaValidator(jsonSchema, skipRequired) {
+  static getJsonSchemaValidator(jsonSchema, skipRequired) {
     skipRequired = !!skipRequired;
 
-    if (jsonSchema === this.jsonSchema) {
-      return this.defaultJsonSchemaValidator(skipRequired);
+    if (jsonSchema === this.getJsonSchema()) {
+      // Fast path for the common case: the json schema is never modified.
+      return this.getDefaultJsonSchemaValidator(skipRequired);
     } else {
       let key = JSON.stringify(jsonSchema);
       let validators = ajvCache[key];
@@ -414,8 +422,8 @@ export default class ModelBase {
    * @returns {function}
    */
   @memoize
-  static defaultJsonSchemaValidator(skipRequired) {
-    return compileJsonSchemaValidator(this.jsonSchema, skipRequired);
+  static getDefaultJsonSchemaValidator(skipRequired) {
+    return compileJsonSchemaValidator(this.getJsonSchema(), skipRequired);
   }
 
   /**

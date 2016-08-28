@@ -213,6 +213,28 @@ describe('Performance tests', function () {
     });
 
     perfTest({
+      name: `12000 $toDatabaseJson calls for the dataset with $omitFromDatabaseJson (${12000 * 25} individual models)`,
+      runCount: 12000,
+      runtimeGoal: 1000,
+      beforeTest: function () {
+        return _.map(data, function (json) {
+          let person = Person.fromJson(json);
+          person.$omitFromDatabaseJson(['address', 'age']);
+          person.children.forEach(child => {
+            child.$omitFromDatabaseJson(['address', 'age']);
+            child.pets.forEach(pet => {
+              pet.$omitFromDatabaseJson(['species']);
+            });
+          });
+          return person;
+        });
+      },
+      test: function (persons) {
+        _.invokeMap(persons, '$toDatabaseJson');
+      }
+    });
+
+    perfTest({
       name: `10000 $clone calls for the dataset (${10000 * 85} individual models)`,
       runCount: 10000,
       runtimeGoal: 1000,

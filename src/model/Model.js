@@ -212,7 +212,7 @@ export default class Model extends ModelBase {
 
   $parseDatabaseJson(json) {
     const ModelClass = this.constructor;
-    const jsonAttr = ModelClass.$$getJsonAttributes();
+    const jsonAttr = ModelClass.getJsonAttributes();
 
     if (jsonAttr.length) {
       for (let i = 0, l = jsonAttr.length; i < l; ++i) {
@@ -230,7 +230,7 @@ export default class Model extends ModelBase {
 
   $formatDatabaseJson(json) {
     const ModelClass = this.constructor;
-    const jsonAttr = ModelClass.$$getJsonAttributes();
+    const jsonAttr = ModelClass.getJsonAttributes();
 
     if (jsonAttr.length) {
       for (let i = 0, l = jsonAttr.length; i < l; ++i) {
@@ -286,7 +286,7 @@ export default class Model extends ModelBase {
    * @override
    */
   $toDatabaseJson() {
-    const jsonSchema = this.constructor.jsonSchema;
+    const jsonSchema = this.constructor.getJsonSchema();
     const pick = jsonSchema && jsonSchema.properties;
     let omit;
 
@@ -355,14 +355,7 @@ export default class Model extends ModelBase {
     if (arguments.length) {
       this.$$knex = knex;
     } else {
-      let modelClass = this;
-
-      while (modelClass && !modelClass.$$knex) {
-        let proto = modelClass.prototype.__proto__;
-        modelClass = proto && proto.constructor;
-      }
-
-      return modelClass && modelClass.$$knex;
+      return this.$$knex;
     }
   }
 
@@ -625,14 +618,14 @@ export default class Model extends ModelBase {
    * @protected
    * @returns {Array.<string>}
    */
-  static $$getJsonAttributes() {
+  static getJsonAttributes() {
     // If the jsonAttributes property is not set, try to create it based
     // on the jsonSchema. All properties that are objects or arrays must
     // be converted to JSON.
-    if (!this.jsonAttributes && this.jsonSchema) {
+    if (!this.jsonAttributes && this.getJsonSchema()) {
       this.jsonAttributes = [];
 
-      _.forOwn(this.jsonSchema.properties, (prop, propName) => {
+      _.forOwn(this.getJsonSchema().properties, (prop, propName) => {
         var types = _.compact(ensureArray(prop.type));
 
         if (types.length === 0 && _.isArray(prop.anyOf)) {

@@ -2,6 +2,7 @@ import _ from 'lodash';
 import path from 'path';
 import memoize from '../utils/decorators/memoize';
 import {inherits, isSubclassOf} from '../utils/classUtils';
+import {initHiddenData, copyHiddenData} from '../utils/hiddenData';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 import RelationFindOperation from './RelationFindOperation';
@@ -75,6 +76,8 @@ export default class Relation {
      * @type {function (QueryBuilder)}
      */
     this.modify = null;
+
+    initHiddenData(this);
   }
 
   /**
@@ -193,6 +196,8 @@ export default class Relation {
     relation.relatedCol = this.relatedCol;
     relation.relatedProp = this.relatedProp;
     relation.modify = this.modify;
+
+    copyHiddenData(this, relation);
 
     return relation;
   }

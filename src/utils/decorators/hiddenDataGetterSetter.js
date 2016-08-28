@@ -1,15 +1,15 @@
 import {createHiddenDataGetter, createHiddenDataSetter} from '../hiddenData';
 
 export default function hiddenDataGetterSetter(propName) {
-  const getHiddenData = createHiddenDataGetter(propName);
-  const setHiddenData = createHiddenDataSetter(propName);
+  const get = createHiddenDataGetter(propName);
+  const set = createHiddenDataSetter(propName);
 
   return function (target, property, descriptor) {
-    descriptor.value = function () {
+    descriptor.value = function decorator$hiddenDataGetterSetter() {
       if (arguments.length === 0) {
-        return getHiddenData(this);
+        return get(this);
       } else {
-        setHiddenData(this, arguments[0]);
+        set(this, arguments[0]);
       }
     };
   };
