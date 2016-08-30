@@ -1,7 +1,7 @@
 var _ = require('lodash')
   , Knex = require('knex')
   , expect = require('expect.js')
-  , Promise = require('bluebird')
+  , Promise = require('knex').Promise
   , mockKnexBuilder = require('../testUtils/mockKnex')
   , mockMochaFactory = require('./mockMocha')
   , Model = require('../').Model;

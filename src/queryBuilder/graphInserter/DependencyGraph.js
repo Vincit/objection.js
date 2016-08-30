@@ -1,11 +1,11 @@
 import _ from 'lodash';
 
+import Model from '../../model/Model';
+import HasManyRelation from '../../relations/hasMany/HasManyRelation';
 import RelationExpression from '../RelationExpression';
 import ManyToManyRelation from '../../relations/manyToMany/ManyToManyRelation';
-import HasManyRelation from '../../relations/hasMany/HasManyRelation';
 import BelongsToOneRelation from '../../relations/belongsToOne/BelongsToOneRelation';
 import ValidationError from '../../ValidationError';
-import Model from '../../model/Model';
 
 import DependencyNode from './DependencyNode';
 import HasManyDependency from './HasManyDependency';
@@ -240,7 +240,7 @@ export default class DependencyGraph {
           let refNode = this.nodesById[refId];
 
           if (!refNode) {
-            throw new ValidationError({ref: 'could not resolve reference "' + value + '"'});
+            throw new ValidationError({ref: `could not resolve reference "${value}"`});
           }
 
           if (value === match) {
@@ -314,7 +314,7 @@ export default class DependencyGraph {
   }
 
   createUid() {
-    return '__objection_uid(' + (++this.uid) + ')__';
+    return `__objection_uid(${++this.uid})__`;
   }
 }
 
