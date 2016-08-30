@@ -414,8 +414,7 @@ export default class ModelBase {
 
   @memoize
   static getJsonSchema() {
-    // Memoized getter in case jsonSchema is a getter property. This is
-    // common in ES6.
+    // Memoized getter in case jsonSchema is a getter property (usually is with ES6).
     return this.jsonSchema;
   }
 

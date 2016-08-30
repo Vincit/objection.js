@@ -39,16 +39,6 @@ describe('ModelBase', function () {
       expect(model).to.be.a(ModelBase);
     });
 
-    it('should fail if the subclass constructor has no name', function () {
-      var Model = function () {
-        ModelBase.apply(this, arguments);
-      };
-
-      expect(function () {
-        ModelBase.extend(Model);
-      }).to.throwException();
-    });
-
   });
 
   describe('fromJson', function () {
