@@ -4,11 +4,11 @@
 
 ### What's new
 
- * `#ref` in graph inserts can now contain extra properties for many-to-many relations [#156](ttps://github.com/Vincit/objection.js/issues/156)
+ * `#ref` in graph inserts can now contain extra properties for many-to-many relations [#156](https://github.com/Vincit/objection.js/issues/156)
  * [modelPaths](http://vincit.github.io/objection.js/#modelpaths) attribute for cleaner way to point to models in relationMappings.
- * [pickJsonSchemaProperties](http://vincit.github.io/objection.js/#pickjsonschemaproperties) config parameter [#110](ttps://github.com/Vincit/objection.js/issues/110)
+ * [pickJsonSchemaProperties](http://vincit.github.io/objection.js/#pickjsonschemaproperties) config parameter [#110](https://github.com/Vincit/objection.js/issues/110)
  * Support length property [#168](ttps://github.com/Vincit/objection.js/issues/168)
- * Make sure operations are executed in the order they are called [#180](ttps://github.com/Vincit/objection.js/issues/180)
+ * Make sure operations are executed in the order they are called [#180](https://github.com/Vincit/objection.js/issues/180)
  * Lots of performance tweaks.
 
 ### Breaking changes
