@@ -470,7 +470,8 @@ export default class QueryBuilder extends QueryBuilderBase {
   execute() {
     // Take a clone so that we don't modify this instance during execution.
     let builder = this.clone();
-    let promise = Promise.resolve();
+    let promiseCtx = {builder: builder};
+    let promise = Promise.bind(promiseCtx);
     let context = builder.context() || {};
     let internalContext = builder.internalContext();
 
@@ -484,36 +485,38 @@ export default class QueryBuilder extends QueryBuilderBase {
       builder._callEagerFetchOperation();
     }
 
-    promise = chainBeforeOperations(promise, builder, builder._operations);
-    promise = chainHooks(promise, builder, context.runBefore);
-    promise = chainHooks(promise, builder, internalContext.runBefore);
-    promise = chainBeforeInternalOperations(promise, builder, builder._operations);
+    promise = chainBeforeOperations(promise, builder._operations);
+    promise = chainHooks(promise, context.runBefore);
+    promise = chainHooks(promise, internalContext.runBefore);
+    promise = chainBeforeInternalOperations(promise, builder._operations);
 
     // Resolve all before hooks before building and executing the query
     // and the rest of the hooks.
-    return promise.then(() => {
-      // We need to build the builder even if the _explicit(Resolve|Reject)Value or _hooks.executor
-      // has been defined so that the onBuild hooks get called.
+    return promise.then(function () {
+      const promiseCtx = this;
+      const builder = promiseCtx.builder;
+
+      let promise = null;
       let knexBuilder = build(builder);
       let queryExecutorOperation = builder._queryExecutorOperation();
-      let promise;
 
       if (builder._explicitRejectValue) {
-        promise = Promise.reject(builder._explicitRejectValue);
+        promise  = Promise.reject(builder._explicitRejectValue).bind(promiseCtx);
       } else if (builder._explicitResolveValue) {
-        promise = Promise.resolve(builder._explicitResolveValue);
+        promise = Promise.resolve(builder._explicitResolveValue).bind(promiseCtx);
       } else if (queryExecutorOperation) {
-        promise = queryExecutorOperation.queryExecutor(builder);
+        promise = queryExecutorOperation.queryExecutor(builder).bind(promiseCtx);
       } else {
-        promise = chainRawResultOperations(knexBuilder, builder, builder._operations);
-        promise = promise.then(result => createModels(builder, result));
+        promise = knexBuilder.bind(promiseCtx);
+        promise = chainRawResultOperations(promise, builder._operations);
+        promise = promise.then(createModels);
       }
 
-      promise = chainAfterQueryOperations(promise, builder, builder._operations);
-      promise = chainAfterInternalOperations(promise, builder, builder._operations);
-      promise = chainHooks(promise, builder, context.runAfter);
-      promise = chainHooks(promise, builder, internalContext.runAfter);
-      promise = chainAfterOperations(promise, builder, builder._operations);
+      promise = chainAfterQueryOperations(promise, builder._operations);
+      promise = chainAfterInternalOperations(promise, builder._operations);
+      promise = chainHooks(promise, context.runAfter);
+      promise = chainHooks(promise, internalContext.runAfter);
+      promise = chainAfterOperations(promise, builder._operations);
 
       return promise;
     });
@@ -524,13 +527,15 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilderOperation}
    */
   _queryExecutorOperation() {
-    let executors = _.filter(this._operations, method => method.hasQueryExecutor());
+    for (let i = 0, l = this._operations.length; i < l; ++i) {
+      const op = this._operations[i];
 
-    if (executors.length > 1) {
-      throw new Error('there can only be one method call that implements queryExecutor()');
+      if (op.hasQueryExecutor()) {
+        return op;
+      }
     }
 
-    return executors[0];
+    return null;
   }
 
   /**
@@ -950,7 +955,9 @@ function checkEager(builder) {
   }
 }
 
-function createModels(builder, result) {
+function createModels(result) {
+  const builder = this.builder;
+
   if (_.isNull(result) || _.isUndefined(result)) {
     return null;
   }
@@ -984,12 +991,16 @@ function build(builder) {
   return builder.buildInto(knexBuilder);
 }
 
-function chainHooks(promise, builder, func) {
+function chainHooks(promise, func) {
   if (_.isFunction(func)) {
-    promise = promise.then(result => func.call(builder, result, builder));
+    promise = promise.then(function (result) {
+      return func.call(this.builder, result, this.builder);
+    });
   } else if (_.isArray(func)) {
     _.each(func, func => {
-      promise = promise.then(result => func.call(builder, result, builder));
+      promise = promise.then(function (result) {
+        return func.call(this.builder, result, this.builder);
+      });
     });
   }
 
@@ -1000,9 +1011,9 @@ function callOnBuildHooks(builder, func) {
   if (_.isFunction(func)) {
     func.call(builder, builder);
   } else if (_.isArray(func)) {
-    _.each(func, func => {
-      func.call(builder, builder);
-    });
+    for (let i = 0, l = func.length; i < l; ++i) {
+      func[i].call(builder, builder);
+    }
   }
 }
 
@@ -1010,19 +1021,19 @@ function createHookCaller(hook) {
   const hasMethod = 'has' + _.upperFirst(hook);
 
   // Compile the caller function for (measured) performance boost.
-  const caller = new Function('promise', 'builder', 'op', `
+  const caller = new Function('promise', 'op', `
     if (op.${hasMethod}()) {
       return promise.then(function (result) {
-        return op.${hook}(builder, result);
+        return op.${hook}(this.builder, result);
       });
     } else {
       return promise;
     }
   `);
 
-  return (promise, builder, operations) => {
+  return (promise, operations) => {
     for (let i = 0, l = operations.length; i < l; ++i) {
-      promise = caller(promise, builder, operations[i]);
+      promise = caller(promise, operations[i]);
     }
 
     return promise;

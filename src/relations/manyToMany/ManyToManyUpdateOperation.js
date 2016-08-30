@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import UpdateOperation from '../../queryBuilder/operations/UpdateOperation';
 
 export default class ManyToManyUpdateOperation extends UpdateOperation {

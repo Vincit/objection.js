@@ -204,16 +204,15 @@ module.exports = function (session) {
         ModelWithSchema
           .query()
           .insert({model1Prop1: 666})
-          .then(function () {
+          .then(function (x) {
             done(new Error('should not get here'));
           })
           .catch(function (err) {
             expect(err).to.be.a(ValidationError);
-            return session.knex(Model1.tableName);
-          })
-          .then(function (rows) {
-            expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
-            done();
+            return session.knex(Model1.tableName).then(function (rows) {
+              expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
+              done();
+            })
           })
           .catch(done);
       });

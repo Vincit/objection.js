@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import InsertOperation from '../../queryBuilder/operations/InsertOperation';
 import {after} from '../../utils/promiseUtils';
 

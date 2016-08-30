@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {mapAfterAllReturn} from '../../utils/promiseUtils';
 import {isPostgres} from '../../utils/dbUtils';
@@ -15,7 +14,7 @@ export default class InsertOperation extends QueryBuilderOperation {
   }
 
   call(builder, args) {
-    this.isArray = _.isArray(args[0]);
+    this.isArray = Array.isArray(args[0]);
     this.models = builder.modelClass().ensureModelArray(args[0], this.modelOptions);
     return true;
   }
@@ -35,30 +34,38 @@ export default class InsertOperation extends QueryBuilderOperation {
       knexBuilder.returning(builder.modelClass().idColumn);
     }
 
-    knexBuilder.insert(_.map(this.models, model => {
-      return model.$toDatabaseJson()
-    }));
+    let json = new Array(this.models.length);
+
+    for (let i = 0, l = this.models.length; i < l; ++i) {
+      json[i] = this.models[i].$toDatabaseJson();
+    }
+
+    knexBuilder.insert(json);
   }
 
   onAfterQuery(builder, ret) {
-    if (!_.isArray(ret) || _.isEmpty(ret) || ret === this.models) {
+    if (!Array.isArray(ret) || !ret.length || ret === this.models) {
       // Early exit if there is nothing to do.
       return this.models;
     }
 
-    if (_.isObject(ret[0])) {
+    if (ret[0] && typeof ret[0] === 'object') {
       // If the user specified a `returning` clause the result may be an array of objects.
       // Merge all values of the objects to our models.
-      _.each(this.models, (model, index) => model.$set(ret[index]));
+      for (let i = 0, l = this.models.length; i < l; ++i) {
+        this.models[i].$set(ret[i]);
+      }
     } else {
       // If the return value is not an array of objects, we assume it is an array of identifiers.
-      _.each(this.models, (model, idx) => {
+      for (let i = 0, l = this.models.length; i < l; ++i) {
+        const model = this.models[i];
+
         // Don't set the id if the model already has one. MySQL and Sqlite don't return the correct
         // primary key value if the id is not generated in db, but given explicitly.
         if (!model.$id()) {
-          model.$id(ret[idx]);
+          model.$id(ret[i]);
         }
-      });
+      }
     }
 
     return this.models;

@@ -8,7 +8,7 @@ export default class WhereInCompositeOperation extends WrappingQueryBuilderOpera
   }
 
   build(knexBuilder, columns, values) {
-    let isCompositeKey = _.isArray(columns) && columns.length > 1;
+    let isCompositeKey = Array.isArray(columns) && columns.length > 1;
 
     if (isCompositeKey) {
       this.buildComposite(knexBuilder, columns, values);
@@ -18,7 +18,7 @@ export default class WhereInCompositeOperation extends WrappingQueryBuilderOpera
   }
 
   buildComposite(knexBuilder, columns, values) {
-    if (_.isArray(values)) {
+    if (Array.isArray(values)) {
       this.buildCompositeValue(knexBuilder, columns, values);
     } else {
       this.buildCompositeSubquery(knexBuilder, columns, values);
@@ -30,16 +30,25 @@ export default class WhereInCompositeOperation extends WrappingQueryBuilderOpera
   }
 
   buildCompositeSubquery(knexBuilder, columns, subquery) {
-    let formatter = this.formatter();
-    let sql = '(' + _.map(columns, col => formatter.wrap(col)).join(',') + ')';
+    const formatter = this.formatter();
+
+    let sql = '(';
+    for (let i = 0, l = columns.length; i < l; ++i) {
+      sql += formatter.wrap(columns[i]);
+
+      if (i !== columns.length - 1) {
+        sql += ',';
+      }
+    }
+    sql += ')';
 
     knexBuilder.whereIn(this.raw(sql), subquery);
   }
 
   buildNonComposite(knexBuilder, columns, values) {
-    let col = _.isString(columns) ? columns : columns[0];
+    let col = (typeof columns === 'string') ? columns : columns[0];
 
-    if (_.isArray(values)) {
+    if (Array.isArray(values)) {
       values = _.compact(_.flatten(values));
     } else {
       values = [values];

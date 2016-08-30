@@ -11,14 +11,22 @@ export default class RelationFindOperation extends FindOperation {
   }
 
   onBeforeBuild(builder) {
-    this.relation.findQuery(builder, _(this.owners)
-      .map(owner => owner.$values(this.relation.ownerProp))
-      .uniqBy(id => id.join())
-      .value());
+    let ids = new Array(this.owners.length);
+
+    for (let i = 0, l = this.owners.length; i < l; ++i) {
+      ids[i] = this.owners[i].$values(this.relation.ownerProp);
+    }
+
+    this.relation.findQuery(builder, _.uniqBy(ids, join));
   }
 
   onAfterInternal(builder, related) {
     this.relation.createRelationProp(this.owners, related);
+
     return related;
   }
+}
+
+function join(arr) {
+  return arr.join();
 }

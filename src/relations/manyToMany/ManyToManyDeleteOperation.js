@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import DeleteOperation from '../../queryBuilder/operations/DeleteOperation';
 
 export default class ManyToManyDeleteOperation extends DeleteOperation {

@@ -8,7 +8,7 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
   }
 
   build(knexBuilder, columns, values) {
-    let isCompositeKey = _.isArray(columns) && columns.length > 1;
+    let isCompositeKey = Array.isArray(columns) && columns.length > 1;
 
     if (isCompositeKey) {
       this.buildComposite(knexBuilder, columns, values);
@@ -18,7 +18,7 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
   }
 
   buildComposite(knexBuilder, columns, values) {
-    if (!_.isArray(values)) {
+    if (!Array.isArray(values)) {
       // If the `values` is not an array of values but a function or a subquery
       // we have no way to implement this method.
       throw new Error(`sqlite doesn't support multi-column where in clauses`);
@@ -38,9 +38,9 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
   }
 
   buildNonComposite(knexBuilder, columns, values) {
-    let col = _.isString(columns) ? columns : columns[0];
+    let col = (typeof columns === 'string') ? columns : columns[0];
 
-    if (_.isArray(values)) {
+    if (Array.isArray(values)) {
       values = _.compact(_.flatten(values));
     }
 

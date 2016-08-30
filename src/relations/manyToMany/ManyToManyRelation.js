@@ -146,6 +146,22 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
+   * @returns {Array.<string>}
+   */
+  @memoize
+  aliasedJoinTableOwnerCol() {
+    return _.map(this.joinTableOwnerCol, col => this.joinTableAlias() + '.' + col);
+  }
+
+  /**
+   * @returns {Array.<string>}
+   */
+  @memoize
+  aliasedJoinTableRelatedCol() {
+    return _.map(this.joinTableRelatedCol, col => this.joinTableAlias() + '.' + col);
+  }
+
+  /**
    * @returns {string}
    */
   joinTableAlias() {
@@ -196,24 +212,37 @@ export default class ManyToManyRelation extends Relation {
    * @returns {QueryBuilder}
    */
   findQuery(builder, ownerIds, isColumnRef) {
-    let fullRelatedCol = this.fullRelatedCol();
-
     builder.join(this.joinTable, join => {
-      _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
-        join.on(joinTableRelatedCol, fullRelatedCol[idx]);
-      });
+      const fullRelatedCol = this.fullRelatedCol();
+      const fullJoinTableRelatedCol = this.fullJoinTableRelatedCol();
+
+      for (let i = 0, l = fullJoinTableRelatedCol.length; i < l; ++i) {
+        join.on(fullJoinTableRelatedCol[i], fullRelatedCol[i]);
+      }
     });
 
     if (isColumnRef) {
-      _.each(this.fullJoinTableOwnerCol(), (joinTableOwnerCol, idx) => {
-        builder.whereRef(joinTableOwnerCol, ownerIds[idx]);
-      });
+      const fullJoinTableOwnerCol = this.fullJoinTableOwnerCol();
+
+      for (let i = 0, l = fullJoinTableOwnerCol.length; i < l; ++i) {
+        builder.whereRef(fullJoinTableOwnerCol[i], ownerIds[i]);
+      }
     } else {
-      if (_(ownerIds).flatten().every(id => _.isNull(id) || _.isUndefined(id))) {
-        // Nothing to fetch.
-        builder.resolve([]);
-      } else {
+      let hasIds = false;
+
+      for (let i = 0, l = ownerIds.length; i < l; ++i) {
+        const id = ownerIds[i];
+
+        if (id) {
+          hasIds = true;
+          break;
+        }
+      }
+
+      if (hasIds) {
         builder.whereInComposite(this.fullJoinTableOwnerCol(), ownerIds);
+      } else {
+        builder.resolve([]);
       }
     }
 
@@ -234,22 +263,22 @@ export default class ManyToManyRelation extends Relation {
     let joinTableAsAlias = joinTable + ' as ' +  joinTableAlias;
     let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
 
-    let joinTableOwnerCol = _.map(this.joinTableOwnerCol, col => joinTableAlias + '.' + col);
-    let joinTableRelatedCol = _.map(this.joinTableRelatedCol, col => joinTableAlias + '.' + col);
+    let joinTableOwnerCol = this.aliasedJoinTableOwnerCol();
+    let joinTableRelatedCol = this.aliasedJoinTableRelatedCol();
 
     let ownerCol = this.fullOwnerCol();
     let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
 
     return builder
       [joinOperation](joinTableAsAlias, join => {
-        _.each(joinTableOwnerCol, (joinTableOwnerCol, idx) => {
-          join.on(joinTableOwnerCol, ownerCol[idx]);
-        });
+        for (let i = 0, l = joinTableOwnerCol.length; i < l; ++i) {
+          join.on(joinTableOwnerCol[i], ownerCol[i]);
+        }
       })
       [joinOperation](relatedTableAsAlias, join => {
-        _.each(joinTableRelatedCol, (joinTableRelatedCol, idx) => {
-          join.on(joinTableRelatedCol, relatedCol[idx]);
-        });
+        for (let i = 0, l = joinTableRelatedCol.length; i < l; ++i) {
+          join.on(joinTableRelatedCol[i], relatedCol[i]);
+        }
       })
       .modify(this.modify);
   }
@@ -346,54 +375,64 @@ export default class ManyToManyRelation extends Relation {
   }
 
   selectForModifySqlite(builder, owner) {
-    let relatedTable = this.relatedModelClass.tableName;
-    let relatedTableAlias = this.relatedTableAlias();
-    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
-    let relatedTableAliasRowId = relatedTableAlias + '.' + sqliteBuiltInRowId;
-    let relatedTableRowId = relatedTable + '.' + sqliteBuiltInRowId;
+    const relatedTable = this.relatedModelClass.tableName;
+    const relatedTableAlias = this.relatedTableAlias();
+    const relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
+    const relatedTableAliasRowId = relatedTableAlias + '.' + sqliteBuiltInRowId;
+    const relatedTableRowId = relatedTable + '.' + sqliteBuiltInRowId;
 
-    let fullRelatedCol = this.fullRelatedCol();
-    let ownerId = owner.$values(this.ownerProp);
-
-    let selectRelatedQuery = this.joinTableModelClass
+    const selectRelatedQuery = this.joinTableModelClass
       .query()
       .childQueryOf(builder)
       .select(relatedTableAliasRowId)
-      .whereComposite(this.fullJoinTableOwnerCol(), ownerId)
+      .whereComposite(this.fullJoinTableOwnerCol(), owner.$values(this.ownerProp))
       .join(relatedTableAsAlias, join => {
-        _.each(this.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
-          join.on(joinTableRelatedCol, fullRelatedCol[idx]);
-        });
+        const fullJoinTableRelatedCols = this.fullJoinTableRelatedCol();
+        const fullRelatedCol = this.fullRelatedCol();
+
+        for (let i = 0, l = fullJoinTableRelatedCols.length; i < l; ++i) {
+          join.on(fullJoinTableRelatedCols[i], fullRelatedCol[i]);
+        }
       });
 
     return builder.whereInComposite(relatedTableRowId, selectRelatedQuery);
   }
 
   createJoinModels(ownerId, related) {
-    return _.map(related, related => {
+    const joinModels = new Array(related.length);
+
+    for (let i = 0, lr = related.length; i < lr; ++i) {
+      const rel = related[i];
       let joinModel = {};
 
-      _.each(this.joinTableOwnerProp, (joinTableOwnerProp, idx) => {
-        joinModel[joinTableOwnerProp] = ownerId[idx];
-      });
+      for (let j = 0, lp = this.joinTableOwnerProp.length; j < lp; ++j) {
+        joinModel[this.joinTableOwnerProp[j]] = ownerId[j];
+      }
 
-      _.each(this.joinTableRelatedProp, (joinTableRelatedProp, idx) => {
-        joinModel[joinTableRelatedProp] = related[this.relatedProp[idx]];
-      });
+      for (let j = 0, lp = this.joinTableRelatedProp.length; j < lp; ++j) {
+        joinModel[this.joinTableRelatedProp[j]] = rel[this.relatedProp[j]];
+      }
 
-      _.each(this.joinTableExtraProps, extraProp => {
-        if (!_.isUndefined(related[extraProp])) {
-          joinModel[extraProp] = related[extraProp];
+      for (let j = 0, lp = this.joinTableExtraProps.length; j < lp; ++j) {
+        const prop = this.joinTableExtraProps[j];
+        const extraValue = rel[prop];
+
+        if (!_.isUndefined(extraValue)) {
+          joinModel[prop] = extraValue;
         }
-      });
+      }
 
-      return joinModel;
-    });
+      joinModels[i] = joinModel;
+    }
+
+    return joinModels;
   }
 
   omitExtraProps(models) {
     if (!_.isEmpty(this.joinTableExtraProps)) {
-      _.each(models, model => model.$omitFromDatabaseJson(this.joinTableExtraProps));
+      for (let i = 0, l = models.length; i < l; ++i) {
+        models[i].$omitFromDatabaseJson(this.joinTableExtraProps);
+      }
     }
   }
 }

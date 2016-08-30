@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Relation from '../Relation';
 
 import HasManyInsertOperation from './HasManyInsertOperation';
@@ -8,12 +7,27 @@ import HasManyUnrelateOperation from './HasManyUnrelateOperation';
 export default class HasManyRelation extends Relation {
 
   createRelationProp(owners, related) {
-    let relatedByOwnerId = _.groupBy(related, related => related.$propKey(this.relatedProp));
+    let relatedByOwnerId = Object.create(null);
 
-    _.each(owners, owner => {
-      let ownerId = owner.$propKey(this.ownerProp);
-      owner[this.name] = relatedByOwnerId[ownerId] || [];
-    });
+    for (let i = 0, l = related.length; i < l; ++i) {
+      const rel = related[i];
+      const key = rel.$propKey(this.relatedProp);
+      let arr = relatedByOwnerId[key];
+
+      if (!arr) {
+        arr = [];
+        relatedByOwnerId[key] = arr;
+      }
+
+      arr.push(rel);
+    }
+
+    for (let i = 0, l = owners.length; i < l; ++i) {
+      const own = owners[i];
+      const key = own.$propKey(this.ownerProp);
+
+      own[this.name] = relatedByOwnerId[key] || [];
+    }
   }
 
   appendRelationProp(owner, related) {

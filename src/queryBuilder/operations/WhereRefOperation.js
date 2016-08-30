@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
 
 export default class WhereRefOperation extends WrappingQueryBuilderOperation {
@@ -17,7 +16,7 @@ export default class WhereRefOperation extends WrappingQueryBuilderOperation {
     const formatter = this.formatter();
     op = formatter.operator(op);
 
-    if (!_.isString(lhs) || !_.isString(rhs) || !_.isString(op)) {
+    if (typeof lhs !== 'string' || typeof rhs !== 'string' || typeof op !== 'string') {
       throw new Error('whereRef: invalid operands or operator');
     }
 

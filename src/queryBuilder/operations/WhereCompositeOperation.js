@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
 
 export default class WhereCompositeOperation extends WrappingQueryBuilderOperation {
@@ -14,15 +13,17 @@ export default class WhereCompositeOperation extends WrappingQueryBuilderOperati
   }
 
   build(knexBuilder, cols, op, values) {
-    const colsIsArray = _.isArray(cols);
-    const valuesIsArray = _.isArray(values);
+    const colsIsArray = Array.isArray(cols);
+    const valuesIsArray = Array.isArray(values);
 
     if (!colsIsArray && !valuesIsArray) {
       knexBuilder.where(cols, op, values);
     } else if (colsIsArray && cols.length === 1 && !valuesIsArray) {
       knexBuilder.where(cols[0], op, values);
     } else if (colsIsArray && valuesIsArray && cols.length === values.length) {
-      _.each(cols, (col, idx) => knexBuilder.where(col, op, values[idx]));
+      for (let i = 0, l = cols.length; i < l; ++i) {
+        knexBuilder.where(cols[i], op, values[i])
+      }
     } else {
       throw new Error(`both cols and values must have same dimensions`);
     }

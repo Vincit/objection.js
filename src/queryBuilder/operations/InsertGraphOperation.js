@@ -62,28 +62,32 @@ export default class InsertGraphOperation extends DelegateOperation {
     });
 
     return inserter.execute(tableInsertion => {
+      const inputs = [];
+      const others = [];
+      const queries = [];
+
       let insertQuery = tableInsertion.modelClass
         .query()
         .childQueryOf(builder);
 
-      // We skipped the validation above. We need to validate here since at this point
-      // the models should no longer contain any special properties.
-      _.each(tableInsertion.models, model => {
+      for (let i = 0, l = tableInsertion.models.length; i < l; ++i) {
+        const model = tableInsertion.models[i];
+
+        // We skipped the validation above. We need to validate here since at this point
+        // the models should no longer contain any special properties.
         model.$validate();
-      });
 
-      let inputs = _.filter(tableInsertion.models, (model, idx) => {
-        return tableInsertion.isInputModel[idx];
-      });
+        if (tableInsertion.isInputModel[i]) {
+          inputs.push(model);
+        } else {
+          others.push(model);
+        }
+      }
 
-      let others = _.filter(tableInsertion.models, (model, idx) => {
-        return !tableInsertion.isInputModel[idx];
-      });
+      batchInsert(inputs, insertQuery.clone().copyFrom(builder, /returning/), batchSize, queries);
+      batchInsert(others, insertQuery.clone(), batchSize, queries);
 
-      return Promise.all(_.flatten([
-        batchInsert(inputs, insertQuery.clone().copyFrom(builder, /returning/), batchSize),
-        batchInsert(others, insertQuery.clone(), batchSize)
-      ]));
+      return Promise.all(queries);
     }).then(() => {
       return super.onAfterQuery(builder, this.models)
     });
@@ -96,10 +100,11 @@ export default class InsertGraphOperation extends DelegateOperation {
   }
 }
 
-function batchInsert(models, queryBuilder, batchSize) {
-  let batches = _.chunk(models, batchSize);
-  return _.map(batches, batch => {
-    return queryBuilder.clone().insert(batch)
-  });
+function batchInsert(models, queryBuilder, batchSize, queries) {
+  const batches = _.chunk(models, batchSize);
+
+  for (let i = 0, l = batches.length; i < l; ++i) {
+    queries.push(queryBuilder.clone().insert(batches[i]));
+  }
 }
 

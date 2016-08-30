@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import normalizeIds from '../../utils/normalizeIds';
 import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation';
 
@@ -23,9 +22,12 @@ export default class HasManyRelateOperation extends QueryBuilderOperation {
   queryExecutor(builder) {
     var patch = {};
 
-    _.each(this.relation.relatedProp, (relatedProp, idx) => {
-      patch[relatedProp] = this.owner[this.relation.ownerProp[idx]];
-    });
+    for (let i = 0, l = this.relation.relatedProp.length; i < l; ++i) {
+      const relatedProp = this.relation.relatedProp[i];
+      const ownerProp = this.relation.ownerProp[i];
+
+      patch[relatedProp] = this.owner[ownerProp];
+    }
 
     return this.relation.relatedModelClass
       .query()

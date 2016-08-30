@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import InsertOperation from '../../queryBuilder/operations/InsertOperation';
 import {after} from '../../utils/promiseUtils';
 
@@ -28,11 +27,14 @@ export default class BelongsToOneInsertOperation extends InsertOperation {
       this.owner[this.relation.name] = inserted[0];
       let patch = {};
 
-      _.each(this.relation.ownerProp, (ownerProp, idx) => {
-        let relatedValue = inserted[0][this.relation.relatedProp[idx]];
-        this.owner[ownerProp] = relatedValue;
+      for (let i = 0, l = this.relation.ownerProp.length; i < l; ++i) {
+        const ownerProp = this.relation.ownerProp[i];
+        const relatedProp = this.relation.relatedProp[i];
+        const relatedValue = inserted[0][relatedProp];
+
+        this.owner[ownerProp] = inserted[0][relatedProp];
         patch[ownerProp] = relatedValue;
-      });
+      }
 
       return this.relation.ownerModelClass
         .query()

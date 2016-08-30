@@ -30,9 +30,11 @@ export default class ManyToManyUnrelateSqliteOperation extends QueryBuilderOpera
       .modify(this.relation.modify)
       .whereComposite(this.relation.fullJoinTableOwnerCol(), ownerId)
       .join(joinTableAsAlias, join => {
-        _.each(this.relation.fullJoinTableRelatedCol(), (joinTableRelatedCol, idx) => {
-          join.on(joinTableRelatedCol, fullRelatedCol[idx]);
-        });
+        const fullJoinTableRelatedCol = this.relation.fullJoinTableRelatedCol();
+
+        for (let i = 0, l = fullJoinTableRelatedCol.length; i < l; ++i) {
+          join.on(fullJoinTableRelatedCol[i], fullRelatedCol[i]);
+        }
       });
 
     return this.relation.joinTableModelClass

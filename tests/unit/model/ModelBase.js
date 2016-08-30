@@ -213,7 +213,9 @@ describe('ModelBase', function () {
 
       expect(function () {
         Model.fromJson(json, options);
-      }).not.to.throwException();
+      }).not.to.throwException(function (err) {
+        console.log(err.stack)
+      });
 
       expect(calls).to.equal(1);
     });

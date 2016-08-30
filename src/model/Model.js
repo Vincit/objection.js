@@ -737,7 +737,7 @@ function setId(model, id) {
 function getId(model) {
   const idProp = model.constructor.getIdProperty();
 
-  if (_.isArray(idProp)) {
+  if (Array.isArray(idProp)) {
     return model.$values(idProp);
   } else {
     return model[idProp];

@@ -12,6 +12,7 @@ export default function normalizeIds(ids, expectedProperties, opt) {
   }
 
   let isComposite = expectedProperties.length > 1;
+  let ret;
 
   if (isComposite) {
     // For composite ids these are okay:
@@ -21,20 +22,28 @@ export default function normalizeIds(ids, expectedProperties, opt) {
     // 3. [[1, 'foo', 4], [4, 'bar', 1]]
     // 4. [{a: 1, b: 'foo', c: 4}, {a: 4, b: 'bar', c: 1}]
     //
-    if (_.isArray(ids)) {
-      if (_.isArray(ids[0])) {
+    if (Array.isArray(ids)) {
+      if (Array.isArray(ids[0])) {
+        ret = new Array(ids.length);
+
         // 3.
-        ids = _.map(ids, item => convertIdArrayToObject(item, expectedProperties));
+        for (let i = 0, l = ids.length; i < l; ++i) {
+          ret[i] = convertIdArrayToObject(ids[i], expectedProperties)
+        }
       } else if (_.isObject(ids[0])) {
+        ret = new Array(ids.length);
+
         // 4.
-        ids = _.map(ids, ensureObject);
+        for (let i = 0, l = ids.length; i < l; ++i) {
+          ret[i] = ensureObject(ids[i], expectedProperties)
+        }
       } else {
         // 1.
-        ids = [convertIdArrayToObject(ids, expectedProperties)];
+        ret = [convertIdArrayToObject(ids, expectedProperties)];
       }
     } else if (_.isObject(ids)) {
       // 2.
-      ids = [ids];
+      ret = [ids];
     } else {
       throw new Error(`invalid composite key ${JSON.stringify(ids)}`);
     }
@@ -48,38 +57,40 @@ export default function normalizeIds(ids, expectedProperties, opt) {
     //
     if (_.isArray(ids)) {
       if (_.isObject(ids[0])) {
+        ret = new Array(ids.length);
+
         // 4.
-        ids = _.map(ids, ensureObject);
+        for (let i = 0, l = ids.length; i < l; ++i) {
+          ret[i] = ensureObject(ids[i]);
+        }
       } else {
+        ret = new Array(ids.length);
+
         // 3.
-        ids = _.map(ids, item => _.zipObject(expectedProperties, [item]));
+        for (let i = 0, l = ids.length; i < l; ++i) {
+          ret[i] = {[expectedProperties[0]]: ids[i]};
+        }
       }
     } else if (_.isObject(ids)) {
       // 2.
-      ids = [ids];
+      ret = [ids];
     } else {
       // 1.
-      ids = [_.zipObject(expectedProperties, [ids])];
+      ret = [{[expectedProperties[0]]: ids}];
     }
   }
 
-  _.each(ids, obj => {
-    _.each(expectedProperties, prop => {
-      if (_.isUndefined(obj[prop])) {
-        throw new Error(`expected id ${JSON.stringify(obj)} to have property ${prop}`);
-      }
-    });
-  });
+  checkProperties(ret, expectedProperties);
 
   if (opt.arrayOutput) {
-    return _.map(ids, obj => _.map(expectedProperties, prop => obj[prop]));
+    return normalizedToArray(ret, expectedProperties);
   } else {
-    return ids;
+    return ret;
   }
 };
 
 function convertIdArrayToObject(ids, expectedProperties) {
-  if (!_.isArray(ids)) {
+  if (!Array.isArray(ids)) {
     throw new Error(`invalid composite key ${JSON.stringify(ids)}`);
   }
 
@@ -96,4 +107,36 @@ function ensureObject(ids) {
   } else {
     throw new Error(`invalid composite key ${JSON.stringify(ids)}`);
   }
+}
+
+function checkProperties(ret, expectedProperties) {
+  for (let i = 0, l = ret.length; i < l; ++i) {
+    const obj = ret[i];
+
+    for (let j = 0, lp = expectedProperties.length; j < lp; ++j) {
+      const prop = expectedProperties[j];
+
+      if (typeof obj[prop] === 'undefined') {
+        throw new Error(`expected id ${JSON.stringify(obj)} to have property ${prop}`);
+      }
+    }
+  }
+}
+
+function normalizedToArray(ret, expectedProperties) {
+  let arr = new Array(ret.length);
+
+  for (let i = 0, l = ret.length; i < l; ++i) {
+    const obj = ret[i];
+    const ids = new Array(expectedProperties.length);
+
+    for (let j = 0, lp = expectedProperties.length; j < lp; ++j) {
+      const prop = expectedProperties[j];
+      ids[j] = obj[prop];
+    }
+
+    arr[i] = ids;
+  }
+
+  return arr;
 }

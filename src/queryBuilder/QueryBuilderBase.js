@@ -107,8 +107,13 @@ export default class QueryBuilderBase {
     if (arguments.length === 1) {
       func.call(this, this);
     } else {
-      let args = _.toArray(arguments);
+      let args = new Array(arguments.length);
+
       args[0] = this;
+      for (let i = 1, l = args.length; i < l; ++i) {
+        args[i] = arguments[i];
+      }
+
       func.apply(this, args);
     }
 
@@ -135,11 +140,13 @@ export default class QueryBuilderBase {
    * @param {RegExp} methodNameRegex
    */
   copyFrom(queryBuilder, methodNameRegex) {
-    _.each(queryBuilder._operations, method => {
-      if (!methodNameRegex || methodNameRegex.test(method.name)) {
-        this._operations.push(method);
+    for (let i = 0, l = queryBuilder._operations.length; i < l; ++i) {
+      const op = queryBuilder._operations[i];
+
+      if (!methodNameRegex || methodNameRegex.test(op.name)) {
+        this._operations.push(op);
       }
-    });
+    }
 
     return this;
   }
@@ -150,13 +157,25 @@ export default class QueryBuilderBase {
    */
   has(operationSelector) {
     if (_.isRegExp(operationSelector)) {
-      return _.some(this._operations, operation => {
-        return operationSelector.test(operation.name);
-      });
+      for (let i = 0, l = this._operations.length; i < l; ++i) {
+        const op = this._operations[i];
+
+        if (operationSelector.test(op.name)) {
+          return true;
+        }
+      }
+
+      return false;
     } else {
-      return _.some(this._operations, operation => {
-        return operation instanceof operationSelector;
-      });
+      for (let i = 0, l = this._operations.length; i < l; ++i) {
+        const op = this._operations[i];
+
+        if (op instanceof operationSelector) {
+          return true;
+        }
+      }
+
+      return false;
     }
   }
 

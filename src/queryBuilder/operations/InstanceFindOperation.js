@@ -8,8 +8,6 @@ export default class InstanceFindOperation extends FindOperation {
   }
 
   onBeforeBuild(builder) {
-    builder
-      .whereComposite(builder.modelClass().getFullIdColumn(), this.instance.$id())
-      .first()
+    builder.whereComposite(builder.modelClass().getFullIdColumn(), this.instance.$id()).first()
   }
 }

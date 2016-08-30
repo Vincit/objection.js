@@ -1,15 +1,23 @@
-import _ from 'lodash';
 import HasManyRelation from '../hasMany/HasManyRelation';
 
 export default class HasOneRelation extends HasManyRelation {
 
   createRelationProp(owners, related) {
-    let relatedByOwnerId = _.keyBy(related, related => related.$propKey(this.relatedProp));
+    const relatedByOwnerId = Object.create(null);
 
-    _.each(owners, owner => {
-      let ownerId = owner.$propKey(this.ownerProp);
-      owner[this.name] = relatedByOwnerId[ownerId] || null;
-    });
+    for (let i = 0, l = related.length; i < l; ++i) {
+      const rel = related[i];
+      const key = rel.$propKey(this.relatedProp);
+
+      relatedByOwnerId[key] = rel;
+    }
+
+    for (let i = 0, l = owners.length; i < l; ++i) {
+      const own = owners[i];
+      const key = own.$propKey(this.ownerProp);
+
+      own[this.name] = relatedByOwnerId[key] || null;
+    }
   }
 
   appendRelationProp(owner, related) {

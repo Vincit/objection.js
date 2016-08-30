@@ -225,15 +225,25 @@ export default class Relation {
     const fullRelatedCol = this.fullRelatedCol();
 
     if (isColumnRef) {
-      _.each(fullRelatedCol, (col, idx) => {
-        builder.whereRef(col, ownerIds[idx]);
-      });
+      for (let i = 0, l = fullRelatedCol.length; i < l; ++i) {
+        builder.whereRef(fullRelatedCol[i], ownerIds[i]);
+      }
     } else {
-      if (_(ownerIds).flatten().every(id => _.isNull(id) || _.isUndefined(id))) {
-        // Nothing to fetch.
-        builder.resolve([]);
-      } else {
+      let hasIds = false;
+
+      for (let i = 0, l = ownerIds.length; i < l; ++i) {
+        const id = ownerIds[i];
+
+        if (id) {
+          hasIds = true;
+          break;
+        }
+      }
+
+      if (hasIds) {
         builder.whereInComposite(fullRelatedCol, ownerIds);
+      } else {
+        builder.resolve([]);
       }
     }
 
@@ -448,13 +458,19 @@ export default class Relation {
     let idProperty = modelClass.getIdPropertyArray();
     let modelsById = Object.create(null);
 
-    _.each(models1, model => {
-      modelsById[model.$propKey(idProperty)] = model;
-    });
+    for (let i = 0, l = models1.length; i < l; ++i) {
+      const model = models1[i];
+      const key = model.$propKey(idProperty);
 
-    _.each(models2, model => {
-      modelsById[model.$propKey(idProperty)] = model;
-    });
+      modelsById[key] = model;
+    }
+
+    for (let i = 0, l = models2.length; i < l; ++i) {
+      const model = models2[i];
+      const key = model.$propKey(idProperty);
+
+      modelsById[key] = model;
+    }
 
     return _.sortBy(_.values(modelsById), idProperty);
   }

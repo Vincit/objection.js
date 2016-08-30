@@ -176,11 +176,16 @@ export default class ModelBase {
    * @param {Object} json
    * @returns {ModelBase}
    */
-  $setDatabaseJson(json = {}) {
+  $setDatabaseJson(json) {
     json = this.$parseDatabaseJson(json);
 
-    for (let key in json) {
-      this[key] = json[key];
+    if (json) {
+      const keys = Object.keys(json);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        const key = keys[i];
+        this[key] = json[key];
+      }
     }
 
     return this;
@@ -191,11 +196,18 @@ export default class ModelBase {
    * @returns {ModelBase}
    */
   $set(obj) {
-    _.forOwn(obj, (value, key) => {
-      if (key.charAt(0) !== '$' && !_.isFunction(value)) {
-        this[key] = value;
+    if (obj) {
+      const keys = Object.keys(obj);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        const key = keys[i];
+        const value = obj[key];
+
+        if (key.charAt(0) !== '$' && !_.isFunction(value)) {
+          this[key] = value;
+        }
       }
-    });
+    }
 
     return this;
   }
@@ -229,7 +241,7 @@ export default class ModelBase {
     if (arguments.length === 1 && _.isObject(arguments[0])) {
       let keys = arguments[0];
 
-      if (_.isArray(keys)) {
+      if (Array.isArray(keys)) {
         omitArray(this, keys);
       } else {
         omitObject(this, keys);
@@ -249,7 +261,7 @@ export default class ModelBase {
     if (arguments.length === 1 && _.isObject(arguments[0])) {
       let keys = arguments[0];
 
-      if (_.isArray(keys)) {
+      if (Array.isArray(keys)) {
         pickArray(this, keys);
       } else {
         pickObject(this, keys);
@@ -268,10 +280,25 @@ export default class ModelBase {
   $values() {
     if (arguments.length === 0) {
       return _.values(this);
-    } else if (arguments.length === 1 && _.isArray(arguments[0])) {
-      return _.map(arguments[0], prop => this[prop]);
     } else {
-      return _.map(arguments, prop => this[prop]);
+      const args = (arguments.length === 1 && Array.isArray(arguments[0]))
+        ? arguments[0]
+        : arguments;
+
+      switch (args.length) {
+        case 1: return [this[args[0]]];
+        case 2: return [this[args[0]], this[args[1]]];
+        case 3: return [this[args[0]], this[args[1]], this[args[2]]];
+        default: {
+          const ret = new Array(args.length);
+
+          for (let i = 0, l = args.length; i < l; ++i) {
+            ret[i] = this[args[i]];
+          }
+
+          return ret;
+        }
+      }
     }
   }
 
@@ -301,14 +328,18 @@ export default class ModelBase {
    */
   $clone() {
     const clone = new this.constructor();
+    const keys = Object.keys(this);
 
-    _.forOwn(this, (value, key) => {
+    for (let i = 0, l = keys.length; i < l; ++i) {
+      const key = keys[i];
+      const value = this[key];
+
       if (_.isObject(value)) {
         clone[key] = cloneObject(value);
       } else {
         clone[key] = value;
       }
-    });
+    }
 
     if (this.$omitFromDatabaseJson()) {
       clone.$omitFromDatabaseJson(this.$omitFromDatabaseJson());
@@ -535,14 +566,22 @@ function toJsonImpl(model, createDbJson, omit, pick) {
 function toDatabaseJsonImpl(model, omit, pick) {
   let json = {};
   const omitFromJson = model.$omitFromDatabaseJson();
+  const stash = model.$stashedQueryProps();
 
-  _.forOwn(model.$stashedQueryProps(), (query, key) => {
-    json[key] = query;
-  });
+  if (stash) {
+    const keys = Object.keys(stash);
 
-  _.forOwn(model, (value, key) => {
-    assignJsonValue(json, key, value, omit, pick, omitFromJson, true);
-  });
+    for (let i = 0, l = keys.length; i < l; ++i) {
+      const key = keys[i];
+      json[key] = stash[key];
+    }
+  }
+
+  const keys = Object.keys(model);
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    assignJsonValue(json, key, model[key], omit, pick, omitFromJson, true);
+  }
 
   return json;
 }
@@ -551,12 +590,17 @@ function toExternalJsonImpl(model, omit, pick) {
   let json = {};
   const omitFromJson = model.$omitFromJson();
 
-  _.forOwn(model, (value, key) => {
-    assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
-  });
+  const keys = Object.keys(model);
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    assignJsonValue(json, key, model[key], omit, pick, omitFromJson, false);
+  }
 
   if (model.constructor.virtualAttributes) {
-    _.each(model.constructor.virtualAttributes, key => {
+    const vAttr = model.constructor.virtualAttributes;
+
+    for (let i = 0, l = vAttr.length; i < l; ++i) {
+      const key = vAttr[i];
       let value = model[key];
 
       if (_.isFunction(value)) {
@@ -564,7 +608,7 @@ function toExternalJsonImpl(model, omit, pick) {
       }
 
       assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
-    });
+    }
   }
 
   return json;
@@ -578,7 +622,7 @@ function assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJso
     && (!pick || pick[key])
     && (!omitFromJson || !contains(omitFromJson, key))) {
 
-    if (_.isObject(value)) {
+    if (value !== null && typeof value === 'object') {
       json[key] = toJsonObject(value, createDbJson);
     } else {
       json[key] = value;
@@ -587,7 +631,7 @@ function assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJso
 }
 
 function toJsonObject(value, createDbJson) {
-  if (_.isArray(value)) {
+  if (Array.isArray(value)) {
     return toJsonArray(value, createDbJson);
   } else if (value instanceof ModelBase) {
     if (createDbJson) {
@@ -603,11 +647,17 @@ function toJsonObject(value, createDbJson) {
 }
 
 function toJsonArray(value, createDbJson) {
-  return _.map(value, (value) => toJsonObject(value, createDbJson));
+  const ret = new Array(value.length);
+
+  for (let i = 0, l = ret.length; i < l; ++i) {
+    ret[i] = toJsonObject(value[i], createDbJson)
+  }
+
+  return ret;
 }
 
 function cloneObject(value) {
-  if (_.isArray(value)) {
+  if (Array.isArray(value)) {
     return cloneArray(value);
   } else if (value instanceof ModelBase) {
     return value.$clone();
@@ -619,47 +669,65 @@ function cloneObject(value) {
 }
 
 function cloneArray(value) {
-  return _.map(value, cloneObject);
+  const ret = new Array(value.length);
+
+  for (let i = 0, l = ret.length; i < l; ++i) {
+    ret[i] = cloneObject(value[i])
+  }
+
+  return ret;
 }
 
 function omitObject(model, keyObj) {
   const ModelClass = model.constructor;
+  const keys = Object.keys(keyObj);
 
-  _.forOwn(keyObj, (value, key) => {
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    const value = keyObj[key];
+
     if (value && key.charAt(0) !== '$' && _.has(model, key)) {
       ModelClass.omitImpl(model, key);
     }
-  });
+  }
 }
 
 function omitArray(model, keys) {
   const ModelClass = model.constructor;
 
-  _.each(keys, (key) => {
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+
     if (key.charAt(0) !== '$' && _.has(model, key)) {
       ModelClass.omitImpl(model, key);
     }
-  });
+  }
 }
 
 function pickObject(model, keyObj) {
   const ModelClass = model.constructor;
+  const keys = Object.keys(model);
 
-  _.forOwn(model, (value, key) => {
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+
     if (key.charAt(0) !== '$' && !keyObj[key]) {
       ModelClass.omitImpl(model, key);
     }
-  });
+  }
 }
 
-function pickArray(model, keys) {
+function pickArray(model, pick) {
   const ModelClass = model.constructor;
+  const keys = Object.keys(model);
 
-  _.forOwn(model, (value, key) => {
-    if (key.charAt(0) !== '$' && !contains(keys, key)) {
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+
+    if (key.charAt(0) !== '$' && !contains(pick, key)) {
       ModelClass.omitImpl(model, key);
     }
-  });
+  }
 }
 
 function contains(arr, value) {

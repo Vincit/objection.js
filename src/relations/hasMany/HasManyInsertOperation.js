@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import InsertOperation from '../../queryBuilder/operations/InsertOperation';
 import {after} from '../../utils/promiseUtils';
 
@@ -14,11 +13,16 @@ export default class HasManyInsertOperation extends InsertOperation {
   call(builder, args) {
     const retVal = super.call(builder, args);
 
-    _.each(this.models, model => {
-      _.each(this.relation.relatedProp, (relatedProp, idx) => {
-        model[relatedProp] = this.owner[this.relation.ownerProp[idx]];
-      });
-    });
+    for (let i = 0, lm = this.models.length; i < lm; ++i) {
+      const model = this.models[i];
+
+      for (let j = 0, lp = this.relation.relatedProp.length; j < lp; ++j) {
+        const relatedProp = this.relation.relatedProp[j];
+        const ownerProp = this.relation.ownerProp[j];
+
+        model[relatedProp] = this.owner[ownerProp];
+      }
+    }
 
     return retVal;
   }

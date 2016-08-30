@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import Model from '../../model/Model';
 import HasManyRelation from '../../relations/hasMany/HasManyRelation';
 import RelationExpression from '../RelationExpression';
@@ -47,10 +45,10 @@ export default class DependencyGraph {
     this.nodesById = Object.create(null);
     this.nodes = [];
 
-    if (_.isArray(models)) {
-      _.each(models, model => {
-        this.buildForModel(modelClass, model, null, null, this.allowedRelations);
-      });
+    if (Array.isArray(models)) {
+      for (let i = 0, l = models.length; i < l; ++i) {
+        this.buildForModel(modelClass, models[i], null, null, this.allowedRelations);
+      }
     } else {
       this.buildForModel(modelClass, models, null, null, this.allowedRelations);
     }
@@ -74,7 +72,7 @@ export default class DependencyGraph {
       model[model.constructor.uidProp] = this.createUid();
     }
 
-    let node = new DependencyNode(model, modelClass);
+    const node = new DependencyNode(model, modelClass);
 
     this.nodesById[node.id] = node;
     this.nodes.push(node);
@@ -105,8 +103,14 @@ export default class DependencyGraph {
   }
 
   buildForRelations(modelClass, model, node, allowedRelations) {
-    _.forOwn(modelClass.getRelations(), (rel, relName) => {
-      let relModels = model[relName];
+    const relations = modelClass.getRelations();
+    const relNames = Object.keys(relations);
+
+    for (let i = 0, l = relNames.length; i < l; ++i) {
+      const relName = relNames[i];
+      const relModels = model[relName];
+      const rel = relations[relName];
+
       let nextAllowed = null;
 
       if (relModels && allowedRelations instanceof RelationExpression) {
@@ -117,14 +121,14 @@ export default class DependencyGraph {
         }
       }
 
-      if (_.isArray(relModels)) {
+      if (Array.isArray(relModels)) {
         for (let i = 0, l = relModels.length; i < l; ++i) {
           this.buildForModel(rel.relatedModelClass, relModels[i], node, rel, nextAllowed);
         }
       } else if (relModels) {
         this.buildForModel(rel.relatedModelClass, relModels, node, rel, nextAllowed);
       }
-    });
+    }
   }
 
   solveReferences() {
@@ -220,11 +224,15 @@ export default class DependencyGraph {
   }
 
   createNonRelationDepsForObject(obj, node, path) {
-    let propRefRegex = node.modelClass.propRefRegex;
-    let relations = node.modelClass.getRelations();
-    let isModel = obj instanceof Model;
+    const propRefRegex = node.modelClass.propRefRegex;
+    const relations = node.modelClass.getRelations();
+    const isModel = obj instanceof Model;
+    const keys = Object.keys(obj);
 
-    _.forOwn(obj, (value, key) => {
+    for (let i = 0, l = keys.length; i < l; ++i) {
+      const key = keys[i];
+      const value = obj[key];
+
       if (isModel && relations[key]) {
         // Don't traverse the relations of model instances.
         return;
@@ -232,7 +240,7 @@ export default class DependencyGraph {
 
       path.push(key);
 
-      if (_.isString(value)) {
+      if (typeof value === 'string') {
         allMatches(propRefRegex, value, matchResult => {
           let match = matchResult[0];
           let refId = matchResult[1];
@@ -256,12 +264,12 @@ export default class DependencyGraph {
             refNode.isNeededBy.push(new InterpolateValueDependency(node, path, refProp, match, true));
           }
         });
-      } else if (_.isObject(value)) {
+      } else if (value && typeof value === 'object') {
         this.createNonRelationDepsForObject(value, node, path);
       }
 
       path.pop();
-    });
+    }
   }
 
   isCyclic(nodes) {

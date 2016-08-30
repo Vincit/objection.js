@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {Promise} from 'knex';
 import ValidationError from '../../ValidationError'
 import QueryBuilderOperation from './QueryBuilderOperation';
@@ -14,21 +13,23 @@ export default class EagerFetchOperation extends QueryBuilderOperation {
   call(builder, args) {
     this.expression = args[0].clone();
 
-    _.each(args[1], filter => {
+    const filters = args[1];
+    for (let i = 0, l = filters.length; i < l; ++i) {
+      const filter = filters[i];
       this.expression.addAnonymousFilterAtPath(filter.path, filter.filter);
-    });
+    }
 
     return true;
   }
 
   onAfterInternal(builder, result) {
-    let models = _.isArray(result) ? result : [result];
+    const models = Array.isArray(result) ? result : [result];
 
-    if (_.isEmpty(models) || !(models[0] instanceof builder.modelClass())) {
+    if (!models.length || !(models[0] instanceof builder.modelClass())) {
       return result;
     }
 
-    let promises = [];
+    const promises = [];
 
     this.expression.forEachChild(child => {
       let relation = builder.modelClass().getRelations()[child.name];
@@ -38,34 +39,41 @@ export default class EagerFetchOperation extends QueryBuilderOperation {
       }
     });
 
-    _.forOwn(builder.modelClass().getRelations(), relation => {
+    const relations = builder.modelClass().getRelations();
+    const relNames = Object.keys(relations);
+
+    for (let i = 0, l = relNames.length; i < l; ++i) {
+      const relName = relNames[i];
+      const relation = relations[relName];
+
       let childExpression = this.expression.childExpression(relation.name);
 
       if (childExpression) {
         promises.push(this._fetchRelation(builder, models, relation, childExpression));
       }
-    });
+    }
 
     return Promise.all(promises).return(result);
   }
 
   _fetchRelation(builder, models, relation, childExpression) {
-    let queryBuilder = relation.ownerModelClass.RelatedQueryBuilder
+    const queryBuilder = relation.ownerModelClass.RelatedQueryBuilder
       .forClass(relation.relatedModelClass)
       .childQueryOf(builder)
       .eager(childExpression);
 
     queryBuilder.callQueryBuilderOperation(relation.find(queryBuilder, models), []);
 
-    _.each(childExpression.args, filterName => {
-      let filter = childExpression.filters[filterName];
+    for (let i = 0, l = childExpression.args.length; i < l; ++i) {
+      const filterName = childExpression.args[i];
+      const filter = childExpression.filters[filterName];
 
-      if (!_.isFunction(filter)) {
+      if (typeof filter !== 'function') {
         throw new ValidationError({eager: 'could not find filter "' + filterName + '" for relation "' + relation.name + '"'});
       }
 
       filter(queryBuilder);
-    });
+    }
 
     return queryBuilder;
   }

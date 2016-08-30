@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation'
 
 export default class HasManyUnrelateOperation extends QueryBuilderOperation {
@@ -15,9 +14,9 @@ export default class HasManyUnrelateOperation extends QueryBuilderOperation {
   queryExecutor(builder) {
     var patch = {};
 
-    _.each(this.relation.relatedProp, relatedProp => {
-      patch[relatedProp] = null;
-    });
+    for (let i = 0, l = this.relation.relatedProp.length; i < l; ++i) {
+      patch[this.relation.relatedProp[i]] = null;
+    }
 
     return this.relation.relatedModelClass
       .query()
