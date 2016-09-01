@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import clone from 'lodash/clone';
+import omit from 'lodash/omit';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {afterReturn} from '../../utils/promiseUtils';
 
@@ -8,7 +9,7 @@ export default class UpdateOperation extends QueryBuilderOperation {
     super(builder, name, opt);
 
     this.model = null;
-    this.modelOptions = this.opt.modelOptions || {};
+    this.modelOptions = clone(this.opt.modelOptions) || {};
     this.isWriteOperation = true;
   }
 
@@ -24,7 +25,7 @@ export default class UpdateOperation extends QueryBuilderOperation {
 
   onBuild(knexBuilder, builder) {
     const json = this.model.$toDatabaseJson();
-    const update = _.omit(json, builder.modelClass().getIdColumnArray());
+    const update = omit(json, builder.modelClass().getIdColumnArray());
     knexBuilder.update(update);
   }
 

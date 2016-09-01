@@ -335,9 +335,22 @@ Type|Description
 
 
 
+#### insertGraphAndFetch
+
+Exactly like [insertGraph](#insertgraph) but also fetches the graph from the db after insert.
+
+
+
+
 #### insertWithRelated
 
 Alias for [insertGraph](#insertgraph).
+
+
+
+#### insertWithRelatedAndFetch
+
+Alias for [insertGraphAndFetch](#insertgraphandfetch).
 
 
 

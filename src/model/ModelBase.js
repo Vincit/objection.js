@@ -500,20 +500,22 @@ function mergeWithDefaults(jsonSchema, json) {
     return json;
   }
 
+  const propNames = Object.keys(jsonSchema.properties);
   // Check each schema property for default value.
-  for (let key in jsonSchema.properties) {
-    let prop = jsonSchema.properties[key];
+  for (let i = 0, l = propNames.length; i < l; ++i) {
+    const propName = propNames[i];
+    const prop = jsonSchema.properties[propName];
 
-    if (!_.has(json, key) && _.has(prop, 'default')) {
+    if (!_.has(json, propName) && _.has(prop, 'default')) {
       if (merged === null) {
         // Only take expensive clone if needed.
         merged = _.cloneDeep(json);
       }
 
       if (_.isObject(prop.default)) {
-        merged[key] = _.cloneDeep(prop.default);
+        merged[propName] = _.cloneDeep(prop.default);
       } else {
-        merged[key] = prop.default;
+        merged[propName] = prop.default;
       }
     }
   }

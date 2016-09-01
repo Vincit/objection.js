@@ -11,6 +11,7 @@ import DeleteOperation from './operations/DeleteOperation';
 import UpdateOperation from './operations/UpdateOperation';
 import InsertOperation from './operations/InsertOperation';
 
+import InsertGraphAndFetchOperation from './operations/InsertGraphAndFetchOperation';
 import InsertAndFetchOperation from './operations/InsertAndFetchOperation';
 import UpdateAndFetchOperation from './operations/UpdateAndFetchOperation';
 import QueryBuilderOperation from './operations/QueryBuilderOperation';
@@ -35,13 +36,13 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
-    this._findOperationFactory = builder => new FindOperation(builder, 'find');
-    this._insertOperationFactory = builder => new InsertOperation(builder, 'insert');
-    this._updateOperationFactory = builder => new UpdateOperation(builder, 'update');
-    this._patchOperationFactory = builder => new UpdateOperation(builder, 'patch', {modelOptions: {patch: true}});
-    this._relateOperationFactory = builder => new QueryBuilderOperation(builder, 'relate');
-    this._unrelateOperationFactory = builder => new QueryBuilderOperation(builder, 'unrelate');
-    this._deleteOperationFactory = builder => new DeleteOperation(builder, 'delete');
+    this._findOperationFactory = findOperationFactory;
+    this._insertOperationFactory = insertOperationFactory;
+    this._updateOperationFactory = updateOperationFactory;
+    this._patchOperationFactory = patchOperationFactory;
+    this._relateOperationFactory = relateOperationFactory;
+    this._unrelateOperationFactory = unrelateOperationFactory;
+    this._deleteOperationFactory = deleteOperationFactory;
   }
 
   /**
@@ -777,6 +778,25 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
+   * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
+   * @returns {QueryBuilder}
+   */
+  @writeQueryOperation
+  insertGraphAndFetch(modelsOrObjects) {
+    const insertGraphAndFetchOperation = new InsertGraphAndFetchOperation(this, 'insertGraphAndFetch', {
+      delegate: new InsertGraphOperation(this, 'insertGraph', {
+        delegate: this._insertOperationFactory(this)
+      })
+    });
+
+    return this.callQueryBuilderOperation(insertGraphAndFetchOperation, [modelsOrObjects]);
+  }
+
+  insertWithRelatedAndFetch(...args) {
+    return this.insertGraphAndFetch(...args);
+  }
+
+  /**
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
@@ -1040,9 +1060,23 @@ function createHookCaller(hook) {
   };
 }
 
-let chainBeforeOperations = createHookCaller('onBefore');
-let chainBeforeInternalOperations = createHookCaller('onBeforeInternal');
-let chainRawResultOperations = createHookCaller('onRawResult');
-let chainAfterQueryOperations = createHookCaller('onAfterQuery');
-let chainAfterInternalOperations = createHookCaller('onAfterInternal');
-let chainAfterOperations = createHookCaller('onAfter');
+function createOperationFactory(OperationClass, name, options) {
+  return builder => {
+    return new OperationClass(builder, name, options);
+  };
+}
+
+const chainBeforeOperations = createHookCaller('onBefore');
+const chainBeforeInternalOperations = createHookCaller('onBeforeInternal');
+const chainRawResultOperations = createHookCaller('onRawResult');
+const chainAfterQueryOperations = createHookCaller('onAfterQuery');
+const chainAfterInternalOperations = createHookCaller('onAfterInternal');
+const chainAfterOperations = createHookCaller('onAfter');
+
+const findOperationFactory = createOperationFactory(FindOperation, 'find');
+const insertOperationFactory = createOperationFactory(InsertOperation, 'insert');
+const updateOperationFactory = createOperationFactory(UpdateOperation, 'update');
+const patchOperationFactory = createOperationFactory(UpdateOperation, 'patch', {modelOptions: {patch: true}});
+const relateOperationFactory = createOperationFactory(QueryBuilderOperation, 'relate');
+const unrelateOperationFactory = createOperationFactory(QueryBuilderOperation, 'unrelate');
+const deleteOperationFactory = createOperationFactory(DeleteOperation, 'delete');

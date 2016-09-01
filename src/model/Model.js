@@ -259,13 +259,17 @@ export default class Model extends ModelBase {
     }
 
     const relations = this.constructor.getRelations();
+    const relNames = Object.keys(relations);
+
     // Parse relations into Model instances.
-    for (let relationName in relations) {
+    for (let i = 0, l = relNames.length; i < l; ++i) {
+      const relationName = relNames[i];
+
       if (_.has(json, relationName)) {
         let relationJson = json[relationName];
         let relation = relations[relationName];
 
-        if (_.isArray(relationJson)) {
+        if (Array.isArray(relationJson)) {
           this[relationName] = relation.relatedModelClass.ensureModelArray(relationJson, options);
         } else if (relationJson) {
           this[relationName] = relation.relatedModelClass.ensureModel(relationJson, options);
@@ -666,7 +670,7 @@ function traverse(models, parent, relationName, modelClass, callback) {
     return;
   }
 
-  if (_.isArray(models)) {
+  if (Array.isArray(models)) {
     for (var i = 0, l = models.length; i < l; ++i) {
       traverseOne(models[i], parent, relationName, modelClass, callback);
     }
@@ -684,8 +688,13 @@ function traverseOne(model, parent, relationName, modelClass, callback) {
     callback(model, parent, relationName);
   }
 
-  for (var relName in model.constructor.getRelations()) {
-    if (_.has(model, relName)) {
+  const relations = model.constructor.getRelations();
+  const relNames = Object.keys(relations);
+
+  for (let i = 0, l = relNames.length; i < l; ++i) {
+    const relName = relNames[i];
+
+    if (model.hasOwnProperty(relName)) {
       traverse(model[relName], model, relName, modelClass, callback);
     }
   }

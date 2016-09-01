@@ -1,3 +1,4 @@
+import clone from 'lodash/clone';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {mapAfterAllReturn} from '../../utils/promiseUtils';
 import {isPostgres} from '../../utils/dbUtils';
@@ -9,7 +10,7 @@ export default class InsertOperation extends QueryBuilderOperation {
 
     this.models = null;
     this.isArray = false;
-    this.modelOptions = this.opt.modelOptions || {};
+    this.modelOptions = clone(this.opt.modelOptions) || {};
     this.isWriteOperation = true;
   }
 

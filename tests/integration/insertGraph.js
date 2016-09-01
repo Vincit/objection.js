@@ -297,6 +297,25 @@ module.exports = function (session) {
 
     });
 
+    describe('.query().insertGraphAndFetch()', function () {
+
+      beforeEach(function () {
+        return session.populate([]);
+      });
+
+      it('should insert a model with relations and fetch the inserted graph', function () {
+        return Model1
+          .query()
+          .insertGraphAndFetch(insertion)
+          .then(function (inserted) {
+            return Model1.query().eager(eagerExpr).where('id', inserted.id).first().then(function (fetched) {
+              expect(inserted.$toJson()).to.eql(fetched.$toJson());
+            });
+          });
+      });
+
+    });
+
     describe('.query().insertGraph().allowRelated()', function () {
 
       beforeEach(function () {

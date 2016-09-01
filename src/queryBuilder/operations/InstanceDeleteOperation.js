@@ -1,4 +1,5 @@
 import DeleteOperation from './DeleteOperation';
+import {afterReturn} from '../../utils/promiseUtils';
 
 export default class InstanceDeleteOperation extends DeleteOperation {
 
