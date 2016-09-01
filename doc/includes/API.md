@@ -293,6 +293,33 @@ Person
 > both 'Jennifer' and 'Bradley' will have the movie related to them through the
 > many-to-many relation `movies`.
 
+> If you need to refer to a model already in the database from a many-to-many relation
+> you can use special properties `#dbRef` like this:
+
+```js
+Person
+  .query()
+  .insertGraph([{
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    movies: [{
+      "#id": 'Silver Linings Playbook'
+      name: 'Silver Linings Playbook',
+      duration: 122
+    }]
+  }, {
+    firstName: 'Bradley',
+    lastName: 'Cooper',
+
+    movies: [{
+      "#dbRef": 1536
+    }, {
+      "#dbRef": 6527
+    }]
+  }]);
+```
+
 > You can refer to the properties of other models in the graph using expressions
 > of format `#ref{<id>.<property>}` for example:
 
@@ -4787,6 +4814,44 @@ class Person extends Model {
 Name of the property used to store a reference to a [`uidProp`](#uidprop)
 
 Defaults to '#ref'.
+
+
+
+
+#### dbRefProp
+
+> ES5:
+
+```js
+function Person() {
+  Model.apply(this, arguments);
+}
+
+Model.extend(Person);
+Person.dbRefProp = '#dbRef';
+```
+
+> ES6:
+
+```js
+class Person extends Model {
+  static get dbRefProp() {
+    return '#dbRef';
+  }
+}
+```
+
+> ES7:
+
+```js
+class Person extends Model {
+  static dbRefProp = '#dbRef';
+}
+```
+
+Name of the property used to point to an existing database row from an `insertGraph` graph.
+
+Defaults to '#dbRef'.
    
     
     

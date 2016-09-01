@@ -123,12 +123,28 @@ export default class DependencyGraph {
 
       if (Array.isArray(relModels)) {
         for (let i = 0, l = relModels.length; i < l; ++i) {
-          this.buildForModel(rel.relatedModelClass, relModels[i], node, rel, nextAllowed);
+          this.buildForItem(rel.relatedModelClass, relModels[i], node, rel, nextAllowed);
         }
       } else if (relModels) {
-        this.buildForModel(rel.relatedModelClass, relModels, node, rel, nextAllowed);
+        this.buildForItem(rel.relatedModelClass, relModels, node, rel, nextAllowed);
       }
     }
+  }
+
+  buildForItem(modelClass, item, parentNode, rel, allowedRelations) {
+    if (rel instanceof ManyToManyRelation && item[modelClass.dbRefProp]) {
+      this.buildForId(modelClass, item, parentNode, rel, allowedRelations);
+    } else {
+      this.buildForModel(modelClass, item, parentNode, rel, allowedRelations);
+    }
+  }
+
+  buildForId(modelClass, item, parentNode, rel) {
+    const node = new DependencyNode(item, modelClass);
+    node.handled = true;
+
+    item.$id(item[modelClass.dbRefProp]);
+    parentNode.manyToManyConnections.push(new ManyToManyConnection(node, rel));
   }
 
   solveReferences() {

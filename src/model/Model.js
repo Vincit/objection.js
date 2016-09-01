@@ -60,6 +60,11 @@ export default class Model extends ModelBase {
   static uidRefProp = '#ref';
 
   /**
+   * @type {string}
+   */
+  static dbRefProp = '#dbRef';
+
+  /**
    * @type {RegExp}
    */
   static propRefRegex = /#ref{([^\.]+)\.([^}]+)}/g;

@@ -13,10 +13,19 @@ module.exports = function (session) {
   var Model2 = session.models.Model2;
 
   describe('Model insertGraph queries', function () {
+    var population;
     var insertion;
     var eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2]';
 
     beforeEach(function () {
+      population = {
+        id: 1,
+        model1Prop1: '20',
+        model1Relation3: [{
+          idCol: 1
+        }]
+      };
+
       insertion = {
         model1Prop1: 'root',
 
@@ -32,6 +41,9 @@ module.exports = function (session) {
             // These should go to the join table.
             extra1: 'extraVal1',
             extra2: 'extraVal2'
+          }, {
+            "#dbRef": 1,
+            extra1: 'foo'
           }]
         },
 
@@ -51,7 +63,7 @@ module.exports = function (session) {
     describe('.query().insertGraph()', function () {
 
       beforeEach(function () {
-        return session.populate([]);
+        return session.populate(population);
       });
 
       it('should insert a model with relations', function () {
@@ -67,6 +79,27 @@ module.exports = function (session) {
           })
           .then(function (model) {
             return check(model);
+          });
+      });
+
+      it('should create #dbRef references to existing rows', function () {
+        return Model1
+          .query()
+          .insertGraph(insertion)
+          .then(function () {
+            return session.knex('Model1Model2');
+          })
+          .then(function (rows) {
+            rows = _.map(_.sortBy(rows, ['model1Id', 'model2Id']), function (row) {
+              return _.pick(row, 'model1Id', 'model2Id', 'extra1');
+            });
+
+            expect(rows).to.eql([
+              { model1Id: 1, model2Id: 1, extra1: null },
+              { model1Id: 2, model2Id: 1, extra1: 'foo' },
+              { model1Id: 2, model2Id: 2, extra1: 'extraVal1'},
+              { model1Id: 2, model2Id: 3, extra1: null }
+            ]);
           });
       });
 
@@ -152,10 +185,10 @@ module.exports = function (session) {
             inserted.model1Relation2 = _.sortBy(inserted.model1Relation2, 'idCol');
 
             expect(inserted.toJSON()).to.eql({
-              id: 3,
+              id: 4,
               model1Relation2: [
-                { model1Id: 3, idCol: 100 },
-                { model1Id: 3, idCol: 101 }
+                { model1Id: 4, idCol: 100 },
+                { model1Id: 4, idCol: 101 }
               ]
             });
 
@@ -165,14 +198,14 @@ module.exports = function (session) {
             inserted[0].model1Relation2 = _.sortBy(inserted[0].model1Relation2, 'idCol');
 
             expect(inserted[0]).to.eql({
-              id: 3,
+              id: 4,
               model1Id: null,
               model1Prop1: '42',
               model1Prop2: null,
               $afterGetCalled: 1,
               model1Relation2: [
-                { idCol: 100, model1Id: 3, model2Prop1: '10', model2Prop2: null, $afterGetCalled: 1},
-                { idCol: 101, model1Id: 3, model2Prop1: '50', model2Prop2: null, $afterGetCalled: 1}
+                { idCol: 100, model1Id: 4, model2Prop1: '10', model2Prop2: null, $afterGetCalled: 1},
+                { idCol: 101, model1Id: 4, model2Prop1: '50', model2Prop2: null, $afterGetCalled: 1}
               ]
             });
           });
@@ -223,8 +256,8 @@ module.exports = function (session) {
             session.knex('model_2')
           ]);
         }).spread(function (rows1, rows2) {
-          expect(rows1).to.have.length(0);
-          expect(rows2).to.have.length(0);
+          expect(rows1).to.have.length(1);
+          expect(rows2).to.have.length(1);
           done();
         }).catch(done);
       });
@@ -300,7 +333,7 @@ module.exports = function (session) {
     describe('.query().insertGraphAndFetch()', function () {
 
       beforeEach(function () {
-        return session.populate([]);
+        return session.populate(population);
       });
 
       it('should insert a model with relations and fetch the inserted graph', function () {
@@ -319,7 +352,7 @@ module.exports = function (session) {
     describe('.query().insertGraph().allowRelated()', function () {
 
       beforeEach(function () {
-        return session.populate([]);
+        return session.populate(population);
       });
 
       it('should allow insert when the allowed relation expression is a superset', function () {
@@ -352,7 +385,7 @@ module.exports = function (session) {
     describe('.$query().insertGraph()', function () {
 
       beforeEach(function () {
-        return session.populate([]);
+        return session.populate(population);
       });
 
       it('should insert a model with relations', function () {
@@ -379,10 +412,7 @@ module.exports = function (session) {
         var parent;
 
         beforeEach(function () {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1'
-          }]);
+          return session.populate(population);
         });
 
         beforeEach(function () {
@@ -432,10 +462,7 @@ module.exports = function (session) {
         var parent;
 
         beforeEach(function () {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1'
-          }]);
+          return session.populate(population);
         });
 
         beforeEach(function () {

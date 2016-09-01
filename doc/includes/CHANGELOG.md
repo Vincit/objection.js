@@ -5,6 +5,7 @@
 ### What's new
 
  * `#ref` in graph inserts can now contain extra properties for many-to-many relations [#156](https://github.com/Vincit/objection.js/issues/156)
+ * `#dbRef` can now be used to existing rows from a `insertWithRelated` graph.
  * [`modelPaths`](http://vincit.github.io/objection.js/#modelpaths) attribute for cleaner way to point to models in relationMappings.
  * [`pickJsonSchemaProperties`](http://vincit.github.io/objection.js/#pickjsonschemaproperties) config parameter [#110](https://github.com/Vincit/objection.js/issues/110)
  * [`insertGraphAndFetch`](http://vincit.github.io/objection.js/#insertgraphandfetch) with `insertWithRelatedAndFetch` alias. [#172](https://github.com/Vincit/objection.js/issues/172)
