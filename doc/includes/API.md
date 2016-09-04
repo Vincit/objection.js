@@ -6369,7 +6369,7 @@ somePerson
   .update(newValues);
 ```
 
-> For the following query `opt.old` is undefined` because there is no old object in the javascript
+> For the following query `opt.old` is `undefined` because there is no old object in the javascript
 > side. objection.js doesn't fetch the old values even if they existed in the database
 > for performance and simplicity reasons.
 
@@ -6438,7 +6438,7 @@ somePerson
   .update(newValues);
 ```
 
-> For the following query `opt.old` is undefined` because there is no old object in the javascript
+> For the following query `opt.old` is `undefined` because there is no old object in the javascript
 > side. objection.js doesn't fetch the old values even if they existed in the database
 > for performance and simplicity reasons.
 
