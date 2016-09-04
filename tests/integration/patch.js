@@ -339,6 +339,27 @@ module.exports = function (session) {
           });
       });
 
+      it('should pass the old values to $beforeUpdate and $afterUpdate hooks in options.old', function () {
+        var patch = Model1.fromJson({model1Prop1: 'updated text'});
+
+        return Model1
+          .fromJson({id: 1})
+          .$query()
+          .patch(patch)
+          .then(function () {
+            expect(patch.$beforeUpdateCalled).to.equal(1);
+            expect(patch.$beforeUpdateOptions).to.eql({patch: true, old: {id: 1}});
+            expect(patch.$afterUpdateCalled).to.equal(1);
+            expect(patch.$afterUpdateOptions).to.eql({patch: true, old: {id: 1}});
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
       it('omitting a field should remove it from the patch', function () {
         return Model1
           .fromJson({id: 1, model1Prop1: 'updated text', thisShouldBeRemoved: 1000})

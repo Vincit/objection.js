@@ -196,14 +196,19 @@ export default class GraphInserter {
       }
     }
 
+    const modelNames = Object.keys(batch);
     // Remove duplicates.
-    _.forOwn(batch, tableInsertion => {
+    for (let i = 0, l = modelNames.length; i < l; ++i) {
+      const modelName = modelNames[i];
+      const tableInsertion = batch[modelName];
+
       if (tableInsertion.models.length) {
-        let keys = _.keys(tableInsertion.models[0]);
+        const keys = _.keys(tableInsertion.models[0]);
+
         tableInsertion.models = _.uniqBy(tableInsertion.models, model => model.$propKey(keys));
         tableInsertion.isInputModel = _.times(tableInsertion.models.length, _.constant(false));
       }
-    });
+    }
 
     return batch;
   }
@@ -248,14 +253,18 @@ export default class GraphInserter {
 
       if (ref) {
         // Copy all the properties to the reference nodes.
-        let actualNode = this.graph.nodesById[ref];
-        let relations = actualNode.modelClass.getRelations();
+        const actualNode = this.graph.nodesById[ref];
+        const relations = actualNode.modelClass.getRelations();
+        const keys = Object.keys(actualNode.model);
 
-        _.forOwn(actualNode.model, (value, key) => {
+        for (let i = 0, l = keys.length; i < l; ++i) {
+          const key = keys[i];
+          const value = actualNode.model[key];
+
           if (!relations[key] && !_.isFunction(value)) {
             refNode.model[key] = value;
           }
-        });
+        }
 
         refNode.model.$omit(refNode.modelClass.uidProp, refNode.modelClass.uidRefProp);
       }

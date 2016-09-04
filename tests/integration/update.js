@@ -271,6 +271,69 @@ module.exports = function (session) {
           });
       });
 
+      it('should pass the old values to $beforeUpdate and $afterUpdate hooks in options.old', function () {
+        var model = Model1.fromJson({id: 1, model1Prop1: 'updated text'});
+
+        return Model1
+          .fromJson({id: 1})
+          .$query()
+          .update(model)
+          .then(function () {
+            expect(model.$beforeUpdateCalled).to.equal(1);
+            expect(model.$beforeUpdateOptions).to.eql({old: {id: 1}});
+            expect(model.$afterUpdateCalled).to.equal(1);
+            expect(model.$afterUpdateOptions).to.eql({old: {id: 1}});
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
+
+      it('should pass the old values to $beforeValidate and $afterValidate hooks in options.old', function () {
+        var TestModel = inheritModel(Model1);
+
+        TestModel.pickJsonSchemaProperties = false;
+        TestModel.jsonSchema = {
+          type: 'object',
+          properties: {
+            id: {type: 'integer'}
+          }
+        };
+
+        var before;
+        var after;
+
+        var model = TestModel.fromJson({id: 1, model1Prop1: 'text'});
+
+        TestModel.prototype.$beforeValidate = function (schema, json, options) {
+          before = options.old.toJSON();
+          return schema;
+        };
+
+        TestModel.prototype.$afterValidate = function (json, options) {
+          after = options.old.toJSON();
+        };
+
+        return model
+          .$query()
+          .update({id: 2, model1Prop1: 'updated text'})
+          .then(function (numUpdated) {
+            expect(numUpdated).to.equal(1);
+            expect(before.id).to.equal(1);
+            expect(after.id).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
       it('model edits in $beforeUpdate should get into database query', function () {
         var model = Model1.fromJson({id: 1});
 

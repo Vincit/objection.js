@@ -5514,9 +5514,21 @@ other property.
 
 #### $beforeValidate
 
+> ES5
+
 ```js
 Person.prototype.$beforeValidate = function (jsonSchema, json, opt) {
   return jsonSchema;
+}
+```
+
+> ES6/ES7:
+
+```js
+class Person extends Model {
+  $beforeValidate(jsonSchema, json, opt) {
+
+  }
 }
 ```
 
@@ -5525,6 +5537,9 @@ This is called before validation.
 You can add any additional validation to this method. If validation fails, simply throw an exception and
 the query will be rejected. If you modify the `jsonSchema` argument and return it, that one will be used
 to validate the model.
+
+`opt.old` object contains the old values while `json` contains the new values if validation is being done
+for an existing object.
 
 ##### Arguments
 
@@ -5619,15 +5634,30 @@ Object|Model as a JSON object.
 
 #### $afterValidate
 
+> ES5
+
 ```js
 Person.prototype.$afterValidate = function (json, opt) {
 
 }
 ```
 
+> ES6/ES7:
+
+```js
+class Person extends Model {
+  $afterValidate(json, opt) {
+
+  }
+}
+```
+
 This is called after successful validation.
 
 You can do further validation here and throw a [`ValidationError`](#validationerror) if something goes wrong.
+
+`opt.old` object contains the old values while `json` contains the new values if validation is being done
+for an existing object.
 
 ##### Arguments
 
@@ -6313,10 +6343,41 @@ Type|Description
 
 #### $beforeUpdate
 
+> ES5:
+
 ```js
 Person.prototype.$beforeUpdate = function (opt, queryContext) {
 
 }
+```
+
+> ES6/ES7:
+
+```js
+class Person extends Model {
+  $beforeUpdate(opt, queryContext) {
+
+  }
+}
+```
+
+> Note that the the `opt.old` object is only populated for instance queries started with `$query`:
+
+```js
+somePerson
+  .$query()
+  .update(newValues);
+```
+
+> For the following query `opt.old` is undefined` because there is no old object in the javascript
+> side. objection.js doesn't fetch the old values even if they existed in the database
+> for performance and simplicity reasons.
+
+```js
+Person
+  .query()
+  .update(newValues)
+  .where('foo', 'bar');
 ```
 
 Called before a model is updated.
@@ -6328,6 +6389,10 @@ you need to do update specific validation.
 This method is also called before a model is patched. Therefore all the model's properties
 may not exist. You can check if the update operation is a patch by checking the `opt.patch`
 boolean.
+
+`opt.old` object contains the old values while `this` contains the updated values. The old
+values are never fetched from the database implicitly. For non-instance queries the `opt.old`
+object is `undefined`. See the examples -->.
 
 ##### Arguments
 
@@ -6347,10 +6412,41 @@ Type|Description
 
 #### $afterUpdate
 
+> ES5
+
 ```js
 Person.prototype.$afterUpdate = function (opt, queryContext) {
 
 }
+```
+
+> ES6/ES7:
+
+```js
+class Person extends Model {
+  $afterUpdate(opt, queryContext) {
+
+  }
+}
+```
+
+> Note that the the `opt.old` object is only populated for instance queries started with `$query`:
+
+```js
+somePerson
+  .$query()
+  .update(newValues);
+```
+
+> For the following query `opt.old` is undefined` because there is no old object in the javascript
+> side. objection.js doesn't fetch the old values even if they existed in the database
+> for performance and simplicity reasons.
+
+```js
+Person
+  .query()
+  .update(newValues)
+  .where('foo', 'bar');
 ```
 
 Called after a model is updated.
@@ -6361,12 +6457,97 @@ This method is also called after a model is patched. Therefore all the model's p
 may not exist. You can check if the update operation is a patch by checking the `opt.patch`
 boolean.
 
+`opt.old` object contains the old values while `this` contains the updated values. The old
+values are never fetched from the database implicitly. For non-instance queries the `opt.old`
+object is `undefined`. See the examples -->.
+
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
 opt|ModelOptions|Update options.
 queryContext|Object|The context object of the update query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
+#### $beforeDelete
+
+> ES5
+
+```js
+Person.prototype.$beforeDelete = function (queryContext) {
+
+}
+```
+
+> ES6/ES7:
+
+```js
+class Person extends Model {
+  $beforeDelete(queryContext) {
+
+  }
+}
+```
+
+Called before a model is deleted.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+Note that this method is only called for instance deletes started with `$query()` method.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the delete query. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)&#124;*|
+
+
+
+
+#### $afterDelete
+
+> ES5
+
+```js
+Person.prototype.$afterDelete = function (queryContext) {
+
+}
+```
+
+> ES6/ES7:
+
+```js
+class Person extends Model {
+  $afterDelete(queryContext) {
+
+  }
+}
+```
+
+Called after a model is deleted.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+Note that this method is only called for instance deletes started with `$query()` method.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the delete query. See [`context`](#context).
 
 ##### Return value
 
@@ -6574,3 +6755,4 @@ Property|Type|Description
 --------|----|-----------
 patch|boolean|If true the json is treated as a patch and the `required` field of the json schema is ignored in the validation. This allows us to create models with a subset of required properties for patch operations.
 skipValidation|boolean|If true the json schema validation is skipped
+old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`.

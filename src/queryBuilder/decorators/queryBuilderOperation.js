@@ -12,7 +12,7 @@ export default function queryBuilderOperation(input, name) {
         const args = new Array(arguments.length);
 
         // Don't turn this into a function. This needs to be inline for V8 to optimize this.
-        for (let i = 0; i < args.length; ++i) {
+        for (let i = 0, l = arguments.length; i < l; ++i) {
           args[i] = arguments[i];
         }
 
@@ -26,7 +26,7 @@ export default function queryBuilderOperation(input, name) {
         const args = new Array(arguments.length);
 
         // Don't turn this into a function. This needs to be inline for V8 to optimize this.
-        for (let i = 0; i < args.length; ++i) {
+        for (let i = 0, l = arguments.length; i < l; ++i) {
           args[i] = arguments[i];
         }
 

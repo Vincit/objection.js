@@ -1,10 +1,13 @@
 import UpdateOperation from './UpdateOperation';
+import {after} from '../../utils/promiseUtils';
 
 export default class InstanceUpdateOperation extends UpdateOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);
+
     this.instance = opt.instance;
+    this.modelOptions.old = opt.instance;
   }
 
   call(builder, args) {
@@ -23,7 +26,10 @@ export default class InstanceUpdateOperation extends UpdateOperation {
   }
 
   onAfterInternal(builder, numUpdated) {
-    this.instance.$set(this.model);
-    return super.onAfterInternal(builder, numUpdated);
+    const maybePromise = super.onAfterInternal(builder, numUpdated);
+    return after(maybePromise, result => {
+      this.instance.$set(this.model);
+      return result;
+    });
   }
 }

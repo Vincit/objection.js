@@ -14,6 +14,7 @@ const ajvCache = Object.create(null);
  *
  * @property {boolean} [patch]
  * @property {boolean} [skipValidation]
+ * @property {Model} [old]
  */
 
 export default class ModelBase {

@@ -210,6 +210,35 @@ describe('ModelBase', function () {
       expect(calls).to.equal(1);
     });
 
+    it('should only call jsonSchema once if jsonSchema is a getter', function () {
+      var calls = 0;
+
+      Object.defineProperty(Model, "jsonSchema", {
+        get: function () {
+          ++calls;
+          return {
+            required: ['a'],
+            properties: {
+              a: {type: 'string'},
+              b: {type: 'number'}
+            }
+          };
+        }
+      });
+
+      for (var i = 0; i < 10; ++i) {
+        Model.fromJson({a: 'str', b: 2});
+      }
+
+      var model = Model.fromJson({a: 'str', b: 2});
+      model.$validate();
+      model.$validate();
+      model.$toJson();
+      model.$toDatabaseJson();
+
+      expect(calls).to.equal(1);
+    });
+
     it('should call $beforeValidate if jsonSchema is defined', function () {
       var calls = 0;
       var json = {a: 1, b: 2};

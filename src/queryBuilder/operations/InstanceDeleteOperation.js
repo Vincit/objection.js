@@ -8,8 +8,18 @@ export default class InstanceDeleteOperation extends DeleteOperation {
     this.instance = opt.instance;
   }
 
+  onBeforeInternal(builder, result) {
+    const maybePromise = this.instance.$beforeDelete(builder.context());
+    return afterReturn(maybePromise, result);
+  }
+
   onBeforeBuild(builder) {
     super.onBeforeBuild(builder);
     builder.whereComposite(builder.modelClass().getFullIdColumn(), this.instance.$id());
+  }
+
+  onAfterInternal(builder, result) {
+    const maybePromise = this.instance.$afterDelete(builder.context());
+    return afterReturn(maybePromise, result);
   }
 }

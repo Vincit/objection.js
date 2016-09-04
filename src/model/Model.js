@@ -342,6 +342,18 @@ export default class Model extends ModelBase {
   $afterGet(queryContext) {}
 
   /**
+   * @param {QueryBuilderContext} queryContext
+   * @returns {Promise|*}
+   */
+  $beforeDelete(queryContext) {}
+
+  /**
+   * @param {QueryBuilderContext} queryContext
+   * @returns {Promise|*}
+   */
+  $afterDelete(queryContext) {}
+
+  /**
    * @param {Transaction=} trx
    * @returns {QueryBuilder}
    */

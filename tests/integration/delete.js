@@ -95,12 +95,46 @@ module.exports = function (session) {
       });
 
       it('should delete a model', function () {
-        return Model1
-          .fromJson({id: 1})
+        var model = Model1.fromJson({id: 1});
+
+        return model
           .$query()
           .delete()
           .then(function (numDeleted) {
             expect(numDeleted).to.equal(1);
+            expect(model.$beforeDeleteCalled).to.equal(1);
+            expect(model.$afterDeleteCalled).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(1);
+            expectPartEql(rows[0], {id: 2, model1Prop1: 'hello 2'});
+          });
+      });
+
+      it('should should call $beforeDelete and $afterDelete hooks', function () {
+        var model = Model1.fromJson({id: 1});
+
+        model.$beforeDelete = function () {
+          var self = this;
+          return Model1.query().findById(this.id).then(function (model) {
+            self.before = model;
+          });
+        };
+
+        model.$afterDelete = function () {
+          var self = this;
+          return Model1.query().findById(this.id).then(function (model) {
+            self.after = model || null;
+          });
+        };
+
+        return model
+          .$query()
+          .delete()
+          .then(function () {
+            expect(model.before.id).to.equal(model.id);
+            expect(model.after).to.equal(null);
             return session.knex('Model1').orderBy('id');
           })
           .then(function (rows) {

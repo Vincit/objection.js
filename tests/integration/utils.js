@@ -67,11 +67,25 @@ module.exports.initialize = function (opt) {
     });
   };
 
+  Model1.prototype.$beforeDelete = function () {
+    var self = this;
+    return Promise.delay(1).then(function () {
+      inc(self, '$beforeDeleteCalled');
+    });
+  };
+
+  Model1.prototype.$afterDelete = function () {
+    var self = this;
+    return Promise.delay(1).then(function () {
+      inc(self, '$afterDeleteCalled');
+    });
+  };
+
   Model1.prototype.$beforeUpdate = function (options) {
     var self = this;
     return Promise.delay(5).then(function () {
       inc(self, '$beforeUpdateCalled');
-      self.$beforeUpdateOptions = options;
+      self.$beforeUpdateOptions = _.cloneDeep(options);
     });
   };
 
@@ -79,7 +93,7 @@ module.exports.initialize = function (opt) {
     var self = this;
     return Promise.delay(1).then(function () {
       inc(self, '$afterUpdateCalled');
-      self.$afterUpdateOptions = options;
+      self.$afterUpdateOptions = _.cloneDeep(options);
     });
   };
 
@@ -109,6 +123,20 @@ module.exports.initialize = function (opt) {
     return Promise.delay(5).then(function () {
       inc(self, '$beforeUpdateCalled');
       self.$beforeUpdateOptions = options;
+    });
+  };
+
+  Model2.prototype.$beforeDelete = function () {
+    var self = this;
+    return Promise.delay(1).then(function () {
+      inc(self, '$beforeDeleteCalled');
+    });
+  };
+
+  Model2.prototype.$afterDelete = function () {
+    var self = this;
+    return Promise.delay(1).then(function () {
+      inc(self, '$afterDeleteCalled');
     });
   };
 
