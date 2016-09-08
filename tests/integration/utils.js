@@ -252,27 +252,34 @@ module.exports.createDb = function () {
 
   return session.knex.schema
     .dropTableIfExists('Model1Model2')
-    .dropTableIfExists('Model1')
-    .dropTableIfExists('model_2')
-    .createTable('Model1', function (table) {
-      table.bigincrements('id').primary();
-      table.biginteger('model1Id');
-      table.string('model1Prop1');
-      table.integer('model1Prop2');
+    .then(function () {
+      return session.knex.schema.dropTableIfExists('Model1');
     })
-    .createTable('model_2', function (table) {
-      table.bigincrements('id_col').primary();
-      table.biginteger('model_1_id');
-      table.string('model_2_prop_1');
-      table.integer('model_2_prop_2');
+    .then(function () {
+      return session.knex.schema.dropTableIfExists('model_2');
     })
-    .createTable('Model1Model2', function (table) {
-      table.bigincrements('id').primary();
-      table.string('extra1');
-      table.string('extra2');
-      table.string('extra3');
-      table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE');
-      table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE');
+    .then(function () {
+      return session.knex.schema
+        .createTable('Model1', function (table) {
+          table.bigincrements('id').primary();
+          table.biginteger('model1Id');
+          table.string('model1Prop1');
+          table.integer('model1Prop2');
+        })
+        .createTable('model_2', function (table) {
+          table.bigincrements('id_col').primary();
+          table.biginteger('model_1_id');
+          table.string('model_2_prop_1');
+          table.integer('model_2_prop_2');
+        })
+        .createTable('Model1Model2', function (table) {
+          table.bigincrements('id').primary();
+          table.string('extra1');
+          table.string('extra2');
+          table.string('extra3');
+          table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE');
+          table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE');
+        })
     })
     .catch(function () {
       throw new Error('Could not connect to '
@@ -291,14 +298,15 @@ module.exports.destroy = function () {
 module.exports.populate = function (data) {
   var session = this;
 
-  return transaction(session.models.Model1, function (Model1) {
-    var trx = Model1.knex();
-
-    return Promise.all([
-        trx('Model1Model2').delete(),
-        trx('Model1').delete(),
-        trx('model_2').delete()
-      ])
+  return transaction(session.models.Model1, function (Model1, trx) {
+    return trx('Model1Model2')
+      .delete()
+      .then(function () {
+        return trx('Model1').delete();
+      })
+      .then(function () {
+        return trx('model_2').delete();
+      })
       .then(function () {
         return Model1.query().insertGraph(data);
       })

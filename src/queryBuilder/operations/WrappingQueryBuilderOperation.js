@@ -10,13 +10,13 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
   }
 
   call(builder, args) {
-    const ret = wrapArgs(builder, args);
+    const ret = wrapArgs(this, builder, args);
     this.args = args;
     return ret;
   }
 }
 
-function wrapArgs(builder, args) {
+function wrapArgs(op, builder, args) {
   const skipUndefined = builder.shouldSkipUndefined();
   const knex = builder.knex();
 
@@ -27,7 +27,7 @@ function wrapArgs(builder, args) {
       if (skipUndefined) {
         return false;
       } else {
-        throw new Error(`undefined passed as argument #${l} for '${this.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
+        throw new Error(`undefined passed as argument #${l} for '${op.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
       }
     } else if (arg instanceof QueryBuilderBase) {
       // Convert QueryBuilderBase instances into knex query builders.
@@ -36,7 +36,7 @@ function wrapArgs(builder, args) {
       if (skipUndefined) {
         args[i] = withoutUndefined(arg);
       } else if (includesUndefined(arg)) {
-        throw new Error(`undefined passed as an item in argument #${l} for '${this.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
+        throw new Error(`undefined passed as an item in argument #${l} for '${op.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
       }
     } else if (typeof arg === 'function') {
       // If an argument is a function, knex calls it with a query builder as
