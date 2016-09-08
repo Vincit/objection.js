@@ -4,7 +4,7 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
-import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
+import hiddenData from '../utils/decorators/hiddenData';
 import deprecated from '../utils/decorators/deprecated';
 import memoize from '../utils/decorators/memoize';
 
@@ -439,7 +439,7 @@ export default class Model extends ModelBase {
     }
 
     // Create a new subclass of this class.
-    let BoundModelClass = inheritModel(ModelClass);
+    const BoundModelClass = inheritModel(ModelClass);
 
     // The bound model is equal to the source model in every way. We want to copy
     // the hidden data as-is from the source so that we don't get the performance
@@ -449,12 +449,14 @@ export default class Model extends ModelBase {
     BoundModelClass.knex(knex);
     knex.$$objection.boundModels[ModelClass.tableName] = BoundModelClass;
 
-    // Bind all relations also.
-    BoundModelClass.relations(_.reduce(ModelClass.getRelations(), (relations, relation, relationName) => {
-      relations[relationName] = relation.bindKnex(knex);
-      return relations;
-    }, Object.create(null)));
+    const boundRelations = Object.create(null);
 
+    // Bind all relations also.
+    _.forOwn(ModelClass.getRelations(), (relation, relationName) => {
+      boundRelations[relationName] = relation.bindKnex(knex);
+    });
+
+    BoundModelClass.relations = boundRelations;
     return BoundModelClass;
   }
 
@@ -562,14 +564,20 @@ export default class Model extends ModelBase {
   /**
    * @private
    */
-  @hiddenDataGetterSetter('relations')
-  static relations(relations) {}
+  @hiddenData()
+  static get relations() {}
+
+  /**
+   * @private
+   */
+  @hiddenData()
+  static set relations(value) {}
 
   /**
    * @return {Object.<string, Relation>}
    */
   static getRelations() {
-    let relations = this.relations();
+    let relations = this.relations;
 
     if (!relations) {
       const ModelClass = this;
@@ -580,7 +588,7 @@ export default class Model extends ModelBase {
         return relations;
       }, Object.create(null));
 
-      this.relations(relations);
+      this.relations = relations;
     }
 
     return relations;

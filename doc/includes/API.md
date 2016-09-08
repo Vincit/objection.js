@@ -5003,7 +5003,7 @@ class Person extends Model {
 }
 ```
 
-[`QueryBuilder`](#querybuilder) subclass to use in [`$_s_relatedQuery`](#relatedquery) method.
+[`QueryBuilder`](#querybuilder) subclass to use in [`$relatedQuery`](#_s_relatedquery) method.
 
 This constructor is used whenever a query builder is created using the [`$relatedQuery`](#_s_relatedquery)  method.
 You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.

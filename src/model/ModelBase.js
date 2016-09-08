@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Ajv from 'ajv';
+import hiddenData from '../utils/decorators/hiddenData';
 import ValidationError from '../ValidationError';
-import hiddenDataGetterSetter from '../utils/decorators/hiddenDataGetterSetter';
 import splitQueryProps from '../utils/splitQueryProps';
 import {inherits} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
@@ -47,8 +47,7 @@ export default class ModelBase {
    * @return {Object}
    */
   $validate(json = this, options = {}) {
-    const ModelClass = this.constructor;
-    let jsonSchema = ModelClass.getJsonSchema();
+    let jsonSchema = this.constructor.getJsonSchema();
 
     if (!jsonSchema || options.skipValidation) {
       return json;
@@ -60,7 +59,7 @@ export default class ModelBase {
       jsonSchema = this.$beforeValidate(jsonSchema, json, options);
     }
 
-    let validator =  ModelClass.getJsonSchemaValidator(jsonSchema, options.patch);
+    let validator =  this.constructor.getJsonSchemaValidator(jsonSchema, options.patch);
     validator(json);
 
     if (validator.errors) {
@@ -217,21 +216,21 @@ export default class ModelBase {
    * @param {Array.<string>=} keys
    * @returns {Array.<string>}
    */
-  @hiddenDataGetterSetter('omitFromJson')
+  @hiddenData({name: 'omitFromJson', append: true})
   $omitFromJson(keys) {}
 
   /**
    * @param {Array.<string>=} keys
    * @returns {Array.<string>}
    */
-  @hiddenDataGetterSetter('omitFromDatabaseJson')
+  @hiddenData({name: 'omitFromDatabaseJson', append: true})
   $omitFromDatabaseJson(keys) {}
 
   /**
    * @param {Object=} queryProps
    * @returns {Object}
    */
-  @hiddenDataGetterSetter('stashedQueryProps')
+  @hiddenData('stashedQueryProps')
   $stashedQueryProps(queryProps) {}
 
   /**
@@ -413,12 +412,6 @@ export default class ModelBase {
     delete obj[prop];
   }
 
-  @memoize
-  static getJsonSchema() {
-    // Memoized getter in case jsonSchema is a getter property (usually is with ES6).
-    return this.jsonSchema;
-  }
-
   /**
    * @param {Object} jsonSchema
    * @param {boolean} skipRequired
@@ -447,6 +440,12 @@ export default class ModelBase {
 
       return validator;
     }
+  }
+
+  @memoize
+  static getJsonSchema() {
+    // Memoized getter in case jsonSchema is a getter property (usually is with ES6).
+    return this.jsonSchema;
   }
 
   /**
@@ -580,6 +579,7 @@ function toDatabaseJsonImpl(model, omit, pick) {
   }
 
   const keys = Object.keys(model);
+
   for (let i = 0, l = keys.length; i < l; ++i) {
     const key = keys[i];
     assignJsonValue(json, key, model[key], omit, pick, omitFromJson, true);
@@ -589,10 +589,10 @@ function toDatabaseJsonImpl(model, omit, pick) {
 }
 
 function toExternalJsonImpl(model, omit, pick) {
-  let json = {};
+  const json = {};
   const omitFromJson = model.$omitFromJson();
-
   const keys = Object.keys(model);
+
   for (let i = 0, l = keys.length; i < l; ++i) {
     const key = keys[i];
     assignJsonValue(json, key, model[key], omit, pick, omitFromJson, false);
