@@ -996,13 +996,17 @@ describe('QueryBuilder', function () {
       QueryBuilder
         .forClass(TestModel)
         .where('id', undefined)
-    }).to.throwException();
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal("undefined passed as argument #2 for \'where\' operation. Call skipUndefined() method to ignore the undefined values.")
+    });
 
     expect(function () {
       QueryBuilder
         .forClass(TestModel)
         .orWhere('id', '<', undefined)
-    }).to.throwException();
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal("undefined passed as argument #3 for \'orWhere\' operation. Call skipUndefined() method to ignore the undefined values.")
+    });
 
     expect(function () {
       QueryBuilder
@@ -1028,7 +1032,9 @@ describe('QueryBuilder', function () {
         .forClass(TestModel)
         .delete()
         .whereIn('id', [1, undefined, 3])
-    }).to.throwException();
+    }).to.throwException(function (err) {
+      expect(err.message).to.equal("undefined passed as an item in argument #2 for \'whereIn\' operation. Call skipUndefined() method to ignore the undefined values.")
+    });
   });
 
   it('undefined values as query builder method arguments should be ignored if `skipUndefined` is called', function () {
