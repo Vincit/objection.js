@@ -70,6 +70,12 @@ npm install mysql2
 npm install mariasql
 ```
 
+> You can use the `next` tag to install an alpha/beta/RC version:
+
+```bash
+npm install objection@next
+```
+
 Objection.js can be installed using `npm`.
 
 # Getting started

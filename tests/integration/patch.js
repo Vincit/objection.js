@@ -291,6 +291,23 @@ module.exports = function (session) {
             expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
           });
       });
+
+      it('should fetch nothing if nothing is updated', function () {
+        return Model1
+          .query()
+          .patchAndFetchById(2, {model1Prop1: 'updated text'})
+          .where('id', -1)
+          .then(function (fetchedModel) {
+            expect(fetchedModel).to.equal(undefined);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
     });
 
     describe('.$query().patch()', function () {

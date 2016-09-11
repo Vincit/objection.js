@@ -22,7 +22,12 @@ export default class UpdateAndFetchOperation extends DelegateOperation {
     builder.whereComposite(builder.modelClass().getFullIdColumn(), this.id);
   }
 
-  onAfterInternal(builder, result) {
+  onAfterInternal(builder, numUpdated) {
+    if (numUpdated == 0) {
+      // If nothing was updated, we should fetch nothing.
+      return afterReturn(super.onAfterInternal(builder, numUpdated), undefined);
+    }
+
     return builder.modelClass()
       .query()
       .childQueryOf(builder)
@@ -36,7 +41,7 @@ export default class UpdateAndFetchOperation extends DelegateOperation {
           retVal = this.model;
         }
 
-        return afterReturn(super.onAfterInternal(builder, result), retVal);
+        return afterReturn(super.onAfterInternal(builder, numUpdated), retVal);
       });
   }
 }

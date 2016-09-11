@@ -13,6 +13,7 @@
  * Old values can now be accessed from `$beforeUpdate`, `$afterUpdate`, `$beforeValidate` and `$afterValidate` hooks [#185](https://github.com/Vincit/objection.js/issues/185)
  * Support length property [#168](ttps://github.com/Vincit/objection.js/issues/168)
  * Make sure operations are executed in the order they are called [#180](https://github.com/Vincit/objection.js/issues/180)
+ * Fetch nothing if the `where` clauses hit no rows in `update/patchAndFetchById` methods [#189](https://github.com/Vincit/objection.js/issues/189)
  * Lots of performance tweaks.
 
 ### Breaking changes
