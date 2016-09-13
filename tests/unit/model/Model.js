@@ -621,6 +621,49 @@ describe('Model', function () {
 
   });
 
+  it('$validate should run run hooks and strip relations', function () {
+    var Model1 = modelClass('Model1');
+
+    Model1.prototype.$parseJson = function (json, opt) {
+      json = Model.prototype.$parseJson.apply(this, arguments);
+      json.foo = parseInt(json.foo);
+      return json;
+    };
+
+    Model1.prototype.$formatJson = function (json, opt) {
+      json = Model.prototype.$formatJson.apply(this, arguments);
+      json.foo = json.foo.toString();
+      return json;
+    };
+
+    Model1.jsonSchema = {
+      type: 'object',
+      properties: {
+        foo: {type: 'integer'}
+      }
+    };
+
+    Model1.relationMappings = {
+      someRelation: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Model1,
+        join: {
+          from: 'Model1.id',
+          to: 'Model1.someId'
+        }
+      }
+    };
+
+    var model = Model1.fromJson({foo: '10'});
+    model.someRelation = Model1.fromJson({foo: '20'});
+
+    expect(model.foo).to.equal(10);
+    model.$validate();
+    expect(model.foo).to.equal(10);
+
+    expect(model.$toJson().foo).to.equal('10');
+  });
+
   it('fn() should be a shortcut to knex.fn', function () {
     var Model1 = modelClass('Model1');
     Model1.knex({fn: {a: 1}});

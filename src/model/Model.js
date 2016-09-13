@@ -216,10 +216,11 @@ export default class Model extends ModelBase {
 
   $validate(json = this, options = {}) {
     if (json instanceof Model) {
-      return super.$validate(json.$toJson(true), options);
-    } else {
-      return super.$validate(json, options);
+      // Strip away relations and other internal stuff.
+      json = json.$parseJson(json.$toJson(true));
     }
+
+    return super.$validate(json, options);
   }
 
   $parseDatabaseJson(json) {
