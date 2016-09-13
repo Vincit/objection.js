@@ -126,7 +126,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   fullJoinTableOwnerCol() {
-    return _.map(this.joinTableOwnerCol, col => this.joinTable + '.' + col);
+    return this.joinTableOwnerCol.map(col => this.joinTable + '.' + col);
   }
 
   /**
@@ -134,7 +134,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   fullJoinTableRelatedCol() {
-    return _.map(this.joinTableRelatedCol, col => this.joinTable + '.' + col);
+    return this.joinTableRelatedCol.map(col => this.joinTable + '.' + col);
   }
 
   /**
@@ -142,7 +142,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   fullJoinTableExtraCols() {
-    return _.map(this.joinTableExtraCols, col => this.joinTable + '.' + col);
+    return this.joinTableExtraCols.map(col => this.joinTable + '.' + col);
   }
 
   /**
@@ -150,7 +150,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   aliasedJoinTableOwnerCol() {
-    return _.map(this.joinTableOwnerCol, col => this.joinTableAlias() + '.' + col);
+    return this.joinTableOwnerCol.map(col => this.joinTableAlias() + '.' + col);
   }
 
   /**
@@ -158,7 +158,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   aliasedJoinTableRelatedCol() {
-    return _.map(this.joinTableRelatedCol, col => this.joinTableAlias() + '.' + col);
+    return this.joinTableRelatedCol.map(col => this.joinTableAlias() + '.' + col);
   }
 
   /**
@@ -174,7 +174,7 @@ export default class ManyToManyRelation extends Relation {
   get joinTableModelClass() {
     const knex = this.ownerModelClass.knex();
 
-    if (knex) {
+    if (knex && knex !== this._joinTableModelClass.knex()) {
       return this._joinTableModelClass.bindKnex(knex);
     } else {
       return this._joinTableModelClass;
@@ -267,7 +267,7 @@ export default class ManyToManyRelation extends Relation {
     let joinTableRelatedCol = this.aliasedJoinTableRelatedCol();
 
     let ownerCol = this.fullOwnerCol();
-    let relatedCol = _.map(this.relatedCol, col => relatedTableAlias + '.' + col);
+    let relatedCol = this.relatedCol.map(col => relatedTableAlias + '.' + col);
 
     return builder
       [joinOperation](joinTableAsAlias, join => {

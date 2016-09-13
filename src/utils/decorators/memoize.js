@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import {createHiddenDataGetter, createHiddenDataSetter} from '../hiddenData';
+import upperFirst from 'lodash/upperFirst';
+import {createGetter, createSetter} from '../hiddenData';
 
 export default function memoize(target, property, descriptor) {
-  const cacheProp = 'memoized' + _.upperFirst(property);
+  const cacheProp = 'memoized' + upperFirst(property);
   const impl = descriptor.value;
 
   if (impl.length === 0) {
@@ -13,8 +13,8 @@ export default function memoize(target, property, descriptor) {
 }
 
 function createSingleValueMemoizedFunc(impl, cacheProp) {
-  const get = createHiddenDataGetter(cacheProp);
-  const set = createHiddenDataSetter(cacheProp);
+  const get = createGetter(cacheProp);
+  const set = createSetter(cacheProp);
 
   return function decorator$memoize() {
     let value = get(this);
@@ -29,8 +29,8 @@ function createSingleValueMemoizedFunc(impl, cacheProp) {
 }
 
 function createMultiValueMemoizedFunc(impl, cacheProp) {
-  const get = createHiddenDataGetter(cacheProp);
-  const set = createHiddenDataSetter(cacheProp);
+  const get = createGetter(cacheProp);
+  const set = createSetter(cacheProp);
 
   return function decorator$memoize(input) {
     let cache = get(this);

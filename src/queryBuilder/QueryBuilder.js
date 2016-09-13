@@ -1016,8 +1016,8 @@ function chainHooks(promise, func) {
     promise = promise.then(function (result) {
       return func.call(this.builder, result, this.builder);
     });
-  } else if (_.isArray(func)) {
-    _.each(func, func => {
+  } else if (Array.isArray(func)) {
+    func.forEach(func => {
       promise = promise.then(function (result) {
         return func.call(this.builder, result, this.builder);
       });

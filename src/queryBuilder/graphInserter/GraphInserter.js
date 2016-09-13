@@ -66,7 +66,8 @@ export default class GraphInserter {
     }
 
     // Insert the batch using the `inserter` function.
-    return Promise.all(_.map(batch, tableInsertion => {
+    return Promise.all(Object.keys(batch).map(tableName => {
+      const tableInsertion = batch[tableName];
       let uids;
 
       if (!tableInsertion.isJoinTableInsertion) {

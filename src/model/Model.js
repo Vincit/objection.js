@@ -4,6 +4,7 @@ import QueryBuilder from '../queryBuilder/QueryBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
+
 import hiddenData from '../utils/decorators/hiddenData';
 import deprecated from '../utils/decorators/deprecated';
 import memoize from '../utils/decorators/memoize';
@@ -95,8 +96,8 @@ export default class Model extends ModelBase {
   static $$knex = null;
 
   /**
-   * @param {string|number|Array.<string|number>=} id
-   * @returns {string|number|Array.<string|number>}
+   * @param {*=} id
+   * @returns {*}
    */
   $id(id) {
     if (arguments.length > 0) {
@@ -159,11 +160,12 @@ export default class Model extends ModelBase {
    * @returns {QueryBuilder}
    */
   $relatedQuery(relationName, trx) {
-    const relation = this.constructor.getRelation(relationName);
-    const ModelClass = relation.relatedModelClass;
+    const ModelClass = this.constructor;
+    const relation = ModelClass.getRelation(relationName);
+    const RelatedModelClass = relation.relatedModelClass;
 
     return ModelClass.RelatedQueryBuilder
-      .forClass(ModelClass)
+      .forClass(RelatedModelClass)
       .transacting(trx)
       .findOperationFactory(builder => {
         return relation.find(builder, [this]);
@@ -221,13 +223,12 @@ export default class Model extends ModelBase {
   }
 
   $parseDatabaseJson(json) {
-    const ModelClass = this.constructor;
-    const jsonAttr = ModelClass.getJsonAttributes();
+    const jsonAttr = this.constructor.getJsonAttributes();
 
     if (jsonAttr.length) {
       for (let i = 0, l = jsonAttr.length; i < l; ++i) {
-        let attr = jsonAttr[i];
-        let value = json[attr];
+        const attr = jsonAttr[i];
+        const value = json[attr];
 
         if (_.isString(value)) {
           json[attr] = JSON.parse(value);
@@ -239,13 +240,12 @@ export default class Model extends ModelBase {
   }
 
   $formatDatabaseJson(json) {
-    const ModelClass = this.constructor;
-    const jsonAttr = ModelClass.getJsonAttributes();
+    const jsonAttr = this.constructor.getJsonAttributes();
 
     if (jsonAttr.length) {
       for (let i = 0, l = jsonAttr.length; i < l; ++i) {
-        let attr = jsonAttr[i];
-        let value = json[attr];
+        const attr = jsonAttr[i];
+        const value = json[attr];
 
         if (_.isObject(value)) {
           json[attr] = JSON.stringify(value);
@@ -271,8 +271,8 @@ export default class Model extends ModelBase {
       const relationName = relNames[i];
 
       if (_.has(json, relationName)) {
-        let relationJson = json[relationName];
-        let relation = relations[relationName];
+        const relationJson = json[relationName];
+        const relation = relations[relationName];
 
         if (Array.isArray(relationJson)) {
           this[relationName] = relation.relatedModelClass.ensureModelArray(relationJson, options);
@@ -421,6 +421,13 @@ export default class Model extends ModelBase {
   }
 
   /**
+   * @returns {string}
+   */
+  static uniqueTag() {
+    return this.tableName;
+  }
+
+  /**
    * @param {knex} knex
    * @returns {Constructor.<Model>}
    */
@@ -428,14 +435,18 @@ export default class Model extends ModelBase {
     const ModelClass = this;
 
     if (!knex.$$objection) {
-      knex.$$objection = {};
-      knex.$$objection.id = _.uniqueId();
-      knex.$$objection.boundModels = Object.create(null);
+      Object.defineProperty(knex, '$$objection', {
+        enumerable: false,
+        writable: false,
+        value: {
+          boundModels: Object.create(null)
+        }
+      });
     }
 
     // Check if this model class has already been bound to the given knex.
-    if (knex.$$objection.boundModels[ModelClass.tableName]) {
-      return knex.$$objection.boundModels[ModelClass.tableName];
+    if (knex.$$objection.boundModels[ModelClass.uniqueTag()]) {
+      return knex.$$objection.boundModels[ModelClass.uniqueTag()];
     }
 
     // Create a new subclass of this class.
@@ -447,14 +458,17 @@ export default class Model extends ModelBase {
     inheritHiddenData(ModelClass, BoundModelClass);
 
     BoundModelClass.knex(knex);
-    knex.$$objection.boundModels[ModelClass.tableName] = BoundModelClass;
+    knex.$$objection.boundModels[ModelClass.uniqueTag()] = BoundModelClass;
 
     const boundRelations = Object.create(null);
+    const relations = ModelClass.getRelations();
+    const relNames = Object.keys(relations);
 
-    // Bind all relations also.
-    _.forOwn(ModelClass.getRelations(), (relation, relationName) => {
-      boundRelations[relationName] = relation.bindKnex(knex);
-    });
+    for (let i = 0, l = relNames.length; i < l; ++i) {
+      const relName = relNames[i];
+      const relation = relations[relName];
+      boundRelations[relName] = relation.bindKnex(knex);
+    }
 
     BoundModelClass.relations = boundRelations;
     return BoundModelClass;
@@ -493,22 +507,20 @@ export default class Model extends ModelBase {
    * @returns {Array.<Model>}
    */
   static ensureModelArray(input, options) {
-    const ModelClass = this;
-
     if (!input) {
       return [];
     }
 
-    if (_.isArray(input)) {
+    if (Array.isArray(input)) {
       let models = new Array(input.length);
 
       for (var i = 0, l = input.length; i < l; ++i) {
-        models[i] = ModelClass.ensureModel(input[i], options);
+        models[i] = this.ensureModel(input[i], options);
       }
 
       return models;
     } else {
-      return [ModelClass.ensureModel(input, options)];
+      return [this.ensureModel(input, options)];
     }
   }
 
@@ -517,35 +529,10 @@ export default class Model extends ModelBase {
    */
   @memoize
   static getIdColumnArray() {
-    let ModelClass = this;
-
-    if (_.isArray(ModelClass.idColumn)) {
-      return ModelClass.idColumn;
+    if (Array.isArray(this.idColumn)) {
+      return this.idColumn;
     } else {
-      return [ModelClass.idColumn];
-    }
-  }
-
-  /**
-   * @returns {Array.<string>}
-   */
-  @memoize
-  static getIdPropertyArray() {
-    let ModelClass = this;
-    return _.map(ModelClass.getIdColumnArray(), col => idColumnToIdProperty(ModelClass, col));
-  }
-
-  /**
-   * @returns {string|Array.<string>}
-   */
-  @memoize
-  static getIdProperty() {
-    let ModelClass = this;
-
-    if (_.isArray(ModelClass.idColumn)) {
-      return _.map(ModelClass.idColumn, col => idColumnToIdProperty(ModelClass, col));
-    } else {
-      return idColumnToIdProperty(ModelClass, ModelClass.idColumn);
+      return [this.idColumn];
     }
   }
 
@@ -554,10 +541,30 @@ export default class Model extends ModelBase {
    */
   @memoize
   static getFullIdColumn() {
-    if (_.isArray(this.idColumn)) {
-      return _.map(this.idColumn, col => this.tableName + '.' + col);
+    if (Array.isArray(this.idColumn)) {
+      return this.idColumn.map(col => this.tableName + '.' + col);
     } else {
       return this.tableName + '.' + this.idColumn;
+    }
+  }
+
+  /**
+   * @returns {Array.<string>}
+   */
+  @memoize
+  static getIdPropertyArray() {
+    return this.getIdColumnArray().map(col => idColumnToIdProperty(this, col));
+  }
+
+  /**
+   * @returns {string|Array.<string>}
+   */
+  @memoize
+  static getIdProperty() {
+    if (Array.isArray(this.idColumn)) {
+      return this.idColumn.map(col => idColumnToIdProperty(this, col));
+    } else {
+      return idColumnToIdProperty(this, this.idColumn);
     }
   }
 
@@ -580,10 +587,8 @@ export default class Model extends ModelBase {
     let relations = this.relations;
 
     if (!relations) {
-      const ModelClass = this;
-
       relations = _.reduce(this.relationMappings, (relations, mapping, relationName) => {
-        relations[relationName] = new mapping.relation(relationName, ModelClass);
+        relations[relationName] = new mapping.relation(relationName, this);
         relations[relationName].setMapping(mapping);
         return relations;
       }, Object.create(null));
@@ -619,7 +624,7 @@ export default class Model extends ModelBase {
       .resolve(this.ensureModelArray($models))
       .eager(expression, filters)
       .then(function (models) {
-        return _.isArray($models) ? models : models[0];
+        return Array.isArray($models) ? models : models[0];
       });
   }
 
@@ -660,11 +665,11 @@ export default class Model extends ModelBase {
       _.forOwn(this.getJsonSchema().properties, (prop, propName) => {
         var types = _.compact(ensureArray(prop.type));
 
-        if (types.length === 0 && _.isArray(prop.anyOf)) {
+        if (types.length === 0 && Array.isArray(prop.anyOf)) {
           types = _.flattenDeep(_.map(prop.anyOf, 'type'));
         }
 
-        if (types.length === 0 && _.isArray(prop.oneOf)) {
+        if (types.length === 0 && Array.isArray(prop.oneOf)) {
           types = _.flattenDeep(_.map(prop.oneOf, 'type'));
         }
 
@@ -674,7 +679,7 @@ export default class Model extends ModelBase {
       });
     }
 
-    if (!_.isArray(this.jsonAttributes)) {
+    if (!Array.isArray(this.jsonAttributes)) {
       this.jsonAttributes = [];
     }
 
@@ -683,7 +688,7 @@ export default class Model extends ModelBase {
 }
 
 function ensureArray(obj) {
-  if (_.isArray(obj)) {
+  if (Array.isArray(obj)) {
     return obj;
   } else {
     return [obj];
@@ -737,9 +742,9 @@ function idColumnToIdProperty(ModelClass, idColumn) {
 
 function setId(model, id) {
   const idProp = model.constructor.getIdProperty();
-  const isArray = _.isArray(idProp);
+  const isArray = Array.isArray(idProp);
 
-  if (_.isArray(id)) {
+  if (Array.isArray(id)) {
     if (isArray) {
       if (id.length !== idProp.length) {
         throw new Error('trying to set an invalid identifier for a model');

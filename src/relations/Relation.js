@@ -2,7 +2,7 @@ import _ from 'lodash';
 import path from 'path';
 import memoize from '../utils/decorators/memoize';
 import {inherits, isSubclassOf} from '../utils/classUtils';
-import {initHiddenData, copyHiddenData} from '../utils/hiddenData';
+import {init, copyHiddenData} from '../utils/hiddenData';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 
 import RelationFindOperation from './RelationFindOperation';
@@ -77,7 +77,7 @@ export default class Relation {
      */
     this.modify = null;
 
-    initHiddenData(this);
+    init(this);
   }
 
   /**
@@ -165,7 +165,7 @@ export default class Relation {
    */
   @memoize
   fullOwnerCol() {
-    return _.map(this.ownerCol, col => this.ownerModelClass.tableName + '.' + col);
+    return this.ownerCol.map(col => this.ownerModelClass.tableName + '.' + col);
   }
 
   /**
@@ -173,7 +173,7 @@ export default class Relation {
    */
   @memoize
   fullRelatedCol() {
-    return _.map(this.relatedCol, col => this.relatedModelClass.tableName + '.' + col);
+    return this.relatedCol.map(col => this.relatedModelClass.tableName + '.' + col);
   }
 
   /**
@@ -262,14 +262,14 @@ export default class Relation {
 
     const relatedTable = this.relatedModelClass.tableName;
     const relatedTableAsAlias = `${relatedTable} as ${relatedTableAlias}`;
-    const relatedCol = _.map(this.relatedCol, col => `${relatedTableAlias}.${col}`);
+    const relatedCol = this.relatedCol.map(col => `${relatedTableAlias}.${col}`);
     const ownerCol = this.fullOwnerCol();
 
     return builder
       [joinOperation](relatedTableAsAlias, join => {
-        _.each(relatedCol, (relatedCol, idx) => {
-          join.on(relatedCol, '=', ownerCol[idx]);
-        });
+        for (let i = 0, l = relatedCol.length; i < l; ++i) {
+          join.on(relatedCol[i], '=', ownerCol[i]);
+        }
       })
       .modify(this.modify);
   }
@@ -369,7 +369,7 @@ export default class Relation {
    * @protected
    */
   propertyName(columns, modelClass) {
-    return _.map(columns, column => {
+    return columns.map(column => {
       let propertyName = modelClass.columnNameToPropertyName(column);
 
       if (!propertyName) {

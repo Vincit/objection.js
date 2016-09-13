@@ -4,6 +4,7 @@ import {isPromise, afterReturn} from '../../utils/promiseUtils';
 import {Promise} from 'knex';
 
 export default class FindOperation extends QueryBuilderOperation {
+
   onAfter(builder, results) {
     if (Array.isArray(results)) {
       if (results.length === 1) {

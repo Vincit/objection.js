@@ -565,6 +565,15 @@ describe('ModelBase', function () {
       expect(model).to.eql({a: 1, b: 2, c: 3});
     });
 
+    it('properties registered using $omitFromJson method should be removed from the json (multiple calls)', function () {
+      var model = Model.fromJson({a: 1, b: 2, c: 3});
+      model.$omitFromJson(['b']);
+      model.$omitFromJson(['c']);
+      model.$omitFromDatabaseJson(['a']);
+      expect(model.$toJson()).to.eql({a: 1});
+      expect(model).to.eql({a: 1, b: 2, c: 3});
+    });
+
   });
 
   describe('$toDatabaseJson', function () {
@@ -626,6 +635,15 @@ describe('ModelBase', function () {
     it('properties registered using $omitFromDatabaseJson method should be removed from the json', function () {
       var model = Model.fromJson({a: 1, b: 2, c: 3});
       model.$omitFromDatabaseJson(['b', 'c']);
+      expect(model.$toDatabaseJson()).to.eql({a: 1});
+      expect(model).to.eql({a: 1, b: 2, c: 3});
+    });
+
+    it('properties registered using $omitFromDatabaseJson method should be removed from the json (multiple calls)', function () {
+      var model = Model.fromJson({a: 1, b: 2, c: 3});
+      model.$omitFromDatabaseJson(['b']);
+      model.$omitFromDatabaseJson(['c']);
+      model.$omitFromJson(['a']);
       expect(model.$toDatabaseJson()).to.eql({a: 1});
       expect(model).to.eql({a: 1, b: 2, c: 3});
     });

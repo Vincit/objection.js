@@ -236,18 +236,36 @@ export default class QueryBuilderBase {
    * @protected
    */
   buildInto(knexBuilder) {
-    let i = 0;
+    const tmp = new Array(10);
+    const operations = this._operations;
 
-    while (i < this._operations.length) {
-      let op = this._operations[i];
-      let ln = this._operations.length;
+    let i = 0;
+    while (i < operations.length) {
+      const op = operations[i];
+      const ln = operations.length;
 
       op.onBeforeBuild(this);
-      // onBeforeBuild may call methods that add more operations. If the
+
+      const numNew = operations.length - ln;
+
+      // onBeforeBuild may call methods that add more operations. If
       // this was the case, move the operations to be executed next.
-      if (ln != this._operations.length) {
-        let newOps = this._operations.splice(ln, this._operations.length - ln);
-        this._operations.splice(i + 1, 0, ...newOps);
+      if (numNew > 0) {
+        while (tmp.length < numNew) {
+          tmp.push(null);
+        }
+
+        for (let j = 0; j < numNew; ++j) {
+          tmp[j] = operations[ln + j];
+        }
+
+        for (let j = ln + numNew - 1; j > i + numNew; --j) {
+          operations[j] = operations[j - numNew];
+        }
+
+        for (let j = 0; j < numNew; ++j) {
+          operations[i + j + 1] = tmp[j];
+        }
       }
 
       ++i;
@@ -255,8 +273,8 @@ export default class QueryBuilderBase {
 
     // onBuild operations should never add new operations. They should only call
     // methods on the knex query builder.
-    for (i = 0; i < this._operations.length; ++i) {
-      this._operations[i].onBuild(knexBuilder, this)
+    for (let i = 0, l = operations.length; i < l; ++i) {
+      operations[i].onBuild(knexBuilder, this)
     }
 
     return knexBuilder;

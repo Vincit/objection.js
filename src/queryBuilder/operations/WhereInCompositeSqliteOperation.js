@@ -27,9 +27,9 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
     // Sqlite doesn't support the `where in` syntax for multiple columns but
     // we can emulate it using grouped `or` clauses.
     knexBuilder.where(builder => {
-      _.each(values, (val) => {
+      values.forEach(val => {
         builder.orWhere(builder => {
-          _.each(columns, (col, idx) => {
+          columns.forEach((col, idx) => {
             builder.andWhere(col, val[idx]);
           });
         });

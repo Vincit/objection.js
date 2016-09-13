@@ -59,7 +59,7 @@ export default class ModelBase {
       jsonSchema = this.$beforeValidate(jsonSchema, json, options);
     }
 
-    let validator =  this.constructor.getJsonSchemaValidator(jsonSchema, options.patch);
+    const validator = this.constructor.getJsonSchemaValidator(jsonSchema, options.patch);
     validator(json);
 
     if (validator.errors) {
@@ -203,7 +203,7 @@ export default class ModelBase {
         const key = keys[i];
         const value = obj[key];
 
-        if (key.charAt(0) !== '$' && !_.isFunction(value)) {
+        if (key.charAt(0) !== '$' && typeof value !== 'function') {
           this[key] = value;
         }
       }

@@ -97,21 +97,20 @@ export default class RelationExpression {
       return 0;
     }
 
-    return _.map(this.children, (val, key) => {
-      const rec = RECURSIVE_REGEX.exec(key);
+    const key = Object.keys(this.children)[0];
+    const rec = RECURSIVE_REGEX.exec(key);
 
-      if (rec) {
-        const maxDepth = rec[1];
+    if (rec) {
+      const maxDepth = rec[1];
 
-        if (maxDepth) {
-          return parseInt(maxDepth, 10);
-        } else {
-          return Number.POSITIVE_INFINITY;
-        }
+      if (maxDepth) {
+        return parseInt(maxDepth, 10);
       } else {
-        return 0;
+        return Number.POSITIVE_INFINITY;
       }
-    })[0];
+    } else {
+      return 0;
+    }
   }
 
   /**

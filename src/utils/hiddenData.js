@@ -1,6 +1,6 @@
 const HIDDEN_DATA = '$$hiddenData';
 
-export function initHiddenData(obj, data) {
+export function init(obj, data) {
   Object.defineProperty(obj, HIDDEN_DATA, {
     enumerable: false,
     writable: true,
@@ -8,7 +8,7 @@ export function initHiddenData(obj, data) {
   });
 }
 
-export function createHiddenDataGetter(propName) {
+export function createGetter(propName) {
   return new Function('obj', `
     if (obj.hasOwnProperty("${HIDDEN_DATA}")) {
       return obj.${HIDDEN_DATA}.${propName};
@@ -18,7 +18,7 @@ export function createHiddenDataGetter(propName) {
   `);
 }
 
-export function createHiddenDataSetter(propName) {
+export function createSetter(propName) {
   return new Function('obj', 'data', `
     if (!obj.hasOwnProperty("${HIDDEN_DATA}")) {
       Object.defineProperty(obj, "${HIDDEN_DATA}", {
@@ -33,9 +33,9 @@ export function createHiddenDataSetter(propName) {
 }
 
 export function inheritHiddenData(src, dst) {
-  initHiddenData(dst, Object.create(src[HIDDEN_DATA] || null));
+  init(dst, Object.create(src[HIDDEN_DATA] || null));
 }
 
 export function copyHiddenData(src, dst) {
-  initHiddenData(dst, src[HIDDEN_DATA]);
+  init(dst, src[HIDDEN_DATA]);
 }

@@ -1,4 +1,4 @@
-import {createHiddenDataGetter, createHiddenDataSetter} from '../hiddenData';
+import {createGetter, createSetter} from '../hiddenData';
 
 export default function hiddenData(opt) {
   return function (target, property, descriptor) {
@@ -13,8 +13,8 @@ export default function hiddenData(opt) {
       append = false;
     }
 
-    const get = createHiddenDataGetter(propName);
-    const set = createHiddenDataSetter(propName);
+    const get = createGetter(propName);
+    const set = createSetter(propName);
 
     if (typeof descriptor.value === 'function') {
       if (append) {

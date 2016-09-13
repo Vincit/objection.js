@@ -32,9 +32,9 @@ describe('utils', function () {
   });
 
   describe('hiddenData', function () {
-    var setHiddenData = hiddenData.createHiddenDataSetter('test');
-    var getHiddenData = hiddenData.createHiddenDataGetter('test');
-    
+    var setHiddenData = hiddenData.createSetter('test');
+    var getHiddenData = hiddenData.createGetter('test');
+
     it('should stored data under a non-enumerable $$hiddenData object', function () {
       var obj = {};
 
