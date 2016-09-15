@@ -47,10 +47,11 @@
   "dependencies": {
     "ajv": "^4.1.5",
     "babel-runtime": "^6.6.1",
+    "bluebird": "^3.4.6",
     "lodash": "^4.7.0"
   },
   "peerDependencies": {
-    "knex": ">= 0.8.0 <= 0.11.10"
+    "knex": ">= 0.8.0 <= 0.12.0"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",
@@ -82,7 +83,7 @@
     "grunt": "^0.4.5",
     "grunt-jsdoc": "^1.0.0",
     "istanbul": "^0.4.0",
-    "knex": "0.11.10",
+    "knex": "0.12.0",
     "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^4.4.0",

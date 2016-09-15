@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 import DelegateOperation from './DelegateOperation';
 import GraphInserter from '../graphInserter/GraphInserter';
 import {isPostgres} from '../../utils/dbUtils';

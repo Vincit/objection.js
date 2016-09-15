@@ -323,7 +323,7 @@ describe('Model', function () {
     Model.knex(knex({client: 'pg'}));
 
     var sql = Model.raw('SELECT * FROM "Model" where "id" = ?', [10]).toString();
-    expect(sql).to.eql('SELECT * FROM "Model" where "id" = \'10\'');
+    expect(sql).to.eql('SELECT * FROM "Model" where "id" = 10');
   });
 
   it('knex instance is inherited from super classes', function () {

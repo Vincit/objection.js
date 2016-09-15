@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 import Model from './model/Model';
 import {isSubclassOf} from './utils/classUtils';
 

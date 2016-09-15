@@ -1,4 +1,4 @@
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 import ValidationError from '../../ValidationError'
 import QueryBuilderOperation from './QueryBuilderOperation';
 

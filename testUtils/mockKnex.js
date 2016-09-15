@@ -1,37 +1,63 @@
 'use strict';
 
 var _ = require('lodash');
-var Knex = require('knex');
-var Promise = require('knex').Promise;
+var knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
 
-module.exports = function (knex) {
-  return new MockKnex(knex);
-};
-
-function MockKnex(knex) {
-  this.knex = knex || Knex({client: 'pg'});
-  this.results = [];
-  this.executedQueries = [];
-  this.originalThen = this.knex.client.QueryBuilder.prototype.then;
-
-  var self = this;
-  this.knex.client.QueryBuilder.prototype.then = function () {
-    self.executedQueries.push(this.toString());
-
-    if (!_.isEmpty(self.results)) {
-      var promise = Promise.resolve(self.results.shift());
-      return promise.then.apply(promise, arguments);
-    } else {
-      return self.originalThen.apply(this, arguments);
-    }
+/**
+ * @param {function} knex
+ *    Knex instance to mock.
+ *
+ * @param {function(object, function, Array)} mockExecutor
+ *    The mock executor.
+ *
+ * @returns {function}
+ *    Mocked knex.
+ */
+module.exports = function mockKnex(knex, mockExecutor) {
+  var mock = function (table) {
+    return mock.queryBuilder().table(table);
   };
-}
 
-MockKnex.prototype.reset = function () {
-  this.result = [];
-  this.executedQueries = [];
-};
+  // Mock query builder methods.
+  _.each(knexMethods, function (methodName) {
+    mock[methodName] = function () {
+      return wrapBuilder(knex[methodName].apply(knex, arguments));
+    }
+  });
 
-MockKnex.prototype.teardown = function () {
-  this.knex.client.QueryBuilder.prototype.then = this.originalThen;
+  // Mock all other methods and properties.
+  _.forOwn(knex, function (value, key) {
+    if (knexMethods.indexOf(key) !== -1) {
+      return;
+    }
+
+    if (_.isFunction(value)) {
+      mock[key] = function () {
+        return knex[key].apply(knex, arguments);
+      };
+    } else {
+      Object.defineProperty(mock, key, {
+        enumerable: true,
+
+        get: function () {
+          return knex[key];
+        },
+        set: function (value) {
+          knex[key] = value;
+        }
+      });
+    }
+  });
+
+  function wrapBuilder(builder) {
+    var oldImpl = builder.then;
+
+    builder.then = function () {
+      return mockExecutor.call(this, mock, oldImpl, _.toArray(arguments));
+    };
+
+    return builder;
+  }
+
+  return mock;
 };

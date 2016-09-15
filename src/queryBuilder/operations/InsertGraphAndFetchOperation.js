@@ -14,8 +14,8 @@ export default class InsertGraphAndFetchOperation extends DelegateOperation {
     const eagerTree = buildEagerTree(this.models, Object.create(null));
     const eager = buildEager(eagerTree);
     const modelClass = this.models[0].constructor;
-
     const ids = new Array(this.models.length);
+
     for (let i = 0, l = this.models.length; i < l; ++i) {
       ids[i] = this.models[i].$id();
     }

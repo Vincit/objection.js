@@ -1,10 +1,11 @@
 'use strict';
 
 var _ = require('lodash')
-  , knex = require('knex')
+  , Knex = require('knex')
   , expect = require('expect.js')
-  , Promise = require('knex').Promise
+  , Promise = require('bluebird')
   , objection = require('../../../')
+  , knexMocker = require('../../../testUtils/mockKnex')
   , Model = objection.Model
   , QueryBuilder = objection.QueryBuilder
   , QueryBuilderBase = objection.QueryBuilderBase
@@ -19,11 +20,16 @@ describe('QueryBuilder', function () {
   var TestModel = null;
 
   before(function () {
-    mockKnex = knex({client: 'pg'});
-    mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
+    var knex = Knex({client: 'pg'});
+
+    mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
       executedQueries.push(this.toString());
-      return Promise.resolve(mockKnexQueryResults[mockKnexQueryResultIndex++] || []).then(cb, ecb);
-    };
+
+      var result = mockKnexQueryResults[mockKnexQueryResultIndex++] || [];
+      var promise = Promise.resolve(result);
+
+      return promise.then.apply(promise, args);
+    });
   });
 
   beforeEach(function () {
@@ -134,7 +140,7 @@ describe('QueryBuilder', function () {
       .select('name', 'id', 'age')
       .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')
       .where('id', 10)
-      .where('height', '>', '180')
+      .where('height', '>', 180)
       .where({name: 'test'})
       .orWhere(function (builder) {
         // The builder passed to these functions should be a QueryBuilderBase instead of
@@ -147,10 +153,10 @@ describe('QueryBuilder', function () {
         expect(executedQueries).to.eql([[
           'select "name", "id", "age" from "Model"',
           'inner join "AnotherTable" on "AnotherTable"."modelId" = "Model"."id"',
-          'where "id" = \'10\'',
-          'and "height" > \'180\'',
+          'where "id" = 10',
+          'and "height" > 180',
           'and "name" = \'test\'',
-          'or ("age" < \'10\' and "eyeColor" = \'blue\')'
+          'or ("age" < 10 and "eyeColor" = \'blue\')'
         ].join(' ')]);
       });
   });
@@ -195,7 +201,7 @@ describe('QueryBuilder', function () {
         .orWhereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
         .then(function () {
           expect(executedQueries).to.eql([
-            'select * from "Model" where "id" = \'10\' or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+            'select * from "Model" where "id" = 10 or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
           ]);
         });
     });
@@ -210,7 +216,7 @@ describe('QueryBuilder', function () {
         .whereComposite(['A.a', 'B.b'], '>', [1, 2])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" > '1' and \"B\".\"b\" > '2'"
+            "select * from \"Model\" where \"A\".\"a\" > 1 and \"B\".\"b\" > 2"
           ]);
         });
     });
@@ -230,7 +236,7 @@ describe('QueryBuilder', function () {
         .whereComposite(['A.a', 'B.b'], [1, 2])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" = '1' and \"B\".\"b\" = '2'"
+            "select * from \"Model\" where \"A\".\"a\" = 1 and \"B\".\"b\" = 2"
           ]);
         });
     });
@@ -241,7 +247,7 @@ describe('QueryBuilder', function () {
         .whereComposite(['A.a'], 1)
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" = '1'"
+            "select * from \"Model\" where \"A\".\"a\" = 1"
            ]);
         });
     });
@@ -252,7 +258,7 @@ describe('QueryBuilder', function () {
         .whereComposite('A.a', 1)
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" = '1'"
+            "select * from \"Model\" where \"A\".\"a\" = 1"
           ]);
         });
     });
@@ -267,7 +273,7 @@ describe('QueryBuilder', function () {
         .whereInComposite(['A.a', 'B.b'], [[1, 2], [3, 4]])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where (\"A\".\"a\", \"B\".\"b\") in (('1', '2'),('3', '4'))"
+            "select * from \"Model\" where (\"A\".\"a\", \"B\".\"b\") in ((1, 2),(3, 4))"
           ]);
         });
     });
@@ -278,7 +284,7 @@ describe('QueryBuilder', function () {
         .whereInComposite(['A.a'], [[1], [3]])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in ('1', '3')"
+            "select * from \"Model\" where \"A\".\"a\" in (1, 3)"
           ]);
         });
     });
@@ -289,7 +295,7 @@ describe('QueryBuilder', function () {
         .whereInComposite('A.a', [[1], [3]])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in ('1', '3')"
+            "select * from \"Model\" where \"A\".\"a\" in (1, 3)"
           ]);
         });
     });
@@ -300,7 +306,7 @@ describe('QueryBuilder', function () {
         .whereInComposite('A.a', [1, 3])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in ('1', '3')"
+            "select * from \"Model\" where \"A\".\"a\" in (1, 3)"
           ]);
         });
     });
@@ -471,7 +477,7 @@ describe('QueryBuilder', function () {
       })
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('select * from "Model" where "a" = \'1\'');
+        expect(executedQueries[0]).to.equal('select * from "Model" where "a" = 1');
       });
   });
 
@@ -484,7 +490,7 @@ describe('QueryBuilder', function () {
       .insert({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a") values (\'1\') returning "id"');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a") values (1) returning "id"');
       });
   });
 
@@ -497,7 +503,7 @@ describe('QueryBuilder', function () {
       .update({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 1');
       });
   });
 
@@ -523,7 +529,7 @@ describe('QueryBuilder', function () {
       .insert({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (\'1\', \'2\')');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (1, 2)');
       });
   });
 
@@ -536,7 +542,7 @@ describe('QueryBuilder', function () {
       .update({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2');
       });
   });
 
@@ -549,7 +555,7 @@ describe('QueryBuilder', function () {
       .patch({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2');
       });
   });
 
@@ -562,7 +568,7 @@ describe('QueryBuilder', function () {
       .delete()
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('delete from "Model" where "id" = \'100\'');
+        expect(executedQueries[0]).to.equal('delete from "Model" where "id" = 100');
       });
   });
 
@@ -575,7 +581,7 @@ describe('QueryBuilder', function () {
       .relate({a: 1})
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (\'1\', \'2\')');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (1, 2)');
       });
   });
 
@@ -588,7 +594,7 @@ describe('QueryBuilder', function () {
       .unrelate()
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('delete from "Model" where "id" = \'100\'');
+        expect(executedQueries[0]).to.equal('delete from "Model" where "id" = 100');
       });
   });
 
@@ -605,21 +611,21 @@ describe('QueryBuilder', function () {
       expect(executedQueries).to.have.length(1);
       expect(query.toString()).to.equal(executedQueries[0]);
       expect(query.toSql()).to.equal(executedQueries[0]);
-      expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\' where "test" < \'100\'');
+      expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2 where "test" < 100');
       executedQueries = [];
       return query;
     }).then(function () {
       expect(executedQueries).to.have.length(1);
       expect(query.toString()).to.equal(executedQueries[0]);
       expect(query.toSql()).to.equal(executedQueries[0]);
-      expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\' where "test" < \'100\'');
+      expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2 where "test" < 100');
       executedQueries = [];
       return query;
     }).then(function () {
       expect(executedQueries).to.have.length(1);
       expect(query.toString()).to.equal(executedQueries[0]);
       expect(query.toSql()).to.equal(executedQueries[0]);
-      expect(executedQueries[0]).to.equal('update "Model" set "a" = \'1\', "b" = \'2\' where "test" < \'100\'');
+      expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2 where "test" < 100');
     });
   });
 
@@ -634,7 +640,7 @@ describe('QueryBuilder', function () {
         expect(executedQueries).to.have.length(1);
         expect(res).to.equal(123);
         // resultSize should cancel the groupBy call since it doesn't affect the outcome.
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = \'100\') as temp');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = 100) as temp');
         done();
       })
       .catch(done);
@@ -649,8 +655,8 @@ describe('QueryBuilder', function () {
       .range(100, 200)
       .then(function (res) {
         expect(executedQueries).to.have.length(2);
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = \'100\') as temp');
-        expect(executedQueries[1]).to.equal('select * from "Model" where "test" = \'100\' order by "order" asc limit \'101\' offset \'100\'');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = 100) as temp');
+        expect(executedQueries[1]).to.equal('select * from "Model" where "test" = 100 order by "order" asc limit 101 offset 100');
         expect(res.total).to.equal(123);
         expect(res.results).to.eql(mockKnexQueryResults[1]);
         done();
@@ -667,8 +673,8 @@ describe('QueryBuilder', function () {
       .page(10, 100)
       .then(function (res) {
         expect(executedQueries).to.have.length(2);
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = \'100\') as temp');
-        expect(executedQueries[1]).to.equal('select * from "Model" where "test" = \'100\' order by "order" asc limit \'100\' offset \'1000\'');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = 100) as temp');
+        expect(executedQueries[1]).to.equal('select * from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000');
         expect(res.total).to.equal(123);
         expect(res.results).to.eql(mockKnexQueryResults[1]);
         done();
@@ -701,7 +707,7 @@ describe('QueryBuilder', function () {
       .update(model)
       .then(function () {
         expect(model.c).to.equal('beforeUpdate');
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
       })
       .catch(done);
@@ -725,7 +731,7 @@ describe('QueryBuilder', function () {
       .update(model)
       .then(function () {
         expect(model.c).to.equal('beforeUpdate');
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
       })
       .catch(done);
@@ -746,7 +752,7 @@ describe('QueryBuilder', function () {
       .patch(model)
       .then(function () {
         expect(model.c).to.equal('beforeUpdate');
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
       })
       .catch(done);
@@ -770,7 +776,7 @@ describe('QueryBuilder', function () {
       .patch(model)
       .then(function () {
         expect(model.c).to.equal('beforeUpdate');
-        expect(executedQueries[0]).to.equal('update "Model" set "a" = \'10\', "b" = \'test\', "c" = \'beforeUpdate\'');
+        expect(executedQueries[0]).to.equal('update "Model" set "a" = 10, "b" = \'test\', "c" = \'beforeUpdate\'');
         done();
       })
       .catch(done);
@@ -790,7 +796,7 @@ describe('QueryBuilder', function () {
       .insert(TestModel.fromJson({a: 10, b: 'test'}))
       .then(function (model) {
         expect(model.c).to.equal('beforeInsert');
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (\'10\', \'test\', \'beforeInsert\') returning "id"');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"');
         done();
       })
       .catch(done);
@@ -813,7 +819,7 @@ describe('QueryBuilder', function () {
       .insert({a: 10, b: 'test'})
       .then(function (model) {
         expect(model.c).to.equal('beforeInsert');
-        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (\'10\', \'test\', \'beforeInsert\') returning "id"');
+        expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b", "c") values (10, \'test\', \'beforeInsert\') returning "id"');
         done();
       })
       .catch(done);
@@ -1256,8 +1262,8 @@ describe('QueryBuilder', function () {
         .then(function () {
           expect(executedQueries).to.eql([
             'select * from "M1"',
-            'select * from "M2" where "M2"."m1Id" in (\'1\')',
-            'select * from "M3" where "M3"."id" in (\'3\')'
+            'select * from "M2" where "M2"."m1Id" in (1)',
+            'select * from "M3" where "M3"."id" in (3)'
           ]);
 
           expect(filter1Check).to.equal(true);
@@ -1303,8 +1309,8 @@ describe('QueryBuilder', function () {
         .then(function (x) {
           expect(executedQueries).to.eql([
             'select * from "M1"',
-            'select * from "M1" where "M1"."m1Id" in (\'1\', \'2\')',
-            'select * from "M1" where "M1"."m1Id" in (\'3\', \'4\', \'5\', \'6\')'
+            'select * from "M1" where "M1"."m1Id" in (1, 2)',
+            'select * from "M1" where "M1"."m1Id" in (3, 4, 5, 6)'
           ]);
 
           expect(x).to.eql([{

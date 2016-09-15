@@ -1,10 +1,11 @@
 'use strict';
 
 var _ = require('lodash')
-  , knex = require('knex')
+  , Knex = require('knex')
   , expect = require('expect.js')
-  , Promise = require('knex').Promise
+  , Promise = require('bluebird')
   , Model = require('../../../').Model
+  , knexMocker = require('../../../testUtils/mockKnex')
   , GraphInserter = require('../../../lib/queryBuilder/graphInserter/GraphInserter').default
   , RelationExpression = require('../../../').RelationExpression;
 
@@ -18,12 +19,14 @@ describe('GraphInserter', function () {
   var Movie = null;
 
   before(function () {
-    mockKnex = knex({client: 'pg'});
+    var knex = Knex({client: 'pg'});
 
-    mockKnex.client.QueryBuilder.prototype.then = function (cb, ecb) {
+    mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
       executedQueries.push(this.toString());
-      return Promise.resolve(mockKnexQueryResult).then(cb, ecb);
-    };
+
+      var promise = Promise.resolve(mockKnexQueryResult);
+      return promise.then.apply(promise, args);
+    });
   });
 
   beforeEach(function () {

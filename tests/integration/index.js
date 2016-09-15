@@ -9,6 +9,7 @@ describe('integration tests', function () {
 
   var testDatabaseConfigs = [{
     client: 'sqlite3',
+    useNullAsDefault: true,
     connection: {
       filename: path.join(os.tmpdir(), 'objection_test.db')
     }

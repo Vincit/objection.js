@@ -1,7 +1,7 @@
 import Model from '../../model/Model';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {isPromise, afterReturn} from '../../utils/promiseUtils';
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 
 export default class FindOperation extends QueryBuilderOperation {
 

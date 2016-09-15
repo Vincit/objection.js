@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var utils = require('../../lib/utils/dbUtils');
 var expect = require('expect.js');
-var Promise = require('knex').Promise;
+var Promise = require('bluebird');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;

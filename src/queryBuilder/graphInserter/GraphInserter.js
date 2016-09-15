@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 
 import DependencyGraph from './DependencyGraph';
 import TableInsertion from './TableInsertion';

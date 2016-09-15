@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
@@ -773,6 +773,9 @@ export default class QueryBuilder extends QueryBuilderBase {
     return this.callQueryBuilderOperation(insertGraphOperation, [modelsOrObjects]);
   }
 
+  /**
+   * @returns {QueryBuilder}
+   */
   insertWithRelated(...args) {
     return this.insertGraph(...args);
   }
@@ -792,6 +795,9 @@ export default class QueryBuilder extends QueryBuilderBase {
     return this.callQueryBuilderOperation(insertGraphAndFetchOperation, [modelsOrObjects]);
   }
 
+  /**
+   * @returns {QueryBuilder}
+   */
   insertWithRelatedAndFetch(...args) {
     return this.insertGraphAndFetch(...args);
   }

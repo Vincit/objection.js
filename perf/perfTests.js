@@ -1,8 +1,8 @@
 var _ = require('lodash')
   , Knex = require('knex')
   , expect = require('expect.js')
-  , Promise = require('knex').Promise
-  , mockKnexBuilder = require('../testUtils/mockKnex')
+  , Promise = require('bluebird')
+  , knexMocker = require('../testUtils/mockKnex')
   , mockMochaFactory = require('./mockMocha')
   , Model = require('../').Model;
 
@@ -18,15 +18,29 @@ if (typeof describe == 'undefined') {
 
 describe('Performance tests', function () {
   var mockKnex = null;
-  var knex = null;
 
   var Person = null;
   var Animal = null;
   var Movie = null;
 
   before(function () {
-    knex = Knex({client: 'pg'});
-    mockKnex = mockKnexBuilder(knex);
+    var knex = Knex({client: 'pg'});
+
+    mockKnex = knexMocker(knex, function (mock, origImpl, args) {
+      mock.executedQueries.push(this.toString());
+
+      var result = mock.results.shift() || [];
+      var promise = Promise.resolve(result);
+
+      return promise.then.apply(promise, args);
+    });
+
+    mockKnex.reset = function () {
+      mockKnex.executedQueries = [];
+      mockKnex.results = [];
+    };
+
+    mockKnex.reset();
   });
 
   before(function () {
@@ -306,7 +320,7 @@ describe('Performance tests', function () {
           });
         });
 
-        return Person.bindKnex(knex);
+        return Person.bindKnex(mockKnex);
       },
       test: function (Person) {
         return Person.query().where('id', 10).then(function (models) {
@@ -330,7 +344,7 @@ describe('Performance tests', function () {
           });
         });
 
-        return Person.bindKnex(knex);
+        return Person.bindKnex(mockKnex);
       },
       test: function (Person) {
         var idx = 0;
@@ -376,7 +390,7 @@ describe('Performance tests', function () {
           });
         });
 
-        return Person.bindKnex(knex).fromJson({
+        return Person.bindKnex(mockKnex).fromJson({
           id: 10,
           firstName: 'Parent',
           lastName: 'Testerson'
@@ -398,7 +412,7 @@ describe('Performance tests', function () {
           return [1];
         });
 
-        return Person.bindKnex(knex).fromJson({
+        return Person.bindKnex(mockKnex).fromJson({
           id: 10,
           firstName: 'Parent',
           lastName: 'Testerson'
@@ -420,7 +434,7 @@ describe('Performance tests', function () {
           return [idx];
         });
 
-        return Person.bindKnex(knex);
+        return Person.bindKnex(mockKnex);
       },
       test: function (Person) {
         return Person.query().insert([{
@@ -442,7 +456,7 @@ describe('Performance tests', function () {
           return _.range(idx, idx + RESULT_SIZE);
         });
 
-        return Person.bindKnex(knex);
+        return Person.bindKnex(mockKnex);
       },
       test: function (Person) {
         return Person.query().insertWithRelated([{

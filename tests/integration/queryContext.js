@@ -1,14 +1,16 @@
 'use strict';
 
 var _ = require('lodash');
+var Promise = require('bluebird');
+
 var utils = require('../../lib/utils/dbUtils');
 var expect = require('expect.js');
 var inheritModel = require('../../lib/model/inheritModel');
-var mockKnexBuilder = require('../../testUtils/mockKnex');
+var knexMocker = require('../../testUtils/mockKnex');
 
 module.exports = function (session) {
-  var Model1 = session.models.Model1;
-  var Model2 = session.models.Model2;
+  var Model1;
+  var Model2;
   var mockKnex;
 
   // This file tests only the query context feature. Query context feature is present in
@@ -18,11 +20,27 @@ module.exports = function (session) {
   describe('Query context', function () {
 
     before(function () {
-      mockKnex = mockKnexBuilder(session.knex);
-    });
+      mockKnex = knexMocker(session.knex, function (mock, origImpl, args) {
+        mock.executedQueries.push(this.toString());
 
-    after(function () {
-      mockKnex.teardown();
+        if (mock.results.length) {
+          var result = mock.results.shift() || [];
+          var promise = Promise.resolve(result);
+          return promise.then.apply(promise, args);
+        } else {
+          return origImpl.apply(this, args);
+        }
+      });
+
+      mockKnex.reset = function () {
+        mockKnex.executedQueries = [];
+        mockKnex.results = [];
+      };
+
+      Model1 = session.models.Model1.bindKnex(mockKnex);
+      Model2 = session.models.Model2.bindKnex(mockKnex);
+
+      mockKnex.reset();
     });
 
     beforeEach(function () {
@@ -161,7 +179,7 @@ module.exports = function (session) {
             expect(mockKnex.executedQueries).to.eql(queries);
             expect(mockKnex.executedQueries).to.eql([
               'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning *',
-              'select "Model1".* from "public"."Model1" where "Model1"."id" in (\'5\')'
+              'select "Model1".* from "public"."Model1" where "Model1"."id" in (5)'
             ]);
 
             expect(model.toJSON()).to.eql({
@@ -194,8 +212,8 @@ module.exports = function (session) {
           .then(function (model) {
             expect(mockKnex.executedQueries).to.eql(queries);
             expect(mockKnex.executedQueries).to.eql([
-              'update "public"."Model1" set "model1Prop1" = \'updated\' where "Model1"."id" = \'1\' returning *',
-              'select "Model1".* from "public"."Model1" where "Model1"."id" = \'1\''
+              'update "public"."Model1" set "model1Prop1" = \'updated\' where "Model1"."id" = 1 returning *',
+              'select "Model1".* from "public"."Model1" where "Model1"."id" = 1'
             ]);
 
             expect(model.toJSON()).to.eql({
@@ -261,9 +279,9 @@ module.exports = function (session) {
             expect(mockKnex.executedQueries).to.eql(queries);
             expect(mockKnex.executedQueries).to.eql([
               'insert into "public"."Model1" ("model1Prop1") values (\'new 2\'), (\'new 4\') returning "id", "model1Prop1" || \' computed1\' as computed',
-              'insert into "public"."Model1" ("model1Id", "model1Prop1") values (\'5\', \'new 1\') returning "id", "model1Prop1" || \' computed1\' as computed',
-              'insert into "public"."model_2" ("model_1_id", "model_2_prop_1") values (\'5\', \'new 3\') returning "id_col", "model_2_prop_1" || \' computed2\' as computed',
-              'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'6\', \'3\') returning "model1Id"'
+              'insert into "public"."Model1" ("model1Id", "model1Prop1") values (5, \'new 1\') returning "id", "model1Prop1" || \' computed1\' as computed',
+              'insert into "public"."model_2" ("model_1_id", "model_2_prop_1") values (5, \'new 3\') returning "id_col", "model_2_prop_1" || \' computed2\' as computed',
+              'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (6, 3) returning "model1Id"'
             ]);
 
             expect(model.$toJson()).to.eql({
@@ -332,11 +350,11 @@ module.exports = function (session) {
           .eager('[model1Relation1.[model1Relation1, model1Relation2.model2Relation1]]')
           .then(function (models) {
             expect(queries).to.eql([
-              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "id" = \'1\'',
-              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (\'2\')',
-              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (\'3\')',
-              'select "model_2".*, "model_2_prop_1" || \' computed2\' as computed from "public"."model_2" where "model_2"."model_1_id" in (\'2\')',
-              'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (\'1\', \'2\')'
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "id" = 1',
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (2)',
+              'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (3)',
+              'select "model_2".*, "model_2_prop_1" || \' computed2\' as computed from "public"."model_2" where "model_2"."model_1_id" in (2)',
+              'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (1, 2)'
             ]);
 
             expect(models).to.eql([{
@@ -527,7 +545,7 @@ module.exports = function (session) {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
                   'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning "id", "model1Prop1" || \' computed1\' as computed',
-                  'update "public"."Model1" set "model1Id" = \'5\' where "Model1"."id" = \'4\' returning "id", "model1Prop1" || \' computed1\' as computed'
+                  'update "public"."Model1" set "model1Id" = 5 where "Model1"."id" = 4 returning "id", "model1Prop1" || \' computed1\' as computed'
                 ]);
 
                 expect(model.toJSON()).to.eql({
@@ -559,7 +577,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."Model1" set "model1Id" = \'1\' where "Model1"."id" = \'4\' returning *'
+                  'update "public"."Model1" set "model1Id" = 1 where "Model1"."id" = 4 returning *'
                 ]);
 
                 return session.knex('Model1').where('id', 4);
@@ -590,7 +608,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."Model1" set "model1Id" = NULL where "Model1"."id" = \'2\' returning *'
+                  'update "public"."Model1" set "model1Id" = NULL where "Model1"."id" = 2 returning *'
                 ]);
 
                 return session.knex('Model1').where('id', 2);
@@ -644,7 +662,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."model_2" set "model_1_id" = \'2\' where "model_2"."id_col" in (\'3\') returning *'
+                  'update "public"."model_2" set "model_1_id" = 2 where "model_2"."id_col" in (3) returning *'
                 ]);
 
                 return session.knex('model_2').where('id_col', newModel.idCol);
@@ -675,7 +693,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'update "public"."model_2" set "model_1_id" = NULL where "model_2"."model_1_id" = \'2\' returning *'
+                  'update "public"."model_2" set "model_1_id" = NULL where "model_2"."model_1_id" = 2 returning *'
                 ]);
 
                 return session.knex('model_2');
@@ -727,7 +745,7 @@ module.exports = function (session) {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
                   'insert into "public"."Model1" ("model1Prop1") values (\'new\') returning "id", "model1Prop1" || \' computed1\' as computed',
-                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'5\', \'1\') returning "model1Id"'
+                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (5, 1) returning "model1Id"'
                 ]);
 
                 expect(model.toJSON()).to.eql({
@@ -759,7 +777,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (\'1\', \'1\') returning *'
+                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (1, 1) returning *'
                 ]);
 
                 return session.knex('Model1Model2');
@@ -788,7 +806,7 @@ module.exports = function (session) {
               .then(function () {
                 expect(mockKnex.executedQueries).to.eql(queries);
                 expect(mockKnex.executedQueries).to.eql([
-                  'delete from "public"."Model1Model2" where "Model1Model2"."model2Id" = \'1\' and "Model1Model2"."model1Id" in (select "Model1"."id" from "public"."Model1" where "id" = \'4\')'
+                  'delete from "public"."Model1Model2" where "Model1Model2"."model2Id" = 1 and "Model1Model2"."model1Id" in (select "Model1"."id" from "public"."Model1" where "id" = 4)'
                 ]);
 
                 return session.knex('Model1Model2');

@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var Promise = require('knex').Promise;
+var Promise = require('bluebird');
 
 module.exports = function () {
   var rootScope = new Scope('root');

@@ -13,7 +13,7 @@ import BelongsToOneRelation from './relations/belongsToOne/BelongsToOneRelation'
 import ManyToManyRelation from './relations/manyToMany/ManyToManyRelation';
 
 import transaction from './transaction';
-import {Promise} from 'knex';
+import Promise from 'bluebird';
 
 export {
   ModelBase,
