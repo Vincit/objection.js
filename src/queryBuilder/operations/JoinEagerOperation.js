@@ -23,7 +23,8 @@ export default class JoinEagerOperation extends EagerOperation {
     this.encIdx = 0;
     this.opt = _.defaults(opt, {
       minimize: true,
-      separator: ':'
+      separator: ':',
+      aliases: {}
     });
   }
 
@@ -260,14 +261,10 @@ export default class JoinEagerOperation extends EagerOperation {
       info = new PathInfo();
     }
 
-    const pathParts = path.split(this.sep);
-    const parentPath = pathParts.slice(0, pathParts.length - 1).join(this.sep);
-    const encParentPath = this.encode(parentPath);
-
     info.path = path;
     info.encPath = encPath;
-    info.parentPath = parentPath;
-    info.encParentPath = encParentPath;
+    info.parentPath = parentInfo && parentInfo.path;
+    info.encParentPath = parentInfo && parentInfo.encPath;
     info.modelClass = modelClass;
     info.relation = relation;
     info.idGetter = this.createIdGetter(modelClass, encPath);
@@ -326,7 +323,23 @@ export default class JoinEagerOperation extends EagerOperation {
 
   encode(path) {
     if (!this.opt.minimize) {
-      return path;
+      let encPath = this.encodings[path];
+
+      if (!encPath) {
+        const parts = path.split(this.sep);
+
+        // Don't encode the root.
+        if (parts.length === 1) {
+          encPath = path;
+        } else {
+          encPath = parts.map(part => this.opt.aliases[part] || part).join(this.sep);
+        }
+
+        this.encodings[path] = encPath;
+        this.decodings[encPath] = path;
+      }
+
+      return encPath;
     } else {
       let encPath = this.encodings[path];
 
@@ -347,11 +360,7 @@ export default class JoinEagerOperation extends EagerOperation {
   }
 
   decode(path) {
-    if (!this.opt.minimize) {
-      return path;
-    } else {
-      return this.decodings[path];
-    }
+    return this.decodings[path];
   }
 
   nextEncodedPath() {
@@ -638,6 +647,7 @@ class OneToOnePathInfo extends PathInfo {
   setModelToBranch(branch, id, model) {
     branch[this.relation.name] = model;
   }
+
 
   finalizeBranch(branch, parentModel) {
     parentModel[this.relation.name] = branch || null;

@@ -65,25 +65,8 @@ function callAfterGetForOne(ctx, model, result, deep) {
   }
 
   if (deep) {
-    const relations = model.constructor.getRelations();
-    const relNames = Object.keys(relations);
     const results = [];
-
-    let containsPromise = false;
-
-    for (let i = 0, l = relNames.length; i < l; ++i) {
-      const relName = relNames[i];
-
-      if (model[relName]) {
-        const maybePromise = callAfterGet(ctx, model[relName], deep);
-
-        if (isPromise(maybePromise)) {
-          containsPromise = true;
-        }
-
-        results.push(maybePromise);
-      }
-    }
+    const containsPromise = callAfterGetForRelations(ctx, model, results);
 
     if (containsPromise) {
       return Promise.all(results).then(() => {
@@ -95,6 +78,29 @@ function callAfterGetForOne(ctx, model, result, deep) {
   } else {
     return doCallAfterGet(ctx, model, result);
   }
+}
+
+function callAfterGetForRelations(ctx, model, results) {
+  const relations = model.constructor.getRelations();
+  const relNames = Object.keys(relations);
+
+  let containsPromise = false;
+
+  for (let i = 0, l = relNames.length; i < l; ++i) {
+    const relName = relNames[i];
+
+    if (model[relName]) {
+      const maybePromise = callAfterGet(ctx, model[relName], true);
+
+      if (isPromise(maybePromise)) {
+        containsPromise = true;
+      }
+
+      results.push(maybePromise);
+    }
+  }
+
+  return containsPromise;
 }
 
 function doCallAfterGet(ctx, model, result) {
