@@ -146,22 +146,6 @@ export default class ManyToManyRelation extends Relation {
   }
 
   /**
-   * @returns {Array.<string>}
-   */
-  @memoize
-  aliasedJoinTableOwnerCol() {
-    return this.joinTableOwnerCol.map(col => this.joinTableAlias() + '.' + col);
-  }
-
-  /**
-   * @returns {Array.<string>}
-   */
-  @memoize
-  aliasedJoinTableRelatedCol() {
-    return this.joinTableRelatedCol.map(col => this.joinTableAlias() + '.' + col);
-  }
-
-  /**
    * @returns {string}
    */
   joinTableAlias() {
@@ -252,46 +236,49 @@ export default class ManyToManyRelation extends Relation {
   /**
    * @returns {QueryBuilder}
    */
-  join(builder, joinOperation, relatedTableAlias) {
-    joinOperation = joinOperation || 'join';
-    relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
+  join(builder, opt) {
+    opt = opt || {};
 
-    let joinTable = this.joinTable;
-    let relatedTable = this.relatedModelClass.tableName;
+    opt.joinOperation = opt.joinOperation || 'join';
+    opt.relatedTableAlias = opt.relatedTableAlias || this.relatedTableAlias();
+    opt.relatedJoinSelectQuery = opt.relatedJoinSelectQuery || this.relatedModelClass.query();
+    opt.relatedTable = opt.relatedTable || this.relatedModelClass.tableName;
+    opt.ownerTable = opt.ownerTable || this.ownerModelClass.tableName;
+    opt.joinTableAlias = opt.joinTableAlias || `${opt.relatedTableAlias}_join`;
 
-    let joinTableAlias = this.joinTableAlias();
-    let joinTableAsAlias = joinTable + ' as ' +  joinTableAlias;
-    let relatedTableAsAlias = relatedTable + ' as ' + relatedTableAlias;
+    const joinTableAsAlias = `${this.joinTable} as ${opt.joinTableAlias}`;
+    const joinTableOwnerCol = this.joinTableOwnerCol.map(col => `${opt.joinTableAlias}.${col}`);
+    const joinTableRelatedCol = this.joinTableRelatedCol.map(col => `${opt.joinTableAlias}.${col}`);
 
-    let joinTableOwnerCol = this.aliasedJoinTableOwnerCol();
-    let joinTableRelatedCol = this.aliasedJoinTableRelatedCol();
+    const relatedCol = this.relatedCol.map(col => `${opt.relatedTableAlias}.${col}`);
+    const ownerCol = this.ownerCol.map(col => `${opt.ownerTable}.${col}`);
 
-    let ownerCol = this.fullOwnerCol();
-    let relatedCol = this.relatedCol.map(col => relatedTableAlias + '.' + col);
+    const relatedJoinSelectQuery = opt.relatedJoinSelectQuery
+      .modify(this.modify)
+      .as(opt.relatedTableAlias);
 
     return builder
-      [joinOperation](joinTableAsAlias, join => {
+      [opt.joinOperation](joinTableAsAlias, join => {
         for (let i = 0, l = joinTableOwnerCol.length; i < l; ++i) {
           join.on(joinTableOwnerCol[i], ownerCol[i]);
         }
       })
-      [joinOperation](relatedTableAsAlias, join => {
+      [opt.joinOperation](relatedJoinSelectQuery, join => {
         for (let i = 0, l = joinTableRelatedCol.length; i < l; ++i) {
           join.on(joinTableRelatedCol[i], relatedCol[i]);
         }
-      })
-      .modify(this.modify);
+      });
   }
 
   find(builder, owners) {
-    return new ManyToManyFindOperation(builder, 'find', {
+    return new ManyToManyFindOperation(builder.knex(), 'find', {
       relation: this,
       owners: owners
     });
   }
 
   insert(builder, owner) {
-    return new ManyToManyInsertOperation(builder, 'insert', {
+    return new ManyToManyInsertOperation(builder.knex(), 'insert', {
       relation: this,
       owner: owner
     });
@@ -299,12 +286,12 @@ export default class ManyToManyRelation extends Relation {
 
   update(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUpdateSqliteOperation(builder, 'update', {
+      return new ManyToManyUpdateSqliteOperation(builder.knex(), 'update', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyUpdateOperation(builder, 'update', {
+      return new ManyToManyUpdateOperation(builder.knex(), 'update', {
         relation: this,
         owner: owner
       });
@@ -313,13 +300,13 @@ export default class ManyToManyRelation extends Relation {
 
   patch(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUpdateSqliteOperation(builder, 'patch', {
+      return new ManyToManyUpdateSqliteOperation(builder.knex(), 'patch', {
         relation: this,
         owner: owner,
         modelOptions: {patch: true}
       });
     } else {
-      return new ManyToManyUpdateOperation(builder, 'patch', {
+      return new ManyToManyUpdateOperation(builder.knex(), 'patch', {
         relation: this,
         owner: owner,
         modelOptions: {patch: true}
@@ -329,12 +316,12 @@ export default class ManyToManyRelation extends Relation {
 
   delete(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyDeleteSqliteOperation(builder, 'delete', {
+      return new ManyToManyDeleteSqliteOperation(builder.knex(), 'delete', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyDeleteOperation(builder, 'delete', {
+      return new ManyToManyDeleteOperation(builder.knex(), 'delete', {
         relation: this,
         owner: owner
       });
@@ -342,7 +329,7 @@ export default class ManyToManyRelation extends Relation {
   }
 
   relate(builder, owner) {
-    return new ManyToManyRelateOperation(builder, 'relate', {
+    return new ManyToManyRelateOperation(builder.knex(), 'relate', {
       relation: this,
       owner: owner
     });
@@ -350,12 +337,12 @@ export default class ManyToManyRelation extends Relation {
 
   unrelate(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUnrelateSqliteOperation(builder, 'unrelate', {
+      return new ManyToManyUnrelateSqliteOperation(builder.knex(), 'unrelate', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyUnrelateOperation(builder, 'unrelate', {
+      return new ManyToManyUnrelateOperation(builder.knex(), 'unrelate', {
         relation: this,
         owner: owner
       });

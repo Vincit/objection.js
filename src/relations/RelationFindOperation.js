@@ -3,8 +3,8 @@ import FindOperation from '../queryBuilder/operations/FindOperation';
 
 export default class RelationFindOperation extends FindOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.relation = opt.relation;
     this.owners = opt.owners;

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import KnexQueryBuilder from 'knex/lib/query/builder'
 
 export function getDialect(knex) {

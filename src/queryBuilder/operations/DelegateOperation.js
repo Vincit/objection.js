@@ -2,8 +2,8 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class DelegateOperation extends QueryBuilderOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.delegate = opt.delegate;
     this.isWriteOperation = this.delegate.isWriteOperation;

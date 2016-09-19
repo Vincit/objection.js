@@ -20,6 +20,17 @@ import InstanceInsertOperation from '../queryBuilder/operations/InstanceInsertOp
 import InstanceUpdateOperation from '../queryBuilder/operations/InstanceUpdateOperation';
 import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOperation';
 
+import JoinEagerOperation from '../queryBuilder/operations/JoinEagerOperation';
+import WhereInEagerOperation from '../queryBuilder/operations/WhereInEagerOperation';
+
+const JoinEagerAlgorithm = (builder) => {
+  return new JoinEagerOperation(builder.knex(), 'eager');
+};
+
+const WhereInEagerAlgorithm = (builder) => {
+  return new WhereInEagerOperation(builder.knex(), 'eager');
+};
+
 export default class Model extends ModelBase {
 
   static QueryBuilder = QueryBuilder;
@@ -29,6 +40,9 @@ export default class Model extends ModelBase {
   static HasManyRelation = HasManyRelation;
   static ManyToManyRelation = ManyToManyRelation;
   static BelongsToOneRelation = BelongsToOneRelation;
+
+  static JoinEagerAlgorithm = JoinEagerAlgorithm;
+  static WhereInEagerAlgorithm = WhereInEagerAlgorithm;
 
   @deprecated({removedIn: '0.7.0', useInstead: 'BelongsToOneRelation'})
   static get OneToOneRelation() {
@@ -91,6 +105,11 @@ export default class Model extends ModelBase {
   static pickJsonSchemaProperties = true;
 
   /**
+   * @type {Constructor.<? extends EagerOperation>}
+   */
+  static defaultEagerAlgorithm = WhereInEagerAlgorithm;
+
+  /**
    * @private
    */
   static $$knex = null;
@@ -132,19 +151,19 @@ export default class Model extends ModelBase {
       .forClass(ModelClass)
       .transacting(trx)
       .findOperationFactory(builder => {
-        return new InstanceFindOperation(builder, 'find', {instance: this});
+        return new InstanceFindOperation(builder.knex(), 'find', {instance: this});
       })
       .insertOperationFactory(builder => {
-        return new InstanceInsertOperation(builder, 'insert', {instance: this});
+        return new InstanceInsertOperation(builder.knex(), 'insert', {instance: this});
       })
       .updateOperationFactory(builder => {
-        return new InstanceUpdateOperation(builder, 'update', {instance: this});
+        return new InstanceUpdateOperation(builder.knex(), 'update', {instance: this});
       })
       .patchOperationFactory(builder => {
-        return new InstanceUpdateOperation(builder, 'patch', {instance: this, modelOptions: {patch: true}});
+        return new InstanceUpdateOperation(builder.knex(), 'patch', {instance: this, modelOptions: {patch: true}});
       })
       .deleteOperationFactory(builder => {
-        return new InstanceDeleteOperation(builder, 'delete', {instance: this});
+        return new InstanceDeleteOperation(builder.knex(), 'delete', {instance: this});
       })
       .relateOperationFactory(() => {
         throw new Error('`relate` makes no sense in this context');
@@ -623,6 +642,7 @@ export default class Model extends ModelBase {
     return this
       .query()
       .resolve(this.ensureModelArray($models))
+      .findOptions({dontCallAfterGet: true})
       .eager(expression, filters)
       .then(function (models) {
         return Array.isArray($models) ? models : models[0];

@@ -3,8 +3,8 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class JoinRelationOperation extends QueryBuilderOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.joinOperation = opt.joinOperation;
     this.relationName = null;
@@ -29,6 +29,9 @@ export default class JoinRelationOperation extends QueryBuilderOperation {
       alias = this.callOpt.alias;
     }
 
-    relation.join(builder, this.joinOperation, alias);
+    relation.join(builder, {
+      joinOperation: this.joinOperation,
+      relatedTableAlias: alias
+    });
   }
 }

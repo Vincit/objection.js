@@ -3,8 +3,8 @@ import {afterReturn} from '../../utils/promiseUtils';
 
 export default class UpdateAndFetchOperation extends DelegateOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
     this.id = null;
   }
 

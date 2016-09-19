@@ -1,26 +1,8 @@
 import Promise from 'bluebird';
 import ValidationError from '../../ValidationError'
-import QueryBuilderOperation from './QueryBuilderOperation';
+import EagerOperation from './EagerOperation';
 
-export default class EagerFetchOperation extends QueryBuilderOperation {
-
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
-
-    this.expression = null;
-  }
-
-  call(builder, args) {
-    this.expression = args[0].clone();
-
-    const filters = args[1];
-    for (let i = 0, l = filters.length; i < l; ++i) {
-      const filter = filters[i];
-      this.expression.addAnonymousFilterAtPath(filter.path, filter.filter);
-    }
-
-    return true;
-  }
+export default class WhereInEagerOperation extends EagerOperation {
 
   onAfterInternal(builder, result) {
     const models = Array.isArray(result) ? result : [result];

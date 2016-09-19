@@ -354,7 +354,7 @@ module.exports = function (session) {
               'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (2)',
               'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (3)',
               'select "model_2".*, "model_2_prop_1" || \' computed2\' as computed from "public"."model_2" where "model_2"."model_1_id" in (2)',
-              'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (1, 2)'
+              'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (2, 1)'
             ]);
 
             expect(models).to.eql([{
@@ -380,6 +380,14 @@ module.exports = function (session) {
                   $afterGetCalled: 1
                 },
                 model1Relation2: [{
+                  idCol: 2,
+                  model1Id: 2,
+                  model2Prop1: "hejsan 2",
+                  model2Prop2: 20,
+                  computed: "hejsan 2 computed2 after",
+                  model2Relation1: [],
+                  $afterGetCalled: 1
+                }, {
                   idCol: 1,
                   model1Id: 2,
                   model2Prop1: "hejsan 1",
@@ -394,14 +402,6 @@ module.exports = function (session) {
                     computed: "hello 4 computed1 after",
                     $afterGetCalled: 1
                   }]
-                }, {
-                  idCol: 2,
-                  model1Id: 2,
-                  model2Prop1: "hejsan 2",
-                  model2Prop2: 20,
-                  computed: "hejsan 2 computed2 after",
-                  model2Relation1: [],
-                  $afterGetCalled: 1
                 }]
               }
             }]);

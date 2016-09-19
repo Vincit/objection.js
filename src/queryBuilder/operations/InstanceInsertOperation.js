@@ -2,8 +2,8 @@ import InsertOperation from './InsertOperation';
 
 export default class InstanceInsertOperation extends InsertOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
     this.instance = opt.instance;
   }
 

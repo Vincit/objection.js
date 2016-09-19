@@ -991,7 +991,7 @@ describe('QueryBuilder', function () {
       .joinRelation('m1', {alias: 'm'})
       .join('M1', 'M1.id', 'M2.m1Id')
       .then(function () {
-        expect(executedQueries[0]).to.equal('select * from "M2" inner join "M1" as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"');
+        expect(executedQueries[0]).to.equal('select * from "M2" inner join (select * from "M1") as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"');
         done();
       })
       .catch(done);

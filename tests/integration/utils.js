@@ -37,20 +37,54 @@ module.exports.initialize = function (opt) {
   Model1.tableName = 'Model1';
   Model2.tableName = 'model_2';
 
+  var snakeCaseCache = Object.create(null);
+  var snakeCase = function (key) {
+    var out = snakeCaseCache[key];
+
+    if (!out) {
+      out = _.snakeCase(key);
+      snakeCaseCache[key] = out;
+    }
+
+    return out;
+  };
+
+  var camelCaseCache = Object.create(null);
+  var camelCase = function (key) {
+    var out = camelCaseCache[key];
+
+    if (!out) {
+      out = _.camelCase(key);
+      camelCaseCache[key] = out;
+    }
+
+    return out;
+  };
+
   Model2.prototype.$formatDatabaseJson = function (json) {
     json = Model.prototype.$formatDatabaseJson.call(this, json);
 
-    return _.mapKeys(json, function (value, key) {
-      return _.snakeCase(key);
-    });
+    var keys = Object.keys(json);
+    var jsonOut = {};
+
+    for (var i = 0, l = keys.length; i < l; ++i) {
+      var key = keys[i];
+      jsonOut[snakeCase(key)] = json[key];
+    }
+
+    return jsonOut;
   };
 
   Model2.prototype.$parseDatabaseJson = function (json) {
-    json = _.mapKeys(json, function (value, key) {
-      return _.camelCase(key);
-    });
+    var keys = Object.keys(json);
+    var jsonOut = {};
 
-    return Model.prototype.$parseDatabaseJson.call(this, json);
+    for (var i = 0, l = keys.length; i < l; ++i) {
+      var key = keys[i];
+      jsonOut[camelCase(key)] = json[key];
+    }
+
+    return Model.prototype.$parseDatabaseJson.call(this, jsonOut);
   };
 
   Model1.prototype.$beforeInsert = function () {
@@ -262,13 +296,13 @@ module.exports.createDb = function () {
       return session.knex.schema
         .createTable('Model1', function (table) {
           table.bigincrements('id').primary();
-          table.biginteger('model1Id');
+          table.biginteger('model1Id').index();
           table.string('model1Prop1');
           table.integer('model1Prop2');
         })
         .createTable('model_2', function (table) {
           table.bigincrements('id_col').primary();
-          table.biginteger('model_1_id');
+          table.biginteger('model_1_id').index();
           table.string('model_2_prop_1');
           table.integer('model_2_prop_2');
         })
@@ -277,8 +311,8 @@ module.exports.createDb = function () {
           table.string('extra1');
           table.string('extra2');
           table.string('extra3');
-          table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE');
-          table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE');
+          table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();;
+          table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();;
         })
     })
     .catch(function () {

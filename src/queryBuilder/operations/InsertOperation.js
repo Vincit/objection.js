@@ -5,8 +5,8 @@ import {isPostgres} from '../../utils/dbUtils';
 
 export default class InsertOperation extends QueryBuilderOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.models = null;
     this.isArray = false;

@@ -5,8 +5,8 @@ import {afterReturn} from '../../utils/promiseUtils';
 
 export default class UpdateOperation extends QueryBuilderOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.model = null;
     this.modelOptions = clone(this.opt.modelOptions) || {};

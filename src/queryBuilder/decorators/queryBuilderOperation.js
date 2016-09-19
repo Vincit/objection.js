@@ -5,7 +5,7 @@ export default function queryBuilderOperation(input, name) {
   const normalizedInput = normalizeInput(input);
 
   return function (target, property, descriptor) {
-    const methodName = name || property;
+    const operationName = name || property;
 
     if (_.isFunction(input) || _.isArray(input)) {
       descriptor.value = function decorator$queryBuilderOperation() {
@@ -17,7 +17,7 @@ export default function queryBuilderOperation(input, name) {
         }
 
         const methodDesc = normalizedInput.default;
-        const method = new methodDesc.methodClass(this, methodName, methodDesc.opt);
+        const method = new methodDesc.operationClass(this.knex(), operationName, methodDesc.opt);
 
         return this.callQueryBuilderOperation(method, args);
       };
@@ -32,7 +32,7 @@ export default function queryBuilderOperation(input, name) {
 
         const dialect = getDialect(this.knex());
         const methodDesc = normalizedInput[dialect] || normalizedInput.default;
-        const method = new methodDesc.methodClass(this, methodName, methodDesc.opt);
+        const method = new methodDesc.operationClass(this.knex(), operationName, methodDesc.opt);
 
         return this.callQueryBuilderOperation(method, args);
       };
@@ -50,15 +50,15 @@ function normalizeInput(input) {
   }
 }
 
-function normalizeQueryOperationDesc(methodDesc) {
-  if (_.isArray(methodDesc)) {
+function normalizeQueryOperationDesc(desc) {
+  if (_.isArray(desc)) {
     return {
-      methodClass: methodDesc[0],
-      opt: methodDesc[1]
+      operationClass: desc[0],
+      opt: desc[1]
     };
   } else {
     return {
-      methodClass: methodDesc,
+      operationClass: desc,
       opt: {}
     };
   }

@@ -2,8 +2,8 @@ import DeleteOperation from '../../queryBuilder/operations/DeleteOperation';
 
 export default class ManyToManyDeleteOperation extends DeleteOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.relation = opt.relation;
     this.owner = opt.owner;

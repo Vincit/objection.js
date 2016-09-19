@@ -6,6 +6,7 @@ import deprecated from '../utils/decorators/deprecated'
 import QueryBuilderContextBase from './QueryBuilderContextBase';
 
 import KnexOperation from './operations/KnexOperation';
+import SelectOperation from './operations/SelectOperation';
 import WhereRefOperation from './operations/WhereRefOperation';
 import WhereCompositeOperation from './operations/WhereCompositeOperation';
 import WhereInCompositeOperation from './operations/WhereInCompositeOperation';
@@ -104,6 +105,10 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   modify(func) {
+    if (!func) {
+      return this;
+    }
+
     if (arguments.length === 1) {
       func.call(this, this);
     } else {
@@ -121,32 +126,29 @@ export default class QueryBuilderBase {
   }
 
   /**
-   * @param {RegExp=} methodNameRegex
+   * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector
+   * @return {QueryBuilderBase}
    */
-  clear(methodNameRegex) {
-    if (_.isRegExp(methodNameRegex)) {
-      this._operations = _.reject(this._operations, method => {
-        return methodNameRegex.test(method.name)
-      });
-    } else {
-      this._operations = [];
-    }
+  clear(operationSelector) {
+    const operations = [];
 
+    this.forEachOperation(operationSelector, (op) => {
+      operations.push(op);
+    }, false);
+
+    this._operations = operations;
     return this;
   }
 
   /**
    * @param {QueryBuilderBase} queryBuilder
-   * @param {RegExp} methodNameRegex
+   * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector
+   * @return {QueryBuilderBase}
    */
-  copyFrom(queryBuilder, methodNameRegex) {
-    for (let i = 0, l = queryBuilder._operations.length; i < l; ++i) {
-      const op = queryBuilder._operations[i];
-
-      if (!methodNameRegex || methodNameRegex.test(op.name)) {
-        this._operations.push(op);
-      }
-    }
+  copyFrom(queryBuilder, operationSelector) {
+    queryBuilder.forEachOperation(operationSelector, (op) => {
+      this._operations.push(op);
+    });
 
     return this;
   }
@@ -156,27 +158,61 @@ export default class QueryBuilderBase {
    * @returns {boolean}
    */
   has(operationSelector) {
+    let found = false;
+
+    this.forEachOperation(operationSelector, () => {
+      found = true;
+      return false;
+    });
+
+    return found;
+  }
+
+  /**
+   * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector
+   * @returns {boolean}
+   */
+  indexOfOperation(operationSelector) {
+    let idx = -1;
+
+    this.forEachOperation(operationSelector, (op, i) => {
+      idx = i;
+      return false;
+    });
+
+    return idx;
+  }
+
+  /**
+   * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector
+   * @param {function(QueryBuilderOperation)} callback
+   * @param {boolean} match
+   * @returns {QueryBuilderBase}
+   */
+  forEachOperation(operationSelector, callback, match = true) {
     if (_.isRegExp(operationSelector)) {
       for (let i = 0, l = this._operations.length; i < l; ++i) {
         const op = this._operations[i];
 
-        if (operationSelector.test(op.name)) {
-          return true;
+        if (operationSelector.test(op.name) === match) {
+          if (callback(op, i) === false) {
+            break;
+          }
         }
       }
-
-      return false;
     } else {
       for (let i = 0, l = this._operations.length; i < l; ++i) {
         const op = this._operations[i];
 
-        if (op instanceof operationSelector) {
-          return true;
+        if ((op instanceof operationSelector) === match) {
+          if (callback(op, i) === false) {
+            break;
+          }
         }
       }
-
-      return false;
     }
+
+    return this;
   }
 
   /**
@@ -203,7 +239,7 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   callKnexQueryBuilderOperation(methodName, args, pushFront) {
-    return this.callQueryBuilderOperation(new KnexOperation(this, methodName), args, pushFront);
+    return this.callQueryBuilderOperation(new KnexOperation(this.knex(), methodName), args, pushFront);
   }
 
   /**
@@ -237,16 +273,15 @@ export default class QueryBuilderBase {
    */
   buildInto(knexBuilder) {
     const tmp = new Array(10);
-    const operations = this._operations;
 
     let i = 0;
-    while (i < operations.length) {
-      const op = operations[i];
-      const ln = operations.length;
+    while (i < this._operations.length) {
+      const op = this._operations[i];
+      const ln = this._operations.length;
 
       op.onBeforeBuild(this);
 
-      const numNew = operations.length - ln;
+      const numNew = this._operations.length - ln;
 
       // onBeforeBuild may call methods that add more operations. If
       // this was the case, move the operations to be executed next.
@@ -256,15 +291,15 @@ export default class QueryBuilderBase {
         }
 
         for (let j = 0; j < numNew; ++j) {
-          tmp[j] = operations[ln + j];
+          tmp[j] = this._operations[ln + j];
         }
 
         for (let j = ln + numNew - 1; j > i + numNew; --j) {
-          operations[j] = operations[j - numNew];
+          this._operations[j] = this._operations[j - numNew];
         }
 
         for (let j = 0; j < numNew; ++j) {
-          operations[i + j + 1] = tmp[j];
+          this._operations[i + j + 1] = tmp[j];
         }
       }
 
@@ -273,8 +308,8 @@ export default class QueryBuilderBase {
 
     // onBuild operations should never add new operations. They should only call
     // methods on the knex query builder.
-    for (let i = 0, l = operations.length; i < l; ++i) {
-      operations[i].onBuild(knexBuilder, this)
+    for (let i = 0, l = this._operations.length; i < l; ++i) {
+      this._operations[i].onBuild(knexBuilder, this)
     }
 
     return knexBuilder;
@@ -321,6 +356,12 @@ export default class QueryBuilderBase {
   /**
    * @returns {QueryBuilderBase}
    */
+  @queryBuilderOperation(SelectOperation)
+  select(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
   @queryBuilderOperation(KnexOperation)
   insert(...args) {}
 
@@ -341,12 +382,6 @@ export default class QueryBuilderBase {
    */
   @queryBuilderOperation(KnexOperation, 'delete')
   del(...args) {}
-
-  /**
-   * @returns {QueryBuilderBase}
-   */
-  @queryBuilderOperation(KnexOperation)
-  select(...args) {}
 
   /**
    * @returns {QueryBuilderBase}

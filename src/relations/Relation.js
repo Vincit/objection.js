@@ -252,26 +252,31 @@ export default class Relation {
 
   /**
    * @param {QueryBuilder} builder
-   * @param {string=} joinOperation
-   * @param {string=} relatedTableAlias
+   * @param {object=} opt
    * @returns {QueryBuilder}
    */
-  join(builder, joinOperation, relatedTableAlias) {
-    joinOperation = joinOperation || 'join';
-    relatedTableAlias = relatedTableAlias || this.relatedTableAlias();
+  join(builder, opt) {
+    opt = opt || {};
 
-    const relatedTable = this.relatedModelClass.tableName;
-    const relatedTableAsAlias = `${relatedTable} as ${relatedTableAlias}`;
-    const relatedCol = this.relatedCol.map(col => `${relatedTableAlias}.${col}`);
-    const ownerCol = this.fullOwnerCol();
+    opt.joinOperation = opt.joinOperation || 'join';
+    opt.relatedTableAlias = opt.relatedTableAlias || this.relatedTableAlias();
+    opt.relatedJoinSelectQuery = opt.relatedJoinSelectQuery || this.relatedModelClass.query();
+    opt.relatedTable = opt.relatedTable || this.relatedModelClass.tableName;
+    opt.ownerTable = opt.ownerTable || this.ownerModelClass.tableName;
+
+    const relatedCol = this.relatedCol.map(col => `${opt.relatedTableAlias}.${col}`);
+    const ownerCol = this.ownerCol.map(col => `${opt.ownerTable}.${col}`);
+
+    const relatedJoinSelectQuery = opt.relatedJoinSelectQuery
+      .modify(this.modify)
+      .as(opt.relatedTableAlias);
 
     return builder
-      [joinOperation](relatedTableAsAlias, join => {
+      [opt.joinOperation](relatedJoinSelectQuery, join => {
         for (let i = 0, l = relatedCol.length; i < l; ++i) {
           join.on(relatedCol[i], '=', ownerCol[i]);
         }
-      })
-      .modify(this.modify);
+      });
   }
 
   /* istanbul ignore next */
@@ -291,7 +296,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   update(builder, owner) {
-    return new RelationUpdateOperation(builder, 'update', {
+    return new RelationUpdateOperation(builder.knex(), 'update', {
       relation: this,
       owner: owner
     });
@@ -303,7 +308,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   patch(builder, owner) {
-    return new RelationUpdateOperation(builder, 'patch', {
+    return new RelationUpdateOperation(builder.knex(), 'patch', {
       relation: this,
       owner: owner,
       modelOptions: {patch: true}
@@ -316,7 +321,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   find(builder, owners) {
-    return new RelationFindOperation(builder, 'find', {
+    return new RelationFindOperation(builder.knex(), 'find', {
       relation: this,
       owners: owners
     });
@@ -328,7 +333,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   delete(builder, owner) {
-    return new RelationDeleteOperation(builder, 'delete', {
+    return new RelationDeleteOperation(builder.knex(), 'delete', {
       relation: this,
       owner: owner
     });

@@ -1,14 +1,14 @@
 export default class QueryBuilderOperation {
 
   /**
-   * @param {QueryBuilder} builder
+   * @param {knex} knex
    * @param {string} name
    * @param {Object} opt
    */
-  constructor(builder, name, opt) {
+  constructor(knex, name, opt) {
     this.name = name;
     this.opt = opt || {};
-    this.knex = builder.knex();
+    this.knex = knex;
     this.isWriteOperation = false;
   }
 

@@ -17,10 +17,11 @@ import UpdateAndFetchOperation from './operations/UpdateAndFetchOperation';
 import QueryBuilderOperation from './operations/QueryBuilderOperation';
 import JoinRelationOperation from './operations/JoinRelationOperation';
 import InsertGraphOperation from './operations/InsertGraphOperation';
-import EagerFetchOperation from './operations/EagerFetchOperation';
 import RunBeforeOperation from './operations/RunBeforeOperation';
 import RunAfterOperation from './operations/RunAfterOperation';
 import OnBuildOperation from './operations/OnBuildOperation';
+import SelectOperation from './operations/SelectOperation';
+import EagerOperation from './operations/EagerOperation';
 
 export default class QueryBuilder extends QueryBuilderBase {
 
@@ -36,6 +37,9 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._allowedEagerExpression = null;
     this._allowedInsertExpression = null;
 
+    this._findOperationOptions = {};
+    this._eagerOperationOptions = {};
+
     this._findOperationFactory = findOperationFactory;
     this._insertOperationFactory = insertOperationFactory;
     this._updateOperationFactory = updateOperationFactory;
@@ -43,6 +47,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     this._relateOperationFactory = relateOperationFactory;
     this._unrelateOperationFactory = unrelateOperationFactory;
     this._deleteOperationFactory = deleteOperationFactory;
+    this._eagerOperationFactory = modelClass.defaultEagerAlgorithm;
   }
 
   /**
@@ -111,6 +116,23 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @queryBuilderOperation(RunAfterOperation)
   runAfter(runAfter) {}
+
+  /**
+   * @param {function(QueryBuilder):EagerOperation} factory
+   * @returns {QueryBuilder}
+   */
+  eagerOperationFactory(factory) {
+    this._eagerOperationFactory = factory;
+    return this;
+  }
+
+  /**
+   * @param {function(QueryBuilder):EagerOperation} algorithm
+   * @returns {QueryBuilder}
+   */
+  eagerAlgorithm(algorithm) {
+    return this.eagerOperationFactory(algorithm);
+  }
 
   /**
    * @param {function(QueryBuilder):QueryBuilderOperation} factory
@@ -243,6 +265,40 @@ export default class QueryBuilder extends QueryBuilderBase {
   }
 
   /**
+   * @param {object} opt
+   * @return {QueryBuilder}
+   */
+  eagerOptions(opt) {
+    this._eagerOperationOptions = Object.assign({}, this._eagerOperationOptions, opt);
+    const opIdx = this.indexOfOperation(EagerOperation);
+
+    if (opIdx !== -1) {
+      this._operations[opIdx] = this._operations[opIdx].clone({
+        opt: this._findOperationOptions
+      });
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {object} opt
+   * @return {QueryBuilder}
+   */
+  findOptions(opt) {
+    this._findOperationOptions = Object.assign({}, this._findOperationOptions, opt);
+    const opIdx = this.indexOfOperation(FindOperation);
+
+    if (opIdx !== -1) {
+      this._operations[opIdx] = this._operations[opIdx].clone({
+        opt: this._findOperationOptions
+      });
+    }
+
+    return this;
+  }
+
+  /**
    * @returns {Constructor.<Model>}
    */
   modelClass() {
@@ -286,6 +342,9 @@ export default class QueryBuilder extends QueryBuilderBase {
     builder._allowedEagerExpression = this._allowedEagerExpression;
     builder._allowedInsertExpression = this._allowedInsertExpression;
 
+    builder._findOperationOptions = this._findOperationOptions;
+    builder._eagerOperationOptions = this._eagerOperationOptions;
+
     builder._findOperationFactory = this._findOperationFactory;
     builder._insertOperationFactory = this._insertOperationFactory;
     builder._updateOperationFactory = this._updateOperationFactory;
@@ -293,6 +352,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     builder._relateOperationFactory = this._relateOperationFactory;
     builder._unrelateOperationFactory = this._unrelateOperationFactory;
     builder._deleteOperationFactory = this._deleteOperationFactory;
+    builder._eagerOperationFactory = this._eagerOperationFactory;
 
     return builder;
   }
@@ -444,7 +504,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   build() {
     // Take a clone so that we don't modify this instance during build.
-    let builder = this.clone();
+    const builder = this.clone();
 
     if (builder.isFindQuery()) {
       // If no write operations have been called at this point this query is a
@@ -452,10 +512,14 @@ export default class QueryBuilder extends QueryBuilderBase {
       builder._callFindOperation();
     }
 
+    if (builder._eagerExpression) {
+      builder._callEagerFetchOperation();
+    }
+
     // We need to build the builder even if a query executor operation
     // has been called so that the onBuild hooks get called.
-    let knexBuilder = build(builder);
-    let queryExecutorOperation = builder._queryExecutorOperation();
+    const knexBuilder = build(builder);
+    const queryExecutorOperation = builder._queryExecutorOperation();
 
     if (queryExecutorOperation) {
       // If the query executor is set, we build the builder that it returns.
@@ -544,7 +608,10 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   _callFindOperation() {
     if (!this.has(FindOperation)) {
-      this.callQueryBuilderOperation(this._findOperationFactory(this), [], /* pushFront = */ true);
+      const operation = this._findOperationFactory(this);
+      operation.opt = Object.assign(operation.opt, this._findOperationOptions);
+
+      this.callQueryBuilderOperation(operation, [], /* pushFront = */ true);
     }
   }
 
@@ -552,8 +619,11 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @private
    */
   _callEagerFetchOperation() {
-    if (!this.has(EagerFetchOperation) && this._eagerExpression) {
-      this.callQueryBuilderOperation(new EagerFetchOperation(this, "eager"), [
+    if (!this.has(EagerOperation) && this._eagerExpression) {
+      const operation = this._eagerOperationFactory(this);
+      operation.opt = Object.assign(operation.opt, this._eagerOperationOptions);
+
+      this.callQueryBuilderOperation(operation, [
         this._eagerExpression,
         this._eagerFilterExpressions
       ]);
@@ -585,6 +655,33 @@ export default class QueryBuilder extends QueryBuilderBase {
         return result;
       }
     });
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  hasSelection(selection) {
+    const table = this.modelClass().tableName;
+    let noSelectStatements = true;
+
+    for (let i = 0, l = this._operations.length; i < l; ++i) {
+      const op = this._operations[i];
+
+      if (op instanceof SelectOperation) {
+        noSelectStatements = false;
+
+        if (op.hasSelection(table, selection)) {
+          return true;
+        }
+      }
+    }
+
+    if (noSelectStatements) {
+      // Implicit `select *`.
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -753,7 +850,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   insertAndFetch(modelsOrObjects) {
-    const insertAndFetchOperation = new InsertAndFetchOperation(this, 'insertAndFetch', {
+    const insertAndFetchOperation = new InsertAndFetchOperation(this.knex(), 'insertAndFetch', {
       delegate: this._insertOperationFactory(this)
     });
 
@@ -766,7 +863,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   insertGraph(modelsOrObjects) {
-    const insertGraphOperation = new InsertGraphOperation(this, 'insertGraph', {
+    const insertGraphOperation = new InsertGraphOperation(this.knex(), 'insertGraph', {
       delegate: this._insertOperationFactory(this)
     });
 
@@ -786,8 +883,8 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   insertGraphAndFetch(modelsOrObjects) {
-    const insertGraphAndFetchOperation = new InsertGraphAndFetchOperation(this, 'insertGraphAndFetch', {
-      delegate: new InsertGraphOperation(this, 'insertGraph', {
+    const insertGraphAndFetchOperation = new InsertGraphAndFetchOperation(this.knex(), 'insertGraphAndFetch', {
+      delegate: new InsertGraphOperation(this.knex(), 'insertGraph', {
         delegate: this._insertOperationFactory(this)
       })
     });
@@ -824,7 +921,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       throw new Error('updateAndFetch can only be called for instance operations');
     }
 
-    const updateAndFetch = new UpdateAndFetchOperation(this, 'updateAndFetch', {
+    const updateAndFetch = new UpdateAndFetchOperation(this.knex(), 'updateAndFetch', {
       delegate: delegateOperation
     });
 
@@ -838,7 +935,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   updateAndFetchById(id, modelOrObject) {
-    const updateAndFetch = new UpdateAndFetchOperation(this, 'updateAndFetch', {
+    const updateAndFetch = new UpdateAndFetchOperation(this.knex(), 'updateAndFetch', {
       delegate: this._updateOperationFactory(this)
     });
 
@@ -867,7 +964,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       throw new Error('patchAndFetch can only be called for instance operations');
     }
 
-    const patchAndFetch = new UpdateAndFetchOperation(this, 'patchAndFetch', {
+    const patchAndFetch = new UpdateAndFetchOperation(this.knex(), 'patchAndFetch', {
       delegate: delegateOperation
     });
 
@@ -881,7 +978,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   patchAndFetchById(id, modelOrObject) {
-    const patchAndFetch = new UpdateAndFetchOperation(this, 'patchAndFetch', {
+    const patchAndFetch = new UpdateAndFetchOperation(this.knex(), 'patchAndFetch', {
       delegate: this._patchOperationFactory(this)
     });
 
@@ -984,17 +1081,17 @@ function checkEager(builder) {
 function createModels(result) {
   const builder = this.builder;
 
-  if (_.isNull(result) || _.isUndefined(result)) {
+  if (result === null || result === undefined) {
     return null;
   }
 
-  if (_.isArray(result)) {
-    if (result.length > 0 && _.isObject(result[0])) {
+  if (Array.isArray(result)) {
+    if (result.length && typeof result[0] === 'object' && !(result[0] instanceof builder._modelClass)) {
       for (let i = 0, l = result.length; i < l; ++i) {
         result[i] = builder._modelClass.fromDatabaseJson(result[i]);
       }
     }
-  } else if (_.isObject(result)) {
+  } else if (typeof result === 'object' && !(result instanceof builder._modelClass)) {
     result = builder._modelClass.fromDatabaseJson(result);
   }
 
@@ -1006,15 +1103,17 @@ function build(builder) {
   let internalContext = builder.internalContext();
   let knexBuilder = builder.knex().queryBuilder();
 
-  if (!builder.has(/from|table|into/)) {
-    // Set the table only if it hasn't been explicitly set yet.
-    builder.table(builder.modelClass().tableName);
-  }
-
   callOnBuildHooks(builder, context.onBuild);
   callOnBuildHooks(builder, internalContext.onBuild);
 
-  return builder.buildInto(knexBuilder);
+  knexBuilder = builder.buildInto(knexBuilder);
+
+  if (!builder.has(/from|table|into/)) {
+    // Set the table only if it hasn't been explicitly set yet.
+    knexBuilder.table(builder.modelClass().tableName);
+  }
+
+  return knexBuilder;
 }
 
 function chainHooks(promise, func) {
@@ -1068,7 +1167,7 @@ function createHookCaller(hook) {
 
 function createOperationFactory(OperationClass, name, options) {
   return builder => {
-    return new OperationClass(builder, name, options);
+    return new OperationClass(builder.knex(), name, options);
   };
 }
 

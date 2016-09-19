@@ -1,24 +1,42 @@
+import clone from 'lodash/clone';
 import Model from '../../model/Model';
 import QueryBuilderOperation from './QueryBuilderOperation';
-import {isPromise, afterReturn} from '../../utils/promiseUtils';
+import {isPromise} from '../../utils/promiseUtils';
 import Promise from 'bluebird';
 
 export default class FindOperation extends QueryBuilderOperation {
 
+  clone(props) {
+    props = props || {};
+
+    const copy = new this.constructor(this.knex, this.name, props.opt || clone(this.opt));
+    copy.isWriteOperation = this.isWriteOperation;
+
+    return copy;
+  }
+
   onAfter(builder, results) {
-    if (Array.isArray(results)) {
-      if (results.length === 1) {
-        return callAfterGet(builder, results[0], results);
-      } else {
-        return callAfterGetArray(builder, results);
-      }
+    if (this.opt.dontCallAfterGet) {
+      return results;
     } else {
-      return callAfterGet(builder, results, results);
+      return callAfterGet(builder.context(), results, !!this.opt.callAfterGetDeeply);
     }
   }
 }
 
-function callAfterGetArray(builder, results) {
+function callAfterGet(ctx, results, deep) {
+  if (Array.isArray(results)) {
+    if (results.length === 1) {
+      return callAfterGetForOne(ctx, results[0], results, deep);
+    } else {
+      return callAfterGetArray(ctx, results, deep);
+    }
+  } else {
+    return callAfterGetForOne(ctx, results, results, deep);
+  }
+}
+
+function callAfterGetArray(ctx, results, deep) {
   if (results.length === 0 || typeof results[0] !== 'object') {
     return results;
   }
@@ -27,7 +45,7 @@ function callAfterGetArray(builder, results) {
   let containsPromise = false;
 
   for (let i = 0, l = results.length; i < l; ++i) {
-    mapped[i] = callAfterGet(builder, results[i], results[i]);
+    mapped[i] = callAfterGetForOne(ctx, results[i], results[i], deep);
 
     if (isPromise(mapped[i])) {
       containsPromise = true;
@@ -41,12 +59,55 @@ function callAfterGetArray(builder, results) {
   }
 }
 
-function callAfterGet(builder, model, result) {
-  if (model !== null
-      && typeof model === 'object'
-      && typeof model.$afterGet === 'function'
-      && model.$afterGet !== Model.prototype.$afterGet) {
-    return afterReturn(model.$afterGet(builder.context()), result);
+function callAfterGetForOne(ctx, model, result, deep) {
+  if (!(model instanceof Model)) {
+    return result;
+  }
+
+  if (deep) {
+    const relations = model.constructor.getRelations();
+    const relNames = Object.keys(relations);
+    const results = [];
+
+    let containsPromise = false;
+
+    for (let i = 0, l = relNames.length; i < l; ++i) {
+      const relName = relNames[i];
+
+      if (model[relName]) {
+        const maybePromise = callAfterGet(ctx, model[relName], deep);
+
+        if (isPromise(maybePromise)) {
+          containsPromise = true;
+        }
+
+        results.push(maybePromise);
+      }
+    }
+
+    if (containsPromise) {
+      return Promise.all(results).then(() => {
+        return doCallAfterGet(ctx, model, result);
+      });
+    } else {
+      return doCallAfterGet(ctx, model, result);
+    }
+  } else {
+    return doCallAfterGet(ctx, model, result);
+  }
+}
+
+function doCallAfterGet(ctx, model, result) {
+  if (model.$afterGet !== Model.prototype.$afterGet) {
+    const maybePromise = model.$afterGet(ctx);
+
+    if (maybePromise instanceof Promise) {
+      return maybePromise.return(result);
+    } else if (isPromise(maybePromise)) {
+      return maybePromise.then(() => result);
+    } else {
+      return result;
+    }
   } else {
     return result;
   }

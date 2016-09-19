@@ -2,8 +2,8 @@ import FindOperation from './FindOperation';
 
 export default class InstanceFindOperation extends FindOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
     this.instance = opt.instance;
   }
 

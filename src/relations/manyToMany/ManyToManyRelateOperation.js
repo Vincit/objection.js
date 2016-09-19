@@ -1,11 +1,10 @@
-import _ from 'lodash';
 import normalizeIds from '../../utils/normalizeIds';
 import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation';
 
 export default class ManyToManyRelateOperation extends QueryBuilderOperation {
 
-  constructor(builder, name, opt) {
-    super(builder, name, opt);
+  constructor(knex, name, opt) {
+    super(knex, name, opt);
 
     this.isWriteOperation = true;
     this.relation = opt.relation;

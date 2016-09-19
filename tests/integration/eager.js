@@ -64,158 +64,351 @@ module.exports = function (session) {
       }]);
     });
 
+    describe.skip('balls', function () {
+
+      before(function () {
+        var _n = 0;
+
+        function n() {
+          return ++_n;
+        }
+
+        return session.populate(_.times(100, function (i) {
+          return {
+            model1Prop2: i,
+
+            model1Relation1: {
+              model1Prop1: 'hello ' + n(),
+
+              model1Relation1: {
+                model1Prop1: 'hello ' + n(),
+
+                model1Relation1: {
+                  model1Prop1: 'hello ' + n(),
+
+                  model1Relation2: _.times(3, function () {
+                    return {
+                      model2Prop1: 'hejsan ' + n()
+                    }
+                  })
+                }
+              }
+            },
+
+            model1Relation2: _.times(3, function () {
+              return {
+                model2Prop1: 'hejsan ' + n(),
+
+                model2Relation1: _.times(2, function () {
+                  return {
+                    model1Prop1: 'hello ' + n(),
+                    extra3: 'extra ' + n(),
+
+                    model1Relation1: {
+                      model1Prop1: 'hello ' + n()
+                    },
+
+                    model1Relation2: [{
+                      model2Prop1: 'hejsan ' + n()
+                    }]
+                  };
+                })
+              };
+            })
+          }
+        }));
+      });
+
+      it('yeahhh', function () {
+        return Promise.all(_.range(100).map(function () {
+          return Model1
+            .query()
+            .where('Model1.model1Prop2', '<', 100)
+            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            //.eager('model1Relation2')
+            .eager('[model1Relation1, model1Relation2.model2Relation1]')
+            /*
+             .modifyEager('model1Relation1', builder => {
+             builder.select('id');
+             })
+             .modifyEager('model1Relation1.model1Relation1', builder => {
+             builder.select('id');
+             })
+             .modifyEager('model1Relation1.model1Relation1.model1Relation1', builder => {
+             builder.select('id');
+             })
+             .modifyEager('model1Relation2', builder => {
+             builder.select('id_col');
+             })
+             .modifyEager('model1Relation2.model2Relation1', builder => {
+             builder.select('id');
+             })
+             .modifyEager('model1Relation2.model2Relation1.model1Relation1', builder => {
+             builder.select('id');
+             })
+             .modifyEager('model1Relation2.model2Relation1.model1Relation2', builder => {
+             builder.select('id_col');
+             })
+             */
+            //.debug()
+            .then(function (res) {
+              //console.log('==================================================================')
+              //console.dir(res, {depth: 100})
+            });
+        }));
+      });
+    });
+
     test('model1Relation1', function (models) {
-      expect(models).to.have.length(1);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1
+        },
+      }]);
+
       expect(models[0]).to.be.a(Model1);
-
       expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-      expect(models[0].model1Relation1.model1Relation1).to.equal(undefined);
-
-      expect(models[0].model1Relation2).to.equal(undefined);
     });
 
     test('model1Relation1.model1Relation1', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-
-      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
-      expect(models[0].model1Relation1.model1Relation1.model1Prop1).to.equal('hello 3');
-
-      expect(models[0].model1Relation2).to.equal(undefined);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled : 1,
+          model1Relation1: {
+            id: 3,
+            model1Id: 4,
+            model1Prop1: 'hello 3',
+            model1Prop2: null,
+            $afterGetCalled : 1
+          }
+        },
+      }]);
     });
 
     test('model1Relation1.model1Relation1Inverse', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-
-      expect(models[0].model1Relation1.model1Relation1Inverse).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1Inverse.id).to.equal(1);
-      expect(models[0].model1Relation1.model1Relation1Inverse.model1Prop1).to.equal('hello 1');
-
-      expect(models[0].model1Relation2).to.equal(undefined);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1Inverse: {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          },
+        },
+      }]);
     });
 
     test('model1Relation1.^', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-
-      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
-      expect(models[0].model1Relation1.model1Relation1.model1Prop1).to.equal('hello 3');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.id).to.equal(4);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Prop1).to.equal('hello 4');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2).to.equal(undefined);
-
-      expect(models[0].model1Relation2).to.equal(undefined);
-    });
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1: {
+            id: 3,
+            model1Id: 4,
+            model1Prop1: 'hello 3',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 4,
+              model1Id: null,
+              model1Prop1: 'hello 4',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+              model1Relation1: null,
+            },
+          },
+        }
+      }]);
+    }, {disableJoin: true});
 
     test('model1Relation1.^2', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-
-      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
-      expect(models[0].model1Relation1.model1Relation1.model1Prop1).to.equal('hello 3');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.equal(undefined);
-      expect(models[0].model1Relation2).to.equal(undefined);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1: {
+            id: 3,
+            model1Id: 4,
+            model1Prop1: 'hello 3',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+          },
+        }
+      }]);
     });
 
     test('model1Relation1(selectId).^', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1).to.not.have.property('model1Prop1');
-      expect(models[0].model1Relation1).to.not.have.property('model1Prop2');
-
-      expect(models[0].model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.id).to.equal(3);
-      expect(models[0].model1Relation1.model1Relation1).to.not.have.property('model1Prop1');
-      expect(models[0].model1Relation1.model1Relation1).to.not.have.property('model1Prop2');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.id).to.equal(4);
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.not.have.property('model1Prop1');
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1).to.not.have.property('model1Prop2');
-
-      expect(models[0].model1Relation1.model1Relation1.model1Relation1.model1Relation2).to.equal(undefined);
-
-      expect(models[0].model1Relation2).to.equal(undefined);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          $afterGetCalled: 1,
+          model1Relation1: {
+            id: 3,
+            model1Id: 4,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 4,
+              $afterGetCalled: 1,
+              model1Id: null,
+              model1Relation1: null
+            },
+          },
+        }
+      }]);
     }, {
       filters: {
         selectId: function (builder) {
           builder.select('id', 'model1Id');
         }
-      }
+      },
+      disableJoin: true
+    });
+
+    test('model1Relation1(selectId).^4', function (models) {
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          model1Prop1: 'hello 2',
+          $afterGetCalled: 1,
+          model1Relation1: {
+            model1Prop1: 'hello 3',
+            $afterGetCalled: 1,
+            model1Relation1: {
+              model1Prop1: 'hello 4',
+              $afterGetCalled: 1,
+              model1Relation1: null,
+            },
+          },
+        }
+      }]);
+    }, {
+      filters: {
+        selectId: function (builder) {
+          builder.select('model1Prop1');
+        }
+      },
+      disableWhereIn: true
     });
 
     test('[model1Relation1, model1Relation2]', function (models) {
-      expect(models).to.have.length(1);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+        },
+
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+        }],
+      }]);
+
       expect(models[0]).to.be.a(Model1);
-
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-
-      expect(models[0].model1Relation2).to.have.length(2);
-      models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'idCol');
-
       expect(models[0].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1]).to.be.a(Model2);
-      expect(models[0].model1Relation2[0].idCol).to.equal(1);
-      expect(models[0].model1Relation2[1].idCol).to.equal(2);
-      expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
-      expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
-
-      expect(models[0].model1Relation2[0].model2Relation1).to.equal(undefined);
-      expect(models[0].model1Relation2[1].model2Relation1).to.equal(undefined);
     });
 
     test('[model1Relation1, model1Relation2(orderByDesc, selectProps)]', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
 
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
-      expect(models[0].model1Relation1).to.have.property('model1Prop2');
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+        },
 
-      expect(models[0].model1Relation2).to.have.length(2);
-      expect(models[0].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1]).to.be.a(Model2);
-      expect(models[0].model1Relation2[0].idCol).to.equal(2);
-      expect(models[0].model1Relation2[1].idCol).to.equal(1);
-      expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 2');
-      expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 1');
-      expect(models[0].model1Relation2[0]).to.not.have.property('model2Prop2');
-      expect(models[0].model1Relation2[1]).to.not.have.property('model2Prop2');
-
-      expect(models[0].model1Relation2[0].model2Relation1).to.equal(undefined);
-      expect(models[0].model1Relation2[1].model2Relation1).to.equal(undefined);
+        model1Relation2: [{
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          $afterGetCalled: 1,
+        }, {
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          $afterGetCalled: 1,
+        }]
+      }]);
     }, {
       filters: {
         selectProps: function (builder) {
@@ -224,77 +417,225 @@ module.exports = function (session) {
         orderByDesc: function (builder) {
           builder.orderBy('model_2_prop_1', 'desc');
         }
-      }
+      },
+      disableJoin: true,
+      disableSort: true
     });
 
     test('[model1Relation1, model1Relation2.model2Relation1]', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
 
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1
+        },
 
-      expect(models[0].model1Relation2).to.have.length(2);
-      models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'idCol');
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+          model2Relation1: []
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
 
-      expect(models[0].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1]).to.be.a(Model2);
-      expect(models[0].model1Relation2[0].idCol).to.equal(1);
-      expect(models[0].model1Relation2[1].idCol).to.equal(2);
-      expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
-      expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
+          model2Relation1: [{
+            id: 5,
+            model1Id: null,
+            model1Prop1: 'hello 5',
+            model1Prop2: null,
+            extra3: 'extra 5',
+            $afterGetCalled: 1
+          }, {
+            id: 6,
+            model1Id: 7,
+            model1Prop1: 'hello 6',
+            model1Prop2: null,
+            extra3: 'extra 6',
+            $afterGetCalled: 1
+          }],
+        }],
+      }]);
+    });
 
-      expect(models[0].model1Relation2[0].model2Relation1).to.have.length(0);
-      expect(models[0].model1Relation2[1].model2Relation1).to.have.length(2);
-      models[0].model1Relation2[1].model2Relation1 = _.sortBy(models[0].model1Relation2[1].model2Relation1, 'id');
+    test('[model1Relation2.model2Relation1, model1Relation1]', function (models) {
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
 
-      expect(models[0].model1Relation2[1].model2Relation1[0]).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[1]).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[0].id).to.equal(5);
-      expect(models[0].model1Relation2[1].model2Relation1[1].id).to.equal(6);
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Prop1).to.equal('hello 5');
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Prop1).to.equal('hello 6');
-      expect(models[0].model1Relation2[1].model2Relation1[0].extra3).to.equal('extra 5');
-      expect(models[0].model1Relation2[1].model2Relation1[1].extra3).to.equal('extra 6');
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1
+        },
+
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+          model2Relation1: []
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+
+          model2Relation1: [{
+            id: 5,
+            model1Id: null,
+            model1Prop1: 'hello 5',
+            model1Prop2: null,
+            extra3: 'extra 5',
+            $afterGetCalled: 1
+          }, {
+            id: 6,
+            model1Id: 7,
+            model1Prop1: 'hello 6',
+            model1Prop2: null,
+            extra3: 'extra 6',
+            $afterGetCalled: 1
+          }],
+        }],
+      }]);
     });
 
     test('[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]', function (models) {
-      expect(models).to.have.length(1);
-      expect(models[0]).to.be.a(Model1);
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
 
-      expect(models[0].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation1.id).to.equal(2);
-      expect(models[0].model1Relation1.model1Prop1).to.equal('hello 2');
+        model1Relation1: {
+          id: 2,
+          model1Id: 3,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1
+        },
 
-      expect(models[0].model1Relation2).to.have.length(2);
-      models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'idCol');
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+          model2Relation1: []
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
 
-      expect(models[0].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1]).to.be.a(Model2);
-      expect(models[0].model1Relation2[0].idCol).to.equal(1);
-      expect(models[0].model1Relation2[1].idCol).to.equal(2);
-      expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 1');
-      expect(models[0].model1Relation2[1].model2Prop1).to.equal('hejsan 2');
+          model2Relation1: [{
+            id: 5,
+            model1Id: null,
+            model1Prop1: 'hello 5',
+            model1Prop2: null,
+            extra3: 'extra 5',
+            model1Relation1: null,
+            model1Relation2: [],
+            $afterGetCalled: 1
+          }, {
+            id: 6,
+            model1Id: 7,
+            model1Prop1: 'hello 6',
+            model1Prop2: null,
+            extra3: 'extra 6',
+            $afterGetCalled: 1,
 
-      expect(models[0].model1Relation2[0].model2Relation1).to.have.length(0);
-      expect(models[0].model1Relation2[1].model2Relation1).to.have.length(2);
-      models[0].model1Relation2[1].model2Relation1 = _.sortBy(models[0].model1Relation2[1].model2Relation1, 'id');
+            model1Relation1: {
+              id: 7,
+              model1Id: null,
+              model1Prop1: 'hello 7',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+            },
 
-      expect(models[0].model1Relation2[1].model2Relation1[0]).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[1]).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[0].id).to.equal(5);
-      expect(models[0].model1Relation2[1].model2Relation1[1].id).to.equal(6);
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Prop1).to.equal('hello 5');
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Prop1).to.equal('hello 6');
+            model1Relation2: [{
+              idCol: 3,
+              model1Id: 6,
+              model2Prop1: 'hejsan 3',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+            }]
+          }],
+        }],
+      }]);
+    });
 
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Relation1).to.equal(null);
-      expect(models[0].model1Relation2[1].model2Relation1[0].model1Relation2).to.eql([]);
+    it('should be able to refer to joined relations with syntax Table:rel1:rel2.col (JoinEagerAlgorithm)', function () {
+      return Model1
+        .query()
+        .where('Model1.id', 1)
+        .where('Model1:model1Relation2.id_col', 2)
+        .eager('[model1Relation1, model1Relation2.model2Relation1]')
+        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+        .eagerOptions({minimize: false})
+        .then(function (models) {
+          expect(models).to.eql([{
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
 
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1).to.be.a(Model1);
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0]).to.be.a(Model2);
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation1.id).to.equal(7);
-      expect(models[0].model1Relation2[1].model2Relation1[1].model1Relation2[0].idCol).to.eql(3);
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1
+            },
+
+            model1Relation2: [{
+              idCol: 2,
+              model1Id: 1,
+              model2Prop1: 'hejsan 2',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+
+              model2Relation1: [{
+                id: 5,
+                model1Id: null,
+                model1Prop1: 'hello 5',
+                model1Prop2: null,
+                extra3: 'extra 5',
+                $afterGetCalled: 1
+              }, {
+                id: 6,
+                model1Id: 7,
+                model1Prop1: 'hello 6',
+                model1Prop2: null,
+                extra3: 'extra 6',
+                $afterGetCalled: 1
+              }],
+            }],
+          }]);
+        });
     });
 
     it('should fail if given missing filter', function (done) {
@@ -348,6 +689,61 @@ module.exports = function (session) {
 
             expect(models[0].model1Relation2[0].model2Relation1).to.have.length(1);
             expect(models[0].model1Relation2[0].model2Relation1[0].id).to.equal(6);
+          });
+      });
+
+      it('should filter the eager query using relation expressions as paths (JoinEagerAlgorithm)', function () {
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
+            builder.where('id', 6);
+          })
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .modifyEager('model1Relation2', function (builder) {
+            builder.where('model_2_prop_1', 'hejsan 2');
+          })
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
+            builder.select('model1Prop1');
+          })
+          .then(function (models) {
+            expect(models).to.eql([{
+              id: 1,
+              model1Id: 2,
+              model1Prop1: 'hello 1',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+
+              model1Relation2: [{
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                model2Prop2: null,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  model1Prop1: 'hello 6',
+                  $afterGetCalled: 1,
+
+                  model1Relation1: {
+                    id: 7,
+                    model1Id: null,
+                    model1Prop1: 'hello 7',
+                    model1Prop2: null,
+                    $afterGetCalled: 1,
+                  },
+
+                  model1Relation2: [{
+                    idCol: 3,
+                    model1Id: 6,
+                    model2Prop1: 'hejsan 3',
+                    model2Prop2: null,
+                    $afterGetCalled: 1,
+                  }]
+                }],
+              }],
+            }]);
           });
       });
 
@@ -533,25 +929,78 @@ module.exports = function (session) {
       id: 1
     });
 
-    var idCol = opt.Model.idColumn;
+    var idCol = opt.Model.getFullIdColumn();
+    var testFn = opt.only ? it.only.bind(it) : it;
 
-    it(expr + ' (QueryBuilder.eager)', function () {
-      return opt.Model.query().where(idCol, opt.id).eager(expr, opt.filters).then(tester);
-    });
-
-    it(expr + ' (Model.loadRelated)', function () {
-      return opt.Model.query().where(idCol, opt.id).then(function (models) {
-        return opt.Model.loadRelated(models, expr, opt.filters);
-      }).then(tester);
-    });
-
-    it(expr + ' (Model.$loadRelated)', function () {
-      return opt.Model.query().where(idCol, opt.id).then(function (models) {
-        return models[0].$loadRelated(expr, opt.filters);
-      }).then(function (result) {
-        tester([result]);
+    if (!opt.disableWhereIn) {
+      testFn(expr + ' (QueryBuilder.eager)', function () {
+        return opt.Model
+          .query()
+          .where(idCol, opt.id)
+          .eager(expr, opt.filters)
+          .then(sortRelations(opt.disableSort))
+          .then(tester);
       });
-    });
+
+      testFn(expr + ' (Model.loadRelated)', function () {
+        return opt.Model
+          .query()
+          .where(idCol, opt.id)
+          .then(function (models) {
+            return opt.Model.loadRelated(models, expr, opt.filters);
+          })
+          .then(sortRelations(opt.disableSort))
+          .then(tester);
+      });
+
+      testFn(expr + ' (Model.$loadRelated)', function () {
+        return opt.Model
+          .query()
+          .where(idCol, opt.id)
+          .then(function (models) {
+            return models[0].$loadRelated(expr, opt.filters);
+          })
+          .then(sortRelations(opt.disableSort))
+          .then(function (result) {
+            tester([result]);
+          });
+      });
+    }
+
+    if (!opt.disableJoin) {
+      testFn(expr + ' (JoinEagerAlgorithm)', function () {
+        return opt.Model
+          .query()
+          .where(idCol, opt.id)
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .eager(expr, opt.filters)
+          .then(sortRelations(opt.disableSort))
+          .then(tester);
+      });
+    }
   }
 
+  function sortRelations(disable) {
+    if (disable) {
+      return function (models) {
+        return models;
+      };
+    }
+
+    return function (models) {
+      Model1.traverse(models, function (model) {
+        if (model.model1Relation2) {
+          model.model1Relation2 = _.sortBy(model.model1Relation2, 'idCol');
+        }
+
+        if (model.model2Relation1) {
+          model.model2Relation1 = _.sortBy(model.model2Relation1, 'id');
+        }
+      });
+
+      return models;
+    };
+  }
 };
+
+
