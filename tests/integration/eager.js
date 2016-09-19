@@ -638,6 +638,40 @@ module.exports = function (session) {
         });
     });
 
+    it('relation references longer that 63 chars should throw an exception (JoinEagerAlgorithm)', function (done) {
+      return Model1
+        .query()
+        .where('Model1.id', 1)
+        .eager('[model1Relation1.model1Relation1.model1Relation1]')
+        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+        .eagerOptions({minimize: false})
+        .then(function () {
+          done(new Error('should not get here'));
+        })
+        .catch(function (err) {
+          expect(err.data.eager).to.equal("identifier Model1:model1Relation1:model1Relation1:model1Relation1:model1Prop1 is over 63 characters long and would be truncated by the database engine.");
+          done();
+        })
+        .catch(done);
+    });
+
+    it('infinitely recursive expressions should fail gracefully with JoinEagerAlgorithm', function (done) {
+      expect(function () {
+        Model1
+          .query()
+          .where('Model1.id', 1)
+          .eager('model1Relation1.^')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(done);
+      }).to.throwException(function (err) {
+        expect(err.data.eager).to.equal('recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm');
+        done();
+      })
+    });
+
     it('should fail if given missing filter', function (done) {
       Model1
         .query()

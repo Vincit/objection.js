@@ -117,7 +117,12 @@ export default class RelationExpression {
    * @returns {boolean}
    */
   isAllRecursive() {
-    return this.numChildren === 1 && _.every(this.children, (val, key) => ALL_RECURSIVE_REGEX.test(key));
+    if (this.numChildren !== 1) {
+      return false;
+    }
+
+    const key = Object.keys(this.children)[0];
+    return ALL_RECURSIVE_REGEX.test(key);
   }
 
   /**
@@ -172,6 +177,13 @@ export default class RelationExpression {
   }
 
   /**
+   * @returns {string}
+   */
+  toString() {
+    return toString(this);
+  }
+
+  /**
    * @private
    * @return {Array.<Object>}
    */
@@ -198,5 +210,31 @@ export default class RelationExpression {
         }
       });
     }
+  }
+}
+
+function toString(node) {
+  let childExpr = _.values(node.children).map(toString);
+
+  if (childExpr.length > 1) {
+    childExpr = '[' + childExpr.join(', ') + ']';
+  } else {
+    childExpr = childExpr[0];
+  }
+
+  let str = node.name;
+
+  if (node.args.length) {
+    str += '(' + node.args.join(', ') + ')'
+  }
+
+  if (childExpr) {
+    if (str) {
+      return str + '.' + childExpr;
+    } else {
+      return childExpr;
+    }
+  } else {
+    return str;
   }
 }

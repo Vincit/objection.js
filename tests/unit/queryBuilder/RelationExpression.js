@@ -504,6 +504,19 @@ describe('RelationExpression', function () {
 
   });
 
+  describe('#toString', function () {
+    testToString('a');
+    testToString('a.b');
+    testToString('a.[b, c]');
+    testToString('a.[b, c.d]');
+    testToString('[a, b]');
+    testToString('[a.[b, c], d.e.f.[g, h.i]]');
+    testToString('a.*');
+    testToString('a.^');
+    testToString('a.^3');
+    testToString('[a.*, b.c.^]');
+  });
+
   describe('#isSubExpression', function () {
     testSubExpression('*', 'a');
     testSubExpression('*', '[a, b]');
@@ -616,6 +629,12 @@ describe('RelationExpression', function () {
 
   function testPath(str, path, expected) {
     expect(RelationExpression.parse(str)._nodesAtPath(path)).to.eql(expected);
+  }
+
+  function testToString(str) {
+    it(str, function () {
+      expect(RelationExpression.parse(str).toString()).to.equal(str);
+    });
   }
 
   function testParseFail(str) {

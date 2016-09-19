@@ -8,6 +8,8 @@ import ManyToManyRelation from '../../relations/manyToMany/ManyToManyRelation';
 import BelongsToOneRelation from '../../relations/belongsToOne/BelongsToOneRelation';
 
 const columnInfo = Object.create(null);
+const idLengthLimit = 63;
+const relationRecursionLimit = 64;
 
 export default class JoinEagerOperation extends EagerOperation {
 
@@ -286,7 +288,10 @@ export default class JoinEagerOperation extends EagerOperation {
       const isIdColumn = idCols.indexOf(col) !== -1;
 
       if (filterPassed || isIdColumn) {
-        selects.push(`${info.encPath}.${col} as ${info.encPath}${this.sep}${col}`);
+        selects.push({
+          col: `${info.encPath}.${col}`,
+          alias: `${info.encPath}${this.sep}${col}`
+        });
 
         if (!filterPassed) {
           info.omitCols[col] = true;
@@ -299,12 +304,24 @@ export default class JoinEagerOperation extends EagerOperation {
 
       relation.joinTableExtraCols.forEach(col => {
         if (selectFilter(col)) {
-          selects.push(`${joinTable}.${col} as ${info.encPath}${this.sep}${col}`);
+          selects.push({
+            col: `${joinTable}.${col}`,
+            alias: `${info.encPath}${this.sep}${col}`
+          });
         }
       });
     }
 
-    builder.select(selects);
+    const tooLongAliases = selects.filter(select => select.alias.length > idLengthLimit);
+
+    if (tooLongAliases.length) {
+      throw new ValidationError({
+        eager: `identifier ${tooLongAliases[0].alias} is over ${idLengthLimit} characters long `
+             + `and would be truncated by the database engine.`
+      });
+    }
+
+    builder.select(selects.map(select => `${select.col} as ${select.alias}`));
   }
 
   encode(path) {
@@ -418,6 +435,12 @@ function fetchColumnInfo(builder, models) {
 function forEachExpr(expr, modelClass, callback) {
   const relations = modelClass.getRelations();
   const relNames = Object.keys(relations);
+
+  if (expr.isAllRecursive() || expr.maxRecursionDepth() > relationRecursionLimit) {
+    throw new ValidationError({
+      eager: `recursion depth of eager expression ${expr.toString()} too big for JoinEagerAlgorithm`
+    });
+  }
 
   for (let i = 0, l = relNames.length; i < l; ++i) {
     const relName = relNames[i];
