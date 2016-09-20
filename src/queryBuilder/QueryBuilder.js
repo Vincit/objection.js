@@ -118,20 +118,27 @@ export default class QueryBuilder extends QueryBuilderBase {
   runAfter(runAfter) {}
 
   /**
+   * @param {function(QueryBuilder):EagerOperation} algorithm
+   * @param {object=} eagerOptions
+   * @returns {QueryBuilder}
+   */
+  eagerAlgorithm(algorithm, eagerOptions) {
+    this.eagerOperationFactory(algorithm);
+
+    if (eagerOptions) {
+      this.eagerOptions(eagerOptions);
+    }
+
+    return this;
+  }
+
+  /**
    * @param {function(QueryBuilder):EagerOperation} factory
    * @returns {QueryBuilder}
    */
   eagerOperationFactory(factory) {
     this._eagerOperationFactory = factory;
     return this;
-  }
-
-  /**
-   * @param {function(QueryBuilder):EagerOperation} algorithm
-   * @returns {QueryBuilder}
-   */
-  eagerAlgorithm(algorithm) {
-    return this.eagerOperationFactory(algorithm);
   }
 
   /**
@@ -609,7 +616,10 @@ export default class QueryBuilder extends QueryBuilderBase {
   _callFindOperation() {
     if (!this.has(FindOperation)) {
       const operation = this._findOperationFactory(this);
-      operation.opt = Object.assign(operation.opt, this._findOperationOptions);
+
+      operation.opt = _.merge(operation.opt,
+        this._findOperationOptions
+      );
 
       this.callQueryBuilderOperation(operation, [], /* pushFront = */ true);
     }
@@ -621,7 +631,11 @@ export default class QueryBuilder extends QueryBuilderBase {
   _callEagerFetchOperation() {
     if (!this.has(EagerOperation) && this._eagerExpression) {
       const operation = this._eagerOperationFactory(this);
-      operation.opt = Object.assign(operation.opt, this._eagerOperationOptions);
+
+      operation.opt = _.merge(operation.opt,
+        this._modelClass.defaultEagerOptions,
+        this._eagerOperationOptions
+      );
 
       this.callQueryBuilderOperation(operation, [
         this._eagerExpression,

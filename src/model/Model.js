@@ -110,6 +110,11 @@ export default class Model extends ModelBase {
   static defaultEagerAlgorithm = WhereInEagerAlgorithm;
 
   /**
+   * @type {object}
+   */
+  static defaultEagerOptions = null;
+
+  /**
    * @private
    */
   static $$knex = null;

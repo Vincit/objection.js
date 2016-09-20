@@ -644,8 +644,7 @@ module.exports = function (session) {
         .where('Model1.id', 1)
         .where('mr2.id_col', 2)
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .eagerOptions({
+        .eagerAlgorithm(Model1.JoinEagerAlgorithm, {
           minimize: false,
           aliases: {
             model1Relation2: 'mr2'
@@ -693,6 +692,79 @@ module.exports = function (session) {
           }]);
         });
     });
+
+    describe('Model.defaultEagerOptions and Model.defaultEagerAlgorithm should be used if defined', function () {
+      var origAlgo;
+      var origOptions;
+
+      before(function () {
+        origAlgo = Model1.defaultEagerAlgorithm;
+        origOptions = Model1.defaultEagerOptions;
+
+        Model1.defaultEagerAlgorithm = Model1.JoinEagerAlgorithm;
+        Model1.defaultEagerOptions = {
+          minimize: false,
+          aliases: {
+            model1Relation2: 'mr2'
+          }
+        };
+      });
+
+      after(function () {
+        Model1.defaultEagerAlgorithm = origAlgo;
+        Model1.defaultEagerOptions = origOptions;
+      });
+
+      it('options for JoinEagerAlgorithm', function () {
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .where('mr2.id_col', 2)
+          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .then(function (models) {
+            expect(models).to.eql([{
+              id: 1,
+              model1Id: 2,
+              model1Prop1: 'hello 1',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+
+              model1Relation1: {
+                id: 2,
+                model1Id: 3,
+                model1Prop1: 'hello 2',
+                model1Prop2: null,
+                $afterGetCalled: 1
+              },
+
+              model1Relation2: [{
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                model2Prop2: null,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  id: 5,
+                  model1Id: null,
+                  model1Prop1: 'hello 5',
+                  model1Prop2: null,
+                  extra3: 'extra 5',
+                  $afterGetCalled: 1
+                }, {
+                  id: 6,
+                  model1Id: 7,
+                  model1Prop1: 'hello 6',
+                  model1Prop2: null,
+                  extra3: 'extra 6',
+                  $afterGetCalled: 1
+                }],
+              }],
+            }]);
+          });
+      });
+
+    })
 
     it('relation references longer that 63 chars should throw an exception (JoinEagerAlgorithm)', function (done) {
       return Model1
