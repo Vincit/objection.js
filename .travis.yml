@@ -12,6 +12,9 @@ before_script:
   - psql -c "create database objection_test;" -U postgres
   - mysql -e "create database objection_test;"
 
+script:
+  - npm run-script test-travis
+
 after_script:
   - npm run-script coveralls
 
