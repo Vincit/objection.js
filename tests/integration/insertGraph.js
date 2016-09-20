@@ -82,27 +82,6 @@ module.exports = function (session) {
           });
       });
 
-      it('should create #dbRef references to existing rows', function () {
-        return Model1
-          .query()
-          .insertGraph(insertion)
-          .then(function () {
-            return session.knex('Model1Model2');
-          })
-          .then(function (rows) {
-            rows = _.map(_.sortBy(rows, ['model1Id', 'model2Id']), function (row) {
-              return _.pick(row, 'model1Id', 'model2Id', 'extra1');
-            });
-
-            expect(rows).to.eql([
-              { model1Id: 1, model2Id: 1, extra1: null },
-              { model1Id: 2, model2Id: 1, extra1: 'foo' },
-              { model1Id: 2, model2Id: 2, extra1: 'extraVal1'},
-              { model1Id: 2, model2Id: 3, extra1: null }
-            ]);
-          });
-      });
-
       it('should have alias `insertWithRelated`', function () {
         return Model1
           .query()
@@ -124,19 +103,29 @@ module.exports = function (session) {
 
         before(function () {
           origSchema = Model1.jsonSchema;
+
           Model1.jsonSchema = {
             type: 'object',
             additionalProperties: false,
             properties: {
+              id: {type: 'number'},
               model1Prop1: {type: 'string'},
               model1Prop2: {type: 'number'},
               model1Id: {type: 'number'}
             }
-          }
+          };
+
+          // Clear the memoized schema.
+          delete Model1.$$hiddenData.memoizedGetJsonSchema;
+          expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
         });
 
         after(function () {
           Model1.jsonSchema = origSchema;
+
+          // Clear the memoized schema.
+          delete Model1.$$hiddenData.memoizedGetJsonSchema;
+          expect(Model1.getJsonSchema()).to.equal(origSchema);
         });
 
         it('should insert a model with relations', function () {
@@ -532,6 +521,8 @@ module.exports = function (session) {
       expect(model.model1Relation1.model1Relation3[1].model2Prop1).to.equal('cibling2');
       expect(model.model1Relation1.model1Relation3[1].extra1).to.equal('extraVal1');
       expect(model.model1Relation1.model1Relation3[1].extra2).to.equal('extraVal2');
+      expect(model.model1Relation1.model1Relation3[2].idCol).to.equal(1);
+      expect(model.model1Relation1.model1Relation3[2].extra1).to.equal('foo');
       shouldCheckHooks && checkHooks(model.model1Relation1.model1Relation3[1]);
 
       expect(model.model1Relation2[0].model2Prop1).to.equal('child1');
