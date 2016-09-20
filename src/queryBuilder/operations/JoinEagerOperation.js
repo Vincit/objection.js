@@ -17,6 +17,7 @@ export default class JoinEagerOperation extends EagerOperation {
     super(knex, name, opt);
 
     this.allRelations = null;
+    this.rootModelClass = null;
     this.pathInfo = Object.create(null);
     this.encodings = Object.create(null);
     this.decodings = Object.create(null);
@@ -33,6 +34,7 @@ export default class JoinEagerOperation extends EagerOperation {
 
     copy.allRelations = this.allRelations;
     copy.allModelClasses = this.allModelClasses;
+    copy.rootModelClass = this.rootModelClass;
     copy.pathInfo = this.pathInfo;
     copy.encodings = this.encodings;
     copy.decodings = this.decodings;
@@ -46,6 +48,7 @@ export default class JoinEagerOperation extends EagerOperation {
     const ModelClass = builder.modelClass();
 
     if (ret) {
+      this.rootModelClass = ModelClass;
       this.allModelClasses = findAllModels(this.expression, ModelClass);
       this.allRelations = findAllRelations(this.expression, ModelClass);
     }
@@ -59,18 +62,17 @@ export default class JoinEagerOperation extends EagerOperation {
 
   onBeforeBuild(builder) {
     const builderClone = builder.clone();
-    const rootTable = builder.modelClass().tableName;
 
-    builder.table(`${rootTable} as ${rootTable}`);
+    builder.table(`${this.rootModelClass.tableName} as ${this.rootModelClass.tableName}`);
     builder.findOptions({callAfterGetDeeply: true});
 
-    this.buildForLevel({
+    this.build({
       expr: this.expression,
       builder: builder,
       modelClass: builder.modelClass(),
       parentInfo: null,
       relation: null,
-      path: rootTable,
+      path: '',
       selectFilter: (col) => {
         return builderClone.hasSelection(col);
       }
@@ -82,7 +84,7 @@ export default class JoinEagerOperation extends EagerOperation {
       return rows;
     }
 
-    const keyInfoByPath = this.createKeyInfo(builder.modelClass(), rows);
+    const keyInfoByPath = this.createKeyInfo(rows);
     const pathInfo = _.values(this.pathInfo);
 
     const tree = Object.create(null);
@@ -124,8 +126,7 @@ export default class JoinEagerOperation extends EagerOperation {
     return this.finalize(pathInfo[0], _.values(tree));
   }
 
-  createKeyInfo(modelClass, rows) {
-    const rootPath = modelClass.tableName;
+  createKeyInfo(rows) {
     const keys = Object.keys(rows[0]);
     const keyInfo = [];
 
@@ -134,7 +135,7 @@ export default class JoinEagerOperation extends EagerOperation {
       const sepIdx = key.lastIndexOf(this.sep);
 
       if (sepIdx === -1) {
-        const pInfo = this.pathInfo[rootPath];
+        const pInfo = this.pathInfo[''];
         const col = key;
 
         if (!pInfo.omitCols[col]) {
@@ -188,7 +189,7 @@ export default class JoinEagerOperation extends EagerOperation {
     }
   }
 
-  buildForLevel({expr, builder, selectFilter, modelClass, relation, path, parentInfo}) {
+  build({expr, builder, selectFilter, modelClass, relation, path, parentInfo}) {
     const info = this.createPathInfo({
       modelClass,
       path,
@@ -206,8 +207,8 @@ export default class JoinEagerOperation extends EagerOperation {
       info
     });
 
-    forEachExpr(expr, modelClass, (childExpr, relation, relName) => {
-      const nextPath = `${path}${this.sep}${relName}`;
+    forEachExpr(expr, modelClass, (childExpr, relation) => {
+      const nextPath = this.joinPath(path, relation.name);
       const encNextPath = this.encode(nextPath);
       const encJoinTablePath = this.encode(joinTableForPath(nextPath));
 
@@ -237,7 +238,7 @@ export default class JoinEagerOperation extends EagerOperation {
       // to be called twice for it.
       filterQuery.modify(relation.modify);
 
-      this.buildForLevel({
+      this.build({
         expr: childExpr,
         builder: builder,
         modelClass: relation.relatedModelClass,
@@ -279,6 +280,7 @@ export default class JoinEagerOperation extends EagerOperation {
   buildSelects({builder, selectFilter, modelClass, relation, info}) {
     const selects = [];
     const idCols = modelClass.getIdColumnArray();
+    const rootTable = this.rootModelClass.tableName;
 
     columnInfo[modelClass.tableName].columns.forEach(col => {
       const filterPassed = selectFilter(col);
@@ -286,8 +288,8 @@ export default class JoinEagerOperation extends EagerOperation {
 
       if (filterPassed || isIdColumn) {
         selects.push({
-          col: `${info.encPath}.${col}`,
-          alias: `${info.encPath}${this.sep}${col}`
+          col: `${info.encPath || rootTable}.${col}`,
+          alias: this.joinPath(info.encPath, col)
         });
 
         if (!filterPassed) {
@@ -303,7 +305,7 @@ export default class JoinEagerOperation extends EagerOperation {
         if (selectFilter(col)) {
           selects.push({
             col: `${joinTable}.${col}`,
-            alias: `${info.encPath}${this.sep}${col}`
+            alias: this.joinPath(info.encPath, col)
           });
         }
       });
@@ -329,7 +331,7 @@ export default class JoinEagerOperation extends EagerOperation {
         const parts = path.split(this.sep);
 
         // Don't encode the root.
-        if (parts.length === 1) {
+        if (!path) {
           encPath = path;
         } else {
           encPath = parts.map(part => this.opt.aliases[part] || part).join(this.sep);
@@ -345,7 +347,7 @@ export default class JoinEagerOperation extends EagerOperation {
 
       if (!encPath) {
         // Don't encode the root.
-        if (path.indexOf(this.sep) === -1) {
+        if (!path) {
           encPath = path;
         } else {
           encPath = this.nextEncodedPath();
@@ -368,7 +370,7 @@ export default class JoinEagerOperation extends EagerOperation {
   }
 
   createIdGetter(modelClass, path) {
-    const idCols = modelClass.getIdColumnArray().map(col => `${path}${this.sep}${col}`);
+    const idCols = modelClass.getIdColumnArray().map(col => this.joinPath(path, col));
 
     if (idCols.length === 1) {
       return createSingleIdGetter(idCols);
@@ -383,6 +385,14 @@ export default class JoinEagerOperation extends EagerOperation {
 
   get sep() {
     return this.opt.separator;
+  }
+
+  joinPath(path, nextPart) {
+    if (path) {
+      return `${path}${this.sep}${nextPart}`;
+    } else {
+      return nextPart;
+    }
   }
 }
 

@@ -591,7 +591,7 @@ module.exports = function (session) {
       return Model1
         .query()
         .where('Model1.id', 1)
-        .where('Model1:model1Relation2.id_col', 2)
+        .where('model1Relation2.id_col', 2)
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm)
         .eagerOptions({minimize: false})
@@ -642,7 +642,7 @@ module.exports = function (session) {
       return Model1
         .query()
         .where('Model1.id', 1)
-        .where('Model1:mr2.id_col', 2)
+        .where('mr2.id_col', 2)
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm)
         .eagerOptions({
@@ -698,14 +698,14 @@ module.exports = function (session) {
       return Model1
         .query()
         .where('Model1.id', 1)
-        .eager('[model1Relation1.model1Relation1.model1Relation1]')
+        .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm)
         .eagerOptions({minimize: false})
         .then(function () {
           done(new Error('should not get here'));
         })
         .catch(function (err) {
-          expect(err.data.eager).to.equal("identifier Model1:model1Relation1:model1Relation1:model1Relation1:model1Prop1 is over 63 characters long and would be truncated by the database engine.");
+          expect(err.data.eager).to.equal("identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.");
           done();
         })
         .catch(done);
