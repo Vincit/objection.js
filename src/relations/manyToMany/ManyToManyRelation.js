@@ -18,50 +18,6 @@ const sqliteBuiltInRowId = '_rowid_';
 
 export default class ManyToManyRelation extends Relation {
 
-  constructor(...args) {
-    super(...args);
-
-    /**
-     * @type {string}
-     */
-    this.joinTable = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableOwnerCol = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableOwnerProp = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableRelatedCol = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableRelatedProp = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableExtraCols = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableExtraProps = null;
-
-    /**
-     * @type {Constructor.<Model>}
-     */
-    this._joinTableModelClass = null;
-  }
-
   setMapping(mapping) {
     let retVal = super.setMapping(mapping);
 
@@ -150,37 +106,6 @@ export default class ManyToManyRelation extends Relation {
    */
   joinTableAlias() {
     return this.joinTable + '_rel_' + this.name;
-  }
-
-  /**
-   * @type {Constructor.<Model>}
-   */
-  get joinTableModelClass() {
-    const knex = this.ownerModelClass.knex();
-
-    if (knex && knex !== this._joinTableModelClass.knex()) {
-      return this._joinTableModelClass.bindKnex(knex);
-    } else {
-      return this._joinTableModelClass;
-    }
-  }
-
-  /**
-   * @returns {ManyToManyRelation}
-   */
-  clone() {
-    let relation = super.clone();
-
-    relation.joinTable = this.joinTable;
-    relation.joinTableOwnerCol = this.joinTableOwnerCol;
-    relation.joinTableOwnerProp = this.joinTableOwnerProp;
-    relation.joinTableRelatedCol = this.joinTableRelatedCol;
-    relation.joinTableRelatedProp = this.joinTableRelatedProp;
-    relation.joinTableExtraCols = this.joinTableExtraCols;
-    relation.joinTableExtraProps = this.joinTableExtraProps;
-    relation._joinTableModelClass = this._joinTableModelClass;
-
-    return relation;
   }
 
   /**

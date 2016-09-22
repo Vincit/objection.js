@@ -6,6 +6,10 @@ import BelongsToOneUnrelateOperation from './BelongsToOneUnrelateOperation';
 
 export default class BelongsToOneRelation extends Relation {
 
+  isOneToOne() {
+    return true;
+  }
+
   createRelationProp(owners, related) {
     const relatedByOwnerId = Object.create(null);
 

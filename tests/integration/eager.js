@@ -343,7 +343,8 @@ module.exports = function (session) {
           builder.select('model1Prop1');
         }
       },
-      disableWhereIn: true
+      disableWhereIn: true,
+      eagerOptions: {minimize: true}
     });
 
     test('[model1Relation1, model1Relation2]', function (models) {
@@ -594,7 +595,6 @@ module.exports = function (session) {
         .where('model1Relation2.id_col', 2)
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .eagerOptions({minimize: false})
         .then(function (models) {
           expect(models).to.eql([{
             id: 1,
@@ -645,7 +645,6 @@ module.exports = function (session) {
         .where('mr2.id_col', 2)
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm, {
-          minimize: false,
           aliases: {
             model1Relation2: 'mr2'
           }
@@ -703,7 +702,6 @@ module.exports = function (session) {
 
         Model1.defaultEagerAlgorithm = Model1.JoinEagerAlgorithm;
         Model1.defaultEagerOptions = {
-          minimize: false,
           aliases: {
             model1Relation2: 'mr2'
           }
@@ -764,7 +762,7 @@ module.exports = function (session) {
           });
       });
 
-    })
+    });
 
     it('relation references longer that 63 chars should throw an exception (JoinEagerAlgorithm)', function (done) {
       return Model1
@@ -772,12 +770,54 @@ module.exports = function (session) {
         .where('Model1.id', 1)
         .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .eagerOptions({minimize: false})
         .then(function () {
           done(new Error('should not get here'));
         })
         .catch(function (err) {
           expect(err.data.eager).to.equal("identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.");
+          done();
+        })
+        .catch(done);
+    });
+
+    it('relation references longer that 63 chars should NOT throw an exception if minimize: true option is given (JoinEagerAlgorithm)', function (done) {
+      return Model1
+        .query()
+        .where('Model1.id', 1)
+        .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
+        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+        .eagerOptions({minimize: true})
+        .then(function (models) {
+          expect(models).to.eql([{
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+              model1Relation1: {
+                id: 3,
+                model1Id: 4,
+                model1Prop1: 'hello 3',
+                model1Prop2: null,
+                $afterGetCalled: 1,
+                model1Relation1: {
+                  id: 4,
+                  model1Id: null,
+                  model1Prop1: 'hello 4',
+                  model1Prop2: null,
+                  $afterGetCalled: 1,
+                  model1Relation1: null,
+                },
+              },
+            }
+          }]);
+
           done();
         })
         .catch(done);
@@ -1134,7 +1174,7 @@ module.exports = function (session) {
         return opt.Model
           .query()
           .where(idCol, opt.id)
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm, opt.eagerOptions)
           .eager(expr, opt.filters)
           .then(sortRelations(opt.disableSort))
           .then(tester);

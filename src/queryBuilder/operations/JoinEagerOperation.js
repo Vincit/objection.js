@@ -3,10 +3,6 @@ import Promise from 'bluebird';
 import EagerOperation from './EagerOperation';
 import ValidationError from '../../ValidationError';
 
-import HasOneRelation from '../../relations/hasOne/HasOneRelation';
-import ManyToManyRelation from '../../relations/manyToMany/ManyToManyRelation';
-import BelongsToOneRelation from '../../relations/belongsToOne/BelongsToOneRelation';
-
 const columnInfo = Object.create(null);
 const idLengthLimit = 63;
 const relationRecursionLimit = 64;
@@ -23,7 +19,7 @@ export default class JoinEagerOperation extends EagerOperation {
     this.decodings = Object.create(null);
     this.encIdx = 0;
     this.opt = _.defaults(opt, {
-      minimize: true,
+      minimize: false,
       separator: ':',
       aliases: {}
     });
@@ -210,7 +206,9 @@ export default class JoinEagerOperation extends EagerOperation {
     forEachExpr(expr, modelClass, (childExpr, relation) => {
       const nextPath = this.joinPath(path, relation.name);
       const encNextPath = this.encode(nextPath);
-      const encJoinTablePath = this.encode(joinTableForPath(nextPath));
+      const encJoinTablePath = relation.joinTable
+        ? this.encode(joinTableForPath(nextPath))
+        : null;
 
       const filterQuery = createFilterQuery({
         builder,
@@ -256,7 +254,7 @@ export default class JoinEagerOperation extends EagerOperation {
     const encPath = this.encode(path);
     let info;
 
-    if (relation instanceof HasOneRelation || relation instanceof BelongsToOneRelation) {
+    if (relation && relation.isOneToOne()) {
       info = new OneToOnePathInfo();
     } else {
       info = new PathInfo();
@@ -298,7 +296,7 @@ export default class JoinEagerOperation extends EagerOperation {
       }
     });
 
-    if (relation instanceof ManyToManyRelation) {
+    if (relation && relation.joinTableExtraCols) {
       const joinTable = this.encode(joinTableForPath(info.path));
 
       relation.joinTableExtraCols.forEach(col => {

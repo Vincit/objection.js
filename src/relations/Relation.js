@@ -53,6 +53,11 @@ export default class Relation {
     this.relatedModelClass = null;
 
     /**
+     * @type {Constructor.<Model>}
+     */
+    this._joinTableModelClass = null;
+
+    /**
      * @type {Array.<string>}
      */
     this.ownerCol = null;
@@ -71,6 +76,41 @@ export default class Relation {
      * @type {Array.<string>}
      */
     this.relatedProp = null;
+
+    /**
+     * @type {string}
+     */
+    this.joinTable = null;
+
+    /**
+     * @type {Array.<string>}
+     */
+    this.joinTableOwnerCol = null;
+
+    /**
+     * @type {Array.<string>}
+     */
+    this.joinTableOwnerProp = null;
+
+    /**
+     * @type {Array.<string>}
+     */
+    this.joinTableRelatedCol = null;
+
+    /**
+     * @type {Array.<string>}
+     */
+    this.joinTableRelatedProp = null;
+
+    /**
+     * @type {Array.<string>}
+     */
+    this.joinTableExtraCols = null;
+
+    /**
+     * @type {Array.<string>}
+     */
+    this.joinTableExtraProps = null;
 
     /**
      * @type {function (QueryBuilder)}
@@ -154,10 +194,30 @@ export default class Relation {
   }
 
   /**
+   * @return {boolean}
+   */
+  isOneToOne() {
+    return false;
+  }
+
+  /**
    * @returns {knex}
    */
   knex() {
     return this.ownerModelClass.knex();
+  }
+
+  /**
+   * @type {Constructor.<Model>}
+   */
+  get joinTableModelClass() {
+    const knex = this.ownerModelClass.knex();
+
+    if (knex && knex !== this._joinTableModelClass.knex()) {
+      return this._joinTableModelClass.bindKnex(knex);
+    } else {
+      return this._joinTableModelClass;
+    }
   }
 
   /**
@@ -196,6 +256,15 @@ export default class Relation {
     relation.relatedCol = this.relatedCol;
     relation.relatedProp = this.relatedProp;
     relation.modify = this.modify;
+
+    relation._joinTableModelClass = this._joinTableModelClass;
+    relation.joinTable = this.joinTable;
+    relation.joinTableOwnerCol = this.joinTableOwnerCol;
+    relation.joinTableOwnerProp = this.joinTableOwnerProp;
+    relation.joinTableRelatedCol = this.joinTableRelatedCol;
+    relation.joinTableRelatedProp = this.joinTableRelatedProp;
+    relation.joinTableExtraCols = this.joinTableExtraCols;
+    relation.joinTableExtraProps = this.joinTableExtraProps;
 
     copyHiddenData(this, relation);
 
