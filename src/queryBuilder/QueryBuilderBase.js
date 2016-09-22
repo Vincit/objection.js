@@ -644,7 +644,19 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   @queryBuilderOperation(KnexOperation)
+  andWhereBetween(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
   whereNotBetween(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  andWhereNotBetween(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
@@ -764,6 +776,12 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   @queryBuilderOperation(KnexOperation)
+  sumDistinct(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
   avg(...args) {}
 
   /**
@@ -807,6 +825,12 @@ export default class QueryBuilderBase {
    */
   @queryBuilderOperation(KnexOperation)
   columnInfo(...args) {}
+
+  /**
+   * @returns {QueryBuilderBase}
+   */
+  @queryBuilderOperation(KnexOperation)
+  with(...args) {}
 
   /**
    * @returns {QueryBuilderBase}

@@ -45,6 +45,24 @@ describe('QueryBuilder', function () {
     TestModel.knex(mockKnex);
   });
 
+  it('should have knex methods', function () {
+    var ignore = [
+      'and', 'toSQL', 'timeout', 'connection', 'stream', 'finally', 'yield', 'ensure', 'reflect', 'domain',
+      'setMaxListeners', 'getMaxListeners', 'emit', 'addListener', 'on', 'prependListener', 'once', 'prependOnceListener',
+      'removeListener', 'removeAllListeners', 'listeners', 'listenerCount', 'eventNames'
+    ];
+
+    var builder = QueryBuilder.forClass(TestModel);
+    for (var name in mockKnex.queryBuilder()) {
+      var func = mockKnex[name];
+      if (typeof func === 'function' && name.charAt(0) !== '_' && ignore.indexOf(name) === -1) {
+        if (typeof builder[name] !== 'function') {
+          expect().to.fail("knex method '" + name + "' is missing from QueryBuilder");
+        }
+      }
+    }
+  });
+
   it('modelClass() should return the model class', function () {
     expect(QueryBuilder.forClass(TestModel).modelClass() === TestModel).to.equal(true);
   });
