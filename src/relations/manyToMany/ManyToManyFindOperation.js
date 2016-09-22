@@ -38,7 +38,9 @@ export default class ManyToManyFindOperation extends FindOperation {
       }
     }
 
-    this.relation.findQuery(builder, _.uniqBy(ids, join));
+    this.relation.findQuery(builder, {
+      ownerIds: _.uniqBy(ids, join)
+    });
 
     const fullJoinTableOwnerCol = this.relation.fullJoinTableOwnerCol();
     // We must select the owner join columns so that we know for which owner model the related

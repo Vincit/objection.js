@@ -17,7 +17,9 @@ export default class RelationFindOperation extends FindOperation {
       ids[i] = this.owners[i].$values(this.relation.ownerProp);
     }
 
-    this.relation.findQuery(builder, _.uniqBy(ids, join));
+    this.relation.findQuery(builder, {
+      ownerIds: _.uniqBy(ids, join)
+    });
   }
 
   onAfterInternal(builder, related) {

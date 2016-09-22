@@ -120,7 +120,7 @@ export default class ManyToManyRelation extends Relation {
   /**
    * @returns {QueryBuilder}
    */
-  findQuery(builder, ownerIds, isColumnRef) {
+  findQuery(builder, opt) {
     builder.join(this.joinTable, join => {
       const fullRelatedCol = this.fullRelatedCol();
       const fullJoinTableRelatedCol = this.fullJoinTableRelatedCol();
@@ -130,17 +130,17 @@ export default class ManyToManyRelation extends Relation {
       }
     });
 
-    if (isColumnRef) {
+    if (opt.isColumnRef) {
       const fullJoinTableOwnerCol = this.fullJoinTableOwnerCol();
 
       for (let i = 0, l = fullJoinTableOwnerCol.length; i < l; ++i) {
-        builder.whereRef(fullJoinTableOwnerCol[i], ownerIds[i]);
+        builder.whereRef(fullJoinTableOwnerCol[i], opt.ownerIds[i]);
       }
     } else {
       let hasIds = false;
 
-      for (let i = 0, l = ownerIds.length; i < l; ++i) {
-        const id = ownerIds[i];
+      for (let i = 0, l = opt.ownerIds.length; i < l; ++i) {
+        const id = opt.ownerIds[i];
 
         if (id) {
           hasIds = true;
@@ -149,7 +149,7 @@ export default class ManyToManyRelation extends Relation {
       }
 
       if (hasIds) {
-        builder.whereInComposite(this.fullJoinTableOwnerCol(), ownerIds);
+        builder.whereInComposite(this.fullJoinTableOwnerCol(), opt.ownerIds);
       } else {
         builder.resolve([]);
       }

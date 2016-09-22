@@ -12,6 +12,8 @@ export default class RelationDeleteOperation extends DeleteOperation {
   onBeforeBuild(builder) {
     super.onBeforeBuild(builder);
 
-    this.relation.findQuery(builder, [this.owner.$values(this.relation.ownerProp)]);
+    this.relation.findQuery(builder, {
+      ownerIds: [this.owner.$values(this.relation.ownerProp)]
+    });
   }
 }

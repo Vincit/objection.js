@@ -286,22 +286,23 @@ export default class Relation {
 
   /**
    * @param {QueryBuilder} builder
-   * @param {Array.<string>|Array.<Array.<(string|number)>>} ownerIds
-   * @param {boolean=} isColumnRef
+   * @param {object} opt
+   * @param {Array.<string>|Array.<Array.<(string|number)>>} opt.ownerIds
+   * @param {boolean=} opt.isColumnRef
    * @returns {QueryBuilder}
    */
-  findQuery(builder, ownerIds, isColumnRef) {
+  findQuery(builder, opt) {
     const fullRelatedCol = this.fullRelatedCol();
 
-    if (isColumnRef) {
+    if (opt.isColumnRef) {
       for (let i = 0, l = fullRelatedCol.length; i < l; ++i) {
-        builder.whereRef(fullRelatedCol[i], ownerIds[i]);
+        builder.whereRef(fullRelatedCol[i], opt.ownerIds[i]);
       }
     } else {
       let hasIds = false;
 
-      for (let i = 0, l = ownerIds.length; i < l; ++i) {
-        const id = ownerIds[i];
+      for (let i = 0, l = opt.ownerIds.length; i < l; ++i) {
+        const id = opt.ownerIds[i];
 
         if (id) {
           hasIds = true;
@@ -310,7 +311,7 @@ export default class Relation {
       }
 
       if (hasIds) {
-        builder.whereInComposite(fullRelatedCol, ownerIds);
+        builder.whereInComposite(fullRelatedCol, opt.ownerIds);
       } else {
         builder.resolve([]);
       }
