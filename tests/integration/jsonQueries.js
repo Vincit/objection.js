@@ -97,20 +97,30 @@ module.exports = function (session) {
 
       complexJsonObj.jsonObject.jsonArray = _.cloneDeep(complexJsonObj.jsonArray);
 
-      return Promise
-        .all([
-          BoundModel.query().insert(complexJsonObj),
-          BoundModel.query().insert({ id:2, name: "empty object and array", jsonObject: {}, jsonArray: [] }),
-          BoundModel.query().insert({ id:3, name: "null object and array"}),
-          BoundModel.query().insert({ id:4, name: "empty object and [1,2]",   jsonObject: {}, jsonArray: [1,2] }),
-          BoundModel.query().insert({ id:5, name: "empty object and array [ null ]",   jsonObject: {}, jsonArray: [ null ] }),
-          BoundModel.query().insert({ id:6, name: "{a: 1} and empty array", jsonObject: {a: 1}, jsonArray: [] }),
-          BoundModel.query().insert({
-            id: 7,
-            name: "{a: {1:1, 2:2}, b:{2:2, 1:1}} for equality comparisons",
-            jsonObject: {a: {1:1, 2:2}, b:{2:2, 1:1}}, jsonArray: []
-          })
-        ]);
+      return BoundModel
+        .query()
+        .delete()
+        .then(function () {
+          return Promise
+            .all([
+              BoundModel.query().insert(complexJsonObj),
+              BoundModel.query().insert({id: 2, name: "empty object and array", jsonObject: {}, jsonArray: []}),
+              BoundModel.query().insert({id: 3, name: "null object and array"}),
+              BoundModel.query().insert({id: 4, name: "empty object and [1,2]", jsonObject: {}, jsonArray: [1, 2]}),
+              BoundModel.query().insert({
+                id: 5,
+                name: "empty object and array [ null ]",
+                jsonObject: {},
+                jsonArray: [null]
+              }),
+              BoundModel.query().insert({id: 6, name: "{a: 1} and empty array", jsonObject: {a: 1}, jsonArray: []}),
+              BoundModel.query().insert({
+                id: 7,
+                name: "{a: {1:1, 2:2}, b:{2:2, 1:1}} for equality comparisons",
+                jsonObject: {a: {1: 1, 2: 2}, b: {2: 2, 1: 1}}, jsonArray: []
+              })
+            ]);
+        });
     });
 
     it('should have test data', function () {

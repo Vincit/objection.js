@@ -1107,6 +1107,18 @@ describe('QueryBuilder', function () {
     }).to.not.throwException();
   });
 
+  it('all query builder methods should work if model is not bound to a knex, when the query is', function () {
+    function UnboundModel() {
+      Model.apply(this, arguments);
+    }
+
+    Model.extend(UnboundModel);
+    UnboundModel.tableName = 'Bar';
+
+    expect(UnboundModel.query(mockKnex).increment("foo", 10).toString()).to.equal('update "Bar" set "foo" = "foo" + 10');
+    expect(UnboundModel.query(mockKnex).decrement("foo", 5).toString()).to.equal('update "Bar" set "foo" = "foo" - 5');
+  });
+
   describe('eager and allowEager' , function () {
 
     it("allowEager('a').eager('a(f1)') should be ok", function (done) {

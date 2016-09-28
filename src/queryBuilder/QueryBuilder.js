@@ -457,7 +457,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {Promise}
    */
   resultSize() {
-    const knex = this._modelClass.knex();
+    const knex = this.knex();
 
     // orderBy is useless here and it can make things a lot slower (at least with postgresql 9.3).
     // Remove it from the count query. We also remove the offset and limit
@@ -1048,7 +1048,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   increment(propertyName, howMuch) {
     let patch = {};
     let columnName = this._modelClass.propertyNameToColumnName(propertyName);
-    patch[propertyName] = this._modelClass.knex().raw('?? + ?', [columnName, howMuch]);
+    patch[propertyName] = this.knex().raw('?? + ?', [columnName, howMuch]);
     return this.patch(patch);
   }
 
@@ -1058,7 +1058,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   decrement(propertyName, howMuch) {
     let patch = {};
     let columnName = this._modelClass.propertyNameToColumnName(propertyName);
-    patch[propertyName] = this._modelClass.knex().raw('?? - ?', [columnName, howMuch]);
+    patch[propertyName] = this.knex().raw('?? - ?', [columnName, howMuch]);
     return this.patch(patch);
   }
 }
