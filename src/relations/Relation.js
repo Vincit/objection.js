@@ -201,18 +201,9 @@ export default class Relation {
   }
 
   /**
-   * @returns {knex}
-   */
-  knex() {
-    return this.ownerModelClass.knex();
-  }
-
-  /**
    * @type {Constructor.<Model>}
    */
-  get joinTableModelClass() {
-    const knex = this.ownerModelClass.knex();
-
+  joinTableModelClass(knex) {
     if (knex && knex !== this._joinTableModelClass.knex()) {
       return this._joinTableModelClass.bindKnex(knex);
     } else {
@@ -330,7 +321,7 @@ export default class Relation {
 
     opt.joinOperation = opt.joinOperation || 'join';
     opt.relatedTableAlias = opt.relatedTableAlias || this.relatedTableAlias();
-    opt.relatedJoinSelectQuery = opt.relatedJoinSelectQuery || this.relatedModelClass.query();
+    opt.relatedJoinSelectQuery = opt.relatedJoinSelectQuery || this.relatedModelClass.query().childQueryOf(builder);
     opt.relatedTable = opt.relatedTable || this.relatedModelClass.tableName;
     opt.ownerTable = opt.ownerTable || this.ownerModelClass.tableName;
 

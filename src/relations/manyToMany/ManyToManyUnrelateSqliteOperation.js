@@ -37,7 +37,7 @@ export default class ManyToManyUnrelateSqliteOperation extends QueryBuilderOpera
         }
       });
 
-    return this.relation.joinTableModelClass
+    return this.relation.joinTableModelClass(builder.knex())
       .query()
       .childQueryOf(builder)
       .delete()

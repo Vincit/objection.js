@@ -28,7 +28,7 @@ export default class ManyToManyInsertOperation extends InsertOperation {
       this.owner[this.relation.name] = this.relation.mergeModels(this.owner[this.relation.name], inserted);
 
       // Insert the join rows to the join table.
-      return this.relation.joinTableModelClass
+      return this.relation.joinTableModelClass(builder.knex())
         .query()
         .childQueryOf(builder)
         .insert(joinModels)

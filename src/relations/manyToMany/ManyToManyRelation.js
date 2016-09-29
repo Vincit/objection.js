@@ -166,7 +166,7 @@ export default class ManyToManyRelation extends Relation {
 
     opt.joinOperation = opt.joinOperation || 'join';
     opt.relatedTableAlias = opt.relatedTableAlias || this.relatedTableAlias();
-    opt.relatedJoinSelectQuery = opt.relatedJoinSelectQuery || this.relatedModelClass.query();
+    opt.relatedJoinSelectQuery = opt.relatedJoinSelectQuery || this.relatedModelClass.query().childQueryOf(builder);
     opt.relatedTable = opt.relatedTable || this.relatedModelClass.tableName;
     opt.ownerTable = opt.ownerTable || this.ownerModelClass.tableName;
     opt.joinTableAlias = opt.joinTableAlias || `${opt.relatedTableAlias}_join`;
@@ -277,7 +277,7 @@ export default class ManyToManyRelation extends Relation {
   selectForModify(builder, owner) {
     let ownerId = owner.$values(this.ownerProp);
 
-    let idQuery = this.joinTableModelClass
+    let idQuery = this.joinTableModelClass(builder.knex())
       .query()
       .childQueryOf(builder)
       .select(this.fullJoinTableRelatedCol())
@@ -293,7 +293,7 @@ export default class ManyToManyRelation extends Relation {
     const relatedTableAliasRowId = relatedTableAlias + '.' + sqliteBuiltInRowId;
     const relatedTableRowId = relatedTable + '.' + sqliteBuiltInRowId;
 
-    const selectRelatedQuery = this.joinTableModelClass
+    const selectRelatedQuery = this.joinTableModelClass(builder.knex())
       .query()
       .childQueryOf(builder)
       .select(relatedTableAliasRowId)

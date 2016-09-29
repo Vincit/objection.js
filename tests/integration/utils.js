@@ -254,6 +254,11 @@ module.exports.initialize = function (opt) {
     opt: opt,
     knex: knex,
 
+    unboundModels: {
+      Model1: Model1,
+      Model2: Model2
+    },
+
     models: {
       Model1: Model1.bindKnex(knex),
       Model2: Model2.bindKnex(knex)

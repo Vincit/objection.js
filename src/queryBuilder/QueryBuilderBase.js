@@ -83,7 +83,15 @@ export default class QueryBuilderBase {
    */
   knex(knex) {
     if (arguments.length === 0) {
-      return this._context.knex || this._knex;
+      const knex = this._context.knex || this._knex;
+
+      if (!knex) {
+        throw new Error(
+          `no database connection available for a query for table ${this.modelClass().tableName}. ` +
+          `You need to bind the model class or the query to a knex instance.`);
+      }
+
+      return knex;
     } else {
       this._knex = knex;
       return this;

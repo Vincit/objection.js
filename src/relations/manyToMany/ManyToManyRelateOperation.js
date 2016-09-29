@@ -22,7 +22,7 @@ export default class ManyToManyRelateOperation extends QueryBuilderOperation {
   queryExecutor(builder) {
     let joinModels = this.relation.createJoinModels(this.owner.$values(this.relation.ownerProp), this.ids);
 
-    return this.relation.joinTableModelClass
+    return this.relation.joinTableModelClass(builder.knex())
       .query()
       .childQueryOf(builder)
       .insert(joinModels);

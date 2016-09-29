@@ -6,7 +6,7 @@ import TableInsertion from './TableInsertion';
 
 export default class GraphInserter {
 
-  constructor({modelClass, models, allowedRelations}) {
+  constructor({modelClass, models, allowedRelations, knex}) {
     /**
      * @type {Constructor.<Model>}
      */
@@ -31,6 +31,11 @@ export default class GraphInserter {
      * @type {DependencyGraph}
      */
     this.graph = this._buildDependencyGraph();
+
+    /**
+     * @type {knex}
+     */
+    this.knex = knex;
   }
 
   /**
@@ -171,7 +176,7 @@ export default class GraphInserter {
         let tableInsertion = batch[conn.relation.joinTable];
 
         let ownerProp = node.model.$values(conn.relation.ownerProp);
-        let modelClass = conn.relation.joinTableModelClass;
+        let modelClass = conn.relation.joinTableModelClass(this.knex);
         let joinModel = conn.relation.createJoinModels(ownerProp, [conn.node.model])[0];
 
         if (conn.refNode) {
