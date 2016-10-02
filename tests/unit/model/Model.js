@@ -352,6 +352,16 @@ describe('Model', function () {
     expect(Model.ensureModelArray(null)).to.eql([]);
   });
 
+  it('loadRelated should return a QueryBuilder', function () {
+    var Model = modelClass('Model1');
+    expect(Model.loadRelated([], '[]')).to.be.a(QueryBuilder);
+  });
+
+  it('$loadRelated should return a QueryBuilder', function () {
+    var Model = modelClass('Model1');
+    expect(Model.fromJson({}).$loadRelated('[]')).to.be.a(QueryBuilder);
+  });
+
   it('loadRelated should throw if an invalid expression is given', function () {
     var Model = modelClass('Model1');
     expect(function () {
