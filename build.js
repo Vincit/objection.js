@@ -9,6 +9,7 @@ var DST_DIR = './lib';
 var CP_ONLY = [SRC_DIR + '/model/inheritModel/inheritModelEs6.js'];
 var BABEL_OPT = {
   presets: [],
+  sourceMaps: 'inline',
   plugins: [
     "transform-decorators-legacy",
     "transform-class-properties",
