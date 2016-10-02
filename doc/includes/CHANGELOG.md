@@ -15,6 +15,7 @@
  * Make sure operations are executed in the order they are called [#180](https://github.com/Vincit/objection.js/issues/180)
  * Fetch nothing if the `where` clauses hit no rows in `update/patchAndFetchById` methods [#189](https://github.com/Vincit/objection.js/issues/189)
  * Lots of performance tweaks.
+ * `$loadRelated` and `loadRelated` now return a `QueryBuilder`.
 
 ### Breaking changes
 
@@ -23,6 +24,9 @@
    method can be called for a query builder to handle the undefined values the old way.
 
  * Deprecated method `dumpSql` is now removed.
+ 
+ * `$loadRelated` and `loadRelated` now return a `QueryBuilder`. This may break your code is some rare cases
+   where you have called a non-standard promise method like `reflect` for the return value of these functions.
 
 ## 0.5.5
 

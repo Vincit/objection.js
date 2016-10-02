@@ -5442,7 +5442,7 @@ filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optiona
 
 Type|Description
 ----|-----------------------------
-[`Promise`](http://bluebirdjs.com/docs/getting-started.html)|
+[`QueryBuilder`](#querybuilder)|The created query builder
 
 
 
@@ -6259,7 +6259,7 @@ filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optiona
 
 Type|Description
 ----|-----------------------------
-[`Promise`](http://bluebirdjs.com/docs/getting-started.html)|
+[`QueryBuilder`](#querybuilder)|The created query builder
 
 
 

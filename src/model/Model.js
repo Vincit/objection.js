@@ -217,7 +217,7 @@ export default class Model extends ModelBase {
   /**
    * @param {string|RelationExpression} relationExpression
    * @param {Object.<string, function(QueryBuilder)>=} filters
-   * @returns {Promise}
+   * @returns {QueryBuilder}
    */
   $loadRelated(relationExpression, filters) {
     return this.constructor.loadRelated(this, relationExpression, filters);
@@ -631,7 +631,7 @@ export default class Model extends ModelBase {
     const relation = this.getRelations()[name];
 
     if (!relation) {
-      throw new Error("model class '" + this.name + "' doesn't have relation '" + name + "'");
+      throw new Error(`A model class (tableName = ${this.tableName}) doesn't have relation ${name}`);
     }
 
     return relation;
@@ -641,7 +641,7 @@ export default class Model extends ModelBase {
    * @param {Array.<Model|Object>} $models
    * @param {string|RelationExpression} expression
    * @param {Object.<string, function(QueryBuilder)>=} filters
-   * @returns {Promise}
+   * @returns {QueryBuilder}
    */
   static loadRelated($models, expression, filters) {
     return this
@@ -649,7 +649,7 @@ export default class Model extends ModelBase {
       .resolve(this.ensureModelArray($models))
       .findOptions({dontCallAfterGet: true})
       .eager(expression, filters)
-      .then(function (models) {
+      .runAfter(function (models) {
         return Array.isArray($models) ? models : models[0];
       });
   }
