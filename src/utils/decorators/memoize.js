@@ -6,13 +6,13 @@ export default function memoize(target, property, descriptor) {
   const impl = descriptor.value;
 
   if (impl.length === 0) {
-    descriptor.value = createSingleValueMemoizedFunc(impl, cacheProp);
+    descriptor.value = memoizeZeroArgs(impl, cacheProp);
   } else {
-    descriptor.value = createMultiValueMemoizedFunc(impl, cacheProp);
+    descriptor.value = memoizeSingleArg(impl, cacheProp);
   }
 }
 
-function createSingleValueMemoizedFunc(impl, cacheProp) {
+function memoizeZeroArgs(impl, cacheProp) {
   const get = createGetter(cacheProp);
   const set = createSetter(cacheProp);
 
@@ -28,7 +28,7 @@ function createSingleValueMemoizedFunc(impl, cacheProp) {
   };
 }
 
-function createMultiValueMemoizedFunc(impl, cacheProp) {
+function memoizeSingleArg(impl, cacheProp) {
   const get = createGetter(cacheProp);
   const set = createSetter(cacheProp);
 
@@ -40,7 +40,7 @@ function createMultiValueMemoizedFunc(impl, cacheProp) {
       set(this, cache);
     }
 
-    if (input in cache) {
+    if (cache[input] !== undefined) {
       return cache[input];
     } else {
       let value = impl.call(this, input);
