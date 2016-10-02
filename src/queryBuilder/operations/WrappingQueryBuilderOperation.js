@@ -4,8 +4,8 @@ import {isKnexQueryBuilder} from '../../utils/dbUtils';
 
 export default class WrappingQueryBuilderOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
     this.args = null;
   }
 

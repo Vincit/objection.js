@@ -1396,7 +1396,7 @@ describe('QueryBuilder', function () {
 });
 
 function createFindOperation(builder, whereObj) {
-  var method = new QueryBuilderOperation(builder, "find");
+  var method = new QueryBuilderOperation("find");
 
   method.onBuild = function (knexBuilder) {
     knexBuilder.where(whereObj);
@@ -1406,7 +1406,7 @@ function createFindOperation(builder, whereObj) {
 }
 
 function createInsertOperation(builder, mergeWithModel) {
-  var method = new QueryBuilderOperation(builder, "insert");
+  var method = new QueryBuilderOperation("insert");
   method.isWriteOperation = true;
 
   method.call = function (builder, args) {
@@ -1423,7 +1423,7 @@ function createInsertOperation(builder, mergeWithModel) {
 }
 
 function createUpdateOperation(builder, mergeWithModel) {
-  var method = new QueryBuilderOperation(builder, "update");
+  var method = new QueryBuilderOperation("update");
   method.isWriteOperation = true;
 
   method.call = function (builder, args) {
@@ -1440,7 +1440,7 @@ function createUpdateOperation(builder, mergeWithModel) {
 }
 
 function createDeleteOperation(builder, whereObj) {
-  var method = new QueryBuilderOperation(builder, "delete");
+  var method = new QueryBuilderOperation("delete");
   method.isWriteOperation = true;
 
   method.onBuild = function (knexBuilder) {

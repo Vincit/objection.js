@@ -3,8 +3,8 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class JoinRelationOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.joinOperation = opt.joinOperation;
     this.relationName = null;

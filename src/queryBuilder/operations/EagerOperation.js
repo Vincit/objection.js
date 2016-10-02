@@ -3,8 +3,8 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class EagerOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.expression = null;
     this.filters = null;
@@ -12,7 +12,7 @@ export default class EagerOperation extends QueryBuilderOperation {
 
   clone(props) {
     props = props || {};
-    const copy = new this.constructor(this.knex, this.name, props.opt || clone(this.opt));
+    const copy = new this.constructor(this.name, props.opt || clone(this.opt));
 
     copy.isWriteOperation = this.isWriteOperation;
     copy.expression = this.expression.clone();

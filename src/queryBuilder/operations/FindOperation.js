@@ -8,7 +8,7 @@ export default class FindOperation extends QueryBuilderOperation {
 
   clone(props) {
     props = props || {};
-    return new this.constructor(this.knex, this.name, props.opt || clone(this.opt));x
+    return new this.constructor(this.name, props.opt || clone(this.opt));x
   }
 
   onAfter(builder, results) {

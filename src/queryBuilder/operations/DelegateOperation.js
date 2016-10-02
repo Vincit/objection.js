@@ -2,19 +2,11 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class DelegateOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.delegate = opt.delegate;
     this.isWriteOperation = this.delegate.isWriteOperation;
-  }
-
-  formatter() {
-    return this.delegate.formatter();
-  }
-
-  raw() {
-    return this.delegate.raw.apply(this.delegate, arguments);
   }
 
   call(builder, args) {

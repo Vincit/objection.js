@@ -13,7 +13,7 @@ export default class WhereRefOperation extends WrappingQueryBuilderOperation {
   }
 
   whereRef(knexBuilder, lhs, op, rhs) {
-    const formatter = this.formatter();
+    const formatter = knexBuilder.client.formatter();
     op = formatter.operator(op);
 
     if (typeof lhs !== 'string' || typeof rhs !== 'string' || typeof op !== 'string') {

@@ -29,21 +29,21 @@ export default class BelongsToOneRelation extends Relation {
   }
 
   insert(builder, owner) {
-    return new BelongsToOneInsertOperation(builder.knex(), 'insert', {
+    return new BelongsToOneInsertOperation('insert', {
       relation: this,
       owner: owner
     });
   }
 
   relate(builder, owner) {
-    return new BelongsToOneRelateOperation(builder.knex(), 'relate', {
+    return new BelongsToOneRelateOperation('relate', {
       relation: this,
       owner: owner
     });
   }
 
   unrelate(builder, owner) {
-    return new BelongsToOneUnrelateOperation(builder.knex(), 'unrelate', {
+    return new BelongsToOneUnrelateOperation('unrelate', {
       relation: this,
       owner: owner
     });

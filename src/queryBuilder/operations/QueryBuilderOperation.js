@@ -5,25 +5,10 @@ export default class QueryBuilderOperation {
    * @param {string} name
    * @param {Object} opt
    */
-  constructor(knex, name, opt) {
+  constructor(name, opt) {
     this.name = name;
     this.opt = opt || {};
-    this.knex = knex;
     this.isWriteOperation = false;
-  }
-
-  /**
-   * @returns {knex.Formatter}
-   */
-  formatter() {
-    return this.knex.client.formatter();
-  }
-
-  /**
-   * @returns {knex.Raw}
-   */
-  raw() {
-    return this.knex.raw.apply(this.knex, arguments);
   }
 
   /**

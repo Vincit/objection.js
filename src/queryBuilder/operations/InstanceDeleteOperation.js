@@ -3,8 +3,8 @@ import {afterReturn} from '../../utils/promiseUtils';
 
 export default class InstanceDeleteOperation extends DeleteOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
     this.instance = opt.instance;
   }
 

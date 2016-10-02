@@ -17,7 +17,7 @@ export default function queryBuilderOperation(input, name) {
         }
 
         const methodDesc = normalizedInput.default;
-        const method = new methodDesc.operationClass(this.knex(), operationName, methodDesc.opt);
+        const method = new methodDesc.operationClass(operationName, methodDesc.opt);
 
         return this.callQueryBuilderOperation(method, args);
       };
@@ -32,7 +32,7 @@ export default function queryBuilderOperation(input, name) {
 
         const dialect = getDialect(this.knex());
         const methodDesc = normalizedInput[dialect] || normalizedInput.default;
-        const method = new methodDesc.operationClass(this.knex(), operationName, methodDesc.opt);
+        const method = new methodDesc.operationClass(operationName, methodDesc.opt);
 
         return this.callQueryBuilderOperation(method, args);
       };

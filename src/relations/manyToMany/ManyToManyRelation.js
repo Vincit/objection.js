@@ -196,14 +196,14 @@ export default class ManyToManyRelation extends Relation {
   }
 
   find(builder, owners) {
-    return new ManyToManyFindOperation(builder.knex(), 'find', {
+    return new ManyToManyFindOperation('find', {
       relation: this,
       owners: owners
     });
   }
 
   insert(builder, owner) {
-    return new ManyToManyInsertOperation(builder.knex(), 'insert', {
+    return new ManyToManyInsertOperation('insert', {
       relation: this,
       owner: owner
     });
@@ -211,12 +211,12 @@ export default class ManyToManyRelation extends Relation {
 
   update(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUpdateSqliteOperation(builder.knex(), 'update', {
+      return new ManyToManyUpdateSqliteOperation('update', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyUpdateOperation(builder.knex(), 'update', {
+      return new ManyToManyUpdateOperation('update', {
         relation: this,
         owner: owner
       });
@@ -225,13 +225,13 @@ export default class ManyToManyRelation extends Relation {
 
   patch(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUpdateSqliteOperation(builder.knex(), 'patch', {
+      return new ManyToManyUpdateSqliteOperation('patch', {
         relation: this,
         owner: owner,
         modelOptions: {patch: true}
       });
     } else {
-      return new ManyToManyUpdateOperation(builder.knex(), 'patch', {
+      return new ManyToManyUpdateOperation('patch', {
         relation: this,
         owner: owner,
         modelOptions: {patch: true}
@@ -241,12 +241,12 @@ export default class ManyToManyRelation extends Relation {
 
   delete(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyDeleteSqliteOperation(builder.knex(), 'delete', {
+      return new ManyToManyDeleteSqliteOperation('delete', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyDeleteOperation(builder.knex(), 'delete', {
+      return new ManyToManyDeleteOperation('delete', {
         relation: this,
         owner: owner
       });
@@ -254,7 +254,7 @@ export default class ManyToManyRelation extends Relation {
   }
 
   relate(builder, owner) {
-    return new ManyToManyRelateOperation(builder.knex(), 'relate', {
+    return new ManyToManyRelateOperation('relate', {
       relation: this,
       owner: owner
     });
@@ -262,12 +262,12 @@ export default class ManyToManyRelation extends Relation {
 
   unrelate(builder, owner) {
     if (isSqlite(builder.knex())) {
-      return new ManyToManyUnrelateSqliteOperation(builder.knex(), 'unrelate', {
+      return new ManyToManyUnrelateSqliteOperation('unrelate', {
         relation: this,
         owner: owner
       });
     } else {
-      return new ManyToManyUnrelateOperation(builder.knex(), 'unrelate', {
+      return new ManyToManyUnrelateOperation('unrelate', {
         relation: this,
         owner: owner
       });

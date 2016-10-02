@@ -35,21 +35,21 @@ export default class HasManyRelation extends Relation {
   }
 
   insert(builder, owner) {
-    return new HasManyInsertOperation(builder.knex(), 'insert', {
+    return new HasManyInsertOperation('insert', {
       relation: this,
       owner: owner
     });
   }
 
   relate(builder, owner) {
-    return new HasManyRelateOperation(builder.knex(), 'relate', {
+    return new HasManyRelateOperation('relate', {
       relation: this,
       owner: owner
     });
   }
 
   unrelate(builder, owner) {
-    return new HasManyUnrelateOperation(builder.knex(), 'unrelate', {
+    return new HasManyUnrelateOperation('unrelate', {
       relation: this,
       owner: owner
     });

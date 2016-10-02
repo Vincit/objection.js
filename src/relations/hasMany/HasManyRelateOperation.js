@@ -3,8 +3,8 @@ import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOpe
 
 export default class HasManyRelateOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.isWriteOperation = true;
     this.relation = opt.relation;

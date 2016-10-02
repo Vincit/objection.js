@@ -30,7 +30,7 @@ export default class WhereInCompositeOperation extends WrappingQueryBuilderOpera
   }
 
   buildCompositeSubquery(knexBuilder, columns, subquery) {
-    const formatter = this.formatter();
+    const formatter = knexBuilder.client.formatter();
 
     let sql = '(';
     for (let i = 0, l = columns.length; i < l; ++i) {
@@ -42,7 +42,7 @@ export default class WhereInCompositeOperation extends WrappingQueryBuilderOpera
     }
     sql += ')';
 
-    knexBuilder.whereIn(this.raw(sql), subquery);
+    knexBuilder.whereIn(knexBuilder.client.raw(sql), subquery);
   }
 
   buildNonComposite(knexBuilder, columns, values) {

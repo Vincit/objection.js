@@ -864,7 +864,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   insertAndFetch(modelsOrObjects) {
-    const insertAndFetchOperation = new InsertAndFetchOperation(this.knex(), 'insertAndFetch', {
+    const insertAndFetchOperation = new InsertAndFetchOperation('insertAndFetch', {
       delegate: this._insertOperationFactory(this)
     });
 
@@ -877,7 +877,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   insertGraph(modelsOrObjects) {
-    const insertGraphOperation = new InsertGraphOperation(this.knex(), 'insertGraph', {
+    const insertGraphOperation = new InsertGraphOperation('insertGraph', {
       delegate: this._insertOperationFactory(this)
     });
 
@@ -897,8 +897,8 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   insertGraphAndFetch(modelsOrObjects) {
-    const insertGraphAndFetchOperation = new InsertGraphAndFetchOperation(this.knex(), 'insertGraphAndFetch', {
-      delegate: new InsertGraphOperation(this.knex(), 'insertGraph', {
+    const insertGraphAndFetchOperation = new InsertGraphAndFetchOperation('insertGraphAndFetch', {
+      delegate: new InsertGraphOperation('insertGraph', {
         delegate: this._insertOperationFactory(this)
       })
     });
@@ -935,7 +935,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       throw new Error('updateAndFetch can only be called for instance operations');
     }
 
-    const updateAndFetch = new UpdateAndFetchOperation(this.knex(), 'updateAndFetch', {
+    const updateAndFetch = new UpdateAndFetchOperation('updateAndFetch', {
       delegate: delegateOperation
     });
 
@@ -949,7 +949,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   updateAndFetchById(id, modelOrObject) {
-    const updateAndFetch = new UpdateAndFetchOperation(this.knex(), 'updateAndFetch', {
+    const updateAndFetch = new UpdateAndFetchOperation('updateAndFetch', {
       delegate: this._updateOperationFactory(this)
     });
 
@@ -978,7 +978,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       throw new Error('patchAndFetch can only be called for instance operations');
     }
 
-    const patchAndFetch = new UpdateAndFetchOperation(this.knex(), 'patchAndFetch', {
+    const patchAndFetch = new UpdateAndFetchOperation('patchAndFetch', {
       delegate: delegateOperation
     });
 
@@ -992,7 +992,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   @writeQueryOperation
   patchAndFetchById(id, modelOrObject) {
-    const patchAndFetch = new UpdateAndFetchOperation(this.knex(), 'patchAndFetch', {
+    const patchAndFetch = new UpdateAndFetchOperation('patchAndFetch', {
       delegate: this._patchOperationFactory(this)
     });
 
@@ -1180,8 +1180,8 @@ function createHookCaller(hook) {
 }
 
 function createOperationFactory(OperationClass, name, options) {
-  return builder => {
-    return new OperationClass(builder.knex(), name, options);
+  return () => {
+    return new OperationClass(name, options);
   };
 }
 

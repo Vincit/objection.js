@@ -3,8 +3,8 @@ import {after} from '../../utils/promiseUtils';
 
 export default class BelongsToOneInsertOperation extends InsertOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.relation = opt.relation;
     this.owner = opt.owner;

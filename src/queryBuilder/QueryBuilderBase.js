@@ -247,7 +247,7 @@ export default class QueryBuilderBase {
    * @returns {QueryBuilderBase}
    */
   callKnexQueryBuilderOperation(methodName, args, pushFront) {
-    return this.callQueryBuilderOperation(new KnexOperation(this.knex(), methodName), args, pushFront);
+    return this.callQueryBuilderOperation(new KnexOperation(methodName), args, pushFront);
   }
 
   /**

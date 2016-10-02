@@ -357,7 +357,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   update(builder, owner) {
-    return new RelationUpdateOperation(builder.knex(), 'update', {
+    return new RelationUpdateOperation('update', {
       relation: this,
       owner: owner
     });
@@ -369,7 +369,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   patch(builder, owner) {
-    return new RelationUpdateOperation(builder.knex(), 'patch', {
+    return new RelationUpdateOperation('patch', {
       relation: this,
       owner: owner,
       modelOptions: {patch: true}
@@ -382,7 +382,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   find(builder, owners) {
-    return new RelationFindOperation(builder.knex(), 'find', {
+    return new RelationFindOperation('find', {
       relation: this,
       owners: owners
     });
@@ -394,7 +394,7 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   delete(builder, owner) {
-    return new RelationDeleteOperation(builder.knex(), 'delete', {
+    return new RelationDeleteOperation('delete', {
       relation: this,
       owner: owner
     });

@@ -2,8 +2,8 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class DeleteOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
     this.isWriteOperation = true;
   }
 

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import jsonApi from './postgresJsonApi';
 import WrappingQueryBuilderOperation from '../WrappingQueryBuilderOperation';
 

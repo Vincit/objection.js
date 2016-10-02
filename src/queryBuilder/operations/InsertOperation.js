@@ -5,8 +5,8 @@ import {isPostgres} from '../../utils/dbUtils';
 
 export default class InsertOperation extends QueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.models = null;
     this.isArray = false;
@@ -21,7 +21,7 @@ export default class InsertOperation extends QueryBuilderOperation {
   }
 
   onBeforeInternal(builder, result) {
-    if (this.models.length > 1 && !isPostgres(this.knex)) {
+    if (this.models.length > 1 && !isPostgres(builder.knex())) {
       throw new Error('batch insert only works with Postgresql');
     } else {
       return mapAfterAllReturn(this.models, model => model.$beforeInsert(builder.context()), result);

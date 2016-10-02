@@ -24,11 +24,11 @@ import JoinEagerOperation from '../queryBuilder/operations/JoinEagerOperation';
 import WhereInEagerOperation from '../queryBuilder/operations/WhereInEagerOperation';
 
 const JoinEagerAlgorithm = (builder) => {
-  return new JoinEagerOperation(builder.knex(), 'eager');
+  return new JoinEagerOperation('eager');
 };
 
 const WhereInEagerAlgorithm = (builder) => {
-  return new WhereInEagerOperation(builder.knex(), 'eager');
+  return new WhereInEagerOperation('eager');
 };
 
 export default class Model extends ModelBase {
@@ -155,20 +155,20 @@ export default class Model extends ModelBase {
     return ModelClass.QueryBuilder
       .forClass(ModelClass)
       .transacting(trx)
-      .findOperationFactory(builder => {
-        return new InstanceFindOperation(builder.knex(), 'find', {instance: this});
+      .findOperationFactory(() => {
+        return new InstanceFindOperation('find', {instance: this});
       })
-      .insertOperationFactory(builder => {
-        return new InstanceInsertOperation(builder.knex(), 'insert', {instance: this});
+      .insertOperationFactory(() => {
+        return new InstanceInsertOperation('insert', {instance: this});
       })
-      .updateOperationFactory(builder => {
-        return new InstanceUpdateOperation(builder.knex(), 'update', {instance: this});
+      .updateOperationFactory(() => {
+        return new InstanceUpdateOperation('update', {instance: this});
       })
-      .patchOperationFactory(builder => {
-        return new InstanceUpdateOperation(builder.knex(), 'patch', {instance: this, modelOptions: {patch: true}});
+      .patchOperationFactory(() => {
+        return new InstanceUpdateOperation('patch', {instance: this, modelOptions: {patch: true}});
       })
-      .deleteOperationFactory(builder => {
-        return new InstanceDeleteOperation(builder.knex(), 'delete', {instance: this});
+      .deleteOperationFactory(() => {
+        return new InstanceDeleteOperation('delete', {instance: this});
       })
       .relateOperationFactory(() => {
         throw new Error('`relate` makes no sense in this context');

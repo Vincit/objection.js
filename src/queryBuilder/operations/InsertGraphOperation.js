@@ -6,8 +6,8 @@ import {isPostgres} from '../../utils/dbUtils';
 
 export default class InsertGraphOperation extends DelegateOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     // Our delegate method inherits from `InsertRelation`. Disable the call-time
     // validation. We do the validation in onAfterQuery instead.

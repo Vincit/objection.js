@@ -3,8 +3,8 @@ import {after} from '../../utils/promiseUtils';
 
 export default class InstanceUpdateOperation extends UpdateOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.instance = opt.instance;
     this.modelOptions.old = opt.instance;

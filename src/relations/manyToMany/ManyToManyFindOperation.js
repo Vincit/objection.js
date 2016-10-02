@@ -5,8 +5,8 @@ const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 
 export default class ManyToManyFindOperation extends FindOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.relation = opt.relation;
     this.owners = opt.owners;

@@ -3,12 +3,11 @@ import WrappingQueryBuilderOperation from '../WrappingQueryBuilderOperation';
 
 export default class WhereJsonNotObjectPostgresOperation extends WrappingQueryBuilderOperation {
 
-  onBuild(knexBuilder) {
-    this.whereJsonNotObject(knexBuilder, this.args[0]);
+  onBuild(knexBuilder, builder) {
+    this.whereJsonNotObject(knexBuilder, builder.knex(), this.args[0]);
   }
 
-  whereJsonNotObject(knexBuilder, fieldExpression) {
-    const knex = this.knex;
+  whereJsonNotObject(knexBuilder, knex, fieldExpression) {
     const self = this;
 
     function innerQuery() {

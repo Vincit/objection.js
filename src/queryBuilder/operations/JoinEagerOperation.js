@@ -9,8 +9,8 @@ const relationRecursionLimit = 64;
 
 export default class JoinEagerOperation extends EagerOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
 
     this.allRelations = null;
     this.rootModelClass = null;

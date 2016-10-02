@@ -3,8 +3,8 @@ import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
 
 export default class SelectOperation extends WrappingQueryBuilderOperation {
 
-  constructor(knex, name, opt) {
-    super(knex, name, opt);
+  constructor(name, opt) {
+    super(name, opt);
     this.selections = [];
   }
 
