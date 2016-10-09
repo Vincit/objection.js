@@ -30,6 +30,37 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="0-6-0">0.6.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Eager loading can now be done using joins and zero extra queries. See <a href="#eagerAlgorithm"><code class="prettyprint">eagerAlgorithm</code></a>, <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> and <a href="#eager"><code class="prettyprint">eager</code></a> for more info.</li>
+<li><code class="prettyprint">#ref</code> in graph inserts can now contain extra properties for many-to-many relations <a href="https://github.com/Vincit/objection.js/issues/156">#156</a></li>
+<li><code class="prettyprint">#dbRef</code> can now be used to refer to existing rows from a <code class="prettyprint">insertWithRelated</code> graph.</li>
+<li><a href="#modelpaths"><code class="prettyprint">modelPaths</code></a> attribute for cleaner way to point to models in relationMappings.</li>
+<li><a href="#pickjsonschemaproperties"><code class="prettyprint">pickJsonSchemaProperties</code></a> config parameter <a href="https://github.com/Vincit/objection.js/issues/110">#110</a></li>
+<li><a href="#insertgraphandfetch"><code class="prettyprint">insertGraphAndFetch</code></a> with <code class="prettyprint">insertWithRelatedAndFetch</code> alias. <a href="https://github.com/Vincit/objection.js/issues/172">#172</a></li>
+<li>Added <a href="#_s_beforedelete"><code class="prettyprint">$beforeDelete</code></a> and <a href="#_s_afterdelete"><code class="prettyprint">$afterDelete</code></a> hooks <a href="https://github.com/Vincit/objection.js/issues/112">#112</a></li>
+<li>Old values can now be accessed from <code class="prettyprint">$beforeUpdate</code>, <code class="prettyprint">$afterUpdate</code>, <code class="prettyprint">$beforeValidate</code> and <code class="prettyprint">$afterValidate</code> hooks <a href="https://github.com/Vincit/objection.js/issues/185">#185</a></li>
+<li>Support length property <a href="ttps://github.com/Vincit/objection.js/issues/168">#168</a></li>
+<li>Make sure operations are executed in the order they are called <a href="https://github.com/Vincit/objection.js/issues/180">#180</a></li>
+<li>Fetch nothing if the <code class="prettyprint">where</code> clauses hit no rows in <code class="prettyprint">update/patchAndFetchById</code> methods <a href="https://github.com/Vincit/objection.js/issues/189">#189</a></li>
+<li>Lots of performance tweaks.</li>
+<li><code class="prettyprint">$loadRelated</code> and <code class="prettyprint">loadRelated</code> now return a <code class="prettyprint">QueryBuilder</code>.</li>
+</ul>
+
+<h3 id="breaking-changes">Breaking changes</h3>
+
+<ul>
+<li><p>Undefined values as query method arguments now throw an exception. Before they were just silently ignored
+and for example <code class="prettyprint">delete().where(&#39;id&#39;, undefined)</code> caused the entire table to be deleted. <a href="http://vincit.github.io/objection.js/#skipundefined">skipUndefined</a>
+method can be called for a query builder to handle the undefined values the old way.</p></li>
+<li><p>Deprecated method <code class="prettyprint">dumpSql</code> is now removed.</p></li>
+<li><p><code class="prettyprint">$loadRelated</code> and <code class="prettyprint">loadRelated</code> now return a <code class="prettyprint">QueryBuilder</code>. This may break your code is some rare cases
+where you have called a non-standard promise method like <code class="prettyprint">reflect</code> for the return value of these functions.</p></li>
+</ul>
+
 <h2 id="0-5-5">0.5.5</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>

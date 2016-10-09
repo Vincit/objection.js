@@ -310,8 +310,8 @@ to get the same result without an additional query.</p>
 </tr>
 </tbody></table>
 
-<h4 id="insertwithrelated">insertWithRelated</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">insertWithRelated</span><span class="p">(</span><span class="nx">graph</span><span class="p">);</span>
+<h4 id="insertgraph">insertGraph</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">insertGraph</span><span class="p">(</span><span class="nx">graph</span><span class="p">);</span>
 </code></pre>
 
 <blockquote>
@@ -319,7 +319,7 @@ to get the same result without an additional query.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">insertWithRelated</span><span class="p">({</span>
+  <span class="p">.</span><span class="nx">insertGraph</span><span class="p">({</span>
     <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Sylvester'</span><span class="p">,</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Stallone'</span><span class="p">,</span>
 
@@ -344,7 +344,7 @@ special properties <code class="prettyprint">#id</code> and <code class="prettyp
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">insertWithRelated</span><span class="p">([{</span>
+  <span class="p">.</span><span class="nx">insertGraph</span><span class="p">([{</span>
     <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
 
@@ -368,12 +368,39 @@ special properties <code class="prettyprint">#id</code> and <code class="prettyp
 both &#39;Jennifer&rsquo; and &#39;Bradley&rsquo; will have the movie related to them through the
 many-to-many relation <code class="prettyprint">movies</code>.</p>
 
+<p>If you need to refer to a model already in the database from a many-to-many relation
+you can use special properties <code class="prettyprint">#dbRef</code> like this:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">insertGraph</span><span class="p">([{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
+
+    <span class="na">movies</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">"#id"</span><span class="p">:</span> <span class="s1">'Silver Linings Playbook'</span>
+      <span class="na">name</span><span class="p">:</span> <span class="s1">'Silver Linings Playbook'</span><span class="p">,</span>
+      <span class="na">duration</span><span class="p">:</span> <span class="mi">122</span>
+    <span class="p">}]</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Bradley'</span><span class="p">,</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Cooper'</span><span class="p">,</span>
+
+    <span class="na">movies</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="s2">"#dbRef"</span><span class="p">:</span> <span class="mi">1536</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="s2">"#dbRef"</span><span class="p">:</span> <span class="mi">6527</span>
+    <span class="p">}]</span>
+  <span class="p">}]);</span>
+</code></pre>
+
+<blockquote>
 <p>You can refer to the properties of other models in the graph using expressions
 of format <code class="prettyprint">#ref{&lt;id&gt;.&lt;property&gt;}</code> for example:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">insertWithRelated</span><span class="p">([{</span>
+  <span class="p">.</span><span class="nx">insertGraph</span><span class="p">([{</span>
     <span class="s2">"#id"</span><span class="p">:</span> <span class="s1">'jenniLaw'</span><span class="p">,</span>
     <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
@@ -425,6 +452,18 @@ this method to avoid security issues.</p>
 <td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
+
+<h4 id="insertgraphandfetch">insertGraphAndFetch</h4>
+
+<p>Exactly like <a href="#insertgraph">insertGraph</a> but also fetches the graph from the db after insert.</p>
+
+<h4 id="insertwithrelated">insertWithRelated</h4>
+
+<p>Alias for <a href="#insertgraph">insertGraph</a>.</p>
+
+<h4 id="insertwithrelatedandfetch">insertWithRelatedAndFetch</h4>
+
+<p>Alias for <a href="#insertgraphandfetch">insertGraphAndFetch</a>.</p>
 
 <h4 id="update">update</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">modelOrObject</span><span class="p">);</span>
@@ -3634,8 +3673,50 @@ registered using the <a href="#then"><code class="prettyprint">then</code></a> m
 </thead><tbody>
 <tr>
 <td>runAfter</td>
-<td>function(, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>function(*, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
 <td>The function to be executed.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="eageralgorithm">eagerAlgorithm</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">eagerAlgorithm</span><span class="p">(</span><span class="nx">algo</span><span class="p">);</span>
+</code></pre>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eagerAlgorithm</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">JoinEagerAlgorithm</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[pets, children]'</span><span class="p">)</span>
+</code></pre>
+
+<p>Select the eager loading algorithm for the query. See comparison between
+the available algorithms <a href="#eager">here</a>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>algo</td>
+<td>EagerAlgorithm</td>
+<td>The eager loading algorithm to use. Either <code class="prettyprint">Model.JoinEagerAlgorithm</code> or <code class="prettyprint">Model.WhereInEagerAlgorithm</code>.</td>
 </tr>
 </tbody></table>
 
@@ -3661,9 +3742,9 @@ registered using the <a href="#then"><code class="prettyprint">then</code></a> m
 <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">people</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
@@ -3684,33 +3765,33 @@ to the relations:</p>
       <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">people</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
 <blockquote>
-<p>Filters can also be registered using the <a href="#filtereager"><code class="prettyprint">filterEager</code></a> method:</p>
+<p>Filters can also be registered using the <a href="#modifyeager"><code class="prettyprint">modifyEager</code></a> method:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Order children by age.</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
   <span class="p">})</span>
-  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Only select `pets` and `movies` whose id &gt; 10 for the children.</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
   <span class="p">})</span>
-  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.movies]'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.movies]'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// Only select 100 first movies for the children.</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
   <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">people</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
@@ -3721,21 +3802,80 @@ to the relations:</p>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.children'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 10</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">9</span><span class="p">].</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 10</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">people</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 10</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">9</span><span class="p">].</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 10</span>
   <span class="p">});</span>
 </code></pre>
 
 <blockquote>
 <p>The person has 10 children and they all have 10 children. The query above will
-return 100 database rows but will generate only three database queries.</p>
+return 100 database rows but will generate only three database queries when using
+<code class="prettyprint">WhereInEagerAlgorithm</code> and only one query when using <code class="prettyprint">JoinEagerAlgorithm</code>.</p>
+
+<p>The loading algorithm can be changed using the <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method:</p>
 </blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">eagerAlgorithm</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">JoinEagerAlgorithm</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[movies, children.pets]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'movies.name'</span><span class="p">,</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'%terminator%'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'children:pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">people</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">});</span>
+</code></pre>
 
 <p>Fetch relations eagerly for the result rows.</p>
 
 <p>See the <a href="#eager-queries">eager queries</a> section for more examples and <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a>
 for more info on the relation expression language.</p>
+
+<p>You can choose the way objection performs the eager loading by using <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method 
+on a query builder or by setting the <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> property of a model. The 
+two algorithms currently available are <code class="prettyprint">Model.WhereInEagerAlgorithm</code> (the default) and <code class="prettyprint">Model.JoinEagerAlgorithm</code>. 
+Both have their strengths and weaknesses. We will go through the main differences below. You can always see the
+executed SQL by calling the <a href="#debug"><code class="prettyprint">debug</code></a> method for the query builder.</p>
+
+<p><b>WhereInEagerAlgorithm</b></p>
+
+<p>This algorithm uses multiple queries to fetch the related objects. Objection performs one query per level
+in the eager tree. For example only two additional queries will be created for eager expression <code class="prettyprint">children.children</code>
+no matter how many children the model has or how many children each of the children have. This algorithm is explained
+in detail in <a href="https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/">this blog post</a>.</p>
+
+<p>Limitations:</p>
+
+<ul>
+<li>Relations cannot be referred in the query because they are not joined.</li>
+<li><code class="prettyprint">limit</code> and <code class="prettyprint">page</code> methods will work incorrectly when applied to a relation using <code class="prettyprint">filterEager</code>, 
+because they will be applied on a query that fetches relations for multiple parents. You can use
+<code class="prettyprint">limit</code> and <code class="prettyprint">page</code> for the root query.</li>
+</ul>
+
+<p><b>JoinEagerAlgorithm</b></p>
+
+<p>This algorithm uses joins to fetch the whole eager tree using one single query. This allows you to reference the relations
+in the root query (see the last example). The related tables can be referred using the relation name. Nested relations
+must be separated by <code class="prettyprint">:</code> character (dot is not used because of the way knex parses identifiers).</p>
+
+<p>Limitations:</p>
+
+<ul>
+<li><code class="prettyprint">limit</code> and <code class="prettyprint">page</code> methods will work incorrectly because the will limit the result set which contains all the result
+rows in a flattened format. For example the result set of the eager expression <code class="prettyprint">children.children</code> will have
+<code class="prettyprint">10 * 10 * 10</code> rows assuming the you fetched 10 models that all had 10 children that all had 10 children.</li>
+</ul>
+
+<p><b>Performance differences</b></p>
+
+<p><code class="prettyprint">WhereInEagerAlgorithm</code> performs more queries than <code class="prettyprint">JoinEagerAlgorithm</code> which can cause a significant delay especially if
+the round trip time to the database server is significant. On the other hand the result from <code class="prettyprint">WhereInEagerAlgorithm</code> is 
+trivial to parse into a tree structure while the result of <code class="prettyprint">JoinEagerAlgorithm</code> needs some complex parsing which
+can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment.
+You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured
+real-life problem. Don&rsquo;t optimize prematurely!</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -3824,13 +3964,13 @@ parameters of a http request.</p>
 </tr>
 </tbody></table>
 
-<h4 id="filtereager">filterEager</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="nx">pathExpression</span><span class="p">,</span> <span class="nx">filterFunc</span><span class="p">);</span>
+<h4 id="modifyeager">modifyEager</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="nx">pathExpression</span><span class="p">,</span> <span class="nx">modifier</span><span class="p">);</span>
 </code></pre>
 
-<p>Adds a filter to the eager query.</p>
+<p>Can be used to modify the eager queries.</p>
 
-<p>The <code class="prettyprint">pathExpression</code> is a relation expression that specifies the queries for which the filter is given.</p>
+<p>The <code class="prettyprint">pathExpression</code> is a relation expression that specifies the queries for which the modifier is given.</p>
 
 <blockquote>
 <p>The following query would filter out the children&rsquo;s pets that
@@ -3839,7 +3979,7 @@ are &lt;= 10 years old:</p>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.pets'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.pets'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
   <span class="p">})</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -3854,7 +3994,7 @@ pets and movies of the children by id:</p>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
   <span class="p">})</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -3868,7 +4008,7 @@ pets and movies of the children by id:</p>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">filterEager</span><span class="p">(</span><span class="s1">'[children.movies, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'[children.movies, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'%Predator%'</span><span class="p">);</span>
   <span class="p">})</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -3891,9 +4031,9 @@ pets and movies of the children by id:</p>
 <td>Expression that specifies the queries for which to give the filter.</td>
 </tr>
 <tr>
-<td>filterFunc</td>
+<td>modifier</td>
 <td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td>The filter function.</td>
+<td>The modifier function.</td>
 </tr>
 </tbody></table>
 
@@ -3911,13 +4051,17 @@ pets and movies of the children by id:</p>
 </tr>
 </tbody></table>
 
+<h4 id="filtereager">filterEager</h4>
+
+<p>Alias for <a href="#modifyeager">modifyEager</a>.</p>
+
 <h4 id="allowinsert">allowInsert</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">allowInsert</span><span class="p">(</span><span class="nx">relationExpression</span><span class="p">);</span>
 </code></pre>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">allowInsert</span><span class="p">(</span><span class="s1">'[children.pets, movies]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">insertWithRelated</span><span class="p">({</span>
+  <span class="p">.</span><span class="nx">insertGraph</span><span class="p">({</span>
     <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Sylvester'</span><span class="p">,</span>
     <span class="na">children</span><span class="p">:</span> <span class="p">[{</span>
       <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Sage'</span><span class="p">,</span>
@@ -3935,9 +4079,9 @@ pets and movies of the children by id:</p>
   <span class="p">});</span>
 </code></pre>
 
-<p>Sets the allowed tree of relations to insert using <a href="#insertwithrelated"><code class="prettyprint">insertWithRelated</code></a> method.</p>
+<p>Sets the allowed tree of relations to insert using <a href="#insertgraph"><code class="prettyprint">insertGraph</code></a> method.</p>
 
-<p>If the model tree given to the <a href="#insertwithrelated"><code class="prettyprint">insertWithRelated</code></a> method isn&rsquo;t a subtree of the
+<p>If the model tree given to the <a href="#insertgraph"><code class="prettyprint">insertGraph</code></a> method isn&rsquo;t a subtree of the
 given expression, the query is rejected.</p>
 
 <p>See methods <a href="#eager"><code class="prettyprint">eager</code></a>, <a href="#alloweager"><code class="prettyprint">allowEager</code></a>, <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a> and the
@@ -4033,24 +4177,41 @@ section about <a href="#eager-queries">eager queries</a> for more information on
 </tr>
 </tbody></table>
 
-<h4 id="dumpsql">dumpSql</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">dumpSql</span><span class="p">(</span><span class="nx">logger</span><span class="p">);</span>
+<h4 id="skipundefined">skipUndefined</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">skipUndefined</span><span class="p">();</span>
 </code></pre>
 
+<p>If this method is called for a builder then undefined values passed to the query builder methods don&rsquo;t cause
+an exception but are ignored instead.</p>
+
 <blockquote>
-<p>Handy for debugging:</p>
+<p>For example the following query will return all <code class="prettyprint">Person</code> rows if <code class="prettyprint">req.query.firstName</code> is <code class="prettyprint">undefined</code>.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'Jennifer'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">dumpSql</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="p">...</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">skipUndefined</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">firstName</span><span class="p">)</span>
 </code></pre>
 
-<p>Logs the SQL string.</p>
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining</td>
+</tr>
+</tbody></table>
+
+<h4 id="transacting">transacting</h4>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">transacting</span><span class="p">(</span><span class="nx">transaction</span><span class="p">);</span>
+</code></pre>
+
+<p>Sets the transaction for a query.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -4062,9 +4223,9 @@ section about <a href="#eager-queries">eager queries</a> for more information on
 </tr>
 </thead><tbody>
 <tr>
-<td>looger</td>
-<td>function(string)</td>
-<td>console.log</td>
+<td>transaction</td>
+<td>object</td>
+<td>A transaction object</td>
 </tr>
 </tbody></table>
 
@@ -5397,6 +5558,47 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 
 <p>Defaults to &#39;id&rsquo;.</p>
 
+<h4 id="modelpaths">modelPaths</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">modelPaths</span> <span class="o">=</span> <span class="p">[</span><span class="nx">__dirname</span><span class="p">];</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modelPaths</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nx">__dirname</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">modelPaths</span> <span class="o">=</span> <span class="p">[</span><span class="nx">__dirname</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>A list of paths from which to search for models for relations.</p>
+
+<p>A model class can be defined for a relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a> as</p>
+
+<ol>
+<li>A model class constructor</li>
+<li>An absolute path to a module that exports a model class</li>
+<li>A path relative to one of the paths in <code class="prettyprint">modelPaths</code> array.</li>
+</ol>
+
 <h4 id="relationmappings">relationMappings</h4>
 
 <blockquote>
@@ -5566,9 +5768,15 @@ models are associated. Note that neither of these columns need to be primary key
 columns. In the case of ManyToManyRelation also the join table needs to be defined. This is
 done using the <code class="prettyprint">through</code> object.</p>
 
-<p>The <code class="prettyprint">modelClass</code> passed to the relation mappings is the class of the related model. It can be either
-a Model subclass constructor or an absolute path to a module that exports one. Using file paths
-is a handy way to prevent require loops.</p>
+<p>The <code class="prettyprint">modelClass</code> passed to the relation mappings is the class of the related model. It can be one of the following:</p>
+
+<ol>
+<li>A model class constructor</li>
+<li>An absolute path to a module that exports a model class</li>
+<li>A path relative to one of the paths in <a href="#modelpaths"><code class="prettyprint">modelPaths</code></a> array.</li>
+</ol>
+
+<p>The file path versions are handy for avoiding require loops.</p>
 
 <p>See <a href="#relationmapping"><code class="prettyprint">RelationMapping</code></a></p>
 
@@ -5589,7 +5797,7 @@ is a handy way to prevent require loops.</p>
 <tr>
 <td>modelClass</td>
 <td><a href="#model"><code class="prettyprint">Model</code></a>&#124;string</td>
-<td>Constructor of the related model class or an absolute path to a module that exports one.</td>
+<td>Constructor of the related model class, an absolute path to a module that exports one or a path relative to <a href="#modelpaths"><code class="prettyprint">modelPaths</code></a> that exports a model class.</td>
 </tr>
 <tr>
 <td>join</td>
@@ -5597,9 +5805,14 @@ is a handy way to prevent require loops.</p>
 <td>Describes how the models are related to each other. See <a href="#relationjoin"><code class="prettyprint">RelationJoin</code></a>.</td>
 </tr>
 <tr>
+<td>modify</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>Optional modifier for the relation query. This is called each time the relation is fetched.</td>
+</tr>
+<tr>
 <td>filter</td>
 <td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
-<td>Optional filter for the relation. This is called each time the relation is fetched.</td>
+<td>Alias for modify.</td>
 </tr>
 </tbody></table>
 
@@ -5860,6 +6073,41 @@ as single database rows.</p>
 
 <p>Defaults to &rsquo;#ref&rsquo;.</p>
 
+<h4 id="dbrefprop">dbRefProp</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">dbRefProp</span> <span class="o">=</span> <span class="s1">'#dbRef'</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">dbRefProp</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'#dbRef'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">dbRefProp</span> <span class="o">=</span> <span class="s1">'#dbRef'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Name of the property used to point to an existing database row from an <code class="prettyprint">insertGraph</code> graph.</p>
+
+<p>Defaults to &rsquo;#dbRef&rsquo;.</p>
+
 <h4 id="proprefregex">propRefRegex</h4>
 
 <blockquote>
@@ -5894,6 +6142,114 @@ as single database rows.</p>
 <p>Regular expression for parsing a reference to a property.</p>
 
 <p>Defaults to <code class="prettyprint">/#ref{([^\.]+)\.([^}]+)}/g</code>.</p>
+
+<h4 id="pickjsonschemaproperties">pickJsonSchemaProperties</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">pickJsonSchemaProperties</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">pickJsonSchemaProperties</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">pickJsonSchemaProperties</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>If this is true (the default) only properties in <code class="prettyprint">jsonSchema</code> are picked when inserting or updating a row
+in the database. To pick all properties, set this to true.</p>
+
+<p>Defaults to true.</p>
+
+<h4 id="defaulteageralgorithm">defaultEagerAlgorithm</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">defaultEagerAlgorithm</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">WhereInEagerAlgorithm</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">defaultEagerAlgorithm</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">WhereInEagerAlgorithm</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">defaultEagerAlgorithm</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">WhereInEagerAlgorithm</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Sets the default eager loading algorithm for this model. Must be either 
+<code class="prettyprint">Model.WhereInEagerAlgorithm</code> or <code class="prettyprint">Model.JoinEagerAlgorithm</code>.</p>
+
+<p>Defaults to <code class="prettyprint">Model.WhereInEagerAlgorithm</code>.</p>
+
+<h4 id="defaulteageroptions">defaultEagerOptions</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">defaultEagerOptions</span> <span class="o">=</span> <span class="p">{</span><span class="na">minimize</span><span class="p">:</span> <span class="kc">true</span><span class="p">};</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">defaultEagerOptions</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span><span class="na">minimize</span><span class="p">:</span> <span class="kc">true</span><span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">defaultEagerOptions</span> <span class="o">=</span> <span class="p">{</span><span class="na">minimize</span><span class="p">:</span> <span class="kc">true</span><span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Sets the default options for eager loading algorithm. See the possible
+fields <a href="#eageroptions">here</a>.</p>
+
+<p>Defaults to <code class="prettyprint">null</code>.</p>
 
 <h4 id="querybuilder">QueryBuilder</h4>
 
@@ -5964,7 +6320,7 @@ You can override this to use your own <a href="#querybuilder"><code class="prett
 <span class="p">}</span>
 </code></pre>
 
-<p><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> subclass to use in <a href="#relatedquery"><code class="prettyprint">$_s_relatedQuery</code></a> method.</p>
+<p><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> subclass to use in <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery</code></a> method.</p>
 
 <p>This constructor is used whenever a query builder is created using the <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery</code></a>  method.
 You can override this to use your own <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> subclass.</p>
@@ -5984,7 +6340,7 @@ You can override this to use your own <a href="#querybuilder"><code class="prett
 <span class="p">});</span>
 
 <span class="c1">// Example of a more complex WHERE clause. This generates:</span>
-<span class="c1">// SELECTFROM "Person"</span>
+<span class="c1">// SELECT FROM "Person"</span>
 <span class="c1">// WHERE ("firstName" = 'Jennifer' AND "age" &lt; 30)</span>
 <span class="c1">// OR ("firstName" = 'Mark' AND "age" &gt; 30)</span>
 <span class="nx">Person</span>
@@ -6071,7 +6427,7 @@ of a model and <code class="prettyprint">patch</code> when only a subset should 
 
 <blockquote>
 <p>Models can be deleted using the delete method. Naturally the delete query can be chained with
-anyknex* methods:</p>
+any knex* methods:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
@@ -6085,6 +6441,22 @@ anyknex* methods:</p>
 <p>Creates a query builder for the model&rsquo;s table.</p>
 
 <p>See the <a href="#query-examples">query examples</a> section for more examples.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>transaction</td>
+<td>object</td>
+<td>Optional transaction for the query.</td>
+</tr>
+</tbody></table>
 
 <h5 id="return-value">Return value</h5>
 
@@ -6450,8 +6822,8 @@ this method to delete the property instead.</p>
 </tr>
 </thead><tbody>
 <tr>
-<td><a href="http://bluebirdjs.com/docs/getting-started.html"><code class="prettyprint">Promise</code></a></td>
-<td></td>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td>The created query builder</td>
 </tr>
 </tbody></table>
 
@@ -6527,8 +6899,22 @@ If the identifier property is known it can be accessed or set just like any
 other property.</p>
 
 <h4 id="beforevalidate">$beforeValidate</h4>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeValidate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">jsonSchema</span><span class="p">,</span> <span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">)</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">jsonSchema</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6/ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeValidate</span><span class="p">(</span><span class="nx">jsonSchema</span><span class="p">,</span> <span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -6537,6 +6923,9 @@ other property.</p>
 <p>You can add any additional validation to this method. If validation fails, simply throw an exception and
 the query will be rejected. If you modify the <code class="prettyprint">jsonSchema</code> argument and return it, that one will be used
 to validate the model.</p>
+
+<p><code class="prettyprint">opt.old</code> object contains the old values while <code class="prettyprint">json</code> contains the new values if validation is being done
+for an existing object.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -6665,14 +7054,31 @@ called explicitly when needed.</p>
 </tbody></table>
 
 <h4 id="aftervalidate">$afterValidate</h4>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterValidate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">)</span> <span class="p">{</span>
 
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6/ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterValidate</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 
 <p>This is called after successful validation.</p>
 
 <p>You can do further validation here and throw a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> if something goes wrong.</p>
+
+<p><code class="prettyprint">opt.old</code> object contains the old values while <code class="prettyprint">json</code> contains the new values if validation is being done
+for an existing object.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -7204,6 +7610,22 @@ they are cloned using their <code class="prettyprint">$clone()</code> method.</p
 
 <p>All queries built using the returned builder only affect this instance.</p>
 
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>transaction</td>
+<td>object</td>
+<td>Optional transaction for the query.</td>
+</tr>
+</tbody></table>
+
 <h5 id="return-value">Return value</h5>
 
 <table><thead>
@@ -7349,6 +7771,11 @@ and <code class="prettyprint">patch</code> ignores the <code class="prettyprint"
 <td>string</td>
 <td>The name of the relation to query.</td>
 </tr>
+<tr>
+<td>transaction</td>
+<td>object</td>
+<td>Optional transaction for the query.</td>
+</tr>
 </tbody></table>
 
 <h5 id="return-value">Return value</h5>
@@ -7433,14 +7860,22 @@ to the relations:</p>
 </tr>
 </thead><tbody>
 <tr>
-<td><a href="http://bluebirdjs.com/docs/getting-started.html"><code class="prettyprint">Promise</code></a></td>
-<td></td>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td>The created query builder</td>
 </tr>
 </tbody></table>
 
 <h4 id="traverse">$traverse</h4>
 
 <p>Shortcut for <a href="#traverse-2212"><code class="prettyprint">Model.traverse(filterConstructor, this, callback)</code></a>.</p>
+
+<h4 id="knex">$knex</h4>
+
+<p>Shortcut for <a href="#knex"><code class="prettyprint">return this.constructor.knex()</code></a>.</p>
+
+<h4 id="transaction">$transaction</h4>
+
+<p>Shortcut for <a href="#knex"><code class="prettyprint">return this.constructor.knex()</code></a>.</p>
 
 <h4 id="beforeinsert">$beforeInsert</h4>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
@@ -7525,9 +7960,42 @@ you need to do insert specific validation.</p>
 </tbody></table>
 
 <h4 id="beforeupdate">$beforeUpdate</h4>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
 
 <span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6/ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>Note that the the <code class="prettyprint">opt.old</code> object is only populated for instance queries started with <code class="prettyprint">$query</code>:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">somePerson</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">newValues</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>For the following query <code class="prettyprint">opt.old</code> is <code class="prettyprint">undefined</code> because there is no old object in the javascript
+side. objection.js doesn&rsquo;t fetch the old values even if they existed in the database
+for performance and simplicity reasons.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">newValues</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">);</span>
 </code></pre>
 
 <p>Called before a model is updated.</p>
@@ -7539,6 +8007,10 @@ you need to do update specific validation.</p>
 <p>This method is also called before a model is patched. Therefore all the model&rsquo;s properties
 may not exist. You can check if the update operation is a patch by checking the <code class="prettyprint">opt.patch</code>
 boolean.</p>
+
+<p><code class="prettyprint">opt.old</code> object contains the old values while <code class="prettyprint">this</code> contains the updated values. The old
+values are never fetched from the database implicitly. For non-instance queries the <code class="prettyprint">opt.old</code>
+object is <code class="prettyprint">undefined</code>. See the examples &ndash;&gt;.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -7576,9 +8048,42 @@ boolean.</p>
 </tbody></table>
 
 <h4 id="afterupdate">$afterUpdate</h4>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
 
 <span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6/ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>Note that the the <code class="prettyprint">opt.old</code> object is only populated for instance queries started with <code class="prettyprint">$query</code>:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">somePerson</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">newValues</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>For the following query <code class="prettyprint">opt.old</code> is <code class="prettyprint">undefined</code> because there is no old object in the javascript
+side. objection.js doesn&rsquo;t fetch the old values even if they existed in the database
+for performance and simplicity reasons.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">newValues</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="s1">'bar'</span><span class="p">);</span>
 </code></pre>
 
 <p>Called after a model is updated.</p>
@@ -7588,6 +8093,10 @@ boolean.</p>
 <p>This method is also called after a model is patched. Therefore all the model&rsquo;s properties
 may not exist. You can check if the update operation is a patch by checking the <code class="prettyprint">opt.patch</code>
 boolean.</p>
+
+<p><code class="prettyprint">opt.old</code> object contains the old values while <code class="prettyprint">this</code> contains the updated values. The old
+values are never fetched from the database implicitly. For non-instance queries the <code class="prettyprint">opt.old</code>
+object is <code class="prettyprint">undefined</code>. See the examples &ndash;&gt;.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -7607,6 +8116,118 @@ boolean.</p>
 <td>queryContext</td>
 <td>Object</td>
 <td>The context object of the update query. See <a href="#context"><code class="prettyprint">context</code></a>.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="http://bluebirdjs.com/docs/getting-started.html"><code class="prettyprint">Promise</code></a>&#124;*</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h4 id="beforedelete">$beforeDelete</h4>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeDelete</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6/ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Called before a model is deleted.</p>
+
+<p>You can return a promise from this function if you need to do asynchronous stuff.</p>
+
+<p>Note that this method is only called for instance deletes started with <code class="prettyprint">$query()</code> method.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>queryContext</td>
+<td>Object</td>
+<td>The context object of the delete query. See <a href="#context"><code class="prettyprint">context</code></a>.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="http://bluebirdjs.com/docs/getting-started.html"><code class="prettyprint">Promise</code></a>&#124;*</td>
+<td></td>
+</tr>
+</tbody></table>
+
+<h4 id="afterdelete">$afterDelete</h4>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterDelete</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES6/ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Called after a model is deleted.</p>
+
+<p>You can return a promise from this function if you need to do asynchronous stuff.</p>
+
+<p>Note that this method is only called for instance deletes started with <code class="prettyprint">$query()</code> method.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>queryContext</td>
+<td>Object</td>
+<td>The context object of the delete query. See <a href="#context"><code class="prettyprint">context</code></a>.</td>
 </tr>
 </tbody></table>
 
@@ -7851,6 +8472,37 @@ the <code class="prettyprint">^</code> character. For example <code class="prett
 <td>skipValidation</td>
 <td>boolean</td>
 <td>If true the json schema validation is skipped</td>
+</tr>
+<tr>
+<td>old</td>
+<td>object</td>
+<td>The old values for methods like <code class="prettyprint">$beforeUpdate</code> and <code class="prettyprint">$beforeValidate</code>.</td>
+</tr>
+</tbody></table>
+
+<h1 id="eageroptions">EagerOptions</h1>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>minimize</td>
+<td>boolean</td>
+<td>If true the aliases of the joined tables and columns in a join based eager loading are minimized. This is sometimes needed because of identifier length limitations of some database engines. objection throws an exception when a query exceeds the length limit. You need to use this only in those cases.</td>
+</tr>
+<tr>
+<td>separator</td>
+<td>string</td>
+<td>Separator between relations in nested join based eager query. Defaults to <code class="prettyprint">:</code>. Dot (<code class="prettyprint">.</code>) cannot be used at the moment because of the way knex parses the identifiers.</td>
+</tr>
+<tr>
+<td>aliases</td>
+<td>Object.&lt;string, string&gt;</td>
+<td>Aliases for relations in a join based eager query. Defaults to an empty object.</td>
 </tr>
 </tbody></table>
 
