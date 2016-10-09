@@ -532,9 +532,22 @@ expressApp.get('/people', function (req, res, next) {
 });
 ```
 
+> Eager loading algorithm can be changed using the [`eagerAlgorithm`](#eageralgorithm) method:
+
+```js
+expressApp.get('/people', function (req, res, next) {
+  Person
+    .query()
+    .eagerAlgorithm(Model.JoinEagerAlgorithm)
+    .eager(req.query.eager)
+    .then(function (people) { res.send(people); })
+    .catch(next);
+});
+```
+
 You can fetch an arbitrary graph of relations for the results of any query by chaining the [`eager`](#eager) method. 
 [`eager`](#eager) takes a [relation expression](#relationexpression) string as a parameter. In addition to making your life easier,
-eager queries avoid the select N+1 problem and provide a great performance.
+eager queries avoid the "select N+1" problem and provide a great performance.
 
 Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
 request. However, allowing the client to pass expressions like this without any limitations is not very secure. 
@@ -560,7 +573,11 @@ Examples of expressions that would cause the query to be rejected:
 In addition to the [`eager`](#eager) method, relations can be fetched using the [`loadRelated`](#loadrelated) and 
 [`$loadRelated`](#_s_loadrelated) methods.
 
-You can read more about eager queries from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
+By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)).
+You can choose to use a join based eager loading algorithm that only performs one single query to fetch thw whole
+eager tree. You can select which algorithm to use per query using [`eagerAlgorithm`](#eageralgorithm) method or 
+per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. Both algorithms
+have their strengths and weaknesses, which are discussed in detail [here](#eager).
 
 ## Graph inserts
 

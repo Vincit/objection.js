@@ -23,11 +23,11 @@ import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOp
 import JoinEagerOperation from '../queryBuilder/operations/JoinEagerOperation';
 import WhereInEagerOperation from '../queryBuilder/operations/WhereInEagerOperation';
 
-const JoinEagerAlgorithm = (builder) => {
+const JoinEagerAlgorithm = () => {
   return new JoinEagerOperation('eager');
 };
 
-const WhereInEagerAlgorithm = (builder) => {
+const WhereInEagerAlgorithm = () => {
   return new WhereInEagerOperation('eager');
 };
 
