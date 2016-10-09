@@ -28,12 +28,14 @@ module.exports = function (app) {
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
   app.get('/persons', function (req, res, next) {
-    // We don't need to check for the existence of the query parameters.
-    // The query builder methods do nothing if one of the values is undefined.
+    // We don't need to check for the existence of the query parameters because
+    // we call the `skipUndefined` method. It causes the query builder methods
+    // to do nothing if one of the values is undefined.
     Person
       .query()
       .allowEager('[pets, children.[pets, movies], movies]')
       .eager(req.query.eager)
+      .skipUndefined()
       .where('age', '>=', req.query.minAge)
       .where('age', '<', req.query.maxAge)
       .where('firstName', 'like', req.query.firstName)
@@ -101,10 +103,12 @@ module.exports = function (app) {
       .findById(req.params.id)
       .then(function (person) {
         if (!person) { throwNotFound(); }
-        // We don't need to check for the existence of the query parameters.
-        // The query builder methods do nothing if one of the values is undefined.
+        // We don't need to check for the existence of the query parameters because
+        // we call the `skipUndefined` method. It causes the query builder methods
+        // to do nothing if one of the values is undefined.
         return person
           .$relatedQuery('pets')
+          .skipUndefined()
           .where('name', 'like', req.query.name)
           .where('species', req.query.species);
       })
