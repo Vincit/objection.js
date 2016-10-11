@@ -413,6 +413,14 @@ export default class ModelBase {
   }
 
   /**
+   * @param {String} name
+   * @param {String|RegExp|Function|Object} format
+   */
+  static addCustomFormat(name, format) {
+    ajv.addFormat(name, format);
+  }
+
+  /**
    * @param {Object} jsonSchema
    * @param {boolean} skipRequired
    * @returns {function}
@@ -761,3 +769,4 @@ function compileJsonSchemaValidator(jsonSchema, skipRequired) {
     }
   }
 }
+

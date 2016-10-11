@@ -374,6 +374,24 @@ describe('ModelBase', function () {
       expect(model.c).not.to.equal(obj);
     });
 
+    it('should validate custom string formats', function () {
+      Model.addCustomFormat('se-ssn', /^[12]{1}[90]{1}[0-9]{6}-[0-9]{4}$/)
+
+      Model.jsonSchema = {
+        properties: {
+          a: {type: 'string', format: 'se-ssn'}
+        }
+      };
+
+      var model = Model.fromJson({a: '19851007-1234'});
+
+      expect(model.a).to.equal('19851007-1234');
+
+      expect(function () {
+        Model.fromJson({a: '198510071234'})
+      }).to.throwException()
+    });
+
     // regression introduced in 0.6
     // https://github.com/Vincit/objection.js/issues/205
     it('should not throw TypeError when jsonSchema.properties == undefined', function () {
