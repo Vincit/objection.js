@@ -17,8 +17,6 @@ describe('main module', function () {
     expect(objection.HasManyRelation).to.equal(require('../lib/relations/hasMany/HasManyRelation').default);
     expect(objection.HasOneRelation).to.equal(require('../lib/relations/hasOne/HasOneRelation').default);
     expect(objection.BelongsToOneRelation).to.equal(require('../lib/relations/belongsToOne/BelongsToOneRelation').default);
-    expect(objection.OneToManyRelation).to.equal(require('../lib/relations/hasMany/HasManyRelation').default);
-    expect(objection.OneToOneRelation).to.equal(require('../lib/relations/belongsToOne/BelongsToOneRelation').default);
     expect(objection.ManyToManyRelation).to.equal(require('../lib/relations/manyToMany/ManyToManyRelation').default);
     expect(objection.transaction).to.equal(require('../lib/transaction').default);
     expect(objection.transaction.start).to.equal(require('../lib/transaction').default.start);
