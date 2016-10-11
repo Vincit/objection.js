@@ -6,7 +6,6 @@ import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
 
 import hiddenData from '../utils/decorators/hiddenData';
-import deprecated from '../utils/decorators/deprecated';
 import memoize from '../utils/decorators/memoize';
 
 import Relation from '../relations/Relation';
@@ -43,16 +42,6 @@ export default class Model extends ModelBase {
 
   static JoinEagerAlgorithm = JoinEagerAlgorithm;
   static WhereInEagerAlgorithm = WhereInEagerAlgorithm;
-
-  @deprecated({removedIn: '0.7.0', useInstead: 'BelongsToOneRelation'})
-  static get OneToOneRelation() {
-    return BelongsToOneRelation;
-  }
-
-  @deprecated({removedIn: '0.7.0', useInstead: 'HasManyRelation'})
-  static get OneToManyRelation() {
-    return HasManyRelation;
-  }
 
   /**
    * @type {string}

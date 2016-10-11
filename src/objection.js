@@ -32,17 +32,3 @@ export {
   Promise
 };
 
-Object.defineProperty(module.exports, "OneToOneRelation", {
-  get: function () {
-    console.warn(`OneToOneRelation is deprecated and will be removed in version 0.7.0. Use BelongsToOneRelation instead. Simply replace OneToOneRelation with BelongsToOneRelation.`);
-    return BelongsToOneRelation;
-  }
-});
-
-Object.defineProperty(module.exports, "OneToManyRelation", {
-  get: function () {
-    console.warn(`OneToManyRelation is deprecated and will be removed in version 0.7.0. Use HasManyRelation instead. Simply replace OneToManyRelation with HasManyRelation.`);
-    return HasManyRelation;
-  }
-});
-

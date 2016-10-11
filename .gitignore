@@ -6,3 +6,4 @@ examples/*/*.db
 *.DS_Store
 lib
 profiling
+npm-debug.log*
