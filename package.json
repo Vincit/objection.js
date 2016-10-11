@@ -52,7 +52,7 @@
     "lodash": "^4.7.0"
   },
   "peerDependencies": {
-    "knex": ">= 0.8.0 <= 0.12.1"
+    "knex": ">= 0.8.0 <= 0.12.3"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",
@@ -84,7 +84,7 @@
     "grunt": "^0.4.5",
     "grunt-jsdoc": "^1.0.0",
     "istanbul": "^0.4.0",
-    "knex": "0.12.1",
+    "knex": "0.12.3",
     "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^4.4.0",
