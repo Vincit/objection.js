@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import {inherits} from '../utils/classUtils';
-import deprecated from '../utils/decorators/deprecated'
 
 import QueryBuilderContextBase from './QueryBuilderContextBase';
 
@@ -96,16 +95,6 @@ export default class QueryBuilderBase {
       this._knex = knex;
       return this;
     }
-  }
-
-  /**
-   * @param {function} func
-   * @returns {QueryBuilderBase}
-   */
-  @deprecated({removedIn: '0.7.0', useInstead: 'modify'})
-  call(func) {
-    func.call(this, this);
-    return this;
   }
 
   /**
