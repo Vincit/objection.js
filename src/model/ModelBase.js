@@ -500,6 +500,10 @@ function mergeWithDefaults(jsonSchema, json) {
     return json;
   }
 
+  if (!jsonSchema.properties) {
+    return json;
+  }
+
   const propNames = Object.keys(jsonSchema.properties);
   // Check each schema property for default value.
   for (let i = 0, l = propNames.length; i < l; ++i) {

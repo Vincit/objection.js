@@ -374,6 +374,30 @@ describe('ModelBase', function () {
       expect(model.c).not.to.equal(obj);
     });
 
+    // regression introduced in 0.6
+    // https://github.com/Vincit/objection.js/issues/205
+    it('should not throw TypeError when jsonSchema.properties == undefined', function () {
+      Model.jsonSchema = {
+        required: ['a']
+      };
+
+      var model = Model.fromJson({a: 100});
+
+      expect(model.a).to.equal(100);
+    });
+
+    it('should validate but not pass if jsonSchema.required exists and jsonSchema.properties == undefined', function () {
+      Model.jsonSchema = {
+        required: ['a']
+      };
+
+      expect(function () {
+        Model.fromJson({b: 200});
+      }).to.throwException(function (exp) {
+        expect(exp).to.be.a(ValidationError);
+      });
+    });
+
     it('should not merge default values from jsonSchema if options.patch == true', function () {
       var obj = {a: 100, b: 200};
 
