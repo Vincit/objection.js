@@ -387,7 +387,7 @@ module.exports = function (session) {
             })
             .spread(function (a1, b1) {
               expect(a1.b).to.eql({id3: 1, id4: '1', bval: 'b1'});
-              expect(b1[0]).to.equal(a1.b);
+              expect(b1).to.equal(a1.b);
             });
         });
 

@@ -8,6 +8,7 @@ export default class RelationFindOperation extends FindOperation {
 
     this.relation = opt.relation;
     this.owners = opt.owners;
+    this.alwaysReturnArray = false;
   }
 
   onBeforeBuild(builder) {
@@ -25,7 +26,11 @@ export default class RelationFindOperation extends FindOperation {
   onAfterInternal(builder, related) {
     this.relation.createRelationProp(this.owners, related);
 
-    return related;
+    if (!this.alwaysReturnArray && this.relation.isOneToOne() && related.length <= 1) {
+      return related[0];
+    } else {
+      return related;
+    }
   }
 }
 

@@ -440,10 +440,9 @@ module.exports = function (session) {
           return parent1
             .$relatedQuery('model1Relation1')
             .then(function (related) {
-              expect(related.length).to.equal(1);
-              expect(related[0]).to.be.a(Model1);
-              expect(parent1.model1Relation1).to.eql(related[0]);
-              expect(related[0]).to.eql({
+              expect(related).to.be.a(Model1);
+              expect(parent1.model1Relation1).to.eql(related);
+              expect(related).to.eql({
                 id: 2,
                 model1Id: null,
                 model1Prop1: 'hello 2',
@@ -471,28 +470,23 @@ module.exports = function (session) {
               .$relatedQuery('model1Relation1')
               .select('id')
               .then(function (related) {
-                expect(related.length).to.equal(1);
-                expect(related[0]).to.be.a(Model1);
-                expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql(['$afterGetCalled', 'id']);
-              });
-          });
-
-          it('.pluck()', function () {
-            return parent1
-              .$relatedQuery('model1Relation1')
-              .pluck('id')
-              .then(function (values) {
-                expect(values).to.eql([2]);
+                expect(related).to.be.a(Model1);
+                expect(_.keys(related).sort()).to.eql(['$afterGetCalled', 'id']);
               });
           });
 
           it('.first()', function () {
             return parent1
               .$relatedQuery('model1Relation1')
-              .pluck('id')
               .first()
               .then(function (value) {
-                expect(value).to.eql(2);
+                expect(value).to.eql({
+                  id: 2,
+                  model1Id: null,
+                  model1Prop1: 'hello 2',
+                  model1Prop2: null,
+                  $afterGetCalled: 1
+                });
               });
           });
 

@@ -215,14 +215,6 @@ export default class Relation {
    * @returns {Array.<string>}
    */
   @memoize
-  fullOwnerCol() {
-    return this.ownerCol.map(col => this.ownerModelClass.tableName + '.' + col);
-  }
-
-  /**
-   * @returns {Array.<string>}
-   */
-  @memoize
   fullRelatedCol() {
     return this.relatedCol.map(col => this.relatedModelClass.tableName + '.' + col);
   }

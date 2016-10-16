@@ -5,6 +5,10 @@ import EagerOperation from './EagerOperation';
 export default class WhereInEagerOperation extends EagerOperation {
 
   onAfterInternal(builder, result) {
+    if (!result) {
+      return result;
+    }
+
     const models = Array.isArray(result) ? result : [result];
 
     if (!models.length || !(models[0] instanceof builder.modelClass())) {
@@ -17,7 +21,7 @@ export default class WhereInEagerOperation extends EagerOperation {
       let relation = builder.modelClass().getRelations()[child.name];
 
       if (!relation) {
-        throw new ValidationError({eager: 'unknown relation "' + child.name + '" in an eager expression'});
+        throw new ValidationError({eager: `unknown relation "${child.name}" in an eager expression`});
       }
     });
 
@@ -44,14 +48,17 @@ export default class WhereInEagerOperation extends EagerOperation {
       .childQueryOf(builder)
       .eager(childExpression);
 
-    queryBuilder.callQueryBuilderOperation(relation.find(queryBuilder, models), []);
+    const findOperation = relation.find(queryBuilder, models);
+    findOperation.alwaysReturnArray = true;
+
+    queryBuilder.callQueryBuilderOperation(findOperation, []);
 
     for (let i = 0, l = childExpression.args.length; i < l; ++i) {
       const filterName = childExpression.args[i];
       const filter = childExpression.filters[filterName];
 
       if (typeof filter !== 'function') {
-        throw new ValidationError({eager: 'could not find filter "' + filterName + '" for relation "' + relation.name + '"'});
+        throw new ValidationError({eager: `could not find filter "${filterName}" for relation "${relation.name}"`});
       }
 
       filter(queryBuilder);

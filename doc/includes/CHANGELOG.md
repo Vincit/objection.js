@@ -4,7 +4,7 @@
 
 ### What's new
 
- * Eager loading can now be done using joins and zero extra queries. See [`eagerAlgorithm`](#eagerAlgorithm), [`defaultEagerAlgorithm`](#defaulteageralgorithm) and [`eager`](#eager) for more info.
+ * Eager loading can now be done using joins and zero extra queries. See [`eagerAlgorithm`](#eageralgorithm), [`defaultEagerAlgorithm`](#defaulteageralgorithm) and [`eager`](#eager) for more info.
  * `#ref` in graph inserts can now contain extra properties for many-to-many relations [#156](https://github.com/Vincit/objection.js/issues/156)
  * `#dbRef` can now be used to refer to existing rows from a `insertWithRelated` graph.
  * [`modelPaths`](#modelpaths) attribute for cleaner way to point to models in relationMappings.

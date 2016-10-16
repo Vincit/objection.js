@@ -88,10 +88,9 @@ describe('BelongsToOneRelation', function () {
         });
 
       return builder.then(function (result) {
-        expect(result).to.have.length(1);
-        expect(result).to.eql(expectedResult);
+        expect(result).to.eql(expectedResult[0]);
         expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
-        expect(result[0]).to.be.a(RelatedModel);
+        expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -181,10 +180,9 @@ describe('BelongsToOneRelation', function () {
         .select('name');
 
       return builder.then(function (result) {
-        expect(result).to.have.length(1);
-        expect(result).to.eql(expectedResult);
+        expect(result).to.eql(expectedResult[0]);
         expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
-        expect(result[0]).to.be.a(RelatedModel);
+        expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -207,10 +205,9 @@ describe('BelongsToOneRelation', function () {
         });
 
       return builder.then(function (result) {
-        expect(result).to.have.length(1);
-        expect(result).to.eql(expectedResult);
+        expect(result).to.eql(expectedResult[0]);
         expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
-        expect(result[0]).to.be.a(RelatedModel);
+        expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -235,10 +232,9 @@ describe('BelongsToOneRelation', function () {
         });
 
       return builder.then(function (result) {
-        expect(result).to.have.length(1);
-        expect(result).to.eql(expectedResult);
+        expect(result).to.eql(expectedResult[0]);
         expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
-        expect(result[0]).to.be.a(RelatedModel);
+        expect(result).to.be.a(RelatedModel);
 
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());

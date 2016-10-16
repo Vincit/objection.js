@@ -393,7 +393,7 @@ module.exports = function (session) {
             .$relatedQuery('model1Relation1')
             .then(function (model) {
               expect(parent1.model1Id).to.equal(null);
-              expect(model).to.eql([]);
+              expect(model).to.eql(undefined);
 
               return parent1
                 .$relatedQuery('model1Relation1')
@@ -493,7 +493,7 @@ module.exports = function (session) {
           return parent1
             .$relatedQuery('model1Relation1Inverse')
             .then(function (model) {
-              expect(model).to.eql([]);
+              expect(model).to.eql(undefined);
 
               return parent1
                 .$relatedQuery('model1Relation1Inverse')

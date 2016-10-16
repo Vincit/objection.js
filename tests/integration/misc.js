@@ -182,6 +182,94 @@ module.exports = function (session) {
 
   });
 
+  describe('multiple results with a one-to-one relation', function () {
+
+    beforeEach(function () {
+      // This tests insertGraph.
+      return session.populate([{
+        id: 1,
+        model1Prop1: 'hello 1',
+
+        model1Relation1: {
+          id: 2,
+          model1Prop1: 'hello 2'
+        }
+      }, {
+        id: 3,
+        model1Prop1: 'hello 1',
+
+        model1Relation1: {
+          id: 4,
+          model1Prop1: 'hello 2'
+        }
+      }]);
+    });
+
+    it('belongs to one relation', function () {
+      return session.models.Model1.query().whereIn('id', [1, 3]).eager('model1Relation1').then(function (models) {
+        expect(models).to.eql([{
+          id: 1,
+          model1Id: 2,
+          model1Prop1: 'hello 1',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1: {
+            id: 2,
+            model1Id: null,
+            model1Prop1: 'hello 2',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          }
+        }, {
+          id: 3,
+          model1Id: 4,
+          model1Prop1: 'hello 1',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+            model1Relation1: {
+            id: 4,
+            model1Id: null,
+            model1Prop1: 'hello 2',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          }
+        }]);
+      });
+    });
+
+    it('has one relation', function () {
+      return session.models.Model1.query().whereIn('id', [2, 4]).eager('model1Relation1Inverse').then(function (models) {
+        expect(models).to.eql([{
+          id: 2,
+          model1Id: null,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1Inverse: {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          }
+        }, {
+          id: 4,
+          model1Id: null,
+          model1Prop1: 'hello 2',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1Inverse: {
+            id: 3,
+            model1Id: 4,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          }
+        }]);
+      });
+    });
+  });
+
   describe('using unbound models by passing a knex to query', function () {
     var Model1 = session.unboundModels.Model1;
     var Model2 = session.unboundModels.Model2;
@@ -346,21 +434,21 @@ module.exports = function (session) {
             return model.$relatedQuery('model2Relation1', session.knex);
           })
         ]).then(function (results) {
-          expect(results[0]).to.eql([{
+          expect(results[0]).to.eql({
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
             $afterGetCalled: 1
-          }]);
+          });
 
-          expect(results[1]).to.eql([{
+          expect(results[1]).to.eql({
             id: 1,
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
             $afterGetCalled: 1
-          }]);
+          });
 
           expect(_.sortBy(results[2], 'idCol')).to.eql([{
             idCol: 1,
