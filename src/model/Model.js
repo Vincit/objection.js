@@ -601,7 +601,7 @@ export default class Model extends ModelBase {
     let relations = this.relations;
 
     if (!relations) {
-      relations = _.reduce(this.relationMappings, (relations, mapping, relationName) => {
+      relations = _.reduce(_.result(this, 'relationMappings'), (relations, mapping, relationName) => {
         relations[relationName] = new mapping.relation(relationName, this);
         relations[relationName].setMapping(mapping);
         return relations;

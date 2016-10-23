@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.2
+
+### What's new
+
+ * `relationMappings` can now be a function [#227](https://github.com/Vincit/objection.js/issues/227)
+
+## 0.6.1
+
+### What's new
+
+ * fix bug [#205](https://github.com/Vincit/objection.js/issues/205)
+
 ## 0.6.0
 
 ### What's new
