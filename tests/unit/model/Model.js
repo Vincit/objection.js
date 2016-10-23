@@ -56,6 +56,26 @@ describe('Model', function () {
     expect(json).to.have.property('relation2');
   });
 
+  it('relationMappings can be a function', function () {
+    var Model1 = modelClass('Model1');
+    var Model2 = modelClass('Model2');
+
+    Model1.relationMappings = function () {
+      return {
+        relation1: {
+          relation: Model.HasManyRelation,
+          modelClass: Model2,
+          join: {
+            from: 'Model1.id',
+            to: 'Model2.model1Id'
+          }
+        }
+      };
+    };
+
+    expect(Model1.getRelation('relation1').relatedModelClass).to.equal(Model2);
+  });
+
   it('if jsonSchema is given, should remove all but schema properties from database representation', function () {
     var Model = modelClass('Model');
 

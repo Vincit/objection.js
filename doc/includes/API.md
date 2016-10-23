@@ -4650,7 +4650,7 @@ class Person extends Model {
 
 This property defines the relations to other models.
 
-relationMappings is an object whose keys are relation names and values are [`RelationMappings`](#relationmapping).
+relationMappings is an object (or a function that returns an object) whose keys are relation names and values are [`RelationMapping`](#relationmapping) instances.
 The `join` property in addition to the relation type define how the models are related to one 
 another. The `from` and `to` properties of the `join` object define the database columns through which the
 models are associated. Note that neither of these columns need to be primary keys. They can be any
