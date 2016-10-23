@@ -330,7 +330,7 @@ module.exports = function (session) {
           .query()
           .insertGraphAndFetch(insertion)
           .then(function (inserted) {
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first().then(function (fetched) {
+            return Model1.query().eager(eagerExpr).findById(inserted.id).then(function (fetched) {
               expect(inserted.$toJson()).to.eql(fetched.$toJson());
             });
           });

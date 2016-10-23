@@ -48,6 +48,17 @@ export default class RelationExpression {
     }
   }
 
+  /**
+   * @param {Object|Array} graph
+   */
+  static fromGraph(graph) {
+    if (!graph) {
+      return new RelationExpression();
+    }
+
+    return new RelationExpression(modelGraphToNode(graph, newNode()));
+  }
+
   get filters() {
     return this._filters;
   }
@@ -217,7 +228,7 @@ function toString(node) {
   let childExpr = _.values(node.children).map(toString);
 
   if (childExpr.length > 1) {
-    childExpr = '[' + childExpr.join(', ') + ']';
+    childExpr = `[${childExpr.join(', ')}]`;
   } else {
     childExpr = childExpr[0];
   }
@@ -225,16 +236,64 @@ function toString(node) {
   let str = node.name;
 
   if (node.args.length) {
-    str += '(' + node.args.join(', ') + ')'
+    str += `(${node.args.join(', ')})`;
   }
 
   if (childExpr) {
     if (str) {
-      return str + '.' + childExpr;
+      return `${str}.${childExpr}`;
     } else {
       return childExpr;
     }
   } else {
     return str;
   }
+}
+
+function modelGraphToNode(models, node) {
+  if (!models) {
+    return;
+  }
+
+  if (Array.isArray(models)) {
+    for (let i = 0, l = models.length; i < l; ++i) {
+      modelToNode(models[i], node);
+    }
+  } else {
+    modelToNode(models, node);
+  }
+
+  return node;
+}
+
+function modelToNode(model, node) {
+  const modelClass = model.constructor;
+  const relations = modelClass.getRelations();
+  const relNames = Object.keys(relations);
+
+  for (let r = 0, lr = relNames.length; r < lr; ++r) {
+    const relName = relNames[r];
+
+    if (model.hasOwnProperty(relName)) {
+      let childNode = node.children[relName];
+
+      if (!childNode) {
+        childNode = newNode(relName);
+
+        node.children[relName] = childNode;
+        node.numChildren++;
+      }
+
+      modelGraphToNode(model[relName], childNode);
+    }
+  }
+}
+
+function newNode(name) {
+  return {
+    name: name || '',
+    args: [],
+    children: Object.create(null),
+    numChildren: 0
+  };
 }

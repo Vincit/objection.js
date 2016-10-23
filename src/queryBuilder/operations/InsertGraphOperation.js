@@ -9,7 +9,7 @@ export default class InsertGraphOperation extends DelegateOperation {
   constructor(name, opt) {
     super(name, opt);
 
-    // Our delegate method inherits from `InsertRelation`. Disable the call-time
+    // Our delegate operation inherits from `InsertOperation`. Disable the call-time
     // validation. We do the validation in onAfterQuery instead.
     this.delegate.modelOptions.skipValidation = true;
   }
