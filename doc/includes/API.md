@@ -5014,7 +5014,7 @@ class Person extends Model {
 ```
 
 If this is true (the default) only properties in `jsonSchema` are picked when inserting or updating a row
-in the database. To pick all properties, set this to true.
+in the database. To pick all properties, set this to false.
 
 Defaults to true.
 
