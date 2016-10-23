@@ -12,6 +12,14 @@ export default class QueryBuilderOperation {
   }
 
   /**
+   * @param {Constructor.<QueryBuilderOperation>} OperationClass
+   * @return {boolean}
+   */
+  is(OperationClass) {
+    return this instanceof OperationClass;
+  }
+
+  /**
    * @param {QueryBuilder} builder
    * @param {Array.<*>} args
    * @returns {boolean}

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
 import DelegateOperation from './DelegateOperation';
+import InsertOperation from './InsertOperation';
 import GraphInserter from '../graphInserter/GraphInserter';
 import {isPostgres} from '../../utils/dbUtils';
 
@@ -8,6 +9,10 @@ export default class InsertGraphOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);
+
+    if (!this.delegate.is(InsertOperation)) {
+      throw new Error('Invalid delegate');
+    }
 
     // Our delegate operation inherits from `InsertOperation`. Disable the call-time
     // validation. We do the validation in onAfterQuery instead.

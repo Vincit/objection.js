@@ -1,7 +1,16 @@
 import DelegateOperation from './DelegateOperation';
 import RelationExpression from '../RelationExpression';
+import InsertGraphOperation from './InsertGraphOperation';
 
 export default class InsertGraphAndFetchOperation extends DelegateOperation {
+
+  constructor(name, opt) {
+    super(name, opt);
+
+    if (!this.delegate.is(InsertGraphOperation)) {
+      throw new Error('Invalid delegate');
+    }
+  }
 
   get models() {
     return this.delegate.models;

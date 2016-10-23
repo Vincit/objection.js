@@ -1,10 +1,16 @@
 import DelegateOperation from './DelegateOperation';
+import UpdateOperation from './UpdateOperation';
 import {afterReturn} from '../../utils/promiseUtils';
 
 export default class UpdateAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);
+
+    if (!this.delegate.is(UpdateOperation)) {
+      throw new Error('Invalid delegate');
+    }
+
     this.id = null;
   }
 

@@ -1,15 +1,24 @@
 import _ from 'lodash';
+import InsertOperation from './InsertOperation';
 import DelegateOperation from './DelegateOperation';
 import {after} from '../../utils/promiseUtils';
 
 export default class InsertAndFetchOperation extends DelegateOperation {
 
+  constructor(name, opt) {
+    super(name, opt);
+
+    if (!this.delegate.is(InsertOperation)) {
+      throw new Error('Invalid delegate');
+    }
+  }
+
   onAfterInternal(builder, inserted) {
     const maybePromise = super.onAfterInternal(builder, inserted);
 
     return after(maybePromise, insertedModels => {
-      let insertedModelArray = _.isArray(insertedModels) ? insertedModels : [insertedModels];
-      let idProps = builder.modelClass().getIdPropertyArray();
+      const insertedModelArray = Array.isArray(insertedModels) ? insertedModels : [insertedModels];
+      const idProps = builder.modelClass().getIdPropertyArray();
 
       return builder.modelClass()
         .query()

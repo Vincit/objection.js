@@ -9,6 +9,10 @@ export default class DelegateOperation extends QueryBuilderOperation {
     this.isWriteOperation = this.delegate.isWriteOperation;
   }
 
+  is(OperationClass) {
+    return super.is(OperationClass) || this.delegate.is(OperationClass);
+  }
+
   call(builder, args) {
     return this.delegate.call(builder, args);
   }
