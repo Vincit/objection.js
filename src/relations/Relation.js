@@ -281,7 +281,7 @@ export default class Relation {
       for (let i = 0, l = opt.ownerIds.length; i < l; ++i) {
         const id = opt.ownerIds[i];
 
-        if (id) {
+        if (id !== null && id !== undefined) {
           hasIds = true;
           break;
         }
