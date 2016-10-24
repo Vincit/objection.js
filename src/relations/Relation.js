@@ -103,14 +103,9 @@ export default class Relation {
     this.joinTableRelatedProp = null;
 
     /**
-     * @type {Array.<string>}
+     * @type {Array.<{joinTableCol: string, joinTableProp: string, aliasCol: string, aliasProp: string}>}
      */
-    this.joinTableExtraCols = null;
-
-    /**
-     * @type {Array.<string>}
-     */
-    this.joinTableExtraProps = null;
+    this.joinTableExtras = [];
 
     /**
      * @type {function (QueryBuilder)}
@@ -246,8 +241,7 @@ export default class Relation {
     relation.joinTableOwnerProp = this.joinTableOwnerProp;
     relation.joinTableRelatedCol = this.joinTableRelatedCol;
     relation.joinTableRelatedProp = this.joinTableRelatedProp;
-    relation.joinTableExtraCols = this.joinTableExtraCols;
-    relation.joinTableExtraProps = this.joinTableExtraProps;
+    relation.joinTableExtras = this.joinTableExtras;
 
     copyHiddenData(this, relation);
 

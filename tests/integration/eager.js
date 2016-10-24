@@ -44,11 +44,11 @@ module.exports = function (session) {
           model2Relation1: [{
             id: 5,
             model1Prop1: 'hello 5',
-            extra3: 'extra 5'
+            aliasedExtra: 'extra 5'
           }, {
             id: 6,
             model1Prop1: 'hello 6',
-            extra3: 'extra 6',
+            aliasedExtra: 'extra 6',
 
             model1Relation1: {
               id: 7,
@@ -102,7 +102,7 @@ module.exports = function (session) {
                 model2Relation1: _.times(2, function () {
                   return {
                     model1Prop1: 'hello ' + n(),
-                    extra3: 'extra ' + n(),
+                    aliasedExtra: 'extra ' + n(),
 
                     model1Relation1: {
                       model1Prop1: 'hello ' + n()
@@ -458,14 +458,14 @@ module.exports = function (session) {
             model1Id: null,
             model1Prop1: 'hello 5',
             model1Prop2: null,
-            extra3: 'extra 5',
+            aliasedExtra: 'extra 5',
             $afterGetCalled: 1
           }, {
             id: 6,
             model1Id: 7,
             model1Prop1: 'hello 6',
             model1Prop2: null,
-            extra3: 'extra 6',
+            aliasedExtra: 'extra 6',
             $afterGetCalled: 1
           }],
         }],
@@ -507,14 +507,14 @@ module.exports = function (session) {
             model1Id: null,
             model1Prop1: 'hello 5',
             model1Prop2: null,
-            extra3: 'extra 5',
+            aliasedExtra: 'extra 5',
             $afterGetCalled: 1
           }, {
             id: 6,
             model1Id: 7,
             model1Prop1: 'hello 6',
             model1Prop2: null,
-            extra3: 'extra 6',
+            aliasedExtra: 'extra 6',
             $afterGetCalled: 1
           }],
         }],
@@ -556,7 +556,7 @@ module.exports = function (session) {
             model1Id: null,
             model1Prop1: 'hello 5',
             model1Prop2: null,
-            extra3: 'extra 5',
+            aliasedExtra: 'extra 5',
             model1Relation1: null,
             model1Relation2: [],
             $afterGetCalled: 1
@@ -565,7 +565,7 @@ module.exports = function (session) {
             model1Id: 7,
             model1Prop1: 'hello 6',
             model1Prop2: null,
-            extra3: 'extra 6',
+            aliasedExtra: 'extra 6',
             $afterGetCalled: 1,
 
             model1Relation1: {
@@ -623,14 +623,14 @@ module.exports = function (session) {
                 model1Id: null,
                 model1Prop1: 'hello 5',
                 model1Prop2: null,
-                extra3: 'extra 5',
+                aliasedExtra: 'extra 5',
                 $afterGetCalled: 1
               }, {
                 id: 6,
                 model1Id: 7,
                 model1Prop1: 'hello 6',
                 model1Prop2: null,
-                extra3: 'extra 6',
+                aliasedExtra: 'extra 6',
                 $afterGetCalled: 1
               }],
             }],
@@ -677,14 +677,14 @@ module.exports = function (session) {
                 model1Id: null,
                 model1Prop1: 'hello 5',
                 model1Prop2: null,
-                extra3: 'extra 5',
+                aliasedExtra: 'extra 5',
                 $afterGetCalled: 1
               }, {
                 id: 6,
                 model1Id: 7,
                 model1Prop1: 'hello 6',
                 model1Prop2: null,
-                extra3: 'extra 6',
+                aliasedExtra: 'extra 6',
                 $afterGetCalled: 1
               }],
             }],
@@ -747,14 +747,14 @@ module.exports = function (session) {
                   model1Id: null,
                   model1Prop1: 'hello 5',
                   model1Prop2: null,
-                  extra3: 'extra 5',
+                  aliasedExtra: 'extra 5',
                   $afterGetCalled: 1
                 }, {
                   id: 6,
                   model1Id: 7,
                   model1Prop1: 'hello 6',
                   model1Prop2: null,
-                  extra3: 'extra 6',
+                  aliasedExtra: 'extra 6',
                   $afterGetCalled: 1
                 }],
               }],
@@ -1059,12 +1059,12 @@ module.exports = function (session) {
                 idCol: 2,
                 model2Relation1: [{
                   id: 5,
-                  extra3: 'extra 5',
+                  aliasedExtra: 'extra 5',
                   model1Relation1: null,
                   model1Relation2: []
                 }, {
                   id: 6,
-                  extra3: 'extra 6',
+                  aliasedExtra: 'extra 6',
                   model1Relation1: {
                     id: 7
                   },
@@ -1101,12 +1101,12 @@ module.exports = function (session) {
                 idCol: 2,
                 model2Relation1: [{
                   id: 5,
-                  extra3: 'extra 5',
+                  aliasedExtra: 'extra 5',
                   model1Relation1: null,
                   model1Relation2: []
                 }, {
                   id: 6,
-                  extra3: 'extra 6',
+                  aliasedExtra: 'extra 6',
                   model1Relation1: {
                     id: 7
                   },

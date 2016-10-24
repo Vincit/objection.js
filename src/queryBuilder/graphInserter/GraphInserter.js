@@ -181,11 +181,11 @@ export default class GraphInserter {
 
         if (conn.refNode) {
           // Also take extra properties from the referring model, it there was one.
-          for (let k = 0, lk = conn.relation.joinTableExtraProps.length; k < lk; ++k) {
-            let extraProp = conn.relation.joinTableExtraProps[k];
+          for (let k = 0, lk = conn.relation.joinTableExtras.length; k < lk; ++k) {
+            let extra = conn.relation.joinTableExtras[k];
 
-            if (!_.isUndefined(conn.refNode.model[extraProp])) {
-              joinModel[extraProp] = conn.refNode.model[extraProp];
+            if (!_.isUndefined(conn.refNode.model[extra.aliasProp])) {
+              joinModel[extra.joinTableProp] = conn.refNode.model[extra.aliasProp];
             }
           }
         }

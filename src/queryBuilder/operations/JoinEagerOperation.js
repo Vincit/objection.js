@@ -296,14 +296,14 @@ export default class JoinEagerOperation extends EagerOperation {
       }
     });
 
-    if (relation && relation.joinTableExtraCols) {
+    if (relation && relation.joinTableExtras) {
       const joinTable = this.encode(joinTableForPath(info.path));
 
-      relation.joinTableExtraCols.forEach(col => {
-        if (selectFilter(col)) {
+      relation.joinTableExtras.forEach(extra => {
+        if (selectFilter(extra.joinTableCol)) {
           selects.push({
-            col: `${joinTable}.${col}`,
-            alias: this.joinPath(info.encPath, col)
+            col: `${joinTable}.${extra.joinTableCol}`,
+            alias: this.joinPath(info.encPath, extra.aliasCol)
           });
         }
       });

@@ -31,10 +31,12 @@ export default class ManyToManyFindOperation extends FindOperation {
       // If we don't do this we also get the join table's columns.
       builder.select(this.relation.relatedModelClass.tableName + '.*');
 
-      const extraCols = this.relation.fullJoinTableExtraCols();
       // Also select all extra columns.
-      for (let i = 0, l = extraCols.length; i < l; ++i) {
-        builder.select(extraCols[i]);
+      for (let i = 0, l = this.relation.joinTableExtras.length; i < l; ++i) {
+        const extra = this.relation.joinTableExtras[i];
+        const joinTable = this.relation.joinTable;
+
+        builder.select(`${joinTable}.${extra.joinTableCol} as ${extra.aliasCol}`);
       }
     }
 

@@ -730,7 +730,7 @@ module.exports = function (session) {
                 id: 6,
                 model1Prop1: 'blaa 4',
                 model1Prop2: 3,
-                extra3: 'extra 4'
+                aliasedExtra: 'extra 4'
               }, {
                 id: 7,
                 model1Prop1: 'blaa 5',
@@ -739,7 +739,7 @@ module.exports = function (session) {
                 id: 8,
                 model1Prop1: 'blaa 6',
                 model1Prop2: 1,
-                extra3: 'extra 6'
+                aliasedExtra: 'extra 6'
               }]
             }]
           }]);
@@ -766,13 +766,13 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
                 expect(_.map(related, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3']);
-                expect(_.map(related, 'extra3').sort()).to.eql([null, null, null]);
+                expect(_.map(related, 'aliasedExtra').sort()).to.eql([null, null, null]);
                 expect(related[0]).to.eql({
                   id: 3,
                   model1Id: null,
                   model1Prop1: 'blaa 1',
                   model1Prop2: 6,
-                  extra3: null,
+                  aliasedExtra: null,
                   $afterGetCalled: 1
                 });
               }),
@@ -786,13 +786,13 @@ module.exports = function (session) {
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
                 expect(_.map(related, 'model1Prop1').sort()).to.eql(['blaa 4', 'blaa 5', 'blaa 6']);
-                expect(_.map(related, 'extra3').sort()).to.eql(['extra 4', 'extra 6', null]);
+                expect(_.map(related, 'aliasedExtra').sort()).to.eql(['extra 4', 'extra 6', null]);
                 expect(related[0]).to.eql({
                   id: 6,
                   model1Id: null,
                   model1Prop1: 'blaa 4',
                   model1Prop2: 3,
-                  extra3: 'extra 4',
+                  aliasedExtra: 'extra 4',
                   $afterGetCalled: 1
                 });
               })
@@ -824,7 +824,7 @@ module.exports = function (session) {
                 model1Id: null,
                 model1Prop1: 'blaa 6',
                 model1Prop2: 1,
-                extra3: 'extra 6',
+                aliasedExtra: 'extra 6',
                 $afterGetCalled: 1
               }]);
             })

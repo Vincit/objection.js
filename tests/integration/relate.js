@@ -386,7 +386,7 @@ module.exports = function (session) {
             .then(function (model) {
               return model
                 .$relatedQuery('model2Relation1')
-                .relate({id: 5, extra3: 'foobar'});
+                .relate({id: 5, aliasedExtra: 'foobar'});
             })
             .then(function () {
               return session.knex('Model1Model2').orderBy('id');

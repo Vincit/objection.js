@@ -50,7 +50,6 @@ export default class ManyToManyRelation extends Relation {
     }
 
     this.joinTable = joinTableFrom.table;
-    this.joinTableExtraCols = joinTableExtra;
 
     if (joinFrom.table === this.ownerModelClass.tableName) {
       this.joinTableOwnerCol = joinTableFrom.columns;
@@ -72,7 +71,7 @@ export default class ManyToManyRelation extends Relation {
 
     this.joinTableOwnerProp = this.propertyName(this.joinTableOwnerCol, this._joinTableModelClass);
     this.joinTableRelatedProp = this.propertyName(this.joinTableRelatedCol, this._joinTableModelClass);
-    this.joinTableExtraProps = this.propertyName(this.joinTableExtraCols, this._joinTableModelClass);
+    this.joinTableExtras = this.parseExtras(joinTableExtra);
 
     return retVal;
   }
@@ -82,7 +81,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   fullJoinTableOwnerCol() {
-    return this.joinTableOwnerCol.map(col => this.joinTable + '.' + col);
+    return this.joinTableOwnerCol.map(col => `${this.joinTable}.${col}`);
   }
 
   /**
@@ -90,15 +89,7 @@ export default class ManyToManyRelation extends Relation {
    */
   @memoize
   fullJoinTableRelatedCol() {
-    return this.joinTableRelatedCol.map(col => this.joinTable + '.' + col);
-  }
-
-  /**
-   * @returns {Array.<string>}
-   */
-  @memoize
-  fullJoinTableExtraCols() {
-    return this.joinTableExtraCols.map(col => this.joinTable + '.' + col);
+    return this.joinTableRelatedCol.map(col => `${this.joinTable}.${col}`);
   }
 
   /**
@@ -325,12 +316,12 @@ export default class ManyToManyRelation extends Relation {
         joinModel[this.joinTableRelatedProp[j]] = rel[this.relatedProp[j]];
       }
 
-      for (let j = 0, lp = this.joinTableExtraProps.length; j < lp; ++j) {
-        const prop = this.joinTableExtraProps[j];
-        const extraValue = rel[prop];
+      for (let j = 0, lp = this.joinTableExtras.length; j < lp; ++j) {
+        const extra = this.joinTableExtras[j];
+        const extraValue = rel[extra.aliasProp];
 
         if (!_.isUndefined(extraValue)) {
-          joinModel[prop] = extraValue;
+          joinModel[extra.joinTableProp] = extraValue;
         }
       }
 
@@ -341,10 +332,35 @@ export default class ManyToManyRelation extends Relation {
   }
 
   omitExtraProps(models) {
-    if (!_.isEmpty(this.joinTableExtraProps)) {
+    if (!_.isEmpty(this.joinTableExtras)) {
+      const props = this.joinTableExtras.map(extra => extra.aliasProp);
+
       for (let i = 0, l = models.length; i < l; ++i) {
-        models[i].$omitFromDatabaseJson(this.joinTableExtraProps);
+        models[i].$omitFromDatabaseJson(props);
       }
     }
+  }
+
+  /**
+   * @protected
+   */
+  parseExtras(extras) {
+    if (Array.isArray(extras)) {
+      extras = extras.reduce((extras, col) => {
+        extras[col] = col;
+        return extras;
+      }, {});
+    }
+
+    return Object.keys(extras).map(key => {
+      const val = extras[key];
+
+      return {
+        joinTableCol: val,
+        joinTableProp: this._joinTableModelClass.columnNameToPropertyName(val),
+        aliasCol: key,
+        aliasProp: this._joinTableModelClass.columnNameToPropertyName(key)
+      };
+    });
   }
 }

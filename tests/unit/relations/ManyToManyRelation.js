@@ -398,7 +398,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal([
-          'select "RelatedModel".*, "JoinTable"."extra1", "JoinTable"."extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
+          'select "RelatedModel".*, "JoinTable"."extra1" as "extra1", "JoinTable"."extra2" as "extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
           'where "JoinTable"."ownerId" in (666)',
@@ -483,7 +483,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal([
-          'select "RelatedModel".*, "JoinTable"."extra1", "JoinTable"."extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
+          'select "RelatedModel".*, "JoinTable"."extra1" as "extra1", "JoinTable"."extra2" as "extra2", "JoinTable"."ownerId" as "objectiontmpjoin0"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
           'where "JoinTable"."ownerId" in (666, 667)',

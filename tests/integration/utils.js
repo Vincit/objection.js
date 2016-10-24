@@ -238,7 +238,7 @@ module.exports.initialize = function (opt) {
         through: {
           from: 'Model1Model2.model2Id',
           to: 'Model1Model2.model1Id',
-          extra: ['extra3']
+          extra: {aliasedExtra: 'extra3'}
         },
         to: 'Model1.id'
       }

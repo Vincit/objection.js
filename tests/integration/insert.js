@@ -900,13 +900,13 @@ module.exports = function (session) {
               expect(models).to.have.length(1);
               return parent1
                 .$relatedQuery('model2Relation1')
-                .insert(Model1.fromJson({model1Prop1: 'test', extra3: 'foo'}));
+                .insert(Model1.fromJson({model1Prop1: 'test', aliasedExtra: 'foo'}));
             })
             .then(function ($inserted) {
               inserted = $inserted;
               expect(inserted.id).to.equal(5);
               expect(inserted.model1Prop1).to.equal('test');
-              expect(inserted.extra3).to.equal('foo');
+              expect(inserted.aliasedExtra).to.equal('foo');
               expect(parent1.model2Relation1).to.eql(_.flatten([originalRelated, inserted]));
               return session.knex('Model1');
             })
@@ -917,7 +917,7 @@ module.exports = function (session) {
             })
             .then(function (rows) {
               expect(rows).to.have.length(3);
-              expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol, extra3: inserted.extra3})).to.have.length(1);
+              expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol, extra3: inserted.aliasedExtra})).to.have.length(1);
             });
         });
 
