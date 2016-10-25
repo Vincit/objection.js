@@ -52,6 +52,84 @@ module.exports = function (session) {
 
   });
 
+  describe('zero value in relation column', function () {
+    var Table1;
+    var Table2;
+
+    before(function () {
+      return session.knex.schema
+        .dropTableIfExists('table1')
+        .dropTableIfExists('table2')
+        .createTable('table1', function (table) {
+          table.increments('id').primary();
+          table.integer('value').notNullable();
+        })
+        .createTable('table2', function (table) {
+          table.increments('id').primary();
+          table.integer('value').notNullable();
+        });
+    });
+
+    after(function () {
+      return Promise.all([
+        session.knex.schema.dropTableIfExists('table1'),
+        session.knex.schema.dropTableIfExists('table2')
+      ]);
+    });
+
+    before(function () {
+      Table1 = function TestModel() {
+        Model.apply(this, arguments);
+      };
+
+      Table2 = function TestModel() {
+        Model.apply(this, arguments);
+      };
+
+      Model.extend(Table1);
+      Model.extend(Table2);
+
+      Table1.tableName = 'table1';
+      Table2.tableName = 'table2';
+
+      Table1.knex(session.knex);
+      Table2.knex(session.knex);
+
+      Table1.relationMappings = {
+        relation: {
+          relation: Model.HasManyRelation,
+          modelClass: Table2,
+          join: {
+            from: 'table1.value',
+            to: 'table2.value'
+          }
+        }
+      };
+    });
+
+    before(function () {
+      return Promise.all([
+        Table1.query().insert({id: 1, value: 0}),
+        Table1.query().insert({id: 2, value: 1}),
+        Table2.query().insert({id: 1, value: 0}),
+        Table2.query().insert({id: 2, value: 1})
+      ])
+    });
+
+    it('should work with zero value', function () {
+      return Table1
+        .query()
+        .findById(1)
+        .then(function (model) {
+          return model.$relatedQuery('relation');
+        })
+        .then(function (models) {
+          expect(models).to.eql([{id: 1, value: 0}]);
+        });
+    });
+
+  });
+
   if (session.isMySql()) {
     describe('mysql binary columns', function () {
       var TestModel;

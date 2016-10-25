@@ -41,11 +41,27 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
     let col = (typeof columns === 'string') ? columns : columns[0];
 
     if (Array.isArray(values)) {
-      values = _.compact(_.flatten(values));
+      values = pickNonNull(values, []);
+    } else {
+      values = [values];
     }
 
     // For non-composite keys we can use the normal whereIn.
     knexBuilder.whereIn(col, values);
   }
+}
+
+function pickNonNull(values, output) {
+  for (let i = 0, l = values.length; i < l; ++i) {
+    const val = values[i];
+
+    if (Array.isArray(val)) {
+      pickNonNull(val, output);
+    } else if (val !== null && val !== undefined) {
+      output.push(val);
+    }
+  }
+
+  return output;
 }
 

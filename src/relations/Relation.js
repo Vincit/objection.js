@@ -276,18 +276,7 @@ export default class Relation {
         builder.whereRef(fullRelatedCol[i], opt.ownerIds[i]);
       }
     } else {
-      let hasIds = false;
-
-      for (let i = 0, l = opt.ownerIds.length; i < l; ++i) {
-        const id = opt.ownerIds[i];
-
-        if (id !== null && id !== undefined) {
-          hasIds = true;
-          break;
-        }
-      }
-
-      if (hasIds) {
+      if (containsNonNull(opt.ownerIds)) {
         builder.whereInComposite(fullRelatedCol, opt.ownerIds);
       } else {
         builder.resolve([]);
@@ -597,4 +586,18 @@ export default class Relation {
 
 function isAbsolutePath(pth) {
   return path.normalize(pth + '/') === path.normalize(path.resolve(pth) + '/');
+}
+
+function containsNonNull(arr) {
+  for (let i = 0, l = arr.length; i < l; ++i) {
+    const val = arr[i];
+
+    if (Array.isArray(val) && containsNonNull(val)) {
+      return true;
+    } else if (val !== null && val !== undefined) {
+      return true;
+    }
+  }
+
+  return false;
 }
