@@ -1,7 +1,7 @@
 export default class QueryBuilderContextBase {
 
-  constructor() {
-    this.userContext = {};
+  constructor(userContext) {
+    this.userContext = userContext;
     this.skipUndefined = false;
     this.knex = null;
   }

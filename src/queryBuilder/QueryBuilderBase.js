@@ -38,7 +38,7 @@ export default class QueryBuilderBase {
      * @type {QueryBuilderContextBase}
      * @protected
      */
-    this._context = new (QueryBuilderContext || QueryBuilderContextBase)();
+    this._context = new (QueryBuilderContext || QueryBuilderContextBase)(this._createUserContextBase());
   }
 
   /**
@@ -58,9 +58,20 @@ export default class QueryBuilderBase {
     if (arguments.length === 0) {
       return this._context.userContext;
     } else {
-      this._context.userContext = ctx;
+      const ctxBase = this._createUserContextBase();
+      this._context.userContext = Object.assign(ctxBase, ctx);
       return this;
     }
+  }
+
+  /**
+   * @param {Object=} ctx
+   * @returns {QueryBuilderBase}
+   */
+  mergeContext(ctx) {
+    const oldCtx = this._context.userContext;
+    this._context.userContext = Object.assign(oldCtx, ctx);
+    return this;
   }
 
   /**
@@ -348,6 +359,20 @@ export default class QueryBuilderBase {
   transacting(trx) {
     this._context.knex = trx || null;
     return this;
+  }
+
+  /**
+   * @private
+   */
+  _createUserContextBase() {
+    const ctxProto = {};
+
+    Object.defineProperty(ctxProto, 'transaction', {
+      enumerable: false,
+      get: () => this.knex()
+    });
+
+    return Object.create(ctxProto);
   }
 
   /**

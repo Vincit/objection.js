@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
 
 export default class WhereInCompositeOperation extends WrappingQueryBuilderOperation {

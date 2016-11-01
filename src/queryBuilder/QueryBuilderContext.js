@@ -2,8 +2,8 @@ import QueryBuilderContextBase from './QueryBuilderContextBase';
 
 export default class QueryBuilderContext extends QueryBuilderContextBase {
 
-  constructor() {
-    super();
+  constructor(userContext) {
+    super(userContext);
 
     this.runBefore = [];
     this.runAfter = [];

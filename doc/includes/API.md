@@ -2652,7 +2652,14 @@ Some query builder methods create more than one query. The query context is an o
 shared with all queries started by a query builder. 
 
 The context is also passed to [`$beforeInsert`](#_s_beforeinsert), [`$afterInsert`](#_s_afterinsert),
-[`$beforeUpdate`](#_s_beforeupdate) and [`$afterUpdate`](#_s_afterupdate) calls that the query creates.
+[`$beforeUpdate`](#_s_beforeupdate), [`$afterUpdate`](#_s_afterupdate), [`$beforeDelete`](#_s_beforeidelete), 
+[`$afterDelete`](#_s_afterdelete) and [`$afterGet`](#_s_afterget) calls that the query creates.
+
+In addition to properties added using this method (and [`mergeContext`](#mergecontext)) the query context
+object always has a `transaction` property that holds the active transaction. If there is no active transaction
+the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere
+where a transaction object can be passed so you never need to check for the existence of the `transaction`
+property.
 
 See the methods [`runBefore`](#runbefore), [`onBuild`](#onbuild) and [`runAfter`](#runafter)
 for more information about the hooks.
@@ -2662,6 +2669,32 @@ for more information about the hooks.
 Argument|Type|Description
 --------|----|-------|------------
 queryContext|Object|The query context object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### mergeContext
+
+```js
+var builder = queryBuilder.mergeContext(queryContext);
+```
+
+Merges values into the query context.
+
+This method is like [`context`](#context) but instead of replacing the whole context
+this method merges the objects.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+queryContext|Object|The object to merge into the query context.
 
 ##### Return value
 

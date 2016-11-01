@@ -75,13 +75,38 @@ module.exports = function (session) {
       mockKnex.reset();
     });
 
+    it('should get passed to the $afterGet method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$afterGet = function (queryContext) {
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        called = true;
+      };
+
+      return Model
+        .query()
+        .context(context)
+        .where('id', 1)
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
     it('should get passed to the $beforeUpdate method', function () {
       var Model = inheritModel(Model1);
       var context = {a: 1, b: '2'};
       var called = false;
 
       Model.prototype.$beforeUpdate = function (opt, queryContext) {
-        expect(queryContext).to.equal(context);
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
         called = true;
       };
 
@@ -101,7 +126,10 @@ module.exports = function (session) {
       var called = false;
 
       Model.prototype.$afterUpdate = function (opt, queryContext) {
-        expect(queryContext).to.equal(context);
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
         called = true;
       };
 
@@ -121,7 +149,10 @@ module.exports = function (session) {
       var called = false;
 
       Model.prototype.$beforeInsert = function (queryContext) {
-        expect(queryContext).to.equal(context);
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
         called = true;
       };
 
@@ -140,7 +171,10 @@ module.exports = function (session) {
       var called = false;
 
       Model.prototype.$afterInsert = function (queryContext) {
-        expect(queryContext).to.equal(context);
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
         called = true;
       };
 
@@ -148,6 +182,79 @@ module.exports = function (session) {
         .query()
         .context(context)
         .insert({model1Prop1: 'new'})
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    it('should get passed to the $beforeDelete method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$beforeDelete = function (queryContext) {
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        called = true;
+      };
+
+      return Model
+        .fromJson({id: 1})
+        .$query()
+        .context(context)
+        .delete()
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    it('should get passed to the $afterDelete method', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var called = false;
+
+      Model.prototype.$afterDelete = function (queryContext) {
+        expect(queryContext).to.eql(context);
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        called = true;
+      };
+
+      return Model
+        .fromJson({id: 1})
+        .$query()
+        .context(context)
+        .delete()
+        .then(function () {
+          expect(called).to.equal(true);
+        });
+    });
+
+    it('mergeContex should merge values into the context', function () {
+      var Model = inheritModel(Model1);
+      var context = {a: 1, b: '2'};
+      var merge1 = {c: [10, 11]};
+      var merge2 = {d: false};
+      var called = false;
+
+      Model.prototype.$afterDelete = function (queryContext) {
+        expect(queryContext).to.eql(Object.assign({}, context, merge1, merge2));
+        expect(context.transaction).to.equal(undefined);
+        expect(queryContext.transaction).to.equal(mockKnex);
+        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        called = true;
+      };
+
+      return Model
+        .fromJson({id: 1})
+        .$query()
+        .context(context)
+        .mergeContext(merge1)
+        .delete()
+        .mergeContext(merge2)
         .then(function () {
           expect(called).to.equal(true);
         });
