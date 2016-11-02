@@ -241,7 +241,7 @@ module.exports = function (session) {
       var called = false;
 
       Model.prototype.$afterDelete = function (queryContext) {
-        expect(queryContext).to.eql(Object.assign({}, context, merge1, merge2));
+        expect(queryContext).to.eql(_.assign({}, context, merge1, merge2));
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
         expect(queryContext.hasOwnProperty('transaction')).to.equal(false);

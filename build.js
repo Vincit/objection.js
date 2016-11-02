@@ -13,7 +13,6 @@ var BABEL_OPT = {
   plugins: [
     "transform-decorators-legacy",
     "transform-class-properties",
-    "transform-object-assign",
 
     "transform-es2015-template-literals",
     "transform-es2015-literals",
