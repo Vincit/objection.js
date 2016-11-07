@@ -1,7 +1,7 @@
 import { Model } from 'objection';
-import { Person } from './Person';
+import Person from './Person';
 
-export class Movie extends Model {
+export default class Movie extends Model {
   // Table name is the only required property.
   static tableName = 'Movie';
 
@@ -24,7 +24,7 @@ export class Movie extends Model {
       // The related model. This can be either a Model subclass constructor or an
       // absolute file path to a module that exports one. We use the file path version
       // here to prevent require loops.
-      modelClass: `${__dirname}/Person`,
+      modelClass: Person,
       join: {
         from: 'Movie.id',
         // ManyToMany relation needs the `through` object to describe the join table.

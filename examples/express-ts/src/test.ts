@@ -1,7 +1,7 @@
 // tslint:disable:no-unused-variable
 
 import * as objection from 'objection';
-import { Person } from './models/Person';
+import Person from './models/Person';
 import { knex } from './app';
 
 // This file exercises the Objection.js typings.

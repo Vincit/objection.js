@@ -1,7 +1,7 @@
 import { JsonSchema } from 'jsonschema';
 import { Model, RelationMappings } from 'objection';
-import { Animal } from './Animal';
-import { Movie } from './Movie';
+import Animal from './Animal';
+import Movie from './Movie';
 
 export interface Address {
   street: string;
@@ -9,7 +9,7 @@ export interface Address {
   zipCode: string;
 }
 
-export class Person extends Model {
+export default class Person extends Model {
   // Table name is the only required property.
   static tableName = 'Person';
 

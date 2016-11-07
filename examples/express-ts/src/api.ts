@@ -1,8 +1,8 @@
 import * as objection from 'objection';
 import * as express from 'express';
 
-import { Person } from './models/Person';
-import { Movie } from './models/Movie';
+import Person from './models/Person';
+import Movie from './models/Movie';
 
 export default function (app: express.Application) {
 
