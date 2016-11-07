@@ -4,6 +4,9 @@
   "description": "Objection.js express TypeScript example",
   "main": "app.js",
   "scripts": {
+    "lint": "tslint src/**/*.ts",
+    "compile": "tsc",
+    "prestart": "compile",
     "start": "tsc && node lib/app.js"
   },
   "author": "Sami Koskimäki",
@@ -24,6 +27,8 @@
     "@types/lodash": "^4.14.38",
     "@types/morgan": "^1.7.32",
     "@types/sqlite3": "^2.2.31",
+    "tslint": "^3.15.1",
+    "tslint-config-standard": "^1.5.0",
     "typescript": "^2.0.7"
   }
 }

@@ -4,9 +4,9 @@ import { Animal } from './Animal';
 import { Movie } from './Movie';
 
 export interface Address {
-  street: string
-  city: string
-  zipCode: string
+  street: string;
+  city: string;
+  zipCode: string;
 }
 
 export class Person extends Model {
@@ -82,4 +82,8 @@ export class Person extends Model {
   lastName: string;
   age: number;
   address: Address;
+
+  examplePersonMethod(arg: string): number {
+    return 1;
+  }
 }

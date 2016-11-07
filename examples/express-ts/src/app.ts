@@ -12,7 +12,7 @@ const knexConfig = require('../knexfile');
 export const knex = Knex(knexConfig.development);
 
 // Create or migrate:
-knex.migrate.latest()
+knex.migrate.latest();
 
 // Bind all Models to a knex instance. If you only have one database in
 // your server this is all you have to do. For multi database systems, see
@@ -24,14 +24,14 @@ const app: express.Application = express()
   .use(morgan('dev'))
   .set('json spaces', 2);
 
-monkeyPatchRouteMethods(app)
+monkeyPatchRouteMethods(app);
 
 // Register our REST API.
 registerApi(app);
 
 // Error handling. The `ValidationError` instances thrown by objection.js have a `statusCode`
 // property that is sent as the status code of the response.
-app.use((err:any, req:express.Request, res:express.Response,next:express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response,next: express.NextFunction) => {
   if (err) {
     res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});
   } else {
@@ -43,13 +43,12 @@ const server = app.listen(8641, function () {
   console.log('Example app listening at port %s', server.address().port);
 });
 
-
 // Wrap each express route method with code that passes unhandled exceptions
 // from async functions to the `next` callback. This way we don't need to
 // wrap our route handlers in try-catch blocks.
 function monkeyPatchRouteMethods(app: express.Application) {
   ['get', 'put', 'post', 'delete', 'patch'].forEach(function (routeMethodName) {
-    const originalRouteMethod = app[routeMethodName]
+    const originalRouteMethod = app[routeMethodName];
 
     app[routeMethodName] = function () {
       const args = _.toArray(arguments);

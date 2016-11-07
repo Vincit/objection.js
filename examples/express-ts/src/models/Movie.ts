@@ -37,7 +37,7 @@ export class Movie extends Model {
     }
   };
 
-  readonly id: number  
-  name: string
-  actors: Person[]
+  readonly id: number;
+  name: string;
+  actors: Person[];
 }
