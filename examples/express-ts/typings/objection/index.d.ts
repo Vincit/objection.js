@@ -65,7 +65,16 @@ declare module "objection" {
    * @see http://vincit.github.io/objection.js/#relationexpression
    */
   type RelationExpression = string;
-  type TraverserFunction = (model: Model, parentModel: string, relationName: string) => void;
+
+  type FilterFunction = (queryBuilder: QueryBuilder) => void;
+  
+  type FilterExpression = { [namedFilter: string]: FilterFunction };
+
+  interface RelationExpressionMethod {
+    (relationExpression: RelationExpression): QueryBuilder;
+  }
+
+  type TraverserFunction = (model: typeof Model, parentModel: string | typeof Model, relationName: string) => void;
 
   type Id = string | number;
 
@@ -77,6 +86,38 @@ declare module "objection" {
 
   interface JoinRelation {
     (relationName: string, opt?: RelationOptions): QueryBuilder;
+  }
+
+  interface WhereJson {
+    (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
+  }
+
+  interface WhereJsonSet {
+    (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: Object | Object[] | FieldExpression): QueryBuilder;
+  }
+
+  interface WhereFieldExpression {
+    (fieldExpression: FieldExpression): QueryBuilder;
+  }
+
+  interface WhereJsonExpression {
+    (fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder;
+  }
+
+  interface WhereJsonField {
+    (fieldExpression: FieldExpression, operator: string, value: boolean | number | string | null): QueryBuilder;
+  }
+
+  interface ModifyEager {
+    (relationExpression: string | RelationExpression, modifier: (builder: QueryBuilder) => void): QueryBuilder;
+  }
+
+  interface BluebirdMapper<T, Result> {
+    (item: T, index: number): Result
+  }
+
+  interface NodeStyleCallback {
+    (err: any, result?: any): void
   }
 
   /**
@@ -277,66 +318,106 @@ declare module "objection" {
     whereInComposite(column: string, values: any[]): QueryBuilder;
     whereInComposite(columns: string[], values: any[]): QueryBuilder;
 
-    whereJsonEquals(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
+    whereJsonEquals: WhereJson;
+    whereJsonNotEquals: WhereJson;
+    orWhereJsonEquals: WhereJson;
+    orWhereJsonNotEquals: WhereJson;
 
+    whereJsonSupersetOf: WhereJsonSet;
+    orWhereJsonSupersetOf: WhereJsonSet;
 
-    /////// below be dragons
+    whereJsonNotSupersetOf: WhereJsonSet;
+    orWhereJsonNotSupersetOf: WhereJsonSet;
 
-    allowEager(relationExpression: string): QueryBuilder;
-    allowInsert(relationExpression: any): QueryBuilder;
-    asCallback(callback: Function): Promise<any>;
-    bind(context: any): Promise<any>;
-    clone(): QueryBuilder;
+    whereJsonSubsetOf: WhereJsonSet;
+    orWhereJsonSubsetOf: WhereJsonSet;
+
+    whereJsonNotSubsetOf: WhereJsonSet;
+    orWhereJsonNotSubsetOf: WhereJsonSet;
+
+    whereJsonIsArray: WhereFieldExpression;
+    orWhereJsonIsArray: WhereFieldExpression;
+
+    whereJsonNotArray: WhereFieldExpression;
+    orWhereJsonNotArray: WhereFieldExpression;
+
+    whereJsonIsObject: WhereFieldExpression;
+    orWhereJsonIsObject: WhereFieldExpression;
+
+    whereJsonNotObject: WhereFieldExpression;
+    orWhereJsonNotObject: WhereFieldExpression;
+
+    whereJsonHasAny: WhereJsonExpression;
+    orWhereJsonHasAny: WhereJsonExpression;
+
+    whereJsonHasAll: WhereJsonExpression;
+    orWhereJsonHasAll: WhereJsonExpression;
+
+    whereJsonField: WhereJsonField;
+    orWhereJsonField: WhereJsonField;
+
+    // Non-query methods:
+
     context(queryContext: Object): QueryBuilder;
-    dumpSql(logger: (sql: string) => any): QueryBuilder;
-    eager(relationExpression: string, filters?: Object): QueryBuilder;
 
-    isExecutable(): boolean;
-    map(mapper: () => any): Promise<any>;
-    modelClass(): typeof Model;
-    nodeify(callback: Function): Promise<any>;
-    omit(modelClass: Model, properties: string[]): QueryBuilder;
-    omit(properties: string[]): QueryBuilder;
-    onBuild(fn: (builder: QueryBuilder) => QueryBuilder): QueryBuilder;
-    orWhereJsonEquals(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    orWhereJsonField(fieldExpression: FieldExpression, operator: string, value: boolean | number | string): QueryBuilder;
-    orWhereJsonHasAll(fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder;
-    orWhereJsonHasAny(fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder;
-    orWhereJsonIsArray(fieldExpression: FieldExpression): QueryBuilder;
-    orWhereJsonIsObject(fieldExpression: FieldExpression): QueryBuilder;
-    orWhereJsonNotArray(fieldExpression: FieldExpression): QueryBuilder;
-    orWhereJsonNotEquals(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    orWhereJsonNotObject(fieldExpression: FieldExpression): QueryBuilder;
-    orWhereJsonNotSubsetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    orWhereJsonNotSupersetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    orWhereJsonSubsetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    orWhereJsonSupersetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    orWhereRef(leftRef: string, operator: string, rightRef: string): QueryBuilder;
-    page(page: number, pageSize: number): QueryBuilder;
-    pick(modelClass: Model, properties: string[]): QueryBuilder;
-    pick(properties: string[]): QueryBuilder;
-    pluck(propertyName: string): QueryBuilder;
-    range(start: number, end: number): QueryBuilder;
     reject(reason: any): QueryBuilder;
     resolve(value: any): QueryBuilder;
-    resultSize(): Promise<any>;
-    runAfter(fn: (builder: QueryBuilder) => QueryBuilder): QueryBuilder;
-    runBefore(fn: (builder: QueryBuilder) => QueryBuilder): QueryBuilder;
+
+    isExecutable(): boolean;
+
+    runBefore(fn: (builder: QueryBuilder) => void): QueryBuilder;
+    onBuild(fn: (builder: QueryBuilder) => void): QueryBuilder;
+    runAfter(fn: (builder: QueryBuilder) => void): QueryBuilder;
+
+    eagerAlgorithm(algo: EagerAlgorithm): QueryBuilder;
+    eager(relationExpression: RelationExpression, filters?: FilterExpression): QueryBuilder;
+    
+    allowEager: RelationExpressionMethod;
+    modifyEager: ModifyEager;
+    filterEager: ModifyEager;
+
+    allowInsert: RelationExpressionMethod;
+
+    modelClass(): typeof Model;
+
+    toString(): string;
+
+    toSql(): string;
+
     skipUndefined(): QueryBuilder;
-    traverse(modelClass: Model, traverser: (model: Model, parentModel: Model, relationName: string) => any): QueryBuilder;
-    traverse(traverser: (model: Model, parentModel: Model, relationName: string) => any): QueryBuilder;
-    whereJsonField(fieldExpression: FieldExpression, operator: string, value: boolean | number | string): QueryBuilder;
-    whereJsonHasAll(fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder;
-    whereJsonHasAny(fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder;
-    whereJsonIsArray(fieldExpression: FieldExpression): QueryBuilder;
-    whereJsonIsObject(fieldExpression: FieldExpression): QueryBuilder;
-    whereJsonNotArray(fieldExpression: FieldExpression): QueryBuilder;
-    whereJsonNotEquals(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    whereJsonNotObject(fieldExpression: FieldExpression): QueryBuilder;
-    whereJsonNotSubsetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    whereJsonNotSupersetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    whereJsonSubsetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-    whereJsonSupersetOf(fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
+
+    transacting(transation: Transaction): QueryBuilder;
+
+    clone(): QueryBuilder;
+
+    execute(): Promise<any>
+
+    // We get `then` and `catch` by extending Promise
+
+    map<T, Result>(mapper: BluebirdMapper<T, Result>): Promise<Result[]>
+
+    return<T>(returnValue: T): Promise<T>
+
+    bind(context: any): Promise<any>;
+
+    asCallback(callback: NodeStyleCallback): Promise<any>;
+
+    nodeify(callback: NodeStyleCallback): Promise<any>;
+
+    resultSize(): Promise<number>;
+
+    page(page: number, pageSize: number): QueryBuilder;
+    range(start: number, end: number): QueryBuilder;
+    pluck(propertyName: string): QueryBuilder;
+    first(): QueryBuilder;
+
+    traverse(modelClass: typeof Model, traverser: TraverserFunction): QueryBuilder;
+
+    pick(modelClass: typeof Model, properties: string[]): QueryBuilder;
+    pick(properties: string[]): QueryBuilder;
+    
+    omit(modelClass: typeof Model, properties: string[]): QueryBuilder;
+    omit(properties: string[]): QueryBuilder;
   }
 
   export function transaction<T>(model: typeof Model, callback: (model: typeof Model) => Promise<T>): Promise<T>;

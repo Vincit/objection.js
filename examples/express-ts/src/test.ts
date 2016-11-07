@@ -55,4 +55,28 @@ qb = qb.distinct('column1', 'column2', 'column3');
 qb = qb.join('tablename', 'column1', '=', 'column2');
 qb = qb.outerJoin('tablename', 'column1', '=', 'column2');
 qb = qb.joinRelation('table');
-qb = qb.joinRelation('table', {alias: false});
+qb = qb.joinRelation('table', { alias: false });
+
+// non-wrapped methods:
+
+const modelFromQuery: typeof objection.Model = qb.modelClass();
+
+const sql = qb.toSql();
+
+qb = qb.whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
+qb = qb.whereJsonEquals('additionalData:myDogs[0]', { name: 'peter' });
+
+function noop() {
+  // no-op
+}
+
+qb = qb.context({
+  runBefore: (qb: objection.QueryBuilder) => noop(),
+  runAfter: (qb: objection.QueryBuilder) => noop(),
+  onBuild: (qb: objection.QueryBuilder) => noop()
+});
+
+qb = qb.runBefore((qb: objection.QueryBuilder) => noop());
+
+qb = qb.reject('fail');
+qb = qb.resolve('success');
