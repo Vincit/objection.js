@@ -6,7 +6,6 @@
   "scripts": {
     "lint": "tslint src/**/*.ts",
     "compile": "tsc",
-    "prestart": "compile",
     "start": "tsc && node lib/app.js"
   },
   "author": "Sami Koskimäki",
