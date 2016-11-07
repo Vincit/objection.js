@@ -9,7 +9,7 @@ import { Model } from 'objection';
 const knexConfig = require('../knexfile');
 
 // Initialize knex.
-const knex = Knex(knexConfig.development);
+export const knex = Knex(knexConfig.development);
 
 // Create or migrate:
 knex.migrate.latest()

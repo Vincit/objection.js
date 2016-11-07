@@ -1,6 +1,7 @@
 import { Model } from 'objection';
+import { Person } from './Person';
 
-export default class Movie extends Model {
+export class Movie extends Model {
   // Table name is the only required property.
   static tableName = 'Movie';
 
@@ -35,4 +36,8 @@ export default class Movie extends Model {
       }
     }
   };
+
+  readonly id: number  
+  name: string
+  actors: Person[]
 }

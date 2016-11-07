@@ -1,15 +1,22 @@
-import { Model } from 'objection';
-import Animal from './Animal';
-import Movie from './Movie';
+import { JsonSchema } from 'jsonschema';
+import { Model, RelationMappings } from 'objection';
+import { Animal } from './Animal';
+import { Movie } from './Movie';
 
-export default class Person extends Model {
+export interface Address {
+  street: string
+  city: string
+  zipCode: string
+}
+
+export class Person extends Model {
   // Table name is the only required property.
   static tableName = 'Person';
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
   // based on this. This is only used for validation. Whenever a model instance
   // is created it is checked against this schema. http://json-schema.org/.
-  static jsonSchema = {
+  static jsonSchema: JsonSchema = {
     type: 'object',
     required: ['firstName', 'lastName'],
 
@@ -32,7 +39,7 @@ export default class Person extends Model {
   };
 
   // This object defines the relations to other models.
-  static relationMappings = {
+  static relationMappings: RelationMappings = {
     pets: {
       relation: Model.HasManyRelation,
       // The related model. This can be either a Model subclass constructor or an
@@ -68,4 +75,11 @@ export default class Person extends Model {
       }
     }
   };
+
+  readonly id: number;
+  parent: Person;
+  firstName: string;
+  lastName: string;
+  age: number;
+  address: Address;
 }

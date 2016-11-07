@@ -55,23 +55,71 @@ declare module "objection" {
   }
 
   /**
-   * This is a hack to make bindKnex return subclasses
+   * @see http://vincit.github.io/objection.js/#relationexpression
+   */
+  export type RelationExpression = string
+  export type TraverserFunction = (model: Model, parentModel: string, relationName: string) => void
+
+  /**
+   * This is a hack to make bindKnex and other static methods return the subclass type, rather than Model.
    * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
-  interface ModelClass<T extends Model> {
+  interface ModelClass<T> {
     new (...a: any[]): T;
-    bindKnex<T extends Model>(this: ModelClass<T>, knex: knex): T;
+    tableName: string;
+    jsonSchema: JsonSchema;
+    idColumn: string;
+    modelPaths: string[];
+    relationMappings: RelationMappings;
+    jsonAttributes: string[];
+    virtualAttributes: string[];
+    uidProp: string;
+    uidRefProp: string;
+    dbRefProp: string;
+    propRefRegex: RegExp;
+    pickJsonSchemaProperties: boolean;
+    defaultEagerAlgorithm?: EagerAlgorithm
+    defaultEagerOptions?: EagerOptions;
+    QueryBuilder: typeof QueryBuilder;
+    RelatedQueryBuilder: typeof QueryBuilder;
+    raw: knex.RawBuilder
+    fn: knex.FunctionHelper
+    BelongsToOneRelation: Relation
+    HasOneRelation: Relation
+    HasManyRelation: Relation
+    ManyToManyRelation: Relation
+
+    query(): QueryBuilder;
+    knex(knex?: knex): knex;
+    formatter(): any; // < the knex typings punts here too
+    knexQuery(): QueryBuilder;
+
+    bindKnex(knex: knex): T & ModelClass<T>;
+    bindTransaction(transaction: Transaction): T & ModelClass<T>;
+    extend(subclass: T): T & ModelClass<T>;
+
+    fromJson(json: Object, opt: ModelOptions): T & Model;
+    fromDatabaseJson(row: Object): T & Model;
+
+    omitImpl(f: (obj: Object, prop: string) => void): void;
+
+    loadRelated(models: Model[], expression: RelationExpression, filters: Filters): void;
+
+    traverse(filterConstructor: ModelClass<any>, models: Model | Model[], traverser: TraverserFunction): void;
+    traverse(models: Model | Model[], traverser: TraverserFunction): void;
   }
 
+  type Filters = { [filterName: string]: (queryBuilder: QueryBuilder) => void }
+  type Properties = { [propertyName: string]: boolean }
 
   export class Model {
     static tableName: string;
-    static jsonSchema?: JsonSchema;
-    static idColumn?: string;
-    static modelPaths?: string[];
-    static relationMappings?: RelationMappings;
-    static jsonAttributes?: string[];
-    static virtualAttributes?: string[];
+    static jsonSchema: JsonSchema;
+    static idColumn: string;
+    static modelPaths: string[];
+    static relationMappings: RelationMappings;
+    static jsonAttributes: string[];
+    static virtualAttributes: string[];
     static uidProp: string;
     static uidRefProp: string;
     static dbRefProp: string;
@@ -97,48 +145,57 @@ declare module "objection" {
 
     // This approach should be applied to all other references of Model that 
     // should return the subclass:
-    static bindKnex<T extends Model>(this: ModelClass<T>, knex: knex): T;
-    static bindTransaction(transaction: Transaction): any;
+    static bindKnex<T extends Model>(this: ModelClass<T>, knex: knex): ModelClass<T>;
+    static bindTransaction<T extends Model>(this: ModelClass<T>, transaction: Transaction): ModelClass<T>;
+    static extend<T>(subclass: T): ModelClass<T>;
 
-    // !!!!
-    // TODO: The remainder of this file should be examined. Most references to "any" are probably wrong:
-    // !!!!
+    static fromJson<T extends Model>(this: ModelClass<T>, json: Object, opt: ModelOptions): T;
+    static fromDatabaseJson<T extends Model>(this: ModelClass<T>, row: Object): T;
 
-    static extend<T>(subclassConstructor: () => T): QueryBuilder & T;
-    static fromDatabaseJson(row: Object): Model;
-    static fromJson(json: Object, opt: ModelOptions): Model;
-    static loadRelated(models: Array<Model | Object>, expression: string, filters: { filterName: string, filterFunction: (queryBuilder: QueryBuilder) => void }): void;
-    static omitImpl(obj: Object, prop: string): void;
-    static traverse(filterConstructor: FunctionConstructor, models: Model | Array<Model>, traverser: (model: Model, parentModel: string, relationName: string) => void): void;
-    static traverse(models: Model | Array<Model>, traverser: (model: Model, parentModel: string, relationName: string) => void): void;
+    static omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    $afterInsert(queryContext: Object): Promise<any>;
-    $afterUpdate(opt: ModelOptions, queryContext: Object): Promise<any>;
-    $afterValidate(json: Object, opt: ModelOptions): void;
-    $beforeInsert(queryContext: Object): Promise<any>;
-    $beforeUpdate(opt: ModelOptions, queryContext: Object): Promise<any>;
-    $beforeValidate(jsonSchema: Object, json: Object, opt: ModelOptions): Object;
-    $clone(): Model;
-    $formatDatabaseJson(json: Object): Object;
-    $formatJson(json: Object): Object;
-    $id(): number | string;
-    $id(id: number | string): void;
-    $loadRelated(expression: string, filters: Object): Promise<any>;
-    $omit(keys: string | Array<string | Object>): Model;
-    $parseDatabaseJson(json: Object): Object;
-    $parseJson(json: Object, opt: ModelOptions): Object;
-    $pick(...keys: string[]): Model;
-    $pick(keys: string | Array<string> | Object): Model
-    $query(): Model;
-    $relatedQuery(relationName: string): QueryBuilder;
-    $set(obj: Object): Model;
-    $setDatabaseJson(json: Object): Model;
-    $setJson(json: Object, opt: ModelOptions): Model;
+    static loadRelated(models: Model[], expression: RelationExpression, filters: Filters): void;
+
+    static traverse(filterConstructor: ModelClass<any>, models: Model | Model[], traverser: TraverserFunction): void;
+    static traverse(models: Model | Model[], traverser: TraverserFunction): void;
+
+    $id(): any;
+    $id(id: any): void;
+
+    $beforeValidate(jsonSchema: JsonSchema, json: Object, opt: ModelOptions): JsonSchema;
+    $validate(): void // may throw ValidationError if validation fails
+    $afterValidate(json: Object, opt: ModelOptions): void; // may throw ValidationError if validation fails
+
     $toDatabaseJson(): Object;
     $toJson(): Object;
-    $traverse(...args: any[]): void;
-    $validate(): ValidationError;
     toJSON(): Object;
+    $parseDatabaseJson(json: Object): Object;
+    $formatDatabaseJson(json: Object): Object;
+    $parseJson(json: Object, opt: ModelOptions): Object;
+    $formatJson(json: Object): Object;
+    $setJson<T extends Model>(this: ModelClass<T>, json: Object, opt: ModelOptions): T;
+    $setDatabaseJson<T extends Model>(this: ModelClass<T>, json: Object): T;
+
+    $set<T extends Model>(this: ModelClass<T>, obj: Object): T;
+    $omit<T extends Model>(this: ModelClass<T>, keys: string | string[] | Properties): T;
+    $pick<T extends Model>(this: ModelClass<T>, keys: string | string[] | Properties): T;
+    $clone<T extends Model>(this: ModelClass<T>): T;
+
+    $query(): QueryBuilder;
+    $relatedQuery(relationName: string): QueryBuilder;
+
+    $loadRelated(expression: RelationExpression, filters: Filters): QueryBuilder;
+
+    $traverse<T extends Model>(this: ModelClass<T>, traverser: TraverserFunction): void;
+    $traverse<T extends Model>(this: ModelClass<T>, filterConstructor: ModelClass<T>, traverser: TraverserFunction): void;
+
+    $knex(): knex;
+    $transaction(): knex; // TODO: this is based on the documentation, but doesn't make sense (why not Transaction?)
+
+    $beforeInsert(queryContext: Object): Promise<any> | void;
+    $afterInsert(queryContext: Object): Promise<any> | void;
+    $afterUpdate(opt: ModelOptions, queryContext: Object): Promise<any> | void;
+    $beforeUpdate(opt: ModelOptions, queryContext: Object): Promise<any> | void;
   }
 
   export class QueryBuilder {
@@ -146,6 +203,7 @@ declare module "objection" {
     static forClass(modelClass: Model): QueryBuilder;
   }
 
+  // TODO: QueryBuilder types are not complete and may have mistakes:  
   export interface QueryBuilder extends knex.QueryBuilder {
     allowEager(relationExpression: string): QueryBuilder;
     allowInsert(relationExpression: any): QueryBuilder;
@@ -154,10 +212,10 @@ declare module "objection" {
     clone(): QueryBuilder;
     context(queryContext: Object): QueryBuilder;
     delete(): QueryBuilder;
-    deleteById(id: any | Array<any>): QueryBuilder;
+    deleteById(id: any): QueryBuilder;
     dumpSql(logger: (sql: string) => any): QueryBuilder;
     eager(relationExpression: string, filters?: Object): QueryBuilder;
-    findById(id: any | Array<any>): QueryBuilder;
+    findById(id: any): QueryBuilder;
     insert(modelsOrObjects: Object | Model | Array<Object> | Array<Model>): QueryBuilder;
     insertAndFetch(modelsOrObjects: Object | Model | Array<Object> | Array<Model>): QueryBuilder;
     insertWithRelated(graph: Object | Model | Array<Object> | Array<Model>): QueryBuilder;

@@ -1,8 +1,18 @@
 import * as objection from 'objection';
 import * as express from 'express';
 
-import Person from './models/Person';
-import Movie from './models/Movie';
+import { knex } from './app'
+
+import { Person } from './models/Person';
+import { Movie } from './models/Movie';
+
+// This ensures https://github.com/Vincit/objection.js/pull/239#issuecomment-258653224 is addressed:
+const BoundModel: typeof objection.Model = Person.bindKnex(knex)
+
+const BoundPerson: typeof Person = Person.bindKnex(knex) 
+const examplePerson: Person = new BoundPerson()
+examplePerson.firstName = "example"
+examplePerson.lastName = "person"
 
 export default function (app: express.Application) {
 
