@@ -420,8 +420,26 @@ declare module "objection" {
     omit(properties: string[]): QueryBuilder;
   }
 
-  export function transaction<T>(model: typeof Model, callback: (model: typeof Model) => Promise<T>): Promise<T>;
+  export function transaction<M extends Model, T>(
+    modelClass: ModelClass<M>,
+    callback: (boundModelClass: ModelClass<M>) => Promise<T>
+  ): Promise<T>;
 
+  export function transaction<M1 extends Model, M2 extends Model, T>(
+    modelClass1: ModelClass<M1>,
+    modelClass2: ModelClass<M2>,
+    callback: (boundModelClass1: ModelClass<M1>, boundModelClass2: ModelClass<M2>) => Promise<T>
+  ): Promise<T>;
+
+  export function transaction<M1 extends Model, M2 extends Model,M3 extends Model, T>(
+    modelClass1: ModelClass<M1>,
+    modelClass2: ModelClass<M2>,
+    modelClass3: ModelClass<M3>,
+    callback: (boundModelClass1: ModelClass<M1>, boundModelClass2: ModelClass<M2>, boundModelClass3: ModelClass<M3>) => Promise<T>
+  ): Promise<T>;
+
+  // I'm not doing more of these I have to respect myself tomorrow morning
+  
   export class Transaction {
     static start(knexOrModel: knex | Model): Promise<Transaction>;
     commit(): void;
@@ -435,9 +453,9 @@ declare module "objection" {
   // to return Objection's QueryBuilder wrapper, rather than the knex QueryBuilder:
   //
 
-  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | knex.Raw;
-  type ColumnName = string | knex.Raw | QueryBuilder;
-  type TableName = string | knex.Raw | QueryBuilder;
+  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw;
+  type ColumnName = string | Raw | QueryBuilder;
+  type TableName = string | Raw | QueryBuilder;
 
   interface QueryInterface {
     select: Select;
