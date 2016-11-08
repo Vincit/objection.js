@@ -287,7 +287,6 @@ declare module "objection" {
     forUpdate(): QueryBuilder;
     forShare(): QueryBuilder;
 
-    // TODO: fromJS does not exist in current knex documentation: http://knexjs.org/#Builder-fromJS
     withSchema(schemaName: string): QueryBuilder;
 
     joinRelation: JoinRelation;
@@ -299,7 +298,8 @@ declare module "objection" {
     rightOuterJoinRelation: JoinRelation;
     fullOuterJoinRelation: JoinRelation;
 
-    // TODO: avgDistinct does not exist in current knex documentation: http://knexjs.org/#Builder-fromJS
+    // TODO: fromJS does not exist in current knex documentation: http://knexjs.org/#Builder-fromJS
+    // TODO: avgDistinct does not exist in current knex documentation: http://knexjs.org/#Builder-avgDistinct
     // TODO: modify does not exist in current knex documentation: http://knexjs.org/#Builder-modify
 
     // TODO: the return value of this method matches the knex typescript and documentation.
