@@ -80,3 +80,8 @@ qb = qb.runBefore((qb: objection.QueryBuilder) => noop());
 
 qb = qb.reject('fail');
 qb = qb.resolve('success');
+
+objection.transaction(Person, (P: typeof Person) => {
+  const n: number = new P().examplePersonMethod('hello');
+  return Promise.resolve('yay');
+});
