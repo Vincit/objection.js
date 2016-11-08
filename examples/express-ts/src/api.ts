@@ -10,7 +10,8 @@ export default function (app: express.Application) {
   app.post('/persons', async function (req, res, next) {
     const person = await Person
       .query()
-      .insert(req.body);
+      .insert(req.body)
+      .catch(next);
 
     res.send(person);
   });
@@ -38,7 +39,8 @@ export default function (app: express.Application) {
       .skipUndefined()
       .where('age', '>=', req.query.minAge)
       .where('age', '<', req.query.maxAge)
-      .where('firstName', 'like', req.query.firstName);
+      .where('firstName', 'like', req.query.firstName)
+      .catch(next);
 
     res.send(persons);
   });
@@ -48,7 +50,8 @@ export default function (app: express.Application) {
     await Person
       .query()
       .delete()
-      .where('id', req.params.id);
+      .where('id', req.params.id)
+      .catch(next);
 
     res.send({});
   });
@@ -57,45 +60,50 @@ export default function (app: express.Application) {
   app.post('/persons/:id/children', async function (req, res, next) {
     const person = await Person
       .query()
-      .findById(req.params.id);
+      .findById(req.params.id)
+      .catch(next);
 
     if (!person) {
-      throwNotFound();
+      next(throwNotFound);
     }
 
     const child = await person
       .$relatedQuery('children')
-      .insert(req.body);
+      .insert(req.body)
+      .catch(next);
 
     res.send(child);
   });
 
   // Add a pet for a Person.
-  app.post('/persons/:id/pets', async function (req, res) {
+  app.post('/persons/:id/pets', async function (req, res, next) {
     const person = await Person
       .query()
-      .findById(req.params.id);
+      .findById(req.params.id)
+      .catch(next);
 
     if (!person) {
-      throwNotFound();
+      next(throwNotFound);
     }
 
     const pet = await person
       .$relatedQuery('pets')
-      .insert(req.body);
+      .insert(req.body)
+      .catch(next);
 
     res.send(pet);
   });
 
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
-  app.get('/persons/:id/pets', async function (req, res) {
+  app.get('/persons/:id/pets', async function (req, res, next) {
     const person = await Person
       .query()
-      .findById(req.params.id);
+      .findById(req.params.id)
+      .catch(next);
 
     if (!person) {
-      throwNotFound();
+      next(throwNotFound);
     }
 
     // We don't need to check for the existence of the query parameters because
@@ -105,57 +113,63 @@ export default function (app: express.Application) {
       .$relatedQuery('pets')
       .skipUndefined()
       .where('name', 'like', req.query.name)
-      .where('species', req.query.species);
+      .where('species', req.query.species)
+      .catch(next);
 
     res.send(pets);
   });
 
   // Add a movie for a Person.
-  app.post('/persons/:id/movies', async function (req, res) {
+  app.post('/persons/:id/movies', async function (req, res, next) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
     const movie = await objection.transaction(Person, async function (Person) {
       const person = await Person
         .query()
-        .findById(req.params.id);
+        .findById(req.params.id)
+        .catch(next);
 
       if (!person) {
-        throwNotFound();
+        next(throwNotFound);
       }
 
       return await person
         .$relatedQuery('movies')
-        .insert(req.body);
+        .insert(req.body)
+        .catch(next);
     });
 
     res.send(movie);
   });
 
   // Add existing Person as an actor to a movie.
-  app.post('/movies/:id/actors', async function (req, res) {
+  app.post('/movies/:id/actors', async function (req, res, next) {
     const movie = await Movie
       .query()
-      .findById(req.params.id);
+      .findById(req.params.id)
+      .catch(next);
 
     if (!movie) {
-      throwNotFound();
+      next(throwNotFound);
     }
 
     await movie
       .$relatedQuery('actors')
-      .relate(req.body.id);
+      .relate(req.body.id)
+      .catch(next);
 
     res.send(req.body);
   });
 
   // Get Movie's actors.
-  app.get('/movies/:id/actors', async function (req, res) {
+  app.get('/movies/:id/actors', async function (req, res, next) {
     const movie = await Movie
       .query()
-      .findById(req.params.id);
+      .findById(req.params.id)
+      .catch(next);
 
     if (!movie) {
-      throwNotFound();
+      next(throwNotFound);
     }
 
     const actors = await movie.$relatedQuery('actors');

@@ -37,6 +37,11 @@ const clonePerson: Person = examplePerson.$clone();
 
 // QueryBuilder.findById accepts single and array values:
 let qb: objection.QueryBuilder = BoundPerson.query();
+
+// Note that the QueryBuilder chaining done in this file
+// is done to verify that the return value is assignable to a QueryBuilder
+// (fewer characters than having each line `const qb: QueryBuilder =`):
+
 qb = qb.findById(1);
 qb = qb.findById([1, 2, 3]);
 
@@ -63,8 +68,14 @@ const modelFromQuery: typeof objection.Model = qb.modelClass();
 
 const sql = qb.toSql();
 
+qb = qb.whereJsonEquals(
+  'Person.jsonColumnName:details.names[1]',
+  { details: { names: ['First', 'Second', 'Last'] } }
+);
 qb = qb.whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
 qb = qb.whereJsonEquals('additionalData:myDogs[0]', { name: 'peter' });
+qb = qb.whereJsonNotEquals('jsonObject:a', 'jsonObject:b');
+qb = qb.whereJsonField('column:field', 'IS', null);
 
 function noop() {
   // no-op
@@ -85,3 +96,7 @@ objection.transaction(Person, (P: typeof Person) => {
   const n: number = new P().examplePersonMethod('hello');
   return Promise.resolve('yay');
 });
+
+// Verify QueryBuilders are thenable:
+
+const p: Promise<string> = qb.then(() => 'done');

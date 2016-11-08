@@ -1,6 +1,6 @@
 // Type definitions for objection v0.6.1
 // Project: Objection.js <http://vincit.github.io/objection.js/>
-// Definitions by: [~YOUR NAME~] <[~A URL FOR YOU~]>
+// Definitions by: Matthew McEachen <https://github.com/mceachen>
 
 declare module "objection" {
 
@@ -59,8 +59,6 @@ declare module "objection" {
    */
   type FieldExpression = string;
 
-  type JsonObjectOrFieldExpression = Object | Object[] | FieldExpression;
-
   /**
    * @see http://vincit.github.io/objection.js/#relationexpression
    */
@@ -88,12 +86,10 @@ declare module "objection" {
     (relationName: string, opt?: RelationOptions): QueryBuilder;
   }
 
-  interface WhereJson {
-    (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: any): QueryBuilder;
-  }
+  type JsonObjectOrFieldExpression = Object | Object[] | FieldExpression;
 
-  interface WhereJsonSet {
-    (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: Object | Object[] | FieldExpression): QueryBuilder;
+  interface WhereJson {
+    (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: JsonObjectOrFieldExpression): QueryBuilder;
   }
 
   interface WhereFieldExpression {
@@ -323,17 +319,17 @@ declare module "objection" {
     orWhereJsonEquals: WhereJson;
     orWhereJsonNotEquals: WhereJson;
 
-    whereJsonSupersetOf: WhereJsonSet;
-    orWhereJsonSupersetOf: WhereJsonSet;
+    whereJsonSupersetOf: WhereJson;
+    orWhereJsonSupersetOf: WhereJson;
 
-    whereJsonNotSupersetOf: WhereJsonSet;
-    orWhereJsonNotSupersetOf: WhereJsonSet;
+    whereJsonNotSupersetOf: WhereJson;
+    orWhereJsonNotSupersetOf: WhereJson;
 
-    whereJsonSubsetOf: WhereJsonSet;
-    orWhereJsonSubsetOf: WhereJsonSet;
+    whereJsonSubsetOf: WhereJson;
+    orWhereJsonSubsetOf: WhereJson;
 
-    whereJsonNotSubsetOf: WhereJsonSet;
-    orWhereJsonNotSubsetOf: WhereJsonSet;
+    whereJsonNotSubsetOf: WhereJson;
+    orWhereJsonNotSubsetOf: WhereJson;
 
     whereJsonIsArray: WhereFieldExpression;
     orWhereJsonIsArray: WhereFieldExpression;

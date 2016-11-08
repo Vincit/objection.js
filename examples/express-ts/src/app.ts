@@ -24,8 +24,6 @@ const app: express.Application = express()
   .use(morgan('dev'))
   .set('json spaces', 2);
 
-monkeyPatchRouteMethods(app);
-
 // Register our REST API.
 registerApi(app);
 
@@ -42,34 +40,3 @@ app.use((err: any, req: express.Request, res: express.Response,next: express.Nex
 const server = app.listen(8641, function () {
   console.log('Example app listening at port %s', server.address().port);
 });
-
-// Wrap each express route method with code that passes unhandled exceptions
-// from async functions to the `next` callback. This way we don't need to
-// wrap our route handlers in try-catch blocks.
-function monkeyPatchRouteMethods(app: express.Application) {
-  ['get', 'put', 'post', 'delete', 'patch'].forEach(function (routeMethodName) {
-    const originalRouteMethod = app[routeMethodName];
-
-    app[routeMethodName] = function () {
-      const args = _.toArray(arguments);
-      const originalRouteHandler = _.last(args);
-
-      if (_.isFunction(originalRouteHandler)) {
-        // Overwrite the route handler.
-        args[args.length - 1] = function (req, res, next) {
-          const ret = originalRouteHandler.call(app, req, res, next);
-
-          // If the route handler returns a Promise (probably an async function) catch
-          // the error and pass it to the next middleware.
-          if (_.isObject(ret) && _.isFunction(ret.then) && _.isFunction(ret.catch)) {
-            return ret.catch(next);
-          } else {
-            return ret;
-          }
-        };
-      }
-
-      return originalRouteMethod.apply(app, args);
-    };
-  });
-}
