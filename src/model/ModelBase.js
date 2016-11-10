@@ -6,7 +6,13 @@ import splitQueryProps from '../utils/splitQueryProps';
 import {inherits} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
 
-const ajv = new Ajv({allErrors: true, validateSchema: false, ownProperties: true});
+const ajv = new Ajv({
+  allErrors: true,
+  validateSchema: false,
+  ownProperties: true,
+  useDefaults: true,
+  v5: true
+});
 const ajvCache = Object.create(null);
 
 /**
