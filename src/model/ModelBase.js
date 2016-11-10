@@ -66,6 +66,7 @@ export default class ModelBase {
     }
 
     const validator = this.constructor.getJsonSchemaValidator(jsonSchema, options.patch);
+    json = cloneObject(json);
     validator(json);
 
     if (validator.errors) {
