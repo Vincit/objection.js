@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "allowUnreachableCode": false,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitUseStrict": false,
+    "strictNullChecks": true,
+    "target": "es6",
+    "rootDir": "src",
+    "outDir": "lib",
+    "typeRoots": [
+      "./typings",
+      "node_modules/@types"
+    ]
+  }
+}
