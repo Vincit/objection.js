@@ -13,6 +13,13 @@ const ajv = new Ajv({
   useDefaults: true,
   v5: true
 });
+const ajvNoDefaults = new Ajv({
+  allErrors: true,
+  validateSchema: false,
+  ownProperties: true,
+  useDefaults: false,
+  v5: true
+});
 const ajvCache = Object.create(null);
 
 /**
@@ -726,9 +733,10 @@ function compileJsonSchemaValidator(jsonSchema, skipRequired) {
     if (skipRequired) {
       origRequired = jsonSchema.required;
       jsonSchema.required = [];
+      return ajvNoDefaults.compile(jsonSchema);
+    } else {
+      return ajv.compile(jsonSchema);
     }
-
-    return ajv.compile(jsonSchema);
   } finally {
     if (skipRequired) {
       jsonSchema.required = origRequired;
