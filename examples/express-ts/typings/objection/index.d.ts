@@ -65,7 +65,7 @@ declare module "objection" {
   type RelationExpression = string;
 
   type FilterFunction = (queryBuilder: QueryBuilder) => void;
-  
+
   type FilterExpression = { [namedFilter: string]: FilterFunction };
 
   interface RelationExpressionMethod {
@@ -145,7 +145,7 @@ declare module "objection" {
     HasManyRelation: Relation;
     ManyToManyRelation: Relation;
 
-    query(): QueryBuilder;
+    query(transaction?: Transaction): QueryBuilder;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
     knexQuery(): QueryBuilder;
@@ -154,7 +154,7 @@ declare module "objection" {
     bindTransaction(transaction: Transaction): T & ModelClass<T>;
     extend(subclass: T): T & ModelClass<T>;
 
-    fromJson(json: Object, opt: ModelOptions): T & Model;
+    fromJson(json: Object, opt?: ModelOptions): T & Model;
     fromDatabaseJson(row: Object): T & Model;
 
     omitImpl(f: (obj: Object, prop: string) => void): void;
@@ -194,7 +194,7 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
-    static query(): QueryBuilder;
+    static query(transaction?: Transaction): QueryBuilder;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery(): QueryBuilder;
@@ -205,7 +205,7 @@ declare module "objection" {
     static bindTransaction<T extends Model>(this: ModelClass<T>, transaction: Transaction): ModelClass<T>;
     static extend<T>(subclass: T): ModelClass<T>;
 
-    static fromJson<T extends Model>(this: ModelClass<T>, json: Object, opt: ModelOptions): T;
+    static fromJson<T extends Model>(this: ModelClass<T>, json: Object, opt?: ModelOptions): T;
     static fromDatabaseJson<T extends Model>(this: ModelClass<T>, row: Object): T;
 
     static omitImpl(f: (obj: Object, prop: string) => void): void;
@@ -367,7 +367,7 @@ declare module "objection" {
 
     eagerAlgorithm(algo: EagerAlgorithm): QueryBuilder;
     eager(relationExpression: RelationExpression, filters?: FilterExpression): QueryBuilder;
-    
+
     allowEager: RelationExpressionMethod;
     modifyEager: ModifyEager;
     filterEager: ModifyEager;
@@ -411,33 +411,56 @@ declare module "objection" {
 
     pick(modelClass: typeof Model, properties: string[]): QueryBuilder;
     pick(properties: string[]): QueryBuilder;
-    
+
     omit(modelClass: typeof Model, properties: string[]): QueryBuilder;
     omit(properties: string[]): QueryBuilder;
   }
 
-  export function transaction<M extends Model, T>(
-    modelClass: ModelClass<M>,
-    callback: (boundModelClass: ModelClass<M>) => Promise<T>
-  ): Promise<T>;
+  export interface transaction {
+    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
 
-  export function transaction<M1 extends Model, M2 extends Model, T>(
-    modelClass1: ModelClass<M1>,
-    modelClass2: ModelClass<M2>,
-    callback: (boundModelClass1: ModelClass<M1>, boundModelClass2: ModelClass<M2>) => Promise<T>
-  ): Promise<T>;
+    <M extends Model, T>(
+      modelClass: ModelClass<M>,
+      callback: (boundModelClass: ModelClass<M>) => Promise<T>
+    ): Promise<T>;
 
-  export function transaction<M1 extends Model, M2 extends Model,M3 extends Model, T>(
-    modelClass1: ModelClass<M1>,
-    modelClass2: ModelClass<M2>,
-    modelClass3: ModelClass<M3>,
-    callback: (boundModelClass1: ModelClass<M1>, boundModelClass2: ModelClass<M2>, boundModelClass3: ModelClass<M3>) => Promise<T>
-  ): Promise<T>;
+    <M1 extends Model, M2 extends Model, T>(
+      modelClass1: ModelClass<M1>,
+      modelClass2: ModelClass<M2>,
+      callback: (
+        boundModelClass1: ModelClass<M1>,
+        boundModelClass2: ModelClass<M2>
+      ) => Promise<T>
+    ): Promise<T>;
 
-  // I'm not doing more of these I have to respect myself tomorrow morning
-  
-  export class Transaction {
-    static start(knexOrModel: knex | Model): Promise<Transaction>;
+    <M1 extends Model, M2 extends Model, M3 extends Model, T>(
+      modelClass1: ModelClass<M1>,
+      modelClass2: ModelClass<M2>,
+      modelClass3: ModelClass<M3>,
+      callback: (
+        boundModelClass1: ModelClass<M1>,
+        boundModelClass2: ModelClass<M2>,
+        boundModelClass3: ModelClass<M3>
+      ) => Promise<T>
+    ): Promise<T>;
+
+    <M1 extends Model, M2 extends Model, M3 extends Model, M4 extends Model, T>(
+      modelClass1: ModelClass<M1>,
+      modelClass2: ModelClass<M2>,
+      modelClass3: ModelClass<M3>,
+      modelClass4: ModelClass<M4>,
+      callback: (
+        boundModelClass1: ModelClass<M1>,
+        boundModelClass2: ModelClass<M2>,
+        boundModelClass3: ModelClass<M3>,
+        boundModelClass4: ModelClass<M4>
+      ) => Promise<T>
+    ): Promise<T>;
+  }
+
+  export const transaction: transaction
+
+  export interface Transaction {
     commit(): void;
     rollback(): void;
   }
