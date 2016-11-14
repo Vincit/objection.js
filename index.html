@@ -7480,7 +7480,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 
 <p>This property defines the relations to other models.</p>
 
-<p>relationMappings is an object whose keys are relation names and values are <a href="#relationmapping"><code class="prettyprint">RelationMappings</code></a>.
+<p>relationMappings is an object (or a function that returns an object) whose keys are relation names and values are <a href="#relationmapping"><code class="prettyprint">RelationMapping</code></a> instances.
 The <code class="prettyprint">join</code> property in addition to the relation type define how the models are related to one 
 another. The <code class="prettyprint">from</code> and <code class="prettyprint">to</code> properties of the <code class="prettyprint">join</code> object define the database columns through which the
 models are associated. Note that neither of these columns need to be primary keys. They can be any
@@ -10226,6 +10226,15 @@ the <code class="prettyprint">^</code> character. For example <code class="prett
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-6-2">0.6.2</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><code class="prettyprint">relationMappings</code> can now be a function <a href="https://github.com/Vincit/objection.js/issues/227">#227</a></li>
+<li>lodash 4.17.0 compatibility</li>
+</ul>
 
 <h2 id="0-6-1">0.6.1</h2>
 
