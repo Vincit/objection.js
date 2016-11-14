@@ -97,6 +97,14 @@ objection.transaction(Person, (P: typeof Person) => {
   return Promise.resolve('yay');
 });
 
+objection.transaction.start(Person).then((trx: objection.Transaction) => {
+  Person.bindTransaction(trx).query()
+    .then(() => trx.commit())
+    .catch(() => trx.rollback());
+  Person.query(trx).where('age', '<', 90);
+});
+
 // Verify QueryBuilders are thenable:
 
 const p: Promise<string> = qb.then(() => 'done');
+
