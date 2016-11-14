@@ -1,5 +1,4 @@
 import clone from 'lodash/clone';
-import omit from 'lodash/omit';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {afterReturn} from '../../utils/promiseUtils';
 
@@ -25,8 +24,14 @@ export default class UpdateOperation extends QueryBuilderOperation {
 
   onBuild(knexBuilder, builder) {
     const json = this.model.$toDatabaseJson();
-    const update = omit(json, builder.modelClass().getIdColumnArray());
-    knexBuilder.update(update);
+    const cols = builder.modelClass().getIdColumnArray();
+
+    for (let i = 0, l = cols.length; i < l; ++i) {
+      const col = cols[i];
+      delete json[col];
+    }
+
+    knexBuilder.update(json);
   }
 
   onAfterInternal(builder, numUpdated) {
