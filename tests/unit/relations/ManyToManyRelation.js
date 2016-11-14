@@ -389,8 +389,8 @@ describe('ManyToManyRelation', function () {
 
       return builder.then(function (result) {
         expect(result).to.have.length(2);
-        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
-        expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
+        expect(result).to.eql(expectedResult);
+        expect(owner.nameOfOurRelation).to.eql(expectedResult);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
 
@@ -471,7 +471,7 @@ describe('ManyToManyRelation', function () {
 
       return builder.then(function (result) {
         expect(result).to.have.length(4);
-        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
+        expect(result).to.eql(expectedResult);
         expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
         expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
         expect(result[0]).to.be.a(RelatedModel);
@@ -560,8 +560,8 @@ describe('ManyToManyRelation', function () {
 
       return builder.then(function (result) {
         expect(result).to.have.length(2);
-        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
-        expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
+        expect(result).to.eql(expectedResult);
+        expect(owner.nameOfOurRelation).to.eql(expectedResult);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
 
@@ -579,6 +579,7 @@ describe('ManyToManyRelation', function () {
       });
     });
 
+    // TODO expectedResult array is changed in-place and the items in it are replaced with model instances. SHOULD FIX THAT!
     it('should apply the modifier', function () {
       createModifiedRelation({someColumn: 100});
 
@@ -600,8 +601,8 @@ describe('ManyToManyRelation', function () {
 
       return builder.then(function (result) {
         expect(result).to.have.length(2);
-        expect(result).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
-        expect(owner.nameOfOurRelation).to.eql(_.omit(expectedResult, 'objectiontmpjoin0'));
+        expect(result).to.eql(expectedResult);
+        expect(owner.nameOfOurRelation).to.eql(expectedResult);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
 
