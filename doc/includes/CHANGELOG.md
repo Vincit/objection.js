@@ -5,6 +5,7 @@
 ### What's new
 
  * `relationMappings` can now be a function [#227](https://github.com/Vincit/objection.js/issues/227)
+ * lodash 4.17.0 compatibility
 
 ## 0.6.1
 
