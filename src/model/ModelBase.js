@@ -6,7 +6,20 @@ import splitQueryProps from '../utils/splitQueryProps';
 import {inherits} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
 
-const ajv = new Ajv({allErrors: true, validateSchema: false, ownProperties: true});
+const ajv = new Ajv({
+  allErrors: true,
+  validateSchema: false,
+  ownProperties: true,
+  useDefaults: true,
+  v5: true
+});
+const ajvNoDefaults = new Ajv({
+  allErrors: true,
+  validateSchema: false,
+  ownProperties: true,
+  useDefaults: false,
+  v5: true
+});
 const ajvCache = Object.create(null);
 
 /**
@@ -60,6 +73,7 @@ export default class ModelBase {
     }
 
     const validator = this.constructor.getJsonSchemaValidator(jsonSchema, options.patch);
+    json = cloneObject(json);
     validator(json);
 
     if (validator.errors) {
@@ -153,7 +167,12 @@ export default class ModelBase {
     }
 
     if (!options.patch) {
-      json = mergeWithDefaults(this.constructor.getJsonSchema(), json);
+      let jsonSchema = this.constructor.getJsonSchema();
+
+      if (jsonSchema) {
+        json = cloneObject(json);
+        this.constructor.getJsonSchemaValidator(jsonSchema)(json);
+      }
     }
 
     // If the json contains query properties like, knex Raw queries or knex/objection query
@@ -493,44 +512,6 @@ export default class ModelBase {
   }
 }
 
-function mergeWithDefaults(jsonSchema, json) {
-  let merged = null;
-
-  if (!jsonSchema) {
-    return json;
-  }
-
-  if (!jsonSchema.properties) {
-    return json;
-  }
-
-  const propNames = Object.keys(jsonSchema.properties);
-  // Check each schema property for default value.
-  for (let i = 0, l = propNames.length; i < l; ++i) {
-    const propName = propNames[i];
-    const prop = jsonSchema.properties[propName];
-
-    if (!_.has(json, propName) && _.has(prop, 'default')) {
-      if (merged === null) {
-        // Only take expensive clone if needed.
-        merged = _.cloneDeep(json);
-      }
-
-      if (_.isObject(prop.default)) {
-        merged[propName] = _.cloneDeep(prop.default);
-      } else {
-        merged[propName] = prop.default;
-      }
-    }
-  }
-
-  if (merged === null) {
-    return json;
-  } else {
-    return merged;
-  }
-}
-
 function parseValidationError(errors) {
   let errorHash = {};
   let index = 0;
@@ -752,9 +733,10 @@ function compileJsonSchemaValidator(jsonSchema, skipRequired) {
     if (skipRequired) {
       origRequired = jsonSchema.required;
       jsonSchema.required = [];
+      return ajvNoDefaults.compile(jsonSchema);
+    } else {
+      return ajv.compile(jsonSchema);
     }
-
-    return ajv.compile(jsonSchema);
   } finally {
     if (skipRequired) {
       jsonSchema.required = origRequired;
