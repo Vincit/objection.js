@@ -184,8 +184,9 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 
 NOTE: The return value of the insert query _only_ contains the properties given to the insert
 method plus the identifier. This is because we don't make an additional fetch query after
-the insert. Using postgres you can chain [`returning('*')`](#returning) to the query to get all properties.
-On other databases you can use the [`insertAndFetch`](#insertandfetch) method.
+the insert. Using postgres you can chain [`returning('*')`](#returning) to the query to get all
+properties - see [this recipe](#postgresql-returning-tricks) for some examples. On other databases you
+can use the [`insertAndFetch`](#insertandfetch) method.
 
 The batch insert only works on Postgres because Postgres is the only database engine
 that returns the identifiers of _all_ inserted rows. knex supports batch inserts on
@@ -217,7 +218,7 @@ var builder = queryBuilder.insertAndFetch(modelsOrObjects);
 Just like [`insert`](#insert) but also fetches the model afterwards.
 
 Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal insert method
-to get the same result without an additional query.
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments
 
@@ -418,7 +419,7 @@ This method is meant for updating _whole_ objects with all required properties. 
 want to update a subset of properties use the [`patch`](#patch) method.
 
 NOTE: The return value of the query will be the number of affected rows. If you want
-the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method.
+the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*
 
 ##### Arguments
 
@@ -469,7 +470,7 @@ The update object is validated against the model's [`jsonSchema`](#jsonschema). 
 the Promise is rejected with a [`ValidationError`](#validationerror).
 
 Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal update method
-to get the same result without an additional query.
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 This method is meant for updating _whole_ objects with all required properties. If you
 want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
@@ -569,14 +570,14 @@ Person
 
 Creates an patch query.
 
-The patch object is validated against the model's [`jsonSchema`](#jsonschema) _but_ the `required` property
+The patch object is validated against the model's [`jsonSchema`](#jsonschema) _but_ the `required` propea
 of the [`jsonSchema`](#jsonschema) is ignored. This way the properties in the patch object are still validated
 but an error isn't thrown if the patch object doesn't contain all required properties.
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
 NOTE: The return value of the query will be the number of affected rows. If you want
-the updated row as a result, you may want to use the [`patchAndFetchById`](#patchandfetchbyid) method.
+the updated row as a result, you may want to use the [`patchAndFetchById`](#patchandfetchbyid) method or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
 
 ##### Arguments
 
@@ -678,7 +679,7 @@ but an error isn't thrown if the patch object doesn't contain all required prope
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
 Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal patch method
-to get the same result without an additional query.
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments
 
