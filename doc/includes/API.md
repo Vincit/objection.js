@@ -382,6 +382,7 @@ Alias for [insertGraphAndFetch](#insertgraphandfetch).
 
 
 
+
 #### update
 
 ```js
@@ -421,60 +422,6 @@ want to update a subset of properties use the [`patch`](#patch) method.
 NOTE: The return value of the query will be the number of affected rows. If you want to update a single row and
 retrieve the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method
 or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-modelOrObject|Object&#124;[`Model`](#model)|The update object
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
-#### updateAndFetch
-
-```js
-var builder = queryBuilder.updateAndFetch(modelOrObject);
-```
-
-```js
-person
-  .$query()
-  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .then(function (updatedModel) {
-    console.log(updatedModel.firstName);
-  });
-```
-
-> You can also give raw expressions and subqueries as values like this:
-
-```js
-person
-  .$query()
-  .updateAndFetch({
-    firstName: Person.raw("'Jenni' || 'fer'"),
-    lastName: 'Lawrence',
-    age: Person.query().avg('age')
-  });
-```
-
-Updates a single model and fetches it from the database afterwards. This only works with instance queries
-started with [`$query()`](#_s_query) method.
-
-The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
-the Promise is rejected with a [`ValidationError`](#validationerror).
-
-This method is meant for updating _whole_ objects with all required properties. If you
-want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
-
-NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`update`](#update) method
-to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments
 
@@ -534,6 +481,60 @@ to get the same result without an additional query. See [this recipe](#postgresq
 Argument|Type|Description
 --------|----|--------------------
 id|string&#124;number|Identifier of the model to update
+modelOrObject|Object&#124;[`Model`](#model)|The update object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### updateAndFetch
+
+```js
+var builder = queryBuilder.updateAndFetch(modelOrObject);
+```
+
+```js
+person
+  .$query()
+  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .then(function (updatedModel) {
+    console.log(updatedModel.firstName);
+  });
+```
+
+> You can also give raw expressions and subqueries as values like this:
+
+```js
+person
+  .$query()
+  .updateAndFetch({
+    firstName: Person.raw("'Jenni' || 'fer'"),
+    lastName: 'Lawrence',
+    age: Person.query().avg('age')
+  });
+```
+
+Updates a single model and fetches it from the database afterwards. This only works with instance queries
+started with [`$query()`](#_s_query) method.
+
+The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
+the Promise is rejected with a [`ValidationError`](#validationerror).
+
+This method is meant for updating _whole_ objects with all required properties. If you
+want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
+
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`update`](#update) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
 modelOrObject|Object&#124;[`Model`](#model)|The update object
 
 ##### Return value
@@ -651,6 +652,7 @@ Type|Description
 
 
 
+
 #### patchAndFetch
 
 ```js
@@ -700,6 +702,7 @@ modelOrObject|Object&#124;[`Model`](#model)|The patch object
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
 
 
 
