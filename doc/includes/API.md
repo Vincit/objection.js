@@ -418,8 +418,9 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 This method is meant for updating _whole_ objects with all required properties. If you
 want to update a subset of properties use the [`patch`](#patch) method.
 
-NOTE: The return value of the query will be the number of affected rows. If you want
-the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*
+NOTE: The return value of the query will be the number of affected rows. If you want to update a single row and
+retrieve the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method
+or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
 
 ##### Arguments
 
@@ -469,11 +470,11 @@ started with [`$query()`](#_s_query) method.
 The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
 the Promise is rejected with a [`ValidationError`](#validationerror).
 
-Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal update method
-to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
-
 This method is meant for updating _whole_ objects with all required properties. If you
 want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
+
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`update`](#update) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments
 
@@ -525,6 +526,9 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 This method is meant for updating _whole_ objects with all required properties. If you
 want to update a subset of properties use the [`patchAndFetchById`](#patchandfetchbyid) method.
 
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`update`](#update) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -568,16 +572,17 @@ Person
   });
 ```
 
-Creates an patch query.
+Creates a patch query.
 
-The patch object is validated against the model's [`jsonSchema`](#jsonschema) _but_ the `required` propea
+The patch object is validated against the model's [`jsonSchema`](#jsonschema) _but_ the `required` property
 of the [`jsonSchema`](#jsonschema) is ignored. This way the properties in the patch object are still validated
 but an error isn't thrown if the patch object doesn't contain all required properties.
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
-NOTE: The return value of the query will be the number of affected rows. If you want
-the updated row as a result, you may want to use the [`patchAndFetchById`](#patchandfetchbyid) method or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
+NOTE: The return value of the query will be the number of affected rows. If you want to patch a single row and
+retrieve the patched row as a result, you may want to use the [`patchAndFetchById`](#patchandfetchbyid) method
+or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
 
 ##### Arguments
 
@@ -627,6 +632,9 @@ of the [`jsonSchema`](#jsonschema) is ignored. This way the properties in the pa
 but an error isn't thrown if the patch object doesn't contain all required properties.
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
+
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`patch`](#patch) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments
 
@@ -678,7 +686,7 @@ but an error isn't thrown if the patch object doesn't contain all required prope
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
-Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal patch method
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`patch`](#patch) method
 to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments

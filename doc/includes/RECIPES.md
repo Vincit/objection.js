@@ -168,48 +168,83 @@ Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-jo
 
 ## PostgreSQL "returning" tricks
 
-> Insert and return the data:
+> Insert and return the data in 1 query:
 
 ```js
 Person
   .query()
-  .insert({firstName: 'Jennifer'})
+  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
   .returning('*')
   .then(function (jennifer) {
+    console.log(jennifer.createdAt); // NOW()-ish
     console.log(jennifer.id);
   });
 
 ```
 
-> Update an instance and return the data for that instance:
+> Update a single row by ID and return the data for that row in 1 query:
 
 ```js
-jennifer
-  .$query()
-  .update({firstName: 'Jennifer', lastName: 'Lawrence'})
+Person
+  .query()
+  .update({firstName: 'Jenn', lastName: 'Lawrence'})
+  .where('id', 1234)
   .first() // Ensures we're returned a single row in the promise resolution
   .returning('*')
   .then(function (jennifer) {
-    console.log(jennifer.firstName); // 'Jenn'
-  });
-
-```
-
-> Patch an instance and return the data for that instance:
-
-```js
-jennifer
-  .$query()
-  .patch({firstName: "Jenn"})
-  .first() // Ensures we're returned a single row in the promise resolution
-  .returning('*')
-  .then(function (jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
     console.log(jennifer.firstName); // "Jenn"
   });
 
 ```
 
-Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or `update` / `patch` an existing row, __and__ receive the affected row in a single query, thus improving efficiency.
+> Update a Model instance and return the data for that instance in 1 query:
+
+```js
+jennifer
+  .$query()
+  .update({firstName: 'J.', lastName: 'Lawrence'})
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function (jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "J."
+  });
+
+```
+
+> Patch a single row by ID and return the data for that row in 1 query:
+
+```js
+Person
+  .query()
+  .patch({firstName: 'Jenn'})
+  .where('id', 1234)
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function(jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "Jenn"
+  });
+
+```
+
+> Patch a Model instance and return the data for that instance in 1 query:
+
+```js
+jennifer
+  .$query()
+  .patch({firstName: 'J.'})
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function(jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "J."
+  });
+
+```
+
+Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or `update` / `patch` an existing row, __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
 
 ## Polymorphic associations
 
