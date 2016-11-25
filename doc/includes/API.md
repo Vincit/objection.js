@@ -4,7 +4,7 @@
 
 Query builder for Models.
 
-This class is a wrapper around [knex QueryBuilder](http://knexjs.org#Builder). QueryBuilder has all the methods a 
+This class is a wrapper around [knex QueryBuilder](http://knexjs.org#Builder). QueryBuilder has all the methods a
 knex QueryBuilder has and more. While knex QueryBuilder returns plain javascript objects, QueryBuilder returns Model
 subclass instances.
 
@@ -184,8 +184,9 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 
 NOTE: The return value of the insert query _only_ contains the properties given to the insert
 method plus the identifier. This is because we don't make an additional fetch query after
-the insert. Using postgres you can chain [`returning('*')`](#returning) to the query to get all properties.
-On other databases you can use the [`insertAndFetch`](#insertandfetch) method.
+the insert. Using postgres you can chain [`returning('*')`](#returning) to the query to get all
+properties - see [this recipe](#postgresql-returning-tricks) for some examples. On other databases you
+can use the [`insertAndFetch`](#insertandfetch) method.
 
 The batch insert only works on Postgres because Postgres is the only database engine
 that returns the identifiers of _all_ inserted rows. knex supports batch inserts on
@@ -217,7 +218,7 @@ var builder = queryBuilder.insertAndFetch(modelsOrObjects);
 Just like [`insert`](#insert) but also fetches the model afterwards.
 
 Note that on postgresql you can just chain [`returning('*')`](#returning) to the normal insert method
-to get the same result without an additional query.
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
 
 ##### Arguments
 
@@ -381,6 +382,7 @@ Alias for [insertGraphAndFetch](#insertgraphandfetch).
 
 
 
+
 #### update
 
 ```js
@@ -417,59 +419,9 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 This method is meant for updating _whole_ objects with all required properties. If you
 want to update a subset of properties use the [`patch`](#patch) method.
 
-NOTE: The return value of the query will be the number of affected rows. If you want
-the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-modelOrObject|Object&#124;[`Model`](#model)|The update object
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
-#### updateAndFetch
-
-```js
-var builder = queryBuilder.updateAndFetch(modelOrObject);
-```
-
-```js
-person
-  .$query()
-  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .then(function (updatedModel) {
-    console.log(updatedModel.firstName);
-  });
-```
-
-> You can also give raw expressions and subqueries as values like this:
-
-```js
-person
-  .$query()
-  .updateAndFetch({
-    firstName: Person.raw("'Jenni' || 'fer'"),
-    lastName: 'Lawrence',
-    age: Person.query().avg('age')
-  });
-```
-
-Updates a single model and fetches it from the database afterwards. This only works with instance queries
-started with [`$query()`](#_s_query) method.
-
-The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
-the Promise is rejected with a [`ValidationError`](#validationerror).
-
-This method is meant for updating _whole_ objects with all required properties. If you
-want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
+NOTE: The return value of the query will be the number of affected rows. If you want to update a single row and
+retrieve the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method
+or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
 
 ##### Arguments
 
@@ -521,11 +473,68 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 This method is meant for updating _whole_ objects with all required properties. If you
 want to update a subset of properties use the [`patchAndFetchById`](#patchandfetchbyid) method.
 
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`update`](#update) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
+
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
 id|string&#124;number|Identifier of the model to update
+modelOrObject|Object&#124;[`Model`](#model)|The update object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### updateAndFetch
+
+```js
+var builder = queryBuilder.updateAndFetch(modelOrObject);
+```
+
+```js
+person
+  .$query()
+  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .then(function (updatedModel) {
+    console.log(updatedModel.firstName);
+  });
+```
+
+> You can also give raw expressions and subqueries as values like this:
+
+```js
+person
+  .$query()
+  .updateAndFetch({
+    firstName: Person.raw("'Jenni' || 'fer'"),
+    lastName: 'Lawrence',
+    age: Person.query().avg('age')
+  });
+```
+
+Updates a single model and fetches it from the database afterwards. This only works with instance queries
+started with [`$query()`](#_s_query) method.
+
+The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
+the Promise is rejected with a [`ValidationError`](#validationerror).
+
+This method is meant for updating _whole_ objects with all required properties. If you
+want to update a subset of properties use the [`patchAndFetch`](#patchandfetch) method.
+
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`update`](#update) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
 modelOrObject|Object&#124;[`Model`](#model)|The update object
 
 ##### Return value
@@ -564,7 +573,7 @@ Person
   });
 ```
 
-Creates an patch query.
+Creates a patch query.
 
 The patch object is validated against the model's [`jsonSchema`](#jsonschema) _but_ the `required` property
 of the [`jsonSchema`](#jsonschema) is ignored. This way the properties in the patch object are still validated
@@ -572,8 +581,9 @@ but an error isn't thrown if the patch object doesn't contain all required prope
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
-NOTE: The return value of the query will be the number of affected rows. If you want
-the updated row as a result, you may want to use the [`patchAndFetchById`](#patchandfetchbyid) method.
+NOTE: The return value of the query will be the number of affected rows. If you want to patch a single row and
+retrieve the patched row as a result, you may want to use the [`patchAndFetchById`](#patchandfetchbyid) method
+or *take a look at [this recipe](#postgresql-returning-tricks) if you're using Postgres*.
 
 ##### Arguments
 
@@ -624,6 +634,9 @@ but an error isn't thrown if the patch object doesn't contain all required prope
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`patch`](#patch) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -636,6 +649,7 @@ modelOrObject|Object&#124;[`Model`](#model)|The patch object
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
 
 
 
@@ -674,6 +688,9 @@ but an error isn't thrown if the patch object doesn't contain all required prope
 
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
+NOTE: On postgresql you can just chain [`first()`](#first) and [`returning('*')`](#returning) to the normal [`patch`](#patch) method
+to get the same result without an additional query. See [this recipe](#postgresql-returning-tricks) for some examples.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -685,6 +702,7 @@ modelOrObject|Object&#124;[`Model`](#model)|The patch object
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
 
 
 
@@ -2649,10 +2667,10 @@ Person
 Sets/gets the query context.
 
 Some query builder methods create more than one query. The query context is an object that is
-shared with all queries started by a query builder. 
+shared with all queries started by a query builder.
 
 The context is also passed to [`$beforeInsert`](#_s_beforeinsert), [`$afterInsert`](#_s_afterinsert),
-[`$beforeUpdate`](#_s_beforeupdate), [`$afterUpdate`](#_s_afterupdate), [`$beforeDelete`](#_s_beforeidelete), 
+[`$beforeUpdate`](#_s_beforeupdate), [`$afterUpdate`](#_s_afterupdate), [`$beforeDelete`](#_s_beforeidelete),
 [`$afterDelete`](#_s_afterdelete) and [`$afterGet`](#_s_afterget) calls that the query creates.
 
 In addition to properties added using this method (and [`mergeContext`](#mergecontext)) the query context
@@ -2800,7 +2818,7 @@ query.then();
 // --> hello 3
 ```
 
-Registers a function to be called before the database query when the builder is executed. Multiple functions can be 
+Registers a function to be called before the database query when the builder is executed. Multiple functions can be
 chained like [`then`](#then) methods of a promise.
 
 ##### Arguments
@@ -3027,7 +3045,7 @@ Person
   .where('movies.name', 'like', '%terminator%')
   .where('children:pets.species', 'dog')
   .then(function (people) {
-  
+
   });
 ```
 
@@ -3037,9 +3055,9 @@ Fetch relations eagerly for the result rows.
 See the [eager queries](#eager-queries) section for more examples and [`RelationExpression`](#relationexpression)
 for more info on the relation expression language.
 
-You can choose the way objection performs the eager loading by using [`eagerAlgorithm`](#eageralgorithm) method 
-on a query builder or by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property of a model. The 
-two algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) and `Model.JoinEagerAlgorithm`. 
+You can choose the way objection performs the eager loading by using [`eagerAlgorithm`](#eageralgorithm) method
+on a query builder or by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property of a model. The
+two algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) and `Model.JoinEagerAlgorithm`.
 Both have their strengths and weaknesses. We will go through the main differences below. You can always see the
 executed SQL by calling the [`debug`](#debug) method for the query builder.
 
@@ -3053,7 +3071,7 @@ in detail in [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading
 Limitations:
 
  * Relations cannot be referred in the query because they are not joined.
- * `limit` and `page` methods will work incorrectly when applied to a relation using `filterEager`, 
+ * `limit` and `page` methods will work incorrectly when applied to a relation using `filterEager`,
    because they will be applied on a query that fetches relations for multiple parents. You can use
    `limit` and `page` for the root query.
 
@@ -3072,7 +3090,7 @@ Limitations:
 <b>Performance differences</b>
 
 `WhereInEagerAlgorithm` performs more queries than `JoinEagerAlgorithm` which can cause a significant delay especially if
-the round trip time to the database server is significant. On the other hand the result from `WhereInEagerAlgorithm` is 
+the round trip time to the database server is significant. On the other hand the result from `WhereInEagerAlgorithm` is
 trivial to parse into a tree structure while the result of `JoinEagerAlgorithm` needs some complex parsing which
 can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment.
 You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured
@@ -3569,7 +3587,7 @@ Type|Description
 
 ```js
 var promise = queryBuilder.resultSize();
-``` 
+```
 
 ```js
 var query = Person
@@ -3584,7 +3602,7 @@ Promise.all([
 });
 ```
 
-Returns the amount of rows the current query would produce without [`limit`](#limit) and [`offset`](#offset) applied. 
+Returns the amount of rows the current query would produce without [`limit`](#limit) and [`offset`](#offset) applied.
 Note that this executes a query (not the one we are building) and returns a Promise.
 
 ##### Return value
@@ -3929,10 +3947,10 @@ module.exports = Person;
 // Table name is the only required property.
 Person.tableName = 'Person';
 
-// Optional JSON schema. This is not the database schema! 
-// Nothing is generated based on this. This is only used 
-// for validation. Whenever a model instance is created 
-// it is checked against this schema. 
+// Optional JSON schema. This is not the database schema!
+// Nothing is generated based on this. This is only used
+// for validation. Whenever a model instance is created
+// it is checked against this schema.
 // http://json-schema.org/.
 Person.jsonSchema = {
   type: 'object',
@@ -3966,10 +3984,10 @@ Person.jsonSchema = {
 Person.relationMappings = {
   pets: {
     relation: Model.HasManyRelation,
-    // The related model. This can be either a Model 
-    // subclass constructor or an absolute file path 
-    // to a module that exports one. We use the file 
-    // path version in this example to prevent require 
+    // The related model. This can be either a Model
+    // subclass constructor or an absolute file path
+    // to a module that exports one. We use the file
+    // path version in this example to prevent require
     // loops.
     modelClass: __dirname + '/Animal',
     join: {
@@ -3983,7 +4001,7 @@ Person.relationMappings = {
     modelClass: __dirname + '/Movie',
     join: {
       from: 'Person.id',
-      // ManyToMany relation needs the `through` object 
+      // ManyToMany relation needs the `through` object
       // to describe the join table.
       through: {
         from: 'Person_Movie.actorId',
@@ -4034,10 +4052,10 @@ class Person extends Model {
     return 'Person';
   }
 
-  // Optional JSON schema. This is not the database schema! 
-  // Nothing is generated based on this. This is only used 
-  // for validation. Whenever a model instance is created 
-  // it is checked against this schema. 
+  // Optional JSON schema. This is not the database schema!
+  // Nothing is generated based on this. This is only used
+  // for validation. Whenever a model instance is created
+  // it is checked against this schema.
   // http://json-schema.org/.
   static get jsonSchema () {
     return {
@@ -4068,7 +4086,7 @@ class Person extends Model {
       }
     };
   }
-  
+
   // This object defines the relations to other models.
   static get relationMappings() {
     return {
@@ -4076,7 +4094,7 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         // The related model. This can be either a Model
         // subclass constructor or an absolute file path
-        // to a module that exports one. We use the file 
+        // to a module that exports one. We use the file
         // path version here to prevent require loops.
         modelClass: __dirname + '/Animal',
         join: {
@@ -4090,7 +4108,7 @@ class Person extends Model {
         modelClass: __dirname + '/Movie',
         join: {
           from: 'Person.id',
-          // ManyToMany relation needs the `through` object 
+          // ManyToMany relation needs the `through` object
           // to describe the join table.
           through: {
             from: 'Person_Movie.actorId',
@@ -4254,11 +4272,11 @@ Whenever data is converted from on layout to another, converter methods are call
 3. `external` -> [`$parseJson`](#_s_parsejson) -> `internal`
 4. `internal` -> [`$formatJson`](#_s_formatjson) -> `external`
 
-So for example when the results of a query are read from the database the data goes through the 
+So for example when the results of a query are read from the database the data goes through the
 [`$parseDatabaseJson`](#_s_parsedatabasejson) method. When data is written to database it goes through
-the [`$formatDatabaseJson`](#_s_formatdatabasejson) method. 
+the [`$formatDatabaseJson`](#_s_formatdatabasejson) method.
 
-Similarly when you give data for a query (for example [`query().insert(req.body)`](#insert)) or create a model 
+Similarly when you give data for a query (for example [`query().insert(req.body)`](#insert)) or create a model
 explicitly using [`Model.fromJson(obj)`](#fromjson) the [`$parseJson`](#_s_parsejson) method is invoked. When you call
 [`model.toJSON()`](#tojson) or [`model.$toJson()`](#_s_tojson) the [`$formatJson`](#_s_formatjson) is called.
 
@@ -4267,12 +4285,12 @@ method when you pass the model to methods like `response.json(model)`. You rarel
 [`toJSON()`](#tojson)  or [`$toJson()`](#_s_tojson) explicitly.
 
 By overriding the lifecycle methods, you can have different layouts for the data in database and when exposed to the
-outside world. See [this recipe](#map-column-names-to-different-property-names) for an example usage of the lifecycle 
+outside world. See [this recipe](#map-column-names-to-different-property-names) for an example usage of the lifecycle
 methods.
 
 All instance methods of models are prefixed with `$` letter so that they won't overlap with database
 properties. All properties that start with `$` are also removed from `database` and `external` layouts.
-    
+
 ### Static properties
 
 #### tableName
@@ -4359,14 +4377,14 @@ class Person extends Model {
     return {
       type: 'object',
       required: ['firstName', 'lastName'],
-    
+
       properties: {
         id: {type: 'integer'},
         parentId: {type: ['integer', 'null']},
         firstName: {type: 'string', minLength: 1, maxLength: 255},
         lastName: {type: 'string', minLength: 1, maxLength: 255},
         age: {type: 'number'},
-    
+
         // Properties defined as objects or arrays are
         // automatically converted to JSON strings when
         // writing to database and back to objects and arrays
@@ -4394,14 +4412,14 @@ class Person extends Model {
   static jsonSchema = {
     type: 'object',
     required: ['firstName', 'lastName'],
-  
+
     properties: {
       id: {type: 'integer'},
       parentId: {type: ['integer', 'null']},
       firstName: {type: 'string', minLength: 1, maxLength: 255},
       lastName: {type: 'string', minLength: 1, maxLength: 255},
       age: {type: 'number'},
-  
+
       // Properties defined as objects or arrays are
       // automatically converted to JSON strings when
       // writing to database and back to objects and arrays
@@ -4591,7 +4609,7 @@ class Person extends Model {
           to: 'Animal.ownerId'
         }
       },
-    
+
       father: {
         relation: Model.BelongsToOneRelation,
         modelClass: Person,
@@ -4600,7 +4618,7 @@ class Person extends Model {
           to: 'Person.id'
         }
       },
-    
+
       movies: {
         relation: Model.ManyToManyRelation,
         modelClass: Movie,
@@ -4643,7 +4661,7 @@ class Person extends Model {
         to: 'Animal.ownerId'
       }
     },
-  
+
     father: {
       relation: Model.BelongsToOneRelation,
       modelClass: Person,
@@ -4652,7 +4670,7 @@ class Person extends Model {
         to: 'Person.id'
       }
     },
-  
+
     movies: {
       relation: Model.ManyToManyRelation,
       modelClass: Movie,
@@ -4684,7 +4702,7 @@ class Person extends Model {
 This property defines the relations to other models.
 
 relationMappings is an object (or a function that returns an object) whose keys are relation names and values are [`RelationMapping`](#relationmapping) instances.
-The `join` property in addition to the relation type define how the models are related to one 
+The `join` property in addition to the relation type define how the models are related to one
 another. The `from` and `to` properties of the `join` object define the database columns through which the
 models are associated. Note that neither of these columns need to be primary keys. They can be any
 columns. In the case of ManyToManyRelation also the join table needs to be defined. This is
@@ -4717,7 +4735,7 @@ Property|Type|Description
 from|string&#124;Array.&lt;string&gt;|The relation column in the owner table. Must be given with the table name. For example `Person.id`. Composite key can be specified using an array of columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column.
 to|string&#124;Array.&lt;string&gt;|The relation column in the related table. Must be given with the table name. For example `Movie.id`. Composite key can be specified using an array of columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column.
 through|[`RelationThrough`](#relationthrough)|Describes the join table if the models are related through one.
-    
+
 ##### RelationThrough
 
 Property|Type|Description
@@ -4898,10 +4916,10 @@ class Person extends Model {
 Name of the property used to store a temporary non-db identifier for the model.
 
 Defaults to '#id'.
-   
-    
-    
-    
+
+
+
+
 #### uidRefProp
 
 > ES5:
@@ -4974,10 +4992,10 @@ class Person extends Model {
 Name of the property used to point to an existing database row from an `insertGraph` graph.
 
 Defaults to '#dbRef'.
-   
-    
-    
-    
+
+
+
+
 #### propRefRegex
 
 > ES5:
@@ -5012,7 +5030,7 @@ class Person extends Model {
 Regular expression for parsing a reference to a property.
 
 Defaults to `/#ref{([^\.]+)\.([^}]+)}/g`.
-    
+
 
 
 #### pickJsonSchemaProperties
@@ -5085,7 +5103,7 @@ class Person extends Model {
 }
 ```
 
-Sets the default eager loading algorithm for this model. Must be either 
+Sets the default eager loading algorithm for this model. Must be either
 `Model.WhereInEagerAlgorithm` or `Model.JoinEagerAlgorithm`.
 
 Defaults to `Model.WhereInEagerAlgorithm`.
@@ -5130,7 +5148,7 @@ fields [here](#eageroptions).
 Defaults to `null`.
 
 
-   
+
 
 #### QueryBuilder
 
@@ -5167,10 +5185,10 @@ class Person extends Model {
 
 This constructor is used whenever a query builder is created using [`query`](#query) or [`$query`](#_s_query) methods.
 You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
-    
+
 [Usage example](#custom-query-builder).
-        
-   
+
+
 
 #### RelatedQueryBuilder
 
@@ -5207,13 +5225,13 @@ class Person extends Model {
 
 This constructor is used whenever a query builder is created using the [`$relatedQuery`](#_s_relatedquery)  method.
 You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
-   
+
 [Usage example](#custom-query-builder).
-   
-  
-   
-   
-    
+
+
+
+
+
 ### Static methods
 
 
@@ -6300,7 +6318,7 @@ jennifer
   .innerJoin('Person', 'Person.id', 'Animal.ownerId')
   .orderBy('Animal.name')
   .then(function (dogsAndCats) {
-    // All the dogs and cats have the owner's name "Jennifer" 
+    // All the dogs and cats have the owner's name "Jennifer"
     // joined as the `ownerName` property.
     console.log(dogsAndCats);
   });
@@ -6373,7 +6391,7 @@ jennifer
     console.log('fluffy\'s new name is', updatedFluffy.name);
   });
 
-// This query will be rejected assuming that `name` or `species` 
+// This query will be rejected assuming that `name` or `species`
 // is a required property for an Animal.
 jennifer
   .$relatedQuery('pets')

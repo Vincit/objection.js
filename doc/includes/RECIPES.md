@@ -12,8 +12,8 @@ Person
   });
 ```
 
-To write raw SQL queries, use the [`raw`](#raw) method of any [`Model`](#model) subclass. There are also some helper 
-methods such as [`whereRaw`](#whereraw) in the [`QueryBuilder`](#querybuilder). The [`raw`](#raw) method works just like the 
+To write raw SQL queries, use the [`raw`](#raw) method of any [`Model`](#model) subclass. There are also some helper
+methods such as [`whereRaw`](#whereraw) in the [`QueryBuilder`](#querybuilder). The [`raw`](#raw) method works just like the
 [knex's raw method](http://knexjs.org/#Raw).
 
 ## Change id column
@@ -55,10 +55,10 @@ Person.prototype.$validate = function (objectToValidate, options) {
 If you want to use the json schema validation but add some custom validation on top of it you can override the
 [`$beforeValidate`](#_s_beforevalidate) and [`$afterValidate`](#_s_aftervalidate) methods.
 
-If you need to do validation on insert or update you can throw exceptions from the 
+If you need to do validation on insert or update you can throw exceptions from the
 [`$beforeInsert`](#_s_beforeinsert) and [`$beforeUpdate`](#_s_beforeupdate) methods.
 
-If you don't want to use the built-in json schema validation, you can just ignore the [`jsonSchema`](#jsonschema) property. 
+If you don't want to use the built-in json schema validation, you can just ignore the [`jsonSchema`](#jsonschema) property.
 It is completely optional. If you want to use some other validation library, simply override the [`$validate`](#_s_validate)
 method of the model class. You need to throw a [`ValidationError`](#validationerror) when validation fails.
 
@@ -148,8 +148,8 @@ Person
   });
 ```
 
-Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building 
-methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places 
+Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
+methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places
 you would expect. You can also pass [`QueryBuilder`](#querybuilder) instances instead of functions.
 
 ## Joins
@@ -165,6 +165,86 @@ Person
 ```
 
 Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-join).
+
+## PostgreSQL "returning" tricks
+
+> Insert and return the data in 1 query:
+
+```js
+Person
+  .query()
+  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+  .returning('*')
+  .then(function (jennifer) {
+    console.log(jennifer.createdAt); // NOW()-ish
+    console.log(jennifer.id);
+  });
+
+```
+
+> Update a single row by ID and return the data for that row in 1 query:
+
+```js
+Person
+  .query()
+  .update({firstName: 'Jenn', lastName: 'Lawrence'})
+  .where('id', 1234)
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function (jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "Jenn"
+  });
+
+```
+
+> Update a Model instance and return the data for that instance in 1 query:
+
+```js
+jennifer
+  .$query()
+  .update({firstName: 'J.', lastName: 'Lawrence'})
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function (jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "J."
+  });
+
+```
+
+> Patch a single row by ID and return the data for that row in 1 query:
+
+```js
+Person
+  .query()
+  .patch({firstName: 'Jenn'})
+  .where('id', 1234)
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function(jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "Jenn"
+  });
+
+```
+
+> Patch a Model instance and return the data for that instance in 1 query:
+
+```js
+jennifer
+  .$query()
+  .patch({firstName: 'J.'})
+  .first() // Ensures we're returned a single row in the promise resolution
+  .returning('*')
+  .then(function(jennifer) {
+    console.log(jennifer.updatedAt); // NOW()-ish
+    console.log(jennifer.firstName); // "J."
+  });
+
+```
+
+Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or `update` / `patch` an existing row, __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
 
 ## Polymorphic associations
 
@@ -223,7 +303,7 @@ Person.prototype.$beforeUpdate = function () {
 };
 ```
 
-You can implement the `$beforeInsert` and `$beforeUpdate` methods to set the timestamps. If you want to do this for all 
+You can implement the `$beforeInsert` and `$beforeUpdate` methods to set the timestamps. If you want to do this for all
 your models, you can simply create common base class that implements these methods.
 
 ## Custom query builder
@@ -313,8 +393,8 @@ By default, the examples guide you to setup the database connection by setting t
 class. This doesn't fly if you want to select the database based on the request as it sets the connection globally.
 
 If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
-`req.models` hash and then _always_ use the models through `req.models` instead of requiring them directly. What 
-[`bindKnex`](#bindknex) method actually does is that it creates an anonymous subclass of the model class and sets its 
+`req.models` hash and then _always_ use the models through `req.models` instead of requiring them directly. What
+[`bindKnex`](#bindknex) method actually does is that it creates an anonymous subclass of the model class and sets its
 knex connection. That way the database connection doesn't change for the other requests that are currently being executed.
 
 ## SQL clause precedence and parentheses
