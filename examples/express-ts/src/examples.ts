@@ -35,8 +35,16 @@ const pickPersonFromKey: Person = examplePerson.$pick('lastName');
 const pickPersonFromObj: Person = examplePerson.$pick({ firstName: true });
 const clonePerson: Person = examplePerson.$clone();
 
+async function byId(id: number) {
+  const p: Person = await Person.query().findById(id);
+}
+
+async function whereLastName(lastName: string) {
+  const p: Person[] = await Person.query().where('lastname', lastName);
+}
+
 // QueryBuilder.findById accepts single and array values:
-let qb: objection.QueryBuilder = BoundPerson.query();
+let qb: objection.QueryBuilder<Person[]> = BoundPerson.query();
 
 // Note that the QueryBuilder chaining done in this file
 // is done to verify that the return value is assignable to a QueryBuilder
@@ -81,13 +89,15 @@ function noop() {
   // no-op
 }
 
+type AnyQB = objection.QueryBuilder<any>
+
 qb = qb.context({
-  runBefore: (qb: objection.QueryBuilder) => noop(),
-  runAfter: (qb: objection.QueryBuilder) => noop(),
-  onBuild: (qb: objection.QueryBuilder) => noop()
+  runBefore: (qb: AnyQB) => noop(),
+  runAfter: (qb: AnyQB) => noop(),
+  onBuild: (qb: AnyQB) => noop()
 });
 
-qb = qb.runBefore((qb: objection.QueryBuilder) => noop());
+qb = qb.runBefore((qb: AnyQB) => noop());
 
 qb = qb.reject('fail');
 qb = qb.resolve('success');
