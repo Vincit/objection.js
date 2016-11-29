@@ -3,45 +3,55 @@ import jsonFieldExpressionParser from './parsers/jsonFieldExpressionParser';
 export default class ReferenceBuilder {
 
   constructor(fieldExpression) {
+    // for premature optimization _reference could be lazy memoized getter... 
     this._reference = jsonFieldExpressionParser.parse(fieldExpression);
     this._cast = null;
+    this._toJson = false;
+    this._as = null; // TODO: UNIT TEST
   }
 
-  asText() {
-    return this.asType('text');
+  castText() {
+    return this.castType('text');
   }
 
-  asInt() {
-    return this.asType('integer');
+  castInt() {
+    return this.castType('integer');
   }
 
-  asBigInt() {
-    return this.asType('bigint');
+  castBigInt() {
+    return this.castType('bigint');
   }
 
-  asFloat() {
-    return this.asType('float');
+  castFloat() {
+    return this.castType('float');
   }
 
-  asDecimal() {
-    return this.asType('decimal');
+  castDecimal() {
+    return this.castType('decimal');
   }
 
-  asReal() {
-    return this.asType('real');
+  castReal() {
+    return this.castType('real');
   }
 
-  asBool() {
-    return this.asType('boolean');
+  castBool() {
+    return this.castType('boolean');
   }
 
-  asJsonb() {
-    return this.asType('jsonb');
+  castJson() {
+    // maybe different for mysql, no need to support postgres plain json
+    this._toJson = true;
+    return this;
   }
 
-  asType(sqlType) {
+  castType(sqlType) {
     // we could maybe check some valid values here... at least fail on invalid chars 
     this._cast = sqlType;
+    return this;
+  }
+
+  as(as) {
+    this._as = as;
     return this;
   }
 
@@ -55,8 +65,12 @@ export default class ReferenceBuilder {
       let jsonFieldRef = this._reference.access.map(field => field.ref).join(',');  
       referenceSql = `??${extractor}'{${jsonFieldRef}}'`;
     }
-    let query = this._cast ? `CAST(${referenceSql} AS ${this._cast})` : referenceSql;
-    return [query, [this._reference.columnName]];
+
+    let castedRefQuery = this._cast ? `CAST(${referenceSql} AS ${this._cast})` : referenceSql;
+    let toJsonQuery = this._toJson ? `to_jsonb(${castedRefQuery})` : castedRefQuery;
+    let assedAndCastedRefQuery = this._as ? `${toJsonQuery} AS ${this._as}` : toJsonQuery;
+
+    return [assedAndCastedRefQuery, [this._reference.columnName]];
   }
 
 }
