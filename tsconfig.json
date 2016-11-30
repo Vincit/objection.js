@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitUseStrict": false,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "target": "es6",
+    "typeRoots": [
+      "./typings",
+      "node_modules/@types"
+    ]
+  },
+  "files": [
+    "tests/ts/examples.ts"
+  ]
+}

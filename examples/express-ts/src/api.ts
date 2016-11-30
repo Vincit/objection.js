@@ -64,15 +64,15 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!person) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      const child = await person
+        .$relatedQuery('children')
+        .insert(req.body)
+        .catch(next);
+
+      res.send(child);
     }
-
-    const child = await person
-      .$relatedQuery('children')
-      .insert(req.body)
-      .catch(next);
-
-    res.send(child);
   });
 
   // Add a pet for a Person.
@@ -83,15 +83,15 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!person) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      const pet = await person
+        .$relatedQuery('pets')
+        .insert(req.body)
+        .catch(next);
+
+      res.send(pet);
     }
-
-    const pet = await person
-      .$relatedQuery('pets')
-      .insert(req.body)
-      .catch(next);
-
-    res.send(pet);
   });
 
   // Get a Person's pets. The result can be filtered using query parameters
@@ -103,40 +103,41 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!person) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+
+      // We don't need to check for the existence of the query parameters because
+      // we call the `skipUndefined` method. It causes the query builder methods
+      // to do nothing if one of the values is undefined.
+      const pets = await person
+        .$relatedQuery('pets')
+        .skipUndefined()
+        .where('name', 'like', req.query.name)
+        .where('species', req.query.species)
+        .catch(next);
+
+      res.send(pets);
     }
-
-    // We don't need to check for the existence of the query parameters because
-    // we call the `skipUndefined` method. It causes the query builder methods
-    // to do nothing if one of the values is undefined.
-    const pets = await person
-      .$relatedQuery('pets')
-      .skipUndefined()
-      .where('name', 'like', req.query.name)
-      .where('species', req.query.species)
-      .catch(next);
-
-    res.send(pets);
   });
 
   // Add a movie for a Person.
   app.post('/persons/:id/movies', async function (req, res, next) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    const movie = await objection.transaction(Person, async function (Person) {
+    const movie = await objection.transaction(Person, async (Person) => {
       const person = await Person
         .query()
         .findById(req.params.id)
         .catch(next);
 
       if (!person) {
-        next(throwNotFound);
+        res.sendStatus(404);
+      } else {
+        await person
+          .$relatedQuery('movies')
+          .insert(req.body)
+          .catch(next);
       }
-
-      return await person
-        .$relatedQuery('movies')
-        .insert(req.body)
-        .catch(next);
     });
 
     res.send(movie);
@@ -150,15 +151,15 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!movie) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      await movie
+        .$relatedQuery('actors')
+        .relate(req.body.id)
+        .catch(next);
+
+      res.send(req.body);
     }
-
-    await movie
-      .$relatedQuery('actors')
-      .relate(req.body.id)
-      .catch(next);
-
-    res.send(req.body);
   });
 
   // Get Movie's actors.
@@ -169,16 +170,11 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!movie) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      const actors = await movie.$relatedQuery('actors');
+
+      res.send(actors);
     }
-
-    const actors = await movie.$relatedQuery('actors');
-
-    res.send(actors);
   });
 };
-
-// The error thrown by this function is handled in the error handler middleware in app.js.
-function throwNotFound() {
-  throw new Error('not found');
-}

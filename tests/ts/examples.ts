@@ -1,31 +1,50 @@
 // tslint:disable:no-unused-variable
-
+import * as knex from 'knex';
 import * as objection from 'objection';
-import Person from './models/Person';
-import { knex } from './app';
 
 // This file exercises the Objection.js typings.
+
 // These calls are WHOLLY NONSENSICAL and are for TypeScript testing only.
 
 // This "test" passes if the TypeScript compiler is satisfied.
 
-// bindKnex returns a typeof Model:
-const BoundModel: typeof objection.Model = Person.bindKnex(knex);
+class Person extends objection.Model {
+  firstName: string;
+  lastName: string;
+  examplePersonMethod = (arg: string) => 1;
+}
 
-// bindKnex also returns the proper Model subclass:
-const BoundPerson: typeof Person = Person.bindKnex(knex);
+class Movie extends objection.Model {
+  title: string;
+}
 
-// The Model subclass is interpretted correctly to be constructable 
+class Animal extends objection.Model {
+  species: string;
+}
+
+// !!! see examples/express-ts/src/app.ts for a valid knex setup. The following is bogus:
+
+const k: knex = knex({}) 
+
+// bindKnex returns the proper Model subclass:
+
+const BoundPerson = Person.bindKnex(k);
+
+// The Model subclass is interpreted correctly to be constructable 
+
 const examplePerson: Person = new BoundPerson();
 
 // and to have expected sublcass fields 
+
 examplePerson.firstName = 'example';
 examplePerson.lastName = 'person';
 
 // and methods
+
 const exampleResult: number = examplePerson.examplePersonMethod('hello');
 
-// And inherited methods:
+// and inherited methods from Model
+
 const personId = examplePerson.$id();
 const exampleJsonPerson: Person = examplePerson.$setJson({ id: 'hello' });
 const exampleDatabaseJsonPerson: Person = examplePerson.$setDatabaseJson({ id: 'hello' });
@@ -35,25 +54,31 @@ const pickPersonFromKey: Person = examplePerson.$pick('lastName');
 const pickPersonFromObj: Person = examplePerson.$pick({ firstName: true });
 const clonePerson: Person = examplePerson.$clone();
 
+// Person typing for findById():
+
 async function byId(id: number) {
   const p: Person = await Person.query().findById(id);
 }
+
+// Person[] typing for where():
 
 async function whereLastName(lastName: string) {
   const p: Person[] = await Person.query().where('lastname', lastName);
 }
 
 // QueryBuilder.findById accepts single and array values:
+
 let qb: objection.QueryBuilder<Person[]> = BoundPerson.query();
 
 // Note that the QueryBuilder chaining done in this file
 // is done to verify that the return value is assignable to a QueryBuilder
-// (fewer characters than having each line `const qb: QueryBuilder =`):
+// (fewer characters than having each line `const qbNNN: QueryBuilder =`):
 
 qb = qb.findById(1);
 qb = qb.findById([1, 2, 3]);
 
 // query builder knex-wrapping methods:
+
 qb = qb.increment('column_name');
 qb = qb.increment('column_name', 2);
 qb = qb.decrement('column_name', 1);
@@ -89,22 +114,33 @@ function noop() {
   // no-op
 }
 
-type AnyQB = objection.QueryBuilder<any>
+const qbcb = (qb: objection.QueryBuilder<Person[]>) => noop()
 
 qb = qb.context({
-  runBefore: (qb: AnyQB) => noop(),
-  runAfter: (qb: AnyQB) => noop(),
-  onBuild: (qb: AnyQB) => noop()
+  runBefore: qbcb,
+  runAfter: qbcb,
+  onBuild: qbcb
 });
 
-qb = qb.runBefore((qb: AnyQB) => noop());
+qb = qb.runBefore(qbcb);
 
 qb = qb.reject('fail');
 qb = qb.resolve('success');
 
-objection.transaction(Person, (P: typeof Person) => {
-  const n: number = new P().examplePersonMethod('hello');
+objection.transaction(Person, (TxPerson) => {
+  const n: number = new TxPerson().examplePersonMethod('hello');
   return Promise.resolve('yay');
+});
+
+objection.transaction(Movie, Person, async (TxMovie, TxPerson) => {
+  const s: string = new TxMovie().title;
+  const n: number = new TxPerson().examplePersonMethod('hello');
+});
+
+objection.transaction(Movie, Person, Animal, async (TxMovie, TxPerson, TxAnimal) => {
+  const t: string = new TxMovie().title;
+  const n: number = new TxPerson().examplePersonMethod('hello');
+  const s: string = new TxAnimal().species;
 });
 
 objection.transaction.start(Person).then((trx: objection.Transaction) => {
@@ -117,4 +153,3 @@ objection.transaction.start(Person).then((trx: objection.Transaction) => {
 // Verify QueryBuilders are thenable:
 
 const p: Promise<string> = qb.then(() => 'done');
-
