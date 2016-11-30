@@ -5,7 +5,6 @@
 declare module "objection" {
 
   import * as knex from 'knex';
-  import { JsonSchema } from 'jsonschema';
 
   export interface ModelOptions {
     patch: boolean;
@@ -65,7 +64,7 @@ declare module "objection" {
   type RelationExpression = string;
 
   type FilterFunction = <T>(queryBuilder: QueryBuilder<T>) => void;
-  
+
   type FilterExpression = { [namedFilter: string]: FilterFunction };
 
   interface RelationExpressionMethod {
@@ -120,7 +119,7 @@ declare module "objection" {
    * This is a hack to make bindKnex and other static methods return the subclass type, rather than Model.
    * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
-  interface ModelClass<T> {
+  interface ModelClass<T extends Model> {
     new (...a: any[]): T;
     tableName: string;
     jsonSchema: JsonSchema;
@@ -194,17 +193,17 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
-    static query<T>(this: { new(): T }, trx?: Transaction): QueryBuilder<T>;
+    static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
     static query<T>(trx?: Transaction): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
+    static knexQuery<T>(this: { new (): T }): QueryBuilder<T>;
 
     // This approach should be applied to all other references of Model that 
     // should return the subclass:
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T extends Model>(this: ModelClass<T>, transaction: Transaction): ModelClass<T>;
-    static extend<T>(subclass: T): ModelClass<T>;
+    static extend<T>(subclass: T): ModelClass<T & Model>;
 
     static fromJson<T extends Model>(this: ModelClass<T>, json: Object, opt?: ModelOptions): T;
     static fromDatabaseJson<T extends Model>(this: ModelClass<T>, row: Object): T;
@@ -261,11 +260,9 @@ declare module "objection" {
     static forClass<T>(modelClass: T): QueryBuilder<T>;
   }
 
-  export interface SingleQueryBuilder<T> extends QueryBuilderBase<T>, Promise<T> {
+  export interface SingleQueryBuilder<T> extends QueryBuilderBase<T>, Promise<T> { }
 
-  }
-
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> {}
+  export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
 
@@ -375,7 +372,7 @@ declare module "objection" {
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
     eager(relationExpression: RelationExpression, filters?: FilterExpression): this;
-    
+
     allowEager: RelationExpressionMethod;
     modifyEager: ModifyEager<T>;
     filterEager: ModifyEager<T>;
@@ -419,51 +416,40 @@ declare module "objection" {
 
     pick(modelClass: typeof Model, properties: string[]): this;
     pick(properties: string[]): this;
-    
+
     omit(modelClass: typeof Model, properties: string[]): this;
     omit(properties: string[]): this;
   }
 
-    export interface transaction {
+  export interface transaction {
     start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
 
-    <M extends Model, T>(
-      modelClass: ModelClass<M>,
-      callback: (boundModelClass: ModelClass<M>) => Promise<T>
+    <MC extends ModelClass<any>, T>(
+      modelClass: MC,
+      callback: (boundModelClass: MC) => Promise<T>
     ): Promise<T>;
 
-    <M1 extends Model, M2 extends Model, T>(
-      modelClass1: ModelClass<M1>,
-      modelClass2: ModelClass<M2>,
-      callback: (
-        boundModelClass1: ModelClass<M1>,
-        boundModelClass2: ModelClass<M2>
-      ) => Promise<T>
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, T>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2) => Promise<T>
     ): Promise<T>;
 
-    <M1 extends Model, M2 extends Model, M3 extends Model, T>(
-      modelClass1: ModelClass<M1>,
-      modelClass2: ModelClass<M2>,
-      modelClass3: ModelClass<M3>,
-      callback: (
-        boundModelClass1: ModelClass<M1>,
-        boundModelClass2: ModelClass<M2>,
-        boundModelClass3: ModelClass<M3>
-      ) => Promise<T>
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, T>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3) => Promise<T>
     ): Promise<T>;
 
-    <M1 extends Model, M2 extends Model, M3 extends Model, M4 extends Model, T>(
-      modelClass1: ModelClass<M1>,
-      modelClass2: ModelClass<M2>,
-      modelClass3: ModelClass<M3>,
-      modelClass4: ModelClass<M4>,
-      callback: (
-        boundModelClass1: ModelClass<M1>,
-        boundModelClass2: ModelClass<M2>,
-        boundModelClass3: ModelClass<M3>,
-        boundModelClass4: ModelClass<M4>
-      ) => Promise<T>
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, MC4 extends ModelClass<any>, T>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      modelClass4: MC4,
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, boundModel4Class: MC4) => Promise<T>
     ): Promise<T>;
+
   }
 
   export const transaction: transaction
@@ -476,8 +462,8 @@ declare module "objection" {
   type Raw = knex.Raw
 
   //
-  // The following is lifted from knex's index.d.ts, to change the signatures 
-  // to return Objection's QueryBuilder wrapper, rather than the knex QueryBuilder:
+  // Lifted from knex's index.d.ts, to change the signatures 
+  // to return Objection's typed QueryBuilder wrapper:
   //
 
   type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw;
@@ -547,7 +533,7 @@ declare module "objection" {
 
     // Union
     union: Union<T>;
-    unionAll(callback: Function): this;    
+    unionAll(callback: Function): this;
 
     // Having
     having: Having<T>;
@@ -719,5 +705,159 @@ declare module "objection" {
     (sql: string, ...bindings: Value[]): QueryBuilder<T>;
     (sql: string, bindings: Value[]): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
+  }
+
+  // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
+
+  /**
+   * MIT License
+   *
+   * Copyright (c) 2016 Richard Adams (https://github.com/enriched)
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a copy
+   * of this software and associated documentation files (the "Software"), to deal
+   * in the Software without restriction, including without limitation the rights
+   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   * copies of the Software, and to permit persons to whom the Software is
+   * furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included in all
+   * copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   * SOFTWARE.
+   */
+
+  export interface JsonSchema {
+    $ref?: string
+    /////////////////////////////////////////////////
+    // Schema Metadata
+    /////////////////////////////////////////////////
+    /**
+     * This is important because it tells refs where
+     * the root of the document is located
+     */
+    id?: string
+    /**
+     * It is recommended that the meta-schema is
+     * included in the root of any JSON Schema
+     */
+    $schema?: JsonSchema
+    /**
+     * Title of the schema
+     */
+    title?: string
+    /**
+     * Schema description
+     */
+    description?: string
+    /**
+     * Default json for the object represented by
+     * this schema
+     */
+    default?: any
+
+    /////////////////////////////////////////////////
+    // Number Validation
+    /////////////////////////////////////////////////
+    /**
+     * The value must be a multiple of the number
+     * (e.g. 10 is a multiple of 5)
+     */
+    multipleOf?: number
+    maximum?: number
+    /**
+     * If true maximum must be > value, >= otherwise
+     */
+    exclusiveMaximum?: boolean
+    minimum?: number
+    /**
+     * If true minimum must be < value, <= otherwise
+     */
+    exclusiveMinimum?: boolean
+
+    /////////////////////////////////////////////////
+    // String Validation
+    /////////////////////////////////////////////////
+    maxLength?: number
+    minLength?: number
+    /**
+     * This is a regex string that the value must
+     * conform to
+     */
+    pattern?: string
+
+    /////////////////////////////////////////////////
+    // Array Validation
+    /////////////////////////////////////////////////
+    additionalItems?: boolean | JsonSchema
+    items?: JsonSchema | JsonSchema[]
+    maxItems?: number
+    minItems?: number
+    uniqueItems?: boolean
+
+    /////////////////////////////////////////////////
+    // Object Validation
+    /////////////////////////////////////////////////
+    maxProperties?: number
+    minProperties?: number
+    required?: string[]
+    additionalProperties?: boolean | JsonSchema
+    /**
+     * Holds simple JSON Schema definitions for
+     * referencing from elsewhere.
+     */
+    definitions?: { [key: string]: JsonSchema }
+    /**
+     * The keys that can exist on the object with the
+     * json schema that should validate their value
+     */
+    properties?: { [property: string]: JsonSchema }
+    /**
+     * The key of this object is a regex for which
+     * properties the schema applies to
+     */
+    patternProperties?: { [pattern: string]: JsonSchema }
+    /**
+     * If the key is present as a property then the
+     * string of properties must also be present.
+     * If the value is a JSON Schema then it must
+     * also be valid for the object if the key is
+     * present.
+     */
+    dependencies?: { [key: string]: JsonSchema | string[] }
+
+    /////////////////////////////////////////////////
+    // Generic
+    /////////////////////////////////////////////////
+    /**
+     * Enumerates the values that this schema can be
+     * e.g.
+     * {"type": "string",
+     *  "enum": ["red", "green", "blue"]}
+     */
+    enum?: any[]
+    /**
+     * The basic type of this schema, can be one of
+     * [string, number, object, array, boolean, null]
+     * or an array of the acceptable types
+     */
+    type?: string | string[]
+
+    /////////////////////////////////////////////////
+    // Combining Schemas
+    /////////////////////////////////////////////////
+    allOf?: JsonSchema[]
+    anyOf?: JsonSchema[]
+    oneOf?: JsonSchema[]
+    /**
+     * The entity being validated must not match this schema
+     */
+    not?: JsonSchema
   }
 }

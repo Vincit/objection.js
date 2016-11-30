@@ -1,4 +1,5 @@
 node_modules
+.history
 .idea
 testCoverage
 examples/*/*.db
