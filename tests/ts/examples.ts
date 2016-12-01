@@ -61,6 +61,9 @@ const k: knex = knex({});
 
 const BoundPerson: typeof Person = Person.bindKnex(k);
 
+// With expected static methods:
+Person.bindKnex(k).truncate();
+
 // The Model subclass is interpreted correctly to be constructable 
 
 const examplePerson: Person = new BoundPerson();
@@ -94,7 +97,7 @@ class Actor {
 
 const PersonActorClass: typeof Person & typeof Actor = Person.extend(Actor);
 
-// Person typing for findById():
+// Optional<Person> typing for findById():
 
 function byId(id: number): Promise<Person | undefined> {
   return Person.query().findById(id);
