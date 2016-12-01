@@ -71,7 +71,15 @@ declare module "objection" {
     <T>(relationExpression: RelationExpression): QueryBuilder<T>;
   }
 
-  type TraverserFunction = (model: typeof Model, parentModel: string | typeof Model, relationName: string) => void;
+  interface TraverserFunction {
+    /** 
+     * Called if model is in a relation of some other model.
+     * @param model the model itself
+     * @param parentModel the parent model
+     * @param relationName the name of the relation
+     */
+    (model: Model, parentModel: Model, relationName: string): void;
+  }
 
   type Id = string | number;
 
@@ -108,24 +116,26 @@ declare module "objection" {
   }
 
   interface BluebirdMapper<T, Result> {
-    (item: T, index: number): Result
+    (item: T, index: number): Result;
   }
 
   interface NodeStyleCallback {
     (err: any, result?: any): void
   }
 
+  type Filters<T> = { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void };
+  type Properties = { [propertyName: string]: boolean };
+
   /**
-   * This is a hack to make bindKnex and other static methods return the subclass type, rather than Model.
+   * This is a hack to support referencing a given Model subclass constructor.
    * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
   interface ModelClass<T extends Model> {
-    new (...a: any[]): T;
     tableName: string;
     jsonSchema: JsonSchema;
     idColumn: string;
     modelPaths: string[];
-    relationMappings: RelationMappings | any;
+    relationMappings: RelationMappings;
     jsonAttributes: string[];
     virtualAttributes: string[];
     uidProp: string;
@@ -137,8 +147,10 @@ declare module "objection" {
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
     RelatedQueryBuilder: typeof QueryBuilder;
+
     raw: knex.RawBuilder;
     fn: knex.FunctionHelper;
+
     BelongsToOneRelation: Relation;
     HasOneRelation: Relation;
     HasManyRelation: Relation;
@@ -149,23 +161,20 @@ declare module "objection" {
     formatter(): any; // < the knex typings punts here too
     knexQuery(): QueryBuilder<T>;
 
-    bindKnex(knex: knex): T & ModelClass<T>;
-    bindTransaction(transaction: Transaction): T & ModelClass<T>;
-    extend(subclass: T): T & ModelClass<T>;
+    bindKnex(knex: knex): this;
+    bindTransaction(transaction: Transaction): this;
+    extend<S>(subclass: S): S & this;
 
-    fromJson(json: Object, opt: ModelOptions): T & Model;
-    fromDatabaseJson(row: Object): T & Model;
+    fromJson(json: Object, opt?: ModelOptions): T;
+    fromDatabaseJson(row: Object): T;
 
     omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    loadRelated<T>(models: T[], expression: RelationExpression, filters: Filters<T>): void;
+    loadRelated(models: (Model | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
 
-    traverse(filterConstructor: ModelClass<any>, models: Model | Model[], traverser: TraverserFunction): void;
+    traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
   }
-
-  type Filters<T> = { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void };
-  type Properties = { [propertyName: string]: boolean };
 
   export class Model {
     static tableName: string;
@@ -193,26 +202,24 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
-    static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
-    static query<T>(trx?: Transaction): QueryBuilder<T>;
+    // "{ new(): T }" from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
+    static query<T>(this: { new(): T }, trx?: Transaction): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new (): T }): QueryBuilder<T>;
+    static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
 
-    // This approach should be applied to all other references of Model that 
-    // should return the subclass:
     static bindKnex<T>(this: T, knex: knex): T;
-    static bindTransaction<T extends Model>(this: ModelClass<T>, transaction: Transaction): ModelClass<T>;
-    static extend<T>(subclass: T): ModelClass<T & Model>;
+    static bindTransaction<T>(this: T, transaction: Transaction): T;
+    static extend<S, T>(this: T, subclass: S): S & T;
 
-    static fromJson<T extends Model>(this: ModelClass<T>, json: Object, opt?: ModelOptions): T;
-    static fromDatabaseJson<T extends Model>(this: ModelClass<T>, row: Object): T;
+    static fromJson<T>(this: T, json: Object, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: T, row: Object): T;
 
     static omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    static loadRelated<T>(models: T[], expression: RelationExpression, filters: Filters<T>): void;
+    static loadRelated<T>(this: { new(): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
 
-    static traverse(filterConstructor: ModelClass<any>, models: Model | Model[], traverser: TraverserFunction): void;
+    static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
 
     $id(): any;
@@ -233,21 +240,20 @@ declare module "objection" {
     $setDatabaseJson(json: Object): this;
 
     $set(obj: Object): this;
-    $omit(keys: string | string[] | Properties): this
+    $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
     $clone(): this;
 
     $query(trx?: Transaction): SingleQueryBuilder<this>;
-    $query<T>(trx?: Transaction): SingleQueryBuilder<T>;
-    $relatedQuery<T>(relationName: string, transaction?: Transaction): QueryBuilder<T>;
+    $relatedQuery(relationName: string, transaction?: Transaction): QueryBuilder<this>;
 
     $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilder<T>;
 
     $traverse(traverser: TraverserFunction): void;
-    $traverse<T extends Model>(this: ModelClass<T>, filterConstructor: ModelClass<T>, traverser: TraverserFunction): void;
+    $traverse(filterConstructor: this, traverser: TraverserFunction): void;
 
     $knex(): knex;
-    $transaction(): knex; // TODO: this is based on the documentation, but doesn't make sense (why not Transaction?)
+    $transaction(): knex;
 
     $beforeInsert(queryContext: Object): Promise<any> | void;
     $afterInsert(queryContext: Object): Promise<any> | void;
@@ -257,7 +263,7 @@ declare module "objection" {
 
   export class QueryBuilder<T> {
     static extend(subclassConstructor: FunctionConstructor): void;
-    static forClass<T>(modelClass: T): QueryBuilder<T>;
+    static forClass<T extends Model>(modelClass: ModelClass<T>): QueryBuilder<T>;
   }
 
   export interface SingleQueryBuilder<T> extends QueryBuilderBase<T>, Promise<T> { }
@@ -709,7 +715,7 @@ declare module "objection" {
 
   // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
 
-  /**
+  /*
    * MIT License
    *
    * Copyright (c) 2016 Richard Adams (https://github.com/enriched)
