@@ -24,11 +24,11 @@ class Animal extends objection.Model {
 
 // !!! see examples/express-ts/src/app.ts for a valid knex setup. The following is bogus:
 
-const k: knex = knex({}) 
+const k: knex = knex({});
 
 // bindKnex returns the proper Model subclass:
 
-const BoundPerson = Person.bindKnex(k);
+const BoundPerson: typeof Person = Person.bindKnex(k);
 
 // The Model subclass is interpreted correctly to be constructable 
 
@@ -54,6 +54,15 @@ const pickPersonFromKey: Person = examplePerson.$pick('lastName');
 const pickPersonFromObj: Person = examplePerson.$pick({ firstName: true });
 const clonePerson: Person = examplePerson.$clone();
 
+// static methods from Model should return the subclass type
+
+Person.loadRelated([new Person()], "movies").then((people: Person[]) => { });
+
+class Actor {
+}
+
+const PersonActorClass: typeof Person & typeof Actor = Person.extend(Actor);
+
 // Person typing for findById():
 
 async function byId(id: number) {
@@ -65,6 +74,8 @@ async function byId(id: number) {
 async function whereLastName(lastName: string) {
   const p: Person[] = await Person.query().where('lastname', lastName);
 }
+
+const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).findById(1);
 
 // QueryBuilder.findById accepts single and array values:
 
@@ -144,7 +155,8 @@ objection.transaction(Movie, Person, Animal, async (TxMovie, TxPerson, TxAnimal)
 });
 
 objection.transaction.start(Person).then((trx: objection.Transaction) => {
-  Person.bindTransaction(trx).query()
+  const TxPerson: typeof Person = Person.bindTransaction(trx)
+  TxPerson.query()
     .then(() => trx.commit())
     .catch(() => trx.rollback());
   Person.query(trx).where('age', '<', 90);
@@ -153,3 +165,4 @@ objection.transaction.start(Person).then((trx: objection.Transaction) => {
 // Verify QueryBuilders are thenable:
 
 const p: Promise<string> = qb.then(() => 'done');
+
