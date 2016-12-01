@@ -12,6 +12,37 @@ class Person extends objection.Model {
   firstName: string;
   lastName: string;
   examplePersonMethod = (arg: string) => 1;
+
+  static async truncate(): Promise<void> {
+    await this.query().truncate()
+  }
+
+  static async withLastName(lastName: string): Promise<Person[]> {
+    return this.query().where("lastName", lastName)
+  }
+
+  static async firstWithLastName(lastName: string): Promise<Person | undefined> {
+    return this.query().where("lastName", lastName).first()
+  }
+
+  static async findById(id: number): Promise<Person | undefined> {
+    return this.query().findById(id)
+  }
+
+  async loadMovies(): Promise<this> {
+    return this.$loadRelated("movies")
+  }
+
+  async reload(): Promise<this> {
+    return this.$query();
+  }
+
+  async petsWithId(petId: number): Promise<Animal[]> {
+    // Types can't look at strings and give strong types, so this must be a Model[] promise:
+    const pets: objection.Model[] = await this.$relatedQuery('pets').where("id", petId)
+    // that we can subsequently cast to Animal:
+    return pets as Animal[]
+  }
 }
 
 class Movie extends objection.Model {
@@ -65,14 +96,14 @@ const PersonActorClass: typeof Person & typeof Actor = Person.extend(Actor);
 
 // Person typing for findById():
 
-async function byId(id: number) {
-  const p: Person = await Person.query().findById(id);
+function byId(id: number): Promise<Person | undefined> {
+  return Person.query().findById(id);
 }
 
 // Person[] typing for where():
 
-async function whereLastName(lastName: string) {
-  const p: Person[] = await Person.query().where('lastname', lastName);
+function whereSpecies(species: string): Promise<Animal[]> {
+  return Person.query().where('species', species);
 }
 
 const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).findById(1);

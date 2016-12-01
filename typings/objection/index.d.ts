@@ -244,10 +244,17 @@ declare module "objection" {
     $pick(keys: string | string[] | Properties): this;
     $clone(): this;
 
-    $query(trx?: Transaction): SingleQueryBuilder<this>;
-    $relatedQuery(relationName: string, transaction?: Transaction): QueryBuilder<this>;
+    /**
+     * AKA `reload` in ActiveRecord parlance
+     */
+    $query(trx?: Transaction): QueryBuilderSingle<this>;
 
-    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilder<T>;
+    /**
+     * @return `QueryBuilder<Model>` because we don't know the type of the relation.
+     */
+    $relatedQuery(relationName: string, transaction?: Transaction): QueryBuilder<Model>;
+
+    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
 
     $traverse(traverser: TraverserFunction): void;
     $traverse(filterConstructor: this, traverser: TraverserFunction): void;
@@ -266,13 +273,25 @@ declare module "objection" {
     static forClass<T extends Model>(modelClass: ModelClass<T>): QueryBuilder<T>;
   }
 
-  export interface SingleQueryBuilder<T> extends QueryBuilderBase<T>, Promise<T> { }
+  /**
+   * QueryBuilder with one expected result
+   */
+  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, Promise<T> { }
+ 
+  /**
+   * QueryBuilder with zero or one expected result
+   * (Using the Scala `Option` terminology)
+   */
+  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Promise<T | undefined> { }
 
+  /**
+   * QueryBuilder with zero or more expected results
+   */
   export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
 
-    findById(idOrIds: IdOrIds): SingleQueryBuilder<T>;
+    findById(idOrIds: IdOrIds): QueryBuilderOption<T>;
 
     insert(modelsOrObjects?: ModelsOrObjects): this;
     insertAndFetch(modelsOrObjects: ModelsOrObjects): this;
@@ -416,7 +435,7 @@ declare module "objection" {
     page(page: number, pageSize: number): this;
     range(start: number, end: number): this;
     pluck(propertyName: string): this;
-    first(): SingleQueryBuilder<T>;
+    first(): QueryBuilderOption<T>;
 
     traverse(modelClass: typeof Model, traverser: TraverserFunction): this;
 
@@ -472,7 +491,12 @@ declare module "objection" {
   // to return Objection's typed QueryBuilder wrapper:
   //
 
-  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw;
+  /**
+   * Value encompasses any where clause operand.
+   * `null` is valid and represents SQL `NULL`. Also see `WhereNull`.
+   * `undefined` is not valid, most likely resulting from programmer error.
+   */
+  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw | null;
   type ColumnName<T> = string | Raw | QueryBuilder<T>;
   type TableName<T> = string | Raw | QueryBuilder<T>;
 
@@ -562,8 +586,8 @@ declare module "objection" {
     decrement(columnName: string, amount?: number): this;
 
     // Others
-    first(...columns: string[]): SingleQueryBuilder<T>;
-    first<T>(...columns: string[]): SingleQueryBuilder<T>;
+    first(...columns: string[]): QueryBuilderOption<T>;
+    first<T>(...columns: string[]): QueryBuilderOption<T>;
 
     debug(enabled?: boolean): this;
     pluck(column: string): this;
@@ -574,9 +598,9 @@ declare module "objection" {
     returning(column: string | string[]): this;
 
     del(returning?: string | string[]): this;
-    del<T>(returning?: string | string[]): SingleQueryBuilder<T>;
+    del<T>(returning?: string | string[]): QueryBuilderOption<T>;
     delete(returning?: string | string[]): this;
-    delete<T>(returning?: string | string[]): SingleQueryBuilder<T>;
+    delete<T>(returning?: string | string[]): QueryBuilderOption<T>;
     truncate(): this;
 
     transacting(trx: Transaction): this;
