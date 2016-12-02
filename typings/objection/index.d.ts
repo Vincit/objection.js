@@ -309,9 +309,9 @@ declare module "objection" {
     updateAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
     updateAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
 
-    patch(modelOrObject: Object | Model): this;
-    patchAndFetchById(id: Id, modelOrObject: Object | Model): this;
-    patchAndFetch(modelOrObject: Object | Model): this;
+    patch(modelOrObject: Object | Model): QueryBuilderSingle<number>;
+    patchAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
+    patchAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
 
     deleteById(idOrIds: IdOrIds): this;
 
