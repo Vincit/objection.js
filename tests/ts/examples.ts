@@ -140,11 +140,21 @@ qb = qb.outerJoin('tablename', 'column1', '=', 'column2');
 qb = qb.joinRelation('table');
 qb = qb.joinRelation('table', { alias: false });
 
+// signature-changing QueryBuilder methods:
+
+const rowsUpdated: Promise<number> = qb.update({})
+const rowsPatched: Promise<number> = qb.patch({})
+const insertedModel: Promise<Person> = Person.query().insertAndFetch({})
+const updatedModel: Promise<Person> = Person.query().updateAndFetch({})
+const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {})
+const patchedModel: Promise<Person> = Person.query().patchAndFetch({})
+const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {})
+
 // non-wrapped methods:
 
 const modelFromQuery: typeof objection.Model = qb.modelClass();
 
-const sql = qb.toSql();
+const sql: string = qb.toSql();
 
 qb = qb.whereJsonEquals(
   'Person.jsonColumnName:details.names[1]',
