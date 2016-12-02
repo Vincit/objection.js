@@ -142,9 +142,16 @@ qb = qb.joinRelation('table', { alias: false });
 
 // signature-changing QueryBuilder methods:
 
+const rowsInserted: Promise<number> = qb.insert({})
+const rowsInsertedWithRelated: Promise<number> = qb.insertWithRelated({})
 const rowsUpdated: Promise<number> = qb.update({})
 const rowsPatched: Promise<number> = qb.patch({})
+const rowsDeleted: Promise<number> = qb.deleteById(123)
+const rowsDeleted2: Promise<number> = qb.deleteById([123, 456])
+
 const insertedModel: Promise<Person> = Person.query().insertAndFetch({})
+const insertedGraphAndFetch: Promise<Person> = Person.query().insertGraphAndFetch({})
+const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch({})
 const updatedModel: Promise<Person> = Person.query().updateAndFetch({})
 const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {})
 const patchedModel: Promise<Person> = Person.query().patchAndFetch({})

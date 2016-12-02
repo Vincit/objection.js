@@ -296,8 +296,9 @@ declare module "objection" {
     insert(modelsOrObjects?: ModelsOrObjects): QueryBuilderSingle<T>;
     insertAndFetch(modelsOrObjects: ModelsOrObjects): QueryBuilderSingle<T>;
 
+    // insertGraph* take one or more objects, so `this` is the best we can do.    
     insertGraph(modelsOrObjects: ModelsOrObjects): this;
-    insertGraphAndFetch(modelsOrObjects: ModelsOrObjects): QueryBuilderSingle<T>;
+    insertGraphAndFetch(modelsOrObjects: ModelsOrObjects): this;
 
     /**
      * @return a Promise of the number of inserted rows
