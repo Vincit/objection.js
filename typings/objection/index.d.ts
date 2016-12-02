@@ -302,8 +302,12 @@ declare module "objection" {
     insertWithRelated(graph: ModelsOrObjects): this;
     insertWithRelatedAndFetch(graph: ModelsOrObjects): this;
 
-    update(modelOrObject: Object | Model): this;
-    updateAndFetchById(id: Id, modelOrObject: Object | Model): this;
+    /**
+     * @return a Promise of the number of rows updated
+     */
+    update(modelOrObject: Object | Model): QueryBuilderSingle<number>;
+    updateAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
+    updateAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
 
     patch(modelOrObject: Object | Model): this;
     patchAndFetchById(id: Id, modelOrObject: Object | Model): this;
@@ -592,9 +596,6 @@ declare module "objection" {
     debug(enabled?: boolean): this;
     pluck(column: string): this;
 
-    insert(data: any, returning?: string | string[]): this;
-    update(data: any, returning?: string | string[]): this;
-    update(columnName: string, value: Value, returning?: string | string[]): this;
     returning(column: string | string[]): this;
 
     del(returning?: string | string[]): this;
