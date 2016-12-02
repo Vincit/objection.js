@@ -277,7 +277,7 @@ declare module "objection" {
    * QueryBuilder with one expected result
    */
   export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, Promise<T> { }
- 
+
   /**
    * QueryBuilder with zero or one expected result
    * (Using the Scala `Option` terminology)
@@ -293,27 +293,36 @@ declare module "objection" {
 
     findById(idOrIds: IdOrIds): QueryBuilderOption<T>;
 
-    insert(modelsOrObjects?: ModelsOrObjects): this;
-    insertAndFetch(modelsOrObjects: ModelsOrObjects): this;
+    insert(modelsOrObjects?: ModelsOrObjects): QueryBuilderSingle<T>;
+    insertAndFetch(modelsOrObjects: ModelsOrObjects): QueryBuilderSingle<T>;
 
     insertGraph(modelsOrObjects: ModelsOrObjects): this;
-    insertGraphAndFetch(modelsOrObjects: ModelsOrObjects): this;
-
-    insertWithRelated(graph: ModelsOrObjects): this;
-    insertWithRelatedAndFetch(graph: ModelsOrObjects): this;
+    insertGraphAndFetch(modelsOrObjects: ModelsOrObjects): QueryBuilderSingle<T>;
 
     /**
-     * @return a Promise of the number of rows updated
+     * @return a Promise of the number of inserted rows
+     */
+    insertWithRelated(graph: ModelsOrObjects): QueryBuilderSingle<number>;
+    insertWithRelatedAndFetch(graph: ModelsOrObjects): QueryBuilderSingle<T>;
+
+    /**
+     * @return a Promise of the number of updated rows
      */
     update(modelOrObject: Object | Model): QueryBuilderSingle<number>;
     updateAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
     updateAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
 
+    /**
+     * @return a Promise of the number of patched rows
+     */
     patch(modelOrObject: Object | Model): QueryBuilderSingle<number>;
     patchAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
     patchAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
 
-    deleteById(idOrIds: IdOrIds): this;
+    /**
+     * @return a Promise of the number of deleted rows
+     */
+    deleteById(idOrIds: IdOrIds): QueryBuilderSingle<number>;
 
     relate(ids: IdOrIds | ModelsOrObjects): this;
     unrelate(): this;
