@@ -41,6 +41,7 @@ declare module "objection" {
     join: RelationJoin;
     modify?: <T>(queryBuilder: QueryBuilder<T>) => {};
     filter?: <T>(queryBuilder: QueryBuilder<T>) => {};
+    orderBy?: string;
   }
 
   export interface EagerAlgorithm {
