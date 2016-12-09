@@ -11,7 +11,7 @@
     "noEmit": true,
     "target": "es6",
     "typeRoots": [
-      "./typings",
+      "typings",
       "node_modules/@types"
     ]
   },

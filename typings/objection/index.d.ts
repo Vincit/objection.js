@@ -2,9 +2,12 @@
 // Project: Objection.js <http://vincit.github.io/objection.js/>
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
+/// <reference types="node" />
+/// <reference types="knex" />
+
 declare module "objection" {
 
-  import * as knex from 'knex';
+  import * as knex from "knex";
 
   export interface ModelOptions {
     patch: boolean;
@@ -84,9 +87,12 @@ declare module "objection" {
 
   type Id = string | number;
 
-  type IdOrIds = Id | Id[];
+  type Ids = Id[];
 
-  type ModelsOrObjects = Model | Object | Model[] | Object[];
+  type IdOrIds = Id | Ids;
+
+  type ModelOrObject = Model | Object
+  type ModelsOrObjects = ModelOrObject | Model[] | Object[];
 
   type RelationOptions = { alias: boolean | string };
 
@@ -203,11 +209,12 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
-    // "{ new(): T }" from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
-    static query<T>(this: { new(): T }, trx?: Transaction): QueryBuilder<T>;
+    // "{ new(): T }" 
+    // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
+    static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
+    static knexQuery<T>(this: { new (): T }): QueryBuilder<T>;
 
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
@@ -218,7 +225,7 @@ declare module "objection" {
 
     static omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    static loadRelated<T>(this: { new(): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
+    static loadRelated<T>(this: { new (): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
 
     static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
@@ -290,36 +297,49 @@ declare module "objection" {
    */
   export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
+  interface Insert {
+    <M extends ModelOrObject>(modelOrObject?: M): QueryBuilderSingle<M>;
+    <M extends ModelsOrObjects>(modelsOrObjects?: M): QueryBuilder<M>;
+    (): this;
+  }
+
+  interface InsertGraphAndFetch<T> {
+    (modelsOrObjects: Model): QueryBuilderSingle<T>;
+    (modelsOrObjects: Model[]): QueryBuilder<T>;
+    (modelsOrObjects?: ModelsOrObjects): QueryBuilderBase<T>;
+  }
+
   interface QueryBuilderBase<T> extends QueryInterface<T> {
 
-    findById(idOrIds: IdOrIds): QueryBuilderOption<T>;
+    findById(id: Id): QueryBuilderOption<T>;
+    findById(idOrIds: IdOrIds): this;
 
-    insert(modelsOrObjects?: ModelsOrObjects): QueryBuilderSingle<T>;
-    insertAndFetch(modelsOrObjects: ModelsOrObjects): QueryBuilderSingle<T>;
+    insert: Insert;
+    insertAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    insertAndFetch(modelsOrObjects?: ModelsOrObjects): QueryBuilder<T>;
 
-    // insertGraph* take one or more objects, so `this` is the best we can do.    
-    insertGraph(modelsOrObjects: ModelsOrObjects): this;
-    insertGraphAndFetch(modelsOrObjects: ModelsOrObjects): this;
+    insertGraph: Insert;
+    insertGraphAndFetch: InsertGraphAndFetch<T>
 
     /**
-     * @return a Promise of the number of inserted rows
+     * insertWithRelated is an alias for insertGraph.
      */
-    insertWithRelated(graph: ModelsOrObjects): QueryBuilderSingle<number>;
-    insertWithRelatedAndFetch(graph: ModelsOrObjects): QueryBuilderSingle<T>;
+    insertWithRelated: Insert;
+    insertWithRelatedAndFetch: InsertGraphAndFetch<T>
 
     /**
      * @return a Promise of the number of updated rows
      */
-    update(modelOrObject: Object | Model): QueryBuilderSingle<number>;
-    updateAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
-    updateAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
+    update(modelOrObject: ModelOrObject): QueryBuilderSingle<number>;
+    updateAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    updateAndFetchById(id: Id, modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
 
     /**
      * @return a Promise of the number of patched rows
      */
-    patch(modelOrObject: Object | Model): QueryBuilderSingle<number>;
-    patchAndFetchById(id: Id, modelOrObject: Object | Model): QueryBuilderSingle<T>;
-    patchAndFetch(modelOrObject: Object | Model): QueryBuilderSingle<T>;
+    patch(modelOrObject: ModelOrObject): QueryBuilderSingle<number>;
+    patchAndFetchById(id: Id, modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    patchAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
 
     /**
      * @return a Promise of the number of deleted rows
