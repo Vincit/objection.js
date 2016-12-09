@@ -106,21 +106,22 @@ function byId(id: number): Promise<Person | undefined> {
 // Person[] typing for where():
 
 function whereSpecies(species: string): Promise<Animal[]> {
-  return Person.query().where('species', species);
+  return Animal.query().where('species', species);
 }
 
 const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).findById(1);
 
 // QueryBuilder.findById accepts single and array values:
 
-let qb: objection.QueryBuilder<Person[]> = BoundPerson.query();
+let qb: objection.QueryBuilder<Person> = BoundPerson.query().where("name", "foo");
 
 // Note that the QueryBuilder chaining done in this file
 // is done to verify that the return value is assignable to a QueryBuilder
 // (fewer characters than having each line `const qbNNN: QueryBuilder =`):
 
-qb = qb.findById(1);
-qb = qb.findById([1, 2, 3]);
+const maybePerson: Promise<Person | undefined> = qb.findById(1);
+
+const maybePeople: Promise<Person[]> = qb.findById([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -142,7 +143,8 @@ qb = qb.joinRelation('table', { alias: false });
 
 // signature-changing QueryBuilder methods:
 
-const rowsInserted: Promise<number> = qb.insert({})
+const rowInserted: Promise<Person> = qb.insert({firstName: "bob"})
+const rowsInserted: Promise<Person[]> = qb.insert([{firstName: "alice"}, {firstName: "bob"}])
 const rowsInsertedWithRelated: Promise<number> = qb.insertWithRelated({})
 const rowsUpdated: Promise<number> = qb.update({})
 const rowsPatched: Promise<number> = qb.patch({})
@@ -150,8 +152,11 @@ const rowsDeleted: Promise<number> = qb.deleteById(123)
 const rowsDeleted2: Promise<number> = qb.deleteById([123, 456])
 
 const insertedModel: Promise<Person> = Person.query().insertAndFetch({})
-const insertedGraphAndFetch: Promise<Person> = Person.query().insertGraphAndFetch({})
-const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch({})
+const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([new Person(), new Person()])
+
+const insertedGraphAndFetchOne: Promise<Person> = Person.query().insertGraphAndFetch(new Person())
+const insertedGraphAndFetchSome: Promise<Person[]> = Person.query().insertGraphAndFetch([new Person(), new Person()])
+const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch(new Person())
 const updatedModel: Promise<Person> = Person.query().updateAndFetch({})
 const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {})
 const patchedModel: Promise<Person> = Person.query().patchAndFetch({})
@@ -176,7 +181,7 @@ function noop() {
   // no-op
 }
 
-const qbcb = (qb: objection.QueryBuilder<Person[]>) => noop()
+const qbcb = (qb: objection.QueryBuilder<Person>) => noop()
 
 qb = qb.context({
   runBefore: qbcb,
