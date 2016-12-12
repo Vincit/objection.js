@@ -68,9 +68,12 @@ export default class ReferenceBuilder {
 
     let castedRefQuery = this._cast ? `CAST(${referenceSql} AS ${this._cast})` : referenceSql;
     let toJsonQuery = this._toJson ? `to_jsonb(${castedRefQuery})` : castedRefQuery;
-    let assedAndCastedRefQuery = this._as ? `${toJsonQuery} AS ${this._as}` : toJsonQuery;
 
-    return [assedAndCastedRefQuery, [this._reference.columnName]];
+    if (this._as) {
+      return [`${toJsonQuery} AS ??`, [this._reference.columnName, this._as]];
+    } else {
+      return [toJsonQuery, [this._reference.columnName]];
+    }
   }
 
 }

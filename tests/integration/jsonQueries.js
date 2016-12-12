@@ -85,7 +85,7 @@ module.exports = function (session) {
           });
       });
 
-      it.skip('should be able to use ref inside select of select subquery', function () {
+      it('should be able to use ref inside select of select subquery', function () {
         return BoundModel.query()
           .select([
             function (builder) {
