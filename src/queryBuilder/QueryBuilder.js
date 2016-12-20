@@ -492,6 +492,7 @@ export default class QueryBuilder extends QueryBuilderBase {
         // Don't return the promise so that it is executed
         // in parallel with the actual query.
         resultSizePromise = this.resultSize();
+        return null;
       })
       .runAfter(results => {
         // Now that the actual query is finished, wait until the
