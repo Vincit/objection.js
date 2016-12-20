@@ -281,7 +281,7 @@ export default class QueryBuilder extends QueryBuilderBase {
 
     if (opIdx !== -1) {
       this._operations[opIdx] = this._operations[opIdx].clone({
-        opt: this._findOperationOptions
+        opt: this._eagerOperationOptions
       });
     }
 
