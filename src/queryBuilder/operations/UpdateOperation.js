@@ -24,13 +24,6 @@ export default class UpdateOperation extends QueryBuilderOperation {
 
   onBuild(knexBuilder, builder) {
     const json = this.model.$toDatabaseJson();
-    const cols = builder.modelClass().getIdColumnArray();
-
-    for (let i = 0, l = cols.length; i < l; ++i) {
-      const col = cols[i];
-      delete json[col];
-    }
-
     knexBuilder.update(json);
   }
 

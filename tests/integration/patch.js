@@ -38,8 +38,7 @@ module.exports = function (session) {
       });
 
       it('should patch a model (1)', function () {
-        // Should ignore the id.
-        var model = Model1.fromJson({id: 666, model1Prop1: 'updated text'});
+        var model = Model1.fromJson({model1Prop1: 'updated text'});
 
         return Model1
           .query()
@@ -62,8 +61,7 @@ module.exports = function (session) {
       });
 
       it('should patch a model (2)', function () {
-        // Should ignore the id.
-        var model = Model2.fromJson({idCol: 666, model2Prop1: 'updated text'});
+        var model = Model2.fromJson({model2Prop1: 'updated text'});
 
         return Model2
           .query()
@@ -83,7 +81,7 @@ module.exports = function (session) {
       it('should accept json', function () {
         return Model1
           .query()
-          .patch({id: 666, model1Prop1: 'updated text'})
+          .patch({model1Prop1: 'updated text'})
           .where('id', '=', 2)
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(1);
@@ -140,7 +138,7 @@ module.exports = function (session) {
       it('should patch multiple', function () {
         return Model1
           .query()
-          .patch({id: 666, model1Prop1: 'updated text'})
+          .patch({model1Prop1: 'updated text'})
           .where('model1Prop1', '<', 'hello 3')
           .then(function (numUpdated) {
             expect(numUpdated).to.equal(2);
