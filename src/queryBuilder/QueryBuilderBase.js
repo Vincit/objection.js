@@ -41,6 +41,10 @@ export default class QueryBuilderBase {
     this._context = new (QueryBuilderContext || QueryBuilderContextBase)(this._createUserContextBase());
   }
 
+  static SelectRegex = /^(select|sum|min|max|count|avg)$/;
+  static WhereRegex = /where|orWhere|andWhere/;
+  static FromRegex = /^(from|into|table)$/;
+
   /**
    * @param {function=} subclassConstructor
    * @return {Constructor.<QueryBuilderBase>}
@@ -174,6 +178,13 @@ export default class QueryBuilderBase {
     });
 
     return found;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  isSelectAll() {
+    return !this.has(QueryBuilderBase.SelectRegex) && !this.has(QueryBuilderBase.WhereRegex);
   }
 
   /**

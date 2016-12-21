@@ -146,7 +146,7 @@ describe('QueryBuilder', function () {
   it('should select all from the model table if no query methods are called', function () {
     var queryBuilder = QueryBuilder.forClass(TestModel);
     return queryBuilder.then(function () {
-      expect(executedQueries).to.eql(['select * from "Model"']);
+      expect(executedQueries).to.eql(['select "Model".* from "Model"']);
     });
   });
 
@@ -187,7 +187,7 @@ describe('QueryBuilder', function () {
         .whereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
         .then(function () {
           expect(executedQueries).to.eql([
-            'select * from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+            'select "Model".* from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
           ]);
         });
     });
@@ -198,7 +198,7 @@ describe('QueryBuilder', function () {
         .whereRef('SomeTable.someColumn', '>', 'SomeOtherTable.someOtherColumn')
         .then(function () {
           expect(executedQueries).to.eql([
-            'select * from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
+            'select "Model".* from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
           ]);
         });
     });
@@ -219,7 +219,7 @@ describe('QueryBuilder', function () {
         .orWhereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
         .then(function () {
           expect(executedQueries).to.eql([
-            'select * from "Model" where "id" = 10 or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
+            'select "Model".* from "Model" where "id" = 10 or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
           ]);
         });
     });
@@ -234,7 +234,7 @@ describe('QueryBuilder', function () {
         .whereComposite(['A.a', 'B.b'], '>', [1, 2])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" > 1 and \"B\".\"b\" > 2"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" > 1 and \"B\".\"b\" > 2"
           ]);
         });
     });
@@ -254,7 +254,7 @@ describe('QueryBuilder', function () {
         .whereComposite(['A.a', 'B.b'], [1, 2])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" = 1 and \"B\".\"b\" = 2"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" = 1 and \"B\".\"b\" = 2"
           ]);
         });
     });
@@ -265,7 +265,7 @@ describe('QueryBuilder', function () {
         .whereComposite(['A.a'], 1)
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" = 1"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" = 1"
            ]);
         });
     });
@@ -276,7 +276,7 @@ describe('QueryBuilder', function () {
         .whereComposite('A.a', 1)
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" = 1"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" = 1"
           ]);
         });
     });
@@ -291,7 +291,7 @@ describe('QueryBuilder', function () {
         .whereInComposite(['A.a', 'B.b'], [[1, 2], [3, 4]])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where (\"A\".\"a\", \"B\".\"b\") in ((1, 2),(3, 4))"
+            "select \"Model\".* from \"Model\" where (\"A\".\"a\", \"B\".\"b\") in ((1, 2),(3, 4))"
           ]);
         });
     });
@@ -302,7 +302,7 @@ describe('QueryBuilder', function () {
         .whereInComposite(['A.a'], [[1], [3]])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in (1, 3)"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" in (1, 3)"
           ]);
         });
     });
@@ -313,7 +313,7 @@ describe('QueryBuilder', function () {
         .whereInComposite('A.a', [[1], [3]])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in (1, 3)"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" in (1, 3)"
           ]);
         });
     });
@@ -324,7 +324,7 @@ describe('QueryBuilder', function () {
         .whereInComposite('A.a', [1, 3])
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in (1, 3)"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" in (1, 3)"
           ]);
         });
     });
@@ -335,7 +335,7 @@ describe('QueryBuilder', function () {
         .whereInComposite('A.a', TestModel.query().select('a'))
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where \"A\".\"a\" in (select \"a\" from \"Model\")"
+            "select \"Model\".* from \"Model\" where \"A\".\"a\" in (select \"a\" from \"Model\")"
           ]);
         });
     });
@@ -346,7 +346,7 @@ describe('QueryBuilder', function () {
         .whereInComposite(['A.a', 'B.b'], TestModel.query().select('a', 'b'))
         .then(function () {
           expect(executedQueries).to.eql([
-            "select * from \"Model\" where (\"A\".\"a\",\"B\".\"b\") in (select \"a\", \"b\" from \"Model\")"
+            "select \"Model\".* from \"Model\" where (\"A\".\"a\",\"B\".\"b\") in (select \"a\", \"b\" from \"Model\")"
           ]);
         });
     });
@@ -495,7 +495,7 @@ describe('QueryBuilder', function () {
       })
       .then(function () {
         expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('select * from "Model" where "a" = 1');
+        expect(executedQueries[0]).to.equal('select "Model".* from "Model" where "a" = 1');
       });
   });
 
@@ -658,7 +658,7 @@ describe('QueryBuilder', function () {
         expect(executedQueries).to.have.length(1);
         expect(res).to.equal(123);
         // resultSize should cancel the groupBy call since it doesn't affect the outcome.
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = 100) as temp');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as temp');
         done();
       })
       .catch(done);
@@ -673,8 +673,8 @@ describe('QueryBuilder', function () {
       .range(100, 200)
       .then(function (res) {
         expect(executedQueries).to.have.length(2);
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = 100) as temp');
-        expect(executedQueries[1]).to.equal('select * from "Model" where "test" = 100 order by "order" asc limit 101 offset 100');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as temp');
+        expect(executedQueries[1]).to.equal('select "Model".* from "Model" where "test" = 100 order by "order" asc limit 101 offset 100');
         expect(res.total).to.equal(123);
         expect(res.results).to.eql(mockKnexQueryResults[1]);
         done();
@@ -691,8 +691,8 @@ describe('QueryBuilder', function () {
       .page(10, 100)
       .then(function (res) {
         expect(executedQueries).to.have.length(2);
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select * from "Model" where "test" = 100) as temp');
-        expect(executedQueries[1]).to.equal('select * from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as temp');
+        expect(executedQueries[1]).to.equal('select "Model".* from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000');
         expect(res.total).to.equal(123);
         expect(res.results).to.eql(mockKnexQueryResults[1]);
         done();
@@ -1009,7 +1009,7 @@ describe('QueryBuilder', function () {
       .joinRelation('m1', {alias: 'm'})
       .join('M1', 'M1.id', 'M2.m1Id')
       .then(function () {
-        expect(executedQueries[0]).to.equal('select * from "M2" inner join (select * from "M1") as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"');
+        expect(executedQueries[0]).to.equal('select "M2".* from "M2" inner join "M1" as "m" on "m"."m2Id" = "M2"."id" inner join "M1" on "M1"."id" = "M2"."m1Id"');
         done();
       })
       .catch(done);
@@ -1291,9 +1291,9 @@ describe('QueryBuilder', function () {
         })
         .then(function () {
           expect(executedQueries).to.eql([
-            'select * from "M1"',
-            'select * from "M2" where "M2"."m1Id" in (1)',
-            'select * from "M3" where "M3"."id" in (3)'
+            'select "M1".* from "M1"',
+            'select "M2".* from "M2" where "M2"."m1Id" in (1)',
+            'select "M3".* from "M3" where "M3"."id" in (3)'
           ]);
 
           expect(filter1Check).to.equal(true);
@@ -1338,9 +1338,9 @@ describe('QueryBuilder', function () {
         .eager('someRel.someRel')
         .then(function (x) {
           expect(executedQueries).to.eql([
-            'select * from "M1"',
-            'select * from "M1" where "M1"."m1Id" in (1, 2)',
-            'select * from "M1" where "M1"."m1Id" in (3, 4, 5, 6)'
+            'select "M1".* from "M1"',
+            'select "M1".* from "M1" where "M1"."m1Id" in (1, 2)',
+            'select "M1".* from "M1" where "M1"."m1Id" in (3, 4, 5, 6)'
           ]);
 
           expect(x).to.eql([{

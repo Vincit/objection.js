@@ -271,7 +271,7 @@ module.exports = function (session) {
           .query()
           .select('Model1.*', 'model1Relation1.model1Prop1 as rel_model1Prop1')
           .joinRelation('model1Relation1')
-          .orderBy('Model1.id')
+          .orderBy('Model1.id') 
           .then(function (models) {
             expect(_.map(models, 'id')).to.eql([1, 2, 3, 7]);
             expect(_.map(models, 'rel_model1Prop1')).to.eql(['hello 2', 'hello 3', 'hello 4', 'hello 8']);
@@ -281,6 +281,7 @@ module.exports = function (session) {
       it('should join a has many relation (1)', function () {
         return Model1
           .query()
+          .select('Model1.*', 'model1Relation2.id_col')
           .joinRelation('model1Relation2')
           .then(function (models) {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -292,6 +293,7 @@ module.exports = function (session) {
       it('should join a has many relation (2)', function () {
         return Model1
           .query()
+          .select('Model1.*', 'model1Relation2.id_col')
           .joinRelation('model1Relation2')
           .where('model1Relation2.id_col', '<', 4)
           .then(function (models) {
@@ -304,6 +306,7 @@ module.exports = function (session) {
       it('should join a many to many relation (1)', function () {
         return Model2
           .query()
+          .select('model_2.*', 'model2Relation1.id')
           .joinRelation('model2Relation1')
           .then(function (models) {
             models = _.sortBy(models, ['idCol', 'id']);
@@ -315,6 +318,7 @@ module.exports = function (session) {
       it('should join a many to many relation (2)', function () {
         return Model2
           .query()
+          .select('model_2.*', 'model2Relation1.id')
           .joinRelation('model2Relation1')
           .whereBetween('model2Relation1.id', [5, 6])
           .then(function (models) {
@@ -327,6 +331,7 @@ module.exports = function (session) {
       it('should disable alias with option alias = false', function () {
         return Model1
           .query()
+          .select('model_2.*', 'Model1.id')
           .joinRelation('model1Relation2', {alias: false})
           .where('model_2.id_col', '<', 4)
           .then(function (models) {
@@ -339,6 +344,7 @@ module.exports = function (session) {
       it('should use relation name as alias with option alias = true', function () {
         return Model1
           .query()
+          .select('Model1.*', 'model1Relation2.id_col')
           .joinRelation('model1Relation2', {alias: true})
           .where('model1Relation2.id_col', '<', 4)
           .then(function (models) {
@@ -351,6 +357,7 @@ module.exports = function (session) {
       it('should use custom alias with option alias = string', function () {
         return Model1
           .query()
+          .select('Model1.*', 'fooBarBaz.id_col')
           .joinRelation('model1Relation2', {alias: 'fooBarBaz'})
           .where('fooBarBaz.id_col', '<', 4)
           .then(function (models) {
@@ -459,7 +466,7 @@ module.exports = function (session) {
             .join(Model1.query())
             .then(function (models) {
               expect(models).to.have.length(2);
-              expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 2', 'hello 4']);
+              expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 3']);
             });
         });
 
@@ -607,6 +614,7 @@ module.exports = function (session) {
           return Model1
             .getRelation('model1Relation2')
             .join(Model1.query())
+            .select('model_2_prop_1')
             .then(function (models) {
               expect(models).to.have.length(6);
               expect(_.map(models, 'model_2_prop_1').sort()).to.eql(['text 1', 'text 2', 'text 3', 'text 4', 'text 5', 'text 6']);
@@ -835,6 +843,7 @@ module.exports = function (session) {
           return Model2
             .getRelation('model2Relation1')
             .join(Model2.query())
+            .select('model1Prop1')
             .then(function (models) {
               expect(models).to.have.length(6);
               expect(_.map(models, 'model1Prop1').sort()).to.eql(['blaa 1', 'blaa 2', 'blaa 3', 'blaa 4', 'blaa 5', 'blaa 6']);

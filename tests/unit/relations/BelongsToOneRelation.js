@@ -95,7 +95,7 @@ describe('BelongsToOneRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (1)');
+        expect(executedQueries[0]).to.equal('select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1)');
       });
     });
 
@@ -129,7 +129,7 @@ describe('BelongsToOneRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22),(11, 33))');
+        expect(executedQueries[0]).to.equal('select "RelatedModel".* from "RelatedModel" where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22),(11, 33))');
       });
     });
 
@@ -163,7 +163,7 @@ describe('BelongsToOneRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (2, 3)');
+        expect(executedQueries[0]).to.equal('select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (2, 3)');
       });
     });
 
@@ -212,7 +212,7 @@ describe('BelongsToOneRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (1) and "filterCol" = 100');
+        expect(executedQueries[0]).to.equal('select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "filterCol" = 100');
       });
     });
 
@@ -239,7 +239,7 @@ describe('BelongsToOneRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select * from "RelatedModel" where "RelatedModel"."rid" in (1) and "name" = \'Jennifer\'');
+        expect(executedQueries[0]).to.equal('select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "name" = \'Jennifer\'');
       });
     });
 

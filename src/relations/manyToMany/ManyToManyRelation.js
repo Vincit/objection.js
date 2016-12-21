@@ -169,9 +169,14 @@ export default class ManyToManyRelation extends Relation {
     const relatedCol = this.relatedCol.map(col => `${opt.relatedTableAlias}.${col}`);
     const ownerCol = this.ownerCol.map(col => `${opt.ownerTable}.${col}`);
 
-    const relatedJoinSelectQuery = opt.relatedJoinSelectQuery
+    let relatedJoinSelect = opt.relatedJoinSelectQuery
       .modify(this.modify)
       .as(opt.relatedTableAlias);
+
+    if (relatedJoinSelect.isSelectAll()) {
+      // No need to join a subquery if the query is `select * from "RelatedTable"`.
+      relatedJoinSelect = `${this.relatedModelClass.tableName} as ${opt.relatedTableAlias}`
+    }
 
     return builder
       [opt.joinOperation](joinTableAsAlias, join => {
@@ -179,7 +184,7 @@ export default class ManyToManyRelation extends Relation {
           join.on(joinTableOwnerCol[i], ownerCol[i]);
         }
       })
-      [opt.joinOperation](relatedJoinSelectQuery, join => {
+      [opt.joinOperation](relatedJoinSelect, join => {
         for (let i = 0, l = joinTableRelatedCol.length; i < l; ++i) {
           join.on(joinTableRelatedCol[i], relatedCol[i]);
         }

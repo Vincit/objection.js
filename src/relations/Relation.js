@@ -303,12 +303,17 @@ export default class Relation {
     const relatedCol = this.relatedCol.map(col => `${opt.relatedTableAlias}.${col}`);
     const ownerCol = this.ownerCol.map(col => `${opt.ownerTable}.${col}`);
 
-    const relatedJoinSelectQuery = opt.relatedJoinSelectQuery
+    let relatedSelect = opt.relatedJoinSelectQuery
       .modify(this.modify)
       .as(opt.relatedTableAlias);
 
+    if (relatedSelect.isSelectAll()) {
+      // No need to join a subquery if the query is `select * from "RelatedTable"`.
+      relatedSelect = `${this.relatedModelClass.tableName} as ${opt.relatedTableAlias}`
+    }
+
     return builder
-      [opt.joinOperation](relatedJoinSelectQuery, join => {
+      [opt.joinOperation](relatedSelect, join => {
         for (let i = 0, l = relatedCol.length; i < l; ++i) {
           join.on(relatedCol[i], '=', ownerCol[i]);
         }
