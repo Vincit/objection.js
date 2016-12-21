@@ -58,6 +58,40 @@ module.exports = function (session) {
           });
       });
 
+      it('should be able to update to null value', function () {
+        return Model1
+          .query()
+          .update({model1Prop1: null, model1Prop2: 100})
+          .where('id', '=', 1)
+          .then(function (numUpdated) {
+            expect(numUpdated).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: null});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
+      it('should be able to update to an empty string', function () {
+        return Model1
+          .query()
+          .update({model1Prop1: '', model1Prop2: 100})
+          .where('id', '=', 1)
+          .then(function (numUpdated) {
+            expect(numUpdated).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(function (rows) {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: ''});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
       it('should accept json', function () {
         return Model1
           .query()

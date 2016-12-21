@@ -271,7 +271,7 @@ module.exports = function (session) {
           .query()
           .select('Model1.*', 'model1Relation1.model1Prop1 as rel_model1Prop1')
           .joinRelation('model1Relation1')
-          .orderBy('Model1.id') 
+          .orderBy('Model1.id')
           .then(function (models) {
             expect(_.map(models, 'id')).to.eql([1, 2, 3, 7]);
             expect(_.map(models, 'rel_model1Prop1')).to.eql(['hello 2', 'hello 3', 'hello 4', 'hello 8']);
