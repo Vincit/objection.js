@@ -4,7 +4,9 @@ import QueryBuilderBase from './queryBuilder/QueryBuilderBase';
 import QueryBuilder from './queryBuilder/QueryBuilder';
 import QueryBuilderOperation from './queryBuilder/operations/QueryBuilderOperation'
 import RelationExpression from './queryBuilder/RelationExpression';
-import ValidationError from './ValidationError';
+import ValidationError from './model/ValidationError';
+import AjvValidator from './model/AjvValidator';
+import Validator from './model/Validator';
 
 import Relation from './relations/Relation';
 import HasOneRelation from './relations/hasOne/HasOneRelation';
@@ -23,6 +25,8 @@ export {
   QueryBuilderOperation,
   RelationExpression,
   ValidationError,
+  AjvValidator,
+  Validator,
   Relation,
   HasOneRelation,
   HasManyRelation,

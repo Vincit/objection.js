@@ -3,7 +3,7 @@ import HasManyRelation from '../../relations/hasMany/HasManyRelation';
 import RelationExpression from '../RelationExpression';
 import ManyToManyRelation from '../../relations/manyToMany/ManyToManyRelation';
 import BelongsToOneRelation from '../../relations/belongsToOne/BelongsToOneRelation';
-import ValidationError from '../../ValidationError';
+import ValidationError from '../../model/ValidationError';
 
 import DependencyNode from './DependencyNode';
 import HasManyDependency from './HasManyDependency';

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import parser from './parsers/relationExpressionParser';
-import ValidationError from './../ValidationError';
+import ValidationError from '../model/ValidationError';
 
 const RECURSIVE_REGEX = /^\^(\d*)$/;
 const ALL_RECURSIVE_REGEX = /^\*$/;

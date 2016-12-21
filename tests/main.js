@@ -12,7 +12,7 @@ describe('main module', function () {
     expect(objection.QueryBuilderBase).to.equal(require('../lib/queryBuilder/QueryBuilderBase').default);
     expect(objection.QueryBuilderOperation).to.equal(require('../lib/queryBuilder/operations/QueryBuilderOperation').default);
     expect(objection.RelationExpression).to.equal(require('../lib/queryBuilder/RelationExpression').default);
-    expect(objection.ValidationError).to.equal(require('../lib/ValidationError').default);
+    expect(objection.ValidationError).to.equal(require('../lib/model/ValidationError').default);
     expect(objection.Relation).to.equal(require('../lib/relations/Relation').default);
     expect(objection.HasManyRelation).to.equal(require('../lib/relations/hasMany/HasManyRelation').default);
     expect(objection.HasOneRelation).to.equal(require('../lib/relations/hasOne/HasOneRelation').default);
@@ -21,6 +21,8 @@ describe('main module', function () {
     expect(objection.transaction).to.equal(require('../lib/transaction').default);
     expect(objection.transaction.start).to.equal(require('../lib/transaction').default.start);
     expect(objection.Promise).to.equal(require('bluebird'));
+    expect(objection.Validator).to.equal(require('../lib/model/Validator').default);
+    expect(objection.AjvValidator).to.equal(require('../lib/model/AjvValidator').default);
   });
 
 });

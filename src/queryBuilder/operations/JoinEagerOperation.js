@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
 import EagerOperation from './EagerOperation';
-import ValidationError from '../../ValidationError';
+import ValidationError from '../../model/ValidationError';
 
 const columnInfo = Object.create(null);
 const idLengthLimit = 63;

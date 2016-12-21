@@ -1,26 +1,9 @@
 import _ from 'lodash';
-import Ajv from 'ajv';
 import hiddenData from '../utils/decorators/hiddenData';
-import ValidationError from '../ValidationError';
+import AjvValidator from './AjvValidator';
 import splitQueryProps from '../utils/splitQueryProps';
 import {inherits} from '../utils/classUtils';
 import memoize from '../utils/decorators/memoize';
-
-const ajv = new Ajv({
-  allErrors: true,
-  validateSchema: false,
-  ownProperties: true,
-  useDefaults: true,
-  v5: true
-});
-const ajvNoDefaults = new Ajv({
-  allErrors: true,
-  validateSchema: false,
-  ownProperties: true,
-  useDefaults: false,
-  v5: true
-});
-const ajvCache = Object.create(null);
 
 /**
  * @typedef {Object} ModelOptions
@@ -60,27 +43,22 @@ export default class ModelBase {
    * @return {Object}
    */
   $validate(json = this, options = {}) {
-    let jsonSchema = this.constructor.getJsonSchema();
-
-    if (!jsonSchema || options.skipValidation) {
+    if (options.skipValidation) {
       return json;
     }
 
-    // No need to call $beforeValidate (and clone the jsonSchema) if $beforeValidate has not been overwritten.
-    if (this.$beforeValidate !== ModelBase.prototype.$beforeValidate) {
-      jsonSchema = _.cloneDeep(jsonSchema);
-      jsonSchema = this.$beforeValidate(jsonSchema, json, options);
-    }
+    const validator = this.constructor.getValidator();
+    const args = {
+      options: options,
+      model: this,
+      json: json,
+      ctx: Object.create(null)
+    };
 
-    const validator = this.constructor.getJsonSchemaValidator(jsonSchema, options.patch);
-    json = cloneObject(json);
-    validator(json);
+    validator.beforeValidate(args);
+    json = validator.validate(args);
+    validator.afterValidate(args);
 
-    if (validator.errors) {
-      throw parseValidationError(validator.errors);
-    }
-
-    this.$afterValidate(json, options);
     return json;
   }
 
@@ -166,15 +144,6 @@ export default class ModelBase {
         + json);
     }
 
-    if (!options.patch) {
-      let jsonSchema = this.constructor.getJsonSchema();
-
-      if (jsonSchema) {
-        json = cloneObject(json);
-        this.constructor.getJsonSchemaValidator(jsonSchema)(json);
-      }
-    }
-
     // If the json contains query properties like, knex Raw queries or knex/objection query
     // builders, we need to split those off into a separate object. This object will be
     // joined back in the $toDatabaseJson method.
@@ -258,7 +227,7 @@ export default class ModelBase {
    */
   $omit() {
     if (arguments.length === 1 && _.isObject(arguments[0])) {
-      let keys = arguments[0];
+      const keys = arguments[0];
 
       if (Array.isArray(keys)) {
         omitArray(this, keys);
@@ -278,7 +247,7 @@ export default class ModelBase {
    */
   $pick() {
     if (arguments.length === 1 && _.isObject(arguments[0])) {
-      let keys = arguments[0];
+      const keys = arguments[0];
 
       if (Array.isArray(keys)) {
         pickArray(this, keys);
@@ -432,47 +401,35 @@ export default class ModelBase {
   }
 
   /**
-   * @param {Object} jsonSchema
-   * @param {boolean} skipRequired
-   * @returns {function}
+   * @return {Validator}
    */
-  static getJsonSchemaValidator(jsonSchema, skipRequired) {
-    skipRequired = !!skipRequired;
-
-    if (jsonSchema === this.getJsonSchema()) {
-      // Fast path for the common case: the json schema is never modified.
-      return this.getDefaultJsonSchemaValidator(skipRequired);
-    } else {
-      let key = JSON.stringify(jsonSchema);
-      let validators = ajvCache[key];
-
-      if (!validators) {
-        validators = {};
-        ajvCache[key] = validators;
+  static createValidator() {
+    return new AjvValidator({
+      onCreateAjv: (ajv) => { /* Do Nothing by default */ },
+      options: {
+        allErrors: true,
+        validateSchema: false,
+        ownProperties: true,
+        v5: true
       }
-
-      let validator = validators[skipRequired];
-      if (!validator) {
-        validator = compileJsonSchemaValidator(jsonSchema, skipRequired);
-        validators[skipRequired] = validator;
-      }
-
-      return validator;
-    }
+    });
   }
 
+  /**
+   * @return {Validator}
+   */
+  @memoize
+  static getValidator() {
+    return this.createValidator();
+  }
+
+  /**
+   * @return {Object}
+   */
   @memoize
   static getJsonSchema() {
     // Memoized getter in case jsonSchema is a getter property (usually is with ES6).
     return this.jsonSchema;
-  }
-
-  /**
-   * @returns {function}
-   */
-  @memoize
-  static getDefaultJsonSchemaValidator(skipRequired) {
-    return compileJsonSchemaValidator(this.getJsonSchema(), skipRequired);
   }
 
   /**
@@ -510,35 +467,6 @@ export default class ModelBase {
 
     return columnName || null;
   }
-}
-
-function parseValidationError(errors) {
-  let errorHash = {};
-  let index = 0;
-
-  for (let i = 0; i < errors.length; ++i) {
-    let error = errors[i];
-    let key = error.dataPath.substring(1);
-
-    if (!key) {
-      let match = /should have required property '(.+)'/.exec(error.message);
-      if (match && match.length > 1) {
-        key = match[1];
-      }
-    }
-
-    if (!key && error.params && error.params.additionalProperty) {
-      key = error.params.additionalProperty;
-    }
-
-    if (!key) {
-      key = (index++).toString();
-    }
-
-    errorHash[key] = error.message;
-  }
-
-  return new ValidationError(errorHash);
 }
 
 function toJsonImpl(model, createDbJson, omit, pick) {
@@ -724,22 +652,4 @@ function contains(arr, value) {
     }
   }
   return false;
-}
-
-function compileJsonSchemaValidator(jsonSchema, skipRequired) {
-  let origRequired;
-
-  try {
-    if (skipRequired) {
-      origRequired = jsonSchema.required;
-      jsonSchema.required = [];
-      return ajvNoDefaults.compile(jsonSchema);
-    } else {
-      return ajv.compile(jsonSchema);
-    }
-  } finally {
-    if (skipRequired) {
-      jsonSchema.required = origRequired;
-    }
-  }
 }

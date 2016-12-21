@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import ValidationError from '../../ValidationError'
+import ValidationError from '../../model/ValidationError'
 import EagerOperation from './EagerOperation';
 
 export default class WhereInEagerOperation extends EagerOperation {

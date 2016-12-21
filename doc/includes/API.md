@@ -5595,6 +5595,61 @@ Type|Description
 
 
 
+
+#### createValidator
+
+```js
+class BaseModel extends Model {
+  static createValidator() {
+    return new MyCustomValidator();
+  }
+}
+```
+
+> The default implementation:
+
+```js
+const AjvValidator = require('objection').AjvValidator;
+
+class Model {
+  static createValidator() {
+    return new AjvValidator({
+      onCreateAjv: (ajv) => { 
+        // Here you can modify the `Ajv` instance. 
+      },
+      options: {
+        allErrors: true,
+        validateSchema: false,
+        ownProperties: true,
+        v5: true
+      }
+    });
+  }
+}
+```
+
+Creates an instance of a [`Validator`](#validator) that is used to do
+all validation related stuff. This method is called only once per
+model class.
+
+You can override this method to return an instance of your custom
+validator. The custom validator doesn't need to be based on the
+`jsonSchema`. It can be anything at all as long as it implements the
+[`Validator`](#validator) interface.
+
+If you want to use the default json schema based [`AjvValidator`](#ajvvalidator) but
+want to modify it, you can use the `objection.AjvValidator` constructor. See
+the default implementation example.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Validator`](#validator)|The created validator instance
+
+
+
+
 #### omitImpl
 
 ```js
@@ -6951,9 +7006,115 @@ the `^` character. For example `parent.^3` is equal to `parent.parent.parent`.
 
 
 
+## Validator
+
+```js
+const Validator = require('objection').Validator;
+```
+
+> Usage example:
+
+```js
+const Validator = require('objection').Validator;
+
+class MyCustomValidator extends Validator {
+  validate(args) {
+    // The model instance. May be empty at this point.
+    const model = args.model;
+    
+    // The properties to validate. After validation these values will
+    // be merged into `model` by objection.
+    const json = args.json;
+    
+    // `ModelOptions` object. If your custom validator sets default
+    // values, you need to check the `opt.patch` boolean. If it is true
+    // we are validating a patch object, the defaults should not be set.
+    const opt = args.options;
+    
+    // A context object shared between the validation methods. A new
+    // object is created for each validation operation.
+    const ctx = args.ctx;
+    
+    // Do your validation here and throw any exception if the
+    // validation fails.
+    doSomeValidationAndThrowIfFails(json);
+    
+    // You need to return the (possibly modified) json.
+    return json;
+  }
+  
+  beforeValidate(args) {
+    // Takes the same arguments as `validate`. Usually there is no need
+    // to override this.
+    return super.beforeValidate(args);
+  }
+  
+  afterValidate(args) {
+    // Takes the same arguments as `validate`. Usually there is no need
+    // to override this.
+    return super.afterValidate(args);
+  }
+}
+
+const Model = require('objection').Model;
+
+// Override the `createValidator` method of a `Model` to use the
+// custom validator.
+class BaseModel extends Model {
+  static createValidator() {
+    return new MyCustomValidator();
+  }
+}
+```
+
+Abstract class from which model validators must be inherited. See the
+example for explanation. Also check out the [`createValidator`](#createvalidator)
+method.
+
+
+
+
+## AjvValidator
+
+```js
+const AjvValidator = require('objection').AjvValidator;
+```
+
+> Usage example:
+
+```js
+const Model = require('objection').Model;
+const AjvValidator = require('objection').AjvValidator;
+
+class BaseModel extends Model {
+  static createValidator() {
+    return new AjvValidator({
+      onCreateAjv: (ajv) => { 
+        // Here you can modify the `Ajv` instance. 
+      },
+      options: {
+        allErrors: true,
+        validateSchema: false,
+        ownProperties: true,
+        v5: true
+      }
+    });
+  }
+}
+```
+
+The default [Ajv](https://github.com/epoberezkin/ajv) based json schema
+validator. You can override the [`createValidator`](#createvalidator)
+method of [`Model`](#model) like in the example to modify the validator.
+
+
+
+
 ## ValidationError
 
 ```js
+const ValidationError = require('objection').ValidationError;
+ 
 throw new ValidationError('any string or object');
 ```
 

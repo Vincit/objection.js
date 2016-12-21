@@ -4,7 +4,7 @@ import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
 import QueryBuilderBase from './QueryBuilderBase';
-import ValidationError from '../ValidationError';
+import ValidationError from '../model/ValidationError';
 
 import FindOperation from './operations/FindOperation';
 import DeleteOperation from './operations/DeleteOperation';
@@ -664,7 +664,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   first() {
     return this.runAfter(result => {
-      if (_.isArray(result)) {
+      if (Array.isArray(result)) {
         return result[0];
       } else {
         return result;
