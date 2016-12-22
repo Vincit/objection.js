@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.7.0
+
+### What's new
+
+ * `jsonSchema` without `properties` now works. [#205](https://github.com/Vincit/objection.js/issues/205)
+ * `relationMappings` can now be a function. [#227](https://github.com/Vincit/objection.js/issues/227)
+ * many to many extras can now be aliased. [#223](https://github.com/Vincit/objection.js/issues/223)
+ * zero values are now allowed in relation columns. [#228](https://github.com/Vincit/objection.js/issues/228)
+ * active transaction can now be accessed in `$before/$after` hooks through `queryContext.transaction` property.
+ * Validation can now be easily modified through a new [`Validator`](#validator) interface. [#241](https://github.com/Vincit/objection.js/issues/241) [#199](https://github.com/Vincit/objection.js/issues/199)
+
+### Breaking changes
+
+ * `$relatedQuery` now returns a single model instead of an array for belongsToOne and hasOne relations. [#155](https://github.com/Vincit/objection.js/issues/155)
+ * identifier of a model can now be updated. Be careful with this one! Before if you forgot a wrong id in an `update`/`patch` operation, it would simply get ignored. Now the id is also updated just like any other column [#100](https://github.com/Vincit/objection.js/issues/100)
+ * `Table.*` is now selected by default in all queries instead of `*`. This will break some join queries that don't have an explicit select clause. [#161](https://github.com/Vincit/objection.js/issues/161)
+ 
 ## 0.6.2
 
 ### What's new
