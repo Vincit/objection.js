@@ -5660,9 +5660,7 @@ Person.omitImp = function (obj, prop) {
 
 Omit implementation to use.
 
-The default just sets the property to undefined for performance reasons.
-If the slight performance drop is not an issue for you, you can override
-this method to delete the property instead.
+The default implementation `delete`s the property.
 
 
 
@@ -5800,7 +5798,7 @@ Person.prototype.$beforeValidate = function (jsonSchema, json, opt) {
 ```js
 class Person extends Model {
   $beforeValidate(jsonSchema, json, opt) {
-
+    return jsonSchema;
   }
 }
 ```

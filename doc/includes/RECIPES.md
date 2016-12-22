@@ -36,20 +36,86 @@ Person.prototype.$beforeInsert = function () {
 };
 ```
 
-> Replace `jsonSchema` validation:
+> Modify the [Ajv](https://github.com/epoberezkin/ajv) based `jsonSchema` validation:
 
 ```js
-Person.prototype.$validate = function (objectToValidate, options) {
-  // This makes revalidation possible: `someModel.$validate()`.
-  objectToValidate = objectToValidate || this;
+const AjvValidator = require('objection').AjvValidator;
 
-  if (!someCustomValidator(objectToValidate)) {
-    throw new objection.ValidationError({someProp: 'validation error message for the property'});
+class Model {
+  static createValidator() {
+    return new AjvValidator({
+      onCreateAjv: (ajv) => { 
+        // Here you can modify the `Ajv` instance. 
+      },
+      options: {
+        allErrors: true,
+        validateSchema: false,
+        ownProperties: true,
+        v5: true
+      }
+    });
   }
+}
+```
 
-  // Remember to return the input json object.
-  return objectToValidate;
-};
+> Replace `jsonSchema` validation with any other validation scheme by
+> implementing a custom [`Validator`](#validator):
+
+```js
+// MyCustomValidator.js
+
+const Validator = require('objection').Validator;
+
+class MyCustomValidator extends Validator {
+  validate(args) {
+    // The model instance. May be empty at this point.
+    const model = args.model;
+    
+    // The properties to validate. After validation these values will
+    // be merged into `model` by objection.
+    const json = args.json;
+    
+    // `ModelOptions` object. If your custom validator sets default
+    // values, you need to check the `opt.patch` boolean. If it is true
+    // we are validating a patch object, the defaults should not be set.
+    const opt = args.options;
+    
+    // A context object shared between the validation methods. A new
+    // object is created for each validation operation.
+    const ctx = args.ctx;
+    
+    // Do your validation here and throw any exception if the
+    // validation fails.
+    doSomeValidationAndThrowIfFails(json);
+    
+    // You need to return the (possibly modified) json.
+    return json;
+  }
+  
+  beforeValidate(args) {
+    // Takes the same arguments as `validate`. Usually there is no need
+    // to override this.
+    return super.beforeValidate(args);
+  }
+  
+  afterValidate(args) {
+    // Takes the same arguments as `validate`. Usually there is no need
+    // to override this.
+    return super.afterValidate(args);
+  }
+}
+
+// BaseModel.js
+
+const Model = require('objection').Model;
+
+// Override the `createValidator` method of a `Model` to use the
+// custom validator.
+class BaseModel extends Model {
+  static createValidator() {
+    return new MyCustomValidator();
+  }
+}
 ```
 
 If you want to use the json schema validation but add some custom validation on top of it you can override the
@@ -59,8 +125,8 @@ If you need to do validation on insert or update you can throw exceptions from t
 [`$beforeInsert`](#_s_beforeinsert) and [`$beforeUpdate`](#_s_beforeupdate) methods.
 
 If you don't want to use the built-in json schema validation, you can just ignore the [`jsonSchema`](#jsonschema) property.
-It is completely optional. If you want to use some other validation library, simply override the [`$validate`](#_s_validate)
-method of the model class. You need to throw a [`ValidationError`](#validationerror) when validation fails.
+It is completely optional. If you want to use some other validation library you need to implement a custom [`Validator`](#validator)
+(see the example).
 
 ## Map column names to different property names
 
