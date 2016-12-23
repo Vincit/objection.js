@@ -138,6 +138,7 @@ declare module "objection" {
    * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
   interface ModelClass<T extends Model> {
+    new(): T;
     tableName: string;
     jsonSchema: JsonSchema;
     idColumn: string;
@@ -150,7 +151,7 @@ declare module "objection" {
     dbRefProp: string;
     propRefRegex: RegExp;
     pickJsonSchemaProperties: boolean;
-    defaultEagerAlgorithm?: EagerAlgorithm
+    defaultEagerAlgorithm?: EagerAlgorithm;
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
     RelatedQueryBuilder: typeof QueryBuilder;
@@ -196,7 +197,7 @@ declare module "objection" {
     static dbRefProp: string;
     static propRefRegex: RegExp;
     static pickJsonSchemaProperties: boolean;
-    static defaultEagerAlgorithm?: EagerAlgorithm
+    static defaultEagerAlgorithm?: EagerAlgorithm;
     static defaultEagerOptions?: EagerOptions;
     static QueryBuilder: typeof QueryBuilder;
     static RelatedQueryBuilder: typeof QueryBuilder;
