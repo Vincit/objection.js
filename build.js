@@ -60,12 +60,14 @@ for (var i = 0; i < src.length; ++i) {
 try {
   var child_process = require('child_process');
   var process = require('process');
-
-  // TypeScript requires node > 4:
-  if (process.version > 'v4') {
-    // sanity-check the TypeScript definitions:
-    child_process.execSync(path.join(__dirname, "node_modules", ".bin", "tsc"), { cwd: __dirname });
-  }
 } catch (e) {
-  // node is too old, nevermind.
+  // node is < v5, don't bother with TypeScript.
+}
+
+if (process && process.version > 'v4') {
+  // sanity-check the TypeScript definitions:
+  child_process.execSync(
+    path.join(__dirname, "node_modules", ".bin", "tsc"),
+    { cwd: __dirname }
+  );
 }
