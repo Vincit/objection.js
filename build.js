@@ -64,7 +64,7 @@ try {
   // node is < v5, don't bother with TypeScript.
 }
 
-if (process && process.version > 'v4') {
+if (process && process.version >= 'v5') {
   // sanity-check the TypeScript definitions:
   child_process.execSync(
     path.join(__dirname, "node_modules", ".bin", "tsc"),
