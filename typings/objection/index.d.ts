@@ -2,10 +2,12 @@
 // Project: Objection.js <http://vincit.github.io/objection.js/>
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
+/// <reference types="node" />
+/// <reference types="knex" />
+
 declare module "objection" {
 
-  import * as knex from 'knex';
-  import { JsonSchema } from 'jsonschema';
+  import * as knex from "knex";
 
   export interface ModelOptions {
     patch: boolean;
@@ -42,6 +44,7 @@ declare module "objection" {
     join: RelationJoin;
     modify?: <T>(queryBuilder: QueryBuilder<T>) => {};
     filter?: <T>(queryBuilder: QueryBuilder<T>) => {};
+    orderBy?: string;
   }
 
   export interface EagerAlgorithm {
@@ -65,20 +68,31 @@ declare module "objection" {
   type RelationExpression = string;
 
   type FilterFunction = <T>(queryBuilder: QueryBuilder<T>) => void;
-  
+
   type FilterExpression = { [namedFilter: string]: FilterFunction };
 
   interface RelationExpressionMethod {
     <T>(relationExpression: RelationExpression): QueryBuilder<T>;
   }
 
-  type TraverserFunction = (model: typeof Model, parentModel: string | typeof Model, relationName: string) => void;
+  interface TraverserFunction {
+    /** 
+     * Called if model is in a relation of some other model.
+     * @param model the model itself
+     * @param parentModel the parent model
+     * @param relationName the name of the relation
+     */
+    (model: Model, parentModel: Model, relationName: string): void;
+  }
 
   type Id = string | number;
 
-  type IdOrIds = Id | Id[];
+  type Ids = Id[];
 
-  type ModelsOrObjects = Model | Object | Model[] | Object[];
+  type IdOrIds = Id | Ids;
+
+  type ModelOrObject = Model | Object
+  type ModelsOrObjects = ModelOrObject | Model[] | Object[];
 
   type RelationOptions = { alias: boolean | string };
 
@@ -109,24 +123,26 @@ declare module "objection" {
   }
 
   interface BluebirdMapper<T, Result> {
-    (item: T, index: number): Result
+    (item: T, index: number): Result;
   }
 
   interface NodeStyleCallback {
     (err: any, result?: any): void
   }
 
+  type Filters<T> = { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void };
+  type Properties = { [propertyName: string]: boolean };
+
   /**
-   * This is a hack to make bindKnex and other static methods return the subclass type, rather than Model.
+   * This is a hack to support referencing a given Model subclass constructor.
    * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
-  interface ModelClass<T> {
-    new (...a: any[]): T;
+  interface ModelClass<T extends Model> {
     tableName: string;
     jsonSchema: JsonSchema;
     idColumn: string;
     modelPaths: string[];
-    relationMappings: RelationMappings | any;
+    relationMappings: RelationMappings;
     jsonAttributes: string[];
     virtualAttributes: string[];
     uidProp: string;
@@ -138,8 +154,10 @@ declare module "objection" {
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
     RelatedQueryBuilder: typeof QueryBuilder;
+
     raw: knex.RawBuilder;
     fn: knex.FunctionHelper;
+
     BelongsToOneRelation: Relation;
     HasOneRelation: Relation;
     HasManyRelation: Relation;
@@ -150,23 +168,20 @@ declare module "objection" {
     formatter(): any; // < the knex typings punts here too
     knexQuery(): QueryBuilder<T>;
 
-    bindKnex(knex: knex): T & ModelClass<T>;
-    bindTransaction(transaction: Transaction): T & ModelClass<T>;
-    extend(subclass: T): T & ModelClass<T>;
+    bindKnex(knex: knex): this;
+    bindTransaction(transaction: Transaction): this;
+    extend<S>(subclass: S): S & this;
 
-    fromJson(json: Object, opt: ModelOptions): T & Model;
-    fromDatabaseJson(row: Object): T & Model;
+    fromJson(json: Object, opt?: ModelOptions): T;
+    fromDatabaseJson(row: Object): T;
 
     omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    loadRelated<T>(models: T[], expression: RelationExpression, filters: Filters<T>): void;
+    loadRelated(models: (Model | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
 
-    traverse(filterConstructor: ModelClass<any>, models: Model | Model[], traverser: TraverserFunction): void;
+    traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
   }
-
-  type Filters<T> = { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void };
-  type Properties = { [propertyName: string]: boolean };
 
   export class Model {
     static tableName: string;
@@ -194,26 +209,25 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
-    static query<T>(this: { new(): T }, trx?: Transaction): QueryBuilder<T>;
-    static query<T>(trx?: Transaction): QueryBuilder<T>;
+    // "{ new(): T }" 
+    // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
+    static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
+    static knexQuery<T>(this: { new (): T }): QueryBuilder<T>;
 
-    // This approach should be applied to all other references of Model that 
-    // should return the subclass:
     static bindKnex<T>(this: T, knex: knex): T;
-    static bindTransaction<T extends Model>(this: ModelClass<T>, transaction: Transaction): ModelClass<T>;
-    static extend<T>(subclass: T): ModelClass<T>;
+    static bindTransaction<T>(this: T, transaction: Transaction): T;
+    static extend<S, T>(this: T, subclass: S): S & T;
 
-    static fromJson<T extends Model>(this: ModelClass<T>, json: Object, opt?: ModelOptions): T;
-    static fromDatabaseJson<T extends Model>(this: ModelClass<T>, row: Object): T;
+    static fromJson<T>(this: T, json: Object, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: T, row: Object): T;
 
     static omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    static loadRelated<T>(models: T[], expression: RelationExpression, filters: Filters<T>): void;
+    static loadRelated<T>(this: { new (): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
 
-    static traverse(filterConstructor: ModelClass<any>, models: Model | Model[], traverser: TraverserFunction): void;
+    static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
 
     $id(): any;
@@ -234,21 +248,27 @@ declare module "objection" {
     $setDatabaseJson(json: Object): this;
 
     $set(obj: Object): this;
-    $omit(keys: string | string[] | Properties): this
+    $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
     $clone(): this;
 
-    $query(trx?: Transaction): SingleQueryBuilder<this>;
-    $query<T>(trx?: Transaction): SingleQueryBuilder<T>;
-    $relatedQuery<T>(relationName: string, transaction?: Transaction): QueryBuilder<T>;
+    /**
+     * AKA `reload` in ActiveRecord parlance
+     */
+    $query(trx?: Transaction): QueryBuilderSingle<this>;
 
-    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilder<T>;
+    /**
+     * @return `QueryBuilder<Model>` because we don't know the type of the relation.
+     */
+    $relatedQuery(relationName: string, transaction?: Transaction): QueryBuilder<Model>;
+
+    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
 
     $traverse(traverser: TraverserFunction): void;
-    $traverse<T extends Model>(this: ModelClass<T>, filterConstructor: ModelClass<T>, traverser: TraverserFunction): void;
+    $traverse(filterConstructor: this, traverser: TraverserFunction): void;
 
     $knex(): knex;
-    $transaction(): knex; // TODO: this is based on the documentation, but doesn't make sense (why not Transaction?)
+    $transaction(): knex;
 
     $beforeInsert(queryContext: Object): Promise<any> | void;
     $afterInsert(queryContext: Object): Promise<any> | void;
@@ -258,36 +278,73 @@ declare module "objection" {
 
   export class QueryBuilder<T> {
     static extend(subclassConstructor: FunctionConstructor): void;
-    static forClass<T>(modelClass: T): QueryBuilder<T>;
+    static forClass<T extends Model>(modelClass: ModelClass<T>): QueryBuilder<T>;
   }
 
-  export interface SingleQueryBuilder<T> extends QueryBuilderBase<T>, Promise<T> {
+  /**
+   * QueryBuilder with one expected result
+   */
+  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, Promise<T> { }
 
+  /**
+   * QueryBuilder with zero or one expected result
+   * (Using the Scala `Option` terminology)
+   */
+  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Promise<T | undefined> { }
+
+  /**
+   * QueryBuilder with zero or more expected results
+   */
+  export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
+
+  interface Insert {
+    <M extends ModelOrObject>(modelOrObject?: M): QueryBuilderSingle<M>;
+    <M extends ModelsOrObjects>(modelsOrObjects?: M): QueryBuilder<M>;
+    (): this;
   }
 
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> {}
+  interface InsertGraphAndFetch<T> {
+    (modelsOrObjects: Model): QueryBuilderSingle<T>;
+    (modelsOrObjects: Model[]): QueryBuilder<T>;
+    (modelsOrObjects?: ModelsOrObjects): QueryBuilderBase<T>;
+  }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
 
-    findById(idOrIds: IdOrIds): SingleQueryBuilder<T>;
+    findById(id: Id): QueryBuilderOption<T>;
+    findById(idOrIds: IdOrIds): this;
 
-    insert(modelsOrObjects?: ModelsOrObjects): this;
-    insertAndFetch(modelsOrObjects: ModelsOrObjects): this;
+    insert: Insert;
+    insertAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    insertAndFetch(modelsOrObjects?: ModelsOrObjects): QueryBuilder<T>;
 
-    insertGraph(modelsOrObjects: ModelsOrObjects): this;
-    insertGraphAndFetch(modelsOrObjects: ModelsOrObjects): this;
+    insertGraph: Insert;
+    insertGraphAndFetch: InsertGraphAndFetch<T>
 
-    insertWithRelated(graph: ModelsOrObjects): this;
-    insertWithRelatedAndFetch(graph: ModelsOrObjects): this;
+    /**
+     * insertWithRelated is an alias for insertGraph.
+     */
+    insertWithRelated: Insert;
+    insertWithRelatedAndFetch: InsertGraphAndFetch<T>
 
-    update(modelOrObject: Object | Model): this;
-    updateAndFetchById(id: Id, modelOrObject: Object | Model): this;
+    /**
+     * @return a Promise of the number of updated rows
+     */
+    update(modelOrObject: ModelOrObject): QueryBuilderSingle<number>;
+    updateAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    updateAndFetchById(id: Id, modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
 
-    patch(modelOrObject: Object | Model): this;
-    patchAndFetchById(id: Id, modelOrObject: Object | Model): this;
-    patchAndFetch(modelOrObject: Object | Model): this;
+    /**
+     * @return a Promise of the number of patched rows
+     */
+    patch(modelOrObject: ModelOrObject): QueryBuilderSingle<number>;
+    patchAndFetchById(id: Id, modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    patchAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
 
-    deleteById(idOrIds: IdOrIds): this;
+    /**
+     * @return a Promise of the number of deleted rows
+     */
+    deleteById(idOrIds: IdOrIds): QueryBuilderSingle<number>;
 
     relate(ids: IdOrIds | ModelsOrObjects): this;
     unrelate(): this;
@@ -375,7 +432,7 @@ declare module "objection" {
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
     eager(relationExpression: RelationExpression, filters?: FilterExpression): this;
-    
+
     allowEager: RelationExpressionMethod;
     modifyEager: ModifyEager<T>;
     filterEager: ModifyEager<T>;
@@ -413,57 +470,46 @@ declare module "objection" {
     page(page: number, pageSize: number): this;
     range(start: number, end: number): this;
     pluck(propertyName: string): this;
-    first(): SingleQueryBuilder<T>;
+    first(): QueryBuilderOption<T>;
 
     traverse(modelClass: typeof Model, traverser: TraverserFunction): this;
 
     pick(modelClass: typeof Model, properties: string[]): this;
     pick(properties: string[]): this;
-    
+
     omit(modelClass: typeof Model, properties: string[]): this;
     omit(properties: string[]): this;
   }
 
-    export interface transaction {
+  export interface transaction {
     start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
 
-    <M extends Model, T>(
-      modelClass: ModelClass<M>,
-      callback: (boundModelClass: ModelClass<M>) => Promise<T>
+    <MC extends ModelClass<any>, T>(
+      modelClass: MC,
+      callback: (boundModelClass: MC) => Promise<T>
     ): Promise<T>;
 
-    <M1 extends Model, M2 extends Model, T>(
-      modelClass1: ModelClass<M1>,
-      modelClass2: ModelClass<M2>,
-      callback: (
-        boundModelClass1: ModelClass<M1>,
-        boundModelClass2: ModelClass<M2>
-      ) => Promise<T>
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, T>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2) => Promise<T>
     ): Promise<T>;
 
-    <M1 extends Model, M2 extends Model, M3 extends Model, T>(
-      modelClass1: ModelClass<M1>,
-      modelClass2: ModelClass<M2>,
-      modelClass3: ModelClass<M3>,
-      callback: (
-        boundModelClass1: ModelClass<M1>,
-        boundModelClass2: ModelClass<M2>,
-        boundModelClass3: ModelClass<M3>
-      ) => Promise<T>
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, T>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3) => Promise<T>
     ): Promise<T>;
 
-    <M1 extends Model, M2 extends Model, M3 extends Model, M4 extends Model, T>(
-      modelClass1: ModelClass<M1>,
-      modelClass2: ModelClass<M2>,
-      modelClass3: ModelClass<M3>,
-      modelClass4: ModelClass<M4>,
-      callback: (
-        boundModelClass1: ModelClass<M1>,
-        boundModelClass2: ModelClass<M2>,
-        boundModelClass3: ModelClass<M3>,
-        boundModelClass4: ModelClass<M4>
-      ) => Promise<T>
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, MC4 extends ModelClass<any>, T>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      modelClass4: MC4,
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, boundModel4Class: MC4) => Promise<T>
     ): Promise<T>;
+
   }
 
   export const transaction: transaction
@@ -476,11 +522,16 @@ declare module "objection" {
   type Raw = knex.Raw
 
   //
-  // The following is lifted from knex's index.d.ts, to change the signatures 
-  // to return Objection's QueryBuilder wrapper, rather than the knex QueryBuilder:
+  // Lifted from knex's index.d.ts, to change the signatures 
+  // to return Objection's typed QueryBuilder wrapper:
   //
 
-  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw;
+  /**
+   * Value encompasses any where clause operand.
+   * `null` is valid and represents SQL `NULL`. Also see `WhereNull`.
+   * `undefined` is not valid, most likely resulting from programmer error.
+   */
+  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw | null;
   type ColumnName<T> = string | Raw | QueryBuilder<T>;
   type TableName<T> = string | Raw | QueryBuilder<T>;
 
@@ -547,7 +598,7 @@ declare module "objection" {
 
     // Union
     union: Union<T>;
-    unionAll(callback: Function): this;    
+    unionAll(callback: Function): this;
 
     // Having
     having: Having<T>;
@@ -570,21 +621,18 @@ declare module "objection" {
     decrement(columnName: string, amount?: number): this;
 
     // Others
-    first(...columns: string[]): SingleQueryBuilder<T>;
-    first<T>(...columns: string[]): SingleQueryBuilder<T>;
+    first(...columns: string[]): QueryBuilderOption<T>;
+    first<T>(...columns: string[]): QueryBuilderOption<T>;
 
     debug(enabled?: boolean): this;
     pluck(column: string): this;
 
-    insert(data: any, returning?: string | string[]): this;
-    update(data: any, returning?: string | string[]): this;
-    update(columnName: string, value: Value, returning?: string | string[]): this;
     returning(column: string | string[]): this;
 
     del(returning?: string | string[]): this;
-    del<T>(returning?: string | string[]): SingleQueryBuilder<T>;
+    del<T>(returning?: string | string[]): QueryBuilderOption<T>;
     delete(returning?: string | string[]): this;
-    delete<T>(returning?: string | string[]): SingleQueryBuilder<T>;
+    delete<T>(returning?: string | string[]): QueryBuilderOption<T>;
     truncate(): this;
 
     transacting(trx: Transaction): this;
@@ -719,5 +767,159 @@ declare module "objection" {
     (sql: string, ...bindings: Value[]): QueryBuilder<T>;
     (sql: string, bindings: Value[]): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
+  }
+
+  // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
+
+  /*
+   * MIT License
+   *
+   * Copyright (c) 2016 Richard Adams (https://github.com/enriched)
+   *
+   * Permission is hereby granted, free of charge, to any person obtaining a copy
+   * of this software and associated documentation files (the "Software"), to deal
+   * in the Software without restriction, including without limitation the rights
+   * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   * copies of the Software, and to permit persons to whom the Software is
+   * furnished to do so, subject to the following conditions:
+   *
+   * The above copyright notice and this permission notice shall be included in all
+   * copies or substantial portions of the Software.
+   *
+   * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   * SOFTWARE.
+   */
+
+  export interface JsonSchema {
+    $ref?: string
+    /////////////////////////////////////////////////
+    // Schema Metadata
+    /////////////////////////////////////////////////
+    /**
+     * This is important because it tells refs where
+     * the root of the document is located
+     */
+    id?: string
+    /**
+     * It is recommended that the meta-schema is
+     * included in the root of any JSON Schema
+     */
+    $schema?: JsonSchema
+    /**
+     * Title of the schema
+     */
+    title?: string
+    /**
+     * Schema description
+     */
+    description?: string
+    /**
+     * Default json for the object represented by
+     * this schema
+     */
+    default?: any
+
+    /////////////////////////////////////////////////
+    // Number Validation
+    /////////////////////////////////////////////////
+    /**
+     * The value must be a multiple of the number
+     * (e.g. 10 is a multiple of 5)
+     */
+    multipleOf?: number
+    maximum?: number
+    /**
+     * If true maximum must be > value, >= otherwise
+     */
+    exclusiveMaximum?: boolean
+    minimum?: number
+    /**
+     * If true minimum must be < value, <= otherwise
+     */
+    exclusiveMinimum?: boolean
+
+    /////////////////////////////////////////////////
+    // String Validation
+    /////////////////////////////////////////////////
+    maxLength?: number
+    minLength?: number
+    /**
+     * This is a regex string that the value must
+     * conform to
+     */
+    pattern?: string
+
+    /////////////////////////////////////////////////
+    // Array Validation
+    /////////////////////////////////////////////////
+    additionalItems?: boolean | JsonSchema
+    items?: JsonSchema | JsonSchema[]
+    maxItems?: number
+    minItems?: number
+    uniqueItems?: boolean
+
+    /////////////////////////////////////////////////
+    // Object Validation
+    /////////////////////////////////////////////////
+    maxProperties?: number
+    minProperties?: number
+    required?: string[]
+    additionalProperties?: boolean | JsonSchema
+    /**
+     * Holds simple JSON Schema definitions for
+     * referencing from elsewhere.
+     */
+    definitions?: { [key: string]: JsonSchema }
+    /**
+     * The keys that can exist on the object with the
+     * json schema that should validate their value
+     */
+    properties?: { [property: string]: JsonSchema }
+    /**
+     * The key of this object is a regex for which
+     * properties the schema applies to
+     */
+    patternProperties?: { [pattern: string]: JsonSchema }
+    /**
+     * If the key is present as a property then the
+     * string of properties must also be present.
+     * If the value is a JSON Schema then it must
+     * also be valid for the object if the key is
+     * present.
+     */
+    dependencies?: { [key: string]: JsonSchema | string[] }
+
+    /////////////////////////////////////////////////
+    // Generic
+    /////////////////////////////////////////////////
+    /**
+     * Enumerates the values that this schema can be
+     * e.g.
+     * {"type": "string",
+     *  "enum": ["red", "green", "blue"]}
+     */
+    enum?: any[]
+    /**
+     * The basic type of this schema, can be one of
+     * [string, number, object, array, boolean, null]
+     * or an array of the acceptable types
+     */
+    type?: string | string[]
+
+    /////////////////////////////////////////////////
+    // Combining Schemas
+    /////////////////////////////////////////////////
+    allOf?: JsonSchema[]
+    anyOf?: JsonSchema[]
+    oneOf?: JsonSchema[]
+    /**
+     * The entity being validated must not match this schema
+     */
+    not?: JsonSchema
   }
 }
