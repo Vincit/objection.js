@@ -149,7 +149,6 @@ export default function (app: express.Application) {
       await movie
         .$relatedQuery('actors')
         .relate(req.body.id)
-        .then(() => res.send(req.body))
         .catch(next);
     }
   });
