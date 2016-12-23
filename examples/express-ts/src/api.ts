@@ -7,32 +7,31 @@ import Movie from './models/Movie';
 export default function (app: express.Application) {
 
   // Create a new Person.
-  app.post('/persons', async function (req, res, next) {
-    const person = await Person
+  app.post('/persons', function (req, res, next) {
+    return Person
       .query()
       .insert(req.body)
+      .then(person => res.send(person))
       .catch(next);
-
-    res.send(person);
   });
 
   // Patch a Person.
-  app.patch('/persons/:id', async function (req, res, next) {
-    const person = await Person
+  app.patch('/persons/:id', function (req, res, next) {
+    return Person
       .query()
-      .patchAndFetchById(req.params.id, req.body);
-
-    res.send(person);
+      .patchAndFetchById(req.params.id, req.body)
+      .then(person => res.send(person))
+      .catch(next);
   });
 
   // Get all Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
-  app.get('/persons', async function (req, res, next) {
+  app.get('/persons', function (req, res, next) {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
-    const persons = await Person
+    return Person
       .query()
       .allowEager('[pets, children.[pets, movies], movies]')
       .eager(req.query.eager)
@@ -40,20 +39,18 @@ export default function (app: express.Application) {
       .where('age', '>=', req.query.minAge)
       .where('age', '<', req.query.maxAge)
       .where('firstName', 'like', req.query.firstName)
+      .then(persons => res.send(persons))
       .catch(next);
-
-    res.send(persons);
   });
 
   // Delete a person.
-  app.delete('/persons/:id', async function (req, res, next) {
-    await Person
+  app.delete('/persons/:id', function (req, res, next) {
+    return Person
       .query()
       .delete()
       .where('id', req.params.id)
+      .then(() => res.send({}))
       .catch(next);
-
-    res.send({});
   });
 
   // Add a child for a Person.
@@ -64,15 +61,14 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!person) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      await person
+        .$relatedQuery('children')
+        .insert(req.body)
+        .then(child => res.send(child))
+        .catch(next);
     }
-
-    const child = await person
-      .$relatedQuery('children')
-      .insert(req.body)
-      .catch(next);
-
-    res.send(child);
   });
 
   // Add a pet for a Person.
@@ -83,15 +79,14 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!person) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      await person
+        .$relatedQuery('pets')
+        .insert(req.body)
+        .then(pet => res.send(pet))
+        .catch(next);
     }
-
-    const pet = await person
-      .$relatedQuery('pets')
-      .insert(req.body)
-      .catch(next);
-
-    res.send(pet);
   });
 
   // Get a Person's pets. The result can be filtered using query parameters
@@ -103,43 +98,42 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!person) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+
+      // We don't need to check for the existence of the query parameters because
+      // we call the `skipUndefined` method. It causes the query builder methods
+      // to do nothing if one of the values is undefined.
+      return person
+        .$relatedQuery('pets')
+        .skipUndefined()
+        .where('name', 'like', req.query.name)
+        .where('species', req.query.species)
+        .then(pets => res.send(pets))
+        .catch(next);
     }
-
-    // We don't need to check for the existence of the query parameters because
-    // we call the `skipUndefined` method. It causes the query builder methods
-    // to do nothing if one of the values is undefined.
-    const pets = await person
-      .$relatedQuery('pets')
-      .skipUndefined()
-      .where('name', 'like', req.query.name)
-      .where('species', req.query.species)
-      .catch(next);
-
-    res.send(pets);
   });
 
   // Add a movie for a Person.
-  app.post('/persons/:id/movies', async function (req, res, next) {
+  app.post('/persons/:id/movies', function (req, res, next) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    const movie = await objection.transaction(Person, async function (Person) {
+    return objection.transaction(Person, async (Person) => {
       const person = await Person
         .query()
         .findById(req.params.id)
         .catch(next);
 
       if (!person) {
-        next(throwNotFound);
+        res.sendStatus(404);
+      } else {
+        await person
+          .$relatedQuery('movies')
+          .insert(req.body)
+          .then(movie => res.send(movie))
+          .catch(next);
       }
-
-      return await person
-        .$relatedQuery('movies')
-        .insert(req.body)
-        .catch(next);
     });
-
-    res.send(movie);
   });
 
   // Add existing Person as an actor to a movie.
@@ -150,15 +144,14 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!movie) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      await movie
+        .$relatedQuery('actors')
+        .relate(req.body.id)
+        .then(() => res.send(req.body))
+        .catch(next);
     }
-
-    await movie
-      .$relatedQuery('actors')
-      .relate(req.body.id)
-      .catch(next);
-
-    res.send(req.body);
   });
 
   // Get Movie's actors.
@@ -169,16 +162,12 @@ export default function (app: express.Application) {
       .catch(next);
 
     if (!movie) {
-      next(throwNotFound);
+      res.sendStatus(404);
+    } else {
+      await movie
+        .$relatedQuery('actors')
+        .then(movie => res.send(movie))
+        .catch(next);
     }
-
-    const actors = await movie.$relatedQuery('actors');
-
-    res.send(actors);
   });
 };
-
-// The error thrown by this function is handled in the error handler middleware in app.js.
-function throwNotFound() {
-  throw new Error('not found');
-}

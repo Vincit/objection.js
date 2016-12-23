@@ -1,8 +1,8 @@
 var babel = require('babel-core');
+var fs = require('fs');
 var glob = require('glob');
 var fsExtra = require('fs-extra');
 var path = require('path');
-var fs = require('fs');
 
 var SRC_DIR = './src';
 var DST_DIR = './lib';
@@ -55,4 +55,17 @@ for (var i = 0; i < src.length; ++i) {
 
   fsExtra.ensureDirSync(path.dirname(dst));
   fs.writeFileSync(dst, code);
+}
+
+try {
+  var child_process = require('child_process');
+  var process = require('process');
+
+  // TypeScript requires node > 4:
+  if (process.version > 'v4') {
+    // sanity-check the TypeScript definitions:
+    child_process.execSync(path.join(__dirname, "node_modules", ".bin", "tsc"), { cwd: __dirname });
+  }
+} catch (e) {
+  // node is too old, nevermind.
 }
