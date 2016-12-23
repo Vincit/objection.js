@@ -6,8 +6,8 @@
   "license": "MIT",
   "scripts": {
     "build": "node build",
-    "test": "npm run build && tsc && istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 15000 --reporter spec --recursive tests",
-    "test-travis": "npm run build && tsc && istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests",
+    "test": "npm run build && istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 15000 --reporter spec --recursive tests",
+    "test-travis": "npm run build && istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests",
     "test-bail": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
     "test-only": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
     "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining",
