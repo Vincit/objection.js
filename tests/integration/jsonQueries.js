@@ -100,9 +100,8 @@ module.exports = function (session) {
           ])
           .orderBy('firstArrayItem', 'desc')
           .then(function (result) {
-            console.log("Got data", result);
             expect(result).to.have.length(4);
-            // foo is always name of the first row of the table (pretty nonsense query)
+            // foo is always name of the first row of the table (quite a nonsense query)
             expect(_.first(result)).eql({ foo: 'test1', firstArrayItem: 4 });
           });
       });
@@ -144,8 +143,7 @@ module.exports = function (session) {
           });
       });
 
-      it.skip('should be able to use ref with double nested join builder', function () {
-        // select * from foo join bar on ref() = ref()
+      it('should be able to use ref with double nested join builder', function () {
         return BoundModel.query()
           .join('ModelJson as t2', function (builder) {
             builder
@@ -164,7 +162,7 @@ module.exports = function (session) {
           })
           .select('t2.*')
           .then(function (result) {
-            console.log("Got data, check the result when implemented", result);
+            expect(result).to.have.length(3);
           });
       });
 

@@ -1,6 +1,5 @@
-import QueryBuilderBase from '../QueryBuilderBase';
 import QueryBuilderOperation from './QueryBuilderOperation';
-import {isKnexQueryBuilder} from '../../utils/dbUtils';
+import {isKnexQueryBuilder, isKnexJoinBuilder} from '../../utils/dbUtils';
 import ReferenceBuilder from '../ReferenceBuilder';
 
 export default class WrappingQueryBuilderOperation extends QueryBuilderOperation {
@@ -18,6 +17,8 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
 }
 
 function wrapArgs(op, builder, args) {
+  const QueryBuilderBase = require('../QueryBuilderBase').default;
+
   const skipUndefined = builder.shouldSkipUndefined();
   const knex = builder.knex();
 
@@ -57,15 +58,25 @@ function wrapArgs(op, builder, args) {
 }
 
 function wrapFunctionArg(func, knex) {
+  // preventing cyclic deps
+  const QueryBuilderBase = require('../QueryBuilderBase').default;
+  const JoinBuilder = require('../JoinBuilder').default;
+
   return function wrappedKnexFunctionArg() {
     if (isKnexQueryBuilder(this)) {
       const knexQueryBuilder = this;
       // Wrap knex query builder into a QueryBuilderBase so that we can use
       // our extended query builder in nested queries.
       const wrappedQueryBuilder = new QueryBuilderBase(knex);
-
       func.call(wrappedQueryBuilder, wrappedQueryBuilder);
       wrappedQueryBuilder.buildInto(knexQueryBuilder);
+
+    } else if (isKnexJoinBuilder(this)) {
+      const knexQueryBuilder = this;
+      const joinClauseBuilder = new JoinBuilder(knex);
+      func.call(joinClauseBuilder, joinClauseBuilder);
+      joinClauseBuilder.buildInto(knexQueryBuilder);
+
     } else {
       // This case is for function argument `join` operation and other methods that
       // Don't take a query builder as the first parameter.

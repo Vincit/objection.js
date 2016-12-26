@@ -5,6 +5,7 @@ import {inherits} from '../utils/classUtils';
 import QueryBuilderContextBase from './QueryBuilderContextBase';
 
 import KnexOperation from './operations/KnexOperation';
+
 import SelectOperation from './operations/SelectOperation';
 import WhereRefOperation from './operations/WhereRefOperation';
 import WhereCompositeOperation from './operations/WhereCompositeOperation';

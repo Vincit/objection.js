@@ -6,7 +6,6 @@ export default function queryBuilderOperation(input, name) {
 
   return function (target, property, descriptor) {
     const operationName = name || property;
-
     if (_.isFunction(input) || _.isArray(input)) {
       descriptor.value = function decorator$queryBuilderOperation() {
         const args = new Array(arguments.length);
