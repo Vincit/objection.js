@@ -295,7 +295,7 @@ export default class DependencyGraph {
       let node = nodes[n];
 
       if (node.handled) {
-        return;
+        continue;
       }
 
       if (this.isCyclicNode(node)) {
