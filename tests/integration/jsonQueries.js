@@ -175,10 +175,23 @@ module.exports = function (session) {
           });
       });
 
-      it.skip('should be able to use ref with groupBy and having', function () {
+      it('should be able to use ref with groupBy and having (last argument of having is ref)', function () {
         return BoundModel.query()
           .select(['id', ref('jsonObject:attr').as('foo')])
           .groupBy([ref('jsonObject:attr'), 'id'])
+          .having('id', '>=', ref('jsonObject:attr').castInt())
+          .orderBy('foo')
+          .then(function (result) {
+            expect(result).to.have.length(3);
+            expect(_.first(result)).to.eql({ id: 2, foo: 2 });
+          });
+      });
+
+      it.skip('should be able to use ref with groupBy and having (also first arg is ref)', function () {
+        return BoundModel.query()
+          .select(['id', ref('jsonObject:attr').as('foo')])
+          .groupBy([ref('jsonObject:attr'), 'id'])
+          // knex doesn't support knex raw as first arg here so this test fails....
           .having(ref('id').castInt(), '>=', ref('jsonObject:attr').castInt())
           .orderBy('foo')
           .then(function (result) {
@@ -187,17 +200,17 @@ module.exports = function (session) {
           });
       });
 
-      it.skip('should be able to use ref with groupBy and nested having', function () {
+      it('should be able to use ref with groupBy and nested having', function () {
         return BoundModel.query()
           .select(['id', ref('jsonObject:attr').as('foo')])
           .groupBy([ref('jsonObject:attr'), 'id'])
-          .having(ref('id').castInt(), '>=', ref('jsonObject:attr').castInt())
+          .having('id', '>=', ref('jsonObject:attr').castInt())
           // knex doesnt seem to support nested having
           .having(function (builder) {
             builder
-              .having(ref('id'), '=', ref('id'))
+              .having('id', '=', ref('id'))
               .having(function (nestedBuilder) {
-                nestedBuilder.having(ref('id'), '=', ref('id'));
+                nestedBuilder.having('id', '=', ref('id'));
               });
           })
           .orderBy('foo')
