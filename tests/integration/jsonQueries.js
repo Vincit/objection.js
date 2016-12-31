@@ -235,7 +235,21 @@ module.exports = function (session) {
       });
     });
 
-    describe.skip('.update()', function () {
+    describe('.update()', function () {
+      before(function () {
+        return BoundModel
+          .query()
+          .truncate()
+          .then(function () {
+            return BoundModel.query().insert([
+              {name: "test1", jsonObject: {}, jsonArray: [ 1 ]},
+              {name: "test2", jsonObject: { attr: 2 }, jsonArray: [ 2 ]},
+              {name: "test3", jsonObject: { attr: 3 }, jsonArray: [ 3 ]},
+              {name: "test4", jsonObject: { attr: 4 }, jsonArray: [ 4 ]},
+            ]);
+          });
+      });
+
       it('should update nicely', function () {
         let SchemalessBoundModel = Model.bindKnex(session.knex);
 
@@ -252,12 +266,17 @@ module.exports = function (session) {
             // each attribute which is updated with ref must be updated separately
             // e.g. SET "jsonArray" = '[ ref(...), ref(...) ]' just isn't valid SQL
             // (though it could be kind of parsed to multiple jsonb_set calls which would be insanely cool)
-            jsonArray: ref('name')
+            jsonArray: ref('name').castJson()
           })
           .where('id', 1) // something something
-          .return('*')
+          .returning('*')
           .then(function (result) {
-            console.log("Got data.. check when implemented", result);
+            expect(result).to.eql([{
+              id: 1,
+              name: '1',
+              jsonObject: { attr: 'test1' },
+              jsonArray: 'test1' }
+            ]);
           });
       });
     });
@@ -272,6 +291,7 @@ module.exports = function (session) {
             jsonArray: ref('name')
           })
           .where('id', 1)
+          .returning('*')
           .then(function (result) {
             console.log("Got data.. check when implemented", result);
           });
