@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "babel-node --presets stage-0,es2015 --plugins transform-class-properties app",
+    "db:migrate": "knex migrate:latest"
   },
   "author": "Sami Koskimäki",
   "license": "MIT",

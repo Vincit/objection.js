@@ -4,7 +4,8 @@
   "description": "Objection.js express ES6 example",
   "main": "app.js",
   "scripts": {
-    "start": "node --harmony app"
+    "start": "node --harmony app",
+    "db:migrate": "knex migrate:latest"
   },
   "author": "Sami Koskimäki",
   "license": "MIT",
