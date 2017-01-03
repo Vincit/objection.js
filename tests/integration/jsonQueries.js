@@ -235,8 +235,8 @@ module.exports = function (session) {
       });
     });
 
-    describe('.update()', function () {
-      before(function () {
+    describe('.update() and .patch()', function () {
+      beforeEach(function () {
         return BoundModel
           .query()
           .truncate()
@@ -250,16 +250,22 @@ module.exports = function (session) {
           });
       });
 
-      it('should update nicely', function () {
-        let SchemalessBoundModel = Model.bindKnex(session.knex);
+      it('should be able to use knex.raw to jsonb column in update', function () {
+        return BoundModel.query()
+          .update({
+            jsonArray: BoundModel.knex().raw('to_jsonb(??)', ['name'])
+          }).then(result => {
+            expect(result).to.be(4);
+          });
+      });
 
+      it('should update nicely', function () {
         // should do something like:
         // update "ModelJson" set
         //   "jsonArray" = jsonb_set('[]', '{0}', to_jsonb("name"), true),
         //   "jsonObject" = jsonb_set("jsonObject", '{attr}', to_jsonb("name"), true),
         //   "name" = "jsonArray"#>>'{0}' where "id" = 1 returning *;
-        return SchemalessBoundModel.query()
-          .table('ModelJson')
+        return BoundModel.query()
           .update({
             name: ref('jsonArray:[0]').castText(),
             'jsonObject:attr': ref('name'),
@@ -268,7 +274,7 @@ module.exports = function (session) {
             // (though it could be kind of parsed to multiple jsonb_set calls which would be insanely cool)
             jsonArray: ref('name').castJson()
           })
-          .where('id', 1) // something something
+          .where('id', 1)
           .returning('*')
           .then(function (result) {
             expect(result).to.eql([{
@@ -279,21 +285,24 @@ module.exports = function (session) {
             ]);
           });
       });
-    });
 
-    describe.skip('.patch()', function () {
       it('should patch nicely', function () {
         // same stuff that with patch but different api method
         return BoundModel.query()
           .patch({
             name: ref('jsonArray:[0]').castText(),
             'jsonObject:attr': ref('name'),
-            jsonArray: ref('name')
+            jsonArray: ref('name').castJson()
           })
           .where('id', 1)
           .returning('*')
           .then(function (result) {
-            console.log("Got data.. check when implemented", result);
+            expect(result).to.eql([{
+              id: 1,
+              name: '1',
+              jsonObject: { attr: 'test1' },
+              jsonArray: 'test1' }
+            ]);
           });
       });
     });
