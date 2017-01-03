@@ -209,7 +209,7 @@ export default class GraphInserter {
       const tableInsertion = batch[modelName];
 
       if (tableInsertion.models.length) {
-        const keys = _.keys(tableInsertion.models[0]);
+        const keys = _.uniq(_.flatMap(tableInsertion.models, _.keys));
 
         tableInsertion.models = _.uniqBy(tableInsertion.models, model => model.$propKey(keys));
         tableInsertion.isInputModel = _.times(tableInsertion.models.length, _.constant(false));
