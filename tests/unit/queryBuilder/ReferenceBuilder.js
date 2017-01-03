@@ -11,34 +11,34 @@ describe('ReferenceBuilder', function () {
   });
 
   it('should create ReferenceBuilder', function () {
-    let reference = ref('Awwww.ItWorks');
+    var reference = ref('Awwww.ItWorks');
     expect(reference instanceof ReferenceBuilder).to.be.ok();
     expect(reference.toRawArgs()).to.eql(['??', ['Awwww.ItWorks']]);
   });
 
   it('should allow plain knex reference + casting', function () {
-    let reference = ref('Table.Column').castBigInt();
+    var reference = ref('Table.Column').castBigInt();
     expect(reference.toRawArgs()).to.eql(['CAST(?? AS bigint)', ['Table.Column']]);
   });
 
   it('should allow field expression + casting', function () {
-    let reference = ref('Table.Column:jsonAttr').castBool();
-    expect(reference.toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS boolean)`, ['Table.Column']]);
+    var reference = ref('Table.Column:jsonAttr').castBool();
+    expect(reference.toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS boolean)", ['Table.Column']]);
   });
 
   it('should allow field expression + no casting', function () {
-    let reference = ref('Table.Column:jsonAttr');
-    expect(reference.toRawArgs()).to.eql([`??#>'{jsonAttr}'`, ['Table.Column']]);
+    var reference = ref('Table.Column:jsonAttr');
+    expect(reference.toRawArgs()).to.eql(["??#>'{jsonAttr}'", ['Table.Column']]);
   });
 
   it('should support few different casts', function () {
-    expect(ref('Table.Column:jsonAttr').castText().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS text)`, ['Table.Column']]);
-    expect(ref('Table.Column:jsonAttr').castInt().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS integer)`, ['Table.Column']]);
-    expect(ref('Table.Column:jsonAttr').castBigInt().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS bigint)`, ['Table.Column']]);
-    expect(ref('Table.Column:jsonAttr').castFloat().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS float)`, ['Table.Column']]);
-    expect(ref('Table.Column:jsonAttr').castDecimal().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS decimal)`, ['Table.Column']]);
-    expect(ref('Table.Column:jsonAttr').castReal().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS real)`, ['Table.Column']]);
-    expect(ref('Table.Column:jsonAttr').castBool().toRawArgs()).to.eql([`CAST(??#>>'{jsonAttr}' AS boolean)`, ['Table.Column']]);
-    expect(ref('Table.Column').castJson().toRawArgs()).to.eql([`to_jsonb(??)`, ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castText().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS text)", ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castInt().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS integer)", ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castBigInt().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS bigint)", ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castFloat().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS float)", ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castDecimal().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS decimal)", ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castReal().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS real)", ['Table.Column']]);
+    expect(ref('Table.Column:jsonAttr').castBool().toRawArgs()).to.eql(["CAST(??#>>'{jsonAttr}' AS boolean)", ['Table.Column']]);
+    expect(ref('Table.Column').castJson().toRawArgs()).to.eql(["to_jsonb(??)", ['Table.Column']]);
   });
 });

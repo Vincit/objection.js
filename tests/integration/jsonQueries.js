@@ -225,7 +225,7 @@ module.exports = function (session) {
       it('should insert nicely', function () {
         // this query actually isnt valid, but I couldn't figure any query where one would actually use ref as value
         // so just testing that refs are converted to raw correctly
-        let query = BoundModel.query()
+        var query = BoundModel.query()
           .insert({
             name: ref('jsonArray:[0]').castText(),
             jsonObject: ref('name').castJson(),
@@ -254,7 +254,7 @@ module.exports = function (session) {
         return BoundModel.query()
           .update({
             jsonArray: BoundModel.knex().raw('to_jsonb(??)', ['name'])
-          }).then(result => {
+          }).then(function (result) {
             expect(result).to.be(4);
           });
       });
