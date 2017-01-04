@@ -56,3 +56,18 @@ for (var i = 0; i < src.length; ++i) {
   fsExtra.ensureDirSync(path.dirname(dst));
   fs.writeFileSync(dst, code);
 }
+
+try {
+  var child_process = require('child_process');
+  var process = require('process');
+} catch (e) {
+  // node is < v5, don't bother with TypeScript.
+}
+
+if (process && process.version >= 'v5') {
+  // sanity-check the TypeScript definitions:
+  child_process.execSync(
+    path.join(__dirname, "node_modules", ".bin", "tsc"),
+    { cwd: __dirname }
+  );
+}

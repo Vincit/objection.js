@@ -43,8 +43,10 @@
     "README.md",
     "LICENSE",
     "lib/*",
-    "src/*"
+    "src/*",
+    "typings/*"
   ],
+  "types": "./typings/objection/index.d.ts",
   "dependencies": {
     "ajv": "^4.8.2",
     "babel-runtime": "^6.6.1",
@@ -55,6 +57,7 @@
     "knex": ">= 0.8.0 <= 0.12.5"
   },
   "devDependencies": {
+    "@types/knex": "^0.0.36",
     "babel-core": "^6.3.17",
     "babel-plugin-check-es2015-constants": "^6.3.13",
     "babel-plugin-transform-class-properties": "^6.3.13",
@@ -87,6 +90,7 @@
     "mysql": "^2.7.0",
     "pg": "^6.1.2",
     "source-map-support": "^0.4.3",
-    "sqlite3": "^3.0.8"
+    "sqlite3": "^3.0.8",
+    "typescript": "^2.0.8"
   }
 }
