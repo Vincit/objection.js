@@ -8,7 +8,10 @@
     "compile": "tsc",
     "start": "tsc && node lib/app.js"
   },
-  "author": "Sami Koskimäki and Matthew McEachen",
+  "author": "Sami Koskimäki",
+  "contributors": [
+    "Matthew McEachen <https://github.com/mceachen>"
+  ],
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.1",
@@ -16,7 +19,7 @@
     "knex": "^0.10.0",
     "lodash": "^4.12.0",
     "morgan": "^1.7.0",
-    "objection": "^0.6.1",
+    "objection": "../..",
     "sqlite3": "^3.1.3"
   },
   "devDependencies": {
@@ -26,8 +29,8 @@
     "@types/lodash": "^4.14.38",
     "@types/morgan": "^1.7.32",
     "@types/sqlite3": "^2.2.31",
-    "tslint": "^3.15.1",
-    "tslint-config-standard": "^1.5.0",
-    "typescript": "^2.0.8"
+    "tslint": "^4.0.2",
+    "tslint-config-standard": "^2.0.0",
+    "typescript": "=2.0.10"
   }
 }
