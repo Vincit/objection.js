@@ -64,10 +64,12 @@ try {
   // node is < v5, don't bother with TypeScript.
 }
 
+// sanity-check the TypeScript definitions, if possible:
 if (process && process.version >= 'v5') {
-  // sanity-check the TypeScript definitions:
-  child_process.execSync(
-    path.join(__dirname, "node_modules", ".bin", "tsc"),
-    { cwd: __dirname }
-  );
+  var tsc = path.join(__dirname, "node_modules", ".bin", "tsc")
+  if (fs.existsSync(tsc)) {
+    child_process.execSync(tsc, { cwd: __dirname });
+  } else {
+    console.log("The typescript compiler is missing. Run `npm install`.")
+  }
 }
