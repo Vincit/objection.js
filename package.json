@@ -91,6 +91,6 @@
     "pg": "^6.1.2",
     "source-map-support": "^0.4.3",
     "sqlite3": "^3.0.8",
-    "typescript": "=2.0.10"
+    "typescript": "2.1.4"
   }
 }
