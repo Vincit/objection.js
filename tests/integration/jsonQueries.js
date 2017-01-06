@@ -205,7 +205,6 @@ module.exports = function (session) {
           .select(['id', ref('jsonObject:attr').as('foo')])
           .groupBy([ref('jsonObject:attr'), 'id'])
           .having('id', '>=', ref('jsonObject:attr').castInt())
-          // knex doesnt seem to support nested having
           .having(function (builder) {
             builder
               .having('id', '=', ref('id'))
@@ -259,7 +258,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should update nicely', function () {
+      it('should be able to update internal field of json column and allow ref() syntax', function () {
         // should do something like:
         // update "ModelJson" set
         //   "jsonArray" = jsonb_set('[]', '{0}', to_jsonb("name"), true),
@@ -286,7 +285,7 @@ module.exports = function (session) {
           });
       });
 
-      it('should patch nicely', function () {
+      it('should be able to patch internal field of json column and allow ref() syntax', function () {
         // same stuff that with patch but different api method
         return BoundModel.query()
           .patch({
