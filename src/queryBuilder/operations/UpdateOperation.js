@@ -17,11 +17,24 @@ export default class UpdateOperation extends QueryBuilderOperation {
   }
 
   call(builder, args) {
+    this.model = builder.modelClass().ensureModel(args[0], this.modelOptions);
+    return true;
+  }
+
+  onBeforeInternal(builder, result) {
+    const maybePromise = this.model.$beforeUpdate(this.modelOptions, builder.context());
+    return afterReturn(maybePromise, result);
+  }
+
+  onBuild(knexBuilder, builder) {
+    const json = this.model.$toDatabaseJson();
+
     // convert ref syntax to knex.raw
     // TODO: jsonb attr update implementation for mysql and sqlite..
     const knex = builder.knex();
+    const loweredJson = {};
 
-    _.forOwn(args[0], (val, key) => {
+    _.forOwn(json, (val, key) => {
       // convert ref values to raw
       let loweredValue = (val instanceof ReferenceBuilder) ?
         knex.raw(...(val.toRawArgs())) : val;
@@ -34,31 +47,16 @@ export default class UpdateOperation extends QueryBuilderOperation {
         let parsed = jsonFieldExpressionParser.parse(key);
         let jsonRefs = '{' + _(parsed.access).map('ref').value().join(',') + '}';
 
-        args[0][parsed.columnName] = knex.raw(
+        loweredJson[parsed.columnName] = knex.raw(
           `jsonb_set(??, '${jsonRefs}', to_jsonb(?), true)`,
           [parsed.columnName, loweredValue]
         );
-        // (looks like I just can't set new stuff to args[0] that
-        //  would be the converted object so I just modify the
-        //  original args|0] object)
-        delete args[0][key];
       } else {
-        args[0][key] = loweredValue;
+        loweredJson[key] = loweredValue;
       }
     });
 
-    this.model = builder.modelClass().ensureModel(args[0], this.modelOptions);
-    return true;
-  }
-
-  onBeforeInternal(builder, result) {
-    const maybePromise = this.model.$beforeUpdate(this.modelOptions, builder.context());
-    return afterReturn(maybePromise, result);
-  }
-
-  onBuild(knexBuilder, builder) {
-    const json = this.model.$toDatabaseJson();
-    knexBuilder.update(json);
+    knexBuilder.update(loweredJson);
   }
 
   onAfterInternal(builder, numUpdated) {

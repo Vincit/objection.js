@@ -78,8 +78,7 @@ function wrapFunctionArg(func, knex) {
       joinClauseBuilder.buildInto(knexQueryBuilder);
 
     } else {
-      // This case is for function argument `join` operation and other methods that
-      // Don't take a query builder as the first parameter.
+      // maybe someone falls here to the original knex implementation
       return func.apply(this, arguments);
     }
   };
