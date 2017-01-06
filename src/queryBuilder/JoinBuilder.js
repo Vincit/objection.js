@@ -1,15 +1,12 @@
 import _ from 'lodash';
+import QueryBuilderOperationSupport from './QueryBuilderOperationSupport';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import {inherits} from '../utils/classUtils';
 
 import QueryBuilderContextBase from './QueryBuilderContextBase';
-
-import QueryBuilderBase from './QueryBuilderBase';
 import KnexOperation from './operations/KnexOperation';
 
-// TODO: Seaparate basecode without any wrapped APIs to base now 
-//       join builder has way too many inherited methods...
-export default class JoinBuilder extends QueryBuilderBase {
+export default class JoinBuilder extends QueryBuilderOperationSupport {
 
   /**
    * @returns {JoinBuilderBase}
