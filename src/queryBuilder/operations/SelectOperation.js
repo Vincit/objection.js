@@ -31,10 +31,8 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
   }
 
   call(builder, args) {
-    // treat select(['1','2','3']) and select('1','2','3') the same way
-    const normalizedArgs = (args.length === 1 && Array.isArray(args[0])) ? args[0] : args;
-    const ret = super.call(builder, normalizedArgs);
-    const selections = _.flatten(this.args);
+    const selections = _.flatten(args);
+    const ret = super.call(builder, selections);
 
     for (let i = 0, l = selections.length; i < l; ++i) {
       const selection = SelectOperation.parseSelection(selections[i]);
