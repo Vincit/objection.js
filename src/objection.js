@@ -15,6 +15,7 @@ import BelongsToOneRelation from './relations/belongsToOne/BelongsToOneRelation'
 import ManyToManyRelation from './relations/manyToMany/ManyToManyRelation';
 
 import transaction from './transaction';
+import { ref } from './queryBuilder/ReferenceBuilder';
 import Promise from 'bluebird';
 
 export {
@@ -33,6 +34,7 @@ export {
   BelongsToOneRelation,
   ManyToManyRelation,
   transaction,
-  Promise
+  Promise,
+  ref
 };
 

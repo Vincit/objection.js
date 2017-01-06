@@ -4,6 +4,7 @@ var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
 var Model = require('../../').Model;
+var ref = require('../../').ref;
 
 function expectIdsEqual(resultArray, expectedIds) {
   expectArraysEqual(_(resultArray).map('id').sort().value(), expectedIds);
@@ -32,6 +33,8 @@ module.exports = function (session) {
     }
   };
 
+  var BoundModel = ModelJson.bindKnex(session.knex);
+
   before(function () {
     return session.knex.schema
       .dropTableIfExists('ModelJson')
@@ -43,7 +46,266 @@ module.exports = function (session) {
       });
   });
 
-  var BoundModel = ModelJson.bindKnex(session.knex);
+  describe('QueryBuilder using ref() in normal query builder methods', function () {
+    describe('Querying rows', function () {
+      before(function () {
+        return BoundModel
+          .query()
+          .delete()
+          .then(function () {
+            return BoundModel.query().insert([
+              {name: "test1", jsonObject: {}, jsonArray: [ 1 ]},
+              {name: "test2", jsonObject: { attr: 2 }, jsonArray: [ 2 ]},
+              {name: "test3", jsonObject: { attr: 3 }, jsonArray: [ 3 ]},
+              {name: "test4", jsonObject: { attr: 4 }, jsonArray: [ 4 ]},
+            ]);
+        });
+      });
+
+      it('should be able to extract json attr in select(ref)', function () {
+        return BoundModel.query()
+          .select(ref('jsonArray:[0]').as('foo'))
+          .orderBy('foo')
+          .then(function (result) {
+            expect(result).to.have.length(4);
+            expect(_.first(result)).eql({ foo: 1 });
+          });
+      });
+
+      it('should be able to extract json attr in select(array)', function () {
+        return BoundModel.query()
+          .select([
+            ref('jsonObject:attr').castBigInt().as('bar'),
+            ref('jsonArray:[0]').as('foo')
+          ])
+          .orderBy('foo')
+          .then(function (result) {
+            expect(result).to.have.length(4);
+            expect(_.first(result)).eql({ foo: 1, bar: null });
+          });
+      });
+
+      it('should be able to use ref inside select of select subquery', function () {
+        return BoundModel.query()
+          .select([
+            function (builder) {
+              builder.select([
+                ref('name').as('barName')
+              ])
+              .from('ModelJson')
+              .orderBy('name')
+              .limit(1).as('foo');
+            },
+            ref('jsonArray:[0]').as('firstArrayItem')
+          ])
+          .orderBy('firstArrayItem', 'desc')
+          .then(function (result) {
+            expect(result).to.have.length(4);
+            // foo is always name of the first row of the table (quite a nonsense query)
+            expect(_.first(result)).eql({ foo: 'test1', firstArrayItem: 4 });
+          });
+      });
+
+      it('should be able to use ref with where', function () {
+        return BoundModel.query()
+          .where(
+            ref('jsonArray:[0]').castBigInt(),
+            ref('jsonObject:attr').castBigInt()
+          )
+          .then(function (result) {
+            expect(result).to.have.length(3);
+          });
+      });
+
+      it('should be able to use ref with where subquery', function () {
+        return BoundModel.query()
+          .where(function (builder) {
+            builder.where(
+              ref('jsonArray:[0]').castBigInt(),
+              ref('jsonObject:attr').castBigInt()
+            );
+          })
+          .then(function (result) {
+            expect(result).to.have.length(3);
+          });
+      });
+
+      it('should be able to use ref with join', function () {
+        // select * from foo join bar on ref() = ref()
+        return BoundModel.query()
+          .join(
+            'ModelJson as t2',
+            ref('ModelJson.jsonArray:[0]'), '=', ref('t2.jsonObject:attr')
+          )
+          .select('t2.*')
+          .then(function (result) {
+            expect(result).to.have.length(3);
+          });
+      });
+
+      it('should be able to use ref with double nested join builder', function () {
+        return BoundModel.query()
+          .join('ModelJson as t2', function (builder) {
+            builder
+              .on(ref('ModelJson.jsonArray:[0]'), '=', ref('t2.jsonObject:attr'))
+              .on(function (nestedBuilder) {
+                nestedBuilder
+                  .on(
+                    ref('ModelJson.id').castInt(), '=',
+                    ref('t2.jsonArray:[0]').castInt()
+                  )
+                  .orOn(
+                    ref('ModelJson.id').castInt(), '=',
+                    ref('t2.jsonObject:attr').castInt()
+                  );
+              });
+          })
+          .select('t2.*')
+          .then(function (result) {
+            expect(result).to.have.length(3);
+          });
+      });
+
+      it('should be able to use ref with orderBy', function () {
+        return BoundModel.query().orderBy(ref('jsonObject:attr'), 'desc')
+          .then(function (result) {
+            expect(result).to.have.length(4);
+            // null is first
+            expect(_.first(result).name).to.equal('test1');
+          });
+      });
+
+      it('should be able to use ref with groupBy and having (last argument of having is ref)', function () {
+        return BoundModel.query()
+          .select(['id', ref('jsonObject:attr').as('foo')])
+          .groupBy([ref('jsonObject:attr'), 'id'])
+          .having('id', '>=', ref('jsonObject:attr').castInt())
+          .orderBy('foo')
+          .then(function (result) {
+            expect(result).to.have.length(3);
+            expect(_.first(result)).to.eql({ id: 2, foo: 2 });
+          });
+      });
+
+      it.skip('should be able to use ref with groupBy and having (also first arg is ref)', function () {
+        return BoundModel.query()
+          .select(['id', ref('jsonObject:attr').as('foo')])
+          .groupBy([ref('jsonObject:attr'), 'id'])
+          // knex doesn't support knex raw as first arg here so this test fails....
+          .having(ref('id').castInt(), '>=', ref('jsonObject:attr').castInt())
+          .orderBy('foo')
+          .then(function (result) {
+            expect(result).to.have.length(3);
+            expect(_.first(result)).to.eql({ id: 2, foo: 2 });
+          });
+      });
+
+      it('should be able to use ref with groupBy and nested having', function () {
+        return BoundModel.query()
+          .select(['id', ref('jsonObject:attr').as('foo')])
+          .groupBy([ref('jsonObject:attr'), 'id'])
+          .having('id', '>=', ref('jsonObject:attr').castInt())
+          .having(function (builder) {
+            builder
+              .having('id', '=', ref('id'))
+              .having(function (nestedBuilder) {
+                nestedBuilder.having('id', '=', ref('id'));
+              });
+          })
+          .orderBy('foo')
+          .then(function (result) {
+            expect(result).to.have.length(3);
+            expect(_.first(result)).to.eql({ id: 2, foo: 2 });
+          });
+      });
+    });
+
+    describe.skip('.insert()', function () {
+      it('should insert nicely', function () {
+        // this query actually isnt valid, but I couldn't figure any query where one would actually use ref as value
+        // so just testing that refs are converted to raw correctly
+        var query = BoundModel.query()
+          .insert({
+            name: ref('jsonArray:[0]').castText(),
+            jsonObject: ref('name').castJson(),
+            jsonArray: [ 1 ]
+          });
+        // I have no idea how to check built result.. toSql() didn't seem to help in this case
+      });
+    });
+
+    describe('.update() and .patch()', function () {
+      beforeEach(function () {
+        return BoundModel
+          .query()
+          .truncate()
+          .then(function () {
+            return BoundModel.query().insert([
+              {name: "test1", jsonObject: {}, jsonArray: [ 1 ]},
+              {name: "test2", jsonObject: { attr: 2 }, jsonArray: [ 2 ]},
+              {name: "test3", jsonObject: { attr: 3 }, jsonArray: [ 3 ]},
+              {name: "test4", jsonObject: { attr: 4 }, jsonArray: [ 4 ]},
+            ]);
+          });
+      });
+
+      it('should be able to use knex.raw to jsonb column in update', function () {
+        return BoundModel.query()
+          .update({
+            jsonArray: BoundModel.knex().raw('to_jsonb(??)', ['name'])
+          }).then(function (result) {
+            expect(result).to.be(4);
+          });
+      });
+
+      it('should be able to update internal field of json column and allow ref() syntax', function () {
+        // should do something like:
+        // update "ModelJson" set
+        //   "jsonArray" = jsonb_set('[]', '{0}', to_jsonb("name"), true),
+        //   "jsonObject" = jsonb_set("jsonObject", '{attr}', to_jsonb("name"), true),
+        //   "name" = "jsonArray"#>>'{0}' where "id" = 1 returning *;
+        return BoundModel.query()
+          .update({
+            name: ref('jsonArray:[0]').castText(),
+            'jsonObject:attr': ref('name'),
+            // each attribute which is updated with ref must be updated separately
+            // e.g. SET "jsonArray" = '[ ref(...), ref(...) ]' just isn't valid SQL
+            // (though it could be kind of parsed to multiple jsonb_set calls which would be insanely cool)
+            jsonArray: ref('name').castJson()
+          })
+          .where('id', 1)
+          .returning('*')
+          .then(function (result) {
+            expect(result).to.eql([{
+              id: 1,
+              name: '1',
+              jsonObject: { attr: 'test1' },
+              jsonArray: 'test1' }
+            ]);
+          });
+      });
+
+      it('should be able to patch internal field of json column and allow ref() syntax', function () {
+        // same stuff that with patch but different api method
+        return BoundModel.query()
+          .patch({
+            name: ref('jsonArray:[0]').castText(),
+            'jsonObject:attr': ref('name'),
+            jsonArray: ref('name').castJson()
+          })
+          .where('id', 1)
+          .returning('*')
+          .then(function (result) {
+            expect(result).to.eql([{
+              id: 1,
+              name: '1',
+              jsonObject: { attr: 'test1' },
+              jsonArray: 'test1' }
+            ]);
+          });
+      });
+    });
+  });
 
   describe('QueryBuilder JSON queries', function () {
     var complexJsonObj;

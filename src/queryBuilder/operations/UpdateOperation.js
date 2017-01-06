@@ -1,6 +1,10 @@
+import _ from 'lodash';
 import clone from 'lodash/clone';
 import QueryBuilderOperation from './QueryBuilderOperation';
+import ReferenceBuilder from '../ReferenceBuilder';
+import jsonFieldExpressionParser from '../parsers/jsonFieldExpressionParser';
 import {afterReturn} from '../../utils/promiseUtils';
+
 
 export default class UpdateOperation extends QueryBuilderOperation {
 
@@ -24,7 +28,35 @@ export default class UpdateOperation extends QueryBuilderOperation {
 
   onBuild(knexBuilder, builder) {
     const json = this.model.$toDatabaseJson();
-    knexBuilder.update(json);
+
+    // convert ref syntax to knex.raw
+    // TODO: jsonb attr update implementation for mysql and sqlite..
+    const knex = builder.knex();
+    const loweredJson = {};
+
+    _.forOwn(json, (val, key) => {
+      // convert ref values to raw
+      let loweredValue = (val instanceof ReferenceBuilder) ?
+        knex.raw(...(val.toRawArgs())) : val;
+
+      // convert update to jsonb_set format if attr inside jsonb column is set
+      if (key.indexOf(':') > -1) {
+        // e.g. 'col:attr' : ref('other:lol') is transformed to
+        // "col" : raw(`jsonb_set("col", '{attr}', to_jsonb("other"#>'{lol}'), true)`)
+
+        let parsed = jsonFieldExpressionParser.parse(key);
+        let jsonRefs = '{' + _(parsed.access).map('ref').value().join(',') + '}';
+
+        loweredJson[parsed.columnName] = knex.raw(
+          `jsonb_set(??, '${jsonRefs}', to_jsonb(?), true)`,
+          [parsed.columnName, loweredValue]
+        );
+      } else {
+        loweredJson[key] = loweredValue;
+      }
+    });
+
+    knexBuilder.update(loweredJson);
   }
 
   onAfterInternal(builder, numUpdated) {

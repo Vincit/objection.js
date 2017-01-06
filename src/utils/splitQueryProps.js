@@ -1,11 +1,13 @@
 const KnexQueryBuilder = require('knex/lib/query/builder');
 const KnexRaw = require('knex/lib/raw');
 let QueryBuilderBase = null;
+let ReferenceBuilder = null;
 
 export default function (ModelClass, obj) {
   if (QueryBuilderBase === null) {
     // Lazy loading to prevent circular deps.
     QueryBuilderBase = require('../queryBuilder/QueryBuilderBase').default;
+    ReferenceBuilder = require('../queryBuilder/ReferenceBuilder').default;
   }
 
   const keys = Object.keys(obj);
@@ -15,7 +17,7 @@ export default function (ModelClass, obj) {
     const key = keys[i];
     const value = obj[key];
 
-    if (value instanceof KnexQueryBuilder || value instanceof QueryBuilderBase || value instanceof KnexRaw) {
+    if (value instanceof KnexQueryBuilder || value instanceof QueryBuilderBase || value instanceof KnexRaw || value instanceof ReferenceBuilder) {
       needsSplit = true;
       break;
     }
@@ -36,7 +38,7 @@ function split(obj) {
     const key = keys[i];
     const value = obj[key];
 
-    if (value instanceof KnexQueryBuilder || value instanceof KnexRaw) {
+    if (value instanceof KnexQueryBuilder || value instanceof KnexRaw || value instanceof ReferenceBuilder) {
       ret.query[key] = value;
     } else if (value instanceof QueryBuilderBase) {
       ret.query[key] = value.build();

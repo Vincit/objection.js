@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import ModelBase from './ModelBase';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
+import ReferenceBuilder from '../queryBuilder/ReferenceBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
@@ -21,6 +22,9 @@ import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOp
 
 import JoinEagerOperation from '../queryBuilder/operations/JoinEagerOperation';
 import WhereInEagerOperation from '../queryBuilder/operations/WhereInEagerOperation';
+
+const KnexRaw = require('knex/lib/raw');
+const KnexQueryBuilder = require('knex/lib/query/builder');
 
 const JoinEagerAlgorithm = () => {
   return new JoinEagerOperation('eager');
@@ -245,7 +249,11 @@ export default class Model extends ModelBase {
         const value = json[attr];
 
         if (_.isString(value)) {
-          json[attr] = JSON.parse(value);
+          try {
+            json[attr] = JSON.parse(value);
+          } catch (err) {
+            // json column might contain plain single string which is not wrapped to array / object
+          }
         }
       }
     }
@@ -261,7 +269,8 @@ export default class Model extends ModelBase {
         const attr = jsonAttr[i];
         const value = json[attr];
 
-        if (_.isObject(value)) {
+        // list of omitted objects is copy pasted from splitQueryProps
+        if (_.isObject(value) && !(value instanceof KnexQueryBuilder || value instanceof KnexRaw || value instanceof ReferenceBuilder)) {
           json[attr] = JSON.stringify(value);
         }
       }

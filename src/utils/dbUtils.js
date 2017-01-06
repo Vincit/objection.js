@@ -1,4 +1,5 @@
 import KnexQueryBuilder from 'knex/lib/query/builder'
+import JoinClause from 'knex/lib/query/joinclause'
 
 export function getDialect(knex) {
   return (knex && knex.client && knex.client.dialect) || null;
@@ -18,4 +19,8 @@ export function isSqlite(knex) {
 
 export function isKnexQueryBuilder(knexQueryBuilder) {
   return knexQueryBuilder instanceof KnexQueryBuilder;
+}
+
+export function isKnexJoinBuilder(knexQueryBuilder) {
+  return knexQueryBuilder instanceof JoinClause;
 }
