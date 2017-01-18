@@ -17,10 +17,10 @@ search: true
 [![Build Status](https://travis-ci.org/Vincit/objection.js.svg?branch=master)](https://travis-ci.org/Vincit/objection.js) [![Coverage Status](https://coveralls.io/repos/Vincit/objection.js/badge.svg?branch=master&service=github)](https://coveralls.io/github/Vincit/objection.js?branch=master) [![Join the chat at https://gitter.im/Vincit/objection.js](https://badges.gitter.im/Vincit/objection.js.svg)](https://gitter.im/Vincit/objection.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Objection.js is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping) for [Node.js](https://nodejs.org/)
-that aims to stay out of your way and make it as easy as possible to use the full power of SQL and the underlying 
+that aims to stay out of your way and make it as easy as possible to use the full power of SQL and the underlying
 database engine.
 
-Objection.js is built on the wonderful SQL query builder [knex](http://knexjs.org). All databases supported by knex 
+Objection.js is built on the wonderful SQL query builder [knex](http://knexjs.org). All databases supported by knex
 are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thoroughly tested](https://travis-ci.org/Vincit/objection.js).
 
 What objection.js gives you:
@@ -37,14 +37,14 @@ What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
  * **Automatic database schema creation and migration.**
-    For simple things it is useful that the database schema is automatically generated from the model definitions, 
-    but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things 
-    to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check 
+    For simple things it is useful that the database schema is automatically generated from the model definitions,
+    but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
+    to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express).
 
-Objection.js uses Promises and coding practices that make it ready for the future. We use Well known 
-[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques and ES6 compatible classes and inheritance 
-in the codebase. You can even use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/) 
+Objection.js uses Promises and coding practices that make it ready for the future. We use Well known
+[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques and ES6 compatible classes and inheritance
+in the codebase. You can even use things like ES7 [async/await](http://jakearchibald.com/2014/es7-async-functions/)
 using a transpiler such as [Babel](https://babeljs.io/). Check out our [ES6](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 and [ES7](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
 
@@ -139,15 +139,15 @@ schemaPromise.then(function () {
 ```
 
 To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the
-connection to objection.js using [`Model.knex(knex)`](#knex). Doing this installs the knex connection globally for all models. 
+connection to objection.js using [`Model.knex(knex)`](#knex). Doing this installs the knex connection globally for all models.
 If you need to use multiple databases check out our [multi-tenancy recipe](#multi-tenancy).
 
 The next step is to create some migrations and models and start using objection.js. The best way to get started is to
-use the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express). The `express` example 
-project is a simple express server. The `example-requests.sh` file contains a bunch of curl commands for you to start 
+use the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express). The `express` example
+project is a simple express server. The `example-requests.sh` file contains a bunch of curl commands for you to start
 playing with the REST API.
 
-If you are using a newer version of Node and you want to use ES6 features then our 
+If you are using a newer version of Node and you want to use ES6 features then our
 [ES6 version of the example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 is the best place to start.
 
@@ -171,7 +171,7 @@ All these methods return a [`QueryBuilder`](#querybuilder) instance that can be 
 
 ## Table queries
 
-Each model class inherits the static [`query`](#query) method from the [`Model`](#model) base class. Use [`query`](#query) to create queries 
+Each model class inherits the static [`query`](#query) method from the [`Model`](#model) base class. Use [`query`](#query) to create queries
 to the table the model class represents. The return value of the [`query`](#query) method is an instance of [`QueryBuilder`](#querybuilder)
 that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and more.
 
@@ -307,8 +307,8 @@ update "Person" set "lastName" = 'Updated' where "id" = 246
 select * from "Person" where "id" = 246
 ```
 
-Update queries are created by chaining the [`update`](#update) or [`patch`](#patch) method to the query. The [`patch`](#patch) and [`update`](#update) 
-methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper 
+Update queries are created by chaining the [`update`](#update) or [`patch`](#patch) method to the query. The [`patch`](#patch) and [`update`](#update)
+methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper
 method [`patchAndFetchById`](#patchandfetchbyid) and [`updateAndFetchById`](#updateandfetchbyid).
 
 ### Delete queries
@@ -360,7 +360,7 @@ order by "name" asc
 ```
 
 Simply call [`$relatedQuery('pets')`](#_s_relatedquery) for a model _instance_ to fetch a relation for it. The relation name is
-given as the only argument. The return value is a [`QueryBuilder`](#querybuilder) so you once again have all the query methods 
+given as the only argument. The return value is a [`QueryBuilder`](#querybuilder) so you once again have all the query methods
 at your disposal.
 
 ### Insert queries
@@ -515,7 +515,7 @@ Person
   })
   .then(function (people) {
     console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id); 
+    console.log(people[0].children[0].movies[0].id);
   });
 ```
 
@@ -545,12 +545,12 @@ expressApp.get('/people', function (req, res, next) {
 });
 ```
 
-You can fetch an arbitrary graph of relations for the results of any query by chaining the [`eager`](#eager) method. 
+You can fetch an arbitrary graph of relations for the results of any query by chaining the [`eager`](#eager) method.
 [`eager`](#eager) takes a [relation expression](#relationexpression) string as a parameter. In addition to making your life easier,
 eager queries avoid the "select N+1" problem and provide a great performance.
 
 Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
-request. However, allowing the client to pass expressions like this without any limitations is not very secure. 
+request. However, allowing the client to pass expressions like this without any limitations is not very secure.
 Therefore the [`QueryBuilder`](#querybuilder) has the [`allowEager`](#alloweager) method. [`allowEager`](#alloweager)
 can be used to  limit the allowed eager expression to a certain subset.
 
@@ -570,12 +570,12 @@ Examples of expressions that would cause the query to be rejected:
  * `'[pets, children.children]'`
  * `'notEvenAnExistingRelation'`
 
-In addition to the [`eager`](#eager) method, relations can be fetched using the [`loadRelated`](#loadrelated) and 
+In addition to the [`eager`](#eager) method, relations can be fetched using the [`loadRelated`](#loadrelated) and
 [`$loadRelated`](#_s_loadrelated) methods.
 
 By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)).
 You can choose to use a join based eager loading algorithm that only performs one single query to fetch thw whole
-eager tree. You can select which algorithm to use per query using [`eagerAlgorithm`](#eageralgorithm) method or 
+eager tree. You can select which algorithm to use per query using [`eagerAlgorithm`](#eageralgorithm) method or
 per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. Both algorithms
 have their strengths and weaknesses, which are discussed in detail [here](#eager).
 
@@ -600,9 +600,9 @@ Person
   });
 ```
 
-> The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined 
+> The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined
 > in the [`relationMappings`](#relationmappings) of the models. Technically [`insertGraph`](#insertgraph)
-> builds a dependency graph from the object graph and inserts the models that don't depend on any other models until 
+> builds a dependency graph from the object graph and inserts the models that don't depend on any other models until
 > the whole graph is inserted.
 
 > If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
@@ -629,12 +629,12 @@ Person
   }]);
 ```
 
-> The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have 
+> The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have
 > the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format
 > or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily
 > [`insertGraph`](#insertgraph) detects them and rejects the query with a clear error message.
 
-> You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}` 
+> You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}`
 > as long as the reference doesn't create a circular dependency. For example:
 
 ```js
@@ -652,14 +652,14 @@ Person
   }]);
 ```
 
-> The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used 
+> The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used
 > within a string, the references are replaced with the referred values inside the string. If the reference string
 > contains nothing but the reference, the referred value is copied to it's place preserving its type.
 
 Arbitrary relation graphs can be inserted using the [`insertGraph`](#insertgraph) method. This is best explained using
 examples, so check them out ➔.
 
-See the [`allowInsert`](#allowinsert) method if you need to limit  which relations can be inserted using 
+See the [`allowInsert`](#allowinsert) method if you need to limit  which relations can be inserted using
 [`insertGraph`](#insertgraph) method to avoid security issues. [`allowInsert`](#allowinsert)
 works like [`allowEager`](#allowinsert).
 
@@ -675,13 +675,13 @@ There are two ways to use transactions in objection.js
 
  1. [Transaction callback](#transaction-callback)
  2. [Transaction object](#transaction-object)
- 
+
 ## Transaction callback
 
 ```js
 objection.transaction(Person, Animal, function (Person, Animal) {
   // Person and Animal inside this function are bound to a newly
-  // created transaction. The Person and Animal outside this function 
+  // created transaction. The Person and Animal outside this function
   // are not!
 
   return Person
@@ -792,7 +792,7 @@ The first way to work with transactions is to perform all operations inside one 
 object to each query explicitly as long as you start all queries using the "bound" model classes that are passed to the
 transaction callback as arguments.
 
-Transactions are started by calling the [`objection.transaction`](#transaction) function. Give all the models you want to use 
+Transactions are started by calling the [`objection.transaction`](#transaction) function. Give all the models you want to use
 in the transaction as parameters to the [`transaction`](#transaction) function. New copies of the model constructors
 are created that are bound to a newly created transaction and passed to the callback function. Inside this callback, all
 queries started through them take part in the same transaction.
@@ -892,7 +892,7 @@ try {
 The second way to use transactions is to express the transaction as an object and bind model classes or queries to the
 transaction when you use them. This way is more convenient when you need to pass the transaction to functions and services.
 
-The transaction object can be created using the [`objection.transaction.start`](#start) method. You need to remember to 
+The transaction object can be created using the [`objection.transaction.start`](#start) method. You need to remember to
 call either the [`commit`](#commit) or [`rollback`](#rollback) method of the transaction object.
 
 ## Detailed explanation of `bindTransaction`
@@ -907,7 +907,7 @@ var BoundMovie;
 objection.transaction.start(Person).then(function (transaction) {
   BoundPerson = Person.bindTransaction(transaction);
   BoundMovie = Movie.bindTransaction(transaction);
-  
+
   return BoundPerson
     .query()
     .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
@@ -989,15 +989,33 @@ Person.query().patch({age: 24}).where('age', '<', 24);
 ```js
 Person.query().insert({firstName: 'jennifer'}).catch(function (err) {
   console.log(err instanceof objection.ValidationError); // --> true
-  console.log(err.data); // --> {lastName: 'required property missing'}
+  console.log(err.data); // --> {lastName: [{message: 'required property missing', ...}]}
+});
+```
+
+> Error parameters returned by [`ValidationError`](#validationerror) could be used to provide custom error messages:
+
+```js
+Person.query().insert({firstName: 'jennifer'}).catch(function (err) {
+  let lastNameErrors = err.data['lastName'];
+  for (let i = 0; i < lastNameErrors.length; ++i) {
+    let lastNameError = lastNameErrors[i];
+    if (lastNameError.keyword === "required") {
+      console.log('This field is required!');
+    } else if (lastNameError.keyword === "minLength") {
+      console.log('Must be longer than ' + lastNameError.params.limit)
+    } else {
+      console.log(lastNameError.message); // Fallback to default error message
+    }
+  }
 });
 ```
 
 [JSON schema](http://json-schema.org/) validation can be enabled by setting the [`jsonSchema`](#jsonschema) property
-of a model class. The validation is ran each time a [`Model`](#model) instance is created. 
+of a model class. The validation is ran each time a [`Model`](#model) instance is created.
 
 You rarely need to call [`$validate`](#_s_validate) method explicitly, but you can do it when needed. If validation fails a
-[`ValidationError`](#validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected 
+[`ValidationError`](#validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected
 with an instance of [`ValidationError`](#validationerror).
 
 See [the recipe book](#custom-validation) for instructions if you want to use some other validation library.
@@ -1013,8 +1031,8 @@ function MinimalModel() {
   Model.apply(this, arguments);
 }
 
-// Inherit `Model`. This does the basic prototype inheritance but also 
-// inherits all the static methods and properties like `Model.query()` 
+// Inherit `Model`. This does the basic prototype inheritance but also
+// inherits all the static methods and properties like `Model.query()`
 // and `Model.fromJson()`. This is consistent with ES6 class inheritance.
 Model.extend(MinimalModel);
 
@@ -1353,10 +1371,9 @@ class Person extends Model {
 }
 ```
 
-Models are created by inheriting from the [`Model`](#model) base class. In objection.js the inheritance is done as 
-transparently as possible. There is no custom Class abstraction making you wonder what the hell is happening. 
+Models are created by inheriting from the [`Model`](#model) base class. In objection.js the inheritance is done as
+transparently as possible. There is no custom Class abstraction making you wonder what the hell is happening.
 Just plain old ugly prototypal inheritance.
 
 The inheritance is compatible with ES6 class inheritance. This means that static properties are inherited as well as
 instance methods. Because of this you can just use the ES6 `class` and `extend` keywords.
-

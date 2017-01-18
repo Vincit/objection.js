@@ -31,7 +31,13 @@ Name of the identifier column can be changed by setting the static [`idColumn`](
 ```js
 Person.prototype.$beforeInsert = function () {
   if (this.id) {
-    throw new objection.ValidationError({id: 'identifier should not be defined before insert'});
+    throw new objection.ValidationError({
+      id: [{
+        message: 'identifier should not be defined before insert'
+        keyword: null,
+        params: null
+      }]
+    });
   }
 };
 ```
@@ -44,8 +50,8 @@ const AjvValidator = require('objection').AjvValidator;
 class Model {
   static createValidator() {
     return new AjvValidator({
-      onCreateAjv: (ajv) => { 
-        // Here you can modify the `Ajv` instance. 
+      onCreateAjv: (ajv) => {
+        // Here you can modify the `Ajv` instance.
       },
       options: {
         allErrors: true,
@@ -70,34 +76,34 @@ class MyCustomValidator extends Validator {
   validate(args) {
     // The model instance. May be empty at this point.
     const model = args.model;
-    
+
     // The properties to validate. After validation these values will
     // be merged into `model` by objection.
     const json = args.json;
-    
+
     // `ModelOptions` object. If your custom validator sets default
     // values, you need to check the `opt.patch` boolean. If it is true
     // we are validating a patch object, the defaults should not be set.
     const opt = args.options;
-    
+
     // A context object shared between the validation methods. A new
     // object is created for each validation operation.
     const ctx = args.ctx;
-    
+
     // Do your validation here and throw any exception if the
     // validation fails.
     doSomeValidationAndThrowIfFails(json);
-    
+
     // You need to return the (possibly modified) json.
     return json;
   }
-  
+
   beforeValidate(args) {
     // Takes the same arguments as `validate`. Usually there is no need
     // to override this.
     return super.beforeValidate(args);
   }
-  
+
   afterValidate(args) {
     // Takes the same arguments as `validate`. Usually there is no need
     // to override this.

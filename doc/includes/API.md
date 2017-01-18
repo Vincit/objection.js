@@ -5614,8 +5614,8 @@ const AjvValidator = require('objection').AjvValidator;
 class Model {
   static createValidator() {
     return new AjvValidator({
-      onCreateAjv: (ajv) => { 
-        // Here you can modify the `Ajv` instance. 
+      onCreateAjv: (ajv) => {
+        // Here you can modify the `Ajv` instance.
       },
       options: {
         allErrors: true,
@@ -7019,34 +7019,34 @@ class MyCustomValidator extends Validator {
   validate(args) {
     // The model instance. May be empty at this point.
     const model = args.model;
-    
+
     // The properties to validate. After validation these values will
     // be merged into `model` by objection.
     const json = args.json;
-    
+
     // `ModelOptions` object. If your custom validator sets default
     // values, you need to check the `opt.patch` boolean. If it is true
     // we are validating a patch object, the defaults should not be set.
     const opt = args.options;
-    
+
     // A context object shared between the validation methods. A new
     // object is created for each validation operation.
     const ctx = args.ctx;
-    
+
     // Do your validation here and throw any exception if the
     // validation fails.
     doSomeValidationAndThrowIfFails(json);
-    
+
     // You need to return the (possibly modified) json.
     return json;
   }
-  
+
   beforeValidate(args) {
     // Takes the same arguments as `validate`. Usually there is no need
     // to override this.
     return super.beforeValidate(args);
   }
-  
+
   afterValidate(args) {
     // Takes the same arguments as `validate`. Usually there is no need
     // to override this.
@@ -7087,8 +7087,8 @@ const AjvValidator = require('objection').AjvValidator;
 class BaseModel extends Model {
   static createValidator() {
     return new AjvValidator({
-      onCreateAjv: (ajv) => { 
-        // Here you can modify the `Ajv` instance. 
+      onCreateAjv: (ajv) => {
+        // Here you can modify the `Ajv` instance.
       },
       options: {
         allErrors: true,
@@ -7112,8 +7112,8 @@ method of [`Model`](#model) like in the example to modify the validator.
 
 ```js
 const ValidationError = require('objection').ValidationError;
- 
-throw new ValidationError('any string or object');
+
+throw new ValidationError({ /* see `data` object below */ });
 ```
 
 Error of this class is thrown if a model validation fails.
@@ -7121,8 +7121,38 @@ Error of this class is thrown if a model validation fails.
 Property|Type|Description
 --------|----|-----------
 statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
-data|*|Any data passed to the constructor.
+data|Object|Dictionary of errors.
 
+The `data` object should follow this pattern:
+
+```js
+{
+  key1: [{
+    message: '...',
+    keyword: 'required',
+    params: null
+  }, {
+    message: '...',
+    keyword: '...',
+    params: {
+      ...
+    }
+  }, ...],
+
+  key2: [{
+    message: '...',
+    keyword: 'minLength',
+    params: {
+      limit: 1,
+      ...
+    }
+  }, ...],
+
+  ...
+}
+```
+
+For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword` string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
 
 
 
