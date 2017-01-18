@@ -32,11 +32,11 @@ Name of the identifier column can be changed by setting the static [`idColumn`](
 Person.prototype.$beforeInsert = function () {
   if (this.id) {
     throw new objection.ValidationError({
-      id: {
+      id: [{
         message: 'identifier should not be defined before insert'
         keyword: null,
         params: null
-      }
+      }]
     });
   }
 };
