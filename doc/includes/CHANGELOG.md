@@ -16,7 +16,8 @@
  * `$relatedQuery` now returns a single model instead of an array for belongsToOne and hasOne relations. [#155](https://github.com/Vincit/objection.js/issues/155)
  * identifier of a model can now be updated. Be careful with this one! Before if you forgot a wrong id in an `update`/`patch` operation, it would simply get ignored. Now the id is also updated just like any other column [#100](https://github.com/Vincit/objection.js/issues/100)
  * `Table.*` is now selected by default in all queries instead of `*`. This will break some join queries that don't have an explicit select clause. [#161](https://github.com/Vincit/objection.js/issues/161)
- 
+ * `ValidationError.data` is now an object including, for each key, a list of errors with context info. [#283](https://github.com/Vincit/objection.js/issues/283)
+
 ## 0.6.2
 
 ### What's new
@@ -54,7 +55,7 @@
    method can be called for a query builder to handle the undefined values the old way.
 
  * Deprecated method `dumpSql` is now removed.
- 
+
  * `$loadRelated` and `loadRelated` now return a `QueryBuilder`. This may break your code is some rare cases
    where you have called a non-standard promise method like `reflect` for the return value of these functions.
 
@@ -85,7 +86,7 @@
 
 * [$afterGet](#afterget) hook.
 
-## 0.5.0 
+## 0.5.0
 
 ### What's new
 
@@ -172,7 +173,7 @@ There are a few known corner cases that may break:
  * generator function support for transactions
  * traverse,pick and omit methods for Model and QueryBuilder
  * bugfix: issue #38
- 
+
 ## 0.2.7
 
 ### What's new
@@ -218,7 +219,7 @@ There are a few known corner cases that may break:
 
 ### What's new
 
- * bugfix: Chaining `insert` with `returning` now returns all listed columns. 
+ * bugfix: Chaining `insert` with `returning` now returns all listed columns.
 
 ## 0.2.0
 
