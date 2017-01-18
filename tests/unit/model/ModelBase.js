@@ -417,6 +417,38 @@ describe('ModelBase', function () {
       expect(model).to.not.have.property('c');
     });
 
+    it('should throw with error context if validation fails', function () {
+      Model.jsonSchema = {
+        required: ['a'],
+        properties: {
+          a: {type: 'number'},
+          b: {type: 'string', minLength: 4}
+        }
+      };
+
+      expect(function () {
+        Model.fromJson({b: 'abc'});
+      }).to.throwException(function (exp) {
+        expect(exp).to.be.a(ValidationError);
+        expect(exp.data).to.have.property('a');
+        expect(exp.data['a']).to.be.a(Array);
+        expect(exp.data['a'].length).to.be.above(0);
+        expect(exp.data['a'][0]).to.have.property('message');
+        expect(exp.data['a'][0]).to.have.property('keyword');
+        expect(exp.data['a'][0]).to.have.property('params');
+        expect(exp.data['a'][0].keyword).to.equal('required');
+        expect(exp.data).to.have.property('b');
+        expect(exp.data['b']).to.be.a(Array);
+        expect(exp.data['b'].length).to.be.above(0);
+        expect(exp.data['b'][0]).to.have.property('message');
+        expect(exp.data['b'][0]).to.have.property('keyword');
+        expect(exp.data['b'][0]).to.have.property('params');
+        expect(exp.data['b'][0].keyword).to.equal('minLength');
+        expect(exp.data['b'][0].params).to.have.property('limit');
+        expect(exp.data['b'][0].params.limit).to.equal(4);
+      });
+    });
+
     it('should throw if anything non-object is given', function () {
       function SomeClass() {}
 
