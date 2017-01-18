@@ -120,7 +120,11 @@ function parseValidationError(errors) {
       key = (index++).toString();
     }
 
-    errorHash[key] = error.message;
+    errorHash[key] = [{
+      message: error.message,
+      keyword: error.keyword,
+      params: error.params
+    }];
   }
 
   return new ValidationError(errorHash);
