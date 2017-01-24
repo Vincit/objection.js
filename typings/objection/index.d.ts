@@ -700,8 +700,8 @@ declare module "objection" {
     <T1>(callback: (queryBuilder: QueryBuilder<T1>) => any): QueryBuilder<T>;
     (object: Object): QueryBuilder<T>;
     (columnName: string, value: Value): QueryBuilder<T>;
-    (columnName: string, operator: string, value: Value): QueryBuilder<T>;
-    <T1>(columnName: string, operator: string, query: QueryBuilder<T1>): QueryBuilder<T>;
+    (columnName: string | Raw, operator: string, value: Value): QueryBuilder<T>;
+    <T1>(columnName: string | Raw, operator: string, query: QueryBuilder<T1>): QueryBuilder<T>;
   }
 
   interface WhereRaw<T> extends RawQueryBuilder<T> {
