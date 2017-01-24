@@ -141,7 +141,7 @@ declare module "objection" {
     new(): T;
     tableName: string;
     jsonSchema: JsonSchema;
-    idColumn: string;
+    idColumn: string | string[];
     modelPaths: string[];
     relationMappings: RelationMappings;
     jsonAttributes: string[];
@@ -187,7 +187,7 @@ declare module "objection" {
   export class Model {
     static tableName: string;
     static jsonSchema: JsonSchema;
-    static idColumn: string;
+    static idColumn: string | string[];
     static modelPaths: string[];
     static relationMappings: RelationMappings;
     static jsonAttributes: string[];
