@@ -210,6 +210,9 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
+    static JoinEagerAlgorithm: () => any;
+    static WhereInEagerAlgorithm: () => any;
+
     // "{ new(): T }" 
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
     static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
@@ -298,9 +301,9 @@ declare module "objection" {
    */
   export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
-  interface Insert {
-    <M extends ModelOrObject>(modelOrObject?: M): QueryBuilderSingle<M>;
-    <M extends ModelsOrObjects>(modelsOrObjects?: M): QueryBuilder<M>;
+  interface Insert<T> {
+    <M extends ModelOrObject>(modelOrObject?: M): QueryBuilderSingle<T>;
+    <M extends ModelsOrObjects>(modelsOrObjects?: M): QueryBuilder<T>;
     (): this;
   }
 
@@ -315,17 +318,17 @@ declare module "objection" {
     findById(id: Id): QueryBuilderOption<T>;
     findById(idOrIds: IdOrIds): this;
 
-    insert: Insert;
+    insert: Insert<T>;
     insertAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
     insertAndFetch(modelsOrObjects?: ModelsOrObjects): QueryBuilder<T>;
 
-    insertGraph: Insert;
+    insertGraph: Insert<T>;
     insertGraphAndFetch: InsertGraphAndFetch<T>
 
     /**
      * insertWithRelated is an alias for insertGraph.
      */
-    insertWithRelated: Insert;
+    insertWithRelated: Insert<T>;
     insertWithRelatedAndFetch: InsertGraphAndFetch<T>
 
     /**
