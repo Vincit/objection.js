@@ -707,4 +707,152 @@ module.exports = function (session) {
 
   });
 
+  describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', function () {
+    function A() {
+      Model.apply(this, arguments);
+    }
+
+    Model.extend(A);
+    A.tableName = 'a';
+
+    function B() {
+      Model.apply(this, arguments);
+    }
+
+    Model.extend(B);
+    B.tableName = 'b';
+
+    function C() {
+      Model.apply(this, arguments);
+    }
+
+    Model.extend(C);
+    C.tableName = 'c';
+
+    function D() {
+      Model.apply(this, arguments);
+    }
+
+    Model.extend(D);
+    D.tableName = 'd';
+
+    A.relationMappings = {
+      Bs: {
+        relation: Model.HasManyRelation,
+        modelClass: B,
+        join: {
+          from: 'a.id',
+          to: 'b.aId',
+        },
+      },
+    };
+
+    B.relationMappings = {
+      Cs: {
+        relation: Model.ManyToManyRelation,
+        modelClass: C,
+        join: {
+          from: 'b.id',
+          through: {
+            from: 'b_c.bId',
+            to: 'b_c.cId',
+          },
+          to: 'c.id',
+        },
+      },
+      Ds: {
+        relation: Model.ManyToManyRelation,
+        modelClass: D,
+        join: {
+          from: 'b.id',
+          through: {
+            from: 'b_d.bId',
+            to: 'b_d.dId',
+          },
+          to: 'd.id',
+        },
+      }
+    };
+
+    beforeEach(function () {
+      return session.knex.schema
+        .dropTableIfExists('b_c')
+        .dropTableIfExists('b_d')
+        .dropTableIfExists('b')
+        .dropTableIfExists('a')
+        .dropTableIfExists('c')
+        .dropTableIfExists('d')
+        .createTable('a', function (table) {
+          table.integer('id').primary();
+        })
+        .createTable('b', function (table) {
+          table.integer('id').primary();
+          table.integer('aId').references('a.id');
+        })
+        .createTable('c', function (table) {
+          table.integer('id').primary();
+        })
+        .createTable('d', function (table) {
+          table.integer('id').primary();
+        })
+        .createTable('b_c', function (table) {
+          table.integer('bId').references('b.id').onDelete('CASCADE');
+          table.integer('cId').references('c.id').onDelete('CASCADE');
+        })
+        .createTable('b_d', function (table) {
+          table.integer('bId').references('b.id').onDelete('CASCADE');
+          table.integer('dId').references('d.id').onDelete('CASCADE');
+        })
+        .then(function () {
+          return Promise.all([
+            session.knex('a').insert({id: 1}),
+            session.knex('d').insert({id: 1}),
+            session.knex('d').insert({id: 2})
+          ]).then(function () {
+            return session.knex('b').insert({id: 1, aId: 1});
+          }).then(function () {
+            return Promise.all([
+              session.knex('b_d').insert({bId: 1, dId: 1}),
+              session.knex('b_d').insert({bId: 1, dId: 2})
+            ]);
+          })
+        });
+    });
+
+    afterEach(function () {
+      return session.knex.schema
+        .dropTableIfExists('b_c')
+        .dropTableIfExists('b_d')
+        .dropTableIfExists('b')
+        .dropTableIfExists('a')
+        .dropTableIfExists('c')
+        .dropTableIfExists('d')
+    });
+
+    it('the test', function () {
+      return A.query(session.knex)
+        .eagerAlgorithm(Model.JoinEagerAlgorithm)
+        .eager('Bs.[Cs, Ds]')
+        .then((results) => {
+          expect(results).to.eql([{
+            id: 1,
+
+            Bs: [{
+              id: 1,
+              aId: 1,
+              Cs: [],
+
+              Ds: [{
+                id: 1
+              }, {
+                id: 2
+              }]
+            }]
+          }]);
+        })
+        .catch((err) => {
+          console.error(err.message);
+        })
+    });
+  });
 };

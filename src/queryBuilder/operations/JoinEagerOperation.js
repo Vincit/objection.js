@@ -95,7 +95,7 @@ export default class JoinEagerOperation extends EagerOperation {
         const id = pInfo.idGetter(row);
 
         if (!id) {
-          break;
+          continue;
         }
 
         if (pInfo.relation) {
