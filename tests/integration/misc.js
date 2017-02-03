@@ -833,7 +833,7 @@ module.exports = function (session) {
       return A.query(session.knex)
         .eagerAlgorithm(Model.JoinEagerAlgorithm)
         .eager('Bs.[Cs, Ds]')
-        .then((results) => {
+        .then(function (results) {
           expect(results).to.eql([{
             id: 1,
 
