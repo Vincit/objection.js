@@ -849,10 +849,7 @@ module.exports = function (session) {
               }]
             }]
           }]);
-        })
-        .catch((err) => {
-          console.error(err.message);
-        })
+        });
     });
   });
 };
