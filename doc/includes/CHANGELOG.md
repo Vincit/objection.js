@@ -10,6 +10,7 @@
  * zero values are now allowed in relation columns. [#228](https://github.com/Vincit/objection.js/issues/228)
  * active transaction can now be accessed in `$before/$after` hooks through `queryContext.transaction` property.
  * Validation can now be easily modified through a new [`Validator`](#validator) interface. [#241](https://github.com/Vincit/objection.js/issues/241) [#199](https://github.com/Vincit/objection.js/issues/199)
+ * fix a `JoinEager` problem where an empty result for a relation caused the following relations to be empty. [#292](https://github.com/Vincit/objection.js/issues/292)
 
 ### Breaking changes
 
