@@ -210,6 +210,9 @@ declare module "objection" {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
 
+    static JoinEagerAlgorithm: () => any;
+    static WhereInEagerAlgorithm: () => any;
+
     // "{ new(): T }" 
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
     static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
