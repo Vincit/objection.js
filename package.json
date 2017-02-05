@@ -80,7 +80,7 @@
     "babel-plugin-transform-es2015-typeof-symbol": "^6.3.13",
     "babel-plugin-transform-es2015-unicode-regex": "^6.3.13",
     "babel-plugin-transform-runtime": "^6.3.13",
-    "coveralls": "^2.11.2",
+    "coveralls": "^2.11.16",
     "expect.js": "^0.3.1",
     "fs-extra": "^2.0.0",
     "glob": "^7.0.3",
