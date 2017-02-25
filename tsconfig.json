@@ -8,6 +8,7 @@
     "noImplicitThis": true,
     "noImplicitUseStrict": false,
     "strictNullChecks": true,
+    "experimentalDecorators": true,
     "noEmit": true,
     "target": "es6",
     "typeRoots": [
