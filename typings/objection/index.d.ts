@@ -302,8 +302,8 @@ declare module "objection" {
   export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
   interface Insert<T> {
+    <M extends Model[] | Object[]>(modelsOrObjects?: M): QueryBuilder<T>;
     <M extends ModelOrObject>(modelOrObject?: M): QueryBuilderSingle<T>;
-    <M extends ModelsOrObjects>(modelsOrObjects?: M): QueryBuilder<T>;
     (): this;
   }
 

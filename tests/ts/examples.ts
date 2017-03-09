@@ -145,7 +145,7 @@ qb = qb.joinRelation('table', { alias: false });
 
 const rowInserted: Promise<Person> = qb.insert({firstName: "bob"})
 const rowsInserted: Promise<Person[]> = qb.insert([{firstName: "alice"}, {firstName: "bob"}])
-const rowsInsertedWithRelated: Promise<number> = qb.insertWithRelated({})
+const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({})
 const rowsUpdated: Promise<number> = qb.update({})
 const rowsPatched: Promise<number> = qb.patch({})
 const rowsDeleted: Promise<number> = qb.deleteById(123)

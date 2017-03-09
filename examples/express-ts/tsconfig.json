@@ -13,10 +13,9 @@
     "strictNullChecks": true,
     "target": "es6",
     "rootDir": "src",
-    "outDir": "lib",
-    "typeRoots": [
-      "./typings",
-      "node_modules/@types"
-    ]
-  }
+    "outDir": "lib"
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }
