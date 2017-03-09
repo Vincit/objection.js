@@ -663,7 +663,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   first() {
-    return this.runAfter(result => {
+    return this.limit(1).runAfter(result => {
       if (Array.isArray(result)) {
         return result[0];
       } else {
