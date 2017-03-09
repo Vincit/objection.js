@@ -226,6 +226,28 @@ export default class QueryBuilder extends QueryBuilderBase {
 
   /**
    * @param {string|RelationExpression} exp
+   * @param {Object.<string, function(QueryBuilder)>=} filters
+   * @returns {QueryBuilder}
+   */
+  mergeEager(exp, filters) {
+    if (!this._eagerExpression) {
+      return this.eager(exp, filters);
+    }
+
+    const expr = RelationExpression.parse(exp);
+
+    if (_.isObject(filters)) {
+      expr.filters = filters;
+    }
+
+    this._eagerExpression = this._eagerExpression.merge(expr);
+
+    checkEager(this);
+    return this;
+  }
+
+  /**
+   * @param {string|RelationExpression} exp
    * @returns {QueryBuilder}
    */
   allowEager(exp) {

@@ -69,6 +69,57 @@ export default class RelationExpression {
 
   /**
    * @param {string|RelationExpression} expr
+   * @returns {RelationExpression}
+   */
+  merge(expr) {
+    const merged = this.clone();
+    expr = RelationExpression.parse(expr);
+
+    merged.numChildren += expr.numChildren;
+    merged.children = _.merge(merged.children, expr.children);
+    merged.args = _.merge(merged.args, expr.args);
+    merged.filters = _.merge(merged.filters, expr.filters);
+
+    // Handle recursive and all recursive nodes.
+    visit(merged, (node, childNames) => {
+      let maxName = null;
+      let maxDepth = 0;
+      let recurCount = 0;
+
+      for (let i = 0, l = childNames.length; i < l; ++i) {
+        const name = childNames[i];
+        const depth = maxRecursionDepth(name);
+
+        if (depth > 0) {
+          recurCount++;
+        }
+
+        if (depth > maxDepth) {
+          maxDepth = depth;
+          maxName = name;
+        }
+      }
+
+      if (recurCount > 0) {
+        delete node.children[node.name];
+      }
+
+      if (recurCount > 1) {
+        for (let i = 0, l = childNames.length; i < l; ++i) {
+          const name = childNames[i];
+
+          if (name !== maxName) {
+            delete node.children[name];
+          }
+        }
+      }
+    });
+
+    return merged;
+  }
+
+  /**
+   * @param {string|RelationExpression} expr
    * @returns {boolean}
    */
   isSubExpression(expr) {
@@ -109,19 +160,7 @@ export default class RelationExpression {
     }
 
     const key = Object.keys(this.children)[0];
-    const rec = RECURSIVE_REGEX.exec(key);
-
-    if (rec) {
-      const maxDepth = rec[1];
-
-      if (maxDepth) {
-        return parseInt(maxDepth, 10);
-      } else {
-        return Number.POSITIVE_INFINITY;
-      }
-    } else {
-      return 0;
-    }
+    return maxRecursionDepth(key);
   }
 
   /**
@@ -155,7 +194,15 @@ export default class RelationExpression {
    * @returns {RelationExpression}
    */
   clone() {
-    return new RelationExpression(JSON.parse(JSON.stringify(this)), this._recursionDepth, _.clone(this._filters));
+    const node = {
+      name: this.name,
+      args: this.args,
+      numChildren: this.numChildren,
+      children: _.cloneDeep(this.children)
+    };
+
+    const filters = _.clone(this._filters);
+    return new RelationExpression(node, this._recursionDepth, filters);
   }
 
   forEachChild(cb) {
@@ -214,7 +261,7 @@ export default class RelationExpression {
       expressions.push(target);
     } else {
       _.forOwn(path.children, child => {
-        let targetChild = target.children[child.name];
+        const targetChild = target.children[child.name];
 
         if (targetChild) {
           this.nodesAtPath(targetChild, child, expressions);
@@ -223,6 +270,38 @@ export default class RelationExpression {
     }
   }
 }
+
+function maxRecursionDepth(key) {
+  const rec = RECURSIVE_REGEX.exec(key);
+
+  if (rec) {
+    const maxDepth = rec[1];
+
+    if (maxDepth) {
+      return parseInt(maxDepth, 10);
+    } else {
+      return Number.POSITIVE_INFINITY;
+    }
+  } else {
+    return 0;
+  }
+}
+
+function visit(node, visitor) {
+  const keys = Object.keys(node.children);
+
+  visitor(node, keys);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    const childNode = node.children[key];
+
+    if (childNode) {
+      visit(childNode, visitor);
+    }
+  }
+}
+
 
 function toString(node) {
   let childExpr = _.values(node.children).map(toString);

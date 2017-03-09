@@ -1121,6 +1121,98 @@ module.exports = function (session) {
 
     });
 
+    describe('QueryBuilder.mergeEager', function () {
+
+      it('mergeEager should merge eager expressions', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2')
+          .mergeEager('model1Relation2.model2Relation1.model1Relation1')
+          .mergeEager('model1Relation2.model2Relation1.model1Relation2')
+          .first()
+          .omit(['model1Id', 'model1Prop1', 'model1Prop2', 'model2Prop1', 'model2Prop2'])
+          .filterEager('model1Relation2', function (builder) {
+            builder.orderBy('id_col');
+          })
+          .modifyEager('model1Relation2.model2Relation1', function (builder) {
+            builder.orderBy('id');
+          })
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Relation2: [{
+                idCol: 1,
+                model2Relation1: []
+              }, {
+                idCol: 2,
+                model2Relation1: [{
+                  id: 5,
+                  aliasedExtra: 'extra 5',
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  id: 6,
+                  aliasedExtra: 'extra 6',
+                  model1Relation1: {
+                    id: 7
+                  },
+                  model1Relation2: [{
+                    idCol: 3
+                  }]
+                }]
+              }]
+            });
+          });
+      });
+
+      it('mergeEager should merge eager expressions and filters', function () {
+        return Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2')
+          .mergeEager('model1Relation2(f1).model2Relation1.model1Relation1', {
+            f1: function (builder) {
+              builder.orderBy('id_col');
+            }
+          })
+          .mergeEager('model1Relation2.model2Relation1(f2).model1Relation2', {
+            f2: function (builder) {
+              builder.orderBy('id');
+            }
+          })
+          .first()
+          .omit(['model1Id', 'model1Prop1', 'model1Prop2', 'model2Prop1', 'model2Prop2'])
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Relation2: [{
+                idCol: 1,
+                model2Relation1: []
+              }, {
+                idCol: 2,
+                model2Relation1: [{
+                  id: 5,
+                  aliasedExtra: 'extra 5',
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  id: 6,
+                  aliasedExtra: 'extra 6',
+                  model1Relation1: {
+                    id: 7
+                  },
+                  model1Relation2: [{
+                    idCol: 3
+                  }]
+                }]
+              }]
+            });
+          });
+      });
+
+    });
+
   });
 
   // Tests all ways to fetch eagerly.

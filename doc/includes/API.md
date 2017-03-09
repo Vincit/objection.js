@@ -3112,6 +3112,57 @@ Type|Description
 
 
 
+#### mergeEager
+
+> The following queries are equivalent
+
+```js
+Person
+  .query()
+  .eager('[children.pets, movies]')
+```
+
+```js
+Person
+  .query()
+  .eager('children')
+  .mergeEager('children.pets')
+  .mergeEager('movies')
+```
+
+```js
+Person
+  .query()
+  .eager('children.pets')
+  .mergeEager('movies')
+```
+
+```js
+Person
+  .query()
+  .mergeEager('children.pets')
+  .mergeEager('movies')
+```
+
+Just like [eager](#eager) but instead of replacing query builder's eager expression this method merges the given
+expression to the existing expression.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The eager expression
+filters|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The named filter functions for the expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### allowEager
 
 ```js

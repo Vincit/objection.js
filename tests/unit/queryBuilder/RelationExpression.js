@@ -504,6 +504,20 @@ describe('RelationExpression', function () {
 
   });
 
+  describe('#merge', function () {
+    testMerge('a', 'b', '[a, b]');
+    testMerge('a.b', 'b', '[a.b, b]');
+    testMerge('a', 'b.c', '[a, b.c]');
+    testMerge('[a, b]', '[b, c]', '[a, b, c]');
+    testMerge('a.b', 'a.c', 'a.[b, c]');
+    testMerge('[a.b, d]', 'a.c', '[a.[b, c], d]');
+    testMerge('a.[c, d.e, g]', 'a.[c.l, d.[e.m, n], f]', 'a.[c.l, d.[e.m, n], g, f]');
+    testMerge('a.^4', 'a.^3', 'a.^4');
+    testMerge('a.^', 'a.^6', 'a.^');
+    testMerge('a.^6', 'a.^', 'a.^');
+    testMerge('a.a', 'a.^', 'a.^')
+  });
+
   describe('#toString', function () {
     testToString('a');
     testToString('a.b');
@@ -625,6 +639,13 @@ describe('RelationExpression', function () {
 
   function testParse(str, parsed) {
     expect(RelationExpression.parse(str)).to.eql(parsed);
+  }
+
+  function testMerge(str1, str2, parsed) {
+    it(str1 + " + " + str2 + " --> " + parsed, function () {
+      expect(RelationExpression.parse(str1).merge(str2).toString()).to.equal(parsed);
+      expect(RelationExpression.parse(str1).merge(RelationExpression.parse(str2)).toString()).to.equal(parsed);
+    });
   }
 
   function testPath(str, path, expected) {
