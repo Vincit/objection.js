@@ -30,13 +30,36 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="0-7-0">0.7.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><code class="prettyprint">jsonSchema</code> without <code class="prettyprint">properties</code> now works. <a href="https://github.com/Vincit/objection.js/issues/205">#205</a></li>
+<li><code class="prettyprint">relationMappings</code> can now be a function. <a href="https://github.com/Vincit/objection.js/issues/227">#227</a></li>
+<li>many to many extras can now be aliased. <a href="https://github.com/Vincit/objection.js/issues/223">#223</a></li>
+<li>zero values are now allowed in relation columns. <a href="https://github.com/Vincit/objection.js/issues/228">#228</a></li>
+<li>active transaction can now be accessed in <code class="prettyprint">$before/$after</code> hooks through <code class="prettyprint">queryContext.transaction</code> property.</li>
+<li>Validation can now be easily modified through a new <a href="#validator"><code class="prettyprint">Validator</code></a> interface. <a href="https://github.com/Vincit/objection.js/issues/241">#241</a> <a href="https://github.com/Vincit/objection.js/issues/199">#199</a></li>
+<li>fix a <code class="prettyprint">JoinEager</code> problem where an empty result for a relation caused the following relations to be empty. <a href="https://github.com/Vincit/objection.js/issues/292">#292</a></li>
+<li><code class="prettyprint">ref(fieldExpression)</code> syntax to reduce need for knex.raw and updating single attribute inside JSON column. <a href="https://github.com/Vincit/objection.js/issues/270">#270</a></li>
+</ul>
+
+<h3 id="breaking-changes">Breaking changes</h3>
+
+<ul>
+<li><code class="prettyprint">$relatedQuery</code> now returns a single model instead of an array for belongsToOne and hasOne relations. <a href="https://github.com/Vincit/objection.js/issues/155">#155</a></li>
+<li>identifier of a model can now be updated. Be careful with this one! Before if you forgot a wrong id in an <code class="prettyprint">update</code>/<code class="prettyprint">patch</code> operation, it would simply get ignored. Now the id is also updated just like any other column <a href="https://github.com/Vincit/objection.js/issues/100">#100</a></li>
+<li><code class="prettyprint">Table.*</code> is now selected by default in all queries instead of <code class="prettyprint">*</code>. This will break some join queries that don&rsquo;t have an explicit select clause. <a href="https://github.com/Vincit/objection.js/issues/161">#161</a></li>
+<li><code class="prettyprint">ValidationError.data</code> is now an object including, for each key, a list of errors with context info. <a href="https://github.com/Vincit/objection.js/issues/283">#283</a></li>
+</ul>
+
 <h2 id="0-6-2">0.6.2</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
 
 <ul>
 <li><code class="prettyprint">relationMappings</code> can now be a function <a href="https://github.com/Vincit/objection.js/issues/227">#227</a></li>
-<li>lodash 4.17.0 compatibility</li>
 </ul>
 
 <h2 id="0-6-1">0.6.1</h2>
@@ -52,7 +75,7 @@
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
 
 <ul>
-<li>Eager loading can now be done using joins and zero extra queries. See <a href="#eagerAlgorithm"><code class="prettyprint">eagerAlgorithm</code></a>, <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> and <a href="#eager"><code class="prettyprint">eager</code></a> for more info.</li>
+<li>Eager loading can now be done using joins and zero extra queries. See <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a>, <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> and <a href="#eager"><code class="prettyprint">eager</code></a> for more info.</li>
 <li><code class="prettyprint">#ref</code> in graph inserts can now contain extra properties for many-to-many relations <a href="https://github.com/Vincit/objection.js/issues/156">#156</a></li>
 <li><code class="prettyprint">#dbRef</code> can now be used to refer to existing rows from a <code class="prettyprint">insertWithRelated</code> graph.</li>
 <li><a href="#modelpaths"><code class="prettyprint">modelPaths</code></a> attribute for cleaner way to point to models in relationMappings.</li>
@@ -276,7 +299,7 @@ in the related model class.</li>
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
 
 <ul>
-<li>bugfix: Chaining <code class="prettyprint">insert</code> with <code class="prettyprint">returning</code> now returns all listed columns. </li>
+<li>bugfix: Chaining <code class="prettyprint">insert</code> with <code class="prettyprint">returning</code> now returns all listed columns.</li>
 </ul>
 
 <h2 id="0-2-0">0.2.0</h2>

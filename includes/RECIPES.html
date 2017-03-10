@@ -40,8 +40,8 @@
   <span class="p">});</span>
 </code></pre>
 
-<p>To write raw SQL queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. There are also some helper 
-methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>. The <a href="#raw"><code class="prettyprint">raw</code></a> method works just like the 
+<p>To write raw SQL queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. There are also some helper
+methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>. The <a href="#raw"><code class="prettyprint">raw</code></a> method works just like the
 <a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>.</p>
 
 <h2 id="change-id-column">Change id column</h2>
@@ -57,36 +57,108 @@ methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span><span class="na">id</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span><span class="p">});</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span>
+      <span class="na">id</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="na">message</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span>
+        <span class="na">keyword</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="na">params</span><span class="p">:</span> <span class="kc">null</span>
+      <span class="p">}]</span>
+    <span class="p">});</span>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre>
 
 <blockquote>
-<p>Replace <code class="prettyprint">jsonSchema</code> validation:</p>
+<p>Modify the <a href="https://github.com/epoberezkin/ajv">Ajv</a> based <code class="prettyprint">jsonSchema</code> validation:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$validate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">objectToValidate</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// This makes revalidation possible: `someModel.$validate()`.</span>
-  <span class="nx">objectToValidate</span> <span class="o">=</span> <span class="nx">objectToValidate</span> <span class="o">||</span> <span class="k">this</span><span class="p">;</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">AjvValidator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">AjvValidator</span><span class="p">;</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">someCustomValidator</span><span class="p">(</span><span class="nx">objectToValidate</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span><span class="na">someProp</span><span class="p">:</span> <span class="s1">'validation error message for the property'</span><span class="p">});</span>
+<span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createValidator</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">AjvValidator</span><span class="p">({</span>
+      <span class="na">onCreateAjv</span><span class="p">:</span> <span class="p">(</span><span class="nx">ajv</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="c1">// Here you can modify the `Ajv` instance.</span>
+      <span class="p">},</span>
+      <span class="na">options</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">allErrors</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="na">validateSchema</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+        <span class="na">ownProperties</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="na">v5</span><span class="p">:</span> <span class="kc">true</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>Replace <code class="prettyprint">jsonSchema</code> validation with any other validation scheme by
+implementing a custom <a href="#validator"><code class="prettyprint">Validator</code></a>:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="c1">// MyCustomValidator.js</span>
+
+<span class="kr">const</span> <span class="nx">Validator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Validator</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">MyCustomValidator</span> <span class="kr">extends</span> <span class="nx">Validator</span> <span class="p">{</span>
+  <span class="nx">validate</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// The model instance. May be empty at this point.</span>
+    <span class="kr">const</span> <span class="nx">model</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">model</span><span class="p">;</span>
+
+    <span class="c1">// The properties to validate. After validation these values will</span>
+    <span class="c1">// be merged into `model` by objection.</span>
+    <span class="kr">const</span> <span class="nx">json</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">json</span><span class="p">;</span>
+
+    <span class="c1">// `ModelOptions` object. If your custom validator sets default</span>
+    <span class="c1">// values, you need to check the `opt.patch` boolean. If it is true</span>
+    <span class="c1">// we are validating a patch object, the defaults should not be set.</span>
+    <span class="kr">const</span> <span class="nx">opt</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">options</span><span class="p">;</span>
+
+    <span class="c1">// A context object shared between the validation methods. A new</span>
+    <span class="c1">// object is created for each validation operation.</span>
+    <span class="kr">const</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">ctx</span><span class="p">;</span>
+
+    <span class="c1">// Do your validation here and throw any exception if the</span>
+    <span class="c1">// validation fails.</span>
+    <span class="nx">doSomeValidationAndThrowIfFails</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+
+    <span class="c1">// You need to return the (possibly modified) json.</span>
+    <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
   <span class="p">}</span>
 
-  <span class="c1">// Remember to return the input json object.</span>
-  <span class="k">return</span> <span class="nx">objectToValidate</span><span class="p">;</span>
-<span class="p">};</span>
+  <span class="nx">beforeValidate</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Takes the same arguments as `validate`. Usually there is no need</span>
+    <span class="c1">// to override this.</span>
+    <span class="k">return</span> <span class="kr">super</span><span class="p">.</span><span class="nx">beforeValidate</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="nx">afterValidate</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Takes the same arguments as `validate`. Usually there is no need</span>
+    <span class="c1">// to override this.</span>
+    <span class="k">return</span> <span class="kr">super</span><span class="p">.</span><span class="nx">afterValidate</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// BaseModel.js</span>
+
+<span class="kr">const</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">;</span>
+
+<span class="c1">// Override the `createValidator` method of a `Model` to use the</span>
+<span class="c1">// custom validator.</span>
+<span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createValidator</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyCustomValidator</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre>
 
 <p>If you want to use the json schema validation but add some custom validation on top of it you can override the
 <a href="#_s_beforevalidate"><code class="prettyprint">$beforeValidate</code></a> and <a href="#_s_aftervalidate"><code class="prettyprint">$afterValidate</code></a> methods.</p>
 
-<p>If you need to do validation on insert or update you can throw exceptions from the 
+<p>If you need to do validation on insert or update you can throw exceptions from the
 <a href="#_s_beforeinsert"><code class="prettyprint">$beforeInsert</code></a> and <a href="#_s_beforeupdate"><code class="prettyprint">$beforeUpdate</code></a> methods.</p>
 
-<p>If you don&rsquo;t want to use the built-in json schema validation, you can just ignore the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> property. 
-It is completely optional. If you want to use some other validation library, simply override the <a href="#_s_validate"><code class="prettyprint">$validate</code></a>
-method of the model class. You need to throw a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> when validation fails.</p>
+<p>If you don&rsquo;t want to use the built-in json schema validation, you can just ignore the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> property.
+It is completely optional. If you want to use some other validation library you need to implement a custom <a href="#validator"><code class="prettyprint">Validator</code></a>
+(see the example).</p>
 
 <h2 id="map-column-names-to-different-property-names">Map column names to different property names</h2>
 
@@ -174,8 +246,8 @@ and camelCased property names in code. You can use the functions</p>
   <span class="p">});</span>
 </code></pre>
 
-<p>Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building 
-methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places 
+<p>Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
+methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places
 you would expect. You can also pass <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> instances instead of functions.</p>
 
 <h2 id="joins">Joins</h2>
@@ -189,6 +261,86 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 </code></pre>
 
 <p>Again, <a href="http://knexjs.org/#Builder-join">do as you would with a knex query builder</a>.</p>
+
+<h2 id="postgresql-quot-returning-quot-tricks">PostgreSQL &ldquo;returning&rdquo; tricks</h2>
+
+<blockquote>
+<p>Insert and return the data in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">});</span>
+
+</code></pre>
+
+<blockquote>
+<p>Update a single row by ID and return the data for that row in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
+  <span class="p">});</span>
+
+</code></pre>
+
+<blockquote>
+<p>Update a Model instance and return the data for that instance in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">jennifer</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "J."</span>
+  <span class="p">});</span>
+
+</code></pre>
+
+<blockquote>
+<p>Patch a single row by ID and return the data for that row in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
+  <span class="p">});</span>
+
+</code></pre>
+
+<blockquote>
+<p>Patch a Model instance and return the data for that instance in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">jennifer</span>
+  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "J."</span>
+  <span class="p">});</span>
+
+</code></pre>
+
+<p>Because PostgreSQL (and some others) support <code class="prettyprint">returning(&#39;*&#39;)</code> chaining, you can actually <code class="prettyprint">insert</code> a row, or <code class="prettyprint">update</code> / <code class="prettyprint">patch</code> an existing row, <strong>and</strong> receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.</p>
 
 <h2 id="polymorphic-associations">Polymorphic associations</h2>
 <pre class="highlight javascript"><code><span class="nx">Issue</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
@@ -243,7 +395,7 @@ how to create relations for this setup ➔</p>
 <span class="p">};</span>
 </code></pre>
 
-<p>You can implement the <code class="prettyprint">$beforeInsert</code> and <code class="prettyprint">$beforeUpdate</code> methods to set the timestamps. If you want to do this for all 
+<p>You can implement the <code class="prettyprint">$beforeInsert</code> and <code class="prettyprint">$beforeUpdate</code> methods to set the timestamps. If you want to do this for all
 your models, you can simply create common base class that implements these methods.</p>
 
 <h2 id="custom-query-builder">Custom query builder</h2>
@@ -331,8 +483,8 @@ property and inherit all your models from the custom Model class.</p>
 class. This doesn&rsquo;t fly if you want to select the database based on the request as it sets the connection globally.</p>
 
 <p>If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
-<code class="prettyprint">req.models</code> hash and then <em>always</em> use the models through <code class="prettyprint">req.models</code> instead of requiring them directly. What 
-<a href="#bindknex"><code class="prettyprint">bindKnex</code></a> method actually does is that it creates an anonymous subclass of the model class and sets its 
+<code class="prettyprint">req.models</code> hash and then <em>always</em> use the models through <code class="prettyprint">req.models</code> instead of requiring them directly. What
+<a href="#bindknex"><code class="prettyprint">bindKnex</code></a> method actually does is that it creates an anonymous subclass of the model class and sets its
 knex connection. That way the database connection doesn&rsquo;t change for the other requests that are currently being executed.</p>
 
 <h2 id="sql-clause-precedence-and-parentheses">SQL clause precedence and parentheses</h2>
