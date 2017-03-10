@@ -125,12 +125,12 @@ npm start
 <pre class="highlight javascript"><code><span class="c1">// run the following command to install:</span>
 <span class="c1">// npm install objection knex sqlite3</span>
 
-<span class="kd">var</span> <span class="nx">objection</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">objection</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
 
 <span class="c1">// Initialize knex connection.</span>
-<span class="kd">var</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">({</span><span class="na">client</span><span class="p">:</span> <span class="s1">'sqlite3'</span><span class="p">,</span> <span class="na">connection</span><span class="p">:</span> <span class="p">{</span><span class="na">filename</span><span class="p">:</span> <span class="s1">'example.db'</span><span class="p">}});</span>
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">({</span><span class="na">client</span><span class="p">:</span> <span class="s1">'sqlite3'</span><span class="p">,</span> <span class="na">connection</span><span class="p">:</span> <span class="p">{</span><span class="na">filename</span><span class="p">:</span> <span class="s1">'example.db'</span><span class="p">}});</span>
 
 <span class="c1">// Give the connection to objection.</span>
 <span class="nx">Model</span><span class="p">.</span><span class="nx">knex</span><span class="p">(</span><span class="nx">knex</span><span class="p">);</span>
@@ -143,13 +143,11 @@ npm start
 <span class="p">});</span>
 
 <span class="c1">// Person model.</span>
-<span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="p">}</span>
 <span class="p">}</span>
-
-<span class="nx">Person</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
-<span class="c1">// Basic ES6 compatible prototypal inheritance.</span>
-<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
 
 <span class="nx">schemaPromise</span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="c1">// Create a person.</span>
@@ -189,6 +187,455 @@ that uses <a href="https://babeljs.io/">Babel</a> for ES7 &ndash;&gt; ES5 transp
 <li><a href="https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/">Introduction</a> (objection.js was originally called moron.js)</li>
 <li><a href="https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/">Eager loading</a></li>
 <li><a href="https://www.vincit.fi/en/blog/by-the-power-of-json-queries/">Postgres JSON queries</a></li>
+</ul>
+
+<h1 id="models">Models</h1>
+
+<blockquote>
+<p>A working model with minimal amount of code:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">MinimalModel</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Inherit `Model`. This does the basic prototype inheritance but also</span>
+<span class="c1">// inherits all the static methods and properties like `Model.query()`</span>
+<span class="c1">// and `Model.fromJson()`. This is consistent with ES6 class inheritance.</span>
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">MinimalModel</span><span class="p">);</span>
+
+<span class="c1">// After the js class boilerplate, all you need to do is set the table name.</span>
+<span class="nx">MinimalModel</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'SomeTableName'</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">MinimalModel</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">MinimalModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">'SomeTableName'</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">MinimalModel</span><span class="p">;</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
+
+<span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">MinimalModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'SomeTableName'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>Model with custom methods, json schema validation and relations. This model is used in the examples:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">;</span>
+
+<span class="c1">// Table name is the only required property.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+
+<span class="c1">// Custom method.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fullName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="c1">// Optional JSON schema. This is not the database schema!</span>
+<span class="c1">// Nothing is generated based on this. This is only used</span>
+<span class="c1">// for validation. Whenever a model instance is created</span>
+<span class="c1">// it is checked against this schema.</span>
+<span class="c1">// http://json-schema.org/.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">jsonSchema</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+  <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
+
+  <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
+    <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+    <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
+
+    <span class="c1">// Properties defined as objects or arrays are</span>
+    <span class="c1">// automatically converted to JSON strings when</span>
+    <span class="c1">// writing to database and back to objects and arrays</span>
+    <span class="c1">// when reading from database. To override this</span>
+    <span class="c1">// behaviour, you can override the</span>
+    <span class="c1">// Person.jsonAttributes property.</span>
+    <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+        <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+        <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// This object defines the relations to other models.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+    <span class="c1">// The related model. This can be either a Model</span>
+    <span class="c1">// subclass constructor or an absolute file path</span>
+    <span class="c1">// to a module that exports one. We use the file</span>
+    <span class="c1">// path version in this example to prevent require</span>
+    <span class="c1">// loops.</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+      <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+      <span class="c1">// ManyToMany relation needs the `through` object</span>
+      <span class="c1">// to describe the join table.</span>
+      <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1">// If you have a model class for the join table</span>
+        <span class="c1">// you need to specify it like this:</span>
+        <span class="c1">// modelClass: PersonMovie,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+      <span class="p">},</span>
+      <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+      <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
+      <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+</code></pre>
+
+<blockquote>
+<p>ES6:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="c1">// Table name is the only required property.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Optional JSON schema. This is not the database schema!</span>
+  <span class="c1">// Nothing is generated based on this. This is only used</span>
+  <span class="c1">// for validation. Whenever a model instance is created</span>
+  <span class="c1">// it is checked against this schema.</span>
+  <span class="c1">// http://json-schema.org/.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">jsonSchema</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+      <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
+
+      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
+        <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
+        <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+        <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+        <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
+
+        <span class="c1">// Properties defined as objects or arrays are</span>
+        <span class="c1">// automatically converted to JSON strings when</span>
+        <span class="c1">// writing to database and back to objects and arrays</span>
+        <span class="c1">// when reading from database. To override this</span>
+        <span class="c1">// behaviour, you can override the</span>
+        <span class="c1">// Person.jsonAttributes property.</span>
+        <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+          <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+            <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+            <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+
+  <span class="c1">// This object defines the relations to other models.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="c1">// The related model. This can be either a Model</span>
+        <span class="c1">// subclass constructor or an absolute file path</span>
+        <span class="c1">// to a module that exports one. We use the file</span>
+        <span class="c1">// path version here to prevent require loops.</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="c1">// ManyToMany relation needs the `through` object</span>
+          <span class="c1">// to describe the join table.</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you need to specify it like this:</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES7:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="c1">// Table name is the only required property.</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+
+  <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Optional JSON schema. This is not the database schema!</span>
+  <span class="c1">// Nothing is generated based on this. This is only used</span>
+  <span class="c1">// for validation. Whenever a model instance is created</span>
+  <span class="c1">// it is checked against this schema.</span>
+  <span class="c1">// http://json-schema.org/.</span>
+  <span class="kr">static</span> <span class="nx">jsonSchema</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+    <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
+
+    <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
+      <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
+      <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+      <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+      <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
+
+      <span class="c1">// Properties defined as objects or arrays are</span>
+      <span class="c1">// automatically converted to JSON strings when</span>
+      <span class="c1">// writing to database and back to objects and arrays</span>
+      <span class="c1">// when reading from database. To override this</span>
+      <span class="c1">// behaviour, you can override the</span>
+      <span class="c1">// Person.jsonAttributes property.</span>
+      <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+        <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+          <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+          <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+
+  <span class="c1">// This object defines the relations to other models.</span>
+  <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+      <span class="c1">// The related model. This can be either a Model</span>
+      <span class="c1">// subclass constructor or an absolute file path</span>
+      <span class="c1">// to a module that exports one. We use the file</span>
+      <span class="c1">// path version here to prevent require loops.</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="c1">// ManyToMany relation needs the `through` object</span>
+        <span class="c1">// to describe the join table.</span>
+        <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+          <span class="c1">// If you have a model class for the join table</span>
+          <span class="c1">// you need to specify it like this:</span>
+          <span class="c1">// modelClass: PersonMovie,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+        <span class="p">},</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+
+    <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>Models are created by inheriting from the <a href="#model"><code class="prettyprint">Model</code></a> base class. In objection.js the inheritance is done as
+transparently as possible. There is no custom Class abstraction making you wonder what the hell is happening.
+Just plain old ugly prototypal inheritance.</p>
+
+<p>The inheritance is compatible with ES class inheritance. This means that static properties are inherited as well as
+instance methods. Because of this you can just use the <code class="prettyprint">class</code> and <code class="prettyprint">extend</code> keywords.</p>
+
+<h1 id="relations">Relations</h1>
+
+<blockquote>
+<p><code class="prettyprint">BelongsToOneRelation</code>: Use this relation when the source model has the foreign key</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">owner</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'animal.ownerId'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'person.id'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p><code class="prettyprint">HasManyRelation</code>: Use this relation when the related model has the foreign key</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">animals</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'animal.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'person.ownerId'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p><code class="prettyprint">ManyToManyRelation</code>: Use this relation when the model is related to a list of other models through a join table</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+          <span class="c1">// Person_Movie is the join table.</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+        <span class="p">},</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p><code class="prettyprint">HasOneThroughRelation</code>: Use this relation when the model is related to a singke model through a join table</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">movie</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasOneThroughRelation</span><span class="p">,</span>
+      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
+      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+          <span class="c1">// Person_Movie is the join table.</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+        <span class="p">},</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>We already went through how to create relations in the <a href="#models">models</a> section but here&rsquo;s a list of all the
+available relation types in a nicely searchable place. See the <a href="#relationmapping">this</a> API doc section for full
+documentation of the relation mapping parameters.</p>
+
+<p>Vocabulary for the relation descriptions:</p>
+
+<ul>
+<li>source model: The model for which you are writing the <code class="prettyprint">relationMapping</code> for.</li>
+<li>related model: The model at the other end of the relation.</li>
 </ul>
 
 <h1 id="query-examples">Query examples</h1>
@@ -1023,364 +1470,6 @@ of a model class. The validation is ran each time a <a href="#model"><code class
 with an instance of <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
 
 <p>See <a href="#custom-validation">the recipe book</a> for instructions if you want to use some other validation library.</p>
-
-<h1 id="models">Models</h1>
-
-<blockquote>
-<p>A working model with minimal amount of code:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">;</span>
-
-<span class="kd">function</span> <span class="nx">MinimalModel</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="c1">// Inherit `Model`. This does the basic prototype inheritance but also</span>
-<span class="c1">// inherits all the static methods and properties like `Model.query()`</span>
-<span class="c1">// and `Model.fromJson()`. This is consistent with ES6 class inheritance.</span>
-<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">MinimalModel</span><span class="p">);</span>
-
-<span class="c1">// After the js class boilerplate, all you need to do is set the table name.</span>
-<span class="nx">MinimalModel</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'SomeTableName'</span><span class="p">;</span>
-
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">MinimalModel</span><span class="p">;</span>
-</code></pre>
-
-<blockquote>
-<p>ES6:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Model</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">;</span>
-
-<span class="kr">class</span> <span class="nx">MinimalModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">'SomeTableName'</span><span class="p">;</span> <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">MinimalModel</span><span class="p">;</span>
-</code></pre>
-
-<blockquote>
-<p>ES7:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
-
-<span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">MinimalModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'SomeTableName'</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre>
-
-<blockquote>
-<p>Model with custom methods, json schema validation and relations. This model is used in the examples:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">;</span>
-
-<span class="c1">// Table name is the only required property.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
-
-<span class="c1">// Custom method.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fullName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
-<span class="p">};</span>
-
-<span class="c1">// Optional JSON schema. This is not the database schema!</span>
-<span class="c1">// Nothing is generated based on this. This is only used</span>
-<span class="c1">// for validation. Whenever a model instance is created</span>
-<span class="c1">// it is checked against this schema.</span>
-<span class="c1">// http://json-schema.org/.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">jsonSchema</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-  <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
-
-  <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
-    <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-    <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-    <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
-
-    <span class="c1">// Properties defined as objects or arrays are</span>
-    <span class="c1">// automatically converted to JSON strings when</span>
-    <span class="c1">// writing to database and back to objects and arrays</span>
-    <span class="c1">// when reading from database. To override this</span>
-    <span class="c1">// behaviour, you can override the</span>
-    <span class="c1">// Person.jsonAttributes property.</span>
-    <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-        <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-        <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="c1">// This object defines the relations to other models.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-    <span class="c1">// The related model. This can be either a Model</span>
-    <span class="c1">// subclass constructor or an absolute file path</span>
-    <span class="c1">// to a module that exports one. We use the file</span>
-    <span class="c1">// path version in this example to prevent require</span>
-    <span class="c1">// loops.</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-      <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-
-  <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-      <span class="c1">// ManyToMany relation needs the `through` object</span>
-      <span class="c1">// to describe the join table.</span>
-      <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-        <span class="c1">// If you have a model class for the join table</span>
-        <span class="c1">// you need to specify it like this:</span>
-        <span class="c1">// modelClass: PersonMovie,</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
-      <span class="p">},</span>
-      <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-
-  <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-      <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
-    <span class="p">}</span>
-  <span class="p">},</span>
-
-  <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-      <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">};</span>
-</code></pre>
-
-<blockquote>
-<p>ES6:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="c1">// Table name is the only required property.</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="c1">// Optional JSON schema. This is not the database schema!</span>
-  <span class="c1">// Nothing is generated based on this. This is only used</span>
-  <span class="c1">// for validation. Whenever a model instance is created</span>
-  <span class="c1">// it is checked against this schema.</span>
-  <span class="c1">// http://json-schema.org/.</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">jsonSchema</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-      <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
-
-      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
-        <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
-        <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-        <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-        <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
-
-        <span class="c1">// Properties defined as objects or arrays are</span>
-        <span class="c1">// automatically converted to JSON strings when</span>
-        <span class="c1">// writing to database and back to objects and arrays</span>
-        <span class="c1">// when reading from database. To override this</span>
-        <span class="c1">// behaviour, you can override the</span>
-        <span class="c1">// Person.jsonAttributes property.</span>
-        <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-          <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-            <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-            <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">};</span>
-  <span class="p">}</span>
-
-  <span class="c1">// This object defines the relations to other models.</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-        <span class="c1">// The related model. This can be either a Model</span>
-        <span class="c1">// subclass constructor or an absolute file path</span>
-        <span class="c1">// to a module that exports one. We use the file</span>
-        <span class="c1">// path version here to prevent require loops.</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="c1">// ManyToMany relation needs the `through` object</span>
-          <span class="c1">// to describe the join table.</span>
-          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="c1">// If you have a model class for the join table</span>
-            <span class="c1">// you need to specify it like this:</span>
-            <span class="c1">// modelClass: PersonMovie,</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
-          <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">};</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-
-<blockquote>
-<p>ES7:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="c1">// Table name is the only required property.</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
-
-  <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="c1">// Optional JSON schema. This is not the database schema!</span>
-  <span class="c1">// Nothing is generated based on this. This is only used</span>
-  <span class="c1">// for validation. Whenever a model instance is created</span>
-  <span class="c1">// it is checked against this schema.</span>
-  <span class="c1">// http://json-schema.org/.</span>
-  <span class="kr">static</span> <span class="nx">jsonSchema</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-    <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
-
-    <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
-      <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
-      <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-      <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-      <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
-
-      <span class="c1">// Properties defined as objects or arrays are</span>
-      <span class="c1">// automatically converted to JSON strings when</span>
-      <span class="c1">// writing to database and back to objects and arrays</span>
-      <span class="c1">// when reading from database. To override this</span>
-      <span class="c1">// behaviour, you can override the</span>
-      <span class="c1">// Person.jsonAttributes property.</span>
-      <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-        <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-          <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-          <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-
-  <span class="c1">// This object defines the relations to other models.</span>
-  <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-      <span class="c1">// The related model. This can be either a Model</span>
-      <span class="c1">// subclass constructor or an absolute file path</span>
-      <span class="c1">// to a module that exports one. We use the file</span>
-      <span class="c1">// path version here to prevent require loops.</span>
-      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
-      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
-      <span class="p">}</span>
-    <span class="p">},</span>
-
-    <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
-      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
-      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-        <span class="c1">// ManyToMany relation needs the `through` object</span>
-        <span class="c1">// to describe the join table.</span>
-        <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-          <span class="c1">// If you have a model class for the join table</span>
-          <span class="c1">// you need to specify it like this:</span>
-          <span class="c1">// modelClass: PersonMovie,</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
-        <span class="p">},</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
-      <span class="p">}</span>
-    <span class="p">},</span>
-
-    <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
-      <span class="p">}</span>
-    <span class="p">},</span>
-
-    <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
-      <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-      <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
-      <span class="p">}</span>
-    <span class="p">}</span>
-  <span class="p">};</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>Models are created by inheriting from the <a href="#model"><code class="prettyprint">Model</code></a> base class. In objection.js the inheritance is done as
-transparently as possible. There is no custom Class abstraction making you wonder what the hell is happening.
-Just plain old ugly prototypal inheritance.</p>
-
-<p>The inheritance is compatible with ES6 class inheritance. This means that static properties are inherited as well as
-instance methods. Because of this you can just use the ES6 <code class="prettyprint">class</code> and <code class="prettyprint">extend</code> keywords.</p>
 
           <h1 id="recipe-book">Recipe book</h1>
 
@@ -10764,7 +10853,7 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
 </tr>
 </tbody></table>
 
-<h1 id="eageroptions">EagerOptions</h1>
+<h2 id="eageroptions">EagerOptions</h2>
 
 <table><thead>
 <tr>
