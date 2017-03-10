@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "0.7.0-rc.3",
+  "version": "0.7.0",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -54,7 +54,7 @@
     "lodash": "^4.7.0"
   },
   "peerDependencies": {
-    "knex": ">= 0.8.0 <= 0.12.5"
+    "knex": "0.x"
   },
   "devDependencies": {
     "@types/knex": "^0.0.36",
@@ -85,7 +85,7 @@
     "fs-extra": "^2.0.0",
     "glob": "^7.0.3",
     "istanbul": "^0.4.0",
-    "knex": "0.12.3",
+    "knex": "0.x",
     "mocha": "^2.3.4",
     "mysql": "^2.7.0",
     "pg": "^6.1.2",
