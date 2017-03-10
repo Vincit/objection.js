@@ -167,7 +167,7 @@ export default class JoinEagerOperation extends EagerOperation {
       for (let m = 0, lm = models.length; m < lm; ++m) {
         this.finalizeOne(pInfo, relNames, models[m]);
       }
-    } else {
+    } else if (models) {
       this.finalizeOne(pInfo, relNames, models);
     }
 

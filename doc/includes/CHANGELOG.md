@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+### What's new
+
+ * Fix `JoinEagerAlgorithm` NPE bug
+
 ## 0.7.0
 
 ### What's new
