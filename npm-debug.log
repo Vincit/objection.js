@@ -1,16 +1,15 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/Cellar/node/6.0.0/bin/node',
+1 verbose cli [ '/usr/local/Cellar/node/7.4.0/bin/node',
 1 verbose cli   '/usr/local/bin/npm',
 1 verbose cli   'test' ]
-2 info using npm@3.8.6
-3 info using node@v6.0.0
+2 info using npm@4.0.5
+3 info using node@v7.4.0
 4 verbose stack Error: ENOENT: no such file or directory, open '/Users/samiko/Projects/objection-doc/slate/objection.js/package.json'
-4 verbose stack     at Error (native)
 5 verbose cwd /Users/samiko/Projects/objection-doc/slate/objection.js
-6 error Darwin 15.4.0
-7 error argv "/usr/local/Cellar/node/6.0.0/bin/node" "/usr/local/bin/npm" "test"
-8 error node v6.0.0
-9 error npm  v3.8.6
+6 error Darwin 16.3.0
+7 error argv "/usr/local/Cellar/node/7.4.0/bin/node" "/usr/local/bin/npm" "test"
+8 error node v7.4.0
+9 error npm  v4.0.5
 10 error path /Users/samiko/Projects/objection-doc/slate/objection.js/package.json
 11 error code ENOENT
 12 error errno -2
