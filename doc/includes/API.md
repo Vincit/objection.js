@@ -84,6 +84,87 @@ Type|Description
 
 
 
+### Query building global helpers
+
+#### import { ref } from 'objection';
+
+Factory function that returns `ReferenceBuilder` instance, which makes it easier to refer
+tables, columns, json attributes and add casting to referred columns wihtout need to use
+Model.raw() directly.
+
+`ref()` can be passed to all `QueryBuilder` APIs which supports `Model.raw()` arguments.
+
+```js
+import { ref } from 'objection';
+
+Model.query()
+  .select([
+    'id',
+    ref('Model.jsonColumn:details.name').castText().as('name'),
+    ref('Model.jsonColumn:details.age').castInt().as('age')
+  ])
+  .join('OtherModel', ref('Model.jsonColumn:details.name').castText(), '=', ref('OtherModel.name'))
+  .where('age', '>', ref('OtherModel.ageLimit'));
+```
+
+#### ReferenceBuilder methods
+
+##### castText()
+
+Cast reference to sql type `text`.
+
+##### castInt()
+
+Cast reference to sql type `integer`.
+
+##### castBigInt()
+
+Cast reference to sql type `bigint`.
+
+##### castFloat()
+
+Cast reference to sql type `float`.
+
+##### castDecimal()
+
+Cast reference to sql type `decimal`.
+
+##### castReal()
+
+Cast reference to sql type `real`.
+
+##### castBool()
+
+Cast reference to sql type `boolean`.
+
+##### castType(sqlType)
+
+Give custom casting type to which referenced value is casted to.
+
+`.castType('mytype') => CAST(?? as mytype)`
+
+##### castJson()
+
+In addition to other casts wrap reference to_jsonb() function so that final value
+reference will be json type.
+
+##### as(as)
+
+As format to tell which name will be used for reference for example in `.select(ref('age').as('yougness'))`
+
+#### lit() (Not implemented yet)
+
+The same as `ref()` but allows one to tell in which format certain javascript literal
+should be passed to database engine.
+
+#### raw() (Not implemented yet)
+
+Wrapper for raw, which will be evaluated lazily in stage where `Model` or query is
+already bound to knex connection. Also understands `ref()` and `lit()` instances as
+bound parameters.
+
+
+
 ### Query building methods
 
 
@@ -399,7 +480,7 @@ Person
   });
 ```
 
-> You can also give raw expressions and subqueries as values like this:
+> You can also give raw expressions, subqueries and `ref()` as values like this:
 
 ```js
 Person
@@ -407,7 +488,19 @@ Person
   .update({
     firstName: Person.raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
-    age: Person.query().avg('age')
+    age: Person.query().avg('age'),
+    oldLastName: ref('lastName') // same as knex.raw('??', ['lastName'])
+  });
+```
+
+> Updating single value inside json column and referring attributes inside json columns (only with postgres) etc.:
+
+```js
+Person
+  .query()
+  .update({
+    lastName: ref('someJsonColumn:mother.lastName').castText(),
+    'detailsJsonColumn:address.street': 'Elm street'
   });
 ```
 
@@ -562,14 +655,15 @@ Person
   });
 ```
 
-> You can also give raw expressions and subqueries as values like this:
+> You can also give raw expressions, subqueries and `ref()` as values like this:
 
 ```js
 Person
   .query()
   .patch({
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: Person.raw("'Jenni' || 'fer'"),
+    oldLastName: ref('lastName')
   });
 ```
 
