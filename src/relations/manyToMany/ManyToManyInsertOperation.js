@@ -21,11 +21,19 @@ export default class ManyToManyInsertOperation extends InsertOperation {
   onAfterQuery(builder, inserted) {
     const maybePromise = super.onAfterQuery(builder, inserted);
 
+    const isOneToOne = this.relation.isOneToOne();
+    const relName = this.relation.name;
+    const owner = this.owner;
+
     return after(maybePromise, inserted => {
       let ownerId = this.owner.$values(this.relation.ownerProp);
       let joinModels = this.relation.createJoinModels(ownerId, inserted);
 
-      this.owner[this.relation.name] = this.relation.mergeModels(this.owner[this.relation.name], inserted);
+      if (isOneToOne) {
+        owner[relName] = inserted[0] || null;
+      } else {
+        owner[relName] = this.relation.mergeModels(owner[relName], inserted);
+      }
 
       // Insert the join rows to the join table.
       return this.relation.joinTableModelClass(builder.knex())

@@ -252,6 +252,65 @@ module.exports = function (session) {
 
       });
 
+      describe('has one through relation', function () {
+
+        beforeEach(function () {
+          return session.populate([{
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [{
+              idCol: 1,
+              model2Prop1: 'text 1',
+
+              model2Relation2: {
+                id: 5,
+                model1Prop1: 'blaa 3',
+                model1Prop2: 4
+              }
+            }]
+          }, {
+            id: 2,
+            model1Prop1: 'hello 2',
+            model1Relation2: [{
+              idCol: 2,
+              model2Prop1: 'text 2',
+
+              model2Relation2: {
+                id: 6,
+                model1Prop1: 'blaa 4',
+                model1Prop2: 5
+              },
+
+              model2Relation1: [{
+                id: 7,
+                model1Prop1: 'blaa 5',
+                model1Prop2: 4
+              }]
+            }]
+          }]);
+        });
+
+        it('should unrelate', function () {
+          return Model2
+            .query()
+            .where('id_col', 2)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model2Relation2')
+                .unrelate();
+            })
+            .then(function () {
+              return session.knex('Model1Model2One');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+            });
+        });
+
+      });
+
     });
 
   });

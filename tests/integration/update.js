@@ -713,6 +713,65 @@ module.exports = function (session) {
         });
       });
 
+      describe('has one through relation', function () {
+        var parent;
+
+        beforeEach(function () {
+          return session.populate([{
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [{
+              idCol: 1,
+              model2Prop1: 'text 1',
+
+              model2Relation2: {
+                id: 3,
+                model1Prop1: 'blaa 1',
+                model1Prop2: 6
+              }
+            }]
+          }, {
+            id: 2,
+            model1Prop1: 'hello 2',
+            model1Relation2: [{
+              idCol: 2,
+              model2Prop1: 'text 2',
+
+              model2Relation2: {
+                id: 7,
+                model1Prop1: 'blaa 5',
+                model1Prop2: 2
+              }
+            }]
+          }]);
+        });
+
+        beforeEach(function () {
+          return Model2
+            .query()
+            .then(function (parents) {
+              parent = _.find(parents, {idCol: 1});
+            });
+        });
+
+        it('should update the related object', function () {
+          return parent
+            .$relatedQuery('model2Relation2')
+            .update({model1Prop1: 'updated text'})
+            .then(function (numUpdated) {
+              expect(numUpdated).to.equal(1);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(4);
+              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+              expectPartEql(rows[2], {id: 3, model1Prop1: 'updated text'});
+              expectPartEql(rows[3], {id: 7, model1Prop1: 'blaa 5'});
+            });
+        });
+      });
+
     });
 
     function subClassWithSchema(Model, schema) {

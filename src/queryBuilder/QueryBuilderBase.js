@@ -1,7 +1,4 @@
-import _ from 'lodash';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
-import {inherits} from '../utils/classUtils';
-
 import QueryBuilderOperationSupport from './QueryBuilderOperationSupport';
 
 import KnexOperation from './operations/KnexOperation';

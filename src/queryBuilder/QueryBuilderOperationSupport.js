@@ -94,7 +94,6 @@ export default class QueryBuilderOperationSupport {
     }
   }
 
-
   /**
    * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector
    * @return {QueryBuilderBase}

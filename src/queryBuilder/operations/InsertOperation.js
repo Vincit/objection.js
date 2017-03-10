@@ -35,7 +35,7 @@ export default class InsertOperation extends QueryBuilderOperation {
       knexBuilder.returning(builder.modelClass().idColumn);
     }
 
-    let json = new Array(this.models.length);
+    const json = new Array(this.models.length);
 
     for (let i = 0, l = this.models.length; i < l; ++i) {
       json[i] = this.models[i].$toDatabaseJson();

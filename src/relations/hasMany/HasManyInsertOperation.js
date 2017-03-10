@@ -30,10 +30,18 @@ export default class HasManyInsertOperation extends InsertOperation {
   onAfterQuery(builder, inserted) {
     const maybePromise = super.onAfterQuery(builder, inserted);
 
+    const isOneToOne = this.relation.isOneToOne();
+    const relName = this.relation.name;
+    const owner = this.owner;
+
     return after(maybePromise, inserted => {
-      this.relation.appendRelationProp(this.owner, inserted);
+      if (isOneToOne) {
+        owner[relName] = inserted[0] || null;
+      } else {
+        owner[relName] = this.relation.mergeModels(owner[relName], inserted);
+      }
+
       return inserted;
     });
   }
-
 }

@@ -403,6 +403,44 @@ module.exports = function (session) {
 
       });
 
+      describe('has one through relation', function () {
+
+        beforeEach(function () {
+          return session.populate([{
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [{
+              idCol: 1,
+              model2Prop1: 'text 1',
+              model2Relation2: null
+            }]
+          }, {
+            id: 2,
+            model1Prop1: 'hello 2',
+          }]);
+        });
+
+        it('should relate', function () {
+          return Model2
+            .query()
+            .where('id_col', 1)
+            .first()
+            .then(function (model) {
+              return model
+                .$relatedQuery('model2Relation2')
+                .relate(2);
+            })
+            .then(function () {
+              return session.knex('Model1Model2One');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(1);
+              expect(_.filter(rows, {model2Id: 1, model1Id: 2})).to.have.length(1);
+            });
+        });
+
+      });
+
     });
 
   });

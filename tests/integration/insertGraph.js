@@ -15,7 +15,7 @@ module.exports = function (session) {
   describe('Model insertGraph queries', function () {
     var population;
     var insertion;
-    var eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2]';
+    var eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2.model2Relation2]';
 
     beforeEach(function () {
       population = {
@@ -55,7 +55,11 @@ module.exports = function (session) {
           "#id": 'child1',
           model2Prop1: 'child1'
         }, {
-          model2Prop1: 'child2'
+          model2Prop1: 'child2',
+
+          model2Relation2: {
+            model1Prop1: 'child3'
+          }
         }]
       };
     });
@@ -330,6 +334,9 @@ module.exports = function (session) {
           .query()
           .insertGraphAndFetch(insertion)
           .then(function (inserted) {
+            return check(inserted).return(inserted);
+          })
+          .then(function (inserted) {
             return Model1.query().eager(eagerExpr).findById(inserted.id).then(function (fetched) {
               expect(inserted.$toJson()).to.eql(fetched.$toJson());
             });
@@ -497,6 +504,7 @@ module.exports = function (session) {
     });
 
     function check(model, shouldCheckHooks) {
+      model = model.$clone();
       var knex = model.constructor.knex();
 
       expect(model).to.have.property('model1Relation1');
@@ -530,6 +538,9 @@ module.exports = function (session) {
 
       expect(model.model1Relation2[1].model2Prop1).to.equal('child2');
       shouldCheckHooks && checkHooks(model.model1Relation2[1]);
+
+      expect(model.model1Relation2[1].model2Relation2.model1Prop1).to.equal('child3');
+      shouldCheckHooks && checkHooks(model.model1Relation2[1].model2Relation2);
 
       return knex(Model2.tableName).then(function (rows) {
         // Check that the reference model was only inserted once.

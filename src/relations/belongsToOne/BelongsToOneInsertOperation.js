@@ -24,7 +24,7 @@ export default class BelongsToOneInsertOperation extends InsertOperation {
     const maybePromise = super.onAfterQuery(builder, inserted);
 
     return after(maybePromise, inserted => {
-      this.owner[this.relation.name] = inserted[0];
+      this.owner[this.relation.name] = inserted[0] || null;
       let patch = {};
 
       for (let i = 0, l = this.relation.ownerProp.length; i < l; ++i) {

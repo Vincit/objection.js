@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.2
+
+### What's new
+
+ * `HasOneThroughRelation` relation type.
+
 ## 0.7.1
 
 ### What's new

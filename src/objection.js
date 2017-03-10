@@ -12,6 +12,7 @@ import Relation from './relations/Relation';
 import HasOneRelation from './relations/hasOne/HasOneRelation';
 import HasManyRelation from './relations/hasMany/HasManyRelation';
 import BelongsToOneRelation from './relations/belongsToOne/BelongsToOneRelation';
+import HasOneThroughRelation from './relations/hasOneThrough/HasOneThroughRelation';
 import ManyToManyRelation from './relations/manyToMany/ManyToManyRelation';
 
 import transaction from './transaction';
@@ -32,6 +33,7 @@ export {
   HasOneRelation,
   HasManyRelation,
   BelongsToOneRelation,
+  HasOneThroughRelation,
   ManyToManyRelation,
   transaction,
   Promise,

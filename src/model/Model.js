@@ -14,6 +14,7 @@ import HasOneRelation from '../relations/hasOne/HasOneRelation';
 import HasManyRelation from '../relations/hasMany/HasManyRelation';
 import ManyToManyRelation from '../relations/manyToMany/ManyToManyRelation';
 import BelongsToOneRelation from '../relations/belongsToOne/BelongsToOneRelation';
+import HasOneThroughRelation from '../relations/hasOneThrough/HasOneThroughRelation';
 
 import InstanceFindOperation from '../queryBuilder/operations/InstanceFindOperation';
 import InstanceInsertOperation from '../queryBuilder/operations/InstanceInsertOperation';
@@ -43,6 +44,7 @@ export default class Model extends ModelBase {
   static HasManyRelation = HasManyRelation;
   static ManyToManyRelation = ManyToManyRelation;
   static BelongsToOneRelation = BelongsToOneRelation;
+  static HasOneThroughRelation = HasOneThroughRelation;
 
   static JoinEagerAlgorithm = JoinEagerAlgorithm;
   static WhereInEagerAlgorithm = WhereInEagerAlgorithm;

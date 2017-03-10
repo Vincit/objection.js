@@ -36,6 +36,7 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
 
     for (let i = 0, l = selections.length; i < l; ++i) {
       const selection = SelectOperation.parseSelection(selections[i]);
+
       if (selection) {
         this.selections.push(selection);
       }

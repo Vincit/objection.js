@@ -1,9 +1,9 @@
 import _ from 'lodash';
-import FindOperation from '../../queryBuilder/operations/FindOperation';
+import RelationFindOperation from '../RelationFindOperation';
 
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 
-export default class ManyToManyFindOperation extends FindOperation {
+export default class ManyToManyFindOperation extends RelationFindOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -56,6 +56,8 @@ export default class ManyToManyFindOperation extends FindOperation {
     const relatedIdxByOwnerId = Object.create(null);
     const propKey = this.relation.relatedModelClass.prototype.$propKey;
 
+    // Remove the join columns before the rows are converted into model instances.
+    // We store the relation information to relatedIdxByOwnerId array.
     for (let i = 0, l = rows.length; i < l; ++i) {
       const row = rows[i];
       const key = propKey.call(row, this.ownerJoinColumnAlias);
@@ -78,9 +80,11 @@ export default class ManyToManyFindOperation extends FindOperation {
   }
 
   onAfterInternal(builder, related) {
+    const isOneToOne = this.relation.isOneToOne();
+
     for (let i = 0, l = this.owners.length; i < l; ++i) {
-      const own = this.owners[i];
-      const key = own.$propKey(this.relation.ownerProp);
+      const owner = this.owners[i];
+      const key = owner.$propKey(this.relation.ownerProp);
       const idx = this.relatedIdxByOwnerId[key];
 
       if (idx) {
@@ -90,13 +94,17 @@ export default class ManyToManyFindOperation extends FindOperation {
           arr[j] = related[idx[j]];
         }
 
-        own[this.relation.name] = arr;
+        owner[this.relation.name] = isOneToOne ? (arr[0] || null) : arr;
       } else {
-        own[this.relation.name] = [];
+        owner[this.relation.name] = isOneToOne ? null : [];
       }
     }
 
-    return related;
+    if (this.alwaysReturnArray) {
+      return related;
+    } else {
+      return isOneToOne ? related[0] || undefined : related;
+    }
   }
 }
 

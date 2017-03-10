@@ -912,6 +912,63 @@ module.exports = function (session) {
 
       });
 
+      describe('has one through relation', function () {
+        var parent;
+
+        before(function () {
+          return session.populate([{
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [{
+              idCol: 1,
+              model2Prop1: 'text 1',
+
+              model2Relation2: {
+                id: 3,
+                model1Prop1: 'blaa 1',
+                model1Prop2: 6
+              }
+            }]
+          }, {
+            id: 2,
+            model1Prop1: 'hello 2',
+            model1Relation2: [{
+              idCol: 2,
+              model2Prop1: 'text 2',
+
+              model2Relation2: {
+                id: 6,
+                model1Prop1: 'blaa 4',
+                model1Prop2: 3,
+              }
+            }]
+          }]);
+        });
+
+        beforeEach(function () {
+          return Model2
+            .query()
+            .then(function (parents) {
+              parent = _.find(parents, {idCol: 1});
+            });
+        });
+
+        it('should fetch a related model', function () {
+          return parent
+            .$relatedQuery('model2Relation2')
+            .then(function (related) {
+              expect(related).to.eql({
+                id: 3,
+                model1Id: null,
+                model1Prop1: 'blaa 1',
+                model1Prop2: 6,
+                $afterGetCalled: 1
+              });
+            });
+        });
+
+      });
+
     });
 
   });

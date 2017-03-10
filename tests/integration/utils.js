@@ -242,6 +242,19 @@ module.exports.initialize = function (opt) {
         },
         to: 'Model1.id'
       }
+    },
+
+    model2Relation2: {
+      relation: Model.HasOneThroughRelation,
+      modelClass: Model1,
+      join: {
+        from: 'model_2.id_col',
+        through: {
+          from: 'Model1Model2One.model2Id',
+          to: 'Model1Model2One.model1Id'
+        },
+        to: 'Model1.id'
+      }
     }
   };
 
@@ -291,6 +304,7 @@ module.exports.createDb = function () {
 
   return session.knex.schema
     .dropTableIfExists('Model1Model2')
+    .dropTableIfExists('Model1Model2One')
     .then(function () {
       return session.knex.schema.dropTableIfExists('Model1');
     })
@@ -316,8 +330,12 @@ module.exports.createDb = function () {
           table.string('extra1');
           table.string('extra2');
           table.string('extra3');
-          table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();;
-          table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();;
+          table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
+          table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+        })
+        .createTable('Model1Model2One', function (table) {
+          table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
+          table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
         })
     })
     .catch(function () {
@@ -340,6 +358,9 @@ module.exports.populate = function (data) {
   return transaction(session.models.Model1, function (Model1, trx) {
     return trx('Model1Model2')
       .delete()
+      .then(function () {
+        return trx('Model1Model2One').delete();
+      })
       .then(function () {
         return trx('Model1').delete();
       })

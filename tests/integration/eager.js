@@ -10,60 +10,6 @@ module.exports = function (session) {
 
   describe('Model eager queries', function () {
 
-    before(function () {
-      return session.populate([{
-        id: 1,
-        model1Prop1: 'hello 1',
-
-        model1Relation1: {
-          id: 2,
-          model1Prop1: 'hello 2',
-
-          model1Relation1: {
-            id: 3,
-            model1Prop1: 'hello 3',
-
-            model1Relation1: {
-              id: 4,
-              model1Prop1: 'hello 4',
-              model1Relation2: [{
-                idCol: 4,
-                model2Prop1: 'hejsan 4'
-              }]
-            }
-          }
-        },
-
-        model1Relation2: [{
-          idCol: 1,
-          model2Prop1: 'hejsan 1'
-        }, {
-          idCol: 2,
-          model2Prop1: 'hejsan 2',
-
-          model2Relation1: [{
-            id: 5,
-            model1Prop1: 'hello 5',
-            aliasedExtra: 'extra 5'
-          }, {
-            id: 6,
-            model1Prop1: 'hello 6',
-            aliasedExtra: 'extra 6',
-
-            model1Relation1: {
-              id: 7,
-              model1Prop1: 'hello 7'
-            },
-
-            model1Relation2: [{
-              idCol: 3,
-              model2Prop1: 'hejsan 3'
-            }]
-          }]
-        }]
-      }]);
-    });
-
     describe.skip('balls', function () {
 
       before(function () {
@@ -157,6 +103,70 @@ module.exports = function (session) {
             });
         }));
       });
+    });
+
+    before(function () {
+      return session.populate([{
+        id: 1,
+        model1Prop1: 'hello 1',
+
+        model1Relation1: {
+          id: 2,
+          model1Prop1: 'hello 2',
+
+          model1Relation1: {
+            id: 3,
+            model1Prop1: 'hello 3',
+
+            model1Relation1: {
+              id: 4,
+              model1Prop1: 'hello 4',
+              model1Relation2: [{
+                idCol: 4,
+                model2Prop1: 'hejsan 4'
+              }]
+            }
+          }
+        },
+
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: 'hejsan 1',
+
+          model2Relation2: {
+            id: 8,
+            model1Prop1: 'hello 8',
+
+            model1Relation1: {
+              id: 9,
+              model1Prop1: 'hello 9'
+            }
+          }
+        }, {
+          idCol: 2,
+          model2Prop1: 'hejsan 2',
+
+          model2Relation1: [{
+            id: 5,
+            model1Prop1: 'hello 5',
+            aliasedExtra: 'extra 5'
+          }, {
+            id: 6,
+            model1Prop1: 'hello 6',
+            aliasedExtra: 'extra 6',
+
+            model1Relation1: {
+              id: 7,
+              model1Prop1: 'hello 7'
+            },
+
+            model1Relation2: [{
+              idCol: 3,
+              model2Prop1: 'hejsan 3'
+            }]
+          }]
+        }]
+      }]);
     });
 
     test('model1Relation1', function (models) {
@@ -345,6 +355,86 @@ module.exports = function (session) {
       },
       disableWhereIn: true,
       eagerOptions: {minimize: true}
+    });
+
+    test('model1Relation2.model2Relation2', function (models) {
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+
+          model2Relation2: {
+            id: 8,
+            model1Id: 9,
+            model1Prop1: 'hello 8',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          }
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+          model2Relation2: null
+        }],
+      }]);
+
+      expect(models[0]).to.be.a(Model1);
+      expect(models[0].model1Relation2[0].model2Relation2).to.be.a(Model1);
+    });
+
+    test('model1Relation2.model2Relation2.model1Relation1', function (models) {
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+
+          model2Relation2: {
+            id: 8,
+            model1Id: 9,
+            model1Prop1: 'hello 8',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+
+            model1Relation1: {
+              id: 9,
+              model1Id: null,
+              model1Prop1: 'hello 9',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+            }
+          }
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+          model2Relation2: null
+        }],
+      }]);
+
+      expect(models[0]).to.be.a(Model1);
+      expect(models[0].model1Relation2[0].model2Relation2.model1Relation1).to.be.a(Model1);
     });
 
     test('[model1Relation1, model1Relation2]', function (models) {

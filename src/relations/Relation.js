@@ -275,12 +275,10 @@ export default class Relation {
       for (let i = 0, l = fullRelatedCol.length; i < l; ++i) {
         builder.whereRef(fullRelatedCol[i], opt.ownerIds[i]);
       }
+    } else if (containsNonNull(opt.ownerIds)) {
+      builder.whereInComposite(fullRelatedCol, opt.ownerIds);
     } else {
-      if (containsNonNull(opt.ownerIds)) {
-        builder.whereInComposite(fullRelatedCol, opt.ownerIds);
-      } else {
-        builder.resolve([]);
-      }
+      builder.resolve([]);
     }
 
     return builder.modify(this.modify);
@@ -399,15 +397,6 @@ export default class Relation {
    * @returns {QueryBuilderOperation}
    */
   unrelate(builder, owner) {
-    this.throwError('not implemented');
-  }
-
-  /* istanbul ignore next */
-  /**
-   * @abstract
-   * @protected
-   */
-  createRelationProp(owners, related) {
     this.throwError('not implemented');
   }
 

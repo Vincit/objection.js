@@ -7311,7 +7311,7 @@ old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`
 
 
 
-# EagerOptions
+## EagerOptions
 
 Property|Type|Description
 --------|----|-----------

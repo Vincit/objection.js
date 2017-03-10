@@ -923,6 +923,80 @@ module.exports = function (session) {
 
       });
 
+      describe('has one through relation', function () {
+        var parent;
+
+        beforeEach(function () {
+          return session.populate([{
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [{
+              idCol: 1,
+              model2Prop1: 'text 1',
+              model2Relation1: [{
+                id: 3,
+                model1Prop1: 'blaa 1',
+                model1Prop2: 6
+              }]
+            }]
+          }, {
+            id: 2,
+            model1Prop1: 'hello 2',
+            model1Relation2: [{
+              idCol: 2,
+              model2Prop1: 'text 2',
+              model2Relation1: [{
+                id: 4,
+                model1Prop1: 'blaa 2',
+                model1Prop2: 3
+              }]
+            }]
+          }]);
+        });
+
+        beforeEach(function () {
+          return Model2
+            .query()
+            .then(function (parents) {
+              parent = _.find(parents, {idCol: 2});
+            });
+        });
+
+        it('should insert a related object', function () {
+          var inserted = null;
+
+          return parent
+            .$relatedQuery('model2Relation2')
+            .then(function (models) {
+              expect(models).to.equal(undefined);
+
+              return parent
+                .$relatedQuery('model2Relation2')
+                .insert({model1Prop1: 'test'});
+            })
+            .then(function ($inserted) {
+              inserted = $inserted;
+
+              expect(inserted.$beforeInsertCalled).to.equal(1);
+              expect(inserted.$afterInsertCalled).to.equal(1);
+              expect(inserted.id).to.equal(5);
+              expect(inserted).to.be.a(Model1);
+              expect(inserted.model1Prop1).to.equal('test');
+
+              return session.knex('Model1');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(5);
+              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              return session.knex('Model1Model2One');
+            })
+            .then(function (rows) {
+              expect(rows).to.have.length(1);
+              expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent.idCol})).to.have.length(1);
+            });
+        });
+      });
+
     });
 
     function subClassWithSchema(Model, schema) {
