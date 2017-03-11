@@ -161,25 +161,9 @@ export default class QueryBuilderOperationSupport {
    */
   forEachOperation(operationSelector, callback, match = true) {
     if (_.isRegExp(operationSelector)) {
-      for (let i = 0, l = this._operations.length; i < l; ++i) {
-        const op = this._operations[i];
-
-        if (operationSelector.test(op.name) === match) {
-          if (callback(op, i) === false) {
-            break;
-          }
-        }
-      }
+      this._forEachOperationRegex(operationSelector, callback, match);
     } else {
-      for (let i = 0, l = this._operations.length; i < l; ++i) {
-        const op = this._operations[i];
-
-        if ((op instanceof operationSelector) === match) {
-          if (callback(op, i) === false) {
-            break;
-          }
-        }
-      }
+      this._forEachOperationInstanceOf(operationSelector, callback, match);
     }
 
     return this;
@@ -326,5 +310,35 @@ export default class QueryBuilderOperationSupport {
     });
 
     return Object.create(ctxProto);
+  }
+
+  /**
+   * @private
+   */
+  _forEachOperationRegex(operationSelector, callback, match) {
+    for (let i = 0, l = this._operations.length; i < l; ++i) {
+      const op = this._operations[i];
+
+      if (operationSelector.test(op.name) === match) {
+        if (callback(op, i) === false) {
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   * @private
+   */
+  _forEachOperationInstanceOf(operationSelector, callback, match) {
+    for (let i = 0, l = this._operations.length; i < l; ++i) {
+      const op = this._operations[i];
+
+      if ((op instanceof operationSelector) === match) {
+        if (callback(op, i) === false) {
+          break;
+        }
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@ import ReferenceBuilder from '../queryBuilder/ReferenceBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import {inheritHiddenData} from '../utils/hiddenData';
+import {visitModels} from './modelVisitor';
 
 import hiddenData from '../utils/decorators/hiddenData';
 import memoize from '../utils/decorators/memoize';
@@ -673,7 +674,20 @@ export default class Model extends ModelBase {
       throw new Error('traverser must be a function');
     }
 
-    traverse(models, null, null, filterConstructor, traverser);
+    if (!models) {
+      return;
+    }
+
+    const modelClass = Array.isArray(models)
+      ? models[0].constructor
+      : models.constructor;
+
+    visitModels(models, modelClass, (model, modelClass, parent, relation) => {
+      if (!filterConstructor || model instanceof filterConstructor) {
+        traverser(model, parent, relation && relation.name);
+      }
+    });
+
     return this;
   }
 
@@ -718,41 +732,6 @@ function ensureArray(obj) {
     return obj;
   } else {
     return [obj];
-  }
-}
-
-function traverse(models, parent, relationName, modelClass, callback) {
-  if (!_.isObject(models)) {
-    return;
-  }
-
-  if (Array.isArray(models)) {
-    for (var i = 0, l = models.length; i < l; ++i) {
-      traverseOne(models[i], parent, relationName, modelClass, callback);
-    }
-  } else {
-    traverseOne(models, parent, relationName, modelClass, callback)
-  }
-}
-
-function traverseOne(model, parent, relationName, modelClass, callback) {
-  if (!(model instanceof Model)) {
-    return;
-  }
-
-  if (!modelClass || model instanceof modelClass) {
-    callback(model, parent, relationName);
-  }
-
-  const relations = model.constructor.getRelations();
-  const relNames = Object.keys(relations);
-
-  for (let i = 0, l = relNames.length; i < l; ++i) {
-    const relName = relNames[i];
-
-    if (model.hasOwnProperty(relName)) {
-      traverse(model[relName], model, relName, modelClass, callback);
-    }
   }
 }
 

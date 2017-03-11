@@ -2,6 +2,9 @@ import QueryBuilderOperation from './QueryBuilderOperation';
 import {isKnexQueryBuilder, isKnexJoinBuilder} from '../../utils/dbUtils';
 import ReferenceBuilder from '../ReferenceBuilder';
 
+let QueryBuilderBase = null;
+let JoinBuilder = null;
+
 export default class WrappingQueryBuilderOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
@@ -17,7 +20,8 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
 }
 
 function wrapArgs(op, builder, args) {
-  const QueryBuilderBase = require('../QueryBuilderBase').default;
+  // Preventing cyclic deps
+  QueryBuilderBase = QueryBuilderBase || requireQueryBuilderBase();
 
   const skipUndefined = builder.shouldSkipUndefined();
   const knex = builder.knex();
@@ -58,9 +62,9 @@ function wrapArgs(op, builder, args) {
 }
 
 function wrapFunctionArg(func, knex) {
-  // preventing cyclic deps
-  const QueryBuilderBase = require('../QueryBuilderBase').default;
-  const JoinBuilder = require('../JoinBuilder').default;
+  // Preventing cyclic deps
+  QueryBuilderBase = QueryBuilderBase || requireQueryBuilderBase();
+  JoinBuilder = JoinBuilder || requireJoinBuilder();
 
   return function wrappedKnexFunctionArg() {
     if (isKnexQueryBuilder(this)) {
@@ -104,4 +108,12 @@ function includesUndefined(arr) {
   }
 
   return false;
+}
+
+function requireQueryBuilderBase() {
+  return require('../QueryBuilderBase').default;
+}
+
+function requireJoinBuilder() {
+  return require('../JoinBuilder').default;
 }
