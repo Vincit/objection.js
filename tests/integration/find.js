@@ -139,6 +139,20 @@ module.exports = function (session) {
             });
         });
 
+        it('.distinct()', function () {
+          return Model1
+            .query()
+            .distinct('Model1.id', 'Model1.model1Prop1')
+            .leftJoinRelation('model1Relation1', { alias: 'balls' })
+            .where('Model1.model1Prop1', 'hello 1')
+            .orderBy('Model1.model1Prop1')
+            .page(0, 1)
+            .debug()
+            .then(function (res) {
+              expect(res.results[0].model1Prop1).to.equal('hello 1');
+            });
+        });
+
         it('complex nested subquery', function () {
           return Model2
             .query()

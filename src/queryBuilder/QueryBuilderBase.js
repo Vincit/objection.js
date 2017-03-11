@@ -21,7 +21,7 @@ import WhereJsonNotObjectPostgresOperation from './operations/jsonApi/WhereJsonN
 
 export default class QueryBuilderBase extends QueryBuilderOperationSupport {
 
-  static SelectRegex = /^(select|sum|min|max|count|avg)$/;
+  static SelectRegex = /^(select|sum|min|max|count|avg|distinct|column)$/;
   static WhereRegex = /where|orWhere|andWhere/;
   static FromRegex = /^(from|into|table)$/;
 
