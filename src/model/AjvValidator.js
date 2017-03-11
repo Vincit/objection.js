@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Ajv from 'ajv';
+import Model from './Model';
 import Validator from './Validator';
-import ModelBase from './ModelBase';
 import ValidationError from './ValidationError';
 
 export default class AjvValidator extends Validator {
@@ -26,7 +26,7 @@ export default class AjvValidator extends Validator {
   beforeValidate({model, json, options, ctx}) {
     ctx.jsonSchema = model.constructor.getJsonSchema();
 
-    if (model.$beforeValidate !== ModelBase.prototype.$beforeValidate) {
+    if (model.$beforeValidate !== Model.prototype.$beforeValidate) {
       ctx.jsonSchema = _.cloneDeep(ctx.jsonSchema);
       ctx.jsonSchema = model.$beforeValidate(ctx.jsonSchema, json, options);
     }

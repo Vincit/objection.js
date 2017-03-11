@@ -68,8 +68,8 @@ export default class DependencyGraph {
       throw new ValidationError({notModel: 'not a model'});
     }
 
-    if (!model[model.constructor.uidProp]) {
-      model[model.constructor.uidProp] = this.createUid();
+    if (!model[modelClass.uidProp]) {
+      model[modelClass.uidProp] = this.createUid();
     }
 
     const node = new DependencyNode(model, modelClass);

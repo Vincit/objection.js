@@ -1,7 +1,7 @@
 export default class DependencyNode {
 
   constructor(model, modelClass) {
-    this.id = model[model.constructor.uidProp];
+    this.id = model[modelClass.uidProp];
 
     /**
      * @type {Model}

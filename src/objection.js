@@ -1,4 +1,3 @@
-import ModelBase from './model/ModelBase';
 import Model from './model/Model';
 import QueryBuilderBase from './queryBuilder/QueryBuilderBase';
 import QueryBuilder from './queryBuilder/QueryBuilder';
@@ -20,7 +19,6 @@ import { ref } from './queryBuilder/ReferenceBuilder';
 import Promise from 'bluebird';
 
 export {
-  ModelBase,
   Model,
   QueryBuilder,
   QueryBuilderBase,

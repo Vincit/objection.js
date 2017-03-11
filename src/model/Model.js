@@ -1,12 +1,14 @@
 import _ from 'lodash';
-import ModelBase from './ModelBase';
+import AjvValidator from './AjvValidator';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
 import ReferenceBuilder from '../queryBuilder/ReferenceBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
-import {inheritHiddenData} from '../utils/hiddenData';
 import {visitModels} from './modelVisitor';
 
+import {inherits} from '../utils/classUtils';
+import {inheritHiddenData} from '../utils/hiddenData';
+import splitQueryProps from '../utils/splitQueryProps';
 import hiddenData from '../utils/decorators/hiddenData';
 import memoize from '../utils/decorators/memoize';
 
@@ -36,7 +38,15 @@ const WhereInEagerAlgorithm = () => {
   return new WhereInEagerOperation('eager');
 };
 
-export default class Model extends ModelBase {
+/**
+ * @typedef {Object} ModelOptions
+ *
+ * @property {boolean} [patch]
+ * @property {boolean} [skipValidation]
+ * @property {Model} [old]
+ */
+
+export default class Model {
 
   static QueryBuilder = QueryBuilder;
   static RelatedQueryBuilder = QueryBuilder;
@@ -54,6 +64,11 @@ export default class Model extends ModelBase {
    * @type {string}
    */
   static tableName = null;
+
+  /**
+   * @type {Object}
+   */
+  static jsonSchema = null;
 
   /**
    * @type {string|Array.<string>}
@@ -84,6 +99,11 @@ export default class Model extends ModelBase {
    * @type {Array.<string>}
    */
   static jsonAttributes = null;
+
+  /**
+   * @type {Array.<string>}
+   */
+  static virtualAttributes = null;
 
   /**
    * @type {Object.<string, RelationMapping>}
@@ -234,15 +254,60 @@ export default class Model extends ModelBase {
     return this;
   }
 
+  /**
+   * @param {Object} jsonSchema
+   * @param {Object} json
+   * @param {ModelOptions=} options
+   * @return {Object}
+   */
+  $beforeValidate(jsonSchema, json, options) {
+    /* istanbul ignore next */
+    return jsonSchema;
+  }
+
+  /**
+   * @param {Object=} json
+   * @param {ModelOptions=} options
+   * @throws {ValidationError}
+   * @return {Object}
+   */
   $validate(json = this, options = {}) {
     if (json instanceof Model) {
       // Strip away relations and other internal stuff.
       json = json.$parseJson(json.$toJson(true));
     }
 
-    return super.$validate(json, options);
+    if (options.skipValidation) {
+      return json;
+    }
+
+    const validator = this.constructor.getValidator();
+    const args = {
+      options: options,
+      model: this,
+      json: json,
+      ctx: Object.create(null)
+    };
+
+    validator.beforeValidate(args);
+    json = validator.validate(args);
+    validator.afterValidate(args);
+
+    return json;
   }
 
+  /**
+   * @param {Object=} json
+   * @param {ModelOptions=} options
+   */
+  $afterValidate(json, options) {
+    // Do nothing by default.
+  }
+
+  /**
+   * @param {Object} json
+   * @return {Object}
+   */
   $parseDatabaseJson(json) {
     const jsonAttr = this.constructor.getJsonAttributes();
 
@@ -252,10 +317,11 @@ export default class Model extends ModelBase {
         const value = json[attr];
 
         if (_.isString(value)) {
-          try {
-            json[attr] = JSON.parse(value);
-          } catch (err) {
-            // json column might contain plain single string which is not wrapped to array / object
+          const parsed = tryParseJson(value);
+
+          // tryParseJson returns undefined if parsing failed.
+          if (parsed !== undefined) {
+            json[attr] = parsed;
           }
         }
       }
@@ -264,6 +330,10 @@ export default class Model extends ModelBase {
     return json;
   }
 
+  /**
+   * @param {Object} json
+   * @return {Object}
+   */
   $formatDatabaseJson(json) {
     const jsonAttr = this.constructor.getJsonAttributes();
 
@@ -273,6 +343,7 @@ export default class Model extends ModelBase {
         const value = json[attr];
 
         // list of omitted objects is copy pasted from splitQueryProps
+        // TODO
         if (_.isObject(value) && !(value instanceof KnexQueryBuilder || value instanceof KnexRaw || value instanceof ReferenceBuilder)) {
           json[attr] = JSON.stringify(value);
         }
@@ -282,12 +353,60 @@ export default class Model extends ModelBase {
     return json;
   }
 
-  $setJson(json, options) {
-    super.$setJson(json, options);
+  /**
+   * @param {Object} json
+   * @param {ModelOptions=} options
+   * @return {Object}
+   */
+  $parseJson(json, options) {
+    return json;
+  }
 
-    if (!_.isObject(json)) {
-      return;
+  /**
+   * @param {Object} json
+   * @return {Object}
+   */
+  $formatJson(json) {
+    return json;
+  }
+
+  /**
+   * @param {Object} json
+   * @param {ModelOptions=} options
+   * @returns {Model}
+   * @throws ValidationError
+   */
+  $setJson(json, options = {}) {
+    json = json || {};
+
+    if (!_.isObject(json)
+      || _.isString(json)
+      || _.isNumber(json)
+      || _.isDate(json)
+      || _.isArray(json)
+      || _.isFunction(json)
+      || _.isTypedArray(json)
+      || _.isRegExp(json)) {
+
+      throw new Error('You should only pass objects to $setJson method. '
+        + '$setJson method was given an invalid value '
+        + json);
     }
+
+    // If the json contains query properties like, knex Raw queries or knex/objection query
+    // builders, we need to split those off into a separate object. This object will be
+    // joined back in the $toDatabaseJson method.
+    const split = splitQueryProps(this.constructor, json);
+
+    if (split.query) {
+      // Stash the query properties for later use in $toDatabaseJson method.
+      this.$stashedQueryProps(split.query);
+    }
+
+    split.json = this.$parseJson(split.json, options);
+    split.json = this.$validate(split.json, options);
+
+    this.$set(split.json);
 
     const relations = this.constructor.getRelations();
     const relNames = Object.keys(relations);
@@ -312,6 +431,46 @@ export default class Model extends ModelBase {
   }
 
   /**
+   * @param {Object} json
+   * @returns {Model}
+   */
+  $setDatabaseJson(json) {
+    json = this.$parseDatabaseJson(json);
+
+    if (json) {
+      const keys = Object.keys(json);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        const key = keys[i];
+        this[key] = json[key];
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {Object} obj
+   * @returns {Model}
+   */
+  $set(obj) {
+    if (obj) {
+      const keys = Object.keys(obj);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        const key = keys[i];
+        const value = obj[key];
+
+        if (key.charAt(0) !== '$' && typeof value !== 'function') {
+          this[key] = value;
+        }
+      }
+    }
+
+    return this;
+  }
+
+  /**
    * @param {boolean=} shallow
    */
   $toJson(shallow) {
@@ -320,6 +479,10 @@ export default class Model extends ModelBase {
     } else {
       return this.$$toJson(false, null, null);
     }
+  }
+
+  toJSON() {
+    return this.$toJson();
   }
 
   /**
@@ -378,6 +541,274 @@ export default class Model extends ModelBase {
    * @returns {Promise|*}
    */
   $afterDelete(queryContext) {}
+
+  /**
+   * @param {string|Array.<string>|Object.<string, boolean>} keys
+   * @returns {Model}
+   */
+  $omit() {
+    if (arguments.length === 1 && _.isObject(arguments[0])) {
+      const keys = arguments[0];
+
+      if (Array.isArray(keys)) {
+        omitArray(this, keys);
+      } else {
+        omitObject(this, keys);
+      }
+    } else {
+      omitArray(this, _.toArray(arguments));
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {string|Array.<string>|Object.<string, boolean>} keys
+   * @returns {Model} `this` for chaining.
+   */
+  $pick() {
+    if (arguments.length === 1 && _.isObject(arguments[0])) {
+      const keys = arguments[0];
+
+      if (Array.isArray(keys)) {
+        pickArray(this, keys);
+      } else {
+        pickObject(this, keys);
+      }
+    } else {
+      pickArray(this, _.toArray(arguments));
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {Array.<string>} props
+   * @return {Array.<*>}
+   */
+  $values() {
+    if (arguments.length === 0) {
+      return _.values(this);
+    } else {
+      const args = (arguments.length === 1 && Array.isArray(arguments[0]))
+        ? arguments[0]
+        : arguments;
+
+      switch (args.length) {
+        case 1: return [this[args[0]]];
+        case 2: return [this[args[0]], this[args[1]]];
+        case 3: return [this[args[0]], this[args[1]], this[args[2]]];
+        default: {
+          const ret = new Array(args.length);
+
+          for (let i = 0, l = args.length; i < l; ++i) {
+            ret[i] = this[args[i]];
+          }
+
+          return ret;
+        }
+      }
+    }
+  }
+
+  /**
+   * @param {Array.<string>} props
+   * @return {string}
+   */
+  $propKey(props) {
+    switch (props.length) {
+      case 1: return this[props[0]] + '';
+      case 2: return this[props[0]] + ',' + this[props[1]];
+      case 3: return this[props[0]] + ',' + this[props[1]] + ',' + this[props[2]];
+      default: {
+        let key = '';
+
+        for (let i = 0, l = props.length; i < l; ++i) {
+          key += this[props[i]] + ((i < props.length - 1) ? ',' : '');
+        }
+
+        return key;
+      }
+    }
+  }
+
+  /**
+   * @return {Model}
+   */
+  $clone() {
+    const clone = new this.constructor();
+    const keys = Object.keys(this);
+
+    for (let i = 0, l = keys.length; i < l; ++i) {
+      const key = keys[i];
+      const value = this[key];
+
+      if (_.isObject(value)) {
+        clone[key] = cloneObject(value);
+      } else {
+        clone[key] = value;
+      }
+    }
+
+    if (this.$omitFromDatabaseJson()) {
+      clone.$omitFromDatabaseJson(this.$omitFromDatabaseJson());
+    }
+
+    if (this.$omitFromJson()) {
+      clone.$omitFromJson(this.$omitFromJson());
+    }
+
+    if (this.$stashedQueryProps()) {
+      clone.$stashedQueryProps(this.$stashedQueryProps());
+    }
+
+    return clone;
+  }
+
+  /**
+   * @param {Array.<string>=} keys
+   * @returns {Array.<string>}
+   */
+  @hiddenData({name: 'omitFromJson', append: true})
+  $omitFromJson(keys) {}
+
+  /**
+   * @param {Array.<string>=} keys
+   * @returns {Array.<string>}
+   */
+  @hiddenData({name: 'omitFromDatabaseJson', append: true})
+  $omitFromDatabaseJson(keys) {}
+
+  /**
+   * @param {Object=} queryProps
+   * @returns {Object}
+   */
+  @hiddenData('stashedQueryProps')
+  $stashedQueryProps(queryProps) {}
+
+  /**
+   * @protected
+   */
+  $$toJson(createDbJson, omit, pick) {
+    let json = toJsonImpl(this, createDbJson, omit, pick);
+
+    if (createDbJson) {
+      return this.$formatDatabaseJson(json);
+    } else {
+      return this.$formatJson(json);
+    }
+  }
+
+  /**
+   * @param {function=} subclassConstructor
+   * @return {Constructor.<Model>}
+   */
+  static extend(subclassConstructor) {
+    if (_.isEmpty(subclassConstructor.name)) {
+      throw new Error('Each Model subclass constructor must have a name');
+    }
+
+    inherits(subclassConstructor, this);
+    return subclassConstructor;
+  }
+
+  /**
+   * @param {Object=} json
+   * @param {ModelOptions=} options
+   * @returns {Model}
+   * @throws ValidationError
+   */
+  static fromJson(json, options) {
+    let model = new this();
+    model.$setJson(json || {}, options);
+    return model;
+  }
+
+  /**
+   * @param {Object=} json
+   * @returns {Model}
+   */
+  static fromDatabaseJson(json) {
+    let model = new this();
+    model.$setDatabaseJson(json || {});
+    return model;
+  }
+
+  /**
+   * @param {Object} obj
+   * @param {string} prop
+   */
+  static omitImpl(obj, prop) {
+    delete obj[prop];
+  }
+
+  /**
+   * @return {Validator}
+   */
+  static createValidator() {
+    return new AjvValidator({
+      onCreateAjv: (ajv) => { /* Do Nothing by default */ },
+      options: {
+        allErrors: true,
+        validateSchema: false,
+        ownProperties: true,
+        v5: true
+      }
+    });
+  }
+
+  /**
+   * @return {Validator}
+   */
+  @memoize
+  static getValidator() {
+    return this.createValidator();
+  }
+
+  /**
+   * @return {Object}
+   */
+  @memoize
+  static getJsonSchema() {
+    // Memoized getter in case jsonSchema is a getter property (usually is with ES6).
+    return this.jsonSchema;
+  }
+
+  /**
+   * @param {string} columnName
+   * @returns {string}
+   */
+  @memoize
+  static columnNameToPropertyName(columnName) {
+    let model = new this();
+    let addedProps = _.keys(model.$parseDatabaseJson({}));
+
+    let row = {};
+    row[columnName] = null;
+
+    let props = _.keys(model.$parseDatabaseJson(row));
+    let propertyName = _.first(_.difference(props, addedProps));
+
+    return propertyName || null;
+  }
+
+  /**
+   * @param {string} propertyName
+   * @returns {string}
+   */
+  @memoize
+  static propertyNameToColumnName(propertyName) {
+    let model = new this();
+    let addedCols = _.keys(model.$formatDatabaseJson({}));
+
+    let obj = {};
+    obj[propertyName] = null;
+
+    let cols = _.keys(model.$formatDatabaseJson(obj));
+    let columnName = _.first(_.difference(cols, addedCols));
+
+    return columnName || null;
+  }
 
   /**
    * @param {Transaction=} trx
@@ -727,24 +1158,6 @@ export default class Model extends ModelBase {
   }
 }
 
-function ensureArray(obj) {
-  if (Array.isArray(obj)) {
-    return obj;
-  } else {
-    return [obj];
-  }
-}
-
-function idColumnToIdProperty(ModelClass, idColumn) {
-  let idProperty = ModelClass.columnNameToPropertyName(idColumn);
-
-  if (!idProperty) {
-    throw new Error(ModelClass.tableName + '.$parseDatabaseJson probably changes the value of the id column `' + idColumn + '` which is a no-no.');
-  }
-
-  return idProperty;
-}
-
 function setId(model, id) {
   const idProp = model.constructor.getIdProperty();
   const isArray = Array.isArray(idProp);
@@ -786,4 +1199,217 @@ function getId(model) {
   } else {
     return model[idProp];
   }
+}
+
+function tryParseJson(maybeJsonStr) {
+  try {
+    return JSON.parse(maybeJsonStr);
+  } catch (err) {
+    // Ignore error.
+  }
+
+  return undefined;
+}
+
+function toJsonImpl(model, createDbJson, omit, pick) {
+  if (createDbJson) {
+    return toDatabaseJsonImpl(model, omit, pick);
+  } else {
+    return toExternalJsonImpl(model, omit, pick);
+  }
+}
+
+function toDatabaseJsonImpl(model, omit, pick) {
+  let json = {};
+  const omitFromJson = model.$omitFromDatabaseJson();
+  const stash = model.$stashedQueryProps();
+
+  if (stash) {
+    const keys = Object.keys(stash);
+
+    for (let i = 0, l = keys.length; i < l; ++i) {
+      const key = keys[i];
+      json[key] = stash[key];
+    }
+  }
+
+  const keys = Object.keys(model);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    assignJsonValue(json, key, model[key], omit, pick, omitFromJson, true);
+  }
+
+  return json;
+}
+
+function toExternalJsonImpl(model, omit, pick) {
+  const json = {};
+  const omitFromJson = model.$omitFromJson();
+  const keys = Object.keys(model);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    assignJsonValue(json, key, model[key], omit, pick, omitFromJson, false);
+  }
+
+  if (model.constructor.virtualAttributes) {
+    const vAttr = model.constructor.virtualAttributes;
+
+    for (let i = 0, l = vAttr.length; i < l; ++i) {
+      const key = vAttr[i];
+      let value = model[key];
+
+      if (_.isFunction(value)) {
+        value = value.call(model);
+      }
+
+      assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
+    }
+  }
+
+  return json;
+}
+
+function assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson) {
+  if (key.charAt(0) !== '$'
+    && !_.isFunction(value)
+    && !_.isUndefined(value)
+    && (!omit || !omit[key])
+    && (!pick || pick[key])
+    && (!omitFromJson || !contains(omitFromJson, key))) {
+
+    if (value !== null && typeof value === 'object') {
+      json[key] = toJsonObject(value, createDbJson);
+    } else {
+      json[key] = value;
+    }
+  }
+}
+
+function toJsonObject(value, createDbJson) {
+  if (Array.isArray(value)) {
+    return toJsonArray(value, createDbJson);
+  } else if (value instanceof Model) {
+    if (createDbJson) {
+      return value.$toDatabaseJson();
+    } else {
+      return value.$toJson();
+    }
+  } else if (Buffer.isBuffer(value)) {
+    return value;
+  } else {
+    return _.cloneDeep(value);
+  }
+}
+
+function toJsonArray(value, createDbJson) {
+  const ret = new Array(value.length);
+
+  for (let i = 0, l = ret.length; i < l; ++i) {
+    ret[i] = toJsonObject(value[i], createDbJson)
+  }
+
+  return ret;
+}
+
+function cloneObject(value) {
+  if (Array.isArray(value)) {
+    return cloneArray(value);
+  } else if (value instanceof Model) {
+    return value.$clone();
+  } else if (Buffer.isBuffer(value)) {
+    return new Buffer(value);
+  } else {
+    return _.cloneDeep(value);
+  }
+}
+
+function cloneArray(value) {
+  const ret = new Array(value.length);
+
+  for (let i = 0, l = ret.length; i < l; ++i) {
+    ret[i] = cloneObject(value[i])
+  }
+
+  return ret;
+}
+
+function omitObject(model, keyObj) {
+  const ModelClass = model.constructor;
+  const keys = Object.keys(keyObj);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    const value = keyObj[key];
+
+    if (value && key.charAt(0) !== '$' && _.has(model, key)) {
+      ModelClass.omitImpl(model, key);
+    }
+  }
+}
+
+function omitArray(model, keys) {
+  const ModelClass = model.constructor;
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+
+    if (key.charAt(0) !== '$' && _.has(model, key)) {
+      ModelClass.omitImpl(model, key);
+    }
+  }
+}
+
+function pickObject(model, keyObj) {
+  const ModelClass = model.constructor;
+  const keys = Object.keys(model);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+
+    if (key.charAt(0) !== '$' && !keyObj[key]) {
+      ModelClass.omitImpl(model, key);
+    }
+  }
+}
+
+function pickArray(model, pick) {
+  const ModelClass = model.constructor;
+  const keys = Object.keys(model);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+
+    if (key.charAt(0) !== '$' && !contains(pick, key)) {
+      ModelClass.omitImpl(model, key);
+    }
+  }
+}
+
+function contains(arr, value) {
+  for (let i = 0, l = arr.length; i < l; ++i) {
+    if (arr[i] === value) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function ensureArray(obj) {
+  if (Array.isArray(obj)) {
+    return obj;
+  } else {
+    return [obj];
+  }
+}
+
+function idColumnToIdProperty(ModelClass, idColumn) {
+  let idProperty = ModelClass.columnNameToPropertyName(idColumn);
+
+  if (!idProperty) {
+    throw new Error(ModelClass.tableName + '.$parseDatabaseJson probably changes the value of the id column `' + idColumn + '` which is a no-no.');
+  }
+
+  return idProperty;
 }
