@@ -29,7 +29,7 @@ describe('Performance tests', function () {
     mockKnex = knexMocker(knex, function (mock, origImpl, args) {
       mock.executedQueries.push(this.toString());
 
-      var result = mock.results.shift() || [];
+      var result = mock.nextResult();
       var promise = Promise.resolve(result);
 
       return promise.then.apply(promise, args);
@@ -37,7 +37,7 @@ describe('Performance tests', function () {
 
     mockKnex.reset = function () {
       mockKnex.executedQueries = [];
-      mockKnex.results = [];
+      mockKnex.nextResult = _.constant({});
     };
 
     mockKnex.reset();
@@ -310,16 +310,15 @@ describe('Performance tests', function () {
       runCount: 5000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(10000), function () {
-          return _.map(_.range(RESULT_SIZE), function (idx) {
-            return {
-              firstName: 'Firstname ' + idx,
-              lastName: 'Lastname ' + idx,
-              age: idx
-            };
-          });
+        var result = _.map(_.range(RESULT_SIZE), function (idx) {
+          return {
+            firstName: 'Firstname ' + idx,
+            lastName: 'Lastname ' + idx,
+            age: idx
+          };
         });
 
+        mockKnex.nextResult = _.constant(result);
         return Person.bindKnex(mockKnex);
       },
       test: function (Person) {
@@ -334,16 +333,15 @@ describe('Performance tests', function () {
       runCount: 2000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(4000), function () {
-          return _.map(_.range(RESULT_SIZE), function (idx) {
-            return {
-              firstName: 'Firstname ' + idx,
-              lastName: 'Lastname ' + idx,
-              age: idx
-            };
-          });
+        var result = _.map(_.range(RESULT_SIZE), function (idx) {
+          return {
+            firstName: 'Firstname ' + idx,
+            lastName: 'Lastname ' + idx,
+            age: idx
+          };
         });
 
+        mockKnex.nextResult = _.constant(result);
         return Person.bindKnex(mockKnex);
       },
       test: function (Person) {
@@ -380,16 +378,15 @@ describe('Performance tests', function () {
       runCount: 4000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(8000), function () {
-          return _.map(_.range(RESULT_SIZE), function (idx) {
-            return {
-              firstName: 'Firstname ' + idx,
-              lastName: 'Lastname ' + idx,
-              age: idx
-            };
-          });
+        var result = _.map(_.range(RESULT_SIZE), function (idx) {
+          return {
+            firstName: 'Firstname ' + idx,
+            lastName: 'Lastname ' + idx,
+            age: idx
+          };
         });
 
+        mockKnex.nextResult = _.constant(result);
         return Person.bindKnex(mockKnex).fromJson({
           id: 10,
           firstName: 'Parent',
@@ -408,9 +405,7 @@ describe('Performance tests', function () {
       runCount: 3000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(6000), function () {
-          return [1];
-        });
+        mockKnex.nextResult = _.constant([1]);
 
         return Person.bindKnex(mockKnex).fromJson({
           id: 10,
@@ -430,9 +425,11 @@ describe('Performance tests', function () {
       runCount: 5000,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(0, 10000), function (idx) {
-          return [idx];
-        });
+        var idx = 0;
+
+        mockKnex.nextResult = function () {
+          return ++idx;
+        };
 
         return Person.bindKnex(mockKnex);
       },
@@ -452,9 +449,13 @@ describe('Performance tests', function () {
       runCount: 400,
       runtimeGoal: 1000,
       beforeTest: function () {
-        mockKnex.results = _.map(_.range(0, 10000 * RESULT_SIZE, RESULT_SIZE), function (idx) {
-          return _.range(idx, idx + RESULT_SIZE);
-        });
+        var idx = 0;
+
+        mockKnex.nextResult = function () {
+          var res = _.range(idx, idx + RESULT_SIZE);
+          idx += RESULT_SIZE;
+          return res;
+        };
 
         return Person.bindKnex(mockKnex);
       },
