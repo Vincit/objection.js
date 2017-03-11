@@ -74,6 +74,19 @@ export default class QueryBuilderOperationSupport {
   }
 
   /**
+   * @param {Object} opt
+   * @returns {Object|QueryBuilderOperationSupport}
+   */
+  internalOptions(opt) {
+    if (arguments.length === 0) {
+      return this._context.options;
+    } else {
+      this._context.options = Object.assign({}, this._context.options, opt);
+      return this;
+    }
+  }
+
+  /**
    * @param {knex=} knex
    * @returns {Object|QueryBuilderOperationSupport}
    */
@@ -136,7 +149,6 @@ export default class QueryBuilderOperationSupport {
 
     return found;
   }
-
 
   /**
    * @param {RegExp|Constructor.<? extends QueryBuilderOperation>} operationSelector

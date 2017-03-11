@@ -1,23 +1,62 @@
 import _ from 'lodash';
-import clone from 'lodash/clone';
 import QueryBuilderOperation from './QueryBuilderOperation';
 import ReferenceBuilder from '../ReferenceBuilder';
 import jsonFieldExpressionParser from '../parsers/jsonFieldExpressionParser';
+import {fromJson, toDatabaseJson} from '../../model/modelFactory';
 import {afterReturn} from '../../utils/promiseUtils';
-
 
 export default class UpdateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
 
+    /**
+     * The update model.
+     *
+     * @type {Model}
+     */
     this.model = null;
-    this.modelOptions = clone(this.opt.modelOptions) || {};
+
+    /**
+     * Options for the Model.fromJson call.
+     *
+     * @type {ModelOptions}
+     */
+    this.modelOptions = Object.assign({}, this.opt.modelOptions || {});
+
+    /**
+     * Query properties separated from this.model.
+     *
+     * @type {Map}
+     */
+    this.queryProps = null;
+
+    /**
+     * @type {boolean}
+     */
     this.isWriteOperation = true;
   }
 
   call(builder, args) {
-    this.model = builder.modelClass().ensureModel(args[0], this.modelOptions);
+    const modelClass = builder.modelClass();
+    let json = args[0];
+
+    if (json instanceof modelClass) {
+      this.model = json;
+    } else if (json) {
+      // Convert into model instance and separate query properties like
+      // query builders, knex raw calls etc.
+      const split = fromJson({
+        modelOptions: this.modelOptions,
+        modelClass: modelClass,
+        deep: false,
+        json
+      });
+
+      this.model = split.model;
+      this.queryProps = split.queryProps;
+    }
+
     return true;
   }
 
@@ -27,7 +66,14 @@ export default class UpdateOperation extends QueryBuilderOperation {
   }
 
   onBuild(knexBuilder, builder) {
-    const json = this.model.$toDatabaseJson();
+    // Builder options can contain a queryProps map. Use it
+    // if there isn't a local one.
+    const queryProps = this.queryProps || builder.internalOptions().queryProps;
+
+    const json = toDatabaseJson({
+      model: this.model,
+      queryProps
+    });
 
     // convert ref syntax to knex.raw
     // TODO: jsonb attr update implementation for mysql and sqlite..

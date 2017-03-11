@@ -1,5 +1,5 @@
-import clone from 'lodash/clone';
 import QueryBuilderOperation from './QueryBuilderOperation';
+import {fromJson, toDatabaseJson} from '../../model/modelFactory';
 import {mapAfterAllReturn} from '../../utils/promiseUtils';
 import {isPostgres} from '../../utils/dbUtils';
 
@@ -8,15 +8,78 @@ export default class InsertOperation extends QueryBuilderOperation {
   constructor(name, opt) {
     super(name, opt);
 
+    /**
+     * The models we are inserting.
+     *
+     * @type {Array.<Model>}
+     */
     this.models = null;
+
+    /**
+     * this.models is always an array, this is true if the
+     * original input was an array.
+     *
+     * @type {boolean}
+     */
     this.isArray = false;
-    this.modelOptions = clone(this.opt.modelOptions) || {};
+
+    /**
+     * Options for the Model.fromJson call.
+     *
+     * @type {ModelOptions}
+     */
+    this.modelOptions = Object.assign({}, this.opt.modelOptions || {});
+
+    /**
+     * Set this to true if the the input should be split into models
+     * and query properties deeply (with relations).
+     *
+     * @type {boolean}
+     */
+    this.splitQueryPropsDeep = false;
+
+    /**
+     * Maps models in this.models into query properties that were
+     * separated from them.
+     *
+     * @type {Map}
+     */
+    this.queryProps = null;
+
+    /**
+     * @type {boolean}
+     */
     this.isWriteOperation = true;
   }
 
   call(builder, args) {
-    this.isArray = Array.isArray(args[0]);
-    this.models = builder.modelClass().ensureModelArray(args[0], this.modelOptions);
+    // The objects to insert.
+    let json = args[0];
+    let modelClass = builder.modelClass();
+
+    this.isArray = Array.isArray(json);
+
+    if (!this.isArray) {
+      json = [json];
+    }
+
+    if (json.every(it => it instanceof modelClass)) {
+      // No need to convert, already model instances.
+      this.models = json;
+    } else {
+      // Convert into model instances and separate query properties like
+      // query builders, knex raw calls etc.
+      const split = fromJson({
+        modelOptions: this.modelOptions,
+        modelClass: modelClass,
+        deep: this.splitQueryPropsDeep,
+        json
+      });
+
+      this.models = split.model;
+      this.queryProps = split.queryProps;
+    }
+
     return true;
   }
 
@@ -36,9 +99,17 @@ export default class InsertOperation extends QueryBuilderOperation {
     }
 
     const json = new Array(this.models.length);
+    // Builder options can contain a queryProps map. Use it
+    // if there isn't a local one.
+    const queryProps = this.queryProps || builder.internalOptions().queryProps;
 
+    // Convert the models into database json and merge the query
+    // properties back.
     for (let i = 0, l = this.models.length; i < l; ++i) {
-      json[i] = this.models[i].$toDatabaseJson();
+      json[i] = toDatabaseJson({
+        model: this.models[i],
+        queryProps
+      });
     }
 
     knexBuilder.insert(json);

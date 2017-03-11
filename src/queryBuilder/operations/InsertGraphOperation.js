@@ -16,6 +16,9 @@ export default class InsertGraphOperation extends DelegateOperation {
     // Our delegate operation inherits from `InsertOperation`. Disable the call-time
     // validation. We do the validation in onAfterQuery instead.
     this.delegate.modelOptions.skipValidation = true;
+
+    // We need to split the query props deeply.
+    this.delegate.splitQueryPropsDeep = true;
   }
 
   call(builder, args) {
@@ -34,6 +37,10 @@ export default class InsertGraphOperation extends DelegateOperation {
 
   get isArray() {
     return this.delegate.isArray;
+  }
+
+  get queryProps() {
+    return this.delegate.queryProps;
   }
 
   onBefore() {
@@ -56,8 +63,15 @@ export default class InsertGraphOperation extends DelegateOperation {
   // We overrode all other hooks but this one and do all the work in here.
   // This is a bit hacky.
   onAfterQuery(builder) {
+    // We split the query props from all the models in the graph in the
+    // InsertOperation.call method. We need to set the queryProps option
+    // so that the individual inserts started by insertFunc all get their
+    // query properties.
+    builder = builder.clone().internalOptions({queryProps: this.queryProps});
+
     const ModelClass = builder.modelClass();
     const insertFunc = insertFuncBuilder(builder);
+
     const graphInserter = new GraphInserter({
       modelClass: ModelClass,
       models: this.models,

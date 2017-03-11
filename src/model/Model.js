@@ -1,14 +1,12 @@
 import _ from 'lodash';
 import AjvValidator from './AjvValidator';
 import QueryBuilder from '../queryBuilder/QueryBuilder';
-import ReferenceBuilder from '../queryBuilder/ReferenceBuilder';
 import inheritModel from './inheritModel';
 import RelationExpression from '../queryBuilder/RelationExpression';
 import {visitModels} from './modelVisitor';
 
 import {inherits} from '../utils/classUtils';
 import {inheritHiddenData} from '../utils/hiddenData';
-import splitQueryProps from '../utils/splitQueryProps';
 import hiddenData from '../utils/decorators/hiddenData';
 import memoize from '../utils/decorators/memoize';
 
@@ -26,9 +24,6 @@ import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOp
 
 import JoinEagerOperation from '../queryBuilder/operations/JoinEagerOperation';
 import WhereInEagerOperation from '../queryBuilder/operations/WhereInEagerOperation';
-
-const KnexRaw = require('knex/lib/raw');
-const KnexQueryBuilder = require('knex/lib/query/builder');
 
 const JoinEagerAlgorithm = () => {
   return new JoinEagerOperation('eager');
@@ -342,9 +337,7 @@ export default class Model {
         const attr = jsonAttr[i];
         const value = json[attr];
 
-        // list of omitted objects is copy pasted from splitQueryProps
-        // TODO
-        if (_.isObject(value) && !(value instanceof KnexQueryBuilder || value instanceof KnexRaw || value instanceof ReferenceBuilder)) {
+        if (_.isObject(value)) {
           json[attr] = JSON.stringify(value);
         }
       }
@@ -393,20 +386,12 @@ export default class Model {
         + json);
     }
 
-    // If the json contains query properties like, knex Raw queries or knex/objection query
-    // builders, we need to split those off into a separate object. This object will be
-    // joined back in the $toDatabaseJson method.
-    const split = splitQueryProps(this.constructor, json);
 
-    if (split.query) {
-      // Stash the query properties for later use in $toDatabaseJson method.
-      this.$stashedQueryProps(split.query);
-    }
+    json = this.$parseJson(json, options);
+    json = this.$validate(json, options);
 
-    split.json = this.$parseJson(split.json, options);
-    split.json = this.$validate(split.json, options);
-
-    this.$set(split.json);
+    // TODO Move to bottom.
+    this.$set(json);
 
     const relations = this.constructor.getRelationArray();
     // Parse relations into Model instances.
@@ -656,10 +641,6 @@ export default class Model {
       clone.$omitFromJson(this.$omitFromJson());
     }
 
-    if (this.$stashedQueryProps()) {
-      clone.$stashedQueryProps(this.$stashedQueryProps());
-    }
-
     return clone;
   }
 
@@ -676,13 +657,6 @@ export default class Model {
    */
   @hiddenData({name: 'omitFromDatabaseJson', append: true})
   $omitFromDatabaseJson(keys) {}
-
-  /**
-   * @param {Object=} queryProps
-   * @returns {Object}
-   */
-  @hiddenData('stashedQueryProps')
-  $stashedQueryProps(queryProps) {}
 
   /**
    * @protected
@@ -1244,19 +1218,8 @@ function toJsonImpl(model, createDbJson, omit, pick) {
 }
 
 function toDatabaseJsonImpl(model, omit, pick) {
-  let json = {};
+  const json = {};
   const omitFromJson = model.$omitFromDatabaseJson();
-  const stash = model.$stashedQueryProps();
-
-  if (stash) {
-    const keys = Object.keys(stash);
-
-    for (let i = 0, l = keys.length; i < l; ++i) {
-      const key = keys[i];
-      json[key] = stash[key];
-    }
-  }
-
   const keys = Object.keys(model);
 
   for (let i = 0, l = keys.length; i < l; ++i) {

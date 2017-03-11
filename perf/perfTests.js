@@ -188,9 +188,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: `1600 fromJson calls for the dataset (${1600 * 85} individual models)`,
-      runCount: 1600,
-      runtimeGoal: 1000,
+      name: `16000 fromJson calls for the dataset (${16000 * 85} individual models)`,
+      runCount: 16000,
+      runtimeGoal: 10000,
       test: function () {
         _.each(data, function (data) {
           Person.fromJson(data);
@@ -199,9 +199,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: `6000 $toJson calls for the dataset (${6000 * 85} individual models)`,
-      runCount: 6000,
-      runtimeGoal: 1000,
+      name: `60000 $toJson calls for the dataset (${60000 * 85} individual models)`,
+      runCount: 60000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         return _.map(data, function (person) {
           return Person.fromJson(person);
@@ -213,9 +213,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: `12000 $toDatabaseJson calls for the dataset (${12000 * 25} individual models)`,
-      runCount: 12000,
-      runtimeGoal: 1000,
+      name: `120000 $toDatabaseJson calls for the dataset (${120000 * 25} individual models)`,
+      runCount: 120000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         return _.map(data, function (person) {
           return Person.fromJson(person);
@@ -227,9 +227,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: `12000 $toDatabaseJson calls for the dataset with $omitFromDatabaseJson (${12000 * 25} individual models)`,
-      runCount: 12000,
-      runtimeGoal: 1000,
+      name: `120000 $toDatabaseJson calls for the dataset with $omitFromDatabaseJson (${120000 * 25} individual models)`,
+      runCount: 120000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         return _.map(data, function (json) {
           let person = Person.fromJson(json);
@@ -249,9 +249,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: `10000 $clone calls for the dataset (${10000 * 85} individual models)`,
-      runCount: 10000,
-      runtimeGoal: 1000,
+      name: `100000 $clone calls for the dataset (${100000 * 85} individual models)`,
+      runCount: 100000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         return _.map(data, function (person) {
           return Person.fromJson(person);
@@ -263,9 +263,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '20000 traverse calls for the dataset',
-      runCount: 20000,
-      runtimeGoal: 1000,
+      name: '200000 traverse calls for the dataset',
+      runCount: 200000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         return _.map(data, function (person) {
           return Person.fromJson(person);
@@ -293,9 +293,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '12000 bindTransaction calls',
-      runCount: 12000,
-      runtimeGoal: 1000,
+      name: '120000 bindTransaction calls',
+      runCount: 120000,
+      runtimeGoal: 10000,
       test: function () {
         Person.bindTransaction({});
       }
@@ -306,9 +306,9 @@ describe('Performance tests', function () {
     const RESULT_SIZE = 10;
 
     perfTest({
-      name: '5000 `Person.query()` queries',
-      runCount: 5000,
-      runtimeGoal: 1000,
+      name: '50000 `Person.query()` queries',
+      runCount: 50000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         var result = _.map(_.range(RESULT_SIZE), function (idx) {
           return {
@@ -329,9 +329,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '2000 complex `Person.query()` queries',
-      runCount: 2000,
-      runtimeGoal: 1000,
+      name: '20000 complex `Person.query()` queries',
+      runCount: 20000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         var result = _.map(_.range(RESULT_SIZE), function (idx) {
           return {
@@ -374,9 +374,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '4000 `person.$relatedQuery("children")` queries',
-      runCount: 4000,
-      runtimeGoal: 1000,
+      name: '40000 `person.$relatedQuery("children")` queries',
+      runCount: 40000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         var result = _.map(_.range(RESULT_SIZE), function (idx) {
           return {
@@ -401,9 +401,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '3000 `person.$relatedQuery("movies").unrelate()` queries',
-      runCount: 3000,
-      runtimeGoal: 1000,
+      name: '30000 `person.$relatedQuery("movies").unrelate()` queries',
+      runCount: 30000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         mockKnex.nextResult = _.constant([1]);
 
@@ -421,9 +421,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '5000 `Person.query().insert()` queries',
-      runCount: 5000,
-      runtimeGoal: 1000,
+      name: '50000 `Person.query().insert()` queries',
+      runCount: 50000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         var idx = 0;
 
@@ -445,9 +445,9 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '400 `Person.query().insertWithRelated()` queries',
-      runCount: 400,
-      runtimeGoal: 1000,
+      name: '4000 `Person.query().insertWithRelated()` queries',
+      runCount: 4000,
+      runtimeGoal: 10000,
       beforeTest: function () {
         var idx = 0;
 
@@ -501,13 +501,15 @@ describe('Performance tests', function () {
     (opt.only ? it.only : it)(opt.name + ' [goal ' + opt.runtimeGoal + ' ms]', function () {
       var beforeTest = opt.beforeTest || _.noop;
 
+      var t0;
       var ctx = beforeTest();
       // warm up.
-      runTest(opt, ctx);
-
-      ctx = beforeTest();
-      var t0 = Date.now();
       return runTest(opt, ctx).then(function () {
+        ctx = beforeTest();
+        t0 = Date.now();
+
+        return runTest(opt, ctx);
+      }).then(function () {
         var t1 = Date.now();
         var runtime = t1 - t0;
 
