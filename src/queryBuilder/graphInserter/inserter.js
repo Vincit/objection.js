@@ -26,7 +26,10 @@ export default function (builder) {
       const model = tableInsertion.models[i];
 
       // We need to validate here since at this point the models should no longer contain any special properties.
-      model.$validate();
+      const json = model.$validate();
+
+      // Set the return value back to model in case defaults were set.
+      model.$set(json);
 
       if (tableInsertion.isInputModel[i]) {
         inputs.push(model);

@@ -147,7 +147,6 @@ module.exports = function (session) {
             .where('Model1.model1Prop1', 'hello 1')
             .orderBy('Model1.model1Prop1')
             .page(0, 1)
-            .debug()
             .then(function (res) {
               expect(res.results[0].model1Prop1).to.equal('hello 1');
             });

@@ -852,4 +852,77 @@ module.exports = function (session) {
         });
     });
   });
+
+  describe('Default values not set with .insertGraph() in 0.7.2 #325', function () {
+    var TestModel;
+
+    before(function () {
+      return session.knex.schema
+        .dropTableIfExists('default_values_note_set_test')
+        .createTable('default_values_note_set_test', function (table) {
+          table.increments('id').primary();
+          table.string('value1');
+          table.string('value2');
+        });
+    });
+
+    after(function () {
+      return session.knex.schema.dropTableIfExists('default_values_note_set_test');
+    });
+
+    before(function () {
+      TestModel = function TestModel() {
+        Model.apply(this, arguments);
+      };
+
+      Model.extend(TestModel);
+
+      TestModel.tableName = 'default_values_note_set_test';
+      TestModel.knex(session.knex);
+
+      TestModel.jsonSchema = {
+        type: 'object',
+        properties: {
+          id: {type: 'integer'},
+          value1: {type: 'string', default: 'foo'},
+          value2: {type: 'string', default: 'bar'},
+        }
+      }
+    });
+
+    beforeEach(function () {
+      return TestModel.query().delete();
+    });
+
+    it('insert should set the defaults', function () {
+      return TestModel
+        .query()
+        .insert({value1: 'hello'})
+        .then(function (model) {
+          expect(model.value1).to.equal('hello');
+          expect(model.value2).to.equal('bar');
+          return session.knex(TestModel.tableName);
+        })
+        .then(function (rows) {
+          expect(rows[0].value1).to.equal('hello');
+          expect(rows[0].value2).to.equal('bar');
+        });
+    });
+
+    it('insertGraph should set the defaults', function () {
+      return TestModel
+        .query()
+        .insertGraph({value1: 'hello'})
+        .then(function (model) {
+          expect(model.value1).to.equal('hello');
+          expect(model.value2).to.equal('bar');
+          return session.knex(TestModel.tableName);
+        })
+        .then(function (rows) {
+          expect(rows[0].value1).to.equal('hello');
+          expect(rows[0].value2).to.equal('bar');
+        });
+    });
+
+  });
 };
