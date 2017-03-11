@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.3
+
+### What's new
+
+ * fix [#325](https://github.com/Vincit/objection.js/issues/325)
+ * fix an issue where `select` had to be used in addition to `distinct` in some cases
+
 ## 0.7.2
 
 ### What's new
