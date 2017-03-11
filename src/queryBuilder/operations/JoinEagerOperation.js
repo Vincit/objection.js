@@ -450,8 +450,7 @@ function fetchColumnInfo(builder, models) {
 }
 
 function forEachExpr(expr, modelClass, callback) {
-  const relations = modelClass.getRelations();
-  const relNames = Object.keys(relations);
+  const relations = modelClass.getRelationArray();
 
   if (expr.isAllRecursive() || expr.maxRecursionDepth() > relationRecursionLimit) {
     throw new ValidationError({
@@ -459,13 +458,12 @@ function forEachExpr(expr, modelClass, callback) {
     });
   }
 
-  for (let i = 0, l = relNames.length; i < l; ++i) {
-    const relName = relNames[i];
-    const relation = relations[relName];
+  for (let i = 0, l = relations.length; i < l; ++i) {
+    const relation = relations[i];
     const childExpr = expr.childExpression(relation.name);
 
     if (childExpr) {
-      callback(childExpr, relation, relName);
+      callback(childExpr, relation, relation.name);
     }
   }
 }

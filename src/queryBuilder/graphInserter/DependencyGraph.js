@@ -103,13 +103,12 @@ export default class DependencyGraph {
   }
 
   buildForRelations(modelClass, model, node, allowedRelations) {
-    const relations = modelClass.getRelations();
-    const relNames = Object.keys(relations);
+    const relations = modelClass.getRelationArray();
 
-    for (let i = 0, l = relNames.length; i < l; ++i) {
-      const relName = relNames[i];
+    for (let i = 0, l = relations.length; i < l; ++i) {
+      const rel = relations[i];
+      const relName = rel.name;
       const relModels = model[relName];
-      const rel = relations[relName];
 
       let nextAllowed = null;
 

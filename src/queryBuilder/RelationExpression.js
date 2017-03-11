@@ -347,11 +347,10 @@ function modelGraphToNode(models, node) {
 
 function modelToNode(model, node) {
   const modelClass = model.constructor;
-  const relations = modelClass.getRelations();
-  const relNames = Object.keys(relations);
+  const relations = modelClass.getRelationArray();
 
-  for (let r = 0, lr = relNames.length; r < lr; ++r) {
-    const relName = relNames[r];
+  for (let r = 0, lr = relations.length; r < lr; ++r) {
+    const relName = relations[r].name;
 
     if (model.hasOwnProperty(relName)) {
       let childNode = node.children[relName];

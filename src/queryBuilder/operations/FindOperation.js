@@ -77,13 +77,11 @@ function callAfterGetForOne(ctx, model, result, deep) {
 }
 
 function callAfterGetForRelations(ctx, model, results) {
-  const relations = model.constructor.getRelations();
-  const relNames = Object.keys(relations);
-
+  const relations = model.constructor.getRelationArray();
   let containsPromise = false;
 
-  for (let i = 0, l = relNames.length; i < l; ++i) {
-    const relName = relNames[i];
+  for (let i = 0, l = relations.length; i < l; ++i) {
+    const relName = relations[i].name;
 
     if (model[relName]) {
       const maybePromise = callAfterGet(ctx, model[relName], true);

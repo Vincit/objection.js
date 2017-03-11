@@ -408,16 +408,14 @@ export default class Model {
 
     this.$set(split.json);
 
-    const relations = this.constructor.getRelations();
-    const relNames = Object.keys(relations);
-
+    const relations = this.constructor.getRelationArray();
     // Parse relations into Model instances.
-    for (let i = 0, l = relNames.length; i < l; ++i) {
-      const relationName = relNames[i];
+    for (let i = 0, l = relations.length; i < l; ++i) {
+      const relation = relations[i];
+      const relationName = relation.name;
 
       if (_.has(json, relationName)) {
         const relationJson = json[relationName];
-        const relation = relations[relationName];
 
         if (Array.isArray(relationJson)) {
           this[relationName] = relation.relatedModelClass.ensureModelArray(relationJson, options);
@@ -918,16 +916,16 @@ export default class Model {
     knex.$$objection.boundModels[ModelClass.uniqueTag()] = BoundModelClass;
 
     const boundRelations = Object.create(null);
-    const relations = ModelClass.getRelations();
-    const relNames = Object.keys(relations);
+    const relations = ModelClass.getRelationArray();
 
-    for (let i = 0, l = relNames.length; i < l; ++i) {
-      const relName = relNames[i];
-      const relation = relations[relName];
-      boundRelations[relName] = relation.bindKnex(knex);
+    for (let i = 0, l = relations.length; i < l; ++i) {
+      const relation = relations[i];
+      boundRelations[relation.name] = relation.bindKnex(knex);
     }
 
     BoundModelClass.relations = boundRelations;
+    BoundModelClass.relationArray = _.values(boundRelations);
+
     return BoundModelClass;
   }
 
@@ -1035,7 +1033,19 @@ export default class Model {
    * @private
    */
   @hiddenData()
+  static get relationArray() {}
+
+  /**
+   * @private
+   */
+  @hiddenData()
   static set relations(value) {}
+
+  /**
+   * @private
+   */
+  @hiddenData()
+  static set relationArray(value) {}
 
   /**
    * @return {Object.<string, Relation>}
@@ -1054,6 +1064,20 @@ export default class Model {
     }
 
     return relations;
+  }
+
+  /**
+   * @return {Array.<Relation>}
+   */
+  static getRelationArray() {
+    let relationArray = this.relationArray;
+
+    if (!relationArray) {
+      relationArray = _.values(this.getRelations());
+      this.relationArray = relationArray;
+    }
+
+    return relationArray;
   }
 
   /**

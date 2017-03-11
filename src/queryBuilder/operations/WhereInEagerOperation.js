@@ -25,14 +25,11 @@ export default class WhereInEagerOperation extends EagerOperation {
       }
     });
 
-    const relations = builder.modelClass().getRelations();
-    const relNames = Object.keys(relations);
+    const relations = builder.modelClass().getRelationArray();
 
-    for (let i = 0, l = relNames.length; i < l; ++i) {
-      const relName = relNames[i];
-      const relation = relations[relName];
-
-      let childExpression = this.expression.childExpression(relation.name);
+    for (let i = 0, l = relations.length; i < l; ++i) {
+      const relation = relations[i];
+      const childExpression = this.expression.childExpression(relation.name);
 
       if (childExpression) {
         promises.push(this._fetchRelation(builder, models, relation, childExpression));

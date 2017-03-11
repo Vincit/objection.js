@@ -4,60 +4,32 @@
  * @param {function(model, modelClass, parent, relation)} visitor
  */
 export function visitModels(models, modelClass, visitor) {
-  doVisit(models, modelClass, null, null, Object.create(null), visitor);
+  doVisit(models, modelClass, null, null, visitor);
 }
 
-function doVisit(models, modelClass, parent, rel, relCache, visitor) {
+function doVisit(models, modelClass, parent, rel, visitor) {
   if (Array.isArray(models)) {
-    visitMany(models, modelClass, parent, rel, relCache, visitor);
+    visitMany(models, modelClass, parent, rel, visitor);
   } else if (models) {
-    visitOne(models, modelClass, parent, rel, relCache, visitor);
+    visitOne(models, modelClass, parent, rel, visitor);
   }
 }
 
-function visitMany(models, modelClass, parent, rel, relCache, visitor) {
+function visitMany(models, modelClass, parent, rel, visitor) {
   for (let i = 0, l = models.length; i < l; ++i) {
-    visitOne(models[i], modelClass, parent, rel, relCache, visitor);
+    visitOne(models[i], modelClass, parent, rel, visitor);
   }
 }
 
-function visitOne(model, modelClass, parent, rel, relCache, visitor) {
+function visitOne(model, modelClass, parent, rel, visitor) {
   if (model) {
     visitor(model, modelClass, parent, rel);
   }
 
-  const rels = getRelations(modelClass, relCache);
+  const relations = modelClass.getRelationArray();
 
-  for (let i = 0, l = rels.length; i < l; ++i) {
-    const relation = rels[i];
-    const relName = relation.name;
-    const relatedModelClass = relation.relatedModelClass;
-    const related = model[relName];
-
-    doVisit(related, relatedModelClass, model, relation, relCache, visitor);
+  for (let i = 0, l = relations.length; i < l; ++i) {
+    const relation = relations[i];
+    doVisit(model[relation.name], relation.relatedModelClass, model, relation, visitor);
   }
-}
-
-function getRelations(modelClass, relCache) {
-  const modelTag = modelClass.uniqueTag();
-  let rels = relCache[modelTag];
-
-  if (!rels) {
-    rels = createRelations(modelClass);
-    relCache[modelTag] = rels;
-  }
-
-  return rels;
-}
-
-function createRelations(modelClass) {
-  const relations = modelClass.getRelations();
-  const relNames = Object.keys(relations);
-  const rels = new Array(relNames.length);
-
-  for (let i = 0, l = relNames.length; i < l; ++i) {
-    rels[i] = relations[relNames[i]];
-  }
-
-  return rels;
 }
