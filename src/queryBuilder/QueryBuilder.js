@@ -1145,13 +1145,13 @@ function build(builder) {
 
   knexBuilder = builder.buildInto(knexBuilder);
 
-  if (!builder.has(QueryBuilderBase.FromRegex)) {
+  if (!builder.has(QueryBuilderBase.FromSelector)) {
     const table = builder.modelClass().tableName;
 
     // Set the table only if it hasn't been explicitly set yet.
     knexBuilder.table(table);
 
-    if (!builder.has(QueryBuilderBase.SelectRegex)) {
+    if (!builder.has(QueryBuilderBase.SelectSelector)) {
       knexBuilder.select(`${table}.*`);
     }
   }

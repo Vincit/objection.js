@@ -26,7 +26,7 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
       ids[i] = this.owners[i].$values(this.relation.ownerProp);
     }
 
-    if (!builder.has(builder.constructor.SelectRegex)) {
+    if (!builder.has(builder.constructor.SelectSelector)) {
       // If the user hasn't specified a select clause, select the related model's columns.
       // If we don't do this we also get the join table's columns.
       builder.select(this.relation.relatedModelClass.tableName + '.*');

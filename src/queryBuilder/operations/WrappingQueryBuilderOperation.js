@@ -49,7 +49,7 @@ function wrapArgs(op, builder, args) {
       // convert reference builders to knex.raw
       args[i] = args[i].map(arg => {
         return arg instanceof ReferenceBuilder ? knex.raw(...arg.toRawArgs()) : arg;
-      })
+      });
     } else if (typeof arg === 'function') {
       // If an argument is a function, knex calls it with a query builder as
       // first argument (and as `this` context). We wrap the query builder into

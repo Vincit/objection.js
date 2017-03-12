@@ -46,7 +46,7 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
   }
 
   onBuild(builder) {
-    builder.select.apply(builder, this.args);
+    builder[this.name].apply(builder, this.args);
   }
 
   hasSelection(fromTable, selection) {

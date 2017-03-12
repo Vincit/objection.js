@@ -2,7 +2,6 @@ import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderOperationSupport from './QueryBuilderOperationSupport';
 
 import KnexOperation from './operations/KnexOperation';
-
 import SelectOperation from './operations/SelectOperation';
 import WhereRefOperation from './operations/WhereRefOperation';
 import WhereCompositeOperation from './operations/WhereCompositeOperation';
@@ -21,15 +20,15 @@ import WhereJsonNotObjectPostgresOperation from './operations/jsonApi/WhereJsonN
 
 export default class QueryBuilderBase extends QueryBuilderOperationSupport {
 
-  static SelectRegex = /^(select|sum|min|max|count|avg|distinct|column)$/;
-  static WhereRegex = /where|orWhere|andWhere/;
-  static FromRegex = /^(from|into|table)$/;
+  static SelectSelector = SelectOperation;
+  static WhereSelector = /where|orWhere|andWhere/;
+  static FromSelector = /^(from|into|table)$/;
 
   /**
    * @return {boolean}
    */
   isSelectAll() {
-    return !this.has(QueryBuilderBase.SelectRegex) && !this.has(QueryBuilderBase.WhereRegex);
+    return !this.has(QueryBuilderBase.SelectSelector) && !this.has(QueryBuilderBase.WhereSelector);
   }
 
   /**
@@ -117,13 +116,13 @@ export default class QueryBuilderBase extends QueryBuilderOperationSupport {
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   columns(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   column(...args) {}
 
   /**
@@ -159,7 +158,7 @@ export default class QueryBuilderBase extends QueryBuilderOperationSupport {
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   distinct(...args) {}
 
   /**
@@ -458,49 +457,49 @@ export default class QueryBuilderBase extends QueryBuilderOperationSupport {
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   count(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   countDistinct(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   min(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   max(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   sum(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   sumDistinct(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   avg(...args) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(SelectOperation)
   avgDistinct(...args) {}
 
   /**
