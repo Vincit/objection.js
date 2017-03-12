@@ -985,61 +985,66 @@ module.exports = function (session) {
       });
 
       it('should implicitly add selects for join columns if they are omitted in filterEager/modifyEager', function () {
-        return Model1
-          .query()
-          .where('id', 1)
-          .max('model1Prop1 as model1Prop1')
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .groupBy('model1Prop1', 'id')
-          .filterEager('model1Relation2', function (builder) {
-            builder.select('model_2_prop_1').orderBy('id_col');
-          })
-          .filterEager('model1Relation2.model2Relation1', function (builder) {
-            builder.distinct('model1Prop1').orderBy('Model1.id');
-          })
-          .filterEager('model1Relation2.model2Relation1.model1Relation1', function (builder) {
-            builder.select('model1Prop1 as model1Prop1').orderBy('id');
-          })
-          .filterEager('model1Relation2.model2Relation1.model1Relation2', function (builder) {
-            builder.select('model_2_prop_1 as foo_bar').orderBy('id_col');
-          })
-          .then(function (models) {
-            expect(models).to.eql([{
-              model1Prop1: 'hello 1',
-              $afterGetCalled: 1,
+        return Promise.all([Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map(function (eagerAlgo) {
+          return Model1
+            .query()
+            .where('Model1.id', 1)
+            .column('Model1.model1Prop1')
+            .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+            .eagerAlgorithm(eagerAlgo)
+            .filterEager('model1Relation2', function (builder) {
+              builder.select('model_2_prop_1');
+            })
+            .filterEager('model1Relation2.model2Relation1', function (builder) {
+              builder.distinct('model1Prop1');
+            })
+            .filterEager('model1Relation2.model2Relation1.model1Relation1', function (builder) {
+              builder.select('model1Prop1');
+            })
+            .filterEager('model1Relation2.model2Relation1.model1Relation2', function (builder) {
+              builder.select('model_2_prop_1');
+            })
+            .then(function (models) {
+              models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'model2Prop1');
+              models[0].model1Relation2[1].model2Relation1 = _.sortBy(models[0].model1Relation2[1].model2Relation1 , 'model1Prop1');
 
-              model1Relation2: [{
-                model2Prop1: 'hejsan 1',
+              expect(models).to.eql([{
+                model1Prop1: 'hello 1',
                 $afterGetCalled: 1,
 
-                model2Relation1: []
-              }, {
-                model2Prop1: 'hejsan 2',
-                $afterGetCalled: 1,
-
-                model2Relation1: [{
-                  model1Prop1: 'hello 5',
+                model1Relation2: [{
+                  model2Prop1: 'hejsan 1',
                   $afterGetCalled: 1,
 
-                  model1Relation1: null,
-                  model1Relation2: []
+                  model2Relation1: []
                 }, {
-                  model1Prop1: 'hello 6',
+                  model2Prop1: 'hejsan 2',
                   $afterGetCalled: 1,
 
-                  model1Relation1: {
-                    model1Prop1: 'hello 7',
-                    $afterGetCalled: 1
-                  },
+                  model2Relation1: [{
+                    model1Prop1: 'hello 5',
+                    $afterGetCalled: 1,
 
-                  model1Relation2: [{
-                    fooBar: 'hejsan 3',
-                    $afterGetCalled: 1
+                    model1Relation1: null,
+                    model1Relation2: []
+                  }, {
+                    model1Prop1: 'hello 6',
+                    $afterGetCalled: 1,
+
+                    model1Relation1: {
+                      model1Prop1: 'hello 7',
+                      $afterGetCalled: 1
+                    },
+
+                    model1Relation2: [{
+                      model2Prop1: 'hejsan 3',
+                      $afterGetCalled: 1
+                    }]
                   }]
-                }]
-              }],
-            }]);
-          });
+                }],
+              }]);
+            });
+        }));
       });
 
       it('should filter the eager query using relation expressions as paths (JoinEagerAlgorithm)', function () {

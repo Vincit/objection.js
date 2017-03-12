@@ -134,7 +134,7 @@ export default class JoinEagerOperation extends EagerOperation {
         const pInfo = this.pathInfo[''];
         const col = key;
 
-        if (!pInfo.omitProps[col]) {
+        if (!pInfo.omitCols[col]) {
           keyInfo.push({
             pInfo: pInfo,
             key: key,
@@ -147,7 +147,7 @@ export default class JoinEagerOperation extends EagerOperation {
         const col = key.substr(sepIdx + 1);
         const pInfo = this.pathInfo[path];
 
-        if (!pInfo.omitProps[col]) {
+        if (!pInfo.omitCols[col]) {
           keyInfo.push({
             pInfo: pInfo,
             key: key,
@@ -291,7 +291,7 @@ export default class JoinEagerOperation extends EagerOperation {
         });
 
         if (!filterPassed) {
-          info.omitProps[col] = true;
+          info.omitCols[col] = true;
         }
       }
     });
@@ -318,7 +318,10 @@ export default class JoinEagerOperation extends EagerOperation {
       });
     }
 
-    builder.select(selects.map(select => `${select.col} as ${select.alias}`));
+    builder.select(selects
+      .filter(select => !builder.hasSelection(select.col, true))
+      .map(select => `${select.col} as ${select.alias}`)
+    );
   }
 
   encode(path) {
@@ -606,7 +609,7 @@ class PathInfo {
     this.encParentPath = null;
     this.modelClass = null;
     this.relation = null;
-    this.omitProps = Object.create(null);
+    this.omitCols = Object.create(null);
     this.children = Object.create(null);
     this.idGetter = null;
   }

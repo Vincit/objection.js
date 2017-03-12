@@ -697,7 +697,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   /**
    * @returns {boolean}
    */
-  hasSelection(selection) {
+  hasSelection(selection, explicit = false) {
     const table = this.modelClass().tableName;
     let noSelectStatements = true;
 
@@ -713,7 +713,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       }
     }
 
-    if (noSelectStatements) {
+    if (noSelectStatements && !explicit) {
       // Implicit `select *`.
       return true;
     } else {
