@@ -143,20 +143,6 @@ export default class Model {
   }
 
   /**
-   * @returns {knex}
-   */
-  $knex() {
-    return this.constructor.knex();
-  }
-
-  /**
-   * @returns {knex}
-   */
-  $transaction() {
-    return this.constructor.transaction();
-  }
-
-  /**
    * @param {Transaction=} trx
    * @returns {QueryBuilder}
    */
@@ -232,21 +218,6 @@ export default class Model {
    */
   $loadRelated(relationExpression, filters) {
     return this.constructor.loadRelated(this, relationExpression, filters);
-  }
-
-  /**
-   * @param {Constructor.<Model>=} filterConstructor
-   * @param {function(Model)} callback
-   * @return {Model}
-   */
-  $traverse(filterConstructor, callback) {
-    if (_.isUndefined(callback)) {
-      callback = filterConstructor;
-      filterConstructor = null;
-    }
-
-    this.constructor.traverse(filterConstructor, this, callback);
-    return this;
   }
 
   /**
@@ -526,6 +497,21 @@ export default class Model {
   $afterDelete(queryContext) {}
 
   /**
+   * @param {Constructor.<Model>=} filterConstructor
+   * @param {function(Model)} callback
+   * @return {Model}
+   */
+  $traverse(filterConstructor, callback) {
+    if (_.isUndefined(callback)) {
+      callback = filterConstructor;
+      filterConstructor = null;
+    }
+
+    this.constructor.traverse(filterConstructor, this, callback);
+    return this;
+  }
+
+  /**
    * @param {string|Array.<string>|Object.<string, boolean>} keys
    * @returns {Model}
    */
@@ -636,6 +622,20 @@ export default class Model {
    */
   @hiddenData({name: 'omitFromDatabaseJson', append: true})
   $omitFromDatabaseJson(keys) {}
+
+  /**
+   * @returns {knex}
+   */
+  $knex() {
+    return this.constructor.knex();
+  }
+
+  /**
+   * @returns {knex}
+   */
+  $transaction() {
+    return this.constructor.transaction();
+  }
 
   /**
    * @protected
