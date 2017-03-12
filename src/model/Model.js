@@ -269,7 +269,7 @@ export default class Model {
   $validate(json = this, options = {}) {
     if (json instanceof Model) {
       // Strip away relations and other internal stuff.
-      json = json.$parseJson(json.$toJson(true));
+      json = cloneModel(json, true, true);
     }
 
     if (options.skipValidation) {
@@ -616,32 +616,11 @@ export default class Model {
   }
 
   /**
+   * @param {boolean} shallow
    * @return {Model}
    */
-  $clone() {
-    const clone = new this.constructor();
-    const keys = Object.keys(this);
-
-    for (let i = 0, l = keys.length; i < l; ++i) {
-      const key = keys[i];
-      const value = this[key];
-
-      if (_.isObject(value)) {
-        clone[key] = cloneObject(value);
-      } else {
-        clone[key] = value;
-      }
-    }
-
-    if (this.$omitFromDatabaseJson()) {
-      clone.$omitFromDatabaseJson(this.$omitFromDatabaseJson());
-    }
-
-    if (this.$omitFromJson()) {
-      clone.$omitFromJson(this.$omitFromJson());
-    }
-
-    return clone;
+  $clone(shallow) {
+    return cloneModel(this, shallow, false);
   }
 
   /**
@@ -1298,6 +1277,41 @@ function toJsonArray(value, createDbJson) {
   }
 
   return ret;
+}
+
+function cloneModel(model, shallow, stripInternal) {
+  const clone = new model.constructor();
+  const relations = model.constructor.getRelations();
+  const keys = Object.keys(model);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    const value = model[key];
+
+    if (shallow && relations[key]) {
+      continue;
+    }
+
+    if (stripInternal && key.charAt(0) === '$') {
+      continue;
+    }
+
+    if (_.isObject(value)) {
+      clone[key] = cloneObject(value);
+    } else {
+      clone[key] = value;
+    }
+  }
+
+  if (model.$omitFromDatabaseJson()) {
+    clone.$omitFromDatabaseJson(model.$omitFromDatabaseJson());
+  }
+
+  if (model.$omitFromJson()) {
+    clone.$omitFromJson(model.$omitFromJson());
+  }
+
+  return clone;
 }
 
 function cloneObject(value) {
