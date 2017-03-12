@@ -1426,6 +1426,18 @@ describe('Model', function () {
       expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
     });
 
+    it('traverse([], traverser) should not throw', function () {
+      expect(function () {
+        Model1.traverse([], function () {});
+      }).to.not.throwException();
+    });
+
+    it('traverse(undefined, traverser) should not throw', function () {
+      expect(function () {
+        Model1.traverse(undefined, function () {});
+      }).to.not.throwException();
+    });
+
     it('traverse callback should be passed the model, its parent (if any) and the relation it is in (if any)', function () {
       Model1.traverse([model], function (model, parent, relationName) {
         if (model instanceof Model1) {

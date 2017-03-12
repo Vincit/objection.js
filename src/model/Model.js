@@ -1082,8 +1082,8 @@ export default class Model {
       throw new Error('traverser must be a function');
     }
 
-    if (!models) {
-      return;
+    if (_.isEmpty(models)) {
+      return this;
     }
 
     const modelClass = Array.isArray(models)
