@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.5
+
+### What's new
+
+ * fix [#327](https://github.com/Vincit/objection.js/issues/327)
+ * fix [#256](https://github.com/Vincit/objection.js/issues/256)
+
 ## 0.7.4
 
 ### What's new
@@ -24,7 +31,7 @@
 
 ### What's new
 
- * Fix `JoinEagerAlgorithm` NPE bug
+ * fix `JoinEagerAlgorithm` NPE bug
 
 ## 0.7.0
 
