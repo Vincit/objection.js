@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var expect = require('expect.js');
+var Promise = require('bluebird');
 var ValidationError = require('../../').ValidationError;
 
 module.exports = function (session) {
