@@ -9,6 +9,7 @@ export default class RelationFindOperation extends FindOperation {
     this.relation = opt.relation;
     this.owners = opt.owners;
     this.alwaysReturnArray = false;
+    this.omitProps = [];
   }
 
   onBeforeBuild(builder) {
@@ -21,6 +22,13 @@ export default class RelationFindOperation extends FindOperation {
     this.relation.findQuery(builder, {
       ownerIds: _.uniqBy(ids, join)
     });
+
+    this.addJoinColumnSelects(builder);
+  }
+
+  onAfter(builder, related) {
+    this.omitImplicitJoinProps(related);
+    return super.onAfter(builder, related);
   }
 
   onAfterInternal(builder, related) {
@@ -61,6 +69,56 @@ export default class RelationFindOperation extends FindOperation {
         own[this.relation.name] = related || [];
       }
     }
+  }
+
+  addJoinColumnSelects(builder) {
+    const addedSelects = {};
+    const cols = this.relation.fullRelatedCol();
+
+    for (let c = 0, lc = cols.length; c < lc; ++c) {
+      const col = cols[c];
+
+      if (!builder.hasSelection(col) && !addedSelects[col]) {
+        this.omitProps.push(this.relation.relatedProp[c]);
+        addedSelects[col] = true;
+      }
+    }
+
+    const selects = Object.keys(addedSelects);
+
+    if (selects.length) {
+      builder.select(selects);
+    }
+  }
+
+  omitImplicitJoinProps(related) {
+    const relatedModelClass = this.relation.relatedModelClass;
+
+    if (!this.omitProps.length || !related) {
+      return related;
+    }
+
+    if (!Array.isArray(related)) {
+      return this.omitImplicitJoinPropsFromOne(relatedModelClass, related);
+    }
+
+    if (!related.length) {
+      return related;
+    }
+
+    for (let i = 0, l = related.length; i < l; ++i) {
+      this.omitImplicitJoinPropsFromOne(relatedModelClass, related[i]);
+    }
+
+    return related;
+  }
+
+  omitImplicitJoinPropsFromOne(relatedModelClass, model) {
+    for (let c = 0, lc = this.omitProps.length; c < lc; ++c) {
+      relatedModelClass.omitImpl(model, this.omitProps[c]);
+    }
+
+    return model;
   }
 }
 

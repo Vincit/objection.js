@@ -8,10 +8,6 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
   constructor(name, opt) {
     super(name, opt);
 
-    this.relation = opt.relation;
-    this.owners = opt.owners;
-
-    this.relatedIdxByOwnerId = null;
     this.ownerJoinColumnAlias = new Array(this.relation.joinTableOwnerCol.length);
 
     for (let i = 0, l = this.relation.joinTableOwnerCol.length; i < l; ++i) {
@@ -20,6 +16,7 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
   }
 
   onBeforeBuild(builder) {
+    const relatedModelClass = this.relation.relatedModelClass;
     const ids = new Array(this.owners.length);
 
     for (let i = 0, l = this.owners.length; i < l; ++i) {
@@ -29,7 +26,7 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
     if (!builder.has(builder.constructor.SelectSelector)) {
       // If the user hasn't specified a select clause, select the related model's columns.
       // If we don't do this we also get the join table's columns.
-      builder.select(this.relation.relatedModelClass.tableName + '.*');
+      builder.select(relatedModelClass.tableName + '.*');
 
       // Also select all extra columns.
       for (let i = 0, l = this.relation.joinTableExtras.length; i < l; ++i) {
@@ -49,54 +46,40 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
     // models belong to after the requests.
     for (let i = 0, l = fullJoinTableOwnerCol.length; i < l; ++i) {
       builder.select(fullJoinTableOwnerCol[i] + ' as ' + this.ownerJoinColumnAlias[i]);
-    }
-  }
 
-  onRawResult(builder, rows) {
-    const relatedIdxByOwnerId = Object.create(null);
-    const propKey = this.relation.relatedModelClass.prototype.$propKey;
-
-    // Remove the join columns before the rows are converted into model instances.
-    // We store the relation information to relatedIdxByOwnerId array.
-    for (let i = 0, l = rows.length; i < l; ++i) {
-      const row = rows[i];
-      const key = propKey.call(row, this.ownerJoinColumnAlias);
-      let arr = relatedIdxByOwnerId[key];
-
-      if (!arr) {
-        arr = [];
-        relatedIdxByOwnerId[key] = arr;
-      }
-
-      for (let j = 0, lc = this.ownerJoinColumnAlias.length; j < lc; ++j) {
-        delete row[this.ownerJoinColumnAlias[j]];
-      }
-
-      arr.push(i);
+      // Mark them to be omitted later.
+      this.omitProps.push(relatedModelClass.columnNameToPropertyName(this.ownerJoinColumnAlias[i]));
     }
 
-    this.relatedIdxByOwnerId = relatedIdxByOwnerId;
-    return rows;
+    this.addJoinColumnSelects(builder);
   }
 
   onAfterInternal(builder, related) {
     const isOneToOne = this.relation.isOneToOne();
+    const relatedByOwnerId = Object.create(null);
+
+    for (let i = 0, l = related.length; i < l; ++i) {
+      const rel = related[i];
+      const key = rel.$propKey(this.ownerJoinColumnAlias);
+      let arr = relatedByOwnerId[key];
+
+      if (!arr) {
+        arr = [];
+        relatedByOwnerId[key] = arr;
+      }
+
+      arr.push(rel);
+    }
 
     for (let i = 0, l = this.owners.length; i < l; ++i) {
-      const owner = this.owners[i];
-      const key = owner.$propKey(this.relation.ownerProp);
-      const idx = this.relatedIdxByOwnerId[key];
+      const own = this.owners[i];
+      const key = own.$propKey(this.relation.ownerProp);
+      const related = relatedByOwnerId[key];
 
-      if (idx) {
-        const arr = new Array(idx.length);
-
-        for (let j = 0, lr = idx.length; j < lr; ++j) {
-          arr[j] = related[idx[j]];
-        }
-
-        owner[this.relation.name] = isOneToOne ? (arr[0] || null) : arr;
+      if (isOneToOne) {
+        own[this.relation.name] = (related && related[0]) || null;
       } else {
-        owner[this.relation.name] = isOneToOne ? null : [];
+        own[this.relation.name] = related || [];
       }
     }
 

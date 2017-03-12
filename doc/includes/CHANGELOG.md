@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.4
+
+### What's new
+
+ * automatically select columns needed for relations [#309](https://github.com/Vincit/objection.js/issues/309)
+ * fix an issue where `$formatJson` was called inside `insertGraph` [#326](https://github.com/Vincit/objection.js/issues/326)
+
 ## 0.7.3
 
 ### What's new

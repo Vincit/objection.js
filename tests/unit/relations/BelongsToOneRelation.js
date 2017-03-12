@@ -187,7 +187,7 @@ describe('BelongsToOneRelation', function () {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
-        expect(executedQueries[0]).to.equal('select "name" from "RelatedModel" where "RelatedModel"."rid" in (2)');
+        expect(executedQueries[0]).to.equal('select "RelatedModel"."rid", "name" from "RelatedModel" where "RelatedModel"."rid" in (2)');
       });
     });
 

@@ -5707,7 +5707,7 @@ The object is checked against [`jsonSchema`](#jsonschema) and an exception is th
 Argument|Type|Description
 --------|----|-------------------
 json|Object|The JSON object from which to create the model.
-opt|ModelOptions|Update options.
+opt|[ModelOptions](#modeloptions)|Update options.
 
 ##### Return value
 

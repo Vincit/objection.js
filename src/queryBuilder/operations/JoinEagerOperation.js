@@ -134,7 +134,7 @@ export default class JoinEagerOperation extends EagerOperation {
         const pInfo = this.pathInfo[''];
         const col = key;
 
-        if (!pInfo.omitCols[col]) {
+        if (!pInfo.omitProps[col]) {
           keyInfo.push({
             pInfo: pInfo,
             key: key,
@@ -147,7 +147,7 @@ export default class JoinEagerOperation extends EagerOperation {
         const col = key.substr(sepIdx + 1);
         const pInfo = this.pathInfo[path];
 
-        if (!pInfo.omitCols[col]) {
+        if (!pInfo.omitProps[col]) {
           keyInfo.push({
             pInfo: pInfo,
             key: key,
@@ -291,7 +291,7 @@ export default class JoinEagerOperation extends EagerOperation {
         });
 
         if (!filterPassed) {
-          info.omitCols[col] = true;
+          info.omitProps[col] = true;
         }
       }
     });
@@ -606,7 +606,7 @@ class PathInfo {
     this.encParentPath = null;
     this.modelClass = null;
     this.relation = null;
-    this.omitCols = Object.create(null);
+    this.omitProps = Object.create(null);
     this.children = Object.create(null);
     this.idGetter = null;
   }

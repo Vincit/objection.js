@@ -569,7 +569,7 @@ describe('ManyToManyRelation', function () {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal([
-          'select "JoinTable"."ownerId" as "objectiontmpjoin0", "name"',
+          'select "JoinTable"."ownerId" as "objectiontmpjoin0", "RelatedModel"."rid", "name"',
           'from "RelatedModel"',
           'inner join "JoinTable" on "JoinTable"."relatedId" = "RelatedModel"."rid"',
           'where "JoinTable"."ownerId" in (666)',
