@@ -350,7 +350,7 @@ declare module "objection" {
      */
     deleteById(idOrIds: IdOrIds): QueryBuilderSingle<number>;
 
-    relate(ids: IdOrIds | PartialOrPartials<T>): this;
+    relate<M extends Model>(ids: IdOrIds | PartialOrPartials<M>): this;
     unrelate(): this;
 
     forUpdate(): this;
