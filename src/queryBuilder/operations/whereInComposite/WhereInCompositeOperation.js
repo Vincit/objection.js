@@ -1,6 +1,6 @@
-import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
+import WrappingQueryBuilderOperation from '../WrappingQueryBuilderOperation';
 
-export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilderOperation {
+export default class WhereInCompositeOperation extends WrappingQueryBuilderOperation {
 
   onBuild(knexBuilder) {
     this.build(knexBuilder, this.args[0], this.args[1]);
@@ -17,23 +17,31 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
   }
 
   buildComposite(knexBuilder, columns, values) {
-    if (!Array.isArray(values)) {
-      // If the `values` is not an array of values but a function or a subquery
-      // we have no way to implement this method.
-      throw new Error(`sqlite doesn't support multi-column where in clauses`);
+    if (Array.isArray(values)) {
+      this.buildCompositeValue(knexBuilder, columns, values);
+    } else {
+      this.buildCompositeSubquery(knexBuilder, columns, values);
     }
+  }
 
-    // Sqlite doesn't support the `where in` syntax for multiple columns but
-    // we can emulate it using grouped `or` clauses.
-    knexBuilder.where(builder => {
-      values.forEach(val => {
-        builder.orWhere(builder => {
-          columns.forEach((col, idx) => {
-            builder.andWhere(col, val[idx]);
-          });
-        });
-      });
-    });
+  buildCompositeValue(knexBuilder, columns, values) {
+    knexBuilder.whereIn(columns, values);
+  }
+
+  buildCompositeSubquery(knexBuilder, columns, subquery) {
+    const formatter = knexBuilder.client.formatter();
+
+    let sql = '(';
+    for (let i = 0, l = columns.length; i < l; ++i) {
+      sql += formatter.wrap(columns[i]);
+
+      if (i !== columns.length - 1) {
+        sql += ',';
+      }
+    }
+    sql += ')';
+
+    knexBuilder.whereIn(knexBuilder.client.raw(sql), subquery);
   }
 
   buildNonComposite(knexBuilder, columns, values) {
@@ -45,7 +53,6 @@ export default class WhereInCompositeSqliteOperation extends WrappingQueryBuilde
       values = [values];
     }
 
-    // For non-composite keys we can use the normal whereIn.
     knexBuilder.whereIn(col, values);
   }
 }

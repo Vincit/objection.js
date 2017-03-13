@@ -4,6 +4,7 @@ var _ = require('lodash');
 var expect = require('expect.js');
 var Promise = require('bluebird');
 var transaction = require('../../').transaction;
+var knexUtils = require('../../lib/utils/knexUtils');
 
 module.exports = function (session) {
   var Model1 = session.models.Model1;

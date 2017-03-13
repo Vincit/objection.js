@@ -23,6 +23,9 @@ import OnBuildOperation from './operations/OnBuildOperation';
 import SelectOperation from './operations/SelectOperation';
 import EagerOperation from './operations/EagerOperation';
 
+import RangePostgresOperation from './operations/range/RangePostgresOperation';
+import RangeOperation from './operations/range/RangeOperation';
+
 export default class QueryBuilder extends QueryBuilderBase {
 
   constructor(modelClass) {
@@ -487,47 +490,12 @@ export default class QueryBuilder extends QueryBuilderBase {
     let rawQuery = knex.raw(query).wrap('(', ') as temp');
     let countQuery = knex.count('* as count').from(rawQuery);
 
+    if (this.internalContext().debug) {
+      countQuery.debug();
+    }
+
     return countQuery.then(result => result[0] ? result[0].count : 0);
   }
-
-  /**
-   * @param {number} page
-   * @param {number} pageSize
-   * @returns {QueryBuilder}
-   */
-  page(page, pageSize) {
-    return this.range(page * pageSize, (page + 1) * pageSize - 1);
-  }
-
-  /**
-   * @param {number} start
-   * @param {number} end
-   * @returns {QueryBuilder}
-   */
-  range(start, end) {
-    let resultSizePromise;
-
-    return this
-      .limit(end - start + 1)
-      .offset(start)
-      .runBefore(() => {
-        // Don't return the promise so that it is executed
-        // in parallel with the actual query.
-        resultSizePromise = this.resultSize();
-        return null;
-      })
-      .runAfter(results => {
-        // Now that the actual query is finished, wait until the
-        // result size has been calculated.
-        return Promise.all([results, resultSizePromise]);
-      })
-      .runAfter(arr => {
-        return {
-          results: arr[0],
-          total: _.parseInt(arr[1])
-        };
-      });
-  };
 
   /**
    * @returns {knex.QueryBuilder}
@@ -749,6 +717,7 @@ export default class QueryBuilder extends QueryBuilderBase {
       modelClass = null;
     }
 
+    // Turn the properties into a hash for performance.
     properties = _.reduce(properties, (obj, prop) => {
       obj[prop] = true;
       return obj;
@@ -780,6 +749,26 @@ export default class QueryBuilder extends QueryBuilderBase {
       model.$omit(properties);
     });
   }
+
+  /**
+   * @param {number} page
+   * @param {number} pageSize
+   * @returns {QueryBuilder}
+   */
+  page(page, pageSize) {
+    return this.range(page * pageSize, (page + 1) * pageSize - 1);
+  }
+
+  /**
+   * @param {number} start
+   * @param {number} end
+   * @returns {QueryBuilder}
+   */
+  @queryBuilderOperation({
+    default: RangeOperation,
+    postgresql: RangePostgresOperation
+  })
+  range(start, end) {}
 
   /**
    * @param {string} relationName
@@ -864,6 +853,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   debug() {
+    this.internalContext().debug = true;
     this.internalContext().onBuild.push(builder => {
       builder.callKnexQueryBuilderOperation('debug', []);
     });

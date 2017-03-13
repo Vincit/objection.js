@@ -83,10 +83,10 @@ export default class QueryBuilderOperation {
 
   /**
    * @param {QueryBuilder} builder
-   * @param {*} result
+   * @param {*} rows
    * @returns {*}
    */
-  onRawResult(builder, result) {
+  onRawResult(builder, rows) {
     return rows;
   }
 

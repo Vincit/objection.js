@@ -69,6 +69,21 @@ module.exports = function (session) {
           });
       });
 
+      it('should return the given range and total count when range() is called without arguments', function () {
+        return Model2
+          .query()
+          .offset(1)
+          .limit(2)
+          .range()
+          .orderBy('model_2_prop_2', 'desc')
+          .then(function (result) {
+            expect(result.results[0]).to.be.a(Model2);
+            expect(result.results[1]).to.be.a(Model2);
+            expect(result.total === 3).to.equal(true);
+            expect(_.map(result.results, 'model2Prop2')).to.eql([20, 10]);
+          });
+      });
+
       it('should return the given page and total count when page() is called', function () {
         return Model2
           .query()

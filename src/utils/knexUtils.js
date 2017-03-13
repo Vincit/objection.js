@@ -29,3 +29,7 @@ export function isKnexJoinBuilder(value) {
 export function isKnexRaw(value) {
   return value instanceof KnexRaw;
 }
+
+export function isKnexTransaction(knex) {
+  return !!getDialect(knex) && typeof knex.commit === 'function' && typeof knex.rollback === 'function';
+}

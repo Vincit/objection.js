@@ -3779,6 +3779,12 @@ Person
 
 Only returns the given page of results.
 
+On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
+(the query itself, and a separate count query) are executed. Mysql has the `SQL_CALC_FOUND_ROWS` option and
+`FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and
+[the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse
+than just executing a separate count query.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -3813,7 +3819,28 @@ Person
   });
 ```
 
+> `range` can be called without arguments if you want to specify the limit and offset explicitly:
+
+```js
+Person
+  .query()
+  .where('age', '>', 20)
+  .limit(10)
+  .range()
+  .then(function (result) {
+    console.log(result.results.length); // --> 101
+    console.log(result.total); // --> 3341
+  });
+```
+
 Only returns the given range of results.
+
+
+On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
+(the query itself, and a separate count query) are executed. Mysql has the `SQL_CALC_FOUND_ROWS` option and
+`FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and
+[the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse
+than just executing a separate count query.
 
 ##### Arguments
 

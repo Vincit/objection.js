@@ -4,6 +4,7 @@ export default class QueryBuilderContextBase {
     this.userContext = userContext;
     this.skipUndefined = false;
     this.options = {};
+    this.debug = false;
     this.knex = null;
   }
 
@@ -13,6 +14,7 @@ export default class QueryBuilderContextBase {
     ctx.userContext = this.userContext;
     ctx.skipUndefined = this.skipUndefined;
     ctx.options = Object.assign({}, this.options);
+    ctx.debug = this.debug;
     ctx.knex = this.knex;
 
     return ctx;

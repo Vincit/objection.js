@@ -5,8 +5,8 @@ import KnexOperation from './operations/KnexOperation';
 import SelectOperation from './operations/SelectOperation';
 import WhereRefOperation from './operations/WhereRefOperation';
 import WhereCompositeOperation from './operations/WhereCompositeOperation';
-import WhereInCompositeOperation from './operations/WhereInCompositeOperation';
-import WhereInCompositeSqliteOperation from './operations/WhereInCompositeSqliteOperation';
+import WhereInCompositeOperation from './operations/whereInComposite/WhereInCompositeOperation';
+import WhereInCompositeSqliteOperation from './operations/whereInComposite/WhereInCompositeSqliteOperation';
 
 import WhereJsonPostgresOperation from './operations/jsonApi/WhereJsonPostgresOperation';
 import WhereJsonHasPostgresOperation from './operations/jsonApi/WhereJsonHasPostgresOperation';

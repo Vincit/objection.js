@@ -74,7 +74,7 @@ transaction.start = function (modelClassOrKnex) {
     knex = modelClassOrKnex.knex();
   }
 
-  if (!_.isFunction(knex.transaction)) {
+  if (!knex || !_.isFunction(knex.transaction)) {
     return Promise.reject(new Error('objection.transaction.start: first argument must be a model class or a knex instance'));
   }
 
