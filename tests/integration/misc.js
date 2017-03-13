@@ -1,7 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
-var utils = require('../../lib/utils/dbUtils');
+var utils = require('../../lib/utils/knexUtils');
 var Model = require('../../').Model;
 var expect = require('expect.js');
 var inheritModel = require('../../lib/model/inheritModel');

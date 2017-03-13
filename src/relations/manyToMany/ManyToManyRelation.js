@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Relation from '../Relation';
 import inheritModel from '../../model/inheritModel';
-import {isSqlite} from '../../utils/dbUtils';
+import {isSqlite} from '../../utils/knexUtils';
 import memoize from '../../utils/decorators/memoize';
 
 import ManyToManyFindOperation from './ManyToManyFindOperation';

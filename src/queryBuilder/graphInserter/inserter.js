@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
-import {isPostgres} from '../../utils/dbUtils';
+import {isPostgres} from '../../utils/knexUtils';
 
 const POSTGRES_INSERT_BATCH_SIZE = 100;
 

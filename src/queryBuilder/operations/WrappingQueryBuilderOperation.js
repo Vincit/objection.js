@@ -1,5 +1,5 @@
 import QueryBuilderOperation from './QueryBuilderOperation';
-import {isKnexQueryBuilder, isKnexJoinBuilder} from '../../utils/dbUtils';
+import {isKnexQueryBuilder, isKnexJoinBuilder} from '../../utils/knexUtils';
 import ReferenceBuilder from '../ReferenceBuilder';
 
 let QueryBuilderBase = null;

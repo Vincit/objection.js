@@ -1,5 +1,4 @@
-const KnexQueryBuilder = require('knex/lib/query/builder');
-const KnexRaw = require('knex/lib/raw');
+import {isKnexQueryBuilder, isKnexRaw} from '../utils/knexUtils';
 
 let QueryBuilderBase = null;
 let ReferenceBuilder = null;
@@ -146,9 +145,9 @@ function doSplit(obj, modelClass, queryProps, modelOpt) {
 }
 
 function isQueryProp(value) {
-  return value instanceof KnexQueryBuilder
+  return isKnexQueryBuilder(value)
+    || isKnexRaw(value)
     || value instanceof QueryBuilderBase
-    || value instanceof KnexRaw
     || value instanceof ReferenceBuilder;
 }
 

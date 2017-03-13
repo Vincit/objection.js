@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var Promise = require('bluebird');
 
-var utils = require('../../lib/utils/dbUtils');
+var utils = require('../../lib/utils/knexUtils');
 var expect = require('expect.js');
 var inheritModel = require('../../lib/model/inheritModel');
 var knexMocker = require('../../testUtils/mockKnex');

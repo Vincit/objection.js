@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {getDialect} from '../../utils/dbUtils';
+import {getDialect} from '../../utils/knexUtils';
 
 export default function queryBuilderOperation(input, name) {
   const normalizedInput = normalizeInput(input);

@@ -1,7 +1,7 @@
 import QueryBuilderOperation from './QueryBuilderOperation';
 import {fromJson, toDatabaseJson} from '../../model/modelFactory';
 import {mapAfterAllReturn} from '../../utils/promiseUtils';
-import {isPostgres} from '../../utils/dbUtils';
+import {isPostgres} from '../../utils/knexUtils';
 
 export default class InsertOperation extends QueryBuilderOperation {
 
