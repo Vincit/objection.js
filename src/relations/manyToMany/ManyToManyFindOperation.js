@@ -51,7 +51,7 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
       this.omitProps.push(relatedModelClass.columnNameToPropertyName(this.ownerJoinColumnAlias[i]));
     }
 
-    this.addJoinColumnSelects(builder);
+    this.selectMissingJoinColumns(builder);
   }
 
   onAfterInternal(builder, related) {

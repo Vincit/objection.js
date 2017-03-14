@@ -23,7 +23,7 @@ export default class RelationFindOperation extends FindOperation {
       ownerIds: _.uniqBy(ids, join)
     });
 
-    this.addJoinColumnSelects(builder);
+    this.selectMissingJoinColumns(builder);
   }
 
   onAfter(builder, related) {
@@ -32,16 +32,7 @@ export default class RelationFindOperation extends FindOperation {
   }
 
   onAfterInternal(builder, related) {
-    this.createRelationProp(this.owners, related);
-
-    if (!this.alwaysReturnArray && this.relation.isOneToOne() && related.length <= 1) {
-      return related[0] || undefined;
-    } else {
-      return related;
-    }
-  }
-
-  createRelationProp(owners, related) {
+    const owners = this.owners;
     const isOneToOne = this.relation.isOneToOne();
     const relatedByOwnerId = Object.create(null);
 
@@ -69,9 +60,15 @@ export default class RelationFindOperation extends FindOperation {
         own[this.relation.name] = related || [];
       }
     }
+
+    if (!this.alwaysReturnArray && this.relation.isOneToOne() && related.length <= 1) {
+      return related[0] || undefined;
+    } else {
+      return related;
+    }
   }
 
-  addJoinColumnSelects(builder) {
+  selectMissingJoinColumns(builder) {
     const addedSelects = {};
     const cols = this.relation.fullRelatedCol();
 
