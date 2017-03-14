@@ -445,8 +445,68 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '4000 `Person.query().insertWithRelated()` queries',
-      runCount: 4000,
+      name: '1000 `Person.query().eager("children.pets")` queries',
+      runCount: 1000,
+      runtimeGoal: 10000,
+      beforeTest: function () {
+        var idx = 0;
+        var petId = 1;
+
+        var results = [
+          // People
+          _.range(100).map(function (i) {
+            return {
+              id: i,
+              firstName: 'Person' + i,
+              lastLame: 'Person' + i + " Lastname",
+              age: i
+            };
+          }),
+
+          // Their children.
+          _.flatten(_.range(100).map(function (parentId) {
+            return _.range(10).map(function (i) {
+              return {
+                id: parentId * 10 + i,
+                parentId: parentId,
+                firstName: 'Child' + i,
+                lastLame: 'Child' + i + " Lastname",
+                age: i
+              };
+            });
+          })),
+
+          // Children's pets.
+          _.flatten(_.range(100).map(function (parentId) {
+            return _.flatten(_.range(10).map(function (childIdx) {
+              var childId = parentId * 10 + childIdx;
+
+              return _.range(3).map(function (i) {
+                return {
+                  id: ++petId,
+                  name: 'Fluffy ' + childId,
+                  ownerId: childId,
+                  species: 'dogBreed ' + i
+                };
+              });
+            }));
+          }))
+        ];
+
+        mockKnex.nextResult = function () {
+          return results[(idx++) % results.length];
+        };
+
+        return Person.bindKnex(mockKnex);
+      },
+      test: function (Person) {
+        return Person.query().eager('children.pets');
+      }
+    });
+
+    perfTest({
+      name: '10000 `Person.query().insertWithRelated()` queries',
+      runCount: 10000,
       runtimeGoal: 10000,
       beforeTest: function () {
         var idx = 0;
@@ -523,17 +583,9 @@ describe('Performance tests', function () {
   }
 
   function runTest(opt, ctx) {
-    var promises = [];
-
-    for (var i = 0; i < opt.runCount; ++i) {
-      var maybePromise = opt.test(ctx);
-
-      if (maybePromise && _.isFunction(maybePromise.then)) {
-        promises.push(maybePromise);
-      }
-    }
-
-    return Promise.all(promises);
+    return Promise.map(_.range(opt.runCount), function () {
+      return opt.test(ctx);
+    }, {concurrency: 1});
   }
 });
 
