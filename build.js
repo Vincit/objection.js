@@ -6,7 +6,7 @@ var fs = require('fs');
 
 var SRC_DIR = './src';
 var DST_DIR = './lib';
-var CP_ONLY = [SRC_DIR + '/model/inheritModel/inheritModelEs6.js'];
+var CP_ONLY = [];
 var BABEL_OPT = {
   presets: [],
   sourceMaps: 'inline',
