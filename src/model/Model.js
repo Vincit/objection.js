@@ -126,11 +126,6 @@ export default class Model {
   static defaultEagerOptions = null;
 
   /**
-   * @private
-   */
-  static $$knex = null;
-
-  /**
    * @param {*=} id
    * @returns {*}
    */
@@ -278,6 +273,8 @@ export default class Model {
     const jsonAttr = this.constructor.getJsonAttributes();
 
     if (jsonAttr.length) {
+      // JSON attributes may be returned as strings depending on the database and
+      // the database client. Convert them to objects here.
       for (let i = 0, l = jsonAttr.length; i < l; ++i) {
         const attr = jsonAttr[i];
         const value = json[attr];
@@ -304,6 +301,7 @@ export default class Model {
     const jsonAttr = this.constructor.getJsonAttributes();
 
     if (jsonAttr.length) {
+      // All database clients want JSON columns as strings. Do the conversion here.
       for (let i = 0, l = jsonAttr.length; i < l; ++i) {
         const attr = jsonAttr[i];
         const value = json[attr];
@@ -343,25 +341,14 @@ export default class Model {
   $setJson(json, options = {}) {
     json = json || {};
 
-    if (!_.isObject(json)
-      || _.isString(json)
-      || _.isNumber(json)
-      || _.isDate(json)
-      || _.isArray(json)
-      || _.isFunction(json)
-      || _.isTypedArray(json)
-      || _.isRegExp(json)) {
-
+    if (Object.prototype.toString.call(json) !== '[object Object]') {
       throw new Error('You should only pass objects to $setJson method. '
         + '$setJson method was given an invalid value '
         + json);
     }
 
-
     json = this.$parseJson(json, options);
     json = this.$validate(json, options);
-
-    // TODO Move to bottom.
     this.$set(json);
 
     const relations = this.constructor.getRelationArray();
@@ -369,10 +356,9 @@ export default class Model {
     for (let i = 0, l = relations.length; i < l; ++i) {
       const relation = relations[i];
       const relationName = relation.name;
+      const relationJson = json[relationName];
 
-      if (_.has(json, relationName)) {
-        const relationJson = json[relationName];
-
+      if (relationJson !== undefined) {
         if (Array.isArray(relationJson)) {
           this[relationName] = relation.relatedModelClass.ensureModelArray(relationJson, options);
         } else if (relationJson) {
@@ -436,7 +422,7 @@ export default class Model {
   }
 
   toJSON() {
-    return this.$toJson();
+    return this.$toJson(false);
   }
 
   /**
@@ -559,23 +545,36 @@ export default class Model {
     if (arguments.length === 0) {
       return _.values(this);
     } else {
-      const args = (arguments.length === 1 && Array.isArray(arguments[0]))
-        ? arguments[0]
-        : arguments;
+      if (arguments.length === 1 && Array.isArray(arguments[0])) {
+        return this.$$values(arguments[0]);
+      } else {
+        const args = new Array(arguments.length);
 
-      switch (args.length) {
-        case 1: return [this[args[0]]];
-        case 2: return [this[args[0]], this[args[1]]];
-        case 3: return [this[args[0]], this[args[1]], this[args[2]]];
-        default: {
-          const ret = new Array(args.length);
-
-          for (let i = 0, l = args.length; i < l; ++i) {
-            ret[i] = this[args[i]];
-          }
-
-          return ret;
+        for (let i = 0, l = args.length; i < l; ++i) {
+          args[i] = arguments[i];
         }
+
+        return this.$$values(args);
+      }
+    }
+  }
+
+  /**
+   * @private
+   */
+  $$values(args) {
+    switch (args.length) {
+      case 1: return [this[args[0]]];
+      case 2: return [this[args[0]], this[args[1]]];
+      case 3: return [this[args[0]], this[args[1]], this[args[2]]];
+      default: {
+        const ret = new Array(args.length);
+
+        for (let i = 0, l = args.length; i < l; ++i) {
+          ret[i] = this[args[i]];
+        }
+
+        return ret;
       }
     }
   }
@@ -783,9 +782,16 @@ export default class Model {
    * @param {knex=} knex
    * @returns {knex}
    */
-  static knex(knex) {
+  static knex() {
     if (arguments.length) {
-      this.$$knex = knex;
+      // We cannot save this to hiddenData because values
+      // in there don't get inherited automatically when
+      // a class is inherited.
+      Object.defineProperty(this, '$$knex', {
+        enumerable: false,
+        writable: true,
+        value: arguments[0]
+      })
     } else {
       return this.$$knex;
     }
@@ -1213,39 +1219,46 @@ function toExternalJsonImpl(model, omit, pick) {
   const json = {};
   const omitFromJson = model.$omitFromJson();
   const keys = Object.keys(model);
+  const vAttr = model.constructor.virtualAttributes;
 
   for (let i = 0, l = keys.length; i < l; ++i) {
     const key = keys[i];
-    assignJsonValue(json, key, model[key], omit, pick, omitFromJson, false);
+    const value = model[key];
+
+    assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
   }
 
-  if (model.constructor.virtualAttributes) {
-    const vAttr = model.constructor.virtualAttributes;
-
-    for (let i = 0, l = vAttr.length; i < l; ++i) {
-      const key = vAttr[i];
-      let value = model[key];
-
-      if (_.isFunction(value)) {
-        value = value.call(model);
-      }
-
-      assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
-    }
+  if (vAttr) {
+    assignVirtualAttributes(json, model, vAttr, omit, pick, omitFromJson);
   }
 
   return json;
 }
 
+function assignVirtualAttributes(json, model, vAttr, omit, pick, omitFromJson) {
+  for (let i = 0, l = vAttr.length; i < l; ++i) {
+    const key = vAttr[i];
+    let value = model[key];
+
+    if (typeof value === 'function') {
+      value = value.call(model);
+    }
+
+    assignJsonValue(json, key, value, omit, pick, omitFromJson, false);
+  }
+}
+
 function assignJsonValue(json, key, value, omit, pick, omitFromJson, createDbJson) {
+  const type = typeof value;
+
   if (key.charAt(0) !== '$'
-    && !_.isFunction(value)
-    && !_.isUndefined(value)
+    && type !== 'function'
+    && type !== 'undefined'
     && (!omit || !omit[key])
     && (!pick || pick[key])
     && (!omitFromJson || !contains(omitFromJson, key))) {
 
-    if (value !== null && typeof value === 'object') {
+    if (value !== null && type === 'object') {
       json[key] = toJsonObject(value, createDbJson);
     } else {
       json[key] = value;
@@ -1280,9 +1293,50 @@ function toJsonArray(value, createDbJson) {
 }
 
 function cloneModel(model, shallow, stripInternal) {
+  let clone = null;
+
+  const omitFromJson = model.$omitFromJson();
+  const omitFromDatabaseJson = model.$omitFromDatabaseJson();
+
+  if (!shallow && !stripInternal) {
+    clone = cloneModelSimple(model);
+  } else {
+    clone = cloneModelWithOpt(model, shallow, stripInternal);
+  }
+
+  if (omitFromJson) {
+    clone.$omitFromJson(omitFromJson);
+  }
+
+  if (omitFromDatabaseJson) {
+    clone.$omitFromDatabaseJson(omitFromDatabaseJson);
+  }
+
+  return clone;
+}
+
+function cloneModelSimple(model) {
   const clone = new model.constructor();
-  const relations = model.constructor.getRelations();
   const keys = Object.keys(model);
+
+  for (let i = 0, l = keys.length; i < l; ++i) {
+    const key = keys[i];
+    const value = model[key];
+
+    if (value !== null && typeof value === 'object') {
+      clone[key] = cloneObject(value);
+    } else {
+      clone[key] = value;
+    }
+  }
+
+  return clone;
+}
+
+function cloneModelWithOpt(model, shallow, stripInternal) {
+  const clone = new model.constructor();
+  const keys = Object.keys(model);
+  const relations = model.constructor.getRelations();
 
   for (let i = 0, l = keys.length; i < l; ++i) {
     const key = keys[i];
@@ -1296,19 +1350,11 @@ function cloneModel(model, shallow, stripInternal) {
       continue;
     }
 
-    if (_.isObject(value)) {
+    if (value !== null && typeof value === 'object') {
       clone[key] = cloneObject(value);
     } else {
       clone[key] = value;
     }
-  }
-
-  if (model.$omitFromDatabaseJson()) {
-    clone.$omitFromDatabaseJson(model.$omitFromDatabaseJson());
-  }
-
-  if (model.$omitFromJson()) {
-    clone.$omitFromJson(model.$omitFromJson());
   }
 
   return clone;
@@ -1318,7 +1364,7 @@ function cloneObject(value) {
   if (Array.isArray(value)) {
     return cloneArray(value);
   } else if (value instanceof Model) {
-    return value.$clone();
+    return cloneModel(value, false, false);
   } else if (Buffer.isBuffer(value)) {
     return new Buffer(value);
   } else {
