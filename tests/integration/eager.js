@@ -11,101 +11,6 @@ module.exports = function (session) {
 
   describe('Model eager queries', function () {
 
-    describe.skip('balls', function () {
-
-      before(function () {
-        var _n = 0;
-
-        function n() {
-          return ++_n;
-        }
-
-        return session.populate(_.times(100, function (i) {
-          return {
-            model1Prop2: i,
-
-            model1Relation1: {
-              model1Prop1: 'hello ' + n(),
-
-              model1Relation1: {
-                model1Prop1: 'hello ' + n(),
-
-                model1Relation1: {
-                  model1Prop1: 'hello ' + n(),
-
-                  model1Relation2: _.times(3, function () {
-                    return {
-                      model2Prop1: 'hejsan ' + n()
-                    }
-                  })
-                }
-              }
-            },
-
-            model1Relation2: _.times(3, function () {
-              return {
-                model2Prop1: 'hejsan ' + n(),
-
-                model2Relation1: _.times(2, function () {
-                  return {
-                    model1Prop1: 'hello ' + n(),
-                    aliasedExtra: 'extra ' + n(),
-
-                    model1Relation1: {
-                      model1Prop1: 'hello ' + n()
-                    },
-
-                    model1Relation2: [{
-                      model2Prop1: 'hejsan ' + n()
-                    }]
-                  };
-                })
-              };
-            })
-          }
-        }));
-      });
-
-      it('yeahhh', function () {
-        return Promise.all(_.range(100).map(function () {
-          return Model1
-            .query()
-            .where('Model1.model1Prop2', '<', 100)
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            //.eager('model1Relation2')
-            .eager('[model1Relation1, model1Relation2.model2Relation1]')
-            /*
-             .modifyEager('model1Relation1', builder => {
-             builder.select('id');
-             })
-             .modifyEager('model1Relation1.model1Relation1', builder => {
-             builder.select('id');
-             })
-             .modifyEager('model1Relation1.model1Relation1.model1Relation1', builder => {
-             builder.select('id');
-             })
-             .modifyEager('model1Relation2', builder => {
-             builder.select('id_col');
-             })
-             .modifyEager('model1Relation2.model2Relation1', builder => {
-             builder.select('id');
-             })
-             .modifyEager('model1Relation2.model2Relation1.model1Relation1', builder => {
-             builder.select('id');
-             })
-             .modifyEager('model1Relation2.model2Relation1.model1Relation2', builder => {
-             builder.select('id_col');
-             })
-             */
-            //.debug()
-            .then(function (res) {
-              //console.log('==================================================================')
-              //console.dir(res, {depth: 100})
-            });
-        }));
-      });
-    });
-
     before(function () {
       return session.populate([{
         id: 1,
@@ -1365,6 +1270,105 @@ module.exports = function (session) {
           });
       });
 
+    });
+
+    describe.skip('big data', function () {
+      var graph = null;
+
+      beforeEach(function () {
+        this.timeout(30000);
+        var n = 0;
+
+        graph = _.range(100).map(function () {
+          return {
+            model1Prop1: 'hello ' + n++,
+
+            model1Relation1: {
+              model1Prop1: 'hi ' + n++,
+
+              model1Relation1: {
+                model1Prop1: 'howdy ' + n++
+              }
+            },
+
+            model1Relation1Inverse: {
+              model1Prop1: 'quux ' + n++,
+            },
+
+            model1Relation2: _.range(10).map(function () {
+              return {
+                model2Prop1: 'foo ' + n++,
+
+                model2Relation1: _.range(10).map(function () {
+                  return {
+                    model1Prop1: 'bar ' + n++
+                  };
+                }),
+
+                model2Relation2: {
+                  model1Prop1: 'baz ' + n++
+                }
+              };
+            }),
+
+            model1Relation3: _.range(10).map(function () {
+              return {
+                model2Prop1: 'spam ' + n++,
+              };
+            })
+          };
+        });
+
+        var t0 = Date.now();
+        return session.populate([]).then(function () {
+          return Model1.query().insertGraph(graph);
+        }).then(function (inserted) {
+          graph = inserted;
+          console.log(Date.now() - t0);
+        });
+      });
+
+      it('should work with a lot of data', function () {
+        this.timeout(30000);
+
+        return Promise.map([/*Model1.WhereInEagerAlgorithm*/ Model1.JoinEagerAlgorithm], function (eagerAlgorithm) {
+          return Model1
+            .query()
+            .where('Model1.model1Prop1', 'like', 'hello%')
+            .eager('[model1Relation1.model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]')
+            .eagerAlgorithm(eagerAlgorithm)
+            .then(function (res) {
+              graph = _.sortBy(graph, 'id');
+              res = _.sortBy(res, 'id');
+
+              Model1.traverse(graph, traverser);
+              Model1.traverse(res, traverser);
+
+              var expected = _.invokeMap(graph, 'toJSON');
+              var got = _.invokeMap(res, 'toJSON');
+
+              expect(got).to.eql(expected);
+            });
+        });
+      });
+
+      function traverser(model) {
+        ['extra1', 'extra2', 'aliasedExtra', 'model1Id', 'model1Prop2', 'model2Prop2'].forEach(function (key) {
+          delete model[key];
+        });
+
+        ['model1Relation2', 'model1Relation3'].map(function (rel) {
+          if (model[rel]) {
+            model[rel] = _.sortBy(model[rel], 'idCol');
+          }
+        });
+
+        ['model2Relation1'].map(function (rel) {
+          if (model[rel]) {
+            model[rel] = _.sortBy(model[rel], 'id');
+          }
+        })
+      }
     });
 
   });

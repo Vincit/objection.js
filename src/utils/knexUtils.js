@@ -18,6 +18,10 @@ export function isSqlite(knex) {
   return getDialect(knex) === 'sqlite3';
 }
 
+export function isMsSql(knex) {
+  return getDialect(knex) === 'mssql';
+}
+
 export function isKnexQueryBuilder(value) {
   return value instanceof KnexQueryBuilder;
 }

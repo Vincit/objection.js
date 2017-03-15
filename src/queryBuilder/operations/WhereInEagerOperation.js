@@ -1,6 +1,9 @@
+import chunk from 'lodash/chunk';
+import flatten from 'lodash/flatten';
 import Promise from 'bluebird';
 import ValidationError from '../../model/ValidationError'
 import EagerOperation from './EagerOperation';
+import {isMsSql} from '../../utils/knexUtils';
 
 export default class WhereInEagerOperation extends EagerOperation {
 
@@ -9,6 +12,19 @@ export default class WhereInEagerOperation extends EagerOperation {
 
     this.relationsToFetch = [];
     this.omitProps = [];
+  }
+
+  batchSize(knex) {
+    if (isMsSql(knex)) {
+      // On MSSQL the parameter limit is actually 2100, but since I couldn't figure out
+      // if the limit is for all parameters in a query or for individual clauses, we set
+      // the limit to 2000 to leave 100 parameters for where clauses etc.
+      return 2000;
+    } else {
+      // I'm sure there is some kind of limit for other databases too, but let's lower
+      // this if someone ever hits those limits.
+      return 10000;
+    }
   }
 
   clone(props) {
@@ -92,7 +108,7 @@ export default class WhereInEagerOperation extends EagerOperation {
       const relation = this.relationsToFetch[i].relation;
       const childExpression = this.relationsToFetch[i].childExpression;
 
-      promises.push(this._fetchRelation(builder, models, relation, childExpression));
+      promises.push(this.fetchRelation(builder, models, relation, childExpression));
     }
 
     return Promise.all(promises).then(() => {
@@ -112,7 +128,16 @@ export default class WhereInEagerOperation extends EagerOperation {
     })
   }
 
-  _fetchRelation(builder, models, relation, childExpression) {
+  fetchRelation(builder, models, relation, childExpression) {
+    const batchSize = this.batchSize(builder.knex());
+    const modelBatches = chunk(models, batchSize);
+
+    return Promise
+      .map(modelBatches, batch => this.fetchRelationBatch(builder, batch, relation, childExpression))
+      .then(flatten);
+  }
+
+  fetchRelationBatch(builder, models, relation, childExpression) {
     const queryBuilder = relation.ownerModelClass.RelatedQueryBuilder
       .forClass(relation.relatedModelClass)
       .childQueryOf(builder)
