@@ -39,7 +39,7 @@ export default class AjvValidator extends Validator {
 
     const validator = this.getJsonSchemaValidator(model.constructor, ctx.jsonSchema, !!options.patch);
 
-    if (!options.patch && this.setsDefaultValues(ctx.jsonSchema)) {
+    if (!options.mutable && !options.patch && this.setsDefaultValues(ctx.jsonSchema)) {
       json = _.cloneDeep(json);
     }
 

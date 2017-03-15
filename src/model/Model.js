@@ -38,6 +38,7 @@ const WhereInEagerAlgorithm = () => {
  *
  * @property {boolean} [patch]
  * @property {boolean} [skipValidation]
+ * @property {boolean} [mutable]
  * @property {Model} [old]
  */
 
@@ -232,10 +233,14 @@ export default class Model {
    * @throws {ValidationError}
    * @return {Object}
    */
-  $validate(json = this, options = {}) {
+  $validate(json = this, options) {
+    options = options || {};
+
     if (json instanceof Model) {
       // Strip away relations and other internal stuff.
       json = cloneModel(json, true, true);
+      // We can mutate `json` now that we took a copy of it.
+      options.mutable = true;
     }
 
     if (options.skipValidation) {
