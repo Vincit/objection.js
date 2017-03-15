@@ -65,6 +65,14 @@ export default class QueryBuilderBase extends QueryBuilderOperationSupport {
     return this;
   }
 
+  clearSelect() {
+    return this.clear(QueryBuilderBase.SelectSelector);
+  }
+
+  clearWhere() {
+    return this.clear(QueryBuilderBase.WhereSelector);
+  }
+
   /**
    * @returns {QueryBuilderBase}
    */
