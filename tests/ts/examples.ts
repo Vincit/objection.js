@@ -224,7 +224,7 @@ const p: Promise<string> = qb.then(() => 'done');
 
 // Verify that we can insert a partial model and relate a partial movie
 Person.query()
-  .insertAndFetch({firstName: "Jim"})
+  .insertAndFetch({firstName: "Jim"} as Partial<Person>)
   .then((p: Person) => {
     console.log(`Inserted ${p}`);
     p.$loadRelated('movies')
