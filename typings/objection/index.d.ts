@@ -14,9 +14,11 @@ declare module "objection" {
     skipValidation: boolean;
   }
 
-  export interface ValidationError {
+  export class ValidationError extends Error {
+    constructor(errors: any);
     statusCode: number;
     data: any;
+    message: string;
   }
 
   export type RelationMappings = { [relationName: string]: RelationMapping };
