@@ -74,14 +74,14 @@ export default class QueryBuilderOperationSupport {
   }
 
   /**
-   * @param {Object} opt
-   * @returns {Object|QueryBuilderOperationSupport}
+   * @param {Object|InternalOptions} opt
+   * @returns {InternalOptions|QueryBuilderOperationSupport}
    */
   internalOptions(opt) {
     if (arguments.length === 0) {
       return this._context.options;
     } else {
-      this._context.options = Object.assign({}, this._context.options, opt);
+      Object.assign(this._context.options, opt);
       return this;
     }
   }
@@ -299,15 +299,8 @@ export default class QueryBuilderOperationSupport {
    * @returns {QueryBuilderOperationSupport}
    */
   skipUndefined() {
-    this._context.skipUndefined = true;
+    this._context.options.skipUndefined = true;
     return this;
-  }
-
-  /**
-   * @returns {boolean}
-   */
-  shouldSkipUndefined() {
-    return this._context.skipUndefined;
   }
 
   /**

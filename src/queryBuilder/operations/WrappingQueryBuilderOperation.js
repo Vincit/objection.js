@@ -23,7 +23,7 @@ function wrapArgs(op, builder, args) {
   // Preventing cyclic deps
   QueryBuilderBase = QueryBuilderBase || requireQueryBuilderBase();
 
-  const skipUndefined = builder.shouldSkipUndefined();
+  const skipUndefined = builder.internalOptions().skipUndefined;
   const knex = builder.knex();
 
   for (let i = 0, l = args.length; i < l; ++i) {

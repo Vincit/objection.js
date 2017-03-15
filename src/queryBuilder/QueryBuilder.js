@@ -490,7 +490,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     let rawQuery = knex.raw(query).wrap('(', ') as temp');
     let countQuery = knex.count('* as count').from(rawQuery);
 
-    if (this.internalContext().debug) {
+    if (this.internalOptions().debug) {
       countQuery.debug();
     }
 
@@ -853,7 +853,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   debug() {
-    this.internalContext().debug = true;
+    this.internalOptions().debug = true;
     this.internalContext().onBuild.push(builder => {
       builder.callKnexQueryBuilderOperation('debug', []);
     });
