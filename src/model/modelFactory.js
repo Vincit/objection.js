@@ -101,10 +101,8 @@ function splitDeepOne(obj, modelClass, ctx) {
 
     if (relatedObjs) {
       model[relation.name] = splitDeep(relatedObjs, relatedModelClass, ctx);
-    } else {
-      if (relatedObjs !== undefined) {
-        model[relation.name] = relatedObjs;
-      }
+    } else if (relatedObjs !== undefined) {
+      model[relation.name] = relatedObjs;
     }
   }
 

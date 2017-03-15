@@ -516,7 +516,13 @@ export default class Model {
         omitObject(this, keys);
       }
     } else {
-      omitArray(this, _.toArray(arguments));
+      const keys = new Array(arguments.length);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        keys[i] = arguments[i];
+      }
+
+      omitArray(this, keys);
     }
 
     return this;
@@ -536,7 +542,13 @@ export default class Model {
         pickObject(this, keys);
       }
     } else {
-      pickArray(this, _.toArray(arguments));
+      const keys = new Array(arguments.length);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        keys[i] = arguments[i];
+      }
+
+      pickArray(this, keys);
     }
 
     return this;

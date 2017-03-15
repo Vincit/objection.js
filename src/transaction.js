@@ -12,8 +12,13 @@ export default function transaction() {
     return Promise.reject(new Error('objection.transaction: provide at least one Model class to bind to the transaction or a knex instance'));
   }
 
-  if (!isSubclassOf(arguments[0], Model) && _.isFunction(arguments[0].transaction)) {
-    let args = _.toArray(arguments);
+  let args = new Array(arguments.length);
+
+  for (let i = 0, l = args.length; i < l; ++i) {
+    args[i] = arguments[i];
+  }
+
+  if (!isSubclassOf(args[0], Model) && _.isFunction(args[0].transaction)) {
     let knex = _.first(args);
     args = args.slice(1);
 
@@ -25,8 +30,8 @@ export default function transaction() {
     return knex.transaction.apply(knex, args);
   } else {
     // The last argument should be the callback and all other Model subclasses.
-    let callback = _.last(arguments);
-    let modelClasses = _.take(arguments, arguments.length - 1);
+    let callback = _.last(args);
+    let modelClasses = _.take(args, args.length - 1);
     let i;
 
     for (i = 0; i < modelClasses.length; ++i) {
