@@ -69,20 +69,17 @@ function wrapFunctionArg(func, knex) {
   return function wrappedKnexFunctionArg() {
     if (isKnexQueryBuilder(this)) {
       const knexQueryBuilder = this;
-      // Wrap knex query builder into a QueryBuilderBase so that we can use
-      // our extended query builder in nested queries.
       const wrappedQueryBuilder = new QueryBuilderBase(knex);
+
       func.call(wrappedQueryBuilder, wrappedQueryBuilder);
       wrappedQueryBuilder.buildInto(knexQueryBuilder);
-
     } else if (isKnexJoinBuilder(this)) {
       const knexQueryBuilder = this;
       const joinClauseBuilder = new JoinBuilder(knex);
+
       func.call(joinClauseBuilder, joinClauseBuilder);
       joinClauseBuilder.buildInto(knexQueryBuilder);
-
     } else {
-      // maybe someone falls here to the original knex implementation
       return func.apply(this, arguments);
     }
   };

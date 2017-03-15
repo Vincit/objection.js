@@ -67,7 +67,9 @@ export default class InsertGraphOperation extends DelegateOperation {
     // InsertOperation.call method. We need to set the queryProps option
     // so that the individual inserts started by insertFunc all get their
     // query properties.
-    builder = builder.clone().internalOptions({queryProps: this.queryProps});
+    builder = builder.clone().internalOptions({
+      queryProps: this.queryProps
+    });
 
     const ModelClass = builder.modelClass();
     const insertFunc = insertFuncBuilder(builder);

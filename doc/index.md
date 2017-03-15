@@ -546,8 +546,8 @@ class Person extends Model {
       relation: Model.HasManyRelation,
       modelClass: Animal,
       join: {
-        from: 'animal.id',
-        to: 'person.ownerId'
+        from: 'person.id',
+        to: 'animal.ownerId'
       }
     }
   }
