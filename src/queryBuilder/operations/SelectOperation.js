@@ -32,6 +32,12 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
 
   call(builder, args) {
     const selections = _.flatten(args);
+
+    // Don't add an empty selection.
+    if (selections.length === 0) {
+      return false;
+    }
+
     const ret = super.call(builder, selections);
 
     for (let i = 0, l = selections.length; i < l; ++i) {
