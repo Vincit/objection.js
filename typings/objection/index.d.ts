@@ -93,9 +93,6 @@ declare module "objection" {
 
   type IdOrIds = Id | Ids;
 
-  type ModelOrObject = Model | Object
-  type ModelsOrObjects = ModelOrObject | Model[] | Object[];
-
   type RelationOptions = { alias: boolean | string };
 
   interface JoinRelation {
@@ -304,15 +301,14 @@ declare module "objection" {
   export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
   interface Insert<T> {
-    <M extends Model[] | Object[]>(modelsOrObjects?: M): QueryBuilder<T>;
-    <M extends ModelOrObject>(modelOrObject?: M): QueryBuilderSingle<T>;
+    (modelsOrObjects?: Array<Partial<T>>): QueryBuilder<T>;
+    (modelOrObject?: Partial<T>): QueryBuilderSingle<T>;
     (): this;
   }
 
   interface InsertGraphAndFetch<T> {
-    (modelsOrObjects: Model): QueryBuilderSingle<T>;
-    (modelsOrObjects: Model[]): QueryBuilder<T>;
-    (modelsOrObjects?: ModelsOrObjects): QueryBuilderBase<T>;
+    (modelsOrObjects?: Partial<T>): QueryBuilderSingle<T>;
+    (modelsOrObjects?: Partial<T>[]): QueryBuilder<T>;
   }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
@@ -321,8 +317,8 @@ declare module "objection" {
     findById(idOrIds: IdOrIds): this;
 
     insert: Insert<T>;
-    insertAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
-    insertAndFetch(modelsOrObjects?: ModelsOrObjects): QueryBuilder<T>;
+    insertAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
+    insertAndFetch(modelsOrObjects?: Partial<T>[]): QueryBuilder<T>;
 
     insertGraph: Insert<T>;
     insertGraphAndFetch: InsertGraphAndFetch<T>
@@ -336,23 +332,23 @@ declare module "objection" {
     /**
      * @return a Promise of the number of updated rows
      */
-    update(modelOrObject: ModelOrObject): QueryBuilderSingle<number>;
-    updateAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
-    updateAndFetchById(id: Id, modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    update(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
+    updateAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
+    updateAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
     /**
      * @return a Promise of the number of patched rows
      */
-    patch(modelOrObject: ModelOrObject): QueryBuilderSingle<number>;
-    patchAndFetchById(id: Id, modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
-    patchAndFetch(modelOrObject: ModelOrObject): QueryBuilderSingle<T>;
+    patch(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
+    patchAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
+    patchAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
     /**
      * @return a Promise of the number of deleted rows
      */
     deleteById(idOrIds: IdOrIds): QueryBuilderSingle<number>;
 
-    relate(ids: IdOrIds | ModelsOrObjects): this;
+    relate<M extends Model>(ids: IdOrIds | Partial<M> | Partial<M>[]): this;
     unrelate(): this;
 
     forUpdate(): this;

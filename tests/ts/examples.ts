@@ -222,3 +222,14 @@ objection.transaction.start(Person).then((trx: objection.Transaction) => {
 
 const p: Promise<string> = qb.then(() => 'done');
 
+// Verify that we can insert a partial model and relate a partial movie
+Person.query()
+  .insertAndFetch({firstName: "Jim"} as Partial<Person>)
+  .then((p: Person) => {
+    console.log(`Inserted ${p}`);
+    p.$loadRelated('movies')
+    .relate({title: 'Total Recall'} as Partial<Movie>)
+    .then((pWithMovie: Person) => {
+      console.log(`Related ${pWithMovie}`);
+    });
+  });
