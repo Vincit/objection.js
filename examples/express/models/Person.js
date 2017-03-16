@@ -75,5 +75,14 @@ Person.relationMappings = {
       from: 'Person.id',
       to: 'Person.parentId'
     }
+  },
+
+  parent: {
+    relation: Model.BelongsToOneRelation,
+    modelClass: Person,
+    join: {
+      from: 'Person.parentId',
+      to: 'Person.id'
+    }
   }
 };

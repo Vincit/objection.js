@@ -8,7 +8,8 @@ module.exports = function (app) {
   app.post('/persons', function (req, res, next) {
     Person
       .query()
-      .insertAndFetch(req.body)
+      .allowInsert('[pets, children.[pets, movies], movies, parent]')
+      .insertGraph(req.body)
       .then(function (person) { res.send(person); })
       .catch(next);
   });
@@ -121,14 +122,14 @@ module.exports = function (app) {
   app.post('/persons/:id/movies', function (req, res, next) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    objection.transaction(Person, function (Person) {
+    objection.transaction(Person.knex(), function (trx) {
       return Person
-        .query()
+        .query(trx)
         .findById(req.params.id)
         .then(function (person) {
           if (!person) { throwNotFound(); }
           return person
-            .$relatedQuery('movies')
+            .$relatedQuery('movies', trx)
             .insert(req.body);
         });
     }).then(function (movie) {

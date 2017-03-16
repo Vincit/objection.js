@@ -6,11 +6,13 @@ const Movie = require('./models/Movie');
 
 module.exports = function (app) {
 
-  // Create a new Person.
+  // Create a new Person. You can pass relations with the person
+  // and they also get inserted.
   app.post('/persons', function* (req, res) {
     const person = yield Person
       .query()
-      .insertAndFetch(req.body);
+      .allowInsert('[pets, children.[pets, movies], movies, parent]')
+      .insertGraph(req.body);
 
     res.send(person);
   });
@@ -49,8 +51,7 @@ module.exports = function (app) {
       .filterEager('children.pets', function (builder) {
         // Only fetch dogs for children.
         builder.where('species', 'dog')
-      })
-      .then(function (persons) { res.send(persons); })
+      });
       
     res.send(persons);
   });
@@ -130,9 +131,9 @@ module.exports = function (app) {
   app.post('/persons/:id/movies', function* (req, res) {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    const movie = yield transaction(Person, function* (Person) {
+    const movie = yield transaction(Person.knex(), function* (trx) {
       const person = yield Person
-        .query()
+        .query(trx)
         .findById(req.params.id);
 
       if (!person) {
@@ -140,7 +141,7 @@ module.exports = function (app) {
       }
        
       return yield person
-        .$relatedQuery('movies')
+        .$relatedQuery('movies', trx)
         .insert(req.body); 
     });
     
@@ -177,7 +178,6 @@ module.exports = function (app) {
     }
 
     const actors = yield movie.$relatedQuery('actors');
-    
     res.send(actors);
   });
 };

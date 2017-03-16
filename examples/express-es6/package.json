@@ -1,6 +1,6 @@
 {
   "name": "objection-example-express-es6",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Objection.js express ES6 example",
   "main": "app.js",
   "scripts": {
@@ -12,10 +12,11 @@
     "bluebird": "^3.3.5",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "knex": "^0.10.0",
+    "express-yields": "^1.0.2",
+    "knex": "^0.12.0",
     "lodash": "^4.12.0",
     "morgan": "^1.7.0",
-    "objection": "^0.6.0",
+    "objection": "^0.7.0",
     "sqlite3": "^3.1.3"
   }
 }

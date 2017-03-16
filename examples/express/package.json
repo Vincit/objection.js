@@ -1,6 +1,6 @@
 {
   "name": "objection-example-express",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Objection.js express example",
   "main": "app.js",
   "scripts": {
@@ -11,9 +11,9 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "knex": "^0.10.0",
+    "knex": "^0.12.0",
     "morgan": "^1.7.0",
-    "objection": "^0.6.0",
+    "objection": "^0.7.0",
     "sqlite3": "^3.1.3"
   }
 }

@@ -1,21 +1,22 @@
-import * as objection from 'objection';
+import { transaction } from 'objection';
 import Person from './models/Person';
 import Movie from './models/Movie';
 
-export default function (app) {
+export default function (router) {
 
   // Create a new Person.
-  app.post('/persons', async function (req, res) {
+  router.post('/persons', async (req, res) => {
     const person = await Person
       .query()
-      .insert(req.body);
+      .allowInsert('[pets, children.[pets, movies], movies, parent]')
+      .insertGraph(req.body);
       
     res.send(person);
   });
 
 
   // Patch a Person.
-  app.patch('/persons/:id', async function (req, res) {
+  router.patch('/persons/:id', async (req, res) => {
     const person = await Person
       .query()
       .patchAndFetchById(req.params.id, req.body);
@@ -27,7 +28,7 @@ export default function (app) {
   // Get all Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
-  app.get('/persons', async function (req, res) {
+  router.get('/persons', async (req, res) => {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
@@ -45,7 +46,7 @@ export default function (app) {
 
 
   // Delete a person.
-  app.delete('/persons/:id', async function (req, res) {
+  router.delete('/persons/:id', async (req, res) => {
     await Person
       .query()
       .delete()
@@ -56,7 +57,7 @@ export default function (app) {
 
 
   // Add a child for a Person.
-  app.post('/persons/:id/children', async function (req, res) {
+  router.post('/persons/:id/children', async (req, res) => {
     const person = await Person
       .query()
       .findById(req.params.id);
@@ -74,7 +75,7 @@ export default function (app) {
 
 
   // Add a pet for a Person.
-  app.post('/persons/:id/pets', async function (req, res) {
+  router.post('/persons/:id/pets', async (req, res) => {
     const person = await Person
       .query()
       .findById(req.params.id);
@@ -93,7 +94,7 @@ export default function (app) {
 
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
-  app.get('/persons/:id/pets', async function (req, res) {
+  router.get('/persons/:id/pets', async (req, res) => {
     const person = await Person
       .query()
       .findById(req.params.id);
@@ -116,12 +117,12 @@ export default function (app) {
 
 
   // Add a movie for a Person.
-  app.post('/persons/:id/movies', async function (req, res) {
+  router.post('/persons/:id/movies', async (req, res) => {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    const movie = await objection.transaction(Person, async function (Person) {
+    const movie = await transaction(Person.knex(), async function (trx) {
       const person = await Person
-        .query()
+        .query(trx)
         .findById(req.params.id);
 
       if (!person) {
@@ -129,7 +130,7 @@ export default function (app) {
       }
        
       return await person
-        .$relatedQuery('movies')
+        .$relatedQuery('movies', trx)
         .insert(req.body); 
     });
     
@@ -138,7 +139,7 @@ export default function (app) {
 
 
   // Add existing Person as an actor to a movie.
-  app.post('/movies/:id/actors', async function (req, res) {
+  router.post('/movies/:id/actors', async (req, res) => {
     const movie = await Movie
       .query()
       .findById(req.params.id);
@@ -156,7 +157,7 @@ export default function (app) {
 
 
   // Get Movie's actors.
-  app.get('/movies/:id/actors', async function (req, res) {
+  router.get('/movies/:id/actors', async (req, res) => {
     const movie = await Movie
       .query()
       .findById(req.params.id);
@@ -171,7 +172,7 @@ export default function (app) {
   });
 };
 
-// The error thrown by this function is handled in the error handler middleware in app.js.
+// The error thrown by this function is handled in the error handler middleware in router.js.
 function throwNotFound() {
   const error = new Error();
   error.statusCode = 404;

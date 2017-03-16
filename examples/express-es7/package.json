@@ -1,10 +1,10 @@
 {
   "name": "objection-example-express-es7",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Objection.js express ES7 example",
   "main": "app.js",
   "scripts": {
-    "start": "node_modules/babel-cli/bin/babel-node.js --presets stage-0,es2015 --plugins transform-class-properties app"
+    "start": "babel-node --presets stage-0,es2015 --plugins transform-class-properties app"
   },
   "author": "Sami Koskimäki",
   "license": "MIT",
@@ -15,10 +15,11 @@
     "babel-preset-stage-0": "^6.5.0",
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "knex": "^0.10.0",
+    "express-promise-router": "^1.1.1",
+    "knex": "^0.12.0",
     "lodash": "^4.12.0",
     "morgan": "^1.7.0",
-    "objection": "^0.6.0",
+    "objection": "^0.7.0",
     "sqlite3": "^3.1.3"
   }
 }

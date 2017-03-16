@@ -72,6 +72,15 @@ class Person extends Model {
           from: 'Person.id',
           to: 'Person.parentId'
         }
+      },
+
+      parent: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.parentId',
+          to: 'Person.id'
+        }
       }
     };
   }
