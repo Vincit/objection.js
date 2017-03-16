@@ -6115,9 +6115,23 @@ opt|[`ModelOptions`](#modeloptions)|Optional options
 #### $parseDatabaseJson
 
 ```js
+class Person extends Model {
+  $parseDatabaseJson(json) {
+    // Remember to call the super class's implementation.
+    json = super.$parseDatabaseJson(json);
+    // Do your conversion here.
+    return json;
+  }
+}
+```
+
+> ES5
+
+```js
 Person.prototype.$parseDatabaseJson = function (json) {
   // Remember to call the super class's implementation.
   json = Model.prototype.$parseDatabaseJson.call(this, json);
+  // Do your conversion here.
   return json;
 }
 ```
@@ -6126,11 +6140,17 @@ This is called when a [`Model`](#model) is created from a database JSON object.
 
 Converts the JSON object from the database format to the internal format.
 
-This function must be able to handle any subset of model's properties coming in.
-You cannot assume that some column is present in the `json` object as it depends
-on the select statement. There can also be additional columns because of joins,
-aliases etc. This method must also be prepared for null values in _any_ property
-of the `json` object.
+There are a couple of requirements for the implementation:
+
+    1. This function must be pure. It should't have any side effects because it is called
+       from "unexpected" places (for example to determine if your model somehow transforms
+       column names between db and code).
+
+    2. This function must be able to handle any subset of model's properties coming in.
+       You cannot assume that some column is present in the `json` object as it depends
+       on the select statement. There can also be additional columns because of joins,
+       aliases etc. This method must also be prepared for null values in _any_ property
+       of the `json` object.
 
 ##### Arguments
 
@@ -6150,9 +6170,23 @@ Object|The JSON object in internal format
 #### $formatDatabaseJson
 
 ```js
+class Person extends Model {
+  $formatDatabaseJson(json) {
+    // Remember to call the super class's implementation.
+    json = super.$formatDatabaseJson(json);
+    // Do your conversion here.
+    return json;
+  }
+}
+```
+
+> ES5
+
+```js
 Person.prototype.$formatDatabaseJson = function (json) {
   // Remember to call the super class's implementation.
   json = Model.prototype.$formatDatabaseJson.call(this, json);
+  // Do your conversion here.
   return json;
 }
 ```
@@ -6161,10 +6195,16 @@ This is called when a [`Model`](#model) is converted to database format.
 
 Converts the JSON object from the internal format to the database format.
 
-This function must be able to handle any subset of model's properties coming in.
-You cannot assume that some property is present in the `json` object. There can
-also be additional properties. This method must also be prepared for null values
-in _any_ property of the `json` object.
+There are a couple of requirements for the implementation:
+
+    1. This function must be pure. It should't have any side effects because it is called
+       from "unexpected" places (for example to determine if your model somehow transforms
+       column names between db and code).
+
+    2. This function must be able to handle any subset of model's properties coming in.
+       You cannot assume that some property is present in the `json` object. There can
+       also be additional properties. This method must also be prepared for null values
+       in _any_ property of the `json` object.
 
 ##### Arguments
 
@@ -6184,9 +6224,23 @@ Object|The JSON object in database format
 #### $parseJson
 
 ```js
+class Person extends Model {
+  $parseJson(json, opt) {
+    // Remember to call the super class's implementation.
+    json = super.$parseJson(json, opt);
+    // Do your conversion here.
+    return json;
+  }
+}
+```
+
+> ES5
+
+```js
 Person.prototype.$parseJson = function (json, opt) {
   // Remember to call the super class's implementation.
   json = Model.prototype.$parseJson.call(this, json, opt);
+  // Do your conversion here.
   return json;
 }
 ```
@@ -6195,10 +6249,16 @@ This is called when a [`Model`](#model) is created from a JSON object.
 
 Converts the JSON object from the external format to the internal format.
 
-This function must be able to handle any subset of model's properties coming in.
-You cannot assume that some property is present in the `json` object. There can
-also be additional properties. This method must also be prepared for null values
-in _any_ property of the `json` object.
+There are a couple of requirements for the implementation:
+
+    1. This function must be pure. It should't have any side effects because it is called
+       from "unexpected" places (for example to determine if your model somehow transforms
+       column names between db and code).
+
+    2. This function must be able to handle any subset of model's properties coming in.
+       You cannot assume that some property is present in the `json` object. There can
+       also be additional properties. This method must also be prepared for null values
+       in _any_ property of the `json` object.
 
 ##### Arguments
 
@@ -6219,9 +6279,23 @@ Object|The JSON object in internal format
 #### $formatJson
 
 ```js
+class Person extends Model {
+  $formatJson(json) {
+    // Remember to call the super class's implementation.
+    json = super.$formatJson(json);
+    // Do your conversion here.
+    return json;
+  }
+}
+```
+
+> ES5
+
+```js
 Person.prototype.$formatJson = function (json) {
   // Remember to call the super class's implementation.
   json = Model.prototype.$formatJson.call(this, json);
+  // Do your conversion here.
   return json;
 }
 ```
@@ -6230,10 +6304,18 @@ This is called when a [`Model`](#model) is converted to JSON.
 
 Converts the JSON object from the internal format to the external format.
 
-This function must be able to handle any subset of model's properties coming in.
-You cannot assume that some property is present in the `json` object. There can
-also be additional properties. This method must also be prepared for null values
-in _any_ property of the `json` object.
+There are a couple of requirements for the implementation:
+
+    1. This function must be pure. It should't have any side effects because it is called
+       from "unexpected" places (for example to determine if your model somehow transforms
+       column names between db and code).
+
+    2. This function must be able to handle any subset of model's properties coming in.
+       You cannot assume that some column is present in the `json` object as it depends
+       on the select statement. There can also be additional columns because of joins,
+       aliases etc. This method must also be prepared for null values in _any_ property
+       of the `json` object.
+
 
 ##### Arguments
 
