@@ -4,9 +4,8 @@
 git clone git@github.com:Vincit/objection.js.git objection
 cd objection/examples/express-es7
 npm install
-# We use knex for migrations in this example.
-npm install knex -g
-knex migrate:latest
+# Run knex migrations
+npm run db:migrate
 # This runs the Babel transpiler and executes the app.
 npm start
 ```

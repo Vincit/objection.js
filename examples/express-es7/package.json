@@ -4,7 +4,8 @@
   "description": "Objection.js express ES7 example",
   "main": "app.js",
   "scripts": {
-    "start": "node_modules/babel-cli/bin/babel-node.js --presets stage-0,es2015 --plugins transform-class-properties app"
+    "start": "babel-node --presets stage-0,es2015 --plugins transform-class-properties app",
+    "db:migrate": "knex migrate:latest"
   },
   "author": "Sami Koskimäki",
   "license": "MIT",
