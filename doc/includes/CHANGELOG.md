@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.6
+
+### What's new
+
+ * `range` and `page` methods now use a window function and only generate one query on postgresql [#62](https://github.com/Vincit/objection.js/issues/62)
+ * fix MSSQL 2100 parameter limit in eager queries [#311](https://github.com/Vincit/objection.js/issues/311)
+
 ## 0.7.5
 
 ### What's new
