@@ -8,6 +8,13 @@ export interface Address {
 }
 
 export default class Person extends Model {
+  readonly id: number;
+  parent: Person;
+  firstName: string;
+  lastName: string;
+  age: number;
+  address: Address;
+
   // Table name is the only required property.
   static tableName = 'Person';
 
@@ -36,14 +43,16 @@ export default class Person extends Model {
     }
   };
 
+  // Where to look for models classes.
+  static modelPaths = [__dirname];
+
   // This object defines the relations to other models.
   static relationMappings: RelationMappings = {
     pets: {
       relation: Model.HasManyRelation,
-      // The related model. This can be either a Model subclass constructor or an
-      // absolute file path to a module that exports one. We use the file path version
-      // here to prevent require loops.
-      modelClass: join(__dirname, 'Animal'),
+      // This model defines the `modelPaths` property. Therefore we can simply use
+      // the model module names in `modelClass`.
+      modelClass: 'Animal',
       join: {
         from: 'Person.id',
         to: 'Animal.ownerId'
@@ -52,7 +61,7 @@ export default class Person extends Model {
 
     movies: {
       relation: Model.ManyToManyRelation,
-      modelClass: join(__dirname, 'Movie'),
+      modelClass: 'Movie',
       join: {
         from: 'Person.id',
         // ManyToMany relation needs the `through` object to describe the join table.
@@ -66,20 +75,22 @@ export default class Person extends Model {
 
     children: {
       relation: Model.HasManyRelation,
-      modelClass: join(__dirname, 'Person'),
+      modelClass: Person,
       join: {
         from: 'Person.id',
         to: 'Person.parentId'
       }
+    },
+
+    parent: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: Person,
+      join: {
+        from: 'Person.parentId',
+        to: 'Person.id'
+      }
     }
   };
-
-  readonly id: number;
-  parent: Person;
-  firstName: string;
-  lastName: string;
-  age: number;
-  address: Address;
 
   examplePersonMethod(arg: string): number {
     return 1;

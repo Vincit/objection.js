@@ -3,6 +3,11 @@ import Person from './Person';
 import { join } from 'path';
 
 export default class Animal extends Model {
+  readonly id: number;
+  owner: Person;
+  name: string;
+  species: string;
+
   // Table name is the only required property.
   static tableName = 'Animal';
 
@@ -35,9 +40,4 @@ export default class Animal extends Model {
       }
     }
   };
-
-  readonly id: number;
-  owner: Person;
-  name: string;
-  species: string;
 }

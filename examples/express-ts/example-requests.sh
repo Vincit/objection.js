@@ -11,6 +11,9 @@ curl -H "Content-Type: application/json" -d '{"firstName":"Jennifer", "lastName"
 curl -H "Content-Type: application/json" -d '{"firstName":"Bradley", "lastName":"Cooper", "age":40}' http://localhost:8641/persons
 curl -H "Content-Type: application/json" -d '{"firstName":"Sylvester", "lastName":"Stallone", "age":68}' http://localhost:8641/persons
 
+# Relations can be sent along with the people.
+curl -H "Content-Type: application/json" -d '{"firstName":"Matt", "lastName":"Damon", "age":42, "parent": {"firstName": "Kent", "lastName": "Damon", "age": 70}}' http://localhost:8641/persons
+
 # Add a child for Sylvester.
 curl -H "Content-Type: application/json" -d '{"firstName":"Sage", "lastName":"Stallone", "age":36}' http://localhost:8641/persons/3/children
 

@@ -4,170 +4,168 @@ import * as express from 'express';
 import Person from './models/Person';
 import Movie from './models/Movie';
 
-export default function (app: express.Application) {
+export default function (router: express.Router) {
 
   // Create a new Person.
-  app.post('/persons', function (req, res, next) {
-    return Person
+  router.post('/persons', async (req, res) => {
+    const person = await Person
       .query()
-      .insert(req.body)
-      .then(person => res.send(person))
-      .catch(next);
+      .allowInsert('[pets, children.[pets, movies], movies, parent]')
+      .insertGraph(req.body);
+
+    res.send(person);
   });
 
   // Patch a Person.
-  app.patch('/persons/:id', function (req, res, next) {
-    return Person
+  router.patch('/persons/:id', async (req, res) => {
+    const person = await Person
       .query()
-      .patchAndFetchById(req.params.id, req.body)
-      .then(person => res.send(person))
-      .catch(next);
+      .patchAndFetchById(req.params.id, req.body);
+
+    res.send(person);
   });
 
   // Get all Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
-  app.get('/persons', function (req, res, next) {
+  router.get('/persons', async (req, res) => {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
-    return Person
+    const persons = await Person
       .query()
       .allowEager('[pets, children.[pets, movies], movies]')
       .eager(req.query.eager)
       .skipUndefined()
       .where('age', '>=', req.query.minAge)
       .where('age', '<', req.query.maxAge)
-      .where('firstName', 'like', req.query.firstName)
-      .then(persons => res.send(persons))
-      .catch(next);
+      .where('firstName', 'like', req.query.firstName);
+
+    res.send(persons);
   });
 
   // Delete a person.
-  app.delete('/persons/:id', function (req, res, next) {
-    return Person
+  router.delete('/persons/:id', async (req, res) => {
+    await Person
       .query()
       .delete()
-      .where('id', req.params.id)
-      .then(() => res.send({}))
-      .catch(next);
+      .where('id', req.params.id);
+
+    res.send({});
   });
 
   // Add a child for a Person.
-  app.post('/persons/:id/children', async function (req, res, next) {
+  router.post('/persons/:id/children', async (req, res) => {
     const person = await Person
       .query()
-      .findById(req.params.id)
-      .catch(next);
+      .findById(req.params.id);
 
     if (!person) {
-      res.sendStatus(404);
+      throwNotFound();
     } else {
-      await person
+      const child = await person
         .$relatedQuery('children')
-        .insert(req.body)
-        .then(child => res.send(child))
-        .catch(next);
+        .insert(req.body);
+
+      res.send(child);
     }
   });
 
   // Add a pet for a Person.
-  app.post('/persons/:id/pets', async function (req, res, next) {
+  router.post('/persons/:id/pets', async (req, res) => {
     const person = await Person
       .query()
-      .findById(req.params.id)
-      .catch(next);
+      .findById(req.params.id);
 
     if (!person) {
-      res.sendStatus(404);
+      throwNotFound();
     } else {
-      await person
+      const pet = await person
         .$relatedQuery('pets')
-        .insert(req.body)
-        .then(pet => res.send(pet))
-        .catch(next);
+        .insert(req.body);
+
+      res.send(pet);
     }
   });
 
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
-  app.get('/persons/:id/pets', async function (req, res, next) {
+  router.get('/persons/:id/pets', async (req, res) => {
     const person = await Person
       .query()
-      .findById(req.params.id)
-      .catch(next);
+      .findById(req.params.id);
 
     if (!person) {
-      res.sendStatus(404);
+      throwNotFound();
     } else {
-
       // We don't need to check for the existence of the query parameters because
       // we call the `skipUndefined` method. It causes the query builder methods
       // to do nothing if one of the values is undefined.
-      return person
+      const pets = await person
         .$relatedQuery('pets')
         .skipUndefined()
         .where('name', 'like', req.query.name)
-        .where('species', req.query.species)
-        .then(pets => res.send(pets))
-        .catch(next);
+        .where('species', req.query.species);
+
+      res.send(pets);
     }
   });
 
   // Add a movie for a Person.
-  app.post('/persons/:id/movies', function (req, res, next) {
+  router.post('/persons/:id/movies', async (req, res) => {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    return objection.transaction(Person, async (Person) => {
+    const movie = await objection.transaction(Person, async (Person) => {
       const person = await Person
         .query()
-        .findById(req.params.id)
-        .catch(next);
+        .findById(req.params.id);
 
       if (!person) {
-        res.sendStatus(404);
+        return throwNotFound();
       } else {
-        await person
+        return person
           .$relatedQuery('movies')
-          .insert(req.body)
-          .then(movie => res.send(movie))
-          .catch(next);
+          .insert(req.body);
       }
     });
+
+    res.send(movie);
   });
 
   // Add existing Person as an actor to a movie.
-  app.post('/movies/:id/actors', async function (req, res, next) {
+  router.post('/movies/:id/actors', async (req, res) => {
     const movie = await Movie
       .query()
-      .findById(req.params.id)
-      .catch(next);
+      .findById(req.params.id);
 
     if (!movie) {
-      res.sendStatus(404);
+      throwNotFound();
     } else {
       await movie
         .$relatedQuery('actors')
-        .relate(req.body.id)
-        .then(() => res.send(req.body))
-        .catch(next);
+        .relate(req.body.id);
+
+      res.send(req.body);
     }
   });
 
   // Get Movie's actors.
-  app.get('/movies/:id/actors', async function (req, res, next) {
+  router.get('/movies/:id/actors', async (req, res) => {
     const movie = await Movie
       .query()
-      .findById(req.params.id)
-      .catch(next);
+      .findById(req.params.id);
 
     if (!movie) {
-      res.sendStatus(404);
+      throwNotFound();
     } else {
-      await movie
-        .$relatedQuery('actors')
-        .then(movie => res.send(movie))
-        .catch(next);
+      const actors = await movie.$relatedQuery('actors');
+      res.send(actors);
     }
   });
 };
+
+function throwNotFound() {
+  const err: any = new Error();
+  err.statusCode = 404;
+  throw err;
+}

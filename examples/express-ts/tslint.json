@@ -1,6 +1,10 @@
 {
   "extends": ["tslint-config-standard"],
   "rules": {
-    "semicolon": [true, "always"]
+    "semicolon": [true, "always"],
+    "space-before-function-paren": false,
+    "member-ordering": [
+      "fields-first"
+    ]
   }
 }

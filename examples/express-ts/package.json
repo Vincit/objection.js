@@ -1,6 +1,6 @@
 {
   "name": "objection-example-express-ts",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Objection.js express TypeScript example",
   "main": "app.js",
   "scripts": {
@@ -16,10 +16,11 @@
   "dependencies": {
     "body-parser": "^1.16.1",
     "express": "^4.14.1",
+    "express-promise-router": "^1.1.1",
     "knex": "^0.12.7",
     "lodash": "^4.17.4",
     "morgan": "^1.8.1",
-    "objection": "../..",
+    "objection": "^0.7.0",
     "sqlite3": "^3.1.8"
   },
   "devDependencies": {
