@@ -9350,9 +9350,23 @@ for an existing object.</p>
 </tbody></table>
 
 <h4 id="parsedatabasejson">$parseDatabaseJson</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Remember to call the super class's implementation.</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+    <span class="c1">// Do your conversion here.</span>
+    <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Remember to call the super class's implementation.</span>
   <span class="nx">json</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
+  <span class="c1">// Do your conversion here.</span>
   <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
@@ -9361,11 +9375,17 @@ for an existing object.</p>
 
 <p>Converts the JSON object from the database format to the internal format.</p>
 
-<p>This function must be able to handle any subset of model&rsquo;s properties coming in.
-You cannot assume that some column is present in the <code class="prettyprint">json</code> object as it depends
-on the select statement. There can also be additional columns because of joins,
-aliases etc. This method must also be prepared for null values in <em>any</em> property
-of the <code class="prettyprint">json</code> object.</p>
+<p>There are a couple of requirements for the implementation:</p>
+
+<p>1. This function must be pure. It should&rsquo;t have any side effects because it is called
+       from &ldquo;unexpected&rdquo; places (for example to determine if your model somehow transforms
+       column names between db and code).</p>
+
+<p>2. This function must be able to handle any subset of model&rsquo;s properties coming in.
+       You cannot assume that some column is present in the <code class="prettyprint">json</code> object as it depends
+       on the select statement. There can also be additional columns because of joins,
+       aliases etc. This method must also be prepared for null values in <em>any</em> property
+       of the <code class="prettyprint">json</code> object.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -9398,9 +9418,23 @@ of the <code class="prettyprint">json</code> object.</p>
 </tbody></table>
 
 <h4 id="formatdatabasejson">$formatDatabaseJson</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$formatDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Remember to call the super class's implementation.</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+    <span class="c1">// Do your conversion here.</span>
+    <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Remember to call the super class's implementation.</span>
   <span class="nx">json</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
+  <span class="c1">// Do your conversion here.</span>
   <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
@@ -9409,10 +9443,16 @@ of the <code class="prettyprint">json</code> object.</p>
 
 <p>Converts the JSON object from the internal format to the database format.</p>
 
-<p>This function must be able to handle any subset of model&rsquo;s properties coming in.
-You cannot assume that some property is present in the <code class="prettyprint">json</code> object. There can
-also be additional properties. This method must also be prepared for null values
-in <em>any</em> property of the <code class="prettyprint">json</code> object.</p>
+<p>There are a couple of requirements for the implementation:</p>
+
+<p>1. This function must be pure. It should&rsquo;t have any side effects because it is called
+       from &ldquo;unexpected&rdquo; places (for example to determine if your model somehow transforms
+       column names between db and code).</p>
+
+<p>2. This function must be able to handle any subset of model&rsquo;s properties coming in.
+       You cannot assume that some property is present in the <code class="prettyprint">json</code> object. There can
+       also be additional properties. This method must also be prepared for null values
+       in <em>any</em> property of the <code class="prettyprint">json</code> object.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -9445,9 +9485,23 @@ in <em>any</em> property of the <code class="prettyprint">json</code> object.</p
 </tbody></table>
 
 <h4 id="parsejson">$parseJson</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$parseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Remember to call the super class's implementation.</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$parseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+    <span class="c1">// Do your conversion here.</span>
+    <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Remember to call the super class's implementation.</span>
   <span class="nx">json</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+  <span class="c1">// Do your conversion here.</span>
   <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
@@ -9456,10 +9510,16 @@ in <em>any</em> property of the <code class="prettyprint">json</code> object.</p
 
 <p>Converts the JSON object from the external format to the internal format.</p>
 
-<p>This function must be able to handle any subset of model&rsquo;s properties coming in.
-You cannot assume that some property is present in the <code class="prettyprint">json</code> object. There can
-also be additional properties. This method must also be prepared for null values
-in <em>any</em> property of the <code class="prettyprint">json</code> object.</p>
+<p>There are a couple of requirements for the implementation:</p>
+
+<p>1. This function must be pure. It should&rsquo;t have any side effects because it is called
+       from &ldquo;unexpected&rdquo; places (for example to determine if your model somehow transforms
+       column names between db and code).</p>
+
+<p>2. This function must be able to handle any subset of model&rsquo;s properties coming in.
+       You cannot assume that some property is present in the <code class="prettyprint">json</code> object. There can
+       also be additional properties. This method must also be prepared for null values
+       in <em>any</em> property of the <code class="prettyprint">json</code> object.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -9497,9 +9557,23 @@ in <em>any</em> property of the <code class="prettyprint">json</code> object.</p
 </tbody></table>
 
 <h4 id="formatjson">$formatJson</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$formatJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Remember to call the super class's implementation.</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$formatJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+    <span class="c1">// Do your conversion here.</span>
+    <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
   <span class="c1">// Remember to call the super class's implementation.</span>
   <span class="nx">json</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
+  <span class="c1">// Do your conversion here.</span>
   <span class="k">return</span> <span class="nx">json</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
@@ -9508,10 +9582,17 @@ in <em>any</em> property of the <code class="prettyprint">json</code> object.</p
 
 <p>Converts the JSON object from the internal format to the external format.</p>
 
-<p>This function must be able to handle any subset of model&rsquo;s properties coming in.
-You cannot assume that some property is present in the <code class="prettyprint">json</code> object. There can
-also be additional properties. This method must also be prepared for null values
-in <em>any</em> property of the <code class="prettyprint">json</code> object.</p>
+<p>There are a couple of requirements for the implementation:</p>
+
+<p>1. This function must be pure. It should&rsquo;t have any side effects because it is called
+       from &ldquo;unexpected&rdquo; places (for example to determine if your model somehow transforms
+       column names between db and code).</p>
+
+<p>2. This function must be able to handle any subset of model&rsquo;s properties coming in.
+       You cannot assume that some column is present in the <code class="prettyprint">json</code> object as it depends
+       on the select statement. There can also be additional columns because of joins,
+       aliases etc. This method must also be prepared for null values in <em>any</em> property
+       of the <code class="prettyprint">json</code> object.</p>
 
 <h5 id="arguments">Arguments</h5>
 
