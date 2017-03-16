@@ -4815,6 +4815,12 @@ Note that this executes a query (not the one we are building) and returns a Prom
 
 <p>Only returns the given page of results.</p>
 
+<p>On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
+(the query itself, and a separate count query) are executed. Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and
+<code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size, but according to my tests and
+<a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the performance is significantly worse
+than just executing a separate count query.</p>
+
 <h5 id="arguments">Arguments</h5>
 
 <table><thead>
@@ -4863,7 +4869,27 @@ Note that this executes a query (not the one we are building) and returns a Prom
   <span class="p">});</span>
 </code></pre>
 
+<blockquote>
+<p><code class="prettyprint">range</code> can be called without arguments if you want to specify the limit and offset explicitly:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">range</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 101</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
+  <span class="p">});</span>
+</code></pre>
+
 <p>Only returns the given range of results.</p>
+
+<p>On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
+(the query itself, and a separate count query) are executed. Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and
+<code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size, but according to my tests and
+<a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the performance is significantly worse
+than just executing a separate count query.</p>
 
 <h5 id="arguments">Arguments</h5>
 
