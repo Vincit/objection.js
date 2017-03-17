@@ -586,133 +586,241 @@ module.exports = function (session) {
       }]);
     });
 
-    it('should be able to refer to joined relations with syntax Table:rel1:rel2.col (JoinEagerAlgorithm)', function () {
-      return Model1
-        .query()
-        .where('Model1.id', 1)
-        .where('model1Relation2.id_col', 2)
-        .eager('[model1Relation1, model1Relation2.model2Relation1]')
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .then(function (models) {
-          expect(models).to.eql([{
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterGetCalled: 1,
+    describe('JoinEagerAlgorithm', function () {
 
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
+      it('should be able to refer to joined relations with syntax Table:rel1:rel2.col', function () {
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .where('model1Relation2.id_col', 2)
+          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .then(function (models) {
+            expect(models).to.eql([{
+              id: 1,
+              model1Id: 2,
+              model1Prop1: 'hello 1',
               model1Prop2: null,
-              $afterGetCalled: 1
-            },
-
-            model1Relation2: [{
-              idCol: 2,
-              model1Id: 1,
-              model2Prop1: 'hejsan 2',
-              model2Prop2: null,
               $afterGetCalled: 1,
 
-              model2Relation1: [{
-                id: 5,
-                model1Id: null,
-                model1Prop1: 'hello 5',
+              model1Relation1: {
+                id: 2,
+                model1Id: 3,
+                model1Prop1: 'hello 2',
                 model1Prop2: null,
-                aliasedExtra: 'extra 5',
                 $afterGetCalled: 1
-              }, {
-                id: 6,
-                model1Id: 7,
-                model1Prop1: 'hello 6',
-                model1Prop2: null,
-                aliasedExtra: 'extra 6',
-                $afterGetCalled: 1
-              }],
-            }],
-          }]);
-        });
-    });
+              },
 
-    it('should be able to give aliases for relations (JoinEagerAlgorithm)', function () {
-      return Model1
-        .query()
-        .where('Model1.id', 1)
-        .where('mr2.id_col', 2)
-        .eager('[model1Relation1, model1Relation2.model2Relation1]')
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm, {
-          aliases: {
-            model1Relation2: 'mr2'
-          }
+              model1Relation2: [{
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                model2Prop2: null,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  id: 5,
+                  model1Id: null,
+                  model1Prop1: 'hello 5',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 5',
+                  $afterGetCalled: 1
+                }, {
+                  id: 6,
+                  model1Id: 7,
+                  model1Prop1: 'hello 6',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 6',
+                  $afterGetCalled: 1
+                }],
+              }],
+            }]);
+          });
+      });
+
+      it('should be able to give aliases for relations', function () {
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .where('mr2.id_col', 2)
+          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm, {
+            aliases: {
+              model1Relation2: 'mr2'
+            }
+          })
+          .then(function (models) {
+            expect(models).to.eql([{
+              id: 1,
+              model1Id: 2,
+              model1Prop1: 'hello 1',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+
+              model1Relation1: {
+                id: 2,
+                model1Id: 3,
+                model1Prop1: 'hello 2',
+                model1Prop2: null,
+                $afterGetCalled: 1
+              },
+
+              model1Relation2: [{
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                model2Prop2: null,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  id: 5,
+                  model1Id: null,
+                  model1Prop1: 'hello 5',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 5',
+                  $afterGetCalled: 1
+                }, {
+                  id: 6,
+                  model1Id: 7,
+                  model1Prop1: 'hello 6',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 6',
+                  $afterGetCalled: 1
+                }],
+              }],
+            }]);
+          });
+      });
+
+      it('relation references longer that 63 chars should throw an exception', function (done) {
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (err) {
+            expect(err.data.eager).to.equal("identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.");
+            done();
+          })
+          .catch(done);
+      });
+
+      it('relation references longer that 63 chars should NOT throw an exception if minimize: true option is given', function (done) {
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .eagerOptions({minimize: true})
+          .then(function (models) {
+            expect(models).to.eql([{
+              id: 1,
+              model1Id: 2,
+              model1Prop1: 'hello 1',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+              model1Relation1: {
+                id: 2,
+                model1Id: 3,
+                model1Prop1: 'hello 2',
+                model1Prop2: null,
+                $afterGetCalled: 1,
+                model1Relation1: {
+                  id: 3,
+                  model1Id: 4,
+                  model1Prop1: 'hello 3',
+                  model1Prop2: null,
+                  $afterGetCalled: 1,
+                  model1Relation1: {
+                    id: 4,
+                    model1Id: null,
+                    model1Prop1: 'hello 4',
+                    model1Prop2: null,
+                    $afterGetCalled: 1,
+                    model1Relation1: null,
+                  },
+                },
+              }
+            }]);
+
+            done();
+          })
+          .catch(done);
+      });
+
+      it('infinitely recursive expressions should fail', function (done) {
+        expect(function () {
+          Model1
+            .query()
+            .where('Model1.id', 1)
+            .eager('model1Relation1.^')
+            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            .then(function () {
+              done(new Error('should not get here'));
+            })
+            .catch(done);
+        }).to.throwException(function (err) {
+          expect(err.data.eager).to.equal('recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm');
+          done();
         })
-        .then(function (models) {
-          expect(models).to.eql([{
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterGetCalled: 1,
+      });
 
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
-              model1Prop2: null,
-              $afterGetCalled: 1
-            },
+      it('should fail if given missing filter', function (done) {
+        Model1
+          .query()
+          .where('id', 1)
+          .eager('model1Relation2(missingFilter)')
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (error) {
+            expect(error).to.be.a(ValidationError);
+            expect(error.data).to.have.property('eager');
+            done();
+          })
+          .catch(done);
+      });
 
-            model1Relation2: [{
-              idCol: 2,
-              model1Id: 1,
-              model2Prop1: 'hejsan 2',
-              model2Prop2: null,
-              $afterGetCalled: 1,
+      it('should fail if given missing relation', function (done) {
+        Model1
+          .query()
+          .where('id', 1)
+          .eager('invalidRelation')
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (error) {
+            expect(error).to.be.a(ValidationError);
+            expect(error.data).to.have.property('eager');
+            done();
+          })
+          .catch(done);
+      });
 
-              model2Relation1: [{
-                id: 5,
-                model1Id: null,
-                model1Prop1: 'hello 5',
-                model1Prop2: null,
-                aliasedExtra: 'extra 5',
-                $afterGetCalled: 1
-              }, {
-                id: 6,
-                model1Id: 7,
-                model1Prop1: 'hello 6',
-                model1Prop2: null,
-                aliasedExtra: 'extra 6',
-                $afterGetCalled: 1
-              }],
-            }],
-          }]);
-        });
     });
 
     describe('Model.defaultEagerOptions and Model.defaultEagerAlgorithm should be used if defined', function () {
-      var origAlgo;
-      var origOptions;
+      var TestModel;
 
       before(function () {
-        origAlgo = Model1.defaultEagerAlgorithm;
-        origOptions = Model1.defaultEagerOptions;
+        // Create a dummy mock so that we can bind Model1 to it.
+        TestModel = Model1.bindKnex(mockKnexFactory(session.knex, function (mock, oldImpl, args) {
+          return oldImpl.apply(this, args);
+        }));
 
-        Model1.defaultEagerAlgorithm = Model1.JoinEagerAlgorithm;
-        Model1.defaultEagerOptions = {
+        TestModel.defaultEagerAlgorithm = TestModel.JoinEagerAlgorithm;
+        TestModel.defaultEagerOptions = {
           aliases: {
             model1Relation2: 'mr2'
           }
         };
       });
 
-      after(function () {
-        Model1.defaultEagerAlgorithm = origAlgo;
-        Model1.defaultEagerOptions = origOptions;
-      });
-
       it('options for JoinEagerAlgorithm', function () {
-        return Model1
+        return TestModel
           .query()
           .where('Model1.id', 1)
           .where('mr2.id_col', 2)
@@ -760,114 +868,6 @@ module.exports = function (session) {
           });
       });
 
-    });
-
-    it('relation references longer that 63 chars should throw an exception (JoinEagerAlgorithm)', function (done) {
-      return Model1
-        .query()
-        .where('Model1.id', 1)
-        .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .then(function () {
-          done(new Error('should not get here'));
-        })
-        .catch(function (err) {
-          expect(err.data.eager).to.equal("identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.");
-          done();
-        })
-        .catch(done);
-    });
-
-    it('relation references longer that 63 chars should NOT throw an exception if minimize: true option is given (JoinEagerAlgorithm)', function (done) {
-      return Model1
-        .query()
-        .where('Model1.id', 1)
-        .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
-        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-        .eagerOptions({minimize: true})
-        .then(function (models) {
-          expect(models).to.eql([{
-            id: 1,
-            model1Id: 2,
-            model1Prop1: 'hello 1',
-            model1Prop2: null,
-            $afterGetCalled: 1,
-            model1Relation1: {
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'hello 2',
-              model1Prop2: null,
-              $afterGetCalled: 1,
-              model1Relation1: {
-                id: 3,
-                model1Id: 4,
-                model1Prop1: 'hello 3',
-                model1Prop2: null,
-                $afterGetCalled: 1,
-                model1Relation1: {
-                  id: 4,
-                  model1Id: null,
-                  model1Prop1: 'hello 4',
-                  model1Prop2: null,
-                  $afterGetCalled: 1,
-                  model1Relation1: null,
-                },
-              },
-            }
-          }]);
-
-          done();
-        })
-        .catch(done);
-    });
-
-    it('infinitely recursive expressions should fail gracefully with JoinEagerAlgorithm', function (done) {
-      expect(function () {
-        Model1
-          .query()
-          .where('Model1.id', 1)
-          .eager('model1Relation1.^')
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .then(function () {
-            done(new Error('should not get here'));
-          })
-          .catch(done);
-      }).to.throwException(function (err) {
-        expect(err.data.eager).to.equal('recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm');
-        done();
-      })
-    });
-
-    it('should fail if given missing filter', function (done) {
-      Model1
-        .query()
-        .where('id', 1)
-        .eager('model1Relation2(missingFilter)')
-        .then(function () {
-          done(new Error('should not get here'));
-        })
-        .catch(function (error) {
-          expect(error).to.be.a(ValidationError);
-          expect(error.data).to.have.property('eager');
-          done();
-        })
-        .catch(done);
-    });
-
-    it('should fail if given missing relation', function (done) {
-      Model1
-        .query()
-        .where('id', 1)
-        .eager('invalidRelation')
-        .then(function () {
-          done(new Error('should not get here'));
-        })
-        .catch(function (error) {
-          expect(error).to.be.a(ValidationError);
-          expect(error.data).to.have.property('eager');
-          done();
-        })
-        .catch(done);
     });
 
     describe('QueryBuilder.modifyEager', function () {
@@ -1289,7 +1289,7 @@ module.exports = function (session) {
           .eagerAlgorithm(Model1.JoinEagerAlgorithm)
           .eager('[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]')
           .then(function () {
-            expect(_.last(queries)).to.equal('select "Model1"."id" as "id", "Model1"."model1Id" as "model1Id", "Model1"."model1Prop1" as "model1Prop1", "Model1"."model1Prop2" as "model1Prop2", "model1Relation1"."id" as "model1Relation1:id", "model1Relation1"."model1Id" as "model1Relation1:model1Id", "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1", "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2", "model1Relation1Inverse"."id" as "model1Relation1Inverse:id", "model1Relation1Inverse"."model1Id" as "model1Relation1Inverse:model1Id", "model1Relation1Inverse"."model1Prop1" as "model1Relation1Inverse:model1Prop1", "model1Relation1Inverse"."model1Prop2" as "model1Relation1Inverse:model1Prop2", "model1Relation2"."id_col" as "model1Relation2:id_col", "model1Relation2"."model_1_id" as "model1Relation2:model_1_id", "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1", "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2", "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id", "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id", "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1", "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2", "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra", "model1Relation2:model2Relation2"."id" as "model1Relation2:model2Relation2:id", "model1Relation2:model2Relation2"."model1Id" as "model1Relation2:model2Relation2:model1Id", "model1Relation2:model2Relation2"."model1Prop1" as "model1Relation2:model2Relation2:model1Prop1", "model1Relation2:model2Relation2"."model1Prop2" as "model1Relation2:model2Relation2:model1Prop2", "model1Relation3"."id_col" as "model1Relation3:id_col", "model1Relation3"."model_1_id" as "model1Relation3:model_1_id", "model1Relation3"."model_2_prop_1" as "model1Relation3:model_2_prop_1", "model1Relation3"."model_2_prop_2" as "model1Relation3:model_2_prop_2", "model1Relation3_join"."extra1" as "model1Relation3:extra1", "model1Relation3_join"."extra2" as "model1Relation3:extra2" from "Model1" as "Model1" left join "Model1" as "model1Relation1" on "model1Relation1"."id" = "Model1"."model1Id" left join "Model1" as "model1Relation1Inverse" on "model1Relation1Inverse"."model1Id" = "Model1"."id" left join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "Model1"."id" left join "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col" left join "Model1" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id" left join "Model1Model2One" as "model1Relation2:model2Relation2_join" on "model1Relation2:model2Relation2_join"."model2Id" = "model1Relation2"."id_col" left join "Model1" as "model1Relation2:model2Relation2" on "model1Relation2:model2Relation2_join"."model1Id" = "model1Relation2:model2Relation2"."id" left join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "Model1"."id" left join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"');
+            expect(_.last(queries))/**/.to.equal('select "Model1"."id" as "id", "Model1"."model1Id" as "model1Id", "Model1"."model1Prop1" as "model1Prop1", "Model1"."model1Prop2" as "model1Prop2", "model1Relation1"."id" as "model1Relation1:id", "model1Relation1"."model1Id" as "model1Relation1:model1Id", "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1", "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2", "model1Relation1Inverse"."id" as "model1Relation1Inverse:id", "model1Relation1Inverse"."model1Id" as "model1Relation1Inverse:model1Id", "model1Relation1Inverse"."model1Prop1" as "model1Relation1Inverse:model1Prop1", "model1Relation1Inverse"."model1Prop2" as "model1Relation1Inverse:model1Prop2", "model1Relation2"."id_col" as "model1Relation2:id_col", "model1Relation2"."model_1_id" as "model1Relation2:model_1_id", "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1", "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2", "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id", "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id", "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1", "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2", "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra", "model1Relation2:model2Relation2"."id" as "model1Relation2:model2Relation2:id", "model1Relation2:model2Relation2"."model1Id" as "model1Relation2:model2Relation2:model1Id", "model1Relation2:model2Relation2"."model1Prop1" as "model1Relation2:model2Relation2:model1Prop1", "model1Relation2:model2Relation2"."model1Prop2" as "model1Relation2:model2Relation2:model1Prop2", "model1Relation3"."id_col" as "model1Relation3:id_col", "model1Relation3"."model_1_id" as "model1Relation3:model_1_id", "model1Relation3"."model_2_prop_1" as "model1Relation3:model_2_prop_1", "model1Relation3"."model_2_prop_2" as "model1Relation3:model_2_prop_2", "model1Relation3_join"."extra1" as "model1Relation3:extra1", "model1Relation3_join"."extra2" as "model1Relation3:extra2" from "Model1" as "Model1" left join "Model1" as "model1Relation1" on "model1Relation1"."id" = "Model1"."model1Id" left join "Model1" as "model1Relation1Inverse" on "model1Relation1Inverse"."model1Id" = "Model1"."id" left join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "Model1"."id" left join "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col" left join "Model1" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id" left join "Model1Model2One" as "model1Relation2:model2Relation2_join" on "model1Relation2:model2Relation2_join"."model2Id" = "model1Relation2"."id_col" left join "Model1" as "model1Relation2:model2Relation2" on "model1Relation2:model2Relation2_join"."model1Id" = "model1Relation2:model2Relation2"."id" left join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "Model1"."id" left join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"');
           });
       });
     }
