@@ -21,7 +21,7 @@ import RunBeforeOperation from './operations/RunBeforeOperation';
 import RunAfterOperation from './operations/RunAfterOperation';
 import OnBuildOperation from './operations/OnBuildOperation';
 import SelectOperation from './operations/SelectOperation';
-import EagerOperation from './operations/EagerOperation';
+import EagerOperation from './operations/eager/EagerOperation';
 import RangeOperation from './operations/range/RangeOperation';
 
 export default class QueryBuilder extends QueryBuilderBase {

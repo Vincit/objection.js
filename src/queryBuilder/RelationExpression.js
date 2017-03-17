@@ -206,11 +206,17 @@ export default class RelationExpression {
   }
 
   forEachChild(cb) {
-    _.forOwn(this.children, (child, childName) => {
-      if (!ALL_RECURSIVE_REGEX.test(childName) && !RECURSIVE_REGEX.test(childName)) {
-        cb(child, childName);
+    if (this.numChildren) {
+      const keys = Object.keys(this.children);
+
+      for (let i = 0, l = keys.length; i < l; ++i) {
+        const childName = keys[i];
+
+        if (!ALL_RECURSIVE_REGEX.test(childName) && !RECURSIVE_REGEX.test(childName)) {
+          cb(this.children[childName], childName);
+        }
       }
-    });
+    }
   }
 
   /**

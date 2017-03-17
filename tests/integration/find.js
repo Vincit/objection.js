@@ -356,6 +356,101 @@ module.exports = function (session) {
           });
       });
 
+      it('should be able to specify innerJoin', function () {
+        return Model1
+          .query()
+          .innerJoinRelation('model1Relation1')
+          .then(function (models) {
+            expect(models.length).to.equal(4);
+          });
+      });
+
+      it('should be able to specify leftJoin', function () {
+        return Model1
+          .query()
+          .leftJoinRelation('model1Relation1')
+          .then(function (models) {
+            expect(models.length).to.equal(8);
+          });
+      });
+
+      it('should join an eager expression `a.a`', function () {
+        return Model1
+          .query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .leftJoinRelation('model1Relation1.model1Relation1')
+          .where('model1Relation1:model1Relation1.model1Prop1', 'hello 4')
+          .first()
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 2,
+              model1Prop1: 'hello 2'
+            });
+          });
+      });
+
+      it('should join an eager expression `a.b`', function () {
+        return Model1
+          .query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .leftJoinRelation('model1Relation1.model1Relation2')
+          .where('model1Relation1:model1Relation2.model_2_prop_1', 'hejsan 4')
+          .first()
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 3,
+              model1Prop1: 'hello 3'
+            });
+          });
+      });
+
+      it('should join an eager expression `a.a.b`', function () {
+        return Model1
+          .query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .leftJoinRelation('model1Relation1.model1Relation1.model1Relation2')
+          .where('model1Relation1:model1Relation1:model1Relation2.model_2_prop_1', 'hejsan 4')
+          .first()
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 2,
+              model1Prop1: 'hello 2'
+            });
+          });
+      });
+
+      it('should join an eager expression `[a, b]`', function () {
+        return Model1
+          .query()
+          .select('Model1.id', 'Model1.model1Prop1', 'model1Relation2.model_2_prop_1 as model2Prop1')
+          .leftJoinRelation('[model1Relation1, model1Relation2]')
+          .where('model1Relation2.model_2_prop_1', 'hejsan 1')
+          .first()
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model1Prop1: 'hello 1',
+              model2Prop1: 'hejsan 1'
+            });
+          });
+      });
+
+      it('should join an eager expression `[a, b.c]`', function () {
+        return Model1
+          .query()
+          .select('Model1.id', 'model1Relation2:model2Relation1.model1Prop1 as foo', 'model1Relation2.model_2_prop_1 as model2Prop1')
+          .leftJoinRelation('[model1Relation1, model1Relation2.model2Relation1]')
+          .where('model1Relation2:model2Relation1.model1Prop1', 'hello 6')
+          .first()
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model2Prop1: 'hejsan 2',
+              foo: 'hello 6'
+            });
+          });
+      });
+
       it('should disable alias with option alias = false', function () {
         return Model1
           .query()

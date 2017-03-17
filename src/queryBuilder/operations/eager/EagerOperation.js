@@ -1,5 +1,5 @@
 import clone from 'lodash/clone';
-import QueryBuilderOperation from './QueryBuilderOperation';
+import QueryBuilderOperation from '../QueryBuilderOperation';
 
 export default class EagerOperation extends QueryBuilderOperation {
 

@@ -1,9 +1,9 @@
 import chunk from 'lodash/chunk';
 import flatten from 'lodash/flatten';
 import Promise from 'bluebird';
-import ValidationError from '../../model/ValidationError'
+import ValidationError from '../../../model/ValidationError'
 import EagerOperation from './EagerOperation';
-import {isMsSql} from '../../utils/knexUtils';
+import {isMsSql} from '../../../utils/knexUtils';
 
 export default class WhereInEagerOperation extends EagerOperation {
 

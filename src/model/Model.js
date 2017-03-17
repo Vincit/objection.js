@@ -22,8 +22,8 @@ import InstanceInsertOperation from '../queryBuilder/operations/InstanceInsertOp
 import InstanceUpdateOperation from '../queryBuilder/operations/InstanceUpdateOperation';
 import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOperation';
 
-import JoinEagerOperation from '../queryBuilder/operations/JoinEagerOperation';
-import WhereInEagerOperation from '../queryBuilder/operations/WhereInEagerOperation';
+import JoinEagerOperation from '../queryBuilder/operations/eager/JoinEagerOperation';
+import WhereInEagerOperation from '../queryBuilder/operations/eager/WhereInEagerOperation';
 
 const JoinEagerAlgorithm = () => {
   return new JoinEagerOperation('eager');

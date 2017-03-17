@@ -1,23 +1,23 @@
 import _ from 'lodash';
 import Promise from 'bluebird';
-import EagerOperation from './EagerOperation';
-import ValidationError from '../../model/ValidationError';
+import ValidationError from '../../../model/ValidationError';
 
 const columnInfo = Object.create(null);
 const idLengthLimit = 63;
 const relationRecursionLimit = 64;
 
-export default class JoinEagerOperation extends EagerOperation {
+export default class RelationJoinBuilder {
 
-  constructor(name, opt) {
-    super(name, opt);
-
+  constructor({modelClass, expression, opt}) {
+    this.rootModelClass = modelClass;
+    this.expression = expression;
     this.allRelations = null;
-    this.rootModelClass = null;
+
     this.pathInfo = Object.create(null);
     this.encodings = Object.create(null);
     this.decodings = Object.create(null);
     this.encIdx = 0;
+
     this.opt = _.defaults(opt, {
       minimize: false,
       separator: ':',
@@ -25,47 +25,76 @@ export default class JoinEagerOperation extends EagerOperation {
     });
   }
 
-  clone() {
-    const copy = super.clone();
+  clone(props) {
+    props = props || {};
+
+    const copy = new RelationJoinBuilder({
+      modelClass: this.rootModelClass,
+      expression: props.expression || this.expression,
+      opt: props.opt || this.opt
+    });
 
     copy.allRelations = this.allRelations;
-    copy.allModelClasses = this.allModelClasses;
-    copy.rootModelClass = this.rootModelClass;
     copy.pathInfo = this.pathInfo;
     copy.encodings = this.encodings;
     copy.decodings = this.decodings;
     copy.encIdx = this.encIdx;
 
-    return this;
+    return copy;
   }
 
-  call(builder, args) {
-    const ret = super.call(builder, args);
-    const ModelClass = builder.modelClass();
+  /**
+   * Fetches the column information needed for building the select clauses.
+   * This must be called before calling `build`. `buildJoinOnly` can be called
+   * without this since it doesn't build joins.
+   */
+  fetchColumnInfo(knex) {
+    const allModelClasses = findAllModels(this.expression, this.rootModelClass);
 
-    if (ret) {
-      this.rootModelClass = ModelClass;
-      this.allModelClasses = findAllModels(this.expression, ModelClass);
-      this.allRelations = findAllRelations(this.expression, ModelClass);
-    }
+    return Promise.all(allModelClasses.map(ModelClass => {
+      const table = ModelClass.tableName;
 
-    return ret;
+      if (columnInfo[table]) {
+        return columnInfo[table];
+      } else {
+        columnInfo[table] = knex(table).columnInfo().then(info => {
+          const result = {
+            columns: Object.keys(info)
+          };
+
+          columnInfo[table] = result;
+          return result;
+        });
+
+        return columnInfo[table];
+      }
+    }));
   }
 
-  onBeforeInternal(builder) {
-    return fetchColumnInfo(builder, this.allModelClasses);
+  buildJoinOnly(builder) {
+    this.doBuild({
+      expr: this.expression,
+      builder: builder,
+      modelClass: builder.modelClass(),
+      joinOperation: this.opt.joinOperation || 'leftJoin',
+      parentInfo: null,
+      relation: null,
+      noSelects: true,
+      path: '',
+    });
   }
 
-  onBeforeBuild(builder) {
+  build(builder) {
     const builderClone = builder.clone();
 
     builder.table(`${this.rootModelClass.tableName} as ${this.rootModelClass.tableName}`);
     builder.findOptions({callAfterGetDeeply: true});
 
-    this.build({
+    this.doBuild({
       expr: this.expression,
       builder: builder,
       modelClass: builder.modelClass(),
+      joinOperation: this.opt.joinOperation || 'leftJoin',
       parentInfo: null,
       relation: null,
       path: '',
@@ -75,7 +104,7 @@ export default class JoinEagerOperation extends EagerOperation {
     });
   }
 
-  onRawResult(builder, rows) {
+  rowsToTree(rows) {
     if (_.isEmpty(rows)) {
       return rows;
     }
@@ -185,7 +214,11 @@ export default class JoinEagerOperation extends EagerOperation {
     }
   }
 
-  build({expr, builder, selectFilter, modelClass, relation, path, parentInfo}) {
+  doBuild({expr, builder, selectFilter, modelClass, relation, path, parentInfo, joinOperation, noSelects}) {
+    if (!this.allRelations) {
+      this.allRelations = findAllRelations(this.expression, this.rootModelClass);
+    }
+
     const info = this.createPathInfo({
       modelClass,
       path,
@@ -195,13 +228,15 @@ export default class JoinEagerOperation extends EagerOperation {
 
     this.pathInfo[path] = info;
 
-    this.buildSelects({
-      builder,
-      selectFilter,
-      modelClass,
-      relation,
-      info
-    });
+    if (!noSelects) {
+      this.buildSelects({
+        builder,
+        selectFilter,
+        modelClass,
+        relation,
+        info
+      });
+    }
 
     forEachExpr(expr, modelClass, (childExpr, relation) => {
       const nextPath = this.joinPath(path, relation.name);
@@ -223,7 +258,7 @@ export default class JoinEagerOperation extends EagerOperation {
       });
 
       relation.join(builder, {
-        joinOperation: 'leftJoin',
+        joinOperation,
         ownerTable: info.encPath,
         relatedTableAlias: encNextPath,
         joinTableAlias: encJoinTablePath,
@@ -236,12 +271,14 @@ export default class JoinEagerOperation extends EagerOperation {
       // to be called twice for it.
       filterQuery.modify(relation.modify);
 
-      this.build({
+      this.doBuild({
         expr: childExpr,
         builder: builder,
         modelClass: relation.relatedModelClass,
+        joinOperation: joinOperation,
         relation: relation,
         parentInfo: info,
+        noSelects: noSelects,
         path: nextPath,
         selectFilter: (col) => {
           return filterQuery.hasSelection(col);
@@ -314,7 +351,7 @@ export default class JoinEagerOperation extends EagerOperation {
     if (tooLongAliases.length) {
       throw new ValidationError({
         eager: `identifier ${tooLongAliases[0].alias} is over ${idLengthLimit} characters long `
-             + `and would be truncated by the database engine.`
+        + `and would be truncated by the database engine.`
       });
     }
 
@@ -427,29 +464,6 @@ function findAllRelationsImpl(expr, modelClass, relations) {
 
     findAllRelationsImpl(childExpr, relation.relatedModelClass, relations);
   });
-}
-
-function fetchColumnInfo(builder, models) {
-  const knex = builder.knex();
-
-  return Promise.all(models.map(ModelClass => {
-    const table = ModelClass.tableName;
-
-    if (columnInfo[table]) {
-      return columnInfo[table];
-    } else {
-      columnInfo[table] = knex(table).columnInfo().then(info => {
-        const result = {
-          columns: Object.keys(info)
-        };
-
-        columnInfo[table] = result;
-        return result;
-      });
-
-      return columnInfo[table];
-    }
-  }));
 }
 
 function forEachExpr(expr, modelClass, callback) {

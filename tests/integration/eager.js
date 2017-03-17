@@ -752,20 +752,18 @@ module.exports = function (session) {
       });
 
       it('infinitely recursive expressions should fail', function (done) {
-        expect(function () {
-          Model1
-            .query()
-            .where('Model1.id', 1)
-            .eager('model1Relation1.^')
-            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            .then(function () {
-              done(new Error('should not get here'));
-            })
-            .catch(done);
-        }).to.throwException(function (err) {
-          expect(err.data.eager).to.equal('recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm');
-          done();
-        })
+        Model1
+          .query()
+          .where('Model1.id', 1)
+          .eager('model1Relation1.^')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .then(function () {
+            done(new Error('should not get here'));
+          })
+          .catch(function (err) {
+            expect(err.data.eager).to.equal('recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm');
+            done();
+          });
       });
 
       it('should fail if given missing filter', function (done) {
