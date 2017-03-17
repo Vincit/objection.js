@@ -27,7 +27,7 @@ export default class RangeOperation extends QueryBuilderOperation {
     return null;
   }
 
-  onAfterInternal(builder, result) {
+  onAfter(builder, result) {
     return this.resultSizePromise.then(count => {
       return {
         results: result,

@@ -33,7 +33,7 @@ export default class RangePostgresOperation extends RangeOperation {
     return rows;
   }
 
-  onAfterInternal(builder, result) {
+  onAfter(builder, result) {
     return {
       results: result,
       total: parseInt(this.count, 10)
