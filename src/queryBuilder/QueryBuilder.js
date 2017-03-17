@@ -22,8 +22,6 @@ import RunAfterOperation from './operations/RunAfterOperation';
 import OnBuildOperation from './operations/OnBuildOperation';
 import SelectOperation from './operations/SelectOperation';
 import EagerOperation from './operations/EagerOperation';
-
-import RangePostgresOperation from './operations/range/RangePostgresOperation';
 import RangeOperation from './operations/range/RangeOperation';
 
 export default class QueryBuilder extends QueryBuilderBase {
@@ -764,10 +762,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @param {number} end
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation({
-    default: RangeOperation,
-    postgresql: RangePostgresOperation
-  })
+  @queryBuilderOperation(RangeOperation)
   range(start, end) {}
 
   /**

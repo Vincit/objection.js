@@ -665,7 +665,7 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it('range should return a range and the total count', function (done) {
+  it.skip('range should return a range and the total count', function (done) {
     mockKnexQueryResults = [[{objectiontmptotalcount: 123, a: 1}]];
     QueryBuilder
       .forClass(TestModel)
@@ -682,7 +682,7 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it('page should return a page and the total count', function (done) {
+  it.skip('page should return a page and the total count', function (done) {
     mockKnexQueryResults = [[{objectiontmptotalcount: 123, a: 1}]];
     QueryBuilder
       .forClass(TestModel)
