@@ -1,4 +1,4 @@
-import QueryBuilderOperation from '../QueryBuilderOperation';
+import QueryBuilderOperation from './QueryBuilderOperation';
 
 export default class RangeOperation extends QueryBuilderOperation {
 

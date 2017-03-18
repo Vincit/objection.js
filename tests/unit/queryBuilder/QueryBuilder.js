@@ -665,16 +665,19 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it.skip('range should return a range and the total count', function (done) {
-    mockKnexQueryResults = [[{objectiontmptotalcount: 123, a: 1}]];
+  it('range should return a range and the total count', function (done) {
+    mockKnexQueryResults = [[{count: 123}], [{a: 1}]];
     QueryBuilder
       .forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .range(100, 200)
       .then(function (res) {
-        expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('select count(*) over () as objectiontmptotalcount, "Model".* from "Model" where "test" = 100 order by "order" asc limit 101 offset 100');
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries).to.eql([
+          "select count(*) as \"count\" from (select \"Model\".* from \"Model\" where \"test\" = 100) as temp",
+          "select \"Model\".* from \"Model\" where \"test\" = 100 order by \"order\" asc limit 101 offset 100"
+        ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{a: 1}]);
         done();
@@ -682,16 +685,19 @@ describe('QueryBuilder', function () {
       .catch(done);
   });
 
-  it.skip('page should return a page and the total count', function (done) {
-    mockKnexQueryResults = [[{objectiontmptotalcount: 123, a: 1}]];
+  it('page should return a page and the total count', function (done) {
+    mockKnexQueryResults = [[{count: 123}], [{a: 1}]];
     QueryBuilder
       .forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
       .page(10, 100)
       .then(function (res) {
-        expect(executedQueries).to.have.length(1);
-        expect(executedQueries[0]).to.equal('select count(*) over () as objectiontmptotalcount, "Model".* from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000');
+        expect(executedQueries).to.have.length(2);
+        expect(executedQueries).to.eql([
+          "select count(*) as \"count\" from (select \"Model\".* from \"Model\" where \"test\" = 100) as temp",
+          "select \"Model\".* from \"Model\" where \"test\" = 100 order by \"order\" asc limit 100 offset 1000"
+        ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{a: 1}]);
         done();

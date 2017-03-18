@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.9
+
+### What's new
+
+ * [`joinRelation`](http://vincit.github.io/objection.js/#joinrelation) now accepts [`RelationExpressions`](http://vincit.github.io/objection.js/#relationexpression) and can join multiple and nested relations.
+
 ## 0.7.6
 
 ### What's new

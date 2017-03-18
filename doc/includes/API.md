@@ -3649,13 +3649,15 @@ Person
   });
 ```
 
-Only returns the given page of results.
+Two queries queries are performed by this method: the actual query and a query to get the `total` count.
 
-On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
-(the query itself, and a separate count query) are executed. Mysql has the `SQL_CALC_FOUND_ROWS` option and
-`FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and
-[the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse
-than just executing a separate count query.
+Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size,
+but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the
+performance is significantly worse than just executing a separate count query.
+
+Postgresql has window functions that can be used to get the total count like this `select count(*) over () as total`.
+The problem with this is that if the result set is empty, we don't get the total count either.
+(If someone can figure out a way around this, a PR is very welcome).
 
 ##### Arguments
 
@@ -3707,12 +3709,15 @@ Person
 
 Only returns the given range of results.
 
+Two queries queries are performed by this method: the actual query and a query to get the `total` count.
 
-On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
-(the query itself, and a separate count query) are executed. Mysql has the `SQL_CALC_FOUND_ROWS` option and
-`FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and
-[the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse
-than just executing a separate count query.
+Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size,
+but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the
+performance is significantly worse than just executing a separate count query.
+
+Postgresql has window functions that can be used to get the total count like this `select count(*) over () as total`.
+The problem with this is that if the result set is empty, we don't get the total count either.
+(If someone can figure out a way around this, a PR is very welcome).
 
 ##### Arguments
 

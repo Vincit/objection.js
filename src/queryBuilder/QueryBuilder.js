@@ -22,7 +22,7 @@ import RunAfterOperation from './operations/RunAfterOperation';
 import OnBuildOperation from './operations/OnBuildOperation';
 import SelectOperation from './operations/SelectOperation';
 import EagerOperation from './operations/eager/EagerOperation';
-import RangeOperation from './operations/range/RangeOperation';
+import RangeOperation from './operations/RangeOperation';
 
 export default class QueryBuilder extends QueryBuilderBase {
 

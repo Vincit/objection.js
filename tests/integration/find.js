@@ -451,6 +451,34 @@ module.exports = function (session) {
           });
       });
 
+      it('should be able to specify aliases`', function () {
+        return Model1
+          .query()
+          .select([
+            'Model1.id',
+            'm1r1:m1r1.id as x',
+            'm1r2:m2r1.model1Prop1 as foo',
+            'm1r2.model_2_prop_1 as model2Prop1'
+          ])
+          .leftJoinRelation('[model1Relation1.model1Relation1, model1Relation2.model2Relation1]', {
+            aliases: {
+              model1Relation1: 'm1r1',
+              model1Relation2: 'm1r2',
+              model2Relation1: 'm2r1'
+            }
+          })
+          .where('m1r2:m2r1.model1Prop1', 'hello 6')
+          .first()
+          .then(function (model) {
+            expect(model.toJSON()).to.eql({
+              id: 1,
+              model2Prop1: 'hejsan 2',
+              foo: 'hello 6',
+              x: 3
+            });
+          });
+      });
+
       it('should disable alias with option alias = false', function () {
         return Model1
           .query()
