@@ -3572,14 +3572,63 @@ join columns to null.</p>
 
 <h4 id="joinrelation">joinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
+<p>Joins a set of relations described by <code class="prettyprint">relationExpression</code>. See the examples for more info.</p>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="nx">relationExpression</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
 </code></pre>
+
+<blockquote>
+<p>Join one relation:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>Give an alias for a single relation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">,</span> <span class="p">{</span><span class="na">alias</span><span class="p">:</span> <span class="s1">'p'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'p.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>Join two relations:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'[pets, parent]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'parent.name'</span><span class="p">,</span> <span class="s1">'Arnold'</span><span class="p">)</span>
+</code></pre>
+
+<blockquote>
+<p>Join two multiple and nested relations. Note that when referring to nested relations
+<code class="prettyprint">:</code> must be used as a separator instead of <code class="prettyprint">.</code>. This limitation comes from the way
+knex parses table references.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'parent:parent.name as grandParentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'[pets, parent.[pets, parent]]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'parent:pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+</code></pre>
+
+<blockquote>
+<p>Give aliases for a bunch of relations:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'pr:pr.name as grandParentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'[pets, parent.[pets, parent]]'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">aliases</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">parent</span><span class="p">:</span> <span class="s1">'pr'</span><span class="p">,</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="s1">'pt'</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pr:pt.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
 </code></pre>
 
 <h5 id="arguments">Arguments</h5>
@@ -3592,14 +3641,14 @@ object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the seco
 </tr>
 </thead><tbody>
 <tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
+<td>relationExpression</td>
+<td><a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a></td>
+<td>An expression describing which relations to join.</td>
 </tr>
 <tr>
 <td>opt</td>
 <td>object</td>
-<td>Optional options.</td>
+<td>Optional options. See the examples.</td>
 </tr>
 </tbody></table>
 
@@ -3619,332 +3668,31 @@ object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the seco
 
 <h4 id="innerjoinrelation">innerJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">innerJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">innerJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Alias for <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a>.</p>
 
 <h4 id="outerjoinrelation">outerJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">outerJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">outerJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Outer join version of the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method.</p>
 
 <h4 id="leftjoinrelation">leftJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">leftJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">leftJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Left join version of the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method.</p>
 
 <h4 id="leftouterjoinrelation">leftOuterJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">leftOuterJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">leftOuterJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Left outer join version of the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method.</p>
 
 <h4 id="rightjoinrelation">rightJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">rightJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">rightJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Right join version of the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method.</p>
 
 <h4 id="rightouterjoinrelation">rightOuterJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">rightOuterJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">rightOuterJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Left outer join version of the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method.</p>
 
 <h4 id="fullouterjoinrelation">fullOuterJoinRelation</h4>
 
-<p>Joins a relation. The joined table is aliased with the relation&rsquo;s name. You can change the alias by providing an
-object <code class="prettyprint">{alias: &#39;someAlias&#39;}</code> as the second argument. Providing <code class="prettyprint">{alias: false}</code> will use the original table name.</p>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">fullOuterJoinRelation</span><span class="p">(</span><span class="nx">relationName</span><span class="p">,</span> <span class="nx">opt</span><span class="p">);</span>
-</code></pre>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">fullOuterJoinRelation</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-</code></pre>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>relationName</td>
-<td>string</td>
-<td>The name of the relation in <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a>.</td>
-</tr>
-<tr>
-<td>opt</td>
-<td>object</td>
-<td>Optional options.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
+<p>Full outer join version of the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method.</p>
 
 <h4 id="where">where</h4>
 
@@ -6791,13 +6539,15 @@ Note that this executes a query (not the one we are building) and returns a Prom
   <span class="p">});</span>
 </code></pre>
 
-<p>Only returns the given page of results.</p>
+<p>Two queries queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
 
-<p>On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
-(the query itself, and a separate count query) are executed. Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and
-<code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size, but according to my tests and
-<a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the performance is significantly worse
-than just executing a separate count query.</p>
+<p>Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and <code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size,
+but according to my tests and <a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the
+performance is significantly worse than just executing a separate count query.</p>
+
+<p>Postgresql has window functions that can be used to get the total count like this <code class="prettyprint">select count(*) over () as total</code>.
+The problem with this is that if the result set is empty, we don&rsquo;t get the total count either.
+(If someone can figure out a way around this, a PR is very welcome).</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -6863,11 +6613,15 @@ than just executing a separate count query.</p>
 
 <p>Only returns the given range of results.</p>
 
-<p>On postgresql a window function is used and only one query is executed. On Mysql and other databases two queries
-(the query itself, and a separate count query) are executed. Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and
-<code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size, but according to my tests and
-<a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the performance is significantly worse
-than just executing a separate count query.</p>
+<p>Two queries queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
+
+<p>Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and <code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size,
+but according to my tests and <a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the
+performance is significantly worse than just executing a separate count query.</p>
+
+<p>Postgresql has window functions that can be used to get the total count like this <code class="prettyprint">select count(*) over () as total</code>.
+The problem with this is that if the result set is empty, we don&rsquo;t get the total count either.
+(If someone can figure out a way around this, a PR is very welcome).</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -10987,6 +10741,14 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-7-9">0.7.9</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><a href="http://vincit.github.io/objection.js/#joinrelation"><code class="prettyprint">joinRelation</code></a> now accepts <a href="http://vincit.github.io/objection.js/#relationexpression"><code class="prettyprint">RelationExpressions</code></a> and can join multiple and nested relations.</li>
+</ul>
 
 <h2 id="0-7-6">0.7.6</h2>
 
