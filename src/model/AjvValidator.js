@@ -131,7 +131,11 @@ function parseValidationError(errors) {
 }
 
 function hasDefaults(obj) {
-  return Array.isArray(obj) ? arrayHasDefaults(obj) : objectHasDefaults(obj);
+  if (Array.isArray(obj)) {
+    return arrayHasDefaults(obj);
+  } else {
+    return objectHasDefaults(obj);
+  }
 }
 
 function arrayHasDefaults(arr) {
