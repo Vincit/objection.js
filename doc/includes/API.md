@@ -1297,12 +1297,13 @@ Type|Description
 
 #### joinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
+Joins a set of relations described by `relationExpression`. See the examples for more info.
 
 ```js
-var builder = queryBuilder.joinRelation(relationName, opt);
+const builder = queryBuilder.joinRelation(relationExpression, opt);
 ```
+
+> Join one relation:
 
 ```js
 Person
@@ -1311,12 +1312,58 @@ Person
   .where('pets.species', 'dog');
 ```
 
+> Give an alias for a single relation:
+
+```js
+Person
+  .query()
+  .joinRelation('pets', {alias: 'p'})
+  .where('p.species', 'dog');
+```
+
+> Join two relations:
+
+```js
+Person
+  .query()
+  .joinRelation('[pets, parent]')
+  .where('pets.species', 'dog');
+  .where('parent.name', 'Arnold')
+```
+
+> Join two multiple and nested relations. Note that when referring to nested relations
+> `:` must be used as a separator instead of `.`. This limitation comes from the way
+> knex parses table references.
+
+```js
+Person
+  .query()
+  .select('Person.id', 'parent:parent.name as grandParentName')
+  .joinRelation('[pets, parent.[pets, parent]]')
+  .where('parent:pets.species', 'dog');
+```
+
+> Give aliases for a bunch of relations:
+
+```js
+Person
+  .query()
+  .select('Person.id', 'pr:pr.name as grandParentName')
+  .joinRelation('[pets, parent.[pets, parent]]', {
+    aliases: {
+      parent: 'pr',
+      pets: 'pt'
+    }
+  })
+  .where('pr:pt.species', 'dog');
+```
+
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
+relationExpression|[`RelationExpression`](#relationexpression)|An expression describing which relations to join.
+opt|object|Optional options. See the examples.
 
 ##### Return value
 
@@ -1329,224 +1376,49 @@ Type|Description
 
 #### innerJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.innerJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .innerJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Alias for [`joinRelation`](#joinrelation).
 
 
 
 
 #### outerJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.outerJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .outerJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Outer join version of the [`joinRelation`](#joinrelation) method.
 
 
 
 
 #### leftJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.leftJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .leftJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Left join version of the [`joinRelation`](#joinrelation) method.
 
 
 
 
 #### leftOuterJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.leftOuterJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .leftOuterJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Left outer join version of the [`joinRelation`](#joinrelation) method.
 
 
 
 
 #### rightJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.rightJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .rightJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Right join version of the [`joinRelation`](#joinrelation) method.
 
 
 
 
 #### rightOuterJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.rightOuterJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .rightOuterJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Left outer join version of the [`joinRelation`](#joinrelation) method.
 
 
 
 
 #### fullOuterJoinRelation
 
-Joins a relation. The joined table is aliased with the relation's name. You can change the alias by providing an
-object `{alias: 'someAlias'}` as the second argument. Providing `{alias: false}` will use the original table name.
-
-```js
-var builder = queryBuilder.fullOuterJoinRelation(relationName, opt);
-```
-
-```js
-Person
-  .query()
-  .fullOuterJoinRelation('pets')
-  .where('pets.species', 'dog');
-```
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation in [`relationMappings`](#relationmappings).
-opt|object|Optional options.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+Full outer join version of the [`joinRelation`](#joinrelation) method.
 
 
 
