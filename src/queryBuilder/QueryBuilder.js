@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import Promise from 'bluebird';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderContext from './QueryBuilderContext';
@@ -213,11 +212,11 @@ export default class QueryBuilder extends QueryBuilderBase {
   eager(exp, filters) {
     this._eagerExpression = exp || null;
 
-    if (_.isString(this._eagerExpression)) {
+    if (typeof this._eagerExpression === 'string') {
       this._eagerExpression = RelationExpression.parse(this._eagerExpression);
     }
 
-    if (_.isObject(filters)) {
+    if (filters) {
       this._eagerExpression.filters = filters;
     }
 
@@ -237,7 +236,7 @@ export default class QueryBuilder extends QueryBuilderBase {
 
     const expr = RelationExpression.parse(exp);
 
-    if (_.isObject(filters)) {
+    if (filters) {
       expr.filters = filters;
     }
 
@@ -254,7 +253,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   allowEager(exp) {
     this._allowedEagerExpression = exp || null;
 
-    if (_.isString(this._allowedEagerExpression)) {
+    if (typeof this._allowedEagerExpression === 'string') {
       this._allowedEagerExpression = RelationExpression.parse(this._allowedEagerExpression);
     }
 
@@ -287,7 +286,7 @@ export default class QueryBuilder extends QueryBuilderBase {
   allowInsert(exp) {
     this._allowedInsertExpression = exp || null;
 
-    if (_.isString(this._allowedInsertExpression)) {
+    if (typeof this._allowedInsertExpression === 'string') {
       this._allowedInsertExpression = RelationExpression.parse(this._allowedInsertExpression);
     }
 
@@ -339,7 +338,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {boolean}
    */
   isFindQuery() {
-    return !_.some(this._operations, method => method.isWriteOperation) && !this._explicitRejectValue;
+    return !this._operations.some(method => method.isWriteOperation) && !this._explicitRejectValue;
   }
 
   /**
@@ -484,9 +483,9 @@ export default class QueryBuilder extends QueryBuilderBase {
 
     // orderBy is useless here and it can make things a lot slower (at least with postgresql 9.3).
     // Remove it from the count query. We also remove the offset and limit
-    let query = this.clone().clear(/orderBy|offset|limit/).build();
-    let rawQuery = knex.raw(query).wrap('(', ') as temp');
-    let countQuery = knex.count('* as count').from(rawQuery);
+    const query = this.clone().clear(/orderBy|offset|limit/).build();
+    const rawQuery = knex.raw(query).wrap('(', ') as temp');
+    const countQuery = knex.count('* as count').from(rawQuery);
 
     if (this.internalOptions().debug) {
       countQuery.debug();
@@ -606,7 +605,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     if (!this.has(FindOperation)) {
       const operation = this._findOperationFactory(this);
 
-      operation.opt = _.merge(operation.opt,
+      operation.opt = Object.assign(operation.opt,
         this._findOperationOptions
       );
 
@@ -621,7 +620,7 @@ export default class QueryBuilder extends QueryBuilderBase {
     if (!this.has(EagerOperation) && this._eagerExpression) {
       const operation = this._eagerOperationFactory(this);
 
-      operation.opt = _.merge(operation.opt,
+      operation.opt = Object.assign(operation.opt,
         this._modelClass.defaultEagerOptions,
         this._eagerOperationOptions
       );
@@ -639,8 +638,8 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   pluck(propertyName) {
     return this.runAfter(result => {
-      if (_.isArray(result)) {
-        return _.map(result, propertyName);
+      if (Array.isArray(result)) {
+        return result.map(it => it && it[propertyName]);
       } else {
         return result;
       }
@@ -693,7 +692,7 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   traverse(modelClass, traverser) {
-    if (_.isUndefined(traverser)) {
+    if (typeof traverser === 'undefined') {
       traverser = modelClass;
       modelClass = null;
     }
@@ -710,13 +709,13 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   pick(modelClass, properties) {
-    if (_.isUndefined(properties)) {
+    if (typeof properties === 'undefined') {
       properties = modelClass;
       modelClass = null;
     }
 
     // Turn the properties into a hash for performance.
-    properties = _.reduce(properties, (obj, prop) => {
+    properties = properties.reduce((obj, prop) => {
       obj[prop] = true;
       return obj;
     }, {});
@@ -732,13 +731,13 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   omit(modelClass, properties) {
-    if (_.isUndefined(properties)) {
+    if (typeof properties === 'undefined') {
       properties = modelClass;
       modelClass = null;
     }
 
     // Turn the properties into a hash for performance.
-    properties = _.reduce(properties, (obj, prop) => {
+    properties = properties.reduce((obj, prop) => {
       obj[prop] = true;
       return obj;
     }, {});
@@ -1054,20 +1053,22 @@ export default class QueryBuilder extends QueryBuilderBase {
    * @returns {QueryBuilder}
    */
   increment(propertyName, howMuch) {
-    let patch = {};
-    let columnName = this._modelClass.propertyNameToColumnName(propertyName);
-    patch[propertyName] = this.knex().raw('?? + ?', [columnName, howMuch]);
-    return this.patch(patch);
+    const columnName = this.modelClass().propertyNameToColumnName(propertyName);
+
+    return this.patch({
+      [columnName]: this.knex().raw('?? + ?', [columnName, howMuch])
+    });
   }
 
   /**
    * @returns {QueryBuilder}
    */
   decrement(propertyName, howMuch) {
-    let patch = {};
-    let columnName = this._modelClass.propertyNameToColumnName(propertyName);
-    patch[propertyName] = this.knex().raw('?? - ?', [columnName, howMuch]);
-    return this.patch(patch);
+    const columnName = this.modelClass().propertyNameToColumnName(propertyName);
+
+    return this.patch({
+      [columnName]: this.knex().raw('?? - ?', [columnName, howMuch])
+    });
   }
 }
 
@@ -1145,7 +1146,7 @@ function build(builder) {
 }
 
 function chainHooks(promise, func) {
-  if (_.isFunction(func)) {
+  if (typeof func === 'function') {
     promise = promise.then(function (result) {
       return func.call(this.builder, result, this.builder);
     });
@@ -1161,9 +1162,9 @@ function chainHooks(promise, func) {
 }
 
 function callOnBuildHooks(builder, func) {
-  if (_.isFunction(func)) {
+  if (typeof func === 'function') {
     func.call(builder, builder);
-  } else if (_.isArray(func)) {
+  } else if (Array.isArray(func)) {
     for (let i = 0, l = func.length; i < l; ++i) {
       func[i].call(builder, builder);
     }
@@ -1171,18 +1172,17 @@ function callOnBuildHooks(builder, func) {
 }
 
 function createHookCaller(hook) {
-  const hasMethod = 'has' + _.upperFirst(hook);
+  const hasMethod = 'has' + hook.charAt(0).toUpperCase() + hook.substr(1);
 
-  // Compile the caller function for (measured) performance boost.
-  const caller = new Function('promise', 'op', `
-    if (op.${hasMethod}()) {
+  const caller = (promise, op) => {
+    if (op[hasMethod]()) {
       return promise.then(function (result) {
-        return op.${hook}(this.builder, result);
+        return op[hook](this.builder, result);
       });
     } else {
       return promise;
     }
-  `);
+  };
 
   return (promise, operations) => {
     for (let i = 0, l = operations.length; i < l; ++i) {
