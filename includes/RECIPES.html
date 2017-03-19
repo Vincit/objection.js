@@ -35,25 +35,54 @@
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
   <span class="p">.</span><span class="nx">groupBy</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">childAgeSums</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">childAgeSums</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
 <p>To write raw SQL queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. There are also some helper
 methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>. The <a href="#raw"><code class="prettyprint">raw</code></a> method works just like the
-<a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>.</p>
+<a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>. And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
 
 <h2 id="change-id-column">Change id column</h2>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'person_id'</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'person_id'</span><span class="p">;</span>
 </code></pre>
 
-<p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.</p>
+<p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.
+Composite key can be defined by using an array of column names.</p>
 
 <h2 id="custom-validation">Custom validation</h2>
 
 <blockquote>
 <p>Additional validation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">beforeInsert</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span>
+        <span class="na">id</span><span class="p">:</span> <span class="p">[{</span>
+          <span class="na">message</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span>
+          <span class="na">keyword</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+          <span class="na">params</span><span class="p">:</span> <span class="kc">null</span>
+        <span class="p">}]</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
@@ -69,7 +98,7 @@ methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a
 </code></pre>
 
 <blockquote>
-<p>Modify the <a href="https://github.com/epoberezkin/ajv">Ajv</a> based <code class="prettyprint">jsonSchema</code> validation:</p>
+<p>Modifying the <a href="https://github.com/epoberezkin/ajv">Ajv</a> based <code class="prettyprint">jsonSchema</code> validation:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">AjvValidator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">AjvValidator</span><span class="p">;</span>
 
@@ -151,7 +180,7 @@ implementing a custom <a href="#validator"><code class="prettyprint">Validator</
 </code></pre>
 
 <p>If you want to use the json schema validation but add some custom validation on top of it you can override the
-<a href="#_s_beforevalidate"><code class="prettyprint">$beforeValidate</code></a> and <a href="#_s_aftervalidate"><code class="prettyprint">$afterValidate</code></a> methods.</p>
+<a href="#_s_beforevalidate"><code class="prettyprint">$beforeValidate</code></a> or <a href="#_s_aftervalidate"><code class="prettyprint">$afterValidate</code></a> method.</p>
 
 <p>If you need to do validation on insert or update you can throw exceptions from the
 <a href="#_s_beforeinsert"><code class="prettyprint">$beforeInsert</code></a> and <a href="#_s_beforeupdate"><code class="prettyprint">$beforeUpdate</code></a> methods.</p>
@@ -164,6 +193,30 @@ It is completely optional. If you want to use some other validation library you 
 
 <blockquote>
 <p>snake_case/camelCase conversion:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="c1">// This is called when an object is serialized to database format.</span>
+  <span class="nx">$formatDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">snakeCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+
+  <span class="c1">// This is called when an object is read from database.</span>
+  <span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="c1">// This is called when an object is serialized to database format.</span>
 <span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
@@ -188,7 +241,7 @@ It is completely optional. If you want to use some other validation library you 
 
 <blockquote>
 <p>Note that even though column names are mapped when fetching / storing data, one still has to use
-correct db column names when writing queries:</p>
+db column names when writing queries:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">insert</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span> <span class="p">});</span>
 <span class="kd">let</span> <span class="nx">jen</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">where</span><span class="p">(</span><span class="s1">'first_name'</span><span class="p">,</span> <span class="s1">'Jennifer'</span><span class="p">);</span>
@@ -212,7 +265,7 @@ and camelCased property names in code. You can use the functions</p>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">page</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 100</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
   <span class="p">});</span>
@@ -223,44 +276,61 @@ and camelCased property names in code. You can use the functions</p>
 <h2 id="subqueries">Subqueries</h2>
 
 <blockquote>
-<p>Use function:</p>
+<p>You can use functions:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">);</span>
   <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
 <blockquote>
-<p>Use <code class="prettyprint">QueryBuilder</code>:</p>
+<p>Or <code class="prettyprint">QueryBuilder</code>s:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
 <p>Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
 methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places
-you would expect. You can also pass <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> instances instead of functions.</p>
+you would expect. You can also pass <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> instances or knex queries instead of functions.</p>
 
 <h2 id="joins">Joins</h2>
+
+<blockquote>
+<p>Normal knex-style join:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentName'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">persons</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">persons</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 
-<p>Again, <a href="http://knexjs.org/#Builder-join">do as you would with a knex query builder</a>.</p>
+<blockquote>
+<p><a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> helper for joining relation graphs:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'parent:parent.name as grandParentName'</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'parent.parent'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">grandParentName</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+
+<p>Again, <a href="http://knexjs.org/#Builder-join">do as you would with a knex query builder</a>. Objection also has helpers like
+the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method family.</p>
 
 <h2 id="postgresql-quot-returning-quot-tricks">PostgreSQL &ldquo;returning&rdquo; tricks</h2>
 
@@ -271,7 +341,7 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
   <span class="p">});</span>
@@ -283,11 +353,11 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
   <span class="p">});</span>
@@ -299,73 +369,52 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">update</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "J."</span>
   <span class="p">});</span>
 
 </code></pre>
 
-<blockquote>
-<p>Patch a single row by ID and return the data for that row in 1 query:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
-  <span class="p">});</span>
-
-</code></pre>
-
-<blockquote>
-<p>Patch a Model instance and return the data for that instance in 1 query:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="nx">jennifer</span>
-  <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "J."</span>
-  <span class="p">});</span>
-
-</code></pre>
-
-<p>Because PostgreSQL (and some others) support <code class="prettyprint">returning(&#39;*&#39;)</code> chaining, you can actually <code class="prettyprint">insert</code> a row, or <code class="prettyprint">update</code> / <code class="prettyprint">patch</code> an existing row, <strong>and</strong> receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.</p>
+<p>Because PostgreSQL (and some others) support <code class="prettyprint">returning(&#39;*&#39;)</code> chaining, you can actually <code class="prettyprint">insert</code> a row, or
+<code class="prettyprint">update</code> / <code class="prettyprint">patch</code> an existing row, <strong>and</strong> receive the affected row(s) in a single query, thus improving
+efficiency. See the examples for more clarity.</p>
 
 <h2 id="polymorphic-associations">Polymorphic associations</h2>
-<pre class="highlight javascript"><code><span class="nx">Issue</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
-    <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">},</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="s1">'Issue.id'</span><span class="p">,</span>
-      <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
-    <span class="p">}</span>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Issue</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
+        <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">},</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Issue.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
   <span class="p">}</span>
-<span class="p">};</span>
+<span class="p">}</span>
 
-<span class="nx">PullRequest</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
-    <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'PullRequest'</span><span class="p">},</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="s1">'PullRequest.id'</span><span class="p">,</span>
-      <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
-    <span class="p">}</span>
+<span class="kr">class</span> <span class="nx">PullRequest</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">comments</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
+        <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'PullRequest'</span><span class="p">},</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'PullRequest.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
   <span class="p">}</span>
-<span class="p">};</span>
+<span class="p">}</span>
 </code></pre>
 
 <blockquote>
@@ -386,6 +435,20 @@ the foreign key and <code class="prettyprint">commentableType</code> to hold the
 how to create relations for this setup ➔</p>
 
 <h2 id="timestamps">Timestamps</h2>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeInsert</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">created_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="nx">$beforeUpdate</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">updated_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<blockquote>
+<p>ES5:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
   <span class="k">this</span><span class="p">.</span><span class="nx">created_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
 <span class="p">};</span>
@@ -399,6 +462,24 @@ how to create relations for this setup ➔</p>
 your models, you can simply create common base class that implements these methods.</p>
 
 <h2 id="custom-query-builder">Custom query builder</h2>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">QueryBuilder</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">MyQueryBuilder</span> <span class="kr">extends</span> <span class="nx">QueryBuilder</span> <span class="p">{</span>
+  <span class="c1">// Some custom method.</span>
+  <span class="nx">upsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">model</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Instance of this is created when you call `query()` or `$query()`.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+<span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
+<span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+</code></pre>
 
 <blockquote>
 <p>ES5:</p>
@@ -427,30 +508,9 @@ your models, you can simply create common base class that implements these metho
 </code></pre>
 
 <blockquote>
-<p>ES6:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">QueryBuilder</span><span class="p">;</span>
-
-<span class="kr">class</span> <span class="nx">MyQueryBuilder</span> <span class="kr">extends</span> <span class="nx">QueryBuilder</span> <span class="p">{</span>
-  <span class="nx">upsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-     <span class="k">if</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">model</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-       <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
-     <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// Instance of this is created when you call `query()` or `$query()`.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
-<span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
-</code></pre>
-
-<blockquote>
 <p>Now you can do this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">upsert</span><span class="p">(</span><span class="nx">person</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">upsert</span><span class="p">(</span><span class="nx">person</span><span class="p">).</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="p">...</span>
 <span class="p">});</span>
 </code></pre>
@@ -459,14 +519,15 @@ your models, you can simply create common base class that implements these metho
 and <a href="#_s_query"><code class="prettyprint">modelInstance.$query()</code></a> methods by setting the model class&rsquo;s static <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> and/or
 <a href="#relatedquerybuilder"><code class="prettyprint">RelatedQueryBuilder</code></a> property.</p>
 
-<p>If you want to set the custom query builder for all model classes you can just override the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>
+<p>If you want to set the custom query builder for all model classes you can just set the <code class="prettyprint">QueryBuilder</code>
 property of the <a href="#model"><code class="prettyprint">Model</code></a> base class. A cleaner option would be to create your own Model subclass, set its <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>
 property and inherit all your models from the custom Model class.</p>
 
 <h2 id="multi-tenancy">Multi-tenancy</h2>
-<pre class="highlight javascript"><code><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">((</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">// Function that parses the tenant id from path, header, query parameter etc.</span>
-  <span class="c1">// and returns an instance of knex.</span>
+  <span class="c1">// and returns an instance of knex. You should cache the knex instances and</span>
+  <span class="c1">// not create a new one for each query.</span>
   <span class="kd">var</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">getDatabaseForRequest</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
 
   <span class="nx">req</span><span class="p">.</span><span class="nx">models</span> <span class="o">=</span> <span class="p">{</span>
@@ -491,7 +552,7 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span><span class="nx">orWhere</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
@@ -505,12 +566,20 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
 <p>You can add parentheses to queries by passing a function to the <a href="#where"><code class="prettyprint">where</code></a> method.</p>
 
 <h2 id="default-values">Default values</h2>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">jsonSchema</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-  <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">gender</span><span class="p">:</span> <span class="p">{</span> <span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">enum</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Male'</span><span class="p">,</span> <span class="s1">'Female'</span><span class="p">,</span> <span class="s1">'Other'</span><span class="p">],</span> <span class="na">default</span><span class="p">:</span> <span class="s1">'Female'</span> <span class="p">}</span>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">jsonSchema</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">gender</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span>
+          <span class="na">enum</span><span class="p">:</span> <span class="p">[</span><span class="s1">'Male'</span><span class="p">,</span> <span class="s1">'Female'</span><span class="p">,</span> <span class="s1">'Other'</span><span class="p">],</span>
+          <span class="na">default</span><span class="p">:</span> <span class="s1">'Female'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
   <span class="p">}</span>
-<span class="p">};</span>
+<span class="p">}</span>
 </code></pre>
 
 <p>You can set the default values for properties using the <code class="prettyprint">default</code> property in <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>.</p>
@@ -520,28 +589,36 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
 <blockquote>
 <p>Specifying a composite primary key for a model:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">,</span> <span class="s1">'dateOfBirth'</span><span class="p">];</span>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">,</span> <span class="s1">'dateOfBirth'</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </code></pre>
 
 <blockquote>
 <p>Specifying a relation using a composite primary key and a composite foreign key:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
-  <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-    <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
-    <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
-    <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-      <span class="na">from</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s1">'Person.firstName'</span><span class="p">,</span>
-        <span class="s1">'Person.lastName'</span><span class="p">,</span>
-        <span class="s1">'Person.dateOfBirth'</span>
-      <span class="p">],</span>
-      <span class="na">to</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s1">'Animal.ownerFirstName'</span><span class="p">,</span>
-        <span class="s1">'Animal.ownerLastName'</span><span class="p">,</span>
-        <span class="s1">'Animal.ownerDateOfBirth'</span>
-      <span class="p">]</span>
-    <span class="p">}</span>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s1">'Person.firstName'</span><span class="p">,</span>
+            <span class="s1">'Person.lastName'</span><span class="p">,</span>
+            <span class="s1">'Person.dateOfBirth'</span>
+          <span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s1">'Animal.ownerFirstName'</span><span class="p">,</span>
+            <span class="s1">'Animal.ownerLastName'</span><span class="p">,</span>
+            <span class="s1">'Animal.ownerDateOfBirth'</span>
+          <span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre>
