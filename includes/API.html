@@ -68,7 +68,7 @@ a normal promise would.</p>
 </code></pre>
 <p>Makes the given constructor a subclass of <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>.</p>
 
-<p>This method can be used to do ES5 inheritance. If you are using ES6 or newer, you can just use the <code class="prettyprint">class</code> and <code class="prettyprint">extend</code>
+<p>This method can be used to do ES5 inheritance. If you are using ES2015 or newer, you can just use the <code class="prettyprint">class</code> and <code class="prettyprint">extend</code>
 keywords and you don&rsquo;t need to call this method.</p>
 
 <h5 id="arguments">Arguments</h5>
@@ -4839,7 +4839,111 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 </tbody></table>
 
 <h2 id="model">Model</h2>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="c1">// Table name is the only required property.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="p">}</span>
 
+  <span class="c1">// Optional JSON schema. This is not the database schema!</span>
+  <span class="c1">// Nothing is generated based on this. This is only used</span>
+  <span class="c1">// for validation. Whenever a model instance is created</span>
+  <span class="c1">// it is checked against this schema.</span>
+  <span class="c1">// http://json-schema.org/.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">jsonSchema</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+      <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
+
+      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
+        <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
+        <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+        <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
+        <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
+
+        <span class="c1">// Properties defined as objects or arrays are</span>
+        <span class="c1">// automatically converted to JSON strings when</span>
+        <span class="c1">// writing to database and back to objects and arrays</span>
+        <span class="c1">// when reading from database. To override this</span>
+        <span class="c1">// behaviour, you can override the</span>
+        <span class="c1">// Person.jsonAttributes property.</span>
+        <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
+          <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+            <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
+            <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+
+  <span class="c1">// This object defines the relations to other models.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="c1">// The related model. This can be either a Model</span>
+        <span class="c1">// subclass constructor or an absolute file path</span>
+        <span class="c1">// to a module that exports one. We use the file</span>
+        <span class="c1">// path version here to prevent require loops.</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="c1">// ManyToMany relation needs the `through` object</span>
+          <span class="c1">// to describe the join table.</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you can specify it like this:</span>
+            <span class="c1">//</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
+
+            <span class="c1">// Columns listed here are automatically joined</span>
+            <span class="c1">// to the related models on read and written to</span>
+            <span class="c1">// the join table instead of the related table</span>
+            <span class="c1">// on insert.</span>
+            <span class="c1">//</span>
+            <span class="c1">// extra: ['someExtra']</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <blockquote>
 <p>Defining a model using ES5:</p>
 </blockquote>
@@ -4949,115 +5053,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 <span class="p">};</span>
 </code></pre>
 <blockquote>
-<p>Defining a model using ES6:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="c1">// Table name is the only required property.</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="c1">// Optional JSON schema. This is not the database schema!</span>
-  <span class="c1">// Nothing is generated based on this. This is only used</span>
-  <span class="c1">// for validation. Whenever a model instance is created</span>
-  <span class="c1">// it is checked against this schema.</span>
-  <span class="c1">// http://json-schema.org/.</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">jsonSchema</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-      <span class="na">required</span><span class="p">:</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">],</span>
-
-      <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">id</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'integer'</span><span class="p">},</span>
-        <span class="na">parentId</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="p">[</span><span class="s1">'integer'</span><span class="p">,</span> <span class="s1">'null'</span><span class="p">]},</span>
-        <span class="na">firstName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-        <span class="na">lastName</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">,</span> <span class="na">minLength</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="na">maxLength</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span>
-        <span class="na">age</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'number'</span><span class="p">},</span>
-
-        <span class="c1">// Properties defined as objects or arrays are</span>
-        <span class="c1">// automatically converted to JSON strings when</span>
-        <span class="c1">// writing to database and back to objects and arrays</span>
-        <span class="c1">// when reading from database. To override this</span>
-        <span class="c1">// behaviour, you can override the</span>
-        <span class="c1">// Person.jsonAttributes property.</span>
-        <span class="na">address</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">type</span><span class="p">:</span> <span class="s1">'object'</span><span class="p">,</span>
-          <span class="na">properties</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">street</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-            <span class="na">city</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">},</span>
-            <span class="na">zipCode</span><span class="p">:</span> <span class="p">{</span><span class="na">type</span><span class="p">:</span> <span class="s1">'string'</span><span class="p">}</span>
-          <span class="p">}</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">};</span>
-  <span class="p">}</span>
-
-  <span class="c1">// This object defines the relations to other models.</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-        <span class="c1">// The related model. This can be either a Model</span>
-        <span class="c1">// subclass constructor or an absolute file path</span>
-        <span class="c1">// to a module that exports one. We use the file</span>
-        <span class="c1">// path version here to prevent require loops.</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="c1">// ManyToMany relation needs the `through` object</span>
-          <span class="c1">// to describe the join table.</span>
-          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
-
-            <span class="c1">// If you have a model class for the join table</span>
-            <span class="c1">// you can specify it like this:</span>
-            <span class="c1">//</span>
-            <span class="c1">// modelClass: PersonMovie,</span>
-
-            <span class="c1">// Columns listed here are automatically joined</span>
-            <span class="c1">// to the related models on read and written to</span>
-            <span class="c1">// the join table instead of the related table</span>
-            <span class="c1">// on insert.</span>
-            <span class="c1">//</span>
-            <span class="c1">// extra: ['someExtra']</span>
-          <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">};</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-<blockquote>
-<p>Defining a model using ES7:</p>
+<p>Defining a model using ESNext:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="c1">// Table name is the only required property.</span>
@@ -7739,8 +7735,17 @@ to the relations:</p>
 <p>Shortcut for <a href="#knex"><code class="prettyprint">return this.constructor.knex()</code></a>.</p>
 
 <h4 id="beforeinsert">$beforeInsert</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ES5:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <p>Called before a model is inserted into the database.</p>
@@ -7780,8 +7785,17 @@ you need to do insert specific validation.</p>
 </tbody></table>
 
 <h4 id="afterinsert">$afterInsert</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ES5:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <p>Called after a model has been inserted into the database.</p>
@@ -7819,21 +7833,17 @@ you need to do insert specific validation.</p>
 </tbody></table>
 
 <h4 id="beforeupdate">$beforeUpdate</h4>
-
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <blockquote>
 <p>ES5:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-<span class="p">}</span>
-</code></pre>
-<blockquote>
-<p>ES6/ES7:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
@@ -7907,17 +7917,17 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <blockquote>
 <p>ES5</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
-<p>ES6/ES7:</p>
+<p>ES5:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="p">}</span>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
@@ -7985,21 +7995,17 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 </tbody></table>
 
 <h4 id="beforedelete">$beforeDelete</h4>
-
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <blockquote>
 <p>ES5</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeDelete</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-<span class="p">}</span>
-</code></pre>
-<blockquote>
-<p>ES6/ES7:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <p>Called before a model is deleted.</p>
@@ -8039,21 +8045,17 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 </tbody></table>
 
 <h4 id="afterdelete">$afterDelete</h4>
-
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <blockquote>
 <p>ES5</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterDelete</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-<span class="p">}</span>
-</code></pre>
-<blockquote>
-<p>ES6/ES7:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <p>Called after a model is deleted.</p>
@@ -8093,17 +8095,17 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 </tbody></table>
 
 <h4 id="afterget">$afterGet</h4>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterGet</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
-<p>ES6</p>
+<p>ES5</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-
-  <span class="p">}</span>
+<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$afterGet</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
 <p>Called after a model is fetched.</p>
