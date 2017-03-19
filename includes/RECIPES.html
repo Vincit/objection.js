@@ -39,7 +39,6 @@
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-
 <p>To write raw SQL queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. There are also some helper
 methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>. The <a href="#raw"><code class="prettyprint">raw</code></a> method works just like the
 <a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>. And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
@@ -51,13 +50,11 @@ methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>ES5:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'person_id'</span><span class="p">;</span>
 </code></pre>
-
 <p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.
 Composite key can be defined by using an array of column names.</p>
 
@@ -80,7 +77,6 @@ Composite key can be defined by using an array of column names.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>ES5:</p>
 </blockquote>
@@ -96,7 +92,6 @@ Composite key can be defined by using an array of column names.</p>
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre>
-
 <blockquote>
 <p>Modifying the <a href="https://github.com/epoberezkin/ajv">Ajv</a> based <code class="prettyprint">jsonSchema</code> validation:</p>
 </blockquote>
@@ -118,7 +113,6 @@ Composite key can be defined by using an array of column names.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>Replace <code class="prettyprint">jsonSchema</code> validation with any other validation scheme by
 implementing a custom <a href="#validator"><code class="prettyprint">Validator</code></a>:</p>
@@ -178,7 +172,6 @@ implementing a custom <a href="#validator"><code class="prettyprint">Validator</
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <p>If you want to use the json schema validation but add some custom validation on top of it you can override the
 <a href="#_s_beforevalidate"><code class="prettyprint">$beforeValidate</code></a> or <a href="#_s_aftervalidate"><code class="prettyprint">$afterValidate</code></a> method.</p>
 
@@ -214,7 +207,6 @@ It is completely optional. If you want to use some other validation library you 
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>ES5:</p>
 </blockquote>
@@ -238,7 +230,6 @@ It is completely optional. If you want to use some other validation library you 
   <span class="k">return</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
 <span class="p">};</span>
 </code></pre>
-
 <blockquote>
 <p>Note that even though column names are mapped when fetching / storing data, one still has to use
 db column names when writing queries:</p>
@@ -247,7 +238,6 @@ db column names when writing queries:</p>
 <span class="kd">let</span> <span class="nx">jen</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">where</span><span class="p">(</span><span class="s1">'first_name'</span><span class="p">,</span> <span class="s1">'Jennifer'</span><span class="p">);</span>
 <span class="nx">expect</span><span class="p">(</span><span class="nx">jen</span><span class="p">.</span><span class="nx">firstName</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">'Jennifer'</span><span class="p">);</span>
 </code></pre>
-
 <p>Sometimes you may want to use for example snake_cased column names in database tables
 and camelCased property names in code. You can use the functions</p>
 
@@ -270,7 +260,6 @@ and camelCased property names in code. You can use the functions</p>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
   <span class="p">});</span>
 </code></pre>
-
 <p>Any query can be paged using the <a href="#page"><code class="prettyprint">page</code></a> or <a href="#range"><code class="prettyprint">range</code></a> method.</p>
 
 <h2 id="subqueries">Subqueries</h2>
@@ -287,7 +276,6 @@ and camelCased property names in code. You can use the functions</p>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-
 <blockquote>
 <p>Or <code class="prettyprint">QueryBuilder</code>s:</p>
 </blockquote>
@@ -298,7 +286,6 @@ and camelCased property names in code. You can use the functions</p>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-
 <p>Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
 methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places
 you would expect. You can also pass <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> instances or knex queries instead of functions.</p>
@@ -316,7 +303,6 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-
 <blockquote>
 <p><a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> helper for joining relation graphs:</p>
 </blockquote>
@@ -328,7 +314,6 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">grandParentName</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-
 <p>Again, <a href="http://knexjs.org/#Builder-join">do as you would with a knex query builder</a>. Objection also has helpers like
 the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method family.</p>
 
@@ -347,7 +332,6 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">});</span>
 
 </code></pre>
-
 <blockquote>
 <p>Update a single row by ID and return the data for that row in 1 query:</p>
 </blockquote>
@@ -363,7 +347,6 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">});</span>
 
 </code></pre>
-
 <blockquote>
 <p>Update a Model instance and return the data for that instance in 1 query:</p>
 </blockquote>
@@ -378,7 +361,6 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">});</span>
 
 </code></pre>
-
 <p>Because PostgreSQL (and some others) support <code class="prettyprint">returning(&#39;*&#39;)</code> chaining, you can actually <code class="prettyprint">insert</code> a row, or
 <code class="prettyprint">update</code> / <code class="prettyprint">patch</code> an existing row, <strong>and</strong> receive the affected row(s) in a single query, thus improving
 efficiency. See the examples for more clarity.</p>
@@ -416,7 +398,6 @@ efficiency. See the examples for more clarity.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>The <code class="prettyprint">{commentableType: &#39;Type&#39;}</code> filter adds a <code class="prettyprint">WHERE &quot;commentableType&quot; = &#39;Type&#39;</code> clause to the relation fetch
 query. It doesn&rsquo;t automatically set the type when you insert a new comment. You have to set the <code class="prettyprint">commentableType</code>
@@ -427,7 +408,6 @@ manually:</p>
   <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">text</span><span class="p">:</span> <span class="s1">'blaa'</span><span class="p">,</span> <span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(...)</span>
 </code></pre>
-
 <p>Creating polymorphic associations isn&rsquo;t as easy as it could be at the moment, but it can be done using
 custom filters for relations. Let&rsquo;s assume we have tables <code class="prettyprint">Comment</code>, <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code>. Both
 <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code> can have a list of comments. <code class="prettyprint">Comment</code> has a column <code class="prettyprint">commentableId</code> to hold
@@ -445,7 +425,6 @@ how to create relations for this setup ➔</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>ES5:</p>
 </blockquote>
@@ -457,7 +436,6 @@ how to create relations for this setup ➔</p>
   <span class="k">this</span><span class="p">.</span><span class="nx">updated_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
 <span class="p">};</span>
 </code></pre>
-
 <p>You can implement the <code class="prettyprint">$beforeInsert</code> and <code class="prettyprint">$beforeUpdate</code> methods to set the timestamps. If you want to do this for all
 your models, you can simply create common base class that implements these methods.</p>
 
@@ -480,7 +458,6 @@ your models, you can simply create common base class that implements these metho
 <span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
 <span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
 </code></pre>
-
 <blockquote>
 <p>ES5:</p>
 </blockquote>
@@ -506,7 +483,6 @@ your models, you can simply create common base class that implements these metho
 <span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
 <span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
 </code></pre>
-
 <blockquote>
 <p>Now you can do this:</p>
 </blockquote>
@@ -514,7 +490,6 @@ your models, you can simply create common base class that implements these metho
   <span class="p">...</span>
 <span class="p">});</span>
 </code></pre>
-
 <p>You can extend the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> returned by <a href="#query"><code class="prettyprint">Model.query()</code></a>, <a href="#_s_relatedquery"><code class="prettyprint">modelInstance.$relatedQuery()</code></a>
 and <a href="#_s_query"><code class="prettyprint">modelInstance.$query()</code></a> methods by setting the model class&rsquo;s static <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> and/or
 <a href="#relatedquerybuilder"><code class="prettyprint">RelatedQueryBuilder</code></a> property.</p>
@@ -539,7 +514,6 @@ property and inherit all your models from the custom Model class.</p>
   <span class="nx">next</span><span class="p">();</span>
 <span class="p">});</span>
 </code></pre>
-
 <p>By default, the examples guide you to setup the database connection by setting the knex object of the <a href="#model"><code class="prettyprint">Model</code></a> base
 class. This doesn&rsquo;t fly if you want to select the database based on the request as it sets the connection globally.</p>
 
@@ -556,13 +530,11 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
     <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'foo'</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span><span class="nx">orWhere</span><span class="p">(</span><span class="s1">'bar'</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-
 <blockquote>
 <p>SQL:</p>
 </blockquote>
 <pre class="highlight sql"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">and</span> <span class="p">(</span><span class="nv">"foo"</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">or</span> <span class="nv">"bar"</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </code></pre>
-
 <p>You can add parentheses to queries by passing a function to the <a href="#where"><code class="prettyprint">where</code></a> method.</p>
 
 <h2 id="default-values">Default values</h2>
@@ -581,7 +553,6 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <p>You can set the default values for properties using the <code class="prettyprint">default</code> property in <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>.</p>
 
 <h2 id="composite-keys">Composite keys</h2>
@@ -595,7 +566,6 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-
 <blockquote>
 <p>Specifying a relation using a composite primary key and a composite foreign key:</p>
 </blockquote>
@@ -622,7 +592,6 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
   <span class="p">}</span>
 <span class="p">};</span>
 </code></pre>
-
 <p>Compound keys are fully supported. Just give an array of columns where you would normally give a single column name.
 Composite primary key can be specified by setting an array of column names to the <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> of a model
 class.</p>
