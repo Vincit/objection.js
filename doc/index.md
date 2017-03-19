@@ -25,7 +25,7 @@ are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thor
 
 What objection.js gives you:
 
- * **An easy declarative way of [defining models](#models) and relations between them**
+ * **An easy declarative way of [defining models](#models) and relationships between them**
  * **Simple and fun way to [fetch, insert, update and delete](#query-examples) objects using the full power of SQL**
  * **Powerful mechanisms for [eager loading](#eager-loading) and [inserting object graphs](#graph-inserts)**
  * **A way to [store complex documents](#documents) as single rows**
