@@ -7,26 +7,55 @@ Person
   .query()
   .select(Person.raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
   .groupBy('parentId')
-  .then(function (childAgeSums) {
+  .then(childAgeSums => {
     console.log(childAgeSums[0].childAgeSum);
   });
 ```
 
 To write raw SQL queries, use the [`raw`](#raw) method of any [`Model`](#model) subclass. There are also some helper
 methods such as [`whereRaw`](#whereraw) in the [`QueryBuilder`](#querybuilder). The [`raw`](#raw) method works just like the
-[knex's raw method](http://knexjs.org/#Raw).
+[knex's raw method](http://knexjs.org/#Raw). And of course you can just use `knex.raw()`.
 
 ## Change id column
+
+```js
+class Person extends Model {
+  static get idColumn() {
+    return 'person_id';
+  }
+}
+```
+
+> ES5:
 
 ```js
 Person.idColumn = 'person_id';
 ```
 
 Name of the identifier column can be changed by setting the static [`idColumn`](#idcolumn) property of a model class.
+Composite key can be defined by using an array of column names.
 
 ## Custom validation
 
 > Additional validation:
+
+```js
+class Person extends Model {
+  beforeInsert() {
+    if (this.id) {
+      throw new objection.ValidationError({
+        id: [{
+          message: 'identifier should not be defined before insert'
+          keyword: null,
+          params: null
+        }]
+      });
+    }
+  }
+}
+```
+
+> ES5:
 
 ```js
 Person.prototype.$beforeInsert = function () {
@@ -42,7 +71,7 @@ Person.prototype.$beforeInsert = function () {
 };
 ```
 
-> Modify the [Ajv](https://github.com/epoberezkin/ajv) based `jsonSchema` validation:
+> Modifying the [Ajv](https://github.com/epoberezkin/ajv) based `jsonSchema` validation:
 
 ```js
 const AjvValidator = require('objection').AjvValidator;
@@ -125,7 +154,7 @@ class BaseModel extends Model {
 ```
 
 If you want to use the json schema validation but add some custom validation on top of it you can override the
-[`$beforeValidate`](#_s_beforevalidate) and [`$afterValidate`](#_s_aftervalidate) methods.
+[`$beforeValidate`](#_s_beforevalidate) or [`$afterValidate`](#_s_aftervalidate) method.
 
 If you need to do validation on insert or update you can throw exceptions from the
 [`$beforeInsert`](#_s_beforeinsert) and [`$beforeUpdate`](#_s_beforeupdate) methods.
@@ -137,6 +166,30 @@ It is completely optional. If you want to use some other validation library you 
 ## Map column names to different property names
 
 > snake_case/camelCase conversion:
+
+```js
+class Person extends Model {
+  // This is called when an object is serialized to database format.
+  $formatDatabaseJson(json) {
+    json = super.$formatDatabaseJson(json);
+
+    return _.mapKeys(json, (value, key) => {
+      return _.snakeCase(key);
+    });
+  }
+
+  // This is called when an object is read from database.
+  $parseDatabaseJson(json) {
+    json = _.mapKeys(json, function (value, key) {
+      return _.camelCase(key);
+    });
+
+    return super.$parseDatabaseJson(json);
+  }
+}
+```
+
+> ES5:
 
 ```js
 // This is called when an object is serialized to database format.
@@ -161,7 +214,7 @@ Person.prototype.$parseDatabaseJson = function (json) {
 ```
 
 > Note that even though column names are mapped when fetching / storing data, one still has to use
-> correct db column names when writing queries:
+> db column names when writing queries:
 
 ```js
 await Person.query().insert({ firstName: 'Jennifer' });
@@ -186,7 +239,7 @@ Person
   .query()
   .where('age', '>', 20)
   .page(5, 100)
-  .then(function (result) {
+  .then(result => {
     console.log(result.results.length); // --> 100
     console.log(result.total); // --> 3341
   });
@@ -196,47 +249,62 @@ Any query can be paged using the [`page`](#page) or [`range`](#range) method.
 
 ## Subqueries
 
-> Use function:
+> You can use functions:
 
 ```js
 Person
   .query()
-  .where('age', '>', function (builder) {
+  .where('age', '>', builder => {
     builder.avg('age').from('Person');
   })
-  .then(function (peopleOlderThanAverage) {
+  .then(peopleOlderThanAverage => {
     console.log(peopleOlderThanAverage);
   });
 ```
 
-> Use `QueryBuilder`:
+> Or `QueryBuilder`s:
 
 ```js
 Person
   .query()
   .where('age', '>', Person.query().avg('age'))
-  .then(function (peopleOlderThanAverage) {
+  .then(peopleOlderThanAverage => {
     console.log(peopleOlderThanAverage);
   });
 ```
 
 Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
 methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places
-you would expect. You can also pass [`QueryBuilder`](#querybuilder) instances instead of functions.
+you would expect. You can also pass [`QueryBuilder`](#querybuilder) instances or knex queries instead of functions.
 
 ## Joins
+
+> Normal knex-style join:
 
 ```js
 Person
   .query()
   .select('Person.*', 'Parent.firstName as parentName')
   .join('Person as Parent', 'Person.parentId', 'Parent.id')
-  .then(function (persons) {
-    console.log(persons[0].parentName);
+  .then(people => {
+    console.log(people[0].parentName);
   });
 ```
 
-Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-join).
+> [`joinRelation`](#joinrelation) helper for joining relation graphs:
+
+```js
+Person
+  .query()
+  .select('parent:parent.name as grandParentName'
+  .joinRelation('parent.parent')
+  .then(people => {
+    console.log(people[0].grandParentName);
+  });
+```
+
+Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-join). Objection also has helpers like
+the [`joinRelation`](#joinrelation) method family.
 
 ## PostgreSQL "returning" tricks
 
@@ -247,7 +315,7 @@ Person
   .query()
   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
   .returning('*')
-  .then(function (jennifer) {
+  .then(jennifer => {
     console.log(jennifer.createdAt); // NOW()-ish
     console.log(jennifer.id);
   });
@@ -259,11 +327,11 @@ Person
 ```js
 Person
   .query()
-  .update({firstName: 'Jenn', lastName: 'Lawrence'})
+  .patch({firstName: 'Jenn', lastName: 'Lawrence'})
   .where('id', 1234)
   .first() // Ensures we're returned a single row in the promise resolution
   .returning('*')
-  .then(function (jennifer) {
+  .then(jennifer => {
     console.log(jennifer.updatedAt); // NOW()-ish
     console.log(jennifer.firstName); // "Jenn"
   });
@@ -275,75 +343,54 @@ Person
 ```js
 jennifer
   .$query()
-  .update({firstName: 'J.', lastName: 'Lawrence'})
+  .patch({firstName: 'J.', lastName: 'Lawrence'})
   .first() // Ensures we're returned a single row in the promise resolution
   .returning('*')
-  .then(function (jennifer) {
+  .then(jennifer => {
     console.log(jennifer.updatedAt); // NOW()-ish
     console.log(jennifer.firstName); // "J."
   });
 
 ```
 
-> Patch a single row by ID and return the data for that row in 1 query:
-
-```js
-Person
-  .query()
-  .patch({firstName: 'Jenn'})
-  .where('id', 1234)
-  .first() // Ensures we're returned a single row in the promise resolution
-  .returning('*')
-  .then(function(jennifer) {
-    console.log(jennifer.updatedAt); // NOW()-ish
-    console.log(jennifer.firstName); // "Jenn"
-  });
-
-```
-
-> Patch a Model instance and return the data for that instance in 1 query:
-
-```js
-jennifer
-  .$query()
-  .patch({firstName: 'J.'})
-  .first() // Ensures we're returned a single row in the promise resolution
-  .returning('*')
-  .then(function(jennifer) {
-    console.log(jennifer.updatedAt); // NOW()-ish
-    console.log(jennifer.firstName); // "J."
-  });
-
-```
-
-Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or `update` / `patch` an existing row, __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
+Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or
+`update` / `patch` an existing row, __and__ receive the affected row(s) in a single query, thus improving
+efficiency. See the examples for more clarity.
 
 ## Polymorphic associations
 
 ```js
-Issue.relationMappings = {
-  comments: {
-    relation: Model.HasManyRelation,
-    modelClass: Comment,
-    filter: {commentableType: 'Issue'},
-    join: {
-      from: 'Issue.id',
-      to: 'Comment.commentableId'
-    }
+class Issue extends Model {
+  static get relationMappings() {
+    return {
+      comments: {
+        relation: Model.HasManyRelation,
+        modelClass: Comment,
+        filter: {commentableType: 'Issue'},
+        join: {
+          from: 'Issue.id',
+          to: 'Comment.commentableId'
+        }
+      }
+    };
   }
-};
+}
 
-PullRequest.relationMappings = {
-  comments: {
-    relation: Model.HasManyRelation,
-    modelClass: Comment,
-    filter: {commentableType: 'PullRequest'},
-    join: {
-      from: 'PullRequest.id',
-      to: 'Comment.commentableId'
-    }
+class PullRequest extends Model {
+  static get relationMappings() {
+    return {
+      comments: {
+        relation: Model.HasManyRelation,
+        modelClass: Comment,
+        filter: {commentableType: 'PullRequest'},
+        join: {
+          from: 'PullRequest.id',
+          to: 'Comment.commentableId'
+        }
+      }
+    };
   }
-};
+}
 ```
 
 > The `{commentableType: 'Type'}` filter adds a `WHERE "commentableType" = 'Type'` clause to the relation fetch
@@ -366,6 +413,20 @@ how to create relations for this setup ➔
 ## Timestamps
 
 ```js
+class Person extends Model {
+  $beforeInsert() {
+    this.created_at = new Date().toISOString();
+  }
+
+  $beforeUpdate() {
+    this.updated_at = new Date().toISOString();
+  }
+}
+```
+
+> ES5:
+
+```js
 Person.prototype.$beforeInsert = function () {
   this.created_at = new Date().toISOString();
 };
@@ -379,6 +440,26 @@ You can implement the `$beforeInsert` and `$beforeUpdate` methods to set the tim
 your models, you can simply create common base class that implements these methods.
 
 ## Custom query builder
+
+```js
+const QueryBuilder = require('objection').QueryBuilder;
+
+class MyQueryBuilder extends QueryBuilder {
+  // Some custom method.
+  upsert(model) {
+    if (model.id) {
+      return this.update(model).where('id', model.id);
+    } else {
+      return this.insert(model);
+    }
+  }
+}
+
+// Instance of this is created when you call `query()` or `$query()`.
+Person.QueryBuilder = MyQueryBuilder;
+// Instance of this is created when you call `$relatedQuery()`.
+Person.RelatedQueryBuilder = MyQueryBuilder;
+```
 
 > ES5:
 
@@ -406,31 +487,10 @@ Person.QueryBuilder = MyQueryBuilder;
 Person.RelatedQueryBuilder = MyQueryBuilder;
 ```
 
-> ES6:
-
-```js
-const QueryBuilder = require('objection').QueryBuilder;
-
-class MyQueryBuilder extends QueryBuilder {
-  upsert(model) {
-     if (model.id) {
-       return this.update(model).where('id', model.id);
-     } else {
-       return this.insert(model);
-     }
-  }
-}
-
-// Instance of this is created when you call `query()` or `$query()`.
-Person.QueryBuilder = MyQueryBuilder;
-// Instance of this is created when you call `$relatedQuery()`.
-Person.RelatedQueryBuilder = MyQueryBuilder;
-```
-
 > Now you can do this:
 
 ```js
-Person.query().upsert(person).then(function () {
+Person.query().upsert(person).then(() => {
   ...
 });
 ```
@@ -439,16 +499,17 @@ You can extend the [`QueryBuilder`](#querybuilder) returned by [`Model.query()`]
 and [`modelInstance.$query()`](#_s_query) methods by setting the model class's static [`QueryBuilder`](#querybuilder) and/or
 [`RelatedQueryBuilder`](#relatedquerybuilder) property.
 
-If you want to set the custom query builder for all model classes you can just override the [`QueryBuilder`](#querybuilder)
+If you want to set the custom query builder for all model classes you can just set the `QueryBuilder`
 property of the [`Model`](#model) base class. A cleaner option would be to create your own Model subclass, set its [`QueryBuilder`](#querybuilder)
 property and inherit all your models from the custom Model class.
 
 ## Multi-tenancy
 
 ```js
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   // Function that parses the tenant id from path, header, query parameter etc.
-  // and returns an instance of knex.
+  // and returns an instance of knex. You should cache the knex instances and
+  // not create a new one for each query.
   var knex = getDatabaseForRequest(req);
 
   req.models = {
@@ -475,7 +536,7 @@ knex connection. That way the database connection doesn't change for the other r
 Person
   .query()
   .where('id', 1)
-  .where(function (builder) {
+  .where(builder => {
     builder.where('foo', 2).orWhere('bar', 3);
   });
 ```
@@ -491,12 +552,20 @@ You can add parentheses to queries by passing a function to the [`where`](#where
 ## Default values
 
 ```js
-Person.jsonSchema = {
-  type: 'object',
-  properties: {
-    gender: { type: 'string', enum: ['Male', 'Female', 'Other'], default: 'Female' }
+class Person extends Model {
+  static get jsonSchema() {
+    return {
+      type: 'object',
+      properties: {
+        gender: {
+          type: 'string',
+          enum: ['Male', 'Female', 'Other'],
+          default: 'Female'
+        }
+      }
+    };
   }
-};
+}
 ```
 
 You can set the default values for properties using the `default` property in [`jsonSchema`](#jsonschema).
@@ -506,28 +575,36 @@ You can set the default values for properties using the `default` property in [`
 > Specifying a composite primary key for a model:
 
 ```js
-Person.idColumn = ['firstName', 'lastName', 'dateOfBirth'];
+class Person extends Model {
+  static get idColumn() {
+    return ['firstName', 'lastName', 'dateOfBirth'];
+  }
+}
 ```
 
 > Specifying a relation using a composite primary key and a composite foreign key:
 
 ```js
-Person.relationMappings = {
-  pets: {
-    relation: Model.BelongsToOneRelation,
-    modelClass: Animal,
-    join: {
-      from: [
-        'Person.firstName',
-        'Person.lastName',
-        'Person.dateOfBirth'
-      ],
-      to: [
-        'Animal.ownerFirstName',
-        'Animal.ownerLastName',
-        'Animal.ownerDateOfBirth'
-      ]
-    }
+class Person extends Model {
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Animal,
+        join: {
+          from: [
+            'Person.firstName',
+            'Person.lastName',
+            'Person.dateOfBirth'
+          ],
+          to: [
+            'Animal.ownerFirstName',
+            'Animal.ownerLastName',
+            'Animal.ownerDateOfBirth'
+          ]
+        }
+      }
+    };
   }
 };
 ```
