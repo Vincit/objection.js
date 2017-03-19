@@ -48,7 +48,7 @@ class MyQueryBuilder extends QueryBuilder {
 
 Makes the given constructor a subclass of [`QueryBuilder`](#querybuilder).
 
-This method can be used to do ES5 inheritance. If you are using ES6 or newer, you can just use the `class` and `extend`
+This method can be used to do ES5 inheritance. If you are using ES2015 or newer, you can just use the `class` and `extend`
 keywords and you don't need to call this method.
 
 ##### Arguments
@@ -3983,6 +3983,113 @@ Type|Description
 
 ## Model
 
+```js
+class Person extends Model {
+  // Table name is the only required property.
+  static get tableName() {
+    return 'Person';
+  }
+
+  // Optional JSON schema. This is not the database schema!
+  // Nothing is generated based on this. This is only used
+  // for validation. Whenever a model instance is created
+  // it is checked against this schema.
+  // http://json-schema.org/.
+  static get jsonSchema () {
+    return {
+      type: 'object',
+      required: ['firstName', 'lastName'],
+
+      properties: {
+        id: {type: 'integer'},
+        parentId: {type: ['integer', 'null']},
+        firstName: {type: 'string', minLength: 1, maxLength: 255},
+        lastName: {type: 'string', minLength: 1, maxLength: 255},
+        age: {type: 'number'},
+
+        // Properties defined as objects or arrays are
+        // automatically converted to JSON strings when
+        // writing to database and back to objects and arrays
+        // when reading from database. To override this
+        // behaviour, you can override the
+        // Person.jsonAttributes property.
+        address: {
+          type: 'object',
+          properties: {
+            street: {type: 'string'},
+            city: {type: 'string'},
+            zipCode: {type: 'string'}
+          }
+        }
+      }
+    };
+  }
+
+  // This object defines the relations to other models.
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        // The related model. This can be either a Model
+        // subclass constructor or an absolute file path
+        // to a module that exports one. We use the file
+        // path version here to prevent require loops.
+        modelClass: __dirname + '/Animal',
+        join: {
+          from: 'Person.id',
+          to: 'Animal.ownerId'
+        }
+      },
+
+      movies: {
+        relation: Model.ManyToManyRelation,
+        modelClass: __dirname + '/Movie',
+        join: {
+          from: 'Person.id',
+          // ManyToMany relation needs the `through` object
+          // to describe the join table.
+          through: {
+            from: 'Person_Movie.actorId',
+            to: 'Person_Movie.movieId'
+
+            // If you have a model class for the join table
+            // you can specify it like this:
+            //
+            // modelClass: PersonMovie,
+
+            // Columns listed here are automatically joined
+            // to the related models on read and written to
+            // the join table instead of the related table
+            // on insert.
+            //
+            // extra: ['someExtra']
+          },
+          to: 'Movie.id'
+        }
+      },
+
+      children: {
+        relation: Model.HasManyRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.id',
+          to: 'Person.parentId'
+        }
+      },
+
+      parent: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.parentId',
+          to: 'Person.id'
+        }
+      }
+    };
+  }
+}
+```
+
 > Defining a model using ES5:
 
 ```js
@@ -4092,116 +4199,7 @@ Person.relationMappings = {
 };
 ```
 
-> Defining a model using ES6:
-
-```js
-class Person extends Model {
-  // Table name is the only required property.
-  static get tableName() {
-    return 'Person';
-  }
-
-  // Optional JSON schema. This is not the database schema!
-  // Nothing is generated based on this. This is only used
-  // for validation. Whenever a model instance is created
-  // it is checked against this schema.
-  // http://json-schema.org/.
-  static get jsonSchema () {
-    return {
-      type: 'object',
-      required: ['firstName', 'lastName'],
-
-      properties: {
-        id: {type: 'integer'},
-        parentId: {type: ['integer', 'null']},
-        firstName: {type: 'string', minLength: 1, maxLength: 255},
-        lastName: {type: 'string', minLength: 1, maxLength: 255},
-        age: {type: 'number'},
-
-        // Properties defined as objects or arrays are
-        // automatically converted to JSON strings when
-        // writing to database and back to objects and arrays
-        // when reading from database. To override this
-        // behaviour, you can override the
-        // Person.jsonAttributes property.
-        address: {
-          type: 'object',
-          properties: {
-            street: {type: 'string'},
-            city: {type: 'string'},
-            zipCode: {type: 'string'}
-          }
-        }
-      }
-    };
-  }
-
-  // This object defines the relations to other models.
-  static get relationMappings() {
-    return {
-      pets: {
-        relation: Model.HasManyRelation,
-        // The related model. This can be either a Model
-        // subclass constructor or an absolute file path
-        // to a module that exports one. We use the file
-        // path version here to prevent require loops.
-        modelClass: __dirname + '/Animal',
-        join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
-        }
-      },
-
-      movies: {
-        relation: Model.ManyToManyRelation,
-        modelClass: __dirname + '/Movie',
-        join: {
-          from: 'Person.id',
-          // ManyToMany relation needs the `through` object
-          // to describe the join table.
-          through: {
-            from: 'Person_Movie.actorId',
-            to: 'Person_Movie.movieId'
-
-            // If you have a model class for the join table
-            // you can specify it like this:
-            //
-            // modelClass: PersonMovie,
-
-            // Columns listed here are automatically joined
-            // to the related models on read and written to
-            // the join table instead of the related table
-            // on insert.
-            //
-            // extra: ['someExtra']
-          },
-          to: 'Movie.id'
-        }
-      },
-
-      children: {
-        relation: Model.HasManyRelation,
-        modelClass: Person,
-        join: {
-          from: 'Person.id',
-          to: 'Person.parentId'
-        }
-      },
-
-      parent: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Person,
-        join: {
-          from: 'Person.parentId',
-          to: 'Person.id'
-        }
-      }
-    };
-  }
-}
-```
-
-> Defining a model using ES7:
+> Defining a model using ESNext:
 
 ```js
 class Person extends Model {
@@ -6690,8 +6688,18 @@ Shortcut for [`return this.constructor.knex()`](#knex).
 #### $beforeInsert
 
 ```js
-Person.prototype.$beforeInsert = function (queryContext) {
+class Person extends Model {
+  $beforeInsert(queryContext) {
+    return doPossiblyAsyncStuff();
+  }
+}
+```
 
+> ES5:
+
+```js
+Person.prototype.$beforeInsert = function (queryContext) {
+  return doPossiblyAsyncStuff();
 }
 ```
 
@@ -6719,8 +6727,18 @@ Type|Description
 #### $afterInsert
 
 ```js
-Person.prototype.$afterInsert = function (queryContext) {
+class Person extends Model {
+  $afterInsert(queryContext) {
+    return doPossiblyAsyncStuff();
+  }
+}
+```
 
+> ES5:
+
+```js
+Person.prototype.$afterInsert = function (queryContext) {
+  return doPossiblyAsyncStuff();
 }
 ```
 
@@ -6745,21 +6763,19 @@ Type|Description
 
 #### $beforeUpdate
 
+```js
+class Person extends Model {
+  $beforeUpdate(opt, queryContext) {
+    return doPossiblyAsyncStuff();
+  }
+}
+```
+
 > ES5:
 
 ```js
 Person.prototype.$beforeUpdate = function (opt, queryContext) {
-
-}
-```
-
-> ES6/ES7:
-
-```js
-class Person extends Model {
-  $beforeUpdate(opt, queryContext) {
-
-  }
+  return doPossiblyAsyncStuff();
 }
 ```
 
@@ -6817,18 +6833,18 @@ Type|Description
 > ES5
 
 ```js
-Person.prototype.$afterUpdate = function (opt, queryContext) {
-
+class Person extends Model {
+  $afterUpdate(opt, queryContext) {
+    return doPossiblyAsyncStuff();
+  }
 }
 ```
 
-> ES6/ES7:
+> ES5:
 
 ```js
-class Person extends Model {
-  $afterUpdate(opt, queryContext) {
-
-  }
+Person.prototype.$afterUpdate = function (opt, queryContext) {
+  return doPossiblyAsyncStuff();
 }
 ```
 
@@ -6880,21 +6896,19 @@ Type|Description
 
 #### $beforeDelete
 
+```js
+class Person extends Model {
+  $beforeDelete(queryContext) {
+    return doPossiblyAsyncStuff();
+  }
+}
+```
+
 > ES5
 
 ```js
 Person.prototype.$beforeDelete = function (queryContext) {
-
-}
-```
-
-> ES6/ES7:
-
-```js
-class Person extends Model {
-  $beforeDelete(queryContext) {
-
-  }
+  return doPossiblyAsyncStuff();
 }
 ```
 
@@ -6921,21 +6935,19 @@ Type|Description
 
 #### $afterDelete
 
+```js
+class Person extends Model {
+  $afterDelete(queryContext) {
+    return doPossiblyAsyncStuff();
+  }
+}
+```
+
 > ES5
 
 ```js
 Person.prototype.$afterDelete = function (queryContext) {
-
-}
-```
-
-> ES6/ES7:
-
-```js
-class Person extends Model {
-  $afterDelete(queryContext) {
-
-  }
+  return doPossiblyAsyncStuff();
 }
 ```
 
@@ -6963,18 +6975,18 @@ Type|Description
 #### $afterGet
 
 ```js
-Person.prototype.$afterGet = function (queryContext) {
-
+class Person extends Model {
+  $afterGet(queryContext) {
+    return doPossiblyAsyncStuff();
+  }
 }
 ```
 
-> ES6
+> ES5
 
 ```js
-class Person extends Model {
-  $afterGet(queryContext) {
-
-  }
+Person.prototype.$afterGet = function (queryContext) {
+  return doPossiblyAsyncStuff();
 }
 ```
 

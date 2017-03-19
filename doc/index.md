@@ -202,16 +202,6 @@ MinimalModel.tableName = 'SomeTableName';
 module.exports = MinimalModel;
 ```
 
-```js
-const Model = require('objection').Model;
-
-class MinimalModel extends Model {
-  static get tableName() { return 'SomeTableName'; }
-}
-
-module.exports = MinimalModel;
-```
-
 > ESNext:
 
 ```js
