@@ -7408,7 +7408,55 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 </ol>
 
 <h4 id="relationmappings">relationMappings</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
 
+      <span class="na">father</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+
+            <span class="c1">// If you have a model class for the join table</span>
+            <span class="c1">// you can specify it like this:</span>
+            <span class="c1">//</span>
+            <span class="c1">// modelClass: PersonMovie,</span>
+
+            <span class="c1">// Columns listed here are automatically joined</span>
+            <span class="c1">// to the related models on read and written to</span>
+            <span class="c1">// the join table instead of the related table</span>
+            <span class="c1">// on insert.</span>
+            <span class="c1">//</span>
+            <span class="c1">// extra: ['someExtra']</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <blockquote>
 <p>ES5:</p>
 </blockquote>
@@ -7463,59 +7511,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <span class="p">};</span>
 </code></pre>
 <blockquote>
-<p>ES6:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">{</span>
-      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">father</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
-        <span class="p">}</span>
-      <span class="p">},</span>
-
-      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
-        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
-
-            <span class="c1">// If you have a model class for the join table</span>
-            <span class="c1">// you can specify it like this:</span>
-            <span class="c1">//</span>
-            <span class="c1">// modelClass: PersonMovie,</span>
-
-            <span class="c1">// Columns listed here are automatically joined</span>
-            <span class="c1">// to the related models on read and written to</span>
-            <span class="c1">// the join table instead of the related table</span>
-            <span class="c1">// on insert.</span>
-            <span class="c1">//</span>
-            <span class="c1">// extra: ['someExtra']</span>
-          <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
-        <span class="p">}</span>
-      <span class="p">}</span>
-    <span class="p">};</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-<blockquote>
-<p>ES7:</p>
+<p>ESNext:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
