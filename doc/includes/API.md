@@ -5369,7 +5369,7 @@ Person
 
 // This will throw assuming that `firstName` or `lastName`
 // is a required property for a Person.
-Person.query().patch({age: 100});
+Person.query().update({age: 100});
 
 // This will _not_ throw.
 Person
