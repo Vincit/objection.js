@@ -4588,6 +4588,57 @@ A model class can be defined for a relation in [`relationMappings`](#relationmap
 
 #### relationMappings
 
+```js
+class Person extends Model {
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'Person.id',
+          to: 'Animal.ownerId'
+        }
+      },
+
+      father: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.fatherId',
+          to: 'Person.id'
+        }
+      },
+
+      movies: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Movie,
+        join: {
+          from: 'Person.id',
+          through: {
+            from: 'Person_Movie.actorId',
+            to: 'Person_Movie.movieId'
+
+            // If you have a model class for the join table
+            // you can specify it like this:
+            //
+            // modelClass: PersonMovie,
+
+            // Columns listed here are automatically joined
+            // to the related models on read and written to
+            // the join table instead of the related table
+            // on insert.
+            //
+            // extra: ['someExtra']
+          },
+          to: 'Movie.id'
+        }
+      }
+    };
+  }
+}
+```
+
 > ES5:
 
 ```js
@@ -4642,60 +4693,7 @@ Person.relationMappings = {
 };
 ```
 
-> ES6:
-
-```js
-class Person extends Model {
-  static get relationMappings() {
-    return {
-      pets: {
-        relation: Model.HasManyRelation,
-        modelClass: Animal,
-        join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
-        }
-      },
-
-      father: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Person,
-        join: {
-          from: 'Person.fatherId',
-          to: 'Person.id'
-        }
-      },
-
-      movies: {
-        relation: Model.ManyToManyRelation,
-        modelClass: Movie,
-        join: {
-          from: 'Person.id',
-          through: {
-            from: 'Person_Movie.actorId',
-            to: 'Person_Movie.movieId'
-
-            // If you have a model class for the join table
-            // you can specify it like this:
-            //
-            // modelClass: PersonMovie,
-
-            // Columns listed here are automatically joined
-            // to the related models on read and written to
-            // the join table instead of the related table
-            // on insert.
-            //
-            // extra: ['someExtra']
-          },
-          to: 'Movie.id'
-        }
-      }
-    };
-  }
-}
-```
-
-> ES7:
+> ESNext:
 
 ```js
 class Person extends Model {
