@@ -1,7 +1,6 @@
-import _ from 'lodash';
-import {inherits} from '../utils/classUtils';
-import QueryBuilderContextBase from './QueryBuilderContextBase';
 import KnexOperation from './operations/KnexOperation';
+import QueryBuilderContextBase from './QueryBuilderContextBase';
+import {inherits} from '../utils/classUtils';
 
 /**
  * Base functionality to be able to use query builder operation annotations.
@@ -172,7 +171,7 @@ export default class QueryBuilderOperationSupport {
    * @returns {QueryBuilderBase}
    */
   forEachOperation(operationSelector, callback, match = true) {
-    if (_.isRegExp(operationSelector)) {
+    if (operationSelector instanceof RegExp) {
       this._forEachOperationRegex(operationSelector, callback, match);
     } else {
       this._forEachOperationInstanceOf(operationSelector, callback, match);
@@ -190,7 +189,7 @@ export default class QueryBuilderOperationSupport {
    callQueryBuilderOperation(operation, args, pushFront) {
     if (operation.call(this, args || [])) {
       if (pushFront) {
-        this._operations.splice(0, 0, operation);
+        this._operations.unshift(operation);
       } else {
         this._operations.push(operation);
       }
@@ -202,6 +201,7 @@ export default class QueryBuilderOperationSupport {
   /**
    * @param {string} methodName
    * @param {Array.<*>} args
+   * @param {boolean=} pushFront
    * @returns {QueryBuilderOperationSupport}
    */
   callKnexQueryBuilderOperation(methodName, args, pushFront) {
@@ -256,14 +256,17 @@ export default class QueryBuilderOperationSupport {
           tmp.push(null);
         }
 
+        // Copy the new operations to tmp.
         for (let j = 0; j < numNew; ++j) {
           tmp[j] = this._operations[ln + j];
         }
 
+        // Make room for the new operations after the current operation.
         for (let j = ln + numNew - 1; j > i + numNew; --j) {
           this._operations[j] = this._operations[j - numNew];
         }
 
+        // Move the new operations after the current operation.
         for (let j = 0; j < numNew; ++j) {
           this._operations[i + j + 1] = tmp[j];
         }
@@ -275,7 +278,11 @@ export default class QueryBuilderOperationSupport {
     // onBuild operations should never add new operations. They should only call
     // methods on the knex query builder.
     for (let i = 0, l = this._operations.length; i < l; ++i) {
-      this._operations[i].onBuild(knexBuilder, this)
+      this._operations[i].onBuild(knexBuilder, this);
+
+      if (this._operations.length !== l) {
+        throw new Error('onBuild should only call query building methods on the knex builder');
+      }
     }
 
     return knexBuilder;
