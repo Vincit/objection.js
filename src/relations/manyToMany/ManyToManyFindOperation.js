@@ -15,6 +15,14 @@ export default class ManyToManyFindOperation extends RelationFindOperation {
     }
   }
 
+  clone(...args) {
+    const copy = super.clone(...args);
+
+    copy.ownerJoinColumnAlias = this.ownerJoinColumnAlias;
+
+    return copy;
+  }
+
   onBeforeBuild(builder) {
     const relatedModelClass = this.relation.relatedModelClass;
     const ids = new Array(this.owners.length);

@@ -56,21 +56,20 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
   }
 
   hasSelection(fromTable, selection) {
-    const select1 = SelectOperation.parseSelection(selection);
+    const testSelect = SelectOperation.parseSelection(selection);
 
-    if (!select1) {
+    if (!testSelect) {
       return false;
     }
 
+    const testTable = testSelect.table || fromTable;
+    const testColumn = testSelect.column;
+
     for (let i = 0, l = this.selections.length; i < l; ++i) {
-      const select2 = this.selections[i];
+      const table = this.selections[i].table || fromTable;
+      const column = this.selections[i].column;
 
-      const match = (select1.table === select2.table && select1.column === select2.column)
-        || (select1.table === select2.table && select2.column === '*')
-        || (select1.table === null && select2.table === fromTable && select1.column === select2.column)
-        || (select2.table === null && select1.table === fromTable && select1.column === select2.column);
-
-      if (match) {
+      if (testTable == table && (column === testColumn || column === '*')) {
         return true;
       }
     }

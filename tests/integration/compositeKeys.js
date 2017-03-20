@@ -329,50 +329,102 @@ module.exports = function (session) {
         ]);
       });
 
-      it('eager fetch', function () {
-        return B
-          .query()
-          .eager('[a(oa).b(ob), ab(oa)]', {
-            oa: function(builder) {
-              builder.orderBy(['id1', 'id2']);
-            },
-            ob: function (builder) {
-              builder.orderBy(['id3', 'id4']);
-            }
-          })
-          .then(function (models) {
-            expect(models).to.eql([{
-              id3: 1,
-              id4: '1',
-              bval: 'b1',
-              a: [
-                {id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
-                {id1: 1, id2: '2', aval: 'a2', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
-                {id1: 2, id2: '1', aval: 'a3', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}}
-              ],
-              ab: [
-                {id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null},
-                {id1: 11, id2: '12', aval: 'a8', bid3: null, bid4: null},
-                {id1: 12, id2: '11', aval: 'a9', bid3: null, bid4: null}
-              ]
-            }, {
-              id3: 1,
-              id4: '2',
-              bval: 'b2',
-              a: [
-                {id1: 2, id2: '2', aval: 'a4', bid3: 1, bid4: '2', b: {id3: 1, id4: '2', bval: 'b2'}},
-                {id1: 2, id2: '3', aval: 'a5', bid3: 1, bid4: '2', b: {id3: 1, id4: '2', bval: 'b2'}},
-                {id1: 3, id2: '2', aval: 'a6', bid3: 1, bid4: '2', b: {id3: 1, id4: '2', bval: 'b2'}}
-              ],
-              ab: [
-                {id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1'},
-                {id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null},
+      describe('eager fetch', function () {
 
-                {id1: 21, id2: '21', aval: 'a10', bid3: null, bid4: null},
-                {id1: 21, id2: '22', aval: 'a11', bid3: null, bid4: null},
-                {id1: 22, id2: '21', aval: 'a12', bid3: null, bid4: null}
-              ]
-            }]);
+        [{
+          eagerAlgo: Model.WhereInEagerAlgorithm,
+          name: 'WhereInEagerAlgorithm'
+        }, {
+          eagerAlgo: Model.JoinEagerAlgorithm,
+          name: 'JoinEagerAlgorithm'
+        }].map(function (eager) {
+
+          it('basic ' + eager.name, function () {
+            return B
+              .query()
+              .eagerAlgorithm(eager.eagerAlgo)
+              .eager('[a(oa).b(ob), ab(oa)]', {
+                oa: function (builder) {
+                  builder.orderBy(['id1', 'id2']);
+                },
+                ob: function (builder) {
+                  builder.orderBy(['id3', 'id4']);
+                }
+              })
+              .then(function (models) {
+                models = _.sortBy(models, ['id3', 'id4']);
+                models.forEach(function (it) { it.a = _.sortBy(it.a, ['id1', 'id2']); });
+                models.forEach(function (it) { it.ab = _.sortBy(it.ab, ['id1', 'id2']); });
+
+                expect(models).to.eql([{
+                  id3: 1,
+                  id4: '1',
+                  bval: 'b1',
+                  a: [
+                    {id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
+                    {id1: 1, id2: '2', aval: 'a2', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
+                    {id1: 2, id2: '1', aval: 'a3', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}}
+                  ],
+                  ab: [
+                    {id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null},
+                    {id1: 11, id2: '12', aval: 'a8', bid3: null, bid4: null},
+                    {id1: 12, id2: '11', aval: 'a9', bid3: null, bid4: null}
+                  ]
+                }, {
+                  id3: 1,
+                  id4: '2',
+                  bval: 'b2',
+                  a: [
+                    {id1: 2, id2: '2', aval: 'a4', bid3: 1, bid4: '2', b: {id3: 1, id4: '2', bval: 'b2'}},
+                    {id1: 2, id2: '3', aval: 'a5', bid3: 1, bid4: '2', b: {id3: 1, id4: '2', bval: 'b2'}},
+                    {id1: 3, id2: '2', aval: 'a6', bid3: 1, bid4: '2', b: {id3: 1, id4: '2', bval: 'b2'}}
+                  ],
+                  ab: [
+                    {id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1'},
+                    {id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null},
+
+                    {id1: 21, id2: '21', aval: 'a10', bid3: null, bid4: null},
+                    {id1: 21, id2: '22', aval: 'a11', bid3: null, bid4: null},
+                    {id1: 22, id2: '21', aval: 'a12', bid3: null, bid4: null}
+                  ]
+                }]);
+              });
+          });
+
+          it('belongs to one $relatedQuery and ' + eager.name, function () {
+            return B
+              .query()
+              .findById([1, '1'])
+              .then(function (b) {
+                return b.$relatedQuery('a')
+                  .eager('b')
+                  .eagerAlgorithm(eager.eagerAlgo);
+              })
+              .then(function (b) {
+                expect(b).to.eql([
+                  {id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
+                  {id1: 1, id2: '2', aval: 'a2', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
+                  {id1: 2, id2: '1', aval: 'a3', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}}
+                ]);
+              });
+          });
+
+          it('many to many $relatedQuery and ' + eager.name, function () {
+            return B
+              .query()
+              .findById([1, '1'])
+              .then(function  (b) {
+                return b.$relatedQuery('ab')
+                  .eager('ba')
+                  .eagerAlgorithm(eager.eagerAlgo);
+              }).then(function (b) {
+                expect(b).to.eql([
+                  {id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null, ba: [{bval: 'b1', id3: 1, id4: '1'}, {bval: 'b2', id3: 1, id4: '2'}]},
+                  {id1: 11, id2: '12', aval: 'a8', bid3: null, bid4: null, ba: [{bval: 'b1', id3: 1, id4: '1'}]},
+                  {id1: 12, id2: '11', aval: 'a9', bid3: null, bid4: null, ba: [{bval: 'b1', id3: 1, id4: '1'}]}
+                ]);
+              });
+            });
           });
       });
 

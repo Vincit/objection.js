@@ -12,6 +12,17 @@ export default class RelationFindOperation extends FindOperation {
     this.omitProps = [];
   }
 
+  clone(...args) {
+    const copy = super.clone(...args);
+
+    copy.relation = this.relation;
+    copy.owners = this.owners;
+    copy.alwaysReturnArray = this.alwaysReturnArray;
+    copy.omitProps = this.omitProps;
+
+    return copy;
+  }
+
   onBeforeBuild(builder) {
     let ids = new Array(this.owners.length);
 

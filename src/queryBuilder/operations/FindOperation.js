@@ -8,7 +8,8 @@ export default class FindOperation extends QueryBuilderOperation {
 
   clone(props) {
     props = props || {};
-    return new this.constructor(this.name, props.opt || clone(this.opt));
+    const opt = Object.assign({}, this.opt, props.opt);
+    return new this.constructor(this.name, opt);
   }
 
   onAfter(builder, results) {
