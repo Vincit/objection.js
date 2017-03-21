@@ -445,43 +445,49 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '1000 `Person.query().eager("children.pets")` queries',
-      runCount: 1000,
+      name: '5000 `Person.query().eager("children.pets")` queries',
+      runCount: 5000,
       runtimeGoal: 10000,
       beforeTest: function () {
         var idx = 0;
         var petId = 1;
 
+        var numPeople = 100;
+        var numChildren = 3;
+        var numPets = 2;
+
         var results = [
           // People
-          _.range(100).map(function (i) {
+          _.range(numPeople).map(function (parentId) {
             return {
-              id: i,
-              firstName: 'Person' + i,
-              lastLame: 'Person' + i + " Lastname",
-              age: i
+              id: parentId,
+              firstName: 'Person' + parentId,
+              lastLame: 'Person' + parentId + " Lastname",
+              age: parentId
             };
           }),
 
           // Their children.
-          _.flatten(_.range(100).map(function (parentId) {
-            return _.range(10).map(function (i) {
+          _.flatten(_.range(numPeople).map(function (parentId) {
+            return _.range(numChildren).map(function (childIdx) {
+              var childId = parentId * numChildren + childIdx;
+
               return {
-                id: parentId * 10 + i,
+                id: childId,
                 parentId: parentId,
-                firstName: 'Child' + i,
-                lastLame: 'Child' + i + " Lastname",
-                age: i
+                firstName: 'Child' + childIdx,
+                lastLame: 'Child' + childIdx + " Lastname",
+                age: childIdx
               };
             });
           })),
 
           // Children's pets.
-          _.flatten(_.range(100).map(function (parentId) {
-            return _.flatten(_.range(10).map(function (childIdx) {
-              var childId = parentId * 10 + childIdx;
+          _.flatten(_.range(numPeople).map(function (parentId) {
+            return _.flatten(_.range(numChildren).map(function (childIdx) {
+              var childId = parentId * numChildren + childIdx;
 
-              return _.range(3).map(function (i) {
+              return _.range(numPets).map(function (i) {
                 return {
                   id: ++petId,
                   name: 'Fluffy ' + childId,
