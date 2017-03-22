@@ -18,11 +18,11 @@ class Person extends objection.Model {
   }
 
   static async withLastName(lastName: string): Promise<Person[]> {
-    return this.query().where("lastName", lastName)
+    return this.query().where('lastName', lastName)
   }
 
   static async firstWithLastName(lastName: string): Promise<Person | undefined> {
-    return this.query().where("lastName", lastName).first()
+    return this.query().where('lastName', lastName).first()
   }
 
   static async findById(id: number): Promise<Person | undefined> {
@@ -30,7 +30,7 @@ class Person extends objection.Model {
   }
 
   async loadMovies(): Promise<this> {
-    return this.$loadRelated("movies")
+    return this.$loadRelated('movies')
   }
 
   async reload(): Promise<this> {
@@ -39,7 +39,7 @@ class Person extends objection.Model {
 
   async petsWithId(petId: number): Promise<Animal[]> {
     // Types can't look at strings and give strong types, so this must be a Model[] promise:
-    const pets: objection.Model[] = await this.$relatedQuery('pets').where("id", petId)
+    const pets: objection.Model[] = await this.$relatedQuery('pets').where('id', petId)
     // that we can subsequently cast to Animal:
     return pets as Animal[]
   }
@@ -51,6 +51,10 @@ class Movie extends objection.Model {
 
 class Animal extends objection.Model {
   species: string;
+}
+
+class Comment extends objection.Model {
+  comment: string;
 }
 
 // !!! see examples/express-ts/src/app.ts for a valid knex setup. The following is bogus:
@@ -90,12 +94,18 @@ const clonePerson: Person = examplePerson.$clone();
 
 // static methods from Model should return the subclass type
 
-Person.loadRelated([new Person()], "movies").then((people: Person[]) => { });
+Person.loadRelated([new Person()], 'movies').then((people: Person[]) => { });
 
 class Actor {
+  canAct: boolean
 }
 
-const PersonActorClass: typeof Person & typeof Actor = Person.extend(Actor);
+// test .extend:
+const PersonActor = Person.extend(Actor);
+
+const pa = new PersonActor()
+pa.firstName = 'chuck'
+pa.canAct = false
 
 // Optional<Person> typing for findById():
 
@@ -113,7 +123,7 @@ const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).f
 
 // QueryBuilder.findById accepts single and array values:
 
-let qb: objection.QueryBuilder<Person> = BoundPerson.query().where("name", "foo");
+let qb: objection.QueryBuilder<Person> = BoundPerson.query().where('name', 'foo');
 
 // Note that the QueryBuilder chaining done in this file
 // is done to verify that the return value is assignable to a QueryBuilder
@@ -143,8 +153,8 @@ qb = qb.joinRelation('table', { alias: false });
 
 // signature-changing QueryBuilder methods:
 
-const rowInserted: Promise<Person> = qb.insert({firstName: "bob"})
-const rowsInserted: Promise<Person[]> = qb.insert([{firstName: "alice"}, {firstName: "bob"}])
+const rowInserted: Promise<Person> = qb.insert({ firstName: 'bob' })
+const rowsInserted: Promise<Person[]> = qb.insert([{ firstName: 'alice' }, { firstName: 'bob' }])
 const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({})
 const rowsUpdated: Promise<number> = qb.update({})
 const rowsPatched: Promise<number> = qb.patch({})
@@ -210,6 +220,24 @@ objection.transaction(Movie, Person, Animal, async (TxMovie, TxPerson, TxAnimal)
   const s: string = new TxAnimal().species;
 });
 
+objection.transaction(Movie, Person, Animal, Comment, async (TxMovie, TxPerson, TxAnimal, TxComment) => {
+  const t: string = new TxMovie().title;
+  const n: number = new TxPerson().examplePersonMethod('hello');
+  const s: string = new TxAnimal().species;
+  const c: string = new TxComment().comment
+});
+
+objection.transaction(Movie, Person, Animal, Comment, PersonActor, async (TxMovie, TxPerson, TxAnimal, TxComment, TxPersonActor) => {
+  const t: string = new TxMovie().title;
+  const n: number = new TxPerson().examplePersonMethod('hello');
+  const s: string = new TxAnimal().species;
+  const c: string = new TxComment().comment
+  const pa = new TxPersonActor()
+  if (pa.canAct) {
+    const n: number = pa.examplePersonMethod('arg')
+  }
+});
+
 objection.transaction.start(Person).then((trx: objection.Transaction) => {
   const TxPerson: typeof Person = Person.bindTransaction(trx)
   TxPerson.query()
@@ -224,12 +252,26 @@ const p: Promise<string> = qb.then(() => 'done');
 
 // Verify that we can insert a partial model and relate a partial movie
 Person.query()
-  .insertAndFetch({firstName: "Jim"} as Partial<Person>)
+  .insertAndFetch({ firstName: 'Jim' })
   .then((p: Person) => {
     console.log(`Inserted ${p}`);
     p.$loadRelated('movies')
-    .relate({title: 'Total Recall'} as Partial<Movie>)
-    .then((pWithMovie: Person) => {
-      console.log(`Related ${pWithMovie}`);
-    });
+      .relate<Movie>({ title: 'Total Recall' })
+      .then((pWithMovie: Person) => {
+        console.log(`Related ${pWithMovie}`);
+      });
   });
+
+// Verify we can call `.insert` with a Partial<Person>:
+
+Person
+  .query()
+  .insert({ firstName: 'Chuck' })
+
+// Verify we can call `.insert` via $relatedQuery 
+// (albeit with a cast to Movie):
+
+new Person()
+  .$relatedQuery<Movie>('movies')
+  .insert({ title: 'Total Recall' })
+
