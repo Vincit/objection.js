@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.10
+
+### What's new
+
+ * fix bugs that prevented using `$relatedQuery` and `eager` together with `JoinEagerAlgorithm`
+ * typing updates
+
+
 ## 0.7.9
 
 ### What's new
