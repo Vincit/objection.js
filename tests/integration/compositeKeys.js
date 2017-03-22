@@ -401,6 +401,8 @@ module.exports = function (session) {
                   .eagerAlgorithm(eager.eagerAlgo);
               })
               .then(function (b) {
+                b = _.sortBy(b, ['id1', 'id2']);
+
                 expect(b).to.eql([
                   {id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
                   {id1: 1, id2: '2', aval: 'a2', bid3: 1, bid4: '1', b: {id3: 1, id4: '1', bval: 'b1'}},
@@ -418,6 +420,9 @@ module.exports = function (session) {
                   .eager('ba')
                   .eagerAlgorithm(eager.eagerAlgo);
               }).then(function (b) {
+                b = _.sortBy(b, ['id1', 'id2']);
+                b[0].ba = _.sortBy(b[0].ba, ['id3', 'id4']);
+
                 expect(b).to.eql([
                   {id1: 11, id2: '11', aval: 'a7', bid3: null, bid4: null, ba: [{bval: 'b1', id3: 1, id4: '1'}, {bval: 'b2', id3: 1, id4: '2'}]},
                   {id1: 11, id2: '12', aval: 'a8', bid3: null, bid4: null, ba: [{bval: 'b1', id3: 1, id4: '1'}]},
