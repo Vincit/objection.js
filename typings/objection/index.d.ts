@@ -223,10 +223,10 @@ declare module "objection" {
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
     // TODO: It'd be nicer to expose an actual T&S union class here: 
-    static extend<T extends Model, S>(
-      this: { new (): T },
+    static extend<M extends Model, S>(
+      this: { new (): M },
       subclass: { new (): S }
-    ): ModelClass<T> & { new (...args: any[]): T & S };
+    ): ModelClass<M> & { new (...args: any[]): M & S };
 
     static fromJson<T>(this: T, json: Object, opt?: ModelOptions): T;
     static fromDatabaseJson<T>(this: T, row: Object): T;
@@ -266,9 +266,11 @@ declare module "objection" {
     $query(trx?: Transaction): QueryBuilderSingle<this>;
 
     /**
-     * @return `QueryBuilder<Model>` because we don't know the type of the relation.
+     * Users need to explicitly type these calls, as the relationName doesn't
+     * indicate the type (and if it returned Model directly, Partial<Model>
+     * guards are worthless)
      */
-    $relatedQuery(relationName: string, transaction?: Transaction): QueryBuilder<Model>;
+    $relatedQuery<M extends Model>(relationName: string, transaction?: Transaction): QueryBuilder<M>;
 
     $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
 
@@ -286,7 +288,7 @@ declare module "objection" {
 
   export class QueryBuilder<T> {
     static extend(subclassConstructor: FunctionConstructor): void;
-    static forClass<T extends Model>(modelClass: ModelClass<T>): QueryBuilder<T>;
+    static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
   /**
