@@ -174,7 +174,7 @@ module.exports = function (session) {
             });
         });
 
-        it('returning(\'*\') should return all columns', function () {
+        it('returning("*") should return all columns', function () {
           return Model1
             .query()
             .insert({model1Prop1: 'hello 3'})
@@ -182,6 +182,22 @@ module.exports = function (session) {
             .then(function (inserted) {
               expect(inserted).to.be.a(Model1);
               expect(inserted.$toJson()).to.eql({id: 3, model1Id: null, model1Prop1: 'hello 3', model1Prop2: null});
+              return session.knex(Model1.tableName);
+            })
+            .then(function (rows) {
+              expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+              expect(_.map(rows, 'id').sort()).to.eql([1, 2, 3]);
+            });
+        });
+
+        it('returning("someColumn") should only return that `someColumn`', function () {
+          return Model1
+            .query()
+            .insert({model1Prop1: Model1.raw("'hello' || ' 3'")})
+            .returning('model1Prop1')
+            .then(function (inserted) {
+              expect(inserted).to.be.a(Model1);
+              expect(inserted.$toJson()).to.eql({model1Prop1: 'hello 3'});
               return session.knex(Model1.tableName);
             })
             .then(function (rows) {

@@ -4,6 +4,7 @@ import QueryBuilderOperationSupport from './QueryBuilderOperationSupport';
 import KnexOperation from './operations/KnexOperation';
 import SelectOperation from './operations/SelectOperation';
 import WhereRefOperation from './operations/WhereRefOperation';
+import ReturningOperation from './operations/ReturningOperation';
 import WhereCompositeOperation from './operations/WhereCompositeOperation';
 import WhereInCompositeOperation from './operations/whereInComposite/WhereInCompositeOperation';
 import WhereInCompositeSqliteOperation from './operations/whereInComposite/WhereInCompositeSqliteOperation';
@@ -519,7 +520,7 @@ export default class QueryBuilderBase extends QueryBuilderOperationSupport {
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
+  @queryBuilderOperation(ReturningOperation)
   returning(...args) {}
 
   /**

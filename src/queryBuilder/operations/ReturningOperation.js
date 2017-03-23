@@ -1,0 +1,27 @@
+import flatten from 'lodash/flatten';
+import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
+
+/**
+ * This class's only purpose is to normalize the arguments as an array.
+ *
+ * In knex, if a single column is given to `returning` it returns an array with the that column's value
+ * in it. If an array is given with a one item inside, the return value is an object.
+ */
+export default class ReturningOperation extends WrappingQueryBuilderOperation {
+
+  call(builder, args) {
+    args = flatten(args);
+
+    // Don't add an empty returning list.
+    if (args.length === 0) {
+      return false;
+    }
+
+    return super.call(builder, args);
+  }
+
+  onBuild(knexBuilder) {
+    // Always pass an array of columns to knex.returning.
+    knexBuilder.returning(this.args);
+  }
+}
