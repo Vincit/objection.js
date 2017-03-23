@@ -14,7 +14,7 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
     }
 
     // Discard the possible alias.
-    selection = selection.split(/\s+as\s+}/i)[0].trim();
+    selection = selection.split(/\s+as\s+/i)[0].trim();
     const dotIdx = selection.indexOf('.');
 
     if (dotIdx !== -1) {
