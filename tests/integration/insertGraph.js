@@ -207,7 +207,7 @@ module.exports = function (session) {
       it('should validate models upon insertion', function (done) {
         insertion.model1Relation1.model1Prop1 = 666;
 
-        return transaction(Model1, Model2, function (Model1, Model2) {
+        transaction(Model1, Model2, function (Model1, Model2) {
           // We can modify Model1 and Model2 here since it is a subclass of the actual
           // models shared between tests.
           Model1.jsonSchema = {
@@ -362,7 +362,7 @@ module.exports = function (session) {
       });
 
       it('should not allow insert when the allowed relation expression is not a superset', function (done) {
-        return Model1
+        Model1
           .query()
           .insertGraph(insertion)
           .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')

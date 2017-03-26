@@ -693,7 +693,7 @@ module.exports = function (session) {
       });
 
       it('relation references longer that 63 chars should throw an exception', function (done) {
-        return Model1
+        Model1
           .query()
           .where('Model1.id', 1)
           .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
@@ -709,7 +709,7 @@ module.exports = function (session) {
       });
 
       it('relation references longer that 63 chars should NOT throw an exception if minimize: true option is given', function (done) {
-        return Model1
+        Model1
           .query()
           .where('Model1.id', 1)
           .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
