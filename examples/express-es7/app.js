@@ -26,7 +26,7 @@ const app = express()
 // Register our REST API.
 registerApi(router);
 
-// Error handling. The `ValidionError` instances thrown by objection.js have a `statusCode`
+// Error handling. The `ValidationError` instances thrown by objection.js have a `statusCode`
 // property that is sent as the status code of the response.
 app.use((err, req, res, next) => {
   if (err) {

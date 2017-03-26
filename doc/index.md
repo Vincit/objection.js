@@ -84,7 +84,7 @@ Objection.js can be installed using `npm`.
 
 ```shell
 git clone git@github.com:Vincit/objection.js.git objection
-cd objection/examples/express
+cd objection/examples/express-es6
 npm install
 # We use knex for migrations in this example.
 npm install knex -g
@@ -116,7 +116,7 @@ Model.knex(knex);
 
 // Create database schema. You should use knex migration files to do this. We
 // create it here for simplicity.
-var schemaPromise = knex.schema.createTableIfNotExists('Person', table => {
+const schemaPromise = knex.schema.createTableIfNotExists('Person', table => {
   table.integer('id').primary();
   table.string('firstName');
 });

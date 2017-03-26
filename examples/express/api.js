@@ -4,7 +4,8 @@ var Movie = require('./models/Movie');
 
 module.exports = function (app) {
 
-  // Create a new Person.
+  // Create a new Person. You can pass relations with the person
+  // and they also get inserted.
   app.post('/persons', function (req, res, next) {
     Person
       .query()

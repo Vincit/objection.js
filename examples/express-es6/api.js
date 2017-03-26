@@ -4,7 +4,7 @@ const transaction = require('objection').transaction;
 const Person = require('./models/Person');
 const Movie = require('./models/Movie');
 
-module.exports = function (app) {
+module.exports = (app) => {
 
   // Create a new Person. You can pass relations with the person
   // and they also get inserted.
@@ -44,11 +44,11 @@ module.exports = function (app) {
       .where('age', '<', req.query.maxAge)
       .where('firstName', 'like', req.query.firstName)
       .orderBy('firstName')
-      .filterEager('pets', function (builder) {
+      .filterEager('pets', builder => {
         // Order eagerly loaded pets by name.
         builder.orderBy('name')
       })
-      .filterEager('children.pets', function (builder) {
+      .filterEager('children.pets', builder => {
         // Only fetch dogs for children.
         builder.where('species', 'dog')
       });

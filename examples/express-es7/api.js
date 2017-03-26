@@ -4,7 +4,8 @@ import Movie from './models/Movie';
 
 export default function (router) {
 
-  // Create a new Person.
+  // Create a new Person. You can pass relations with the person
+  // and they also get inserted.
   router.post('/persons', async (req, res) => {
     const person = await Person
       .query()
