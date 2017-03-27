@@ -37,6 +37,7 @@ and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express
 Shortcuts:
  * [API reference](http://vincit.github.io/objection.js/#api-reference)
  * [Changelog](http://vincit.github.io/objection.js/#changelog)
+ * [Contribution guide](http://vincit.github.io/objection.js/#contribution-guide)
 
 Blog posts and tutorials:
 
