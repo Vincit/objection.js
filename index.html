@@ -108,7 +108,7 @@ npm install mariasql
 <p>Install example project:</p>
 </blockquote>
 <pre class="highlight shell"><code>git clone git@github.com:Vincit/objection.js.git objection
-<span class="nb">cd </span>objection/examples/express
+<span class="nb">cd </span>objection/examples/express-es6
 npm install
 <span class="c"># We use knex for migrations in this example.</span>
 npm install knex -g
@@ -139,7 +139,7 @@ npm start
 
 <span class="c1">// Create database schema. You should use knex migration files to do this. We</span>
 <span class="c1">// create it here for simplicity.</span>
-<span class="kd">var</span> <span class="nx">schemaPromise</span> <span class="o">=</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTableIfNotExists</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">,</span> <span class="nx">table</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<span class="kr">const</span> <span class="nx">schemaPromise</span> <span class="o">=</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTableIfNotExists</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">,</span> <span class="nx">table</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
   <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">);</span>
 <span class="p">});</span>
@@ -1431,6 +1431,76 @@ of a model class. The validation is ran each time a <a href="#model"><code class
 with an instance of <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
 
 <p>See <a href="#custom-validation">the recipe book</a> for instructions if you want to use some other validation library.</p>
+
+<h1 id="contribution-guide">Contribution guide</h1>
+
+<h2 id="issues">Issues</h2>
+
+<p>You can use <a href="https://github.com/Vincit/objection.js/issues">github issues</a> to request features and file bug reports.
+An issue is also a good place to ask questions. We are happy to help out if you have reached a dead end, but please try
+to solve the problem yourself first. The <a href="https://gitter.im/Vincit/objection.js">gitter chat</a> is also a good place to
+ask for help.</p>
+
+<p>When creating an issue there are couple of things you need to remember:</p>
+
+<ol>
+<li><p><strong>Update to the latest version of objection if possible and see if the problem remains.</strong> If updating is not an
+option you can still request critical bug fixes for older versions.</p></li>
+<li><p><strong>Describe your problem.</strong> What is happening and what you expect to happen.</p></li>
+<li><p><strong>Provide enough information about the problem for others to reproduce it.</strong> The fastest way to get your bug fixed or
+problem solved is to create a simple standalone app or a test case that demonstrates your problem. If that&rsquo;s too much
+work then at least provide the code that fails with enough context and any possible stack traces. Please bear in mind
+that objection has hundreds of tests and if you run into a problem, say with <code class="prettyprint">insert</code> function, it probably doesn&rsquo;t mean
+that <code class="prettyprint">insert</code> is totally and completely broken, but some small part of it you are using is. That&rsquo;s why enough context
+is necessary.</p></li>
+</ol>
+
+<h2 id="pull-requests">Pull requests</h2>
+
+<p>If you have found a bug or want to add a feature, pull requests are always welcome! It&rsquo;s better to create an issue
+first to open a discussion if the feature is something that should be added to objection. In case of bugfixes it&rsquo;s also
+a good idea to open an issue indicating that you are working on a fix.</p>
+
+<p>For a pull request to get merged it needs to have the following things:</p>
+
+<ol>
+<li><p>A good description of what the PR fixes or adds. You can just add a link to the corresponding issue.</p></li>
+<li><p>Test(s) that verifies the fix/feature. It&rsquo;s possible to create a PR without tests and ask for someone else to write
+them but in that case it may take a long time or forever until someone finds time to do it. Untested code will never get
+merged!</p></li>
+<li><p>For features you also need to write documentation.</p></li>
+</ol>
+
+<h2 id="development-guide">Development guide</h2>
+
+<h3 id="development-setup">Development setup</h3>
+
+<blockquote>
+<p>clone</p>
+</blockquote>
+<pre class="highlight shell"><code>git clone git@github.com:&lt;your-account&gt;/objection.js.git objection
+</code></pre>
+<blockquote>
+<p>create databases</p>
+</blockquote>
+<pre class="highlight shell"><code>psql -U postgres -c <span class="s2">"create database objection_test;"</span>
+mysql -u travis -e <span class="s2">"create database objection_test;"</span>
+</code></pre>
+<ol>
+<li><p>Fork objection in github</p></li>
+<li><p>Clone objection</p></li>
+<li><p>Install mysql and postgresql. Add a <code class="prettyprint">travis</code> user for mysql (ugly, I know. PR to fix this is welcome :D).</p></li>
+<li><p>Create test databases</p></li>
+<li><p>Run <code class="prettyprint">npm test</code> in objection&rsquo;s root to see if everything works.</p></li>
+</ol>
+
+<h3 id="develop">Develop</h3>
+
+<p>Objection uses babel to transpile ESNext into ES5. <code class="prettyprint">npm run build</code> runs babel and saves the transpiled code to <code class="prettyprint">lib</code>
+folder. The <code class="prettyprint">lib</code> folder is not stored in github. <code class="prettyprint">npm test</code> runs <code class="prettyprint">npm run build</code> before running the tests. To save
+time you can run the tests using <code class="prettyprint">npm run test-only</code> command that doesn&rsquo;t invoke <code class="prettyprint">npm run build</code>. In this case remember
+to build after making changes to the code. The tests are not transpiled. Therefore tests need to be written in ES5
+(until we drop the legacy node support).</p>
 
           <h1 id="recipe-book">Recipe book</h1>
 
