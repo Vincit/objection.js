@@ -15,7 +15,7 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
 
     // Discard the possible alias.
     selection = selection.split(/\s+as\s+/i)[0].trim();
-    const dotIdx = selection.indexOf('.');
+    const dotIdx = selection.lastIndexOf('.');
 
     if (dotIdx !== -1) {
       return {
@@ -69,7 +69,7 @@ export default class SelectOperation extends WrappingQueryBuilderOperation {
       const table = this.selections[i].table || fromTable;
       const column = this.selections[i].column;
 
-      if (testTable == table && (column === testColumn || column === '*')) {
+      if (testTable === table && (column === testColumn || column === '*')) {
         return true;
       }
     }

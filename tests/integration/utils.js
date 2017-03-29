@@ -4,6 +4,7 @@ var _ = require('lodash');
 var path = require('path');
 var utils = require('../../lib/utils/knexUtils');
 var transaction = require('../../').transaction;
+var knexUtils = require('../../lib/utils/knexUtils');
 var Promise = require('bluebird');
 var expect = require('expect.js');
 var Model = require('../../').Model;
@@ -302,9 +303,13 @@ module.exports.initialize = function (opt) {
 module.exports.createDb = function () {
   var session = this;
 
-  return session.knex.schema
-    .dropTableIfExists('Model1Model2')
-    .dropTableIfExists('Model1Model2One')
+  return Promise.resolve()
+    .then(function () {
+      return session.knex.schema.dropTableIfExists('Model1Model2');
+    })
+    .then(function () {
+      return session.knex.schema.dropTableIfExists('Model1Model2One');
+    })
     .then(function () {
       return session.knex.schema.dropTableIfExists('Model1');
     })
@@ -338,7 +343,7 @@ module.exports.createDb = function () {
           table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
         })
     })
-    .catch(function () {
+    .catch(function (err) {
       throw new Error('Could not connect to '
         + session.opt.knexConfig.client
         + '. Make sure the server is running and the database '

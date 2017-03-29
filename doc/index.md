@@ -1538,20 +1538,23 @@ merged!
 git clone git@github.com:<your-account>/objection.js.git objection
 ```
 
-> create databases
+> create users and databases
 
 ```shell
-psql -U postgres -c "create database objection_test;"
-mysql -u travis -e "create database objection_test;"
+psql -U postgres -c "CREATE USER objection SUPERUSER"
+psql -U postgres -c "CREATE DATABASE objection_test"
+mysql -u root -e "CREATE USER objection"
+mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO objection"
+mysql -u root -e "CREATE DATABASE objection_test"
 ```
 
 1. Fork objection in github
 
 2. Clone objection
 
-3. Install mysql and postgresql. Add a `travis` user for mysql (ugly, I know. PR to fix this is welcome :D).
+3. Install MySQL and PostgreSQL
 
-4. Create test databases
+4. Create test users and databases
 
 5. Run `npm test` in objection's root to see if everything works.
 

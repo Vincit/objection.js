@@ -17,13 +17,14 @@ describe('integration tests', function () {
     client: 'mysql',
     connection: {
       host: '127.0.0.1',
-      user: 'travis',
+      user: 'objection',
       database: 'objection_test'
     }
   }, {
     client: 'postgres',
     connection: {
       host: '127.0.0.1',
+      user: 'objection',
       database: 'objection_test'
     }
   }];
@@ -56,6 +57,7 @@ describe('integration tests', function () {
       require('./transactions')(session);
       require('./queryContext')(session);
       require('./compositeKeys')(session);
+      require('./crossDb')(session);
 
       if (knexConfig.client === 'postgres') {
         require('./jsonQueries')(session);
