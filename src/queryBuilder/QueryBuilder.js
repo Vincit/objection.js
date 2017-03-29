@@ -1,9 +1,9 @@
 import Promise from 'bluebird';
+import ValidationError from '../model/ValidationError';
 import queryBuilderOperation from './decorators/queryBuilderOperation';
 import QueryBuilderContext from './QueryBuilderContext';
 import RelationExpression from './RelationExpression';
 import QueryBuilderBase from './QueryBuilderBase';
-import ValidationError from '../model/ValidationError';
 
 import FindOperation from './operations/FindOperation';
 import DeleteOperation from './operations/DeleteOperation';
@@ -1174,19 +1174,15 @@ function callOnBuildHooks(builder, func) {
 function createHookCaller(hook) {
   const hasMethod = 'has' + hook.charAt(0).toUpperCase() + hook.substr(1);
 
-  const caller = (promise, op) => {
-    if (op[hasMethod]()) {
-      return promise.then(function (result) {
-        return op[hook](this.builder, result);
-      });
-    } else {
-      return promise;
-    }
-  };
-
   return (promise, operations) => {
     for (let i = 0, l = operations.length; i < l; ++i) {
-      promise = caller(promise, operations[i]);
+      const op = operations[i];
+
+      if (op[hasMethod]()) {
+        promise = promise.then(function (result) {
+          return op[hook](this.builder, result);
+        });
+      }
     }
 
     return promise;
