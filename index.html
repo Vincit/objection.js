@@ -1481,16 +1481,19 @@ merged!</p></li>
 <pre class="highlight shell"><code>git clone git@github.com:&lt;your-account&gt;/objection.js.git objection
 </code></pre>
 <blockquote>
-<p>create databases</p>
+<p>create users and databases</p>
 </blockquote>
-<pre class="highlight shell"><code>psql -U postgres -c <span class="s2">"create database objection_test;"</span>
-mysql -u travis -e <span class="s2">"create database objection_test;"</span>
+<pre class="highlight shell"><code>psql -U postgres -c <span class="s2">"CREATE USER objection SUPERUSER"</span>
+psql -U postgres -c <span class="s2">"CREATE DATABASE objection_test"</span>
+mysql -u root -e <span class="s2">"CREATE USER objection"</span>
+mysql -u root -e <span class="s2">"GRANT ALL PRIVILEGES ON *.* TO objection"</span>
+mysql -u root -e <span class="s2">"CREATE DATABASE objection_test"</span>
 </code></pre>
 <ol>
 <li><p>Fork objection in github</p></li>
 <li><p>Clone objection</p></li>
-<li><p>Install mysql and postgresql. Add a <code class="prettyprint">travis</code> user for mysql (ugly, I know. PR to fix this is welcome :D).</p></li>
-<li><p>Create test databases</p></li>
+<li><p>Install MySQL and PostgreSQL</p></li>
+<li><p>Create test users and databases</p></li>
 <li><p>Run <code class="prettyprint">npm test</code> in objection&rsquo;s root to see if everything works.</p></li>
 </ol>
 
@@ -10521,6 +10524,15 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-7-11">0.7.11</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/339">#339</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/341">#341</a></li>
+</ul>
 
 <h2 id="0-7-10">0.7.10</h2>
 
