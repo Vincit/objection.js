@@ -594,6 +594,7 @@ module.exports = function (session) {
           .where('Model1.id', 1)
           .where('model1Relation2.id_col', 2)
           .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .orderBy(['Model1.id', 'model1Relation2:model2Relation1.id'])
           .eagerAlgorithm(Model1.JoinEagerAlgorithm)
           .then(function (models) {
             expect(models).to.eql([{
@@ -644,6 +645,7 @@ module.exports = function (session) {
           .where('Model1.id', 1)
           .where('mr2.id_col', 2)
           .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .orderBy(['Model1.id', 'mr2:model2Relation1.id'])
           .eagerAlgorithm(Model1.JoinEagerAlgorithm, {
             aliases: {
               model1Relation2: 'mr2'
@@ -823,6 +825,7 @@ module.exports = function (session) {
           .where('Model1.id', 1)
           .where('mr2.id_col', 2)
           .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .orderBy(['Model1.id', 'mr2:model2Relation1.id'])
           .then(function (models) {
             expect(models).to.eql([{
               id: 1,
@@ -1272,6 +1275,50 @@ module.exports = function (session) {
 
     });
 
+    describe('QueryBuilder.orderBy', function () {
+
+      it('orderBy should work for the root query', function () {
+
+        return Promise.map([Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm], function (eagerAlgorithm) {
+          return Model1
+            .query()
+            .select('Model1.model1Prop1')
+            .modifyEager('model1Relation1', function (builder) {
+              builder.select('model1Prop1');
+            })
+            .eager('model1Relation1')
+            .eagerAlgorithm(eagerAlgorithm)
+            .orderBy('Model1.model1Prop1', 'DESC')
+            .whereNotNull('Model1.model1Id')
+            .then(function (models) {
+              expect(models).to.eql([{
+                model1Prop1: 'hello 8',
+                model1Relation1: { model1Prop1: 'hello 9', '$afterGetCalled': 1 },
+                '$afterGetCalled': 1
+              }, {
+                model1Prop1: 'hello 6',
+                model1Relation1:  { model1Prop1: 'hello 7', '$afterGetCalled': 1 },
+                '$afterGetCalled': 1
+              }, {
+                model1Prop1: 'hello 3',
+                model1Relation1:  { model1Prop1: 'hello 4', '$afterGetCalled': 1 },
+                '$afterGetCalled': 1
+              }, {
+                model1Prop1: 'hello 2',
+                model1Relation1:  { model1Prop1: 'hello 3', '$afterGetCalled': 1 },
+                '$afterGetCalled': 1
+              }, {
+                model1Prop1: 'hello 1',
+                model1Relation1:  { model1Prop1: 'hello 2', '$afterGetCalled': 1 },
+                '$afterGetCalled': 1 }
+              ]);
+            });
+        });
+
+      });
+
+    });
+
     if (isPostgres(session.knex)) {
       it('check JoinEagerAlgorithm generated SQL', function () {
         var queries = [];
@@ -1339,12 +1386,10 @@ module.exports = function (session) {
           };
         });
 
-        var t0 = Date.now();
         return session.populate([]).then(function () {
           return Model1.query().insertGraph(graph);
         }).then(function (inserted) {
           graph = inserted;
-          console.log(Date.now() - t0);
         });
       });
 
@@ -1352,12 +1397,15 @@ module.exports = function (session) {
         this.timeout(30000);
 
         return Promise.map([/*Model1.WhereInEagerAlgorithm*/ Model1.JoinEagerAlgorithm], function (eagerAlgorithm) {
+          var t1 = Date.now();
           return Model1
             .query()
             .where('Model1.model1Prop1', 'like', 'hello%')
             .eager('[model1Relation1.model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]')
             .eagerAlgorithm(eagerAlgorithm)
             .then(function (res) {
+              console.log(Date.now() - t1);
+
               graph = _.sortBy(graph, 'id');
               res = _.sortBy(res, 'id');
 
@@ -1369,7 +1417,7 @@ module.exports = function (session) {
 
               expect(got).to.eql(expected);
             });
-        });
+        }, {concurrency: 1});
       });
 
       function traverser(model) {

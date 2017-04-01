@@ -494,7 +494,7 @@ function createSingleIdGetter(idCols) {
     if (!val) {
       return null;
     } else {
-      return val;
+      return `id:${val}`;
     }
   };
 }
@@ -510,7 +510,7 @@ function createTwoIdGetter(idCols) {
     if (!val1 || !val2) {
       return null;
     } else {
-      return `${val1},${val2}`;
+      return `id:${val1},${val2}`;
     }
   };
 }
@@ -528,14 +528,14 @@ function createThreeIdGetter(idCols) {
     if (!val1 || !val2 || !val3) {
       return null;
     } else {
-      return `${val1},${val2},${val3}`;
+      return `id:${val1},${val2},${val3}`;
     }
   };
 }
 
 function createNIdGetter(idCols) {
   return (row) => {
-    let id = '';
+    let id = 'id:';
 
     for (let i = 0, l = idCols.length; i < l; ++i) {
       const val = row[idCols[i]];
