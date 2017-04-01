@@ -834,6 +834,8 @@ module.exports = function (session) {
         .eagerAlgorithm(Model.JoinEagerAlgorithm)
         .eager('Bs.[Cs, Ds]')
         .then(function (results) {
+          results[0].Bs[0].Ds = _.sortBy(results[0].Bs[0].Ds, 'id');
+
           expect(results).to.eql([{
             id: 1,
 
