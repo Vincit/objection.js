@@ -46,7 +46,7 @@ export default class RelationJoinBuilder {
   /**
    * Fetches the column information needed for building the select clauses.
    * This must be called before calling `build`. `buildJoinOnly` can be called
-   * without this since it doesn't build joins.
+   * without this since it doesn't build selects.
    */
   fetchColumnInfo(knex) {
     const allModelClasses = findAllModels(this.expression, this.rootModelClass);
