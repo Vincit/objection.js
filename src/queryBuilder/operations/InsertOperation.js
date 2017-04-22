@@ -1,9 +1,9 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
-import {fromJson, toDatabaseJson} from '../../model/modelFactory';
-import {mapAfterAllReturn} from '../../utils/promiseUtils';
-import {isPostgres} from '../../utils/knexUtils';
+const QueryBuilderOperation = require('./QueryBuilderOperation');
+const {fromJson, toDatabaseJson} = require('../../model/modelFactory');
+const {mapAfterAllReturn} = require('../../utils/promiseUtils');
+const {isPostgres} = require('../../utils/knexUtils');
 
-export default class InsertOperation extends QueryBuilderOperation {
+module.exports = class InsertOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

@@ -1,6 +1,6 @@
-import DeleteOperation from '../queryBuilder/operations/DeleteOperation';
+const DeleteOperation = require('../queryBuilder/operations/DeleteOperation');
 
-export default class RelationDeleteOperation extends DeleteOperation {
+module.exports = class RelationDeleteOperation extends DeleteOperation {
 
   constructor(name, opt) {
     super(name, opt);

@@ -1,6 +1,6 @@
-import UpdateOperation from '../queryBuilder/operations/UpdateOperation';
+const UpdateOperation = require('../queryBuilder/operations/UpdateOperation');
 
-export default class RelationUpdateOperation extends UpdateOperation {
+module.exports = class RelationUpdateOperation extends UpdateOperation {
 
   constructor(name, opt) {
     super(name, opt);

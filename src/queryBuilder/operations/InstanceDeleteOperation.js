@@ -1,7 +1,7 @@
-import DeleteOperation from './DeleteOperation';
-import {afterReturn} from '../../utils/promiseUtils';
+const DeleteOperation = require('./DeleteOperation');
+const {afterReturn} = require('../../utils/promiseUtils');
 
-export default class InstanceDeleteOperation extends DeleteOperation {
+module.exports = class InstanceDeleteOperation extends DeleteOperation {
 
   constructor(name, opt) {
     super(name, opt);

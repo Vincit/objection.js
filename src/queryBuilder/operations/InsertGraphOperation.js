@@ -1,10 +1,10 @@
-import DelegateOperation from './DelegateOperation';
-import InsertOperation from './InsertOperation';
+const DelegateOperation = require('./DelegateOperation');
+const InsertOperation = require('./InsertOperation');
 
-import insertFuncBuilder from '../graphInserter/inserter';
-import GraphInserter from '../graphInserter/GraphInserter';
+const insertFuncBuilder = require('../graphInserter/inserter');
+const GraphInserter = require('../graphInserter/GraphInserter');
 
-export default class InsertGraphOperation extends DelegateOperation {
+module.exports = class InsertGraphOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);

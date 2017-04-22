@@ -3,7 +3,7 @@
  * @param {Constructor.<Model>} modelClass
  * @param {function(model, modelClass, parent, relation)} visitor
  */
-export function visitModels(models, modelClass, visitor) {
+function visitModels(models, modelClass, visitor) {
   doVisit(models, modelClass, null, null, visitor);
 }
 
@@ -33,3 +33,7 @@ function visitOne(model, modelClass, parent, rel, visitor) {
     doVisit(model[relation.name], relation.relatedModelClass, model, relation, visitor);
   }
 }
+
+module.exports = {
+  visitModels: visitModels
+};

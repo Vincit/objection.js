@@ -1,4 +1,4 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
 /**
  * Makes the `Constructor` inherit `SuperConstructor`.
@@ -11,7 +11,7 @@ import _ from 'lodash';
  * @param {Object} subClass
  * @param {Object} superClass
  */
-export function inherits(subClass, superClass) {
+function inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
   }
@@ -39,7 +39,7 @@ export function inherits(subClass, superClass) {
  * @param {Object} SuperConstructor
  * @returns {boolean}
  */
-export function isSubclassOf(Constructor, SuperConstructor) {
+function isSubclassOf(Constructor, SuperConstructor) {
   if (!_.isFunction(SuperConstructor)) {
     return false;
   }
@@ -52,3 +52,9 @@ export function isSubclassOf(Constructor, SuperConstructor) {
 
   return false;
 }
+
+module.exports = {
+  inherits: inherits,
+  isSubclassOf: isSubclassOf
+};
+

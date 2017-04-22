@@ -1,4 +1,4 @@
-export default class QueryBuilderOperation {
+module.exports = class QueryBuilderOperation {
 
   /**
    * @param {knex} knex

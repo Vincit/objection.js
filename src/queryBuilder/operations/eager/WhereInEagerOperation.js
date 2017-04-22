@@ -1,11 +1,11 @@
-import chunk from 'lodash/chunk';
-import flatten from 'lodash/flatten';
-import Promise from 'bluebird';
-import ValidationError from '../../../model/ValidationError'
-import EagerOperation from './EagerOperation';
-import {isMsSql} from '../../../utils/knexUtils';
+const chunk = require('lodash/chunk');
+const flatten = require('lodash/flatten');
+const Promise = require('bluebird');
+const ValidationError = require('../../../model/ValidationError');
+const EagerOperation = require('./EagerOperation');
+const {isMsSql} = require('../../../utils/knexUtils');
 
-export default class WhereInEagerOperation extends EagerOperation {
+module.exports = class WhereInEagerOperation extends EagerOperation {
 
   constructor(name, opt) {
     super(name, opt);

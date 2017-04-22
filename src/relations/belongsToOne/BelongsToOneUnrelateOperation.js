@@ -1,6 +1,6 @@
-import BelongsToOneRelateOperation from './BelongsToOneRelateOperation';
+const BelongsToOneRelateOperation = require('./BelongsToOneRelateOperation');
 
-export default class BelongsToOneUnrelateOperation extends BelongsToOneRelateOperation {
+module.exports = class BelongsToOneUnrelateOperation extends BelongsToOneRelateOperation {
 
   call(builder, args) {
     const ids = new Array(this.relation.ownerProp.length);

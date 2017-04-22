@@ -1,11 +1,11 @@
-import _ from 'lodash';
-import parser from './parsers/relationExpressionParser';
-import ValidationError from '../model/ValidationError';
+const _ = require('lodash');
+const parser = require('./parsers/relationExpressionParser');
+const ValidationError = require('../model/ValidationError');
 
 const RECURSIVE_REGEX = /^\^(\d*)$/;
 const ALL_RECURSIVE_REGEX = /^\*$/;
 
-export default class RelationExpression {
+module.exports = class RelationExpression {
 
   constructor(node, recursionDepth, filters) {
     node = node || {};

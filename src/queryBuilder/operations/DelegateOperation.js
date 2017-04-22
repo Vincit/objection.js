@@ -1,6 +1,6 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
+const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-export default class DelegateOperation extends QueryBuilderOperation {
+module.exports = class DelegateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

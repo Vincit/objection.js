@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import {getDialect} from '../../utils/knexUtils';
+const _ = require('lodash');
+const {getDialect} = require('../../utils/knexUtils');
 
-export default function queryBuilderOperation(input, name) {
+module.exports = function queryBuilderOperation(input, name) {
   const normalizedInput = normalizeInput(input);
 
   return function (target, property, descriptor) {

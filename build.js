@@ -16,7 +16,6 @@ var BABEL_OPT = {
 
     "transform-es2015-template-literals",
     "transform-es2015-literals",
-    "transform-es2015-function-name",
     "transform-es2015-arrow-functions",
     "transform-es2015-block-scoped-functions",
     ["transform-es2015-classes", {
@@ -31,10 +30,7 @@ var BABEL_OPT = {
     "transform-es2015-spread",
     "transform-es2015-parameters",
     "transform-es2015-destructuring",
-    "transform-es2015-block-scoping",
-    "transform-es2015-typeof-symbol",
-    "transform-es2015-modules-commonjs",
-    "transform-runtime"
+    "transform-es2015-block-scoping"
   ]
 };
 

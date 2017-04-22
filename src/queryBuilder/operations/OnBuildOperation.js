@@ -1,6 +1,6 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
+const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-export default class OnBuildOperation extends QueryBuilderOperation {
+module.exports = class OnBuildOperation extends QueryBuilderOperation {
 
   call(builder, args) {
     this.func = args[0];

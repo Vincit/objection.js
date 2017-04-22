@@ -1,7 +1,7 @@
-import upperFirst from 'lodash/upperFirst';
-import {createGetter, createSetter} from '../hiddenData';
+const upperFirst = require('lodash/upperFirst');
+const {createGetter, createSetter} = require('../hiddenData');
 
-export default function memoize(target, property, descriptor) {
+module.exports = function memoize(target, property, descriptor) {
   const cacheProp = 'memoized' + upperFirst(property);
   const impl = descriptor.value;
 

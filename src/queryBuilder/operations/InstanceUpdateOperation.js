@@ -1,7 +1,7 @@
-import UpdateOperation from './UpdateOperation';
-import {after} from '../../utils/promiseUtils';
+const UpdateOperation = require('./UpdateOperation');
+const {after} = require('../../utils/promiseUtils');
 
-export default class InstanceUpdateOperation extends UpdateOperation {
+module.exports = class InstanceUpdateOperation extends UpdateOperation {
 
   constructor(name, opt) {
     super(name, opt);

@@ -1,4 +1,4 @@
-export default class DependencyNode {
+module.exports = class DependencyNode {
 
   constructor(model, modelClass) {
     this.id = model[modelClass.uidProp];

@@ -1,4 +1,4 @@
-export default class TableInsertion {
+module.exports = class TableInsertion {
 
   constructor(modelClass, isJoinTableInsertion) {
     /**

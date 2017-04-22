@@ -1,5 +1,5 @@
-import flatten from 'lodash/flatten';
-import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
+const flatten = require('lodash/flatten');
+const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
 /**
  * This class's only purpose is to normalize the arguments as an array.
@@ -7,7 +7,7 @@ import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
  * In knex, if a single column is given to `returning` it returns an array with the that column's value
  * in it. If an array is given with a one item inside, the return value is an object.
  */
-export default class ReturningOperation extends WrappingQueryBuilderOperation {
+module.exports = class ReturningOperation extends WrappingQueryBuilderOperation {
 
   call(builder, args) {
     args = flatten(args);

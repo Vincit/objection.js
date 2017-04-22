@@ -1,4 +1,4 @@
-export default class Validator {
+module.exports = class Validator {
   beforeValidate({model, json, options}) {
     model.$beforeValidate(null, json, options);
   }

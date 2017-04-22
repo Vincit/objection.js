@@ -1,12 +1,12 @@
-import KnexOperation from './operations/KnexOperation';
-import QueryBuilderContextBase from './QueryBuilderContextBase';
-import {inherits} from '../utils/classUtils';
+const KnexOperation = require('./operations/KnexOperation');
+const QueryBuilderContextBase = require('./QueryBuilderContextBase');
+const {inherits} = require('../utils/classUtils');
 
 /**
  * Base functionality to be able to use query builder operation annotations.
  */
 
-export default class QueryBuilderOperationSupport {
+module.exports = class QueryBuilderOperationSupport {
 
   constructor(knex, QueryBuilderContext) {
     /**

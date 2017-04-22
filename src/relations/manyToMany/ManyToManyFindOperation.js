@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import RelationFindOperation from '../RelationFindOperation';
+const _ = require('lodash');
+const RelationFindOperation = require('../RelationFindOperation');
 
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 
-export default class ManyToManyFindOperation extends RelationFindOperation {
+module.exports = class ManyToManyFindOperation extends RelationFindOperation {
 
   constructor(name, opt) {
     super(name, opt);

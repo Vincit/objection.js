@@ -1,29 +1,36 @@
-import queryBuilderOperation from './decorators/queryBuilderOperation';
-import QueryBuilderOperationSupport from './QueryBuilderOperationSupport';
+const queryBuilderOperation = require('./decorators/queryBuilderOperation');
+const QueryBuilderOperationSupport = require('./QueryBuilderOperationSupport');
 
-import KnexOperation from './operations/KnexOperation';
-import SelectOperation from './operations/SelectOperation';
-import WhereRefOperation from './operations/WhereRefOperation';
-import ReturningOperation from './operations/ReturningOperation';
-import WhereCompositeOperation from './operations/WhereCompositeOperation';
-import WhereInCompositeOperation from './operations/whereInComposite/WhereInCompositeOperation';
-import WhereInCompositeSqliteOperation from './operations/whereInComposite/WhereInCompositeSqliteOperation';
+const KnexOperation = require('./operations/KnexOperation');
+const SelectOperation = require('./operations/SelectOperation');
+const WhereRefOperation = require('./operations/WhereRefOperation');
+const ReturningOperation = require('./operations/ReturningOperation');
+const WhereCompositeOperation = require('./operations/WhereCompositeOperation');
+const WhereInCompositeOperation = require('./operations/whereInComposite/WhereInCompositeOperation');
+const WhereInCompositeSqliteOperation = require('./operations/whereInComposite/WhereInCompositeSqliteOperation');
 
-import WhereJsonPostgresOperation from './operations/jsonApi/WhereJsonPostgresOperation';
-import WhereJsonHasPostgresOperation from './operations/jsonApi/WhereJsonHasPostgresOperation';
-import WhereJsonFieldPostgresOperation from './operations/jsonApi/WhereJsonFieldPostgresOperation';
-import WhereJsonNotObjectPostgresOperation from './operations/jsonApi/WhereJsonNotObjectPostgresOperation';
+const WhereJsonPostgresOperation = require('./operations/jsonApi/WhereJsonPostgresOperation');
+const WhereJsonHasPostgresOperation = require('./operations/jsonApi/WhereJsonHasPostgresOperation');
+const WhereJsonFieldPostgresOperation = require('./operations/jsonApi/WhereJsonFieldPostgresOperation');
+const WhereJsonNotObjectPostgresOperation = require('./operations/jsonApi/WhereJsonNotObjectPostgresOperation');
 
 /**
  * This class is a thin wrapper around knex query builder. This class allows us to add our own
  * query builder methods without monkey patching knex query builder.
  */
 
-export default class QueryBuilderBase extends QueryBuilderOperationSupport {
+module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
 
   static SelectSelector = SelectOperation;
   static WhereSelector = /where|orWhere|andWhere/;
   static FromSelector = /^(from|into|table)$/;
+
+  /**
+   * @return {boolean}
+   */
+  get isObjectionQueryBuilderBase() {
+    return true;
+  }
 
   /**
    * @return {boolean}

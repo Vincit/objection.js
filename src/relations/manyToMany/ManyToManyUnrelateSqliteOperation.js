@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation';
+const _ = require('lodash');
+const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
 const sqliteBuiltInRowId = '_rowid_';
 
-export default class ManyToManyUnrelateSqliteOperation extends QueryBuilderOperation {
+module.exports = class ManyToManyUnrelateSqliteOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

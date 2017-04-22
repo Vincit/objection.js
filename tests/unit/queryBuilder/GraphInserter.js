@@ -6,7 +6,7 @@ var _ = require('lodash')
   , Promise = require('bluebird')
   , Model = require('../../../').Model
   , knexMocker = require('../../../testUtils/mockKnex')
-  , GraphInserter = require('../../../lib/queryBuilder/graphInserter/GraphInserter').default
+  , GraphInserter = require('../../../lib/queryBuilder/graphInserter/GraphInserter')
   , RelationExpression = require('../../../').RelationExpression;
 
 describe('GraphInserter', function () {

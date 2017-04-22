@@ -7,7 +7,7 @@ if (isClassKeywordSupported()) {
   createInheritor = createFunctionInheritor;
 }
 
-export default (ModelClass) => {
+module.exports = (ModelClass) => {
   let inherit = cache[ModelClass.name];
 
   if (!inherit) {

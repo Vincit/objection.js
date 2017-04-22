@@ -1,10 +1,10 @@
-import Promise from 'bluebird';
+const Promise = require('bluebird');
 
-export function isPromise(obj) {
+function isPromise(obj) {
   return obj && (typeof obj === 'object') && (typeof obj.then === 'function');
 }
 
-export function after(obj, func) {
+function after(obj, func) {
   if (isPromise(obj)) {
     return obj.then(func);
   } else {
@@ -12,7 +12,7 @@ export function after(obj, func) {
   }
 }
 
-export function afterReturn(obj, returnValue) {
+function afterReturn(obj, returnValue) {
   if (obj instanceof Promise) {
     return obj.return(returnValue);
   } else if (isPromise(obj)) {
@@ -22,7 +22,7 @@ export function afterReturn(obj, returnValue) {
   }
 }
 
-export function mapAfterAllReturn(arr, mapper, returnValue) {
+function mapAfterAllReturn(arr, mapper, returnValue) {
   const results = new Array(arr.length);
   let containsPromise = false;
 
@@ -40,3 +40,10 @@ export function mapAfterAllReturn(arr, mapper, returnValue) {
     return returnValue;
   }
 }
+
+module.exports = {
+  isPromise: isPromise,
+  after: after,
+  afterReturn: afterReturn,
+  mapAfterAllReturn: mapAfterAllReturn
+};

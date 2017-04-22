@@ -1,6 +1,6 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default function normalizeIds(ids, expectedProperties, opt) {
+module.exports = function normalizeIds(ids, expectedProperties, opt) {
   opt = opt || {};
 
   if (!_.isArray(expectedProperties)) {

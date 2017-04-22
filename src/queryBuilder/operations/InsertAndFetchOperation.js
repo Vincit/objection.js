@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import InsertOperation from './InsertOperation';
-import DelegateOperation from './DelegateOperation';
-import {after} from '../../utils/promiseUtils';
+const _ = require('lodash');
+const InsertOperation = require('./InsertOperation');
+const DelegateOperation = require('./DelegateOperation');
+const {after} = require('../../utils/promiseUtils');
 
-export default class InsertAndFetchOperation extends DelegateOperation {
+module.exports = class InsertAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);

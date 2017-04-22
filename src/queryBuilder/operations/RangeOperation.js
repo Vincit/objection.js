@@ -1,6 +1,6 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
+const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-export default class RangeOperation extends QueryBuilderOperation {
+module.exports = class RangeOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

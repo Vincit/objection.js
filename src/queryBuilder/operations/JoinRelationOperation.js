@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import QueryBuilderOperation from './QueryBuilderOperation';
-import RelationJoinBuilder from './eager/RelationJoinBuilder';
-import RelationExpression from '../RelationExpression';
+const _ = require('lodash');
+const QueryBuilderOperation = require('./QueryBuilderOperation');
+const RelationJoinBuilder = require('./eager/RelationJoinBuilder');
+const RelationExpression = require('../RelationExpression');
 
-export default class JoinRelationOperation extends QueryBuilderOperation {
+module.exports = class JoinRelationOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

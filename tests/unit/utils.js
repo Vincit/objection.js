@@ -2,7 +2,7 @@ var util = require('util');
 var expect = require('expect.js');
 var utils = require('../../lib/utils/classUtils');
 var hiddenData = require('../../lib/utils/hiddenData');
-var memoize = require('../../lib/utils/decorators/memoize').default;
+var memoize = require('../../lib/utils/decorators/memoize');
 
 describe('utils', function () {
 

@@ -1,29 +1,29 @@
-import _ from 'lodash';
-import AjvValidator from './AjvValidator';
-import QueryBuilder from '../queryBuilder/QueryBuilder';
-import inheritModel from './inheritModel';
-import RelationExpression from '../queryBuilder/RelationExpression';
-import {visitModels} from './modelVisitor';
+const _ = require('lodash');
+const AjvValidator = require('./AjvValidator');
+const QueryBuilder = require('../queryBuilder/QueryBuilder');
+const inheritModel = require('./inheritModel');
+const RelationExpression = require('../queryBuilder/RelationExpression');
+const {visitModels} = require('./modelVisitor');
 
-import {inherits} from '../utils/classUtils';
-import {inheritHiddenData} from '../utils/hiddenData';
-import hiddenData from '../utils/decorators/hiddenData';
-import memoize from '../utils/decorators/memoize';
+const {inherits} = require('../utils/classUtils');
+const {inheritHiddenData} = require('../utils/hiddenData');
+const hiddenData = require('../utils/decorators/hiddenData');
+const memoize = require('../utils/decorators/memoize');
 
-import Relation from '../relations/Relation';
-import HasOneRelation from '../relations/hasOne/HasOneRelation';
-import HasManyRelation from '../relations/hasMany/HasManyRelation';
-import ManyToManyRelation from '../relations/manyToMany/ManyToManyRelation';
-import BelongsToOneRelation from '../relations/belongsToOne/BelongsToOneRelation';
-import HasOneThroughRelation from '../relations/hasOneThrough/HasOneThroughRelation';
+const Relation = require('../relations/Relation');
+const HasOneRelation = require('../relations/hasOne/HasOneRelation');
+const HasManyRelation = require('../relations/hasMany/HasManyRelation');
+const ManyToManyRelation = require('../relations/manyToMany/ManyToManyRelation');
+const BelongsToOneRelation = require('../relations/belongsToOne/BelongsToOneRelation');
+const HasOneThroughRelation = require('../relations/hasOneThrough/HasOneThroughRelation');
 
-import InstanceFindOperation from '../queryBuilder/operations/InstanceFindOperation';
-import InstanceInsertOperation from '../queryBuilder/operations/InstanceInsertOperation';
-import InstanceUpdateOperation from '../queryBuilder/operations/InstanceUpdateOperation';
-import InstanceDeleteOperation from '../queryBuilder/operations/InstanceDeleteOperation';
+const InstanceFindOperation = require('../queryBuilder/operations/InstanceFindOperation');
+const InstanceInsertOperation = require('../queryBuilder/operations/InstanceInsertOperation');
+const InstanceUpdateOperation = require('../queryBuilder/operations/InstanceUpdateOperation');
+const InstanceDeleteOperation = require('../queryBuilder/operations/InstanceDeleteOperation');
 
-import JoinEagerOperation from '../queryBuilder/operations/eager/JoinEagerOperation';
-import WhereInEagerOperation from '../queryBuilder/operations/eager/WhereInEagerOperation';
+const JoinEagerOperation = require('../queryBuilder/operations/eager/JoinEagerOperation');
+const WhereInEagerOperation = require('../queryBuilder/operations/eager/WhereInEagerOperation');
 
 const JoinEagerAlgorithm = () => {
   return new JoinEagerOperation('eager');
@@ -42,7 +42,7 @@ const WhereInEagerAlgorithm = () => {
  * @property {Model} [old]
  */
 
-export default class Model {
+class Model {
 
   static QueryBuilder = QueryBuilder;
   static RelatedQueryBuilder = QueryBuilder;
@@ -125,6 +125,20 @@ export default class Model {
    * @type {object}
    */
   static defaultEagerOptions = null;
+
+  /**
+   * @return {boolean}
+   */
+  get isObjectionModel() {
+    return true;
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get objectionModelClass() {
+    return Model;
+  }
 
   /**
    * @param {*=} id
@@ -1156,7 +1170,7 @@ export default class Model {
 
     return this.jsonAttributes;
   }
-}
+};
 
 function setId(model, id) {
   const idProp = model.constructor.getIdProperty();
@@ -1477,3 +1491,5 @@ function idColumnToIdProperty(ModelClass, idColumn) {
 
   return idProperty;
 }
+
+module.exports = Model;

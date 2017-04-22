@@ -1,6 +1,6 @@
-import FindOperation from './FindOperation';
+const FindOperation = require('./FindOperation');
 
-export default class InstanceFindOperation extends FindOperation {
+module.exports = class InstanceFindOperation extends FindOperation {
 
   constructor(name, opt) {
     super(name, opt);

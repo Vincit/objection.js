@@ -1,10 +1,9 @@
-import _ from 'lodash';
-import Ajv from 'ajv';
-import Model from './Model';
-import Validator from './Validator';
-import ValidationError from './ValidationError';
+const _ = require('lodash');
+const Ajv = require('ajv');
+const Validator = require('./Validator');
+const ValidationError = require('./ValidationError');
 
-export default class AjvValidator extends Validator {
+module.exports = class AjvValidator extends Validator {
 
   constructor(conf) {
     super();
@@ -26,7 +25,7 @@ export default class AjvValidator extends Validator {
   beforeValidate({model, json, options, ctx}) {
     ctx.jsonSchema = model.constructor.getJsonSchema();
 
-    if (model.$beforeValidate !== Model.prototype.$beforeValidate) {
+    if (model.$beforeValidate !== model.objectionModelClass.prototype.$beforeValidate) {
       ctx.jsonSchema = _.cloneDeep(ctx.jsonSchema);
       ctx.jsonSchema = model.$beforeValidate(ctx.jsonSchema, json, options);
     }

@@ -1,6 +1,6 @@
-import QueryBuilderContextBase from './QueryBuilderContextBase';
+const QueryBuilderContextBase = require('./QueryBuilderContextBase');
 
-export default class QueryBuilderContext extends QueryBuilderContextBase {
+module.exports = class QueryBuilderContext extends QueryBuilderContextBase {
 
   constructor(userContext) {
     super(userContext);

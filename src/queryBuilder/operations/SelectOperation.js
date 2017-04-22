@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
+const _ = require('lodash');
+const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
-export default class SelectOperation extends WrappingQueryBuilderOperation {
+module.exports = class SelectOperation extends WrappingQueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

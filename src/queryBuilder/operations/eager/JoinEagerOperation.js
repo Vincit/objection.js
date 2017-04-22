@@ -1,7 +1,7 @@
-import EagerOperation from './EagerOperation';
-import RelationJoinBuilder from './RelationJoinBuilder';
+const EagerOperation = require('./EagerOperation');
+const RelationJoinBuilder = require('./RelationJoinBuilder');
 
-export default class JoinEagerOperation extends EagerOperation {
+module.exports = class JoinEagerOperation extends EagerOperation {
 
   constructor(name, opt) {
     super(name, opt);

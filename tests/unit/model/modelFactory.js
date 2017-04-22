@@ -4,7 +4,7 @@ var KnexRaw = require('knex/lib/raw');
 var Knex = require('knex');
 
 var modelFactory = require('../../../lib/model/modelFactory');
-var ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').default;
+var ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
 var QueryBuilderBase = require('../../../').QueryBuilderBase;
 var Model = require('../../../').Model;
 var ref = require('../../../').ref;

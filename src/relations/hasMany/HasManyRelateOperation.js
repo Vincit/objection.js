@@ -1,7 +1,7 @@
-import normalizeIds from '../../utils/normalizeIds';
-import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation';
+const normalizeIds = require('../../utils/normalizeIds');
+const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
-export default class HasManyRelateOperation extends QueryBuilderOperation {
+module.exports = class HasManyRelateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

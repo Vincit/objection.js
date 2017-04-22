@@ -1,12 +1,12 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import Model from './model/Model';
-import {isSubclassOf} from './utils/classUtils';
+const _ = require('lodash');
+const Promise = require('bluebird');
+const Model = require('./model/Model');
+const {isSubclassOf} = require('./utils/classUtils');
 
 /**
  * @returns {Promise}
  */
-export default function transaction() {
+function transaction() {
   // There must be at least one model class and the callback.
   if (arguments.length < 2) {
     return Promise.reject(new Error('objection.transaction: provide at least one Model class to bind to the transaction or a knex instance'));
@@ -95,3 +95,5 @@ transaction.start = function (modelClassOrKnex) {
 function isGenerator(fn) {
   return fn && fn.constructor && fn.constructor.name === 'GeneratorFunction';
 }
+
+module.exports = transaction;

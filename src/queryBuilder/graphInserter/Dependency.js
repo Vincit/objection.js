@@ -1,4 +1,4 @@
-export default class Dependency {
+module.exports = class Dependency {
 
   constructor(node) {
     /**

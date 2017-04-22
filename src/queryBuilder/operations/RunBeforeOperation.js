@@ -1,6 +1,6 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
+const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-export default class RunBeforeOperation extends QueryBuilderOperation {
+module.exports = class RunBeforeOperation extends QueryBuilderOperation {
 
   call(builder, args) {
     this.func = args[0];

@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import Dependency from './Dependency';
+const _ = require('lodash');
+const Dependency = require('./Dependency');
 
-export default class ReplaceValueDependency extends Dependency {
+module.exports = class ReplaceValueDependency extends Dependency {
 
   constructor(node, path, refProp,inverse) {
     super(node);

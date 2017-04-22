@@ -1,6 +1,6 @@
-import HasManyRelation from '../hasMany/HasManyRelation';
+const HasManyRelation = require('../hasMany/HasManyRelation');
 
-export default class HasOneRelation extends HasManyRelation {
+module.exports = class HasOneRelation extends HasManyRelation {
 
   isOneToOne() {
     return true;

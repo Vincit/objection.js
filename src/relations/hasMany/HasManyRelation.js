@@ -1,10 +1,10 @@
-import Relation from '../Relation';
+const Relation = require('../Relation');
 
-import HasManyInsertOperation from './HasManyInsertOperation';
-import HasManyRelateOperation from './HasManyRelateOperation';
-import HasManyUnrelateOperation from './HasManyUnrelateOperation';
+const HasManyInsertOperation = require('./HasManyInsertOperation');
+const HasManyRelateOperation = require('./HasManyRelateOperation');
+const HasManyUnrelateOperation = require('./HasManyUnrelateOperation');
 
-export default class HasManyRelation extends Relation {
+module.exports = class HasManyRelation extends Relation {
 
   insert(builder, owner) {
     return new HasManyInsertOperation('insert', {

@@ -1,40 +1,40 @@
-import Model from './model/Model';
-import QueryBuilderBase from './queryBuilder/QueryBuilderBase';
-import QueryBuilder from './queryBuilder/QueryBuilder';
-import QueryBuilderOperation from './queryBuilder/operations/QueryBuilderOperation'
-import RelationExpression from './queryBuilder/RelationExpression';
-import ValidationError from './model/ValidationError';
-import AjvValidator from './model/AjvValidator';
-import Validator from './model/Validator';
+const Model = require('./model/Model');
+const QueryBuilderBase = require('./queryBuilder/QueryBuilderBase');
+const QueryBuilder = require('./queryBuilder/QueryBuilder');
+const QueryBuilderOperation = require('./queryBuilder/operations/QueryBuilderOperation');
+const RelationExpression = require('./queryBuilder/RelationExpression');
+const ValidationError = require('./model/ValidationError');
+const AjvValidator = require('./model/AjvValidator');
+const Validator = require('./model/Validator');
 
-import Relation from './relations/Relation';
-import HasOneRelation from './relations/hasOne/HasOneRelation';
-import HasManyRelation from './relations/hasMany/HasManyRelation';
-import BelongsToOneRelation from './relations/belongsToOne/BelongsToOneRelation';
-import HasOneThroughRelation from './relations/hasOneThrough/HasOneThroughRelation';
-import ManyToManyRelation from './relations/manyToMany/ManyToManyRelation';
+const Relation = require('./relations/Relation');
+const HasOneRelation = require('./relations/hasOne/HasOneRelation');
+const HasManyRelation = require('./relations/hasMany/HasManyRelation');
+const BelongsToOneRelation = require('./relations/belongsToOne/BelongsToOneRelation');
+const HasOneThroughRelation = require('./relations/hasOneThrough/HasOneThroughRelation');
+const ManyToManyRelation = require('./relations/manyToMany/ManyToManyRelation');
 
-import transaction from './transaction';
-import { ref } from './queryBuilder/ReferenceBuilder';
-import Promise from 'bluebird';
+const transaction = require('./transaction');
+const { ref } = require('./queryBuilder/ReferenceBuilder');
+const Promise = require('bluebird');
 
-export {
-  Model,
-  QueryBuilder,
-  QueryBuilderBase,
-  QueryBuilderOperation,
-  RelationExpression,
-  ValidationError,
-  AjvValidator,
-  Validator,
-  Relation,
-  HasOneRelation,
-  HasManyRelation,
-  BelongsToOneRelation,
-  HasOneThroughRelation,
-  ManyToManyRelation,
-  transaction,
-  Promise,
-  ref
+module.exports = {
+  Model: Model,
+  QueryBuilder: QueryBuilder,
+  QueryBuilderBase: QueryBuilderBase,
+  QueryBuilderOperation: QueryBuilderOperation,
+  RelationExpression: RelationExpression,
+  ValidationError: ValidationError,
+  AjvValidator: AjvValidator,
+  Validator: Validator,
+  Relation: Relation,
+  HasOneRelation: HasOneRelation,
+  HasManyRelation: HasManyRelation,
+  BelongsToOneRelation: BelongsToOneRelation,
+  HasOneThroughRelation: HasOneThroughRelation,
+  ManyToManyRelation: ManyToManyRelation,
+  transaction: transaction,
+  Promise: Promise,
+  ref: ref
 };
 

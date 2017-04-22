@@ -1,6 +1,6 @@
-import WrappingQueryBuilderOperation from './WrappingQueryBuilderOperation';
+const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
-export default class KnexOperation extends WrappingQueryBuilderOperation {
+module.exports = class KnexOperation extends WrappingQueryBuilderOperation {
 
   onBuild(builder) {
     if (typeof builder[this.name] === 'function') {

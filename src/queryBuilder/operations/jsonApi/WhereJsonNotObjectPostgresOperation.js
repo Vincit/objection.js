@@ -1,7 +1,7 @@
-import jsonApi from './postgresJsonApi';
-import WrappingQueryBuilderOperation from '../WrappingQueryBuilderOperation';
+const jsonApi = require('./postgresJsonApi');
+const WrappingQueryBuilderOperation = require('../WrappingQueryBuilderOperation');
 
-export default class WhereJsonNotObjectPostgresOperation extends WrappingQueryBuilderOperation {
+module.exports = class WhereJsonNotObjectPostgresOperation extends WrappingQueryBuilderOperation {
 
   onBuild(knexBuilder, builder) {
     this.whereJsonNotObject(knexBuilder, builder.knex(), this.args[0]);

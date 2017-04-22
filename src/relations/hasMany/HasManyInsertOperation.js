@@ -1,7 +1,7 @@
-import InsertOperation from '../../queryBuilder/operations/InsertOperation';
-import {after} from '../../utils/promiseUtils';
+const InsertOperation = require('../../queryBuilder/operations/InsertOperation');
+const {after} = require('../../utils/promiseUtils');
 
-export default class HasManyInsertOperation extends InsertOperation {
+module.exports = class HasManyInsertOperation extends InsertOperation {
 
   constructor(name, opt) {
     super(name, opt);

@@ -1,10 +1,10 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
+const _ = require('lodash');
+const Promise = require('bluebird');
 
-import DependencyGraph from './DependencyGraph';
-import TableInsertion from './TableInsertion';
+const DependencyGraph = require('./DependencyGraph');
+const TableInsertion = require('./TableInsertion');
 
-export default class GraphInserter {
+module.exports = class GraphInserter {
 
   constructor({modelClass, models, allowedRelations, knex}) {
     /**

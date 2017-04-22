@@ -1,6 +1,6 @@
-import {createGetter, createSetter} from '../hiddenData';
+const {createGetter, createSetter} = require('../hiddenData');
 
-export default function hiddenData(opt) {
+module.exports = function hiddenData(opt) {
   return function (target, property, descriptor) {
     let propName;
     let append;

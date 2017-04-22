@@ -1,11 +1,10 @@
-import QueryBuilderOperation from './QueryBuilderOperation';
-import {isKnexQueryBuilder, isKnexJoinBuilder} from '../../utils/knexUtils';
-import ReferenceBuilder from '../ReferenceBuilder';
+const QueryBuilderOperation = require('./QueryBuilderOperation');
+const {isKnexQueryBuilder, isKnexJoinBuilder} = require('../../utils/knexUtils');
 
 let QueryBuilderBase = null;
 let JoinBuilder = null;
 
-export default class WrappingQueryBuilderOperation extends QueryBuilderOperation {
+module.exports = class WrappingQueryBuilderOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -20,7 +19,7 @@ export default class WrappingQueryBuilderOperation extends QueryBuilderOperation
 }
 
 function wrapArgs(op, builder, args) {
-  // Preventing cyclic deps
+  // Preventing cyclic deps.
   QueryBuilderBase = QueryBuilderBase || requireQueryBuilderBase();
 
   const skipUndefined = builder.internalOptions().skipUndefined;
@@ -35,9 +34,9 @@ function wrapArgs(op, builder, args) {
       } else {
         throw new Error(`undefined passed as argument #${l} for '${op.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
       }
-    } else if (arg instanceof ReferenceBuilder) {
+    } else if (arg && arg.isObjectionReferenceBuilder) {
       args[i] = knex.raw(...args[i].toRawArgs());
-    } else if (arg instanceof QueryBuilderBase) {
+    } else if (arg && arg.isObjectionQueryBuilderBase) {
       // Convert QueryBuilderBase instances into knex query builders.
       args[i] = arg.build();
     } else if (Array.isArray(arg)) {
@@ -48,7 +47,7 @@ function wrapArgs(op, builder, args) {
       }
       // convert reference builders to knex.raw
       args[i] = args[i].map(arg => {
-        return arg instanceof ReferenceBuilder ? knex.raw(...arg.toRawArgs()) : arg;
+        return (arg && arg.isObjectionReferenceBuilder) ? knex.raw(...arg.toRawArgs()) : arg;
       });
     } else if (typeof arg === 'function') {
       // If an argument is a function, knex calls it with a query builder as
@@ -62,7 +61,7 @@ function wrapArgs(op, builder, args) {
 }
 
 function wrapFunctionArg(func, knex) {
-  // Preventing cyclic deps
+  // Preventing cyclic deps.
   QueryBuilderBase = QueryBuilderBase || requireQueryBuilderBase();
   JoinBuilder = JoinBuilder || requireJoinBuilder();
 
@@ -108,9 +107,9 @@ function includesUndefined(arr) {
 }
 
 function requireQueryBuilderBase() {
-  return require('../QueryBuilderBase').default;
+  return require('../QueryBuilderBase');
 }
 
 function requireJoinBuilder() {
-  return require('../JoinBuilder').default;
+  return require('../JoinBuilder');
 }

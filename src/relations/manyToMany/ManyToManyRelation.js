@@ -1,28 +1,28 @@
-import _ from 'lodash';
-import Relation from '../Relation';
-import inheritModel from '../../model/inheritModel';
-import {isSqlite} from '../../utils/knexUtils';
-import memoize from '../../utils/decorators/memoize';
+const _ = require('lodash');
+const Relation = require('../Relation');
+const inheritModel = require('../../model/inheritModel');
+const {isSqlite} = require('../../utils/knexUtils');
+const memoize = require('../../utils/decorators/memoize');
 
-import ManyToManyFindOperation from './ManyToManyFindOperation';
-import ManyToManyInsertOperation from './ManyToManyInsertOperation';
-import ManyToManyRelateOperation from './ManyToManyRelateOperation';
-import ManyToManyUnrelateOperation from './ManyToManyUnrelateOperation';
-import ManyToManyUnrelateSqliteOperation from './ManyToManyUnrelateSqliteOperation';
-import ManyToManyUpdateOperation from './ManyToManyUpdateOperation';
-import ManyToManyUpdateSqliteOperation from './ManyToManyUpdateSqliteOperation';
-import ManyToManyDeleteOperation from './ManyToManyDeleteOperation';
-import ManyToManyDeleteSqliteOperation from './ManyToManyDeleteSqliteOperation';
+const ManyToManyFindOperation = require('./ManyToManyFindOperation');
+const ManyToManyInsertOperation = require('./ManyToManyInsertOperation');
+const ManyToManyRelateOperation = require('./ManyToManyRelateOperation');
+const ManyToManyUnrelateOperation = require('./ManyToManyUnrelateOperation');
+const ManyToManyUnrelateSqliteOperation = require('./ManyToManyUnrelateSqliteOperation');
+const ManyToManyUpdateOperation = require('./ManyToManyUpdateOperation');
+const ManyToManyUpdateSqliteOperation = require('./ManyToManyUpdateSqliteOperation');
+const ManyToManyDeleteOperation = require('./ManyToManyDeleteOperation');
+const ManyToManyDeleteSqliteOperation = require('./ManyToManyDeleteSqliteOperation');
 
 const sqliteBuiltInRowId = '_rowid_';
 
-export default class ManyToManyRelation extends Relation {
+module.exports = class ManyToManyRelation extends Relation {
 
   setMapping(mapping) {
     let retVal = super.setMapping(mapping);
 
     // Avoid require loop and import here.
-    let Model = require(__dirname + '/../../model/Model').default;
+    let Model = require(__dirname + '/../../model/Model');
 
     if (!_.isObject(mapping.join.through)) {
       this.throwError('join must have the `through` that describes the join table.');

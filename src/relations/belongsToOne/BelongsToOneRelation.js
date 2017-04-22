@@ -1,9 +1,9 @@
-import Relation from '../Relation';
-import BelongsToOneInsertOperation from './BelongsToOneInsertOperation';
-import BelongsToOneRelateOperation from './BelongsToOneRelateOperation';
-import BelongsToOneUnrelateOperation from './BelongsToOneUnrelateOperation';
+const Relation = require('../Relation');
+const BelongsToOneInsertOperation = require('./BelongsToOneInsertOperation');
+const BelongsToOneRelateOperation = require('./BelongsToOneRelateOperation');
+const BelongsToOneUnrelateOperation = require('./BelongsToOneUnrelateOperation');
 
-export default class BelongsToOneRelation extends Relation {
+module.exports = class BelongsToOneRelation extends Relation {
 
   isOneToOne() {
     return true;

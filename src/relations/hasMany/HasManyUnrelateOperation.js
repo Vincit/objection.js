@@ -1,6 +1,6 @@
-import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation'
+const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
-export default class HasManyUnrelateOperation extends QueryBuilderOperation {
+module.exports = class HasManyUnrelateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

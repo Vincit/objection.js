@@ -1,13 +1,13 @@
-import _ from 'lodash';
-import path from 'path';
-import memoize from '../utils/decorators/memoize';
-import {inherits, isSubclassOf} from '../utils/classUtils';
-import {init, copyHiddenData} from '../utils/hiddenData';
-import QueryBuilder from '../queryBuilder/QueryBuilder';
+const _ = require('lodash');
+const path = require('path');
+const memoize = require('../utils/decorators/memoize');
+const {inherits, isSubclassOf} = require('../utils/classUtils');
+const {init, copyHiddenData} = require('../utils/hiddenData');
+const QueryBuilder = require('../queryBuilder/QueryBuilder');
 
-import RelationFindOperation from './RelationFindOperation';
-import RelationUpdateOperation from './RelationUpdateOperation';
-import RelationDeleteOperation from './RelationDeleteOperation';
+const RelationFindOperation = require('./RelationFindOperation');
+const RelationUpdateOperation = require('./RelationUpdateOperation');
+const RelationDeleteOperation = require('./RelationDeleteOperation');
 
 /**
  * @typedef {Object} RelationJoin
@@ -34,7 +34,7 @@ import RelationDeleteOperation from './RelationDeleteOperation';
 /**
  * @abstract
  */
-export default class Relation {
+module.exports = class Relation {
 
   constructor(relationName, OwnerClass) {
     /**
@@ -129,7 +129,7 @@ export default class Relation {
    */
   setMapping(mapping) {
     // Avoid require loop and import here.
-    let Model = require(__dirname + '/../model/Model').default;
+    let Model = require(__dirname + '/../model/Model');
 
     if (!isSubclassOf(this.ownerModelClass, Model)) {
       this.throwError('Relation\'s owner is not a subclass of Model');

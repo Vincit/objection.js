@@ -1,7 +1,7 @@
-import jsonApi from './postgresJsonApi';
-import WrappingQueryBuilderOperation from '../WrappingQueryBuilderOperation';
+const jsonApi = require('./postgresJsonApi');
+const WrappingQueryBuilderOperation = require('../WrappingQueryBuilderOperation');
 
-export default class WhereJsonPostgresOperation extends WrappingQueryBuilderOperation {
+module.exports = class WhereJsonPostgresOperation extends WrappingQueryBuilderOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);

@@ -1,11 +1,10 @@
-import _ from 'lodash';
-import QueryBuilderOperation from './QueryBuilderOperation';
-import ReferenceBuilder from '../ReferenceBuilder';
-import jsonFieldExpressionParser from '../parsers/jsonFieldExpressionParser';
-import {fromJson, toDatabaseJson} from '../../model/modelFactory';
-import {afterReturn} from '../../utils/promiseUtils';
+const _ = require('lodash');
+const QueryBuilderOperation = require('./QueryBuilderOperation');
+const jsonFieldExpressionParser = require('../parsers/jsonFieldExpressionParser');
+const {fromJson, toDatabaseJson} = require('../../model/modelFactory');
+const {afterReturn} = require('../../utils/promiseUtils');
 
-export default class UpdateOperation extends QueryBuilderOperation {
+module.exports = class UpdateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -82,7 +81,7 @@ export default class UpdateOperation extends QueryBuilderOperation {
 
     _.forOwn(json, (val, key) => {
       // convert ref values to raw
-      let loweredValue = (val instanceof ReferenceBuilder) ?
+      let loweredValue = (val && val.isObjectionReferenceBuilder) ?
         knex.raw(...(val.toRawArgs())) : val;
 
       // convert update to jsonb_set format if attr inside jsonb column is set

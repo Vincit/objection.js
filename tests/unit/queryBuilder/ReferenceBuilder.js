@@ -2,7 +2,7 @@
 
 var expect = require('expect.js')
   , ref = require('../../../').ref
-  , ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').default;
+  , ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
 
 describe('ReferenceBuilder', function () {
   it('fail if reference cannot be parsed', function () {

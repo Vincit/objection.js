@@ -1,6 +1,6 @@
-import ManyToManyRelation from '../manyToMany/ManyToManyRelation';
+const ManyToManyRelation = require('../manyToMany/ManyToManyRelation');
 
-export default class HasOneThroughRelation extends ManyToManyRelation {
+module.exports = class HasOneThroughRelation extends ManyToManyRelation {
 
   isOneToOne() {
     return true;

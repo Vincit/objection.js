@@ -1,6 +1,6 @@
-import UpdateOperation from '../../queryBuilder/operations/UpdateOperation';
+const UpdateOperation = require('../../queryBuilder/operations/UpdateOperation');
 
-export default class ManyToManyUpdateSqliteOperation extends UpdateOperation {
+module.exports = class ManyToManyUpdateSqliteOperation extends UpdateOperation {
 
   constructor(name, opt) {
     super(name, opt);

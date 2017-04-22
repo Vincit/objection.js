@@ -1,4 +1,4 @@
-import util from 'util';
+const util = require('util');
 
 // Note: babel cannot inherit from built-in types like Error.
 // that's why we use ES5 inheritance here.
@@ -6,7 +6,7 @@ import util from 'util';
 /**
  * @param {Object} errors
  */
-export default function ValidationError(errors) {
+function ValidationError(errors) {
   Error.call(this);
   Error.captureStackTrace(this, ValidationError);
 
@@ -27,5 +27,7 @@ export default function ValidationError(errors) {
 }
 
 util.inherits(ValidationError, Error);
+
+module.exports = ValidationError;
 
 

@@ -1,29 +1,29 @@
-import Promise from 'bluebird';
-import ValidationError from '../model/ValidationError';
-import queryBuilderOperation from './decorators/queryBuilderOperation';
-import QueryBuilderContext from './QueryBuilderContext';
-import RelationExpression from './RelationExpression';
-import QueryBuilderBase from './QueryBuilderBase';
+const Promise = require('bluebird');
+const ValidationError = require('../model/ValidationError');
+const queryBuilderOperation = require('./decorators/queryBuilderOperation');
+const QueryBuilderContext = require('./QueryBuilderContext');
+const RelationExpression = require('./RelationExpression');
+const QueryBuilderBase = require('./QueryBuilderBase');
 
-import FindOperation from './operations/FindOperation';
-import DeleteOperation from './operations/DeleteOperation';
-import UpdateOperation from './operations/UpdateOperation';
-import InsertOperation from './operations/InsertOperation';
+const FindOperation = require('./operations/FindOperation');
+const DeleteOperation = require('./operations/DeleteOperation');
+const UpdateOperation = require('./operations/UpdateOperation');
+const InsertOperation = require('./operations/InsertOperation');
 
-import InsertGraphAndFetchOperation from './operations/InsertGraphAndFetchOperation';
-import InsertAndFetchOperation from './operations/InsertAndFetchOperation';
-import UpdateAndFetchOperation from './operations/UpdateAndFetchOperation';
-import QueryBuilderOperation from './operations/QueryBuilderOperation';
-import JoinRelationOperation from './operations/JoinRelationOperation';
-import InsertGraphOperation from './operations/InsertGraphOperation';
-import RunBeforeOperation from './operations/RunBeforeOperation';
-import RunAfterOperation from './operations/RunAfterOperation';
-import OnBuildOperation from './operations/OnBuildOperation';
-import SelectOperation from './operations/SelectOperation';
-import EagerOperation from './operations/eager/EagerOperation';
-import RangeOperation from './operations/RangeOperation';
+const InsertGraphAndFetchOperation = require('./operations/InsertGraphAndFetchOperation');
+const InsertAndFetchOperation = require('./operations/InsertAndFetchOperation');
+const UpdateAndFetchOperation = require('./operations/UpdateAndFetchOperation');
+const QueryBuilderOperation = require('./operations/QueryBuilderOperation');
+const JoinRelationOperation = require('./operations/JoinRelationOperation');
+const InsertGraphOperation = require('./operations/InsertGraphOperation');
+const RunBeforeOperation = require('./operations/RunBeforeOperation');
+const RunAfterOperation = require('./operations/RunAfterOperation');
+const OnBuildOperation = require('./operations/OnBuildOperation');
+const SelectOperation = require('./operations/SelectOperation');
+const EagerOperation = require('./operations/eager/EagerOperation');
+const RangeOperation = require('./operations/RangeOperation');
 
-export default class QueryBuilder extends QueryBuilderBase {
+module.exports = class QueryBuilder extends QueryBuilderBase {
 
   constructor(modelClass) {
     super(modelClass.knex(), QueryBuilderContext);
@@ -56,6 +56,13 @@ export default class QueryBuilder extends QueryBuilderBase {
    */
   static forClass(modelClass) {
     return new this(modelClass);
+  }
+
+  /**
+   * @return {boolean}
+   */
+  get isObjectionQueryBuilder() {
+    return true;
   }
 
   /**

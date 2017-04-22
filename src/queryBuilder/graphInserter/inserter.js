@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import {isPostgres} from '../../utils/knexUtils';
+const _ = require('lodash');
+const Promise = require('bluebird');
+const {isPostgres} = require('../../utils/knexUtils');
 
 const POSTGRES_INSERT_BATCH_SIZE = 100;
 
@@ -8,7 +8,7 @@ const POSTGRES_INSERT_BATCH_SIZE = 100;
  * @param {QueryBuilder} builder
  * @return {function(TableInsertion)}
  */
-export default function (builder) {
+module.exports = function (builder) {
   // Postgres is the only db engine that returns identifiers of all inserted rows. Therefore
   // we can insert batches only with postgres.
   const batchSize = isPostgres(builder.knex()) ? POSTGRES_INSERT_BATCH_SIZE : 1;

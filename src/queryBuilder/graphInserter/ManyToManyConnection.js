@@ -1,4 +1,4 @@
-export default class ManyToManyConnection {
+module.exports = class ManyToManyConnection {
 
   constructor(node, relation) {
     /**

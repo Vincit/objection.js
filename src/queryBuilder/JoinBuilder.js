@@ -1,12 +1,12 @@
-import _ from 'lodash';
-import QueryBuilderOperationSupport from './QueryBuilderOperationSupport';
-import queryBuilderOperation from './decorators/queryBuilderOperation';
-import {inherits} from '../utils/classUtils';
+const _ = require('lodash');
+const QueryBuilderOperationSupport = require('./QueryBuilderOperationSupport');
+const queryBuilderOperation = require('./decorators/queryBuilderOperation');
+const {inherits} = require('../utils/classUtils');
 
-import QueryBuilderContextBase from './QueryBuilderContextBase';
-import KnexOperation from './operations/KnexOperation';
+const QueryBuilderContextBase = require('./QueryBuilderContextBase');
+const KnexOperation = require('./operations/KnexOperation');
 
-export default class JoinBuilder extends QueryBuilderOperationSupport {
+module.exports = class JoinBuilder extends QueryBuilderOperationSupport {
 
   /**
    * @returns {JoinBuilderBase}

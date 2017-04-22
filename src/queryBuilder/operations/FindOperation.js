@@ -1,10 +1,9 @@
-import clone from 'lodash/clone';
-import Model from '../../model/Model';
-import QueryBuilderOperation from './QueryBuilderOperation';
-import {isPromise} from '../../utils/promiseUtils';
-import Promise from 'bluebird';
+const clone = require('lodash/clone');
+const QueryBuilderOperation = require('./QueryBuilderOperation');
+const {isPromise} = require('../../utils/promiseUtils');
+const Promise = require('bluebird');
 
-export default class FindOperation extends QueryBuilderOperation {
+module.exports = class FindOperation extends QueryBuilderOperation {
 
   clone(props) {
     props = props || {};
@@ -57,7 +56,7 @@ function callAfterGetArray(ctx, results, deep) {
 }
 
 function callAfterGetForOne(ctx, model, result, deep) {
-  if (!(model instanceof Model)) {
+  if (!model || !model.isObjectionModel) {
     return result;
   }
 
@@ -99,7 +98,7 @@ function callAfterGetForRelations(ctx, model, results) {
 }
 
 function doCallAfterGet(ctx, model, result) {
-  if (model.$afterGet !== Model.prototype.$afterGet) {
+  if (model.$afterGet !== model.objectionModelClass.prototype.$afterGet) {
     const maybePromise = model.$afterGet(ctx);
 
     if (maybePromise instanceof Promise) {

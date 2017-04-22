@@ -1,6 +1,6 @@
-import Dependency from './Dependency';
+const Dependency = require('./Dependency');
 
-export default class BelongsToOneDependency extends Dependency {
+module.exports = class BelongsToOneDependency extends Dependency {
 
   constructor(node, relation) {
     super(node);

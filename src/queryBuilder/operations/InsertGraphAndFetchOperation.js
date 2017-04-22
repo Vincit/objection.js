@@ -1,8 +1,8 @@
-import DelegateOperation from './DelegateOperation';
-import RelationExpression from '../RelationExpression';
-import InsertGraphOperation from './InsertGraphOperation';
+const DelegateOperation = require('./DelegateOperation');
+const RelationExpression = require('../RelationExpression');
+const InsertGraphOperation = require('./InsertGraphOperation');
 
-export default class InsertGraphAndFetchOperation extends DelegateOperation {
+module.exports = class InsertGraphAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);

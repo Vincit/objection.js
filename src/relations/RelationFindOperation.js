@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import FindOperation from '../queryBuilder/operations/FindOperation';
+const _ = require('lodash');
+const FindOperation = require('../queryBuilder/operations/FindOperation');
 
-export default class RelationFindOperation extends FindOperation {
+module.exports = class RelationFindOperation extends FindOperation {
 
   constructor(name, opt) {
     super(name, opt);

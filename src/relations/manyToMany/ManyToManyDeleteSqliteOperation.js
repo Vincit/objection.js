@@ -1,6 +1,6 @@
-import DeleteOperation from '../../queryBuilder/operations/DeleteOperation';
+const DeleteOperation = require('../../queryBuilder/operations/DeleteOperation');
 
-export default class ManyToManyDeleteSqliteOperation extends DeleteOperation {
+module.exports = class ManyToManyDeleteSqliteOperation extends DeleteOperation {
 
   constructor(name, opt) {
     super(name, opt);

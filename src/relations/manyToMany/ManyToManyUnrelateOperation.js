@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import QueryBuilderOperation from '../../queryBuilder/operations/QueryBuilderOperation';
+const _ = require('lodash');
+const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
-export default class ManyToManyUnrelateOperation extends QueryBuilderOperation {
+module.exports = class ManyToManyUnrelateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

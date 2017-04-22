@@ -1,6 +1,6 @@
-import InsertOperation from './InsertOperation';
+const InsertOperation = require('./InsertOperation');
 
-export default class InstanceInsertOperation extends InsertOperation {
+module.exports = class InstanceInsertOperation extends InsertOperation {
 
   constructor(name, opt) {
     super(name, opt);

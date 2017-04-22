@@ -1,18 +1,17 @@
-import Model from '../../model/Model';
-import HasManyRelation from '../../relations/hasMany/HasManyRelation';
-import RelationExpression from '../RelationExpression';
-import ManyToManyRelation from '../../relations/manyToMany/ManyToManyRelation';
-import BelongsToOneRelation from '../../relations/belongsToOne/BelongsToOneRelation';
-import ValidationError from '../../model/ValidationError';
+const HasManyRelation = require('../../relations/hasMany/HasManyRelation');
+const RelationExpression = require('../RelationExpression');
+const ManyToManyRelation = require('../../relations/manyToMany/ManyToManyRelation');
+const BelongsToOneRelation = require('../../relations/belongsToOne/BelongsToOneRelation');
+const ValidationError = require('../../model/ValidationError');
 
-import DependencyNode from './DependencyNode';
-import HasManyDependency from './HasManyDependency';
-import ManyToManyConnection from './ManyToManyConnection';
-import ReplaceValueDependency from './ReplaceValueDependency';
-import BelongsToOneDependency from './BelongsToOneDependency';
-import InterpolateValueDependency from './InterpolateValueDependency';
+const DependencyNode = require('./DependencyNode');
+const HasManyDependency = require('./HasManyDependency');
+const ManyToManyConnection = require('./ManyToManyConnection');
+const ReplaceValueDependency = require('./ReplaceValueDependency');
+const BelongsToOneDependency = require('./BelongsToOneDependency');
+const InterpolateValueDependency = require('./InterpolateValueDependency');
 
-export default class DependencyGraph {
+module.exports = class DependencyGraph {
 
   constructor(allowedRelations) {
     /**
@@ -64,7 +63,7 @@ export default class DependencyGraph {
   };
 
   buildForModel(modelClass, model, parentNode, rel, allowedRelations) {
-    if (!(model instanceof Model)) {
+    if (!model || !model.isObjectionModel) {
       throw new ValidationError({notModel: 'not a model'});
     }
 
@@ -241,7 +240,7 @@ export default class DependencyGraph {
   createNonRelationDepsForObject(obj, node, path) {
     const propRefRegex = node.modelClass.propRefRegex;
     const relations = node.modelClass.getRelations();
-    const isModel = obj instanceof Model;
+    const isModel = obj && obj.isObjectionModel;
     const keys = Object.keys(obj);
 
     for (let i = 0, l = keys.length; i < l; ++i) {

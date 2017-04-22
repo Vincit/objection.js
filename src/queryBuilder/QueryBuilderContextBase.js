@@ -1,4 +1,4 @@
-export default class QueryBuilderContextBase {
+module.exports = class QueryBuilderContextBase {
 
   constructor(userContext) {
     this.userContext = userContext;

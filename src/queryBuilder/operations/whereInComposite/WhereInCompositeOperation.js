@@ -1,6 +1,6 @@
-import WrappingQueryBuilderOperation from '../WrappingQueryBuilderOperation';
+const WrappingQueryBuilderOperation = require('../WrappingQueryBuilderOperation');
 
-export default class WhereInCompositeOperation extends WrappingQueryBuilderOperation {
+module.exports = class WhereInCompositeOperation extends WrappingQueryBuilderOperation {
 
   onBuild(knexBuilder) {
     this.build(knexBuilder, this.args[0], this.args[1]);

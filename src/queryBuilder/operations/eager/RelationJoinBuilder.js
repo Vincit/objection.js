@@ -1,12 +1,12 @@
-import _ from 'lodash';
-import Promise from 'bluebird';
-import ValidationError from '../../../model/ValidationError';
+const _ = require('lodash');
+const Promise = require('bluebird');
+const ValidationError = require('../../../model/ValidationError');
 
 const columnInfo = Object.create(null);
 const idLengthLimit = 63;
 const relationRecursionLimit = 64;
 
-export default class RelationJoinBuilder {
+module.exports = class RelationJoinBuilder {
 
   constructor({modelClass, expression, opt}) {
     this.rootModelClass = modelClass;

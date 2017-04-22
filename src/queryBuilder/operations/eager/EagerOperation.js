@@ -1,7 +1,7 @@
-import clone from 'lodash/clone';
-import QueryBuilderOperation from '../QueryBuilderOperation';
+const clone = require('lodash/clone');
+const QueryBuilderOperation = require('../QueryBuilderOperation');
 
-export default class EagerOperation extends QueryBuilderOperation {
+module.exports = class EagerOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);

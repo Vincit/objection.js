@@ -1,6 +1,6 @@
-import _ from 'lodash';
+const _ = require('lodash');
 
-export default function deprecated(opt) {
+module.exports = function deprecated(opt) {
   return function (target, property, descriptor) {
     const message = `${property} is deprecated and will be removed in version ${opt.removedIn}. Use ${opt.useInstead} instead.`;
 

@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import Dependency from './Dependency';
+const _ = require('lodash');
+const Dependency = require('./Dependency');
 
-export default class InterpolateValueDependency extends Dependency {
+module.exports = class InterpolateValueDependency extends Dependency {
 
   constructor(node, path, refProp, match, inverse) {
     super(node);

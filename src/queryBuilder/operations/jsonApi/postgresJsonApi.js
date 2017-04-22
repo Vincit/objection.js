@@ -1,5 +1,5 @@
-import _ from 'lodash';
-import jsonFieldExpressionParser from '../../parsers/jsonFieldExpressionParser';
+const _ = require('lodash');
+const jsonFieldExpressionParser = require('../../parsers/jsonFieldExpressionParser');
 
 /**
  * @typedef {String} FieldExpression
@@ -40,7 +40,7 @@ import jsonFieldExpressionParser from '../../parsers/jsonFieldExpressionParser';
  *     not currently supported
  */
 
-export default {
+module.exports = {
   parseFieldExpression,
   whereJsonbRefOnLeftJsonbValOrRefOnRight,
   whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams,

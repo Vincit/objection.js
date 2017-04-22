@@ -1,39 +1,51 @@
-import KnexQueryBuilder from 'knex/lib/query/builder'
-import JoinClause from 'knex/lib/query/joinclause'
-import KnexRaw from 'knex/lib/raw';
+const KnexQueryBuilder = require('knex/lib/query/builder');
+const JoinClause = require('knex/lib/query/joinclause');
+const KnexRaw = require('knex/lib/raw');
 
-export function getDialect(knex) {
+function getDialect(knex) {
   return (knex && knex.client && knex.client.dialect) || null;
 }
 
-export function isPostgres(knex) {
+function isPostgres(knex) {
   return getDialect(knex) === 'postgresql';
 }
 
-export function isMySql(knex) {
+function isMySql(knex) {
   return getDialect(knex) === 'mysql';
 }
 
-export function isSqlite(knex) {
+function isSqlite(knex) {
   return getDialect(knex) === 'sqlite3';
 }
 
-export function isMsSql(knex) {
+function isMsSql(knex) {
   return getDialect(knex) === 'mssql';
 }
 
-export function isKnexQueryBuilder(value) {
+function isKnexQueryBuilder(value) {
   return value instanceof KnexQueryBuilder;
 }
 
-export function isKnexJoinBuilder(value) {
+function isKnexJoinBuilder(value) {
   return value instanceof JoinClause;
 }
 
-export function isKnexRaw(value) {
+function isKnexRaw(value) {
   return value instanceof KnexRaw;
 }
 
-export function isKnexTransaction(knex) {
+function isKnexTransaction(knex) {
   return !!getDialect(knex) && typeof knex.commit === 'function' && typeof knex.rollback === 'function';
 }
+
+module.exports = {
+  getDialect: getDialect,
+  isPostgres: isPostgres,
+  isMySql: isMySql,
+  isSqlite: isSqlite,
+  isMsSql: isMsSql,
+  isKnexQueryBuilder: isKnexQueryBuilder,
+  isKnexJoinBuilder: isKnexJoinBuilder,
+  isKnexRaw: isKnexRaw,
+  isKnexTransaction: isKnexTransaction
+};

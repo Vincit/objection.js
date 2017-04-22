@@ -1,6 +1,6 @@
-import jsonFieldExpressionParser from './parsers/jsonFieldExpressionParser';
+const jsonFieldExpressionParser = require('./parsers/jsonFieldExpressionParser');
 
-export default class ReferenceBuilder {
+class ReferenceBuilder {
 
   constructor(fieldExpression) {
     // for premature optimization _reference could be lazy memoized getter... 
@@ -8,6 +8,10 @@ export default class ReferenceBuilder {
     this._cast = null;
     this._toJson = false;
     this._as = null; // TODO: UNIT TEST
+  }
+
+  get isObjectionReferenceBuilder() {
+    return true;
   }
 
   castText() {
@@ -80,4 +84,7 @@ export default class ReferenceBuilder {
 
 let ref = fieldExpression => new ReferenceBuilder(fieldExpression);
 
-export { ref };
+module.exports = {
+  ReferenceBuilder,
+  ref
+};

@@ -1,11 +1,6 @@
-import {isKnexQueryBuilder, isKnexRaw} from '../utils/knexUtils';
+const {isKnexQueryBuilder, isKnexRaw} = require('../utils/knexUtils');
 
-let QueryBuilderBase = null;
-let ReferenceBuilder = null;
-
-export function fromJson({modelClass, json, deep, modelOptions}) {
-  lazyLoadDeps();
-
+function fromJson({modelClass, json, deep, modelOptions}) {
   if (deep) {
     return fromJsonDeep(json, modelClass, modelOptions);
   } else {
@@ -13,7 +8,7 @@ export function fromJson({modelClass, json, deep, modelOptions}) {
   }
 }
 
-export function toDatabaseJson({model, queryProps}) {
+function toDatabaseJson({model, queryProps}) {
   const json = model.$toDatabaseJson();
   const modelClass = model.constructor;
 
@@ -27,7 +22,7 @@ export function toDatabaseJson({model, queryProps}) {
         const key = keys[i];
         let queryProp = query[key];
 
-        if (queryProp instanceof QueryBuilderBase) {
+        if (queryProp && queryProp.isObjectionQueryBuilderBase) {
           queryProp = queryProp.build();
         }
 
@@ -143,21 +138,17 @@ function doSplit(obj, modelClass, queryProps, modelOpt) {
 }
 
 function isQueryProp(value) {
+  if (!value) {
+    return false;
+  }
+
   return isKnexQueryBuilder(value)
     || isKnexRaw(value)
-    || value instanceof QueryBuilderBase
-    || value instanceof ReferenceBuilder;
+    || value.isObjectionQueryBuilderBase
+    || value.isObjectionReferenceBuilder;
 }
 
-function lazyLoadDeps() {
-  QueryBuilderBase = QueryBuilderBase || requireQueryBuilderBase();
-  ReferenceBuilder = ReferenceBuilder || requireReferenceBuilder();
-}
-
-function requireQueryBuilderBase() {
-  return require('../queryBuilder/QueryBuilderBase').default;
-}
-
-function requireReferenceBuilder() {
-  return require('../queryBuilder/ReferenceBuilder').default;
-}
+module.exports = {
+  fromJson: fromJson,
+  toDatabaseJson: toDatabaseJson
+};

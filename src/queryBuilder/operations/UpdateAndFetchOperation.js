@@ -1,8 +1,8 @@
-import DelegateOperation from './DelegateOperation';
-import UpdateOperation from './UpdateOperation';
-import {afterReturn} from '../../utils/promiseUtils';
+const DelegateOperation = require('./DelegateOperation');
+const UpdateOperation = require('./UpdateOperation');
+const {afterReturn} = require('../../utils/promiseUtils');
 
-export default class UpdateAndFetchOperation extends DelegateOperation {
+module.exports = class UpdateAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);

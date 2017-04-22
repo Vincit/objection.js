@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 
 var utils = require('../../lib/utils/knexUtils');
 var expect = require('expect.js');
-var inheritModel = require('../../lib/model/inheritModel').default;
+var inheritModel = require('../../lib/model/inheritModel');
 var knexMocker = require('../../testUtils/mockKnex');
 
 module.exports = function (session) {
