@@ -1,6 +1,8 @@
+'use strict';
+
 const UpdateOperation = require('../../queryBuilder/operations/UpdateOperation');
 
-module.exports = class ManyToManyUpdateOperation extends UpdateOperation {
+class ManyToManyUpdateOperation extends UpdateOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -14,3 +16,5 @@ module.exports = class ManyToManyUpdateOperation extends UpdateOperation {
     this.relation.selectForModify(builder, this.owner).modify(this.relation.modify);
   }
 }
+
+module.exports = ManyToManyUpdateOperation;

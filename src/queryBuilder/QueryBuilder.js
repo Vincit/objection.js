@@ -1,9 +1,12 @@
+'use strict';
+
 const Promise = require('bluebird');
 const ValidationError = require('../model/ValidationError');
 const queryBuilderOperation = require('./decorators/queryBuilderOperation');
 const QueryBuilderContext = require('./QueryBuilderContext');
 const RelationExpression = require('./RelationExpression');
 const QueryBuilderBase = require('./QueryBuilderBase');
+const decorate = require('../utils/decorators/decorate');
 
 const FindOperation = require('./operations/FindOperation');
 const DeleteOperation = require('./operations/DeleteOperation');
@@ -23,7 +26,7 @@ const SelectOperation = require('./operations/SelectOperation');
 const EagerOperation = require('./operations/eager/EagerOperation');
 const RangeOperation = require('./operations/RangeOperation');
 
-module.exports = class QueryBuilder extends QueryBuilderBase {
+class QueryBuilder extends QueryBuilderBase {
 
   constructor(modelClass) {
     super(modelClass.knex(), QueryBuilderContext);
@@ -107,21 +110,18 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {function(*, QueryBuilder)} runBefore
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation(RunBeforeOperation)
   runBefore(runBefore) {}
 
   /**
    * @param {function(QueryBuilder)} onBuild
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation(OnBuildOperation)
   onBuild(onBuild) {}
 
   /**
    * @param {function(Model|Array.<Model>, QueryBuilder)} runAfter
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation(RunAfterOperation)
   runAfter(runAfter) {}
 
   /**
@@ -282,8 +282,8 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
     return this;
   }
 
-  filterEager(...args) {
-    return this.modifyEager(...args);
+  filterEager() {
+    return this.modifyEager.apply(this, arguments);
   }
 
   /**
@@ -669,7 +669,9 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
   /**
    * @returns {boolean}
    */
-  hasSelection(selection, explicit = false) {
+  hasSelection(selection, explicit) {
+    explicit = (explicit == null) ? false : explicit;
+
     const table = this.modelClass().tableName;
     let noSelectStatements = true;
 
@@ -768,63 +770,54 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {number} end
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation(RangeOperation)
   range(start, end) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'join'}])
   joinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'innerJoin'}])
   innerJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'outerJoin'}])
   outerJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'leftJoin'}])
   leftJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'leftOuterJoin'}])
   leftOuterJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'rightJoin'}])
   rightJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'rightOuterJoin'}])
   rightOuterJoinRelation(relationName) {}
 
   /**
    * @param {string} relationName
    * @returns {QueryBuilder}
    */
-  @queryBuilderOperation([JoinRelationOperation, {joinOperation: 'fullOuterJoin'}])
   fullOuterJoinRelation(relationName) {}
 
   /**
@@ -866,7 +859,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   insert(modelsOrObjects) {
     const insertOperation = this._insertOperationFactory(this);
     return this.callQueryBuilderOperation(insertOperation, [modelsOrObjects]);
@@ -876,7 +868,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   insertAndFetch(modelsOrObjects) {
     const insertAndFetchOperation = new InsertAndFetchOperation('insertAndFetch', {
       delegate: this._insertOperationFactory(this)
@@ -889,7 +880,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   insertGraph(modelsOrObjects) {
     const insertGraphOperation = new InsertGraphOperation('insertGraph', {
       delegate: this._insertOperationFactory(this)
@@ -901,15 +891,14 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
   /**
    * @returns {QueryBuilder}
    */
-  insertWithRelated(...args) {
-    return this.insertGraph(...args);
+  insertWithRelated() {
+    return this.insertGraph.apply(this, arguments);
   }
 
   /**
    * @param {Object|Model|Array.<Object>|Array.<Model>} modelsOrObjects
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   insertGraphAndFetch(modelsOrObjects) {
     const insertGraphAndFetchOperation = new InsertGraphAndFetchOperation('insertGraphAndFetch', {
       delegate: new InsertGraphOperation('insertGraph', {
@@ -923,15 +912,14 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
   /**
    * @returns {QueryBuilder}
    */
-  insertWithRelatedAndFetch(...args) {
-    return this.insertGraphAndFetch(...args);
+  insertWithRelatedAndFetch() {
+    return this.insertGraphAndFetch.apply(this, arguments);
   }
 
   /**
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   update(modelOrObject) {
     const updateOperation = this._updateOperationFactory(this);
     return this.callQueryBuilderOperation(updateOperation, [modelOrObject]);
@@ -941,7 +929,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   updateAndFetch(modelOrObject) {
     const delegateOperation = this._updateOperationFactory(this);
 
@@ -961,7 +948,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   updateAndFetchById(id, modelOrObject) {
     const updateAndFetch = new UpdateAndFetchOperation('updateAndFetch', {
       delegate: this._updateOperationFactory(this)
@@ -974,7 +960,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   patch(modelOrObject) {
     const patchOperation = this._patchOperationFactory(this);
     return this.callQueryBuilderOperation(patchOperation, [modelOrObject]);
@@ -984,7 +969,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   patchAndFetch(modelOrObject) {
     const delegateOperation = this._patchOperationFactory(this);
 
@@ -1004,7 +988,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {Model|Object=} modelOrObject
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   patchAndFetchById(id, modelOrObject) {
     const patchAndFetch = new UpdateAndFetchOperation('patchAndFetch', {
       delegate: this._patchOperationFactory(this)
@@ -1016,7 +999,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
   /**
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   delete() {
     const deleteOperation = this._deleteOperationFactory(this);
     return this.callQueryBuilderOperation(deleteOperation, []);
@@ -1041,7 +1023,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
    * @param {number|string|object|Array.<number|string>|Array.<Array.<number|string>>|Array.<object>} ids
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   relate(ids) {
     const relateOperation = this._relateOperationFactory(this);
     return this.callQueryBuilderOperation(relateOperation, [ids]);
@@ -1050,7 +1031,6 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
   /**
    * @returns {QueryBuilder}
    */
-  @writeQueryOperation
   unrelate() {
     const unrelateOperation = this._unrelateOperationFactory(this);
     return this.callQueryBuilderOperation(unrelateOperation, []);
@@ -1078,6 +1058,64 @@ module.exports = class QueryBuilder extends QueryBuilderBase {
     });
   }
 }
+
+/**
+ * Until node gets decorators, we need to apply them like this.
+ */
+decorate(QueryBuilder.prototype, [{
+  decorator: writeQueryOperation,
+  properties: [
+    'insert',
+    'insertAndFetch',
+    'insertGraph',
+    'insertGraphAndFetch',
+    'update',
+    'updateAndFetch',
+    'updateAndFetchById',
+    'patch',
+    'patchAndFetch',
+    'patchAndFetchById',
+    'delete',
+    'unrelate',
+    'relate'
+  ]
+}, {
+  decorator: queryBuilderOperation(RangeOperation),
+  properties: ['range']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'join'}]),
+  properties: ['joinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'innerJoin'}]),
+  properties: ['innerJoinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'outerJoin'}]),
+  properties: ['outerJoinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'leftJoin'}]),
+  properties: ['leftJoinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'leftOuterJoin'}]),
+  properties: ['leftOuterJoinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'rightJoin'}]),
+  properties: ['rightJoinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'rightOuterJoin'}]),
+  properties: ['rightOuterJoinRelation']
+}, {
+  decorator: queryBuilderOperation([JoinRelationOperation, {joinOperation: 'fullOuterJoin'}]),
+  properties: ['fullOuterJoinRelation']
+}, {
+  decorator: queryBuilderOperation(RunBeforeOperation),
+  properties: ['runBefore']
+}, {
+  decorator: queryBuilderOperation(OnBuildOperation),
+  properties: ['onBuild']
+}, {
+  decorator: queryBuilderOperation(RunAfterOperation),
+  properties: ['runAfter']
+}]);
 
 function writeQueryOperation(target, property, descriptor) {
   const func = descriptor.value;
@@ -1216,3 +1254,5 @@ const patchOperationFactory = createOperationFactory(UpdateOperation, 'patch', {
 const relateOperationFactory = createOperationFactory(QueryBuilderOperation, 'relate');
 const unrelateOperationFactory = createOperationFactory(QueryBuilderOperation, 'unrelate');
 const deleteOperationFactory = createOperationFactory(DeleteOperation, 'delete');
+
+module.exports = QueryBuilder;

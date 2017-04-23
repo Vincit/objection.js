@@ -1,9 +1,12 @@
-const QueryBuilderOperation = require('./QueryBuilderOperation');
-const {fromJson, toDatabaseJson} = require('../../model/modelFactory');
-const {mapAfterAllReturn} = require('../../utils/promiseUtils');
-const {isPostgres} = require('../../utils/knexUtils');
+'use strict';
 
-module.exports = class InsertOperation extends QueryBuilderOperation {
+const QueryBuilderOperation = require('./QueryBuilderOperation');
+const fromJson = require('../../model/modelFactory').fromJson;
+const toDatabaseJson = require('../../model/modelFactory').toDatabaseJson;
+const mapAfterAllReturn = require('../../utils/promiseUtils').mapAfterAllReturn;
+const isPostgres = require('../../utils/knexUtils').isPostgres;
+
+class InsertOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -148,3 +151,5 @@ module.exports = class InsertOperation extends QueryBuilderOperation {
     return mapAfterAllReturn(models, model => model.$afterInsert(builder.context()), result);
   }
 }
+
+module.exports = InsertOperation;

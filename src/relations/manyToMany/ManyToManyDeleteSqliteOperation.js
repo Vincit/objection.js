@@ -1,6 +1,8 @@
+'use strict';
+
 const DeleteOperation = require('../../queryBuilder/operations/DeleteOperation');
 
-module.exports = class ManyToManyDeleteSqliteOperation extends DeleteOperation {
+class ManyToManyDeleteSqliteOperation extends DeleteOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -14,3 +16,5 @@ module.exports = class ManyToManyDeleteSqliteOperation extends DeleteOperation {
     this.relation.selectForModifySqlite(builder, this.owner).modify(this.relation.modify);
   }
 }
+
+module.exports = ManyToManyDeleteSqliteOperation;

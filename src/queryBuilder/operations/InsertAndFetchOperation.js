@@ -1,9 +1,11 @@
+'use strict';
+
 const _ = require('lodash');
 const InsertOperation = require('./InsertOperation');
 const DelegateOperation = require('./DelegateOperation');
-const {after} = require('../../utils/promiseUtils');
+const after = require('../../utils/promiseUtils').after;
 
-module.exports = class InsertAndFetchOperation extends DelegateOperation {
+class InsertAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -38,3 +40,5 @@ module.exports = class InsertAndFetchOperation extends DelegateOperation {
     });
   }
 }
+
+module.exports = InsertAndFetchOperation;

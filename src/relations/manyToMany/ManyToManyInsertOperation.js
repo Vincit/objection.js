@@ -1,7 +1,9 @@
-const InsertOperation = require('../../queryBuilder/operations/InsertOperation');
-const {after} = require('../../utils/promiseUtils');
+'use strict';
 
-module.exports = class ManyToManyInsertOperation extends InsertOperation {
+const InsertOperation = require('../../queryBuilder/operations/InsertOperation');
+const after = require('../../utils/promiseUtils').after;
+
+class ManyToManyInsertOperation extends InsertOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -45,3 +47,5 @@ module.exports = class ManyToManyInsertOperation extends InsertOperation {
   }
 
 }
+
+module.exports = ManyToManyInsertOperation;

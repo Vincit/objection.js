@@ -1,7 +1,9 @@
-const DeleteOperation = require('./DeleteOperation');
-const {afterReturn} = require('../../utils/promiseUtils');
+'use strict';
 
-module.exports = class InstanceDeleteOperation extends DeleteOperation {
+const DeleteOperation = require('./DeleteOperation');
+const afterReturn = require('../../utils/promiseUtils').afterReturn;
+
+class InstanceDeleteOperation extends DeleteOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -23,3 +25,5 @@ module.exports = class InstanceDeleteOperation extends DeleteOperation {
     return afterReturn(maybePromise, result);
   }
 }
+
+module.exports = InstanceDeleteOperation;

@@ -1,6 +1,8 @@
+'use strict';
+
 const WrappingQueryBuilderOperation = require('../WrappingQueryBuilderOperation');
 
-module.exports = class WhereInCompositeSqliteOperation extends WrappingQueryBuilderOperation {
+class WhereInCompositeSqliteOperation extends WrappingQueryBuilderOperation {
 
   onBuild(knexBuilder) {
     this.build(knexBuilder, this.args[0], this.args[1]);
@@ -63,4 +65,6 @@ function pickNonNull(values, output) {
 
   return output;
 }
+
+module.exports = WhereInCompositeSqliteOperation;
 

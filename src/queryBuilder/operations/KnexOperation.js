@@ -1,6 +1,8 @@
+'use strict';
+
 const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
-module.exports = class KnexOperation extends WrappingQueryBuilderOperation {
+class KnexOperation extends WrappingQueryBuilderOperation {
 
   onBuild(builder) {
     if (typeof builder[this.name] === 'function') {
@@ -10,3 +12,5 @@ module.exports = class KnexOperation extends WrappingQueryBuilderOperation {
     }
   }
 }
+
+module.exports = KnexOperation;

@@ -1,6 +1,8 @@
+'use strict';
+
 const Dependency = require('./Dependency');
 
-module.exports = class BelongsToOneDependency extends Dependency {
+class BelongsToOneDependency extends Dependency {
 
   constructor(node, relation) {
     super(node);
@@ -17,3 +19,5 @@ module.exports = class BelongsToOneDependency extends Dependency {
     }
   }
 }
+
+module.exports = BelongsToOneDependency;

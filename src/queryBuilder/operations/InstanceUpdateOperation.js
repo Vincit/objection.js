@@ -1,7 +1,9 @@
-const UpdateOperation = require('./UpdateOperation');
-const {after} = require('../../utils/promiseUtils');
+'use strict';
 
-module.exports = class InstanceUpdateOperation extends UpdateOperation {
+const UpdateOperation = require('./UpdateOperation');
+const after = require('../../utils/promiseUtils').after;
+
+class InstanceUpdateOperation extends UpdateOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -33,3 +35,5 @@ module.exports = class InstanceUpdateOperation extends UpdateOperation {
     });
   }
 }
+
+module.exports = InstanceUpdateOperation;

@@ -24,16 +24,13 @@ Promise.onPossiblyUnhandledRejection(function (error) {
 module.exports.initialize = function (opt) {
   var knex = require('knex')(opt.knexConfig);
 
-  function Model1() {
-    Model.apply(this, arguments);
+  class Model1 extends Model {
+
   }
 
-  function Model2() {
-    Model.apply(this, arguments);
-  }
+  class Model2 extends Model {
 
-  Model.extend(Model1);
-  Model.extend(Model2);
+  }
 
   Model1.tableName = 'Model1';
   Model2.tableName = 'model_2';

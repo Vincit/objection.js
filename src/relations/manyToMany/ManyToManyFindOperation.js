@@ -1,9 +1,11 @@
+'use strict';
+
 const _ = require('lodash');
 const RelationFindOperation = require('../RelationFindOperation');
 
 const ownerJoinColumnAliasPrefix = 'objectiontmpjoin';
 
-module.exports = class ManyToManyFindOperation extends RelationFindOperation {
+class ManyToManyFindOperation extends RelationFindOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -15,8 +17,8 @@ module.exports = class ManyToManyFindOperation extends RelationFindOperation {
     }
   }
 
-  clone(...args) {
-    const copy = super.clone(...args);
+  clone(props) {
+    const copy = super.clone(props);
 
     copy.ownerJoinColumnAlias = this.ownerJoinColumnAlias;
 
@@ -102,3 +104,5 @@ module.exports = class ManyToManyFindOperation extends RelationFindOperation {
 function join(arr) {
   return arr.join();
 }
+
+module.exports = ManyToManyFindOperation;

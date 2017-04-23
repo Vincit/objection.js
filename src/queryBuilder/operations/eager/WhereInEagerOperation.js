@@ -1,11 +1,13 @@
+'use strict';
+
 const chunk = require('lodash/chunk');
 const flatten = require('lodash/flatten');
 const Promise = require('bluebird');
 const ValidationError = require('../../../model/ValidationError');
 const EagerOperation = require('./EagerOperation');
-const {isMsSql} = require('../../../utils/knexUtils');
+const isMsSql = require('../../../utils/knexUtils').isMsSql;
 
-module.exports = class WhereInEagerOperation extends EagerOperation {
+class WhereInEagerOperation extends EagerOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -28,7 +30,7 @@ module.exports = class WhereInEagerOperation extends EagerOperation {
   }
 
   clone(props) {
-    const copy = super.clone();
+    const copy = super.clone(props);
 
     copy.relationsToFetch = this.relationsToFetch.slice();
     copy.omitProps = this.omitProps.slice();
@@ -162,3 +164,5 @@ module.exports = class WhereInEagerOperation extends EagerOperation {
     return queryBuilder;
   }
 }
+
+module.exports = WhereInEagerOperation;

@@ -1,10 +1,13 @@
+'use strict';
+
 const _ = require('lodash');
 const QueryBuilderOperation = require('./QueryBuilderOperation');
 const jsonFieldExpressionParser = require('../parsers/jsonFieldExpressionParser');
-const {fromJson, toDatabaseJson} = require('../../model/modelFactory');
-const {afterReturn} = require('../../utils/promiseUtils');
+const fromJson = require('../../model/modelFactory').fromJson;
+const toDatabaseJson = require('../../model/modelFactory').toDatabaseJson;
+const afterReturn = require('../../utils/promiseUtils').afterReturn;
 
-module.exports = class UpdateOperation extends QueryBuilderOperation {
+class UpdateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -82,7 +85,7 @@ module.exports = class UpdateOperation extends QueryBuilderOperation {
     _.forOwn(json, (val, key) => {
       // convert ref values to raw
       let loweredValue = (val && val.isObjectionReferenceBuilder) ?
-        knex.raw(...(val.toRawArgs())) : val;
+        knex.raw.apply(knex, val.toRawArgs()) : val;
 
       // convert update to jsonb_set format if attr inside jsonb column is set
       if (key.indexOf(':') > -1) {
@@ -109,3 +112,5 @@ module.exports = class UpdateOperation extends QueryBuilderOperation {
     return afterReturn(maybePromise, numUpdated);
   }
 }
+
+module.exports = UpdateOperation;

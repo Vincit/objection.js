@@ -36,15 +36,15 @@ describe('GraphInserter', function () {
 
   beforeEach(function () {
     Person = function Person() {
-      Model.apply(this, arguments);
+
     };
 
     Animal = function Animal() {
-      Model.apply(this, arguments);
+
     };
 
     Movie = function Movie() {
-      Model.apply(this, arguments);
+
     };
 
     Model.extend(Person);

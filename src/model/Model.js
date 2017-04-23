@@ -1,12 +1,15 @@
+'use strict';
+
 const _ = require('lodash');
 const AjvValidator = require('./AjvValidator');
 const QueryBuilder = require('../queryBuilder/QueryBuilder');
 const inheritModel = require('./inheritModel');
 const RelationExpression = require('../queryBuilder/RelationExpression');
-const {visitModels} = require('./modelVisitor');
+const visitModels = require('./modelVisitor').visitModels;
 
-const {inherits} = require('../utils/classUtils');
-const {inheritHiddenData} = require('../utils/hiddenData');
+const decorate = require('../utils/decorators/decorate');
+const inherits = require('../utils/classUtils').inherits;
+const inheritHiddenData = require('../utils/hiddenData').inheritHiddenData;
 const hiddenData = require('../utils/decorators/hiddenData');
 const memoize = require('../utils/decorators/memoize');
 
@@ -43,88 +46,6 @@ const WhereInEagerAlgorithm = () => {
  */
 
 class Model {
-
-  static QueryBuilder = QueryBuilder;
-  static RelatedQueryBuilder = QueryBuilder;
-
-  static HasOneRelation = HasOneRelation;
-  static HasManyRelation = HasManyRelation;
-  static ManyToManyRelation = ManyToManyRelation;
-  static BelongsToOneRelation = BelongsToOneRelation;
-  static HasOneThroughRelation = HasOneThroughRelation;
-
-  static JoinEagerAlgorithm = JoinEagerAlgorithm;
-  static WhereInEagerAlgorithm = WhereInEagerAlgorithm;
-
-  /**
-   * @type {string}
-   */
-  static tableName = null;
-
-  /**
-   * @type {Object}
-   */
-  static jsonSchema = null;
-
-  /**
-   * @type {string|Array.<string>}
-   */
-  static idColumn = 'id';
-
-  /**
-   * @type {string}
-   */
-  static uidProp = '#id';
-
-  /**
-   * @type {string}
-   */
-  static uidRefProp = '#ref';
-
-  /**
-   * @type {string}
-   */
-  static dbRefProp = '#dbRef';
-
-  /**
-   * @type {RegExp}
-   */
-  static propRefRegex = /#ref{([^\.]+)\.([^}]+)}/g;
-
-  /**
-   * @type {Array.<string>}
-   */
-  static jsonAttributes = null;
-
-  /**
-   * @type {Array.<string>}
-   */
-  static virtualAttributes = null;
-
-  /**
-   * @type {Object.<string, RelationMapping>}
-   */
-  static relationMappings = null;
-
-  /**
-   * @type {Array.<string>}
-   */
-  static modelPaths = [];
-
-  /**
-   * @type {boolean}
-   */
-  static pickJsonSchemaProperties = true;
-
-  /**
-   * @type {Constructor.<? extends EagerOperation>}
-   */
-  static defaultEagerAlgorithm = WhereInEagerAlgorithm;
-
-  /**
-   * @type {object}
-   */
-  static defaultEagerOptions = null;
 
   /**
    * @return {boolean}
@@ -247,7 +168,8 @@ class Model {
    * @throws {ValidationError}
    * @return {Object}
    */
-  $validate(json = this, options) {
+  $validate(json, options) {
+    json = json || this;
     options = options || {};
 
     if (json instanceof Model) {
@@ -298,7 +220,7 @@ class Model {
         const attr = jsonAttr[i];
         const value = json[attr];
 
-        if (_.isString(value)) {
+        if (typeof value === 'string') {
           const parsed = tryParseJson(value);
 
           // tryParseJson returns undefined if parsing failed.
@@ -357,8 +279,9 @@ class Model {
    * @returns {Model}
    * @throws ValidationError
    */
-  $setJson(json, options = {}) {
+  $setJson(json, options) {
     json = json || {};
+    options = options || {};
 
     if (Object.prototype.toString.call(json) !== '[object Object]') {
       throw new Error('You should only pass objects to $setJson method. '
@@ -643,15 +566,17 @@ class Model {
    * @param {Array.<string>=} keys
    * @returns {Array.<string>}
    */
-  @hiddenData({name: 'omitFromJson', append: true})
-  $omitFromJson(keys) {}
+  $omitFromJson(keys) {
+    // Implemented by a decorator.
+  }
 
   /**
    * @param {Array.<string>=} keys
    * @returns {Array.<string>}
    */
-  @hiddenData({name: 'omitFromDatabaseJson', append: true})
-  $omitFromDatabaseJson(keys) {}
+  $omitFromDatabaseJson(keys) {
+    // Implemented by a decorator.
+  }
 
   /**
    * @returns {knex}
@@ -741,7 +666,6 @@ class Model {
   /**
    * @return {Validator}
    */
-  @memoize
   static getValidator() {
     return this.createValidator();
   }
@@ -749,9 +673,7 @@ class Model {
   /**
    * @return {Object}
    */
-  @memoize
   static getJsonSchema() {
-    // Memoized getter in case jsonSchema is a getter property (usually is with ES6).
     return this.jsonSchema;
   }
 
@@ -759,7 +681,6 @@ class Model {
    * @param {string} columnName
    * @returns {string}
    */
-  @memoize
   static columnNameToPropertyName(columnName) {
     let model = new this();
     let addedProps = _.keys(model.$parseDatabaseJson({}));
@@ -777,7 +698,6 @@ class Model {
    * @param {string} propertyName
    * @returns {string}
    */
-  @memoize
   static propertyNameToColumnName(propertyName) {
     let model = new this();
     let addedCols = _.keys(model.$formatDatabaseJson({}));
@@ -913,8 +833,8 @@ class Model {
       boundRelations[relation.name] = relation.bindKnex(knex);
     }
 
-    BoundModelClass.relations = boundRelations;
-    BoundModelClass.relationArray = _.values(boundRelations);
+    BoundModelClass.relations(boundRelations);
+    BoundModelClass.relationArray(_.values(boundRelations));
 
     return BoundModelClass;
   }
@@ -972,7 +892,6 @@ class Model {
   /**
    * @returns {Array.<string>}
    */
-  @memoize
   static getIdColumnArray() {
     if (Array.isArray(this.idColumn)) {
       return this.idColumn;
@@ -984,7 +903,6 @@ class Model {
   /**
    * @returns {string|Array.<string>}
    */
-  @memoize
   static getFullIdColumn() {
     if (Array.isArray(this.idColumn)) {
       return this.idColumn.map(col => this.tableName + '.' + col);
@@ -996,7 +914,6 @@ class Model {
   /**
    * @returns {Array.<string>}
    */
-  @memoize
   static getIdPropertyArray() {
     return this.getIdColumnArray().map(col => idColumnToIdProperty(this, col));
   }
@@ -1004,7 +921,6 @@ class Model {
   /**
    * @returns {string|Array.<string>}
    */
-  @memoize
   static getIdProperty() {
     if (Array.isArray(this.idColumn)) {
       return this.idColumn.map(col => idColumnToIdProperty(this, col));
@@ -1016,32 +932,22 @@ class Model {
   /**
    * @private
    */
-  @hiddenData()
-  static get relations() {}
+  static relations() {
+    // Implemented by a decorator.
+  }
 
   /**
    * @private
    */
-  @hiddenData()
-  static get relationArray() {}
-
-  /**
-   * @private
-   */
-  @hiddenData()
-  static set relations(value) {}
-
-  /**
-   * @private
-   */
-  @hiddenData()
-  static set relationArray(value) {}
+  static relationArray() {
+    // Implemented by a decorator.
+  }
 
   /**
    * @return {Object.<string, Relation>}
    */
   static getRelations() {
-    let relations = this.relations;
+    let relations = this.relations();
 
     if (!relations) {
       relations = _.reduce(_.result(this, 'relationMappings'), (relations, mapping, relationName) => {
@@ -1050,7 +956,7 @@ class Model {
         return relations;
       }, Object.create(null));
 
-      this.relations = relations;
+      this.relations(relations);
     }
 
     return relations;
@@ -1060,11 +966,11 @@ class Model {
    * @return {Array.<Relation>}
    */
   static getRelationArray() {
-    let relationArray = this.relationArray;
+    let relationArray = this.relationArray();
 
     if (!relationArray) {
       relationArray = _.values(this.getRelations());
-      this.relationArray = relationArray;
+      this.relationArray(relationArray);
     }
 
     return relationArray;
@@ -1170,7 +1076,7 @@ class Model {
 
     return this.jsonAttributes;
   }
-};
+}
 
 function setId(model, id) {
   const idProp = model.constructor.getIdProperty();
@@ -1204,6 +1110,123 @@ function setId(model, id) {
     }
   }
 }
+
+Model.QueryBuilder = QueryBuilder;
+Model.RelatedQueryBuilder = QueryBuilder;
+
+Model.HasOneRelation = HasOneRelation;
+Model.HasManyRelation = HasManyRelation;
+Model.ManyToManyRelation = ManyToManyRelation;
+Model.BelongsToOneRelation = BelongsToOneRelation;
+Model.HasOneThroughRelation = HasOneThroughRelation;
+
+Model.JoinEagerAlgorithm = JoinEagerAlgorithm;
+Model.WhereInEagerAlgorithm = WhereInEagerAlgorithm;
+
+/**
+ * @type {string}
+ */
+Model.tableName = null;
+
+/**
+ * @type {Object}
+ */
+Model.jsonSchema = null;
+
+/**
+ * @type {string|Array.<string>}
+ */
+Model.idColumn = 'id';
+
+/**
+ * @type {string}
+ */
+Model.uidProp = '#id';
+
+/**
+ * @type {string}
+ */
+Model.uidRefProp = '#ref';
+
+/**
+ * @type {string}
+ */
+Model.dbRefProp = '#dbRef';
+
+/**
+ * @type {RegExp}
+ */
+Model.propRefRegex = /#ref{([^\.]+)\.([^}]+)}/g;
+
+/**
+ * @type {Array.<string>}
+ */
+Model.jsonAttributes = null;
+
+/**
+ * @type {Array.<string>}
+ */
+Model.virtualAttributes = null;
+
+/**
+ * @type {Object.<string, RelationMapping>}
+ */
+Model.relationMappings = null;
+
+/**
+ * @type {Array.<string>}
+ */
+Model.modelPaths = [];
+
+/**
+ * @type {boolean}
+ */
+Model.pickJsonSchemaProperties = true;
+
+/**
+ * @type {Constructor.<? extends EagerOperation>}
+ */
+Model.defaultEagerAlgorithm = WhereInEagerAlgorithm;
+
+/**
+ * @type {object}
+ */
+Model.defaultEagerOptions = null;
+
+/**
+ * Until node gets decorators, we need to apply them like this.
+ */
+decorate(Model.prototype, [{
+  decorator: hiddenData({name: 'omitFromJson', append: true}),
+  properties: [
+    '$omitFromJson'
+  ]
+}, {
+  decorator: hiddenData({name: 'omitFromDatabaseJson', append: true}),
+  properties: [
+    '$omitFromDatabaseJson'
+  ]
+}]);
+
+decorate(Model, [{
+  decorator: memoize,
+  properties: [
+    'getValidator',
+    'getJsonSchema',
+    'columnNameToPropertyName',
+    'propertyNameToColumnName',
+    'getIdColumnArray',
+    'getIdProperty',
+    'getIdPropertyArray',
+    'getFullIdColumn'
+  ]
+}, {
+  decorator: hiddenData(),
+  properties: [
+    'relations',
+    'relationArray'
+  ]
+}]);
 
 function getId(model) {
   const idProp = model.constructor.getIdProperty();

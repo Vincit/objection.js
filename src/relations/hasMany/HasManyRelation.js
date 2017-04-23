@@ -1,10 +1,12 @@
+'use strict';
+
 const Relation = require('../Relation');
 
 const HasManyInsertOperation = require('./HasManyInsertOperation');
 const HasManyRelateOperation = require('./HasManyRelateOperation');
 const HasManyUnrelateOperation = require('./HasManyUnrelateOperation');
 
-module.exports = class HasManyRelation extends Relation {
+class HasManyRelation extends Relation {
 
   insert(builder, owner) {
     return new HasManyInsertOperation('insert', {
@@ -27,4 +29,6 @@ module.exports = class HasManyRelation extends Relation {
     });
   }
 }
+
+module.exports = HasManyRelation;
 

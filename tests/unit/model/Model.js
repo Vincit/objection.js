@@ -13,7 +13,7 @@ describe('Model', function () {
 
     it('should create a subclass', function () {
       function Model1() {
-        Model.apply(this, arguments);
+
       }
 
       Model.extend(Model1);
@@ -26,10 +26,10 @@ describe('Model', function () {
 
     it('should create a subclass of subclass', function () {
       function Model1() {
-        Model.apply(this, arguments);
+
       }
       function Model2() {
-        Model1.apply(this, arguments);
+
       }
 
       Model.extend(Model1).extend(Model2);
@@ -1285,11 +1285,9 @@ describe('Model', function () {
   });
 
   it('should use Model.QueryBuilder to create `query()` and `$query()`', function () {
-    function MyQueryBuilder() {
-      QueryBuilder.apply(this, arguments);
-    }
+    class MyQueryBuilder extends QueryBuilder {
 
-    QueryBuilder.extend(MyQueryBuilder);
+    }
 
     var Model = modelClass('Model');
 
@@ -1312,11 +1310,9 @@ describe('Model', function () {
   });
 
   it('should use Model.RelatedQueryBuilder to create `$relatedQuery()`', function () {
-    function MyQueryBuilder() {
-      QueryBuilder.apply(this, arguments);
-    }
+    class MyQueryBuilder extends QueryBuilder {
 
-    QueryBuilder.extend(MyQueryBuilder);
+    }
 
     var Model = modelClass('Model');
 
@@ -1602,7 +1598,7 @@ describe('Model', function () {
 
   function modelClass(tableName) {
     function TestModel() {
-      Model.apply(this, arguments);
+
     }
     Model.extend(TestModel);
     TestModel.tableName = tableName;
@@ -1611,7 +1607,7 @@ describe('Model', function () {
 
   function createModelClass(proto, staticStuff) {
     function Model1() {
-      Model.apply(this, arguments);
+
     }
 
     Model.extend(Model1);

@@ -1,4 +1,6 @@
-module.exports = class QueryBuilderOperation {
+'use strict';
+
+class QueryBuilderOperation {
 
   /**
    * @param {knex} knex
@@ -152,3 +154,5 @@ module.exports = class QueryBuilderOperation {
     return this.queryExecutor !== QueryBuilderOperation.prototype.queryExecutor;
   }
 }
+
+module.exports = QueryBuilderOperation;

@@ -1,4 +1,6 @@
-module.exports = class TableInsertion {
+'use strict';
+
+class TableInsertion {
 
   constructor(modelClass, isJoinTableInsertion) {
     /**
@@ -22,3 +24,5 @@ module.exports = class TableInsertion {
     this.isInputModel = [];
   }
 }
+
+module.exports = TableInsertion;

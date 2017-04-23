@@ -1,4 +1,4 @@
-const _ = require('lodash');
+'use strict';
 
 module.exports = function deprecated(opt) {
   return function (target, property, descriptor) {
@@ -7,18 +7,18 @@ module.exports = function deprecated(opt) {
     const value = descriptor.value;
     const getter = descriptor.get;
 
-    if (_.isFunction(value)) {
+    if (typeof value === 'function') {
       descriptor.value = function () {
         console.warn(message);
         return value.apply(this, arguments);
       };
     }
 
-    if (_.isFunction(getter)) {
+    if (typeof getter === 'function') {
       descriptor.get = function () {
         console.warn(message);
         return getter.apply(this, arguments);
       };
     }
   };
-}
+};

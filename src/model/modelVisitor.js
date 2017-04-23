@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @param {Array.<Model|Object>|Model|Object} models
  * @param {Constructor.<Model>} modelClass

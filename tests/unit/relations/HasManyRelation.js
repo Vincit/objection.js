@@ -37,11 +37,11 @@ describe('HasManyRelation', function () {
     executedQueries = [];
 
     OwnerModel = Model.extend(function OwnerModel () {
-      Model.apply(this, arguments);
+
     });
 
     RelatedModel = Model.extend(function RelatedModel () {
-      Model.apply(this, arguments);
+
     });
 
     OwnerModel.tableName = 'OwnerModel';

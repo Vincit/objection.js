@@ -1,7 +1,9 @@
+'use strict';
+
 const _ = require('lodash');
 const Promise = require('bluebird');
 const Model = require('./model/Model');
-const {isSubclassOf} = require('./utils/classUtils');
+const isSubclassOf = require('./utils/classUtils').isSubclassOf;
 
 /**
  * @returns {Promise}

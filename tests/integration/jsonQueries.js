@@ -17,7 +17,7 @@ function expectArraysEqual(arr1, arr2) {
 module.exports = function (session) {
 
   function ModelJson() {
-    Model.apply(this, arguments);
+
   }
   Model.extend(ModelJson);
 

@@ -1,9 +1,11 @@
+'use strict';
+
 const _ = require('lodash');
 
 module.exports = function normalizeIds(ids, expectedProperties, opt) {
   opt = opt || {};
 
-  if (!_.isArray(expectedProperties)) {
+  if (!Array.isArray(expectedProperties)) {
     throw new Error(`expected expectedProperties to be an array, got ${expectedProperties}`);
   }
 
@@ -76,7 +78,9 @@ module.exports = function normalizeIds(ids, expectedProperties, opt) {
       ret = [ids];
     } else {
       // 1.
-      ret = [{[expectedProperties[0]]: ids}];
+      const obj = {};
+      obj[expectedProperties[0]] = ids;
+      ret = [obj];
     }
   }
 

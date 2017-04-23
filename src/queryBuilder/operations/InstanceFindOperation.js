@@ -1,6 +1,8 @@
+'use strict';
+
 const FindOperation = require('./FindOperation');
 
-module.exports = class InstanceFindOperation extends FindOperation {
+class InstanceFindOperation extends FindOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -11,3 +13,5 @@ module.exports = class InstanceFindOperation extends FindOperation {
     builder.whereComposite(builder.modelClass().getFullIdColumn(), this.instance.$id()).first()
   }
 }
+
+module.exports = InstanceFindOperation;

@@ -1,3 +1,5 @@
+'use strict';
+
 const flatten = require('lodash/flatten');
 const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
@@ -7,7 +9,7 @@ const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation')
  * In knex, if a single column is given to `returning` it returns an array with the that column's value
  * in it. If an array is given with a one item inside, the return value is an object.
  */
-module.exports = class ReturningOperation extends WrappingQueryBuilderOperation {
+class ReturningOperation extends WrappingQueryBuilderOperation {
 
   call(builder, args) {
     args = flatten(args);
@@ -25,3 +27,5 @@ module.exports = class ReturningOperation extends WrappingQueryBuilderOperation 
     knexBuilder.returning(this.args);
   }
 }
+
+module.exports = ReturningOperation;

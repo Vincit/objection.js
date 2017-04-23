@@ -1,4 +1,7 @@
-const {createGetter, createSetter} = require('../hiddenData');
+'use strict';
+
+const createGetter = require('../hiddenData').createGetter;
+const createSetter = require('../hiddenData').createSetter;
 
 module.exports = function hiddenData(opt) {
   return function (target, property, descriptor) {

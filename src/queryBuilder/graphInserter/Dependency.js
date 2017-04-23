@@ -1,4 +1,6 @@
-module.exports = class Dependency {
+'use strict';
+
+class Dependency {
 
   constructor(node) {
     /**
@@ -11,3 +13,5 @@ module.exports = class Dependency {
     throw new Error('not implemented');
   }
 }
+
+module.exports = Dependency;

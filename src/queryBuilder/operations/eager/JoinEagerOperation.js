@@ -1,15 +1,17 @@
+'use strict';
+
 const EagerOperation = require('./EagerOperation');
 const RelationJoinBuilder = require('./RelationJoinBuilder');
 
-module.exports = class JoinEagerOperation extends EagerOperation {
+class JoinEagerOperation extends EagerOperation {
 
   constructor(name, opt) {
     super(name, opt);
     this.joinBuilder = null;
   }
 
-  clone(...args) {
-    const copy = super.clone(...args);
+  clone(props) {
+    const copy = super.clone(props);
 
     if (this.joinBuilder) {
       copy.joinBuilder = this.joinBuilder.clone({
@@ -48,3 +50,5 @@ module.exports = class JoinEagerOperation extends EagerOperation {
     return this.joinBuilder.rowsToTree(rows);
   }
 }
+
+module.exports = JoinEagerOperation;

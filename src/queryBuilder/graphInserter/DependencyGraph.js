@@ -1,3 +1,5 @@
+'use strict';
+
 const HasManyRelation = require('../../relations/hasMany/HasManyRelation');
 const RelationExpression = require('../RelationExpression');
 const ManyToManyRelation = require('../../relations/manyToMany/ManyToManyRelation');
@@ -11,7 +13,7 @@ const ReplaceValueDependency = require('./ReplaceValueDependency');
 const BelongsToOneDependency = require('./BelongsToOneDependency');
 const InterpolateValueDependency = require('./InterpolateValueDependency');
 
-module.exports = class DependencyGraph {
+class DependencyGraph {
 
   constructor(allowedRelations) {
     /**
@@ -348,3 +350,5 @@ function allMatches(regex, str, cb) {
     matchResult = regex.exec(str);
   }
 }
+
+module.exports = DependencyGraph;

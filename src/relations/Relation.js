@@ -1,8 +1,13 @@
+'use strict';
+
 const _ = require('lodash');
 const path = require('path');
 const memoize = require('../utils/decorators/memoize');
-const {inherits, isSubclassOf} = require('../utils/classUtils');
-const {init, copyHiddenData} = require('../utils/hiddenData');
+const decorate = require('../utils/decorators/decorate');
+const inherits = require('../utils/classUtils').inherits;
+const isSubclassOf = require('../utils/classUtils').isSubclassOf;
+const init = require('../utils/hiddenData').init;
+const copyHiddenData = require('../utils/hiddenData').copyHiddenData;
 const QueryBuilder = require('../queryBuilder/QueryBuilder');
 
 const RelationFindOperation = require('./RelationFindOperation');
@@ -34,7 +39,7 @@ const RelationDeleteOperation = require('./RelationDeleteOperation');
 /**
  * @abstract
  */
-module.exports = class Relation {
+class Relation {
 
   constructor(relationName, OwnerClass) {
     /**
@@ -209,7 +214,6 @@ module.exports = class Relation {
   /**
    * @returns {Array.<string>}
    */
-  @memoize
   fullRelatedCol() {
     return this.relatedCol.map(col => this.relatedModelClass.tableName + '.' + col);
   }
@@ -217,7 +221,6 @@ module.exports = class Relation {
   /**
    * @returns {Array.<string>}
    */
-  @memoize
   fullOwnerCol() {
     return this.ownerCol.map(col => this.ownerModelClass.tableName + '.' + col);
   }
@@ -225,7 +228,6 @@ module.exports = class Relation {
   /**
    * @returns {string}
    */
-  @memoize
   relatedTableAlias() {
     return this.relatedModelClass.tableName + '_rel_' + this.name;
   }
@@ -586,6 +588,18 @@ module.exports = class Relation {
   }
 }
 
+/**
+ * Until node gets decorators, we need to apply them like this.
+ */
+decorate(Relation.prototype, [{
+  decorator: memoize,
+  properties: [
+    'fullRelatedCol',
+    'fullOwnerCol',
+    'relatedTableAlias'
+  ]
+}]);
+
 function isAbsolutePath(pth) {
   return path.normalize(pth + '/') === path.normalize(path.resolve(pth) + '/');
 }
@@ -603,3 +617,5 @@ function containsNonNull(arr) {
 
   return false;
 }
+
+module.exports = Relation;

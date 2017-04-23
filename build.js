@@ -6,31 +6,16 @@ var fs = require('fs');
 
 var SRC_DIR = './src';
 var DST_DIR = './lib';
-var CP_ONLY = [];
+
+var ONLY = [
+
+];
+
 var BABEL_OPT = {
   presets: [],
   sourceMaps: 'inline',
   plugins: [
-    "transform-decorators-legacy",
-    "transform-class-properties",
-
-    "transform-es2015-template-literals",
-    "transform-es2015-literals",
-    "transform-es2015-arrow-functions",
-    "transform-es2015-block-scoped-functions",
-    ["transform-es2015-classes", {
-      loose: true
-    }],
-    "transform-es2015-shorthand-properties",
-    "transform-es2015-duplicate-keys",
-    "transform-es2015-computed-properties",
-    "transform-es2015-sticky-regex",
-    "transform-es2015-unicode-regex",
-    "check-es2015-constants",
-    "transform-es2015-spread",
-    "transform-es2015-parameters",
-    "transform-es2015-destructuring",
-    "transform-es2015-block-scoping"
+    "transform-decorators-legacy"
   ]
 };
 
@@ -43,10 +28,11 @@ for (var i = 0; i < src.length; ++i) {
   var dst = DST_DIR + src[i].substring(SRC_DIR.length);
   var code;
 
-  if (CP_ONLY.indexOf(src[i]) !== -1) {
-    code = fs.readFileSync(src[i]);
-  } else {
+  if (ONLY.some(tester => tester(src[i]))) {
+    console.log(src[i])
     code = babel.transformFileSync(src[i], BABEL_OPT).code;
+  } else {
+    code = fs.readFileSync(src[i]);
   }
 
   fsExtra.ensureDirSync(path.dirname(dst));

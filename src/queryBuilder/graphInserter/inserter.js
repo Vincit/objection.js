@@ -1,6 +1,8 @@
+'use strict';
+
 const _ = require('lodash');
 const Promise = require('bluebird');
-const {isPostgres} = require('../../utils/knexUtils');
+const isPostgres = require('../../utils/knexUtils').isPostgres;
 
 const POSTGRES_INSERT_BATCH_SIZE = 100;
 
@@ -8,7 +10,7 @@ const POSTGRES_INSERT_BATCH_SIZE = 100;
  * @param {QueryBuilder} builder
  * @return {function(TableInsertion)}
  */
-module.exports = function (builder) {
+module.exports = (builder) => {
   // Postgres is the only db engine that returns identifiers of all inserted rows. Therefore
   // we can insert batches only with postgres.
   const batchSize = isPostgres(builder.knex()) ? POSTGRES_INSERT_BATCH_SIZE : 1;
@@ -43,7 +45,7 @@ module.exports = function (builder) {
 
     return Promise.all(queries);
   };
-}
+};
 
 function batchInsert(models, queryBuilder, batchSize, queries) {
   const batches = _.chunk(models, batchSize);

@@ -1,6 +1,8 @@
+'use strict';
+
 const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
-module.exports = class WhereCompositeOperation extends WrappingQueryBuilderOperation {
+class WhereCompositeOperation extends WrappingQueryBuilderOperation {
 
   onBuild(knexBuilder) {
     if (this.args.length === 2) {
@@ -29,4 +31,6 @@ module.exports = class WhereCompositeOperation extends WrappingQueryBuilderOpera
     }
   }
 }
+
+module.exports = WhereCompositeOperation;
 

@@ -1,6 +1,8 @@
+'use strict';
+
 const DeleteOperation = require('../queryBuilder/operations/DeleteOperation');
 
-module.exports = class RelationDeleteOperation extends DeleteOperation {
+class RelationDeleteOperation extends DeleteOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -17,3 +19,5 @@ module.exports = class RelationDeleteOperation extends DeleteOperation {
     });
   }
 }
+
+module.exports = RelationDeleteOperation;

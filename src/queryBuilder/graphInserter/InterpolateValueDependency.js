@@ -1,7 +1,9 @@
+'use strict';
+
 const _ = require('lodash');
 const Dependency = require('./Dependency');
 
-module.exports = class InterpolateValueDependency extends Dependency {
+class InterpolateValueDependency extends Dependency {
 
   constructor(node, path, refProp, match, inverse) {
     super(node);
@@ -39,3 +41,5 @@ module.exports = class InterpolateValueDependency extends Dependency {
     }
   }
 }
+
+module.exports = InterpolateValueDependency;

@@ -1,8 +1,12 @@
+'use strict';
+
 const ManyToManyRelation = require('../manyToMany/ManyToManyRelation');
 
-module.exports = class HasOneThroughRelation extends ManyToManyRelation {
+class HasOneThroughRelation extends ManyToManyRelation {
 
   isOneToOne() {
     return true;
   }
 }
+
+module.exports = HasOneThroughRelation;

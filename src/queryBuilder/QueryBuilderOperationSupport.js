@@ -1,12 +1,14 @@
+'use strict';
+
 const KnexOperation = require('./operations/KnexOperation');
 const QueryBuilderContextBase = require('./QueryBuilderContextBase');
-const {inherits} = require('../utils/classUtils');
+const inherits = require('../utils/classUtils').inherits;
 
 /**
  * Base functionality to be able to use query builder operation annotations.
  */
 
-module.exports = class QueryBuilderOperationSupport {
+class QueryBuilderOperationSupport {
 
   constructor(knex, QueryBuilderContext) {
     /**
@@ -170,7 +172,9 @@ module.exports = class QueryBuilderOperationSupport {
    * @param {boolean} match
    * @returns {QueryBuilderBase}
    */
-  forEachOperation(operationSelector, callback, match = true) {
+  forEachOperation(operationSelector, callback, match) {
+    match = (match == null) ? true : match;
+
     if (operationSelector instanceof RegExp) {
       this._forEachOperationRegex(operationSelector, callback, match);
     } else {
@@ -354,3 +358,5 @@ module.exports = class QueryBuilderOperationSupport {
     }
   }
 }
+
+module.exports = QueryBuilderOperationSupport;

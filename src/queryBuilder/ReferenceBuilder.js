@@ -1,3 +1,5 @@
+'use strict';
+
 const jsonFieldExpressionParser = require('./parsers/jsonFieldExpressionParser');
 
 class ReferenceBuilder {

@@ -1,7 +1,9 @@
+'use strict';
+
 const _ = require('lodash');
 const Dependency = require('./Dependency');
 
-module.exports = class ReplaceValueDependency extends Dependency {
+class ReplaceValueDependency extends Dependency {
 
   constructor(node, path, refProp,inverse) {
     super(node);
@@ -30,3 +32,5 @@ module.exports = class ReplaceValueDependency extends Dependency {
     }
   }
 }
+
+module.exports = ReplaceValueDependency;

@@ -1,9 +1,11 @@
+'use strict';
+
 const _ = require('lodash');
 const QueryBuilderOperation = require('./QueryBuilderOperation');
 const RelationJoinBuilder = require('./eager/RelationJoinBuilder');
 const RelationExpression = require('../RelationExpression');
 
-module.exports = class JoinRelationOperation extends QueryBuilderOperation {
+class JoinRelationOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -59,3 +61,5 @@ module.exports = class JoinRelationOperation extends QueryBuilderOperation {
     joinBuilder.buildJoinOnly(builder);
   }
 }
+
+module.exports = JoinRelationOperation;

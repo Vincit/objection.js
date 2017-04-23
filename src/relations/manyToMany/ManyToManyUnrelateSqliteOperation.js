@@ -1,9 +1,11 @@
+'use strict';
+
 const _ = require('lodash');
 const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
 const sqliteBuiltInRowId = '_rowid_';
 
-module.exports = class ManyToManyUnrelateSqliteOperation extends QueryBuilderOperation {
+class ManyToManyUnrelateSqliteOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -45,3 +47,5 @@ module.exports = class ManyToManyUnrelateSqliteOperation extends QueryBuilderOpe
       .runAfter(_.constant({}));
   }
 }
+
+module.exports = ManyToManyUnrelateSqliteOperation;

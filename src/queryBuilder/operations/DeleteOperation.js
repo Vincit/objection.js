@@ -1,6 +1,8 @@
+'use strict';
+
 const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-module.exports = class DeleteOperation extends QueryBuilderOperation {
+class DeleteOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -11,3 +13,5 @@ module.exports = class DeleteOperation extends QueryBuilderOperation {
     knexBuilder.delete();
   }
 }
+
+module.exports = DeleteOperation;

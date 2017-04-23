@@ -1,12 +1,14 @@
-const _ = require('lodash');
-const {getDialect} = require('../../utils/knexUtils');
+'use strict';
 
-module.exports = function queryBuilderOperation(input, name) {
+const mapValues = require('lodash/mapValues');
+const getDialect = require('../../utils/knexUtils').getDialect;
+
+function queryBuilderOperation(input, name) {
   const normalizedInput = normalizeInput(input);
 
   return function (target, property, descriptor) {
     const operationName = name || property;
-    if (_.isFunction(input) || _.isArray(input)) {
+    if (typeof input === 'function' || Array.isArray(input)) {
       descriptor.value = function decorator$queryBuilderOperation() {
         const args = new Array(arguments.length);
 
@@ -40,17 +42,17 @@ module.exports = function queryBuilderOperation(input, name) {
 }
 
 function normalizeInput(input) {
-  if (_.isFunction(input) || _.isArray(input)) {
+  if (typeof input === 'function' || Array.isArray(input)) {
     return {
       default: normalizeQueryOperationDesc(input)
     };
   } else {
-    return _.mapValues(input, normalizeQueryOperationDesc);
+    return mapValues(input, normalizeQueryOperationDesc);
   }
 }
 
 function normalizeQueryOperationDesc(desc) {
-  if (_.isArray(desc)) {
+  if (Array.isArray(desc)) {
     return {
       operationClass: desc[0],
       opt: desc[1]
@@ -62,3 +64,5 @@ function normalizeQueryOperationDesc(desc) {
     };
   }
 }
+
+module.exports = queryBuilderOperation;

@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 const parser = require('./parsers/relationExpressionParser');
 const ValidationError = require('../model/ValidationError');
@@ -5,7 +7,7 @@ const ValidationError = require('../model/ValidationError');
 const RECURSIVE_REGEX = /^\^(\d*)$/;
 const ALL_RECURSIVE_REGEX = /^\*$/;
 
-module.exports = class RelationExpression {
+class RelationExpression {
 
   constructor(node, recursionDepth, filters) {
     node = node || {};
@@ -381,3 +383,5 @@ function newNode(name) {
     numChildren: 0
   };
 }
+
+module.exports = RelationExpression;

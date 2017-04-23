@@ -1,6 +1,8 @@
+'use strict';
+
 const QueryBuilderContextBase = require('./QueryBuilderContextBase');
 
-module.exports = class QueryBuilderContext extends QueryBuilderContextBase {
+class QueryBuilderContext extends QueryBuilderContextBase {
 
   constructor(userContext) {
     super(userContext);
@@ -20,3 +22,5 @@ module.exports = class QueryBuilderContext extends QueryBuilderContextBase {
     return ctx;
   }
 }
+
+module.exports = QueryBuilderContext;

@@ -1,26 +1,28 @@
+'use strict';
+
 const _ = require('lodash');
 const Promise = require('bluebird');
 
 const DependencyGraph = require('./DependencyGraph');
 const TableInsertion = require('./TableInsertion');
 
-module.exports = class GraphInserter {
+class GraphInserter {
 
-  constructor({modelClass, models, allowedRelations, knex}) {
+  constructor(args) {
     /**
      * @type {Constructor.<Model>}
      */
-    this.modelClass = modelClass;
+    this.modelClass = args.modelClass;
 
     /**
      * @type {Model|Array.<Model>}
      */
-    this.models = models;
+    this.models = args.models;
 
     /**
      * @type {RelationExpression}
      */
-    this.allowedRelations = allowedRelations || null;
+    this.allowedRelations = args.allowedRelations || null;
 
     /**
      * @type {boolean}
@@ -35,7 +37,7 @@ module.exports = class GraphInserter {
     /**
      * @type {knex}
      */
-    this.knex = knex;
+    this.knex = args.knex;
   }
 
   /**
@@ -279,3 +281,5 @@ module.exports = class GraphInserter {
     return Promise.resolve(this.models);
   }
 }
+
+module.exports = GraphInserter;

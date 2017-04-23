@@ -1,6 +1,8 @@
+'use strict';
+
 const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-module.exports = class RangeOperation extends QueryBuilderOperation {
+class RangeOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -36,3 +38,5 @@ module.exports = class RangeOperation extends QueryBuilderOperation {
     });
   }
 }
+
+module.exports = RangeOperation;

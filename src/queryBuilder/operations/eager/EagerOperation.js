@@ -1,7 +1,9 @@
+'use strict';
+
 const clone = require('lodash/clone');
 const QueryBuilderOperation = require('../QueryBuilderOperation');
 
-module.exports = class EagerOperation extends QueryBuilderOperation {
+class EagerOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -33,3 +35,5 @@ module.exports = class EagerOperation extends QueryBuilderOperation {
     return true;
   }
 }
+
+module.exports = EagerOperation;

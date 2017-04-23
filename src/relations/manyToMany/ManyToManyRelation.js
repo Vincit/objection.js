@@ -1,7 +1,10 @@
+'use strict';
+
 const _ = require('lodash');
 const Relation = require('../Relation');
 const inheritModel = require('../../model/inheritModel');
-const {isSqlite} = require('../../utils/knexUtils');
+const isSqlite = require('../../utils/knexUtils').isSqlite;
+const decorate = require('../../utils/decorators/decorate');
 const memoize = require('../../utils/decorators/memoize');
 
 const ManyToManyFindOperation = require('./ManyToManyFindOperation');
@@ -16,7 +19,7 @@ const ManyToManyDeleteSqliteOperation = require('./ManyToManyDeleteSqliteOperati
 
 const sqliteBuiltInRowId = '_rowid_';
 
-module.exports = class ManyToManyRelation extends Relation {
+class ManyToManyRelation extends Relation {
 
   setMapping(mapping) {
     let retVal = super.setMapping(mapping);
@@ -79,7 +82,6 @@ module.exports = class ManyToManyRelation extends Relation {
   /**
    * @returns {Array.<string>}
    */
-  @memoize
   fullJoinTableOwnerCol() {
     return this.joinTableOwnerCol.map(col => `${this.joinTable}.${col}`);
   }
@@ -87,7 +89,6 @@ module.exports = class ManyToManyRelation extends Relation {
   /**
    * @returns {Array.<string>}
    */
-  @memoize
   fullJoinTableRelatedCol() {
     return this.joinTableRelatedCol.map(col => `${this.joinTable}.${col}`);
   }
@@ -369,3 +370,13 @@ module.exports = class ManyToManyRelation extends Relation {
     });
   }
 }
+
+/**
+ * Until node gets decorators, we need to apply them like this.
+ */
+decorate(ManyToManyRelation.prototype, [{
+  decorator: memoize,
+  properties: ['fullJoinTableOwnerCol', 'fullJoinTableRelatedCol']
+}]);
+
+module.exports = ManyToManyRelation;

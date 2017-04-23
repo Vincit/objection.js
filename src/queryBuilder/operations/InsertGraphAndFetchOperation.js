@@ -1,8 +1,10 @@
+'use strict';
+
 const DelegateOperation = require('./DelegateOperation');
 const RelationExpression = require('../RelationExpression');
 const InsertGraphOperation = require('./InsertGraphOperation');
 
-module.exports = class InsertGraphAndFetchOperation extends DelegateOperation {
+class InsertGraphAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -39,4 +41,6 @@ module.exports = class InsertGraphAndFetchOperation extends DelegateOperation {
       });
   }
 }
+
+module.exports = InsertGraphAndFetchOperation;
 

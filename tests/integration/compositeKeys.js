@@ -47,11 +47,11 @@ module.exports = function (session) {
 
     before(function () {
       A = function A() {
-        Model.apply(this, arguments);
+
       };
 
       B = function B() {
-        Model.apply(this, arguments);
+
       };
 
       Model.extend(A);

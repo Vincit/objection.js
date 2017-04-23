@@ -1,6 +1,8 @@
+'use strict';
+
 const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
-module.exports = class HasManyUnrelateOperation extends QueryBuilderOperation {
+class HasManyUnrelateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -31,3 +33,5 @@ module.exports = class HasManyUnrelateOperation extends QueryBuilderOperation {
     return {};
   }
 }
+
+module.exports = HasManyUnrelateOperation;

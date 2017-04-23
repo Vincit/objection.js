@@ -1,7 +1,9 @@
+'use strict';
+
 const _ = require('lodash');
 const FindOperation = require('../queryBuilder/operations/FindOperation');
 
-module.exports = class RelationFindOperation extends FindOperation {
+class RelationFindOperation extends FindOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -12,8 +14,8 @@ module.exports = class RelationFindOperation extends FindOperation {
     this.omitProps = [];
   }
 
-  clone(...args) {
-    const copy = super.clone(...args);
+  clone(props) {
+    const copy = super.clone(props);
 
     copy.relation = this.relation;
     copy.owners = this.owners;
@@ -133,3 +135,5 @@ module.exports = class RelationFindOperation extends FindOperation {
 function join(arr) {
   return arr.join();
 }
+
+module.exports = RelationFindOperation;

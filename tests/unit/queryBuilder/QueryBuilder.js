@@ -39,7 +39,7 @@ describe('QueryBuilder', function () {
     executedQueries = [];
 
     TestModel = Model.extend(function TestModel() {
-      Model.apply(this, arguments);
+
     });
 
     TestModel.tableName = 'Model';
@@ -985,14 +985,14 @@ describe('QueryBuilder', function () {
 
   it("joinRelation should add join clause to correct place", function (done) {
     var M1 = Model.extend(function M1() {
-      Model.apply(this, arguments);
+
     });
 
     M1.tableName = 'M1';
     M1.knex(mockKnex);
 
     var M2 = Model.extend(function M2() {
-      Model.apply(this, arguments);
+
     });
 
     M2.tableName = 'M2';
@@ -1114,7 +1114,7 @@ describe('QueryBuilder', function () {
 
   it('all query builder methods should work if model is not bound to a knex, when the query is', function () {
     function UnboundModel() {
-      Model.apply(this, arguments);
+
     }
 
     Model.extend(UnboundModel);
@@ -1223,21 +1223,21 @@ describe('QueryBuilder', function () {
 
     it("should use correct query builders", function (done) {
       var M1 = Model.extend(function M1() {
-        Model.apply(this, arguments);
+
       });
 
       M1.tableName = 'M1';
       M1.knex(mockKnex);
 
       var M2 = Model.extend(function M2() {
-        Model.apply(this, arguments);
+
       });
 
       M2.tableName = 'M2';
       M2.knex(mockKnex);
 
       var M3 = Model.extend(function M3() {
-        Model.apply(this, arguments);
+
       });
 
       M3.tableName = 'M3';
@@ -1265,13 +1265,13 @@ describe('QueryBuilder', function () {
         }
       };
 
-      var M1RelatedBuilder = QueryBuilder.extend(function M1RelatedBuilder() {
-        QueryBuilder.apply(this, arguments);
-      });
+      class M1RelatedBuilder extends QueryBuilder {
 
-      var M2RelatedBuilder = QueryBuilder.extend(function M2RelatedBuilder() {
-        QueryBuilder.apply(this, arguments);
-      });
+      }
+
+      class M2RelatedBuilder extends QueryBuilder {
+
+      }
 
       M1.RelatedQueryBuilder = M1RelatedBuilder;
       M2.RelatedQueryBuilder = M2RelatedBuilder;
@@ -1311,7 +1311,7 @@ describe('QueryBuilder', function () {
 
     it("$afterGet should be called after relations have been fetched", function (done) {
       var M1 = Model.extend(function M1() {
-        Model.apply(this, arguments);
+
       });
 
       M1.prototype.$afterGet = function () {

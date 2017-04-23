@@ -1,6 +1,8 @@
+'use strict';
+
 const BelongsToOneRelateOperation = require('./BelongsToOneRelateOperation');
 
-module.exports = class BelongsToOneUnrelateOperation extends BelongsToOneRelateOperation {
+class BelongsToOneUnrelateOperation extends BelongsToOneRelateOperation {
 
   call(builder, args) {
     const ids = new Array(this.relation.ownerProp.length);
@@ -17,3 +19,5 @@ module.exports = class BelongsToOneUnrelateOperation extends BelongsToOneRelateO
     return result;
   }
 }
+
+module.exports = BelongsToOneUnrelateOperation;

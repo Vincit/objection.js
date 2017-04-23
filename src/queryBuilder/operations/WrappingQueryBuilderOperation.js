@@ -1,10 +1,13 @@
+'use strict';
+
 const QueryBuilderOperation = require('./QueryBuilderOperation');
-const {isKnexQueryBuilder, isKnexJoinBuilder} = require('../../utils/knexUtils');
+const isKnexQueryBuilder = require('../../utils/knexUtils').isKnexQueryBuilder;
+const isKnexJoinBuilder = require('../../utils/knexUtils').isKnexJoinBuilder;
 
 let QueryBuilderBase = null;
 let JoinBuilder = null;
 
-module.exports = class WrappingQueryBuilderOperation extends QueryBuilderOperation {
+class WrappingQueryBuilderOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -35,7 +38,7 @@ function wrapArgs(op, builder, args) {
         throw new Error(`undefined passed as argument #${l} for '${op.name}' operation. Call skipUndefined() method to ignore the undefined values.`);
       }
     } else if (arg && arg.isObjectionReferenceBuilder) {
-      args[i] = knex.raw(...args[i].toRawArgs());
+      args[i] = knex.raw.apply(knex, args[i].toRawArgs());
     } else if (arg && arg.isObjectionQueryBuilderBase) {
       // Convert QueryBuilderBase instances into knex query builders.
       args[i] = arg.build();
@@ -47,7 +50,7 @@ function wrapArgs(op, builder, args) {
       }
       // convert reference builders to knex.raw
       args[i] = args[i].map(arg => {
-        return (arg && arg.isObjectionReferenceBuilder) ? knex.raw(...arg.toRawArgs()) : arg;
+        return (arg && arg.isObjectionReferenceBuilder) ? knex.raw.apply(knex, arg.toRawArgs()) : arg;
       });
     } else if (typeof arg === 'function') {
       // If an argument is a function, knex calls it with a query builder as
@@ -113,3 +116,5 @@ function requireQueryBuilderBase() {
 function requireJoinBuilder() {
   return require('../JoinBuilder');
 }
+
+module.exports = WrappingQueryBuilderOperation;

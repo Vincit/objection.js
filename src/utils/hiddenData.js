@@ -1,3 +1,5 @@
+'use strict';
+
 const HIDDEN_DATA = '$$hiddenData';
 
 function init(obj, data) {

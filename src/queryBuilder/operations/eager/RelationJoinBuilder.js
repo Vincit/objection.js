@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 const Promise = require('bluebird');
 const ValidationError = require('../../../model/ValidationError');
@@ -6,11 +8,11 @@ const columnInfo = Object.create(null);
 const idLengthLimit = 63;
 const relationRecursionLimit = 64;
 
-module.exports = class RelationJoinBuilder {
+class RelationJoinBuilder {
 
-  constructor({modelClass, expression, opt}) {
-    this.rootModelClass = modelClass;
-    this.expression = expression;
+  constructor(args) {
+    this.rootModelClass = args.modelClass;
+    this.expression = args.expression;
     this.allRelations = null;
 
     this.pathInfo = Object.create(null);
@@ -18,7 +20,7 @@ module.exports = class RelationJoinBuilder {
     this.decodings = Object.create(null);
     this.encIdx = 0;
 
-    this.opt = _.defaults(opt, {
+    this.opt = _.defaults(args.opt, {
       minimize: false,
       separator: ':',
       aliases: {}
@@ -214,27 +216,37 @@ module.exports = class RelationJoinBuilder {
     }
   }
 
-  doBuild({expr, builder, selectFilter, modelClass, relation, path, parentInfo, joinOperation, noSelects}) {
+  doBuild(args) {
+    const expr = args.expr;
+    const builder = args.builder;
+    const selectFilter = args.selectFilter;
+    const modelClass = args.modelClass;
+    const relation = args.relation;
+    const path = args.path;
+    const parentInfo = args.parentInfo;
+    const joinOperation = args.joinOperation;
+    const noSelects = args.noSelects;
+
     if (!this.allRelations) {
       this.allRelations = findAllRelations(this.expression, this.rootModelClass);
     }
 
     const info = this.createPathInfo({
-      modelClass,
-      path,
-      relation,
-      parentInfo
+      modelClass: modelClass,
+      path: path,
+      relation: relation,
+      parentInfo: parentInfo
     });
 
     this.pathInfo[path] = info;
 
     if (!noSelects) {
       this.buildSelects({
-        builder,
-        selectFilter,
-        modelClass,
-        relation,
-        info
+        builder: builder,
+        selectFilter: selectFilter,
+        modelClass: modelClass,
+        relation: relation,
+        info: info
       });
     }
 
@@ -246,19 +258,19 @@ module.exports = class RelationJoinBuilder {
         : null;
 
       const filterQuery = createFilterQuery({
-        builder,
-        relation,
+        builder: builder,
+        relation: relation,
         expr: childExpr
       });
 
       const relatedJoinSelectQuery = createRelatedJoinFromQuery({
-        filterQuery,
-        relation,
+        filterQuery: filterQuery,
+        relation: relation,
         allRelations: this.allRelations
       });
 
       relation.join(builder, {
-        joinOperation,
+        joinOperation: joinOperation,
         ownerTable: info.encPath,
         relatedTableAlias: encNextPath,
         joinTableAlias: encJoinTablePath,
@@ -287,7 +299,11 @@ module.exports = class RelationJoinBuilder {
     });
   }
 
-  createPathInfo({modelClass, path, relation, parentInfo}) {
+  createPathInfo(args) {
+    const modelClass = args.modelClass;
+    const path = args.path;
+    const relation = args.relation;
+    const parentInfo = args.parentInfo;
     const encPath = this.encode(path);
     let info;
 
@@ -312,7 +328,12 @@ module.exports = class RelationJoinBuilder {
     return info;
   }
 
-  buildSelects({builder, selectFilter, modelClass, relation, info}) {
+  buildSelects(args) {
+    const builder = args.builder;
+    const selectFilter = args.selectFilter;
+    const modelClass = args.modelClass;
+    const relation = args.relation;
+    const info = args.info;
     const selects = [];
     const idCols = modelClass.getIdColumnArray();
     const rootTable = this.rootModelClass.tableName;
@@ -551,7 +572,10 @@ function createNIdGetter(idCols) {
   };
 }
 
-function createFilterQuery({builder, expr, relation}) {
+function createFilterQuery(args) {
+  const builder = args.builder;
+  const expr = args.expr;
+  const relation = args.relation;
   const filterQuery = relation.relatedModelClass
     .query()
     .childQueryOf(builder);
@@ -570,7 +594,10 @@ function createFilterQuery({builder, expr, relation}) {
   return filterQuery;
 }
 
-function createRelatedJoinFromQuery({filterQuery, relation, allRelations}) {
+function createRelatedJoinFromQuery(args) {
+  const filterQuery = args.filterQuery;
+  const relation = args.relation;
+  const allRelations = args.allRelations;
   const relatedJoinFromQuery = filterQuery.clone();
 
   const allForeignKeys = findAllForeignKeysForModel({
@@ -583,8 +610,10 @@ function createRelatedJoinFromQuery({filterQuery, relation, allRelations}) {
   }));
 }
 
-function findAllForeignKeysForModel({modelClass, allRelations}) {
-  let foreignKeys = modelClass.getIdColumnArray().slice();
+function findAllForeignKeysForModel(args) {
+  const modelClass = args.modelClass;
+  const allRelations = args.allRelations;
+  const foreignKeys = modelClass.getIdColumnArray().slice();
 
   allRelations.forEach(rel => {
     if (rel.relatedModelClass.tableName === modelClass.tableName) {
@@ -677,3 +706,5 @@ class OneToOnePathInfo extends PathInfo {
     return branch || null;
   }
 }
+
+module.exports = RelationJoinBuilder;

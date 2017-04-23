@@ -1,6 +1,8 @@
+'use strict';
+
 const Dependency = require('./Dependency');
 
-module.exports = class HasManyDependency extends Dependency {
+class HasManyDependency extends Dependency {
 
   constructor(node, relation) {
     super(node);
@@ -17,3 +19,5 @@ module.exports = class HasManyDependency extends Dependency {
     }
   }
 }
+
+module.exports = HasManyDependency;

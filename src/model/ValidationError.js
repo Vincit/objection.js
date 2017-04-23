@@ -1,3 +1,5 @@
+'use strict';
+
 const util = require('util');
 
 // Note: babel cannot inherit from built-in types like Error.

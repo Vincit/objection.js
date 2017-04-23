@@ -1,7 +1,9 @@
+'use strict';
+
 const _ = require('lodash');
 const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
-module.exports = class ManyToManyUnrelateOperation extends QueryBuilderOperation {
+class ManyToManyUnrelateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -28,3 +30,5 @@ module.exports = class ManyToManyUnrelateOperation extends QueryBuilderOperation
       .runAfter(_.constant({}));
   }
 }
+
+module.exports = ManyToManyUnrelateOperation;

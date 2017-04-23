@@ -1,9 +1,11 @@
+'use strict';
+
 const _ = require('lodash');
 const Ajv = require('ajv');
 const Validator = require('./Validator');
 const ValidationError = require('./ValidationError');
 
-module.exports = class AjvValidator extends Validator {
+class AjvValidator extends Validator {
 
   constructor(conf) {
     super();
@@ -22,7 +24,12 @@ module.exports = class AjvValidator extends Validator {
     conf.onCreateAjv(this.ajvNoDefaults);
   }
 
-  beforeValidate({model, json, options, ctx}) {
+  beforeValidate(args) {
+    const json = args.json;
+    const model = args.model;
+    const options = args.options;
+    const ctx = args.ctx;
+
     ctx.jsonSchema = model.constructor.getJsonSchema();
 
     if (model.$beforeValidate !== model.objectionModelClass.prototype.$beforeValidate) {
@@ -31,7 +38,12 @@ module.exports = class AjvValidator extends Validator {
     }
   }
 
-  validate({model, json, options, ctx}) {
+  validate(args) {
+    let json = args.json;
+    const model = args.model;
+    const options = args.options;
+    const ctx = args.ctx;
+
     if (!ctx.jsonSchema) {
       return json;
     }
@@ -168,3 +180,5 @@ function objectHasDefaults(obj) {
 
   return false;
 }
+
+module.exports = AjvValidator;

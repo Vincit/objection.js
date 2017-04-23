@@ -1,7 +1,9 @@
+'use strict';
+
 const normalizeIds = require('../../utils/normalizeIds');
 const QueryBuilderOperation = require('../../queryBuilder/operations/QueryBuilderOperation');
 
-module.exports = class HasManyRelateOperation extends QueryBuilderOperation {
+class HasManyRelateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -42,3 +44,5 @@ module.exports = class HasManyRelateOperation extends QueryBuilderOperation {
     return this.input;
   }
 }
+
+module.exports = HasManyRelateOperation;

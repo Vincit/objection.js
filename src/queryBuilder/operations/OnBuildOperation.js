@@ -1,6 +1,8 @@
+'use strict';
+
 const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-module.exports = class OnBuildOperation extends QueryBuilderOperation {
+class OnBuildOperation extends QueryBuilderOperation {
 
   call(builder, args) {
     this.func = args[0];
@@ -11,3 +13,5 @@ module.exports = class OnBuildOperation extends QueryBuilderOperation {
     return this.func.call(builder, builder);
   }
 }
+
+module.exports = OnBuildOperation;

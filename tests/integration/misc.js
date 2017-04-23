@@ -27,7 +27,7 @@ module.exports = function (session) {
 
     before(function () {
       TestModel = function TestModel() {
-        Model.apply(this, arguments);
+
       };
 
       Model.extend(TestModel);
@@ -79,11 +79,11 @@ module.exports = function (session) {
 
     before(function () {
       Table1 = function TestModel() {
-        Model.apply(this, arguments);
+
       };
 
       Table2 = function TestModel() {
-        Model.apply(this, arguments);
+
       };
 
       Model.extend(Table1);
@@ -149,7 +149,7 @@ module.exports = function (session) {
 
       before(function () {
         TestModel = function TestModel() {
-          Model.apply(this, arguments);
+
         };
 
         Model.extend(TestModel);
@@ -205,7 +205,7 @@ module.exports = function (session) {
 
     before(function () {
       TestModel = function TestModel() {
-        Model.apply(this, arguments);
+
       };
 
       Model.extend(TestModel);
@@ -709,28 +709,28 @@ module.exports = function (session) {
 
   describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', function () {
     function A() {
-      Model.apply(this, arguments);
+
     }
 
     Model.extend(A);
     A.tableName = 'a';
 
     function B() {
-      Model.apply(this, arguments);
+
     }
 
     Model.extend(B);
     B.tableName = 'b';
 
     function C() {
-      Model.apply(this, arguments);
+
     }
 
     Model.extend(C);
     C.tableName = 'c';
 
     function D() {
-      Model.apply(this, arguments);
+
     }
 
     Model.extend(D);
@@ -874,7 +874,7 @@ module.exports = function (session) {
 
     before(function () {
       TestModel = function TestModel() {
-        Model.apply(this, arguments);
+
       };
 
       Model.extend(TestModel);

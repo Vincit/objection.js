@@ -50,12 +50,12 @@ module.exports = function (session) {
     beforeEach(function () {
       // Create model T1 that points to the t1 table in the other database.
       T1 = function T1() {
-        Model.apply(this, arguments);
+
       };
 
       // Create model T2 that points to the t2 table in the other database.
       T2 = function T2() {
-        Model.apply(this, arguments);
+
       };
 
       T1.tableName = 'objection_test_2.t1';

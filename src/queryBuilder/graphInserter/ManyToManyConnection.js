@@ -1,4 +1,6 @@
-module.exports = class ManyToManyConnection {
+'use strict';
+
+class ManyToManyConnection {
 
   constructor(node, relation) {
     /**
@@ -20,3 +22,5 @@ module.exports = class ManyToManyConnection {
   }
 
 }
+
+module.exports = ManyToManyConnection;

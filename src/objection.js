@@ -1,3 +1,5 @@
+'use strict';
+
 const Model = require('./model/Model');
 const QueryBuilderBase = require('./queryBuilder/QueryBuilderBase');
 const QueryBuilder = require('./queryBuilder/QueryBuilder');
@@ -15,7 +17,7 @@ const HasOneThroughRelation = require('./relations/hasOneThrough/HasOneThroughRe
 const ManyToManyRelation = require('./relations/manyToMany/ManyToManyRelation');
 
 const transaction = require('./transaction');
-const { ref } = require('./queryBuilder/ReferenceBuilder');
+const ref = require('./queryBuilder/ReferenceBuilder').ref;
 const Promise = require('bluebird');
 
 module.exports = {

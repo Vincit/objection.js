@@ -1,4 +1,6 @@
-module.exports = class QueryBuilderContextBase {
+'use strict';
+
+class QueryBuilderContextBase {
 
   constructor(userContext) {
     this.userContext = userContext;
@@ -34,3 +36,5 @@ class InternalOptions {
     return copy;
   }
 }
+
+module.exports = QueryBuilderContextBase;

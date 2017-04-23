@@ -1,6 +1,8 @@
+'use strict';
+
 const QueryBuilderOperation = require('./QueryBuilderOperation');
 
-module.exports = class DelegateOperation extends QueryBuilderOperation {
+class DelegateOperation extends QueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -89,3 +91,5 @@ module.exports = class DelegateOperation extends QueryBuilderOperation {
     return this.queryExecutor !== DelegateOperation.prototype.queryExecutor || this.delegate.hasQueryExecutor();
   }
 }
+
+module.exports = DelegateOperation;

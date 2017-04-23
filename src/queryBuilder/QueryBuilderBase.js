@@ -1,3 +1,6 @@
+'use strict';
+
+const decorate = require('../utils/decorators/decorate');
 const queryBuilderOperation = require('./decorators/queryBuilderOperation');
 const QueryBuilderOperationSupport = require('./QueryBuilderOperationSupport');
 
@@ -14,16 +17,7 @@ const WhereJsonHasPostgresOperation = require('./operations/jsonApi/WhereJsonHas
 const WhereJsonFieldPostgresOperation = require('./operations/jsonApi/WhereJsonFieldPostgresOperation');
 const WhereJsonNotObjectPostgresOperation = require('./operations/jsonApi/WhereJsonNotObjectPostgresOperation');
 
-/**
- * This class is a thin wrapper around knex query builder. This class allows us to add our own
- * query builder methods without monkey patching knex query builder.
- */
-
-module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
-
-  static SelectSelector = SelectOperation;
-  static WhereSelector = /where|orWhere|andWhere/;
-  static FromSelector = /^(from|into|table)$/;
+class QueryBuilderBase extends QueryBuilderOperationSupport {
 
   /**
    * @return {boolean}
@@ -73,10 +67,16 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
     return this;
   }
 
+  /**
+   * @returns {QueryBuilderBase}
+   */
   clearSelect() {
     return this.clear(QueryBuilderBase.SelectSelector);
   }
 
+  /**
+   * @returns {QueryBuilderBase}
+   */
   clearWhere() {
     return this.clear(QueryBuilderBase.WhereSelector);
   }
@@ -84,507 +84,421 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  select(...args) {}
+  select() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  insert(...args) {}
+  insert() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  update(...args) {}
+  update() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  delete(...args) {}
+  delete() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation, 'delete')
-  del(...args) {}
+  del() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  forUpdate(...args) {}
+  forUpdate() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  forShare(...args) {}
+  forShare() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  as(...args) {}
+  as() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  columns(...args) {}
+  columns() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  column(...args) {}
+  column() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  from(...args) {}
+  from() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  fromJS(...args) {}
+  fromJS() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  into(...args) {}
+  into() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  withSchema(...args) {}
+  withSchema() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  table(...args) {}
+  table() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  distinct(...args) {}
+  distinct() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  join(...args) {}
+  join() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  joinRaw(...args) {}
+  joinRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  innerJoin(...args) {}
+  innerJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  leftJoin(...args) {}
+  leftJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  leftOuterJoin(...args) {}
+  leftOuterJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  rightJoin(...args) {}
+  rightJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  rightOuterJoin(...args) {}
+  rightOuterJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  outerJoin(...args) {}
+  outerJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  fullOuterJoin(...args) {}
+  fullOuterJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  crossJoin(...args) {}
+  crossJoin() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  where(...args) {}
+  where() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  andWhere(...args) {}
+  andWhere() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhere(...args) {}
+  orWhere() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereNot(...args) {}
+  whereNot() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereNot(...args) {}
+  orWhereNot() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereRaw(...args) {}
+  whereRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereWrapped(...args) {}
+  whereWrapped() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  havingWrapped(...args) {}
+  havingWrapped() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereRaw(...args) {}
+  orWhereRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereExists(...args) {}
+  whereExists() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereExists(...args) {}
+  orWhereExists() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereNotExists(...args) {}
+  whereNotExists() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereNotExists(...args) {}
+  orWhereNotExists() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereIn(...args) {}
+  whereIn() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereIn(...args) {}
+  orWhereIn() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereNotIn(...args) {}
+  whereNotIn() {}
 
   /**
+   * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereNotIn(...args) {}
+  orWhereNotIn() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereNull(...args) {}
+  whereNull() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereNull(...args) {}
+  orWhereNull() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereNotNull(...args) {}
+  whereNotNull() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereNotNull(...args) {}
+  orWhereNotNull() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereBetween(...args) {}
+  whereBetween() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  andWhereBetween(...args) {}
+  andWhereBetween() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  whereNotBetween(...args) {}
+  whereNotBetween() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  andWhereNotBetween(...args) {}
+  andWhereNotBetween() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereBetween(...args) {}
+  orWhereBetween() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orWhereNotBetween(...args) {}
+  orWhereNotBetween() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  groupBy(...args) {}
+  groupBy() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  groupByRaw(...args) {}
+  groupByRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orderBy(...args) {}
+  orderBy() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orderByRaw(...args) {}
+  orderByRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  union(...args) {}
+  union() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  unionAll(...args) {}
+  unionAll() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  having(...args) {}
+  having() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  havingRaw(...args) {}
+  havingRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orHaving(...args) {}
+  orHaving() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  orHavingRaw(...args) {}
+  orHavingRaw() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  offset(...args) {}
+  offset() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  limit(...args) {}
+  limit() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  count(...args) {}
+  count() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  countDistinct(...args) {}
+  countDistinct() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  min(...args) {}
+  min() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  max(...args) {}
+  max() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  sum(...args) {}
+  sum() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  sumDistinct(...args) {}
+  sumDistinct() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  avg(...args) {}
+  avg() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(SelectOperation)
-  avgDistinct(...args) {}
+  avgDistinct() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  debug(...args) {}
+  debug() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(ReturningOperation)
-  returning(...args) {}
+  returning() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  truncate(...args) {}
+  truncate() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  connection(...args) {}
+  connection() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  options(...args) {}
+  options() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  columnInfo(...args) {}
+  columnInfo() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(KnexOperation)
-  with(...args) {}
+  with() {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereRefOperation, {bool: 'and'}])
   whereRef(lhs, op, rhs) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereRefOperation, {bool: 'or'}])
   orWhereRef(lhs, op, rhs) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation(WhereCompositeOperation)
   whereComposite(cols, op, values) {}
 
   /**
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation({
-    default: WhereInCompositeOperation,
-    sqlite3: WhereInCompositeSqliteOperation
-  })
   whereInComposite(columns, values) {}
 
   /**
@@ -592,7 +506,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '=', bool: 'and'}])
   whereJsonEquals(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -600,7 +513,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '=', bool: 'or'}])
   orWhereJsonEquals(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -608,7 +520,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '!=', bool: 'and'}])
   whereJsonNotEquals(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -616,7 +527,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '!=', bool: 'or'}])
   orWhereJsonNotEquals(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -624,7 +534,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'and'}])
   whereJsonSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -632,7 +541,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'or'}])
   orWhereJsonSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -640,7 +548,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'and', prefix: 'not'}])
   whereJsonNotSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -648,7 +555,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'or', prefix: 'not'}])
   orWhereJsonNotSupersetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -656,7 +562,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'and'}])
   whereJsonSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -664,7 +569,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'or'}])
   orWhereJsonSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -672,7 +576,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'and', prefix: 'not'}])
   whereJsonNotSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -680,7 +583,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {Object|Array|FieldExpression} jsonObjectOrFieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'or', prefix: 'not'}])
   orWhereJsonNotSubsetOf(fieldExpression, jsonObjectOrFieldExpression) {}
 
   /**
@@ -719,28 +621,24 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {FieldExpression} fieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'and', compareValue: []}])
   whereJsonNotArray(fieldExpression) {}
 
   /**
    * @param {FieldExpression} fieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'or', compareValue: []}])
   orWhereJsonNotArray(fieldExpression) {}
 
   /**
    * @param {FieldExpression} fieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'and', compareValue: {}}])
   whereJsonNotObject(fieldExpression) {}
 
   /**
    * @param {FieldExpression} fieldExpression
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'or', compareValue: {}}])
   orWhereJsonNotObject(fieldExpression) {}
 
   /**
@@ -748,7 +646,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {string|Array.<string>} keys
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'and', operator: '?|'}])
   whereJsonHasAny(fieldExpression, keys) {}
 
   /**
@@ -756,7 +653,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {string|Array.<string>} keys
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'or', operator: '?|'}])
   orWhereJsonHasAny(fieldExpression, keys) {}
 
   /**
@@ -764,7 +660,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {string|Array.<string>} keys
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'and', operator: '?&'}])
   whereJsonHasAll(fieldExpression, keys) {}
 
   /**
@@ -772,7 +667,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {string|Array.<string>} keys
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'or', operator: '?&'}])
   orWhereJsonHasAll(fieldExpression, keys) {}
 
   /**
@@ -781,7 +675,6 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {boolean|Number|string|null} value
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonFieldPostgresOperation, {bool: 'and'}])
   whereJsonField(fieldExpression, operator, value) {}
 
   /**
@@ -790,6 +683,189 @@ module.exports = class QueryBuilderBase extends QueryBuilderOperationSupport {
    * @param {boolean|Number|string|null} value
    * @returns {QueryBuilderBase}
    */
-  @queryBuilderOperation([WhereJsonFieldPostgresOperation, {bool: 'or'}])
   orWhereJsonField(fieldExpression, operator, value) {}
 }
+
+QueryBuilderBase.SelectSelector = SelectOperation;
+QueryBuilderBase.WhereSelector = /where|orWhere|andWhere/;
+QueryBuilderBase.FromSelector = /^(from|into|table)$/;
+
+/**
+ * Until node gets decorators, we need to apply them like this.
+ */
+decorate(QueryBuilderBase.prototype, [{
+  decorator: queryBuilderOperation(SelectOperation),
+  properties: [
+    'select',
+    'avgDistinct',
+    'avg',
+    'sumDistinct',
+    'sum',
+    'max',
+    'min',
+    'countDistinct',
+    'count',
+    'distinct',
+    'column',
+    'columns'
+  ]
+}, {
+  decorator: queryBuilderOperation(KnexOperation),
+  properties: [
+    'insert',
+    'update',
+    'delete',
+    'forUpdate',
+    'forShare',
+    'as',
+    'from',
+    'fromJS',
+    'into',
+    'withSchema',
+    'table',
+    'join',
+    'joinRaw',
+    'innerJoin',
+    'leftJoin',
+    'leftOuterJoin',
+    'rightJoin',
+    'rightOuterJoin',
+    'outerJoin',
+    'fullOuterJoin',
+    'crossJoin',
+    'where',
+    'andWhere',
+    'orWhere',
+    'whereNot',
+    'orWhereNot',
+    'whereRaw',
+    'whereWrapped',
+    'havingWrapped',
+    'orWhereRaw',
+    'whereExists',
+    'orWhereExists',
+    'whereNotExists',
+    'orWhereNotExists',
+    'whereIn',
+    'orWhereIn',
+    'whereNotIn',
+    'orWhereNotIn',
+    'whereNull',
+    'orWhereNull',
+    'whereNotNull',
+    'orWhereNotNull',
+    'whereBetween',
+    'andWhereBetween',
+    'whereNotBetween',
+    'andWhereNotBetween',
+    'orWhereBetween',
+    'orWhereNotBetween',
+    'groupBy',
+    'groupByRaw',
+    'orderBy',
+    'orderByRaw',
+    'union',
+    'unionAll',
+    'having',
+    'havingRaw',
+    'orHaving',
+    'orHavingRaw',
+    'offset',
+    'limit',
+    'debug',
+    'truncate',
+    'connection',
+    'options',
+    'columnInfo',
+    'with'
+  ]
+}, {
+  decorator: queryBuilderOperation(KnexOperation, 'delete'),
+  properties: ['del']
+}, {
+  decorator: queryBuilderOperation(ReturningOperation),
+  properties: ['returning']
+}, {
+  decorator: queryBuilderOperation([WhereRefOperation, {bool: 'and'}]),
+  properties: ['whereRef']
+}, {
+  decorator: queryBuilderOperation([WhereRefOperation, {bool: 'or'}]),
+  properties: ['orWhereRef']
+}, {
+  decorator: queryBuilderOperation(WhereCompositeOperation),
+  properties: ['whereComposite']
+}, {
+  decorator: queryBuilderOperation({
+    default: WhereInCompositeOperation,
+    sqlite3: WhereInCompositeSqliteOperation
+  }),
+  properties: ['whereInComposite']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '=', bool: 'and'}]),
+  properties: ['whereJsonEquals']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '=', bool: 'or'}]),
+  properties: ['orWhereJsonEquals']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '!=', bool: 'and'}]),
+  properties: ['whereJsonNotEquals']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '!=', bool: 'or'}]),
+  properties: ['orWhereJsonNotEquals']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'and'}]),
+  properties: ['whereJsonSupersetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'or'}]),
+  properties: ['orWhereJsonSupersetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'and', prefix: 'not'}]),
+  properties: ['whereJsonNotSupersetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '@>', bool: 'or', prefix: 'not'}]),
+  properties: ['orWhereJsonNotSupersetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'and'}]),
+  properties: ['whereJsonSubsetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'or'}]),
+  properties: ['orWhereJsonSubsetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'and', prefix: 'not'}]),
+  properties: ['whereJsonNotSubsetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonPostgresOperation, {operator: '<@', bool: 'or', prefix: 'not'}]),
+  properties: ['orWhereJsonNotSubsetOf']
+}, {
+  decorator: queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'and', compareValue: []}]),
+  properties: ['whereJsonNotArray']
+}, {
+  decorator: queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'or', compareValue: []}]),
+  properties: ['orWhereJsonNotArray']
+}, {
+  decorator: queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'and', compareValue: {}}]),
+  properties: ['whereJsonNotObject']
+}, {
+  decorator: queryBuilderOperation([WhereJsonNotObjectPostgresOperation, {bool: 'or', compareValue: {}}]),
+  properties: ['orWhereJsonNotObject']
+}, {
+  decorator: queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'and', operator: '?|'}]),
+  properties: ['whereJsonHasAny']
+}, {
+  decorator: queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'or', operator: '?|'}]),
+  properties: ['orWhereJsonHasAny']
+}, {
+  decorator: queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'and', operator: '?&'}]),
+  properties: ['whereJsonHasAll']
+}, {
+  decorator: queryBuilderOperation([WhereJsonHasPostgresOperation, {bool: 'or', operator: '?&'}]),
+  properties: ['orWhereJsonHasAll']
+}, {
+  decorator: queryBuilderOperation([WhereJsonFieldPostgresOperation, {bool: 'and'}]),
+  properties: ['whereJsonField']
+}, {
+  decorator: queryBuilderOperation([WhereJsonFieldPostgresOperation, {bool: 'or'}]),
+  properties: ['orWhereJsonField']
+}]);
+
+module.exports = QueryBuilderBase;

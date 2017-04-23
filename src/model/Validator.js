@@ -1,13 +1,17 @@
-module.exports = class Validator {
-  beforeValidate({model, json, options}) {
-    model.$beforeValidate(null, json, options);
+'use strict';
+
+class Validator {
+  beforeValidate(args) {
+    args.model.$beforeValidate(null, args.json, args.options);
   }
 
-  validate({model, json, options}) {
+  validate(args) {
     throw new Error('not implemented');
   }
 
-  afterValidate({model, json, options}) {
-    model.$afterValidate(json, options);
+  afterValidate(args) {
+    args.model.$afterValidate(args.json, args.options);
   }
 }
+
+ module.exports = Validator;

@@ -1,6 +1,8 @@
+'use strict';
+
 const InsertOperation = require('./InsertOperation');
 
-module.exports = class InstanceInsertOperation extends InsertOperation {
+class InstanceInsertOperation extends InsertOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -13,3 +15,5 @@ module.exports = class InstanceInsertOperation extends InsertOperation {
     return true;
   }
 }
+
+module.exports = InstanceInsertOperation;

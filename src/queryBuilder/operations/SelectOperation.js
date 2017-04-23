@@ -1,7 +1,9 @@
+'use strict';
+
 const _ = require('lodash');
 const WrappingQueryBuilderOperation = require('./WrappingQueryBuilderOperation');
 
-module.exports = class SelectOperation extends WrappingQueryBuilderOperation {
+class SelectOperation extends WrappingQueryBuilderOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -77,3 +79,5 @@ module.exports = class SelectOperation extends WrappingQueryBuilderOperation {
     return false;
   }
 }
+
+module.exports = SelectOperation;

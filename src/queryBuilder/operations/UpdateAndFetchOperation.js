@@ -1,8 +1,10 @@
+'use strict';
+
 const DelegateOperation = require('./DelegateOperation');
 const UpdateOperation = require('./UpdateOperation');
-const {afterReturn} = require('../../utils/promiseUtils');
+const afterReturn = require('../../utils/promiseUtils').afterReturn;
 
-module.exports = class UpdateAndFetchOperation extends DelegateOperation {
+class UpdateAndFetchOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -51,3 +53,5 @@ module.exports = class UpdateAndFetchOperation extends DelegateOperation {
       });
   }
 }
+
+module.exports = UpdateAndFetchOperation;

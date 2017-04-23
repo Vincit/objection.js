@@ -1,191 +1,200 @@
-const _ = require('lodash');
-const QueryBuilderOperationSupport = require('./QueryBuilderOperationSupport');
-const queryBuilderOperation = require('./decorators/queryBuilderOperation');
-const {inherits} = require('../utils/classUtils');
+'use strict';
 
-const QueryBuilderContextBase = require('./QueryBuilderContextBase');
+const decorate = require('../utils/decorators/decorate');
+const queryBuilderOperation = require('./decorators/queryBuilderOperation');
+const QueryBuilderOperationSupport = require('./QueryBuilderOperationSupport');
 const KnexOperation = require('./operations/KnexOperation');
 
-module.exports = class JoinBuilder extends QueryBuilderOperationSupport {
+class JoinBuilder extends QueryBuilderOperationSupport {
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  using(...args) {}
+  using() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  on(...args) {}
+  on() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOn(...args) {}
+  orOn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onBetween(...args) {}
+  onBetween() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onNotBetween(...args) {}
+  onNotBetween() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnBetween(...args) {}
+  orOnBetween() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnNotBetween(...args) {}
+  orOnNotBetween() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onIn(...args) {}
+  onIn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onNotIn(...args) {}
+  onNotIn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnIn(...args) {}
+  orOnIn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnNotIn(...args) {}
+  orOnNotIn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onNull(...args) {}
+  onNull() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnNull(...args) {}
+  orOnNull() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onNotNull(...args) {}
+  onNotNull() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnNotNull(...args) {}
+  orOnNotNull() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onExists(...args) {}
+  onExists() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnExists(...args) {}
+  orOnExists() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  onNotExists(...args) {}
+  onNotExists() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  orOnNotExists(...args) {}
+  orOnNotExists() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  type(...args) {}
+  type() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  or(...args) {}
+  or() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOn(...args) {}
+  andOn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnIn(...args) {}
+  andOnIn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnNotIn(...args) {}
+  andOnNotIn() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnNull(...args) {}
+  andOnNull() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnNotNull(...args) {}
+  andOnNotNull() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnExists(...args) {}
+  andOnExists() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnNotExists(...args) {}
+  andOnNotExists() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnBetween(...args) {}
+  andOnBetween() {}
 
   /**
-   * @returns {JoinBuilderBase}
+   * @returns {JoinBuilder}
    */
-  @queryBuilderOperation(KnexOperation)
-  andOnNotBetween(...args) {}
-
+  andOnNotBetween() {}
 }
+
+/**
+ * Until node gets decorators, we need to apply them like this.
+ */
+decorate(JoinBuilder.prototype, [{
+  decorator: queryBuilderOperation(KnexOperation),
+  properties: [
+    'using',
+    'on',
+    'orOn',
+    'onBetween',
+    'onNotBetween',
+    'orOnBetween',
+    'orOnNotBetween',
+    'onIn',
+    'onNotIn',
+    'orOnIn',
+    'orOnNotIn',
+    'onNull',
+    'orOnNull',
+    'onNotNull',
+    'orOnNotNull',
+    'onExists',
+    'orOnExists',
+    'onNotExists',
+    'orOnNotExists',
+    'type',
+    'or',
+    'andOn',
+    'andOnIn',
+    'andOnNotIn',
+    'andOnNull',
+    'andOnNotNull',
+    'andOnExists',
+    'andOnNotExists',
+    'andOnBetween',
+    'andOnNotBetween'
+  ]
+}]);
+
+module.exports = JoinBuilder;

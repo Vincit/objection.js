@@ -1,7 +1,9 @@
-const InsertOperation = require('../../queryBuilder/operations/InsertOperation');
-const {after} = require('../../utils/promiseUtils');
+'use strict';
 
-module.exports = class BelongsToOneInsertOperation extends InsertOperation {
+const InsertOperation = require('../../queryBuilder/operations/InsertOperation');
+const after = require('../../utils/promiseUtils').after;
+
+class BelongsToOneInsertOperation extends InsertOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -47,3 +49,5 @@ module.exports = class BelongsToOneInsertOperation extends InsertOperation {
   }
 
 }
+
+module.exports = BelongsToOneInsertOperation;

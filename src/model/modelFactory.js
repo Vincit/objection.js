@@ -1,14 +1,23 @@
-const {isKnexQueryBuilder, isKnexRaw} = require('../utils/knexUtils');
+'use strict';
 
-function fromJson({modelClass, json, deep, modelOptions}) {
-  if (deep) {
+const isKnexQueryBuilder = require('../utils/knexUtils').isKnexQueryBuilder;
+const isKnexRaw = require('../utils/knexUtils').isKnexRaw;
+
+function fromJson(args) {
+  const json = args.json;
+  const modelClass = args.modelClass;
+  const modelOptions = args.modelOptions;
+
+  if (args.deep) {
     return fromJsonDeep(json, modelClass, modelOptions);
   } else {
     return fromJsonShallow(json, modelClass, modelOptions);
   }
 }
 
-function toDatabaseJson({model, queryProps}) {
+function toDatabaseJson(args) {
+  const model = args.model;
+  const queryProps = args.queryProps;
   const json = model.$toDatabaseJson();
   const modelClass = model.constructor;
 

@@ -1,10 +1,12 @@
+'use strict';
+
 const DelegateOperation = require('./DelegateOperation');
 const InsertOperation = require('./InsertOperation');
 
 const insertFuncBuilder = require('../graphInserter/inserter');
 const GraphInserter = require('../graphInserter/GraphInserter');
 
-module.exports = class InsertGraphOperation extends DelegateOperation {
+class InsertGraphOperation extends DelegateOperation {
 
   constructor(name, opt) {
     super(name, opt);
@@ -92,3 +94,5 @@ module.exports = class InsertGraphOperation extends DelegateOperation {
     return this.isArray ? this.models : (this.models[0] || null);
   }
 }
+
+module.exports = InsertGraphOperation;

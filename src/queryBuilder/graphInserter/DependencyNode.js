@@ -1,4 +1,6 @@
-module.exports = class DependencyNode {
+'use strict';
+
+class DependencyNode {
 
   constructor(model, modelClass) {
     this.id = model[modelClass.uidProp];
@@ -35,3 +37,5 @@ module.exports = class DependencyNode {
   }
 
 }
+
+module.exports = DependencyNode;

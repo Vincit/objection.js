@@ -1,7 +1,9 @@
+'use strict';
+
 const jsonApi = require('./postgresJsonApi');
 const WrappingQueryBuilderOperation = require('../WrappingQueryBuilderOperation');
 
-module.exports = class WhereJsonPostgresOperation extends WrappingQueryBuilderOperation {
+class WhereJsonPostgresOperation extends WrappingQueryBuilderOperation {
 
   constructor(builder, name, opt) {
     super(builder, name, opt);
@@ -31,3 +33,5 @@ module.exports = class WhereJsonPostgresOperation extends WrappingQueryBuilderOp
     }
   }
 }
+
+module.exports = WhereJsonPostgresOperation;

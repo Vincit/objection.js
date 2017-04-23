@@ -1,3 +1,5 @@
+'use strict';
+
 const _ = require('lodash');
 const jsonFieldExpressionParser = require('../../parsers/jsonFieldExpressionParser');
 
@@ -39,14 +41,6 @@ const jsonFieldExpressionParser = require('../../parsers/jsonFieldExpressionPars
  * 99. Keys containing dots, square brackets, single quotes and double quotes in one json key is
  *     not currently supported
  */
-
-module.exports = {
-  parseFieldExpression,
-  whereJsonbRefOnLeftJsonbValOrRefOnRight,
-  whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams,
-  whereJsonFieldRightStringArrayOnLeftQuery,
-  whereJsonFieldQuery
-}
 
 function parseFieldExpression(expression, extractAsText) {
   let parsed = jsonFieldExpressionParser.parse(expression);
@@ -134,3 +128,11 @@ function normalizeOperator(knex, operator) {
       return knex.client.formatter().operator(operator);
   }
 }
+
+module.exports = {
+  parseFieldExpression: parseFieldExpression,
+  whereJsonbRefOnLeftJsonbValOrRefOnRight: whereJsonbRefOnLeftJsonbValOrRefOnRight,
+  whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams: whereJsonbRefOnLeftJsonbValOrRefOnRightRawQueryParams,
+  whereJsonFieldRightStringArrayOnLeftQuery: whereJsonFieldRightStringArrayOnLeftQuery,
+  whereJsonFieldQuery: whereJsonFieldQuery
+};

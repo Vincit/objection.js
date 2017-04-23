@@ -1,9 +1,11 @@
+'use strict';
+
 const Relation = require('../Relation');
 const BelongsToOneInsertOperation = require('./BelongsToOneInsertOperation');
 const BelongsToOneRelateOperation = require('./BelongsToOneRelateOperation');
 const BelongsToOneUnrelateOperation = require('./BelongsToOneUnrelateOperation');
 
-module.exports = class BelongsToOneRelation extends Relation {
+class BelongsToOneRelation extends Relation {
 
   isOneToOne() {
     return true;
@@ -30,3 +32,5 @@ module.exports = class BelongsToOneRelation extends Relation {
     });
   }
 }
+
+module.exports = BelongsToOneRelation;

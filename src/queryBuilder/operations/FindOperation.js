@@ -1,9 +1,11 @@
+'use strict';
+
 const clone = require('lodash/clone');
 const QueryBuilderOperation = require('./QueryBuilderOperation');
-const {isPromise} = require('../../utils/promiseUtils');
+const isPromise = require('../../utils/promiseUtils').isPromise;
 const Promise = require('bluebird');
 
-module.exports = class FindOperation extends QueryBuilderOperation {
+class FindOperation extends QueryBuilderOperation {
 
   clone(props) {
     props = props || {};
@@ -112,3 +114,5 @@ function doCallAfterGet(ctx, model, result) {
     return result;
   }
 }
+
+module.exports = FindOperation;

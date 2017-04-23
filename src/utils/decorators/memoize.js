@@ -1,5 +1,8 @@
+'use strict';
+
 const upperFirst = require('lodash/upperFirst');
-const {createGetter, createSetter} = require('../hiddenData');
+const createGetter = require('../hiddenData').createGetter;
+const createSetter = require('../hiddenData').createSetter;
 
 module.exports = function memoize(target, property, descriptor) {
   const cacheProp = 'memoized' + upperFirst(property);
@@ -10,7 +13,7 @@ module.exports = function memoize(target, property, descriptor) {
   } else {
     descriptor.value = memoizeSingleArg(impl, cacheProp);
   }
-}
+};
 
 function memoizeZeroArgs(impl, cacheProp) {
   const get = createGetter(cacheProp);
