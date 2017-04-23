@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash')
+const _ = require('lodash')
   , Knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
@@ -9,32 +9,32 @@ var _ = require('lodash')
   , GraphInserter = require('../../../lib/queryBuilder/graphInserter/GraphInserter')
   , RelationExpression = require('../../../').RelationExpression;
 
-describe('GraphInserter', function () {
-  var mockKnexQueryResult = [];
-  var executedQueries = [];
-  var mockKnex = null;
+describe('GraphInserter', () => {
+  let mockKnexQueryResult = [];
+  let executedQueries = [];
+  let mockKnex = null;
 
-  var Person = null;
-  var Animal = null;
-  var Movie = null;
+  let Person = null;
+  let Animal = null;
+  let Movie = null;
 
-  before(function () {
-    var knex = Knex({client: 'pg'});
+  before(() => {
+    let knex = Knex({client: 'pg'});
 
     mockKnex = knexMocker(knex, function (mock, oldImpl, args) {
       executedQueries.push(this.toString());
 
-      var promise = Promise.resolve(mockKnexQueryResult);
+      let promise = Promise.resolve(mockKnexQueryResult);
       return promise.then.apply(promise, args);
     });
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     mockKnexQueryResult = [];
     executedQueries = [];
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     Person = function Person() {
 
     };
@@ -52,7 +52,7 @@ describe('GraphInserter', function () {
     Model.extend(Movie);
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     Person.tableName = 'Person';
 
     Person.relationMappings = {
@@ -99,7 +99,7 @@ describe('GraphInserter', function () {
     };
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     Animal.tableName = 'Animal';
 
     Animal.relationMappings = {
@@ -114,7 +114,7 @@ describe('GraphInserter', function () {
     };
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     Movie.tableName = 'Movie';
 
     Movie.relationMappings = {
@@ -133,8 +133,8 @@ describe('GraphInserter', function () {
     };
   });
 
-  it('one Person', function () {
-    var models = [{
+  it('one Person', () => {
+    let models = [{
       name: 'person1'
     }];
 
@@ -150,8 +150,8 @@ describe('GraphInserter', function () {
     })
   });
 
-  it('two Persons', function () {
-    var models = [{
+  it('two Persons', () => {
+    let models = [{
       name: 'person1'
     }, {
       name: 'person2'
@@ -171,8 +171,8 @@ describe('GraphInserter', function () {
     })
   });
 
-  it('belongs to one relation', function () {
-    var models = [{
+  it('belongs to one relation', () => {
+    let models = [{
       name: 'child',
       parent: {
         name: 'parent'
@@ -199,8 +199,8 @@ describe('GraphInserter', function () {
     })
   });
 
-  it('has many relation (1)', function () {
-    var models = [{
+  it('has many relation (1)', () => {
+    let models = [{
       name: 'parent1',
       children: [{
         name: 'child11'
@@ -248,8 +248,8 @@ describe('GraphInserter', function () {
     })
   });
 
-  it('has many relation (2)', function () {
-    var models = [{
+  it('has many relation (2)', () => {
+    let models = [{
       name: 'parent1',
       children: [{
         name: 'child1'
@@ -298,8 +298,8 @@ describe('GraphInserter', function () {
     })
   });
 
-  it('many to many relation', function () {
-    var models = [{
+  it('many to many relation', () => {
+    let models = [{
       name: 'parent1',
       movies: [{
         name: 'movie1'
@@ -340,11 +340,11 @@ describe('GraphInserter', function () {
     })
   });
 
-  describe('allowedRelations', function () {
-    var models;
-    var expectedInsertions;
+  describe('allowedRelations', () => {
+    let models;
+    let expectedInsertions;
 
-    beforeEach(function () {
+    beforeEach(() => {
       models = [{
         "#id": 'person_1',
         name: 'person_1',
@@ -439,7 +439,7 @@ describe('GraphInserter', function () {
       }];
     });
 
-    it('should not throw if an allowed model tree is given (1)', function () {
+    it('should not throw if an allowed model tree is given (1)', () => {
       return test({
         modelClass: Person,
         models: models,
@@ -448,7 +448,7 @@ describe('GraphInserter', function () {
       });
     });
 
-    it('should not throw if an allowed model tree is given (2)', function () {
+    it('should not throw if an allowed model tree is given (2)', () => {
       return test({
         modelClass: Person,
         models: models,
@@ -457,7 +457,7 @@ describe('GraphInserter', function () {
       });
     });
 
-    it('should throw if an unallowed model tree is given (1)', function () {
+    it('should throw if an unallowed model tree is given (1)', () => {
       return test({
         modelClass: Person,
         models: models,
@@ -467,7 +467,7 @@ describe('GraphInserter', function () {
       });
     });
 
-    it('should throw if an unallowed model tree is given (2)', function () {
+    it('should throw if an unallowed model tree is given (2)', () => {
       return test({
         modelClass: Person,
         models: models,
@@ -477,7 +477,7 @@ describe('GraphInserter', function () {
       });
     });
 
-    it('should throw if an unallowed model tree is given (3)', function () {
+    it('should throw if an unallowed model tree is given (3)', () => {
       return test({
         modelClass: Person,
         models: models,
@@ -489,10 +489,10 @@ describe('GraphInserter', function () {
 
   });
 
-  describe('#ref', function () {
+  describe('#ref', () => {
 
-    it('belongs to one relation', function () {
-      var models = [{
+    it('belongs to one relation', () => {
+      let models = [{
         name: 'child1',
         parent: {
           "#id": 'parent',
@@ -528,8 +528,8 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('has many relation', function () {
-      var models = [{
+    it('has many relation', () => {
+      let models = [{
         id: 1,
         "#id": 'parent1',
         name: 'parent1',
@@ -597,8 +597,8 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('many to many relation', function () {
-      var model = {
+    it('many to many relation', () => {
+      let model = {
         "#id": 'actor1',
         name: 'actor1',
         movies: [{
@@ -670,8 +670,8 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('many to many relation with extra properties in #ref', function () {
-      var model = {
+    it('many to many relation with extra properties in #ref', () => {
+      let model = {
         "#id": 'actor1',
         name: 'actor1',
         movies: [{
@@ -745,7 +745,7 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('should throw error if model tree contain reference cycles', function () {
+    it('should throw error if model tree contain reference cycles', () => {
 
       test({
         models: [{
@@ -818,7 +818,7 @@ describe('GraphInserter', function () {
 
     });
 
-    it('should be able to change the reference keys through `Model.uidProp` and `Model.uidRefProp`', function () {
+    it('should be able to change the reference keys through `Model.uidProp` and `Model.uidRefProp`', () => {
       Person.uidProp = 'myCustomIdKey';
       Person.uidRefProp = 'myCustomRefKey';
 
@@ -828,7 +828,7 @@ describe('GraphInserter', function () {
       Movie.uidProp = 'myCustomIdKey';
       Movie.uidRefProp = 'myCustomRefKey';
 
-      var models = [{
+      let models = [{
         "myCustomIdKey": 'person_1',
         name: 'person_1',
 
@@ -864,7 +864,7 @@ describe('GraphInserter', function () {
         }]
       }];
 
-      var expectedInsertions = [{
+      let expectedInsertions = [{
         "tableName": "Movie",
         "models": [{
           "name": "person_1_movie_1"
@@ -928,7 +928,7 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('should fail if a reference cannot be found from the graph', function () {
+    it('should fail if a reference cannot be found from the graph', () => {
       test({
         models: [{
           parent: {
@@ -942,10 +942,10 @@ describe('GraphInserter', function () {
 
   });
 
-  describe('#ref{id.prop}', function () {
+  describe('#ref{id.prop}', () => {
 
-    it('should replace references with the inserted values (1)', function () {
-      var models = [{
+    it('should replace references with the inserted values (1)', () => {
+      let models = [{
         firstName: 'I am the child of #ref{parent.firstName} #ref{parent.lastName}',
         lastName: '#ref{parent.id}',
         parent: {
@@ -975,8 +975,8 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('should replace references with the inserted values (2)', function () {
-      var models = [{
+    it('should replace references with the inserted values (2)', () => {
+      let models = [{
         "#id": 'actor',
         name: 'actor',
         metaData: [{
@@ -1037,8 +1037,8 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('should replace references inside deep json properties with the inserted values', function () {
-      var models = [{
+    it('should replace references inside deep json properties with the inserted values', () => {
+      let models = [{
         firstName: 'Child',
         lastName: 'Childsson',
         jsonProp: {
@@ -1080,8 +1080,8 @@ describe('GraphInserter', function () {
       })
     });
 
-    it('should fail if a reference is not found', function () {
-      var models = [{
+    it('should fail if a reference is not found', () => {
+      let models = [{
         firstName: 'I am the child of #ref{parent.firstName} #ref{parent.lastName}',
         lastName: '#ref{doesNotExist.id}',
         parent: {
@@ -1106,7 +1106,7 @@ describe('GraphInserter', function () {
     // Convert the input object graph into model graph. The input may be
     // an array of objects or a single object.
     if (_.isArray(opt.models)) {
-      opt.models = _.map(opt.models, function (model) {
+      opt.models = _.map(opt.models, model => {
         return opt.modelClass.fromJson(model);
       });
     } else {
@@ -1114,7 +1114,7 @@ describe('GraphInserter', function () {
     }
 
     function createInserter() {
-      var insertOpt = {
+      let insertOpt = {
         modelClass: opt.modelClass,
         models: opt.models
       };
@@ -1126,10 +1126,10 @@ describe('GraphInserter', function () {
       return new GraphInserter(insertOpt);
     }
 
-    var inserter;
+    let inserter;
 
      if (opt.expectErrorWithData) {
-      expect(createInserter).to.throwException(function (err) {
+      expect(createInserter).to.throwException(err => {
         expect(err.data).to.eql(opt.expectErrorWithData);
       });
       return;
@@ -1137,13 +1137,13 @@ describe('GraphInserter', function () {
       inserter = createInserter();
     }
 
-    var id = 1;
-    var insertions = [];
+    let id = 1;
+    let insertions = [];
 
-    return inserter.execute(function (tableInsertion) {
-      var ret = _.clone(tableInsertion.models);
+    return inserter.execute(tableInsertion => {
+      let ret = _.clone(tableInsertion.models);
 
-      _.each(tableInsertion.models, function (model, idx) {
+      _.each(tableInsertion.models, (model, idx) => {
         if (_.isArray(opt.models)) {
           expect(opt.models.indexOf(model) !== -1).to.equal(tableInsertion.isInputModel[idx]);
         } else {
@@ -1153,7 +1153,7 @@ describe('GraphInserter', function () {
 
       insertions.push({
         tableName: tableInsertion.modelClass.tableName,
-        models: _.map(tableInsertion.models, function (model) {
+        models: _.map(tableInsertion.models, model => {
           if (model instanceof Model) {
             return model.$toJson(true)
           } else {
@@ -1169,7 +1169,7 @@ describe('GraphInserter', function () {
       });
 
       return Promise.resolve(ret);
-    }).then(function () {
+    }).then(() => {
       expect(insertions).to.eql(opt.expectedInsertions);
     });
   }

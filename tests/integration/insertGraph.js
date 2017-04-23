@@ -1,23 +1,23 @@
 'use strict';
 
-var _ = require('lodash');
-var utils = require('../../lib/utils/knexUtils');
-var expect = require('expect.js');
-var Promise = require('bluebird');
-var transaction = require('../../').transaction;
-var ValidationError = require('../../').ValidationError;
-var inheritModel = require('../../lib/model/inheritModel');
+const _ = require('lodash');
+const utils = require('../../lib/utils/knexUtils');
+const expect = require('expect.js');
+const Promise = require('bluebird');
+const transaction = require('../../').transaction;
+const ValidationError = require('../../').ValidationError;
+const inheritModel = require('../../lib/model/inheritModel');
 
-module.exports = function (session) {
-  var Model1 = session.models.Model1;
-  var Model2 = session.models.Model2;
+module.exports = (session) => {
+  let Model1 = session.models.Model1;
+  let Model2 = session.models.Model2;
 
-  describe('Model insertGraph queries', function () {
-    var population;
-    var insertion;
-    var eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2.model2Relation2]';
+  describe('Model insertGraph queries', () => {
+    let population;
+    let insertion;
+    let eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2.model2Relation2]';
 
-    beforeEach(function () {
+    beforeEach(() => {
       population = {
         id: 1,
         model1Prop1: '20',
@@ -64,48 +64,48 @@ module.exports = function (session) {
       };
     });
 
-    describe('.query().insertGraph()', function () {
+    describe('.query().insertGraph()', () => {
 
-      beforeEach(function () {
+      beforeEach(() => {
         return session.populate(population);
       });
 
-      it('should insert a model with relations', function () {
+      it('should insert a model with relations', () => {
         return Model1
           .query()
           .insertGraph(insertion)
-          .then(function (inserted) {
+          .then(inserted => {
             return check(inserted, true).return(inserted);
           })
-          .then(function (inserted) {
+          .then(inserted => {
             expect(inserted).to.not.have.property('model1Prop2');
             return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
           })
-          .then(function (model) {
+          .then(model => {
             return check(model);
           });
       });
 
-      it('should have alias `insertWithRelated`', function () {
+      it('should have alias `insertWithRelated`', () => {
         return Model1
           .query()
           .insertWithRelated(insertion)
-          .then(function (inserted) {
+          .then(inserted => {
             return check(inserted, true).return(inserted);
           })
-          .then(function (inserted) {
+          .then(inserted => {
             expect(inserted).to.not.have.property('model1Prop2');
             return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
           })
-          .then(function (model) {
+          .then(model => {
             return check(model);
           });
       });
 
-      describe('jsonSchema: additionalProperties = false', function () {
-        var origSchema;
+      describe('jsonSchema: additionalProperties = false', () => {
+        let origSchema;
 
-        before(function () {
+        before(() => {
           origSchema = Model1.jsonSchema;
 
           Model1.jsonSchema = {
@@ -124,7 +124,7 @@ module.exports = function (session) {
           expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
         });
 
-        after(function () {
+        after(() => {
           Model1.jsonSchema = origSchema;
 
           // Clear the memoized schema.
@@ -132,25 +132,25 @@ module.exports = function (session) {
           expect(Model1.getJsonSchema()).to.equal(origSchema);
         });
 
-        it('should insert a model with relations', function () {
+        it('should insert a model with relations', () => {
           return Model1
             .query()
             .insertGraph(insertion)
-            .then(function (inserted) {
+            .then(inserted => {
               return check(inserted, true).return(inserted);
             })
-            .then(function (inserted) {
+            .then(inserted => {
               expect(inserted).to.not.have.property('model1Prop2');
               return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
             })
-            .then(function (model) {
+            .then(model => {
               return check(model);
             });
         });
 
       });
 
-      it('should accept raw sql and subqueries', function () {
+      it('should accept raw sql and subqueries', () => {
         return Model1
           .query()
           .insertGraph([{
@@ -158,7 +158,7 @@ module.exports = function (session) {
           }, {
             model1Prop1: '50'
           }])
-          .then(function () {
+          .then(() => {
             return Model1
               .query()
               .insertGraph({
@@ -174,7 +174,7 @@ module.exports = function (session) {
                 }]
               });
           })
-          .then(function (inserted) {
+          .then(inserted => {
             inserted.model1Relation2 = _.sortBy(inserted.model1Relation2, 'idCol');
 
             expect(inserted.toJSON()).to.eql({
@@ -187,7 +187,7 @@ module.exports = function (session) {
 
             return Model1.query().eager('model1Relation2').where('id', inserted.id);
           })
-          .then(function (inserted) {
+          .then(inserted => {
             inserted[0].model1Relation2 = _.sortBy(inserted[0].model1Relation2, 'idCol');
 
             expect(inserted[0]).to.eql({
@@ -204,10 +204,10 @@ module.exports = function (session) {
           });
       });
 
-      it('should validate models upon insertion', function (done) {
+      it('should validate models upon insertion', done => {
         insertion.model1Relation1.model1Prop1 = 666;
 
-        transaction(Model1, Model2, function (Model1, Model2) {
+        transaction(Model1, Model2, (Model1, Model2) => {
           // We can modify Model1 and Model2 here since it is a subclass of the actual
           // models shared between tests.
           Model1.jsonSchema = {
@@ -238,9 +238,9 @@ module.exports = function (session) {
           expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
 
           return Model1.query().insertGraph(insertion);
-        }).then(function () {
+        }).then(() => {
           done(new Error('should not get here'));
-        }).catch(function (err) {
+        }).catch(err => {
           expect(err).to.be.a(ValidationError);
           expect(err.data).to.have.property('model1Prop1');
 
@@ -248,15 +248,15 @@ module.exports = function (session) {
             session.knex('Model1'),
             session.knex('model_2')
           ]);
-        }).spread(function (rows1, rows2) {
+        }).spread((rows1, rows2) => {
           expect(rows1).to.have.length(1);
           expect(rows2).to.have.length(1);
           done();
         }).catch(done);
       });
 
-      it('should validate models upon insertion: references in integer columns should be accepted', function () {
-        return transaction(Model1, Model2, function (Model1, Model2) {
+      it('should validate models upon insertion: references in integer columns should be accepted', () => {
+        return transaction(Model1, Model2, (Model1, Model2) => {
           // We can modify Model1 and Model2 here since it is a subclass of the actual
           // models shared between tests.
           Model1.jsonSchema = {
@@ -289,33 +289,33 @@ module.exports = function (session) {
           return Model1
             .query()
             .insertGraph(insertion)
-            .then(function (inserted) {
+            .then(inserted => {
               return check(inserted, true).return(inserted);
             })
-            .then(function (inserted) {
+            .then(inserted => {
               expect(inserted).to.not.have.property('model1Prop2');
               return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
             })
-            .then(function (model) {
+            .then(model => {
               return check(model);
             });
         });
       });
 
       if (utils.isPostgres(session.knex)) {
-        it('query building methods should be applied to the root models', function () {
+        it('query building methods should be applied to the root models', () => {
           return Model1
             .query()
             .insertGraph(insertion)
             .returning('*')
-            .then(function (inserted) {
+            .then(inserted => {
               return check(inserted, true).return(inserted);
             })
-            .then(function (inserted) {
+            .then(inserted => {
               expect(inserted).to.have.property('model1Prop2');
               return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
             })
-            .then(function (model) {
+            .then(model => {
               return check(model);
             });
         });
@@ -323,21 +323,21 @@ module.exports = function (session) {
 
     });
 
-    describe('.query().insertGraphAndFetch()', function () {
+    describe('.query().insertGraphAndFetch()', () => {
 
-      beforeEach(function () {
+      beforeEach(() => {
         return session.populate(population);
       });
 
-      it('should insert a model with relations and fetch the inserted graph', function () {
+      it('should insert a model with relations and fetch the inserted graph', () => {
         return Model1
           .query()
           .insertGraphAndFetch(insertion)
-          .then(function (inserted) {
+          .then(inserted => {
             return check(inserted).return(inserted);
           })
-          .then(function (inserted) {
-            return Model1.query().eager(eagerExpr).findById(inserted.id).then(function (fetched) {
+          .then(inserted => {
+            return Model1.query().eager(eagerExpr).findById(inserted.id).then(fetched => {
               expect(inserted.$toJson()).to.eql(fetched.$toJson());
             });
           });
@@ -345,31 +345,31 @@ module.exports = function (session) {
 
     });
 
-    describe('.query().insertGraph().allowRelated()', function () {
+    describe('.query().insertGraph().allowRelated()', () => {
 
-      beforeEach(function () {
+      beforeEach(() => {
         return session.populate(population);
       });
 
-      it('should allow insert when the allowed relation expression is a superset', function () {
+      it('should allow insert when the allowed relation expression is a superset', () => {
         return Model1
           .query()
           .insertGraph(insertion)
           .allowInsert(eagerExpr)
-          .then(function (inserted) {
+          .then(inserted => {
             return check(inserted, true).return(inserted);
           });
       });
 
-      it('should not allow insert when the allowed relation expression is not a superset', function (done) {
+      it('should not allow insert when the allowed relation expression is not a superset', done => {
         Model1
           .query()
           .insertGraph(insertion)
           .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')
-          .then(function () {
+          .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(function (err) {
+          .catch(err => {
             expect(err instanceof ValidationError).to.equal(true);
             done();
           })
@@ -378,124 +378,124 @@ module.exports = function (session) {
 
     });
 
-    describe('.$query().insertGraph()', function () {
+    describe('.$query().insertGraph()', () => {
 
-      beforeEach(function () {
+      beforeEach(() => {
         return session.populate(population);
       });
 
-      it('should insert a model with relations', function () {
+      it('should insert a model with relations', () => {
         return Model1
           .fromJson(insertion)
           .$query()
           .insertGraph()
-          .then(function (inserted) {
+          .then(inserted => {
             return check(inserted, true).return(inserted);
           })
-          .then(function (inserted) {
+          .then(inserted => {
             return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
           })
-          .then(function (model) {
+          .then(model => {
             return check(model);
           });
       });
 
     });
 
-    describe('.$relatedQuery().insertGraph()', function () {
+    describe('.$relatedQuery().insertGraph()', () => {
 
-      describe('has many relation', function () {
-        var parent;
+      describe('has many relation', () => {
+        let parent;
 
-        beforeEach(function () {
+        beforeEach(() => {
           return session.populate(population);
         });
 
-        beforeEach(function () {
+        beforeEach(() => {
           return Model1
             .query()
             .where('id', 1)
             .first()
-            .then(function (par) {
+            .then(par => {
               parent = par;
             });
         });
 
-        beforeEach(function () {
+        beforeEach(() => {
           insertion = {
             model2Prop1: 'howdy',
             model2Relation1: [insertion]
           };
         });
 
-        it('should insert a model with relations', function () {
+        it('should insert a model with relations', () => {
           return parent
             .$relatedQuery('model1Relation2')
             .insertGraph(insertion)
-            .then(function (inserted) {
+            .then(inserted => {
               return check(inserted.model2Relation1[0], true);
             })
-            .then(function () {
+            .then(() => {
               return parent
                 .$relatedQuery('model1Relation2')
                 .first();
             })
-            .then(function (insertion) {
+            .then(insertion => {
               expect(insertion.model2Prop1).to.equal('howdy');
               return insertion
                 .$relatedQuery('model2Relation1')
                 .eager(eagerExpr)
                 .first();
             })
-            .then(function (model) {
+            .then(model => {
               return check(model);
             });
         });
 
       });
 
-      describe('many to many relation', function () {
-        var parent;
+      describe('many to many relation', () => {
+        let parent;
 
-        beforeEach(function () {
+        beforeEach(() => {
           return session.populate(population);
         });
 
-        beforeEach(function () {
+        beforeEach(() => {
           return Model1
             .query()
             .where('id', 1)
             .first()
-            .then(function (par) {
+            .then(par => {
               parent = par;
             });
         });
 
-        beforeEach(function () {
+        beforeEach(() => {
           insertion = {
             model2Prop1: 'howdy',
             model2Relation1: [insertion]
           };
         });
 
-        it('should insert a model with relations', function () {
+        it('should insert a model with relations', () => {
           return parent
             .$relatedQuery('model1Relation3')
             .insertGraph(insertion)
-            .then(function (inserted) {
+            .then(inserted => {
               return check(inserted.model2Relation1[0], true);
             })
-            .then(function () {
+            .then(() => {
               return parent.$relatedQuery('model1Relation3');
             })
-            .then(function (models) {
-              var insertion = _.find(models, {model2Prop1: 'howdy'});
+            .then(models => {
+              let insertion = _.find(models, {model2Prop1: 'howdy'});
               return insertion
                 .$relatedQuery('model2Relation1')
                 .eager(eagerExpr);
             })
-            .then(function (models) {
-              var model = _.find(models, {model1Prop1: 'root'});
+            .then(models => {
+              let model = _.find(models, {model1Prop1: 'root'});
               return check(model);
             });
         });
@@ -505,7 +505,7 @@ module.exports = function (session) {
 
     function check(model, shouldCheckHooks) {
       model = model.$clone();
-      var knex = model.constructor.knex();
+      let knex = model.constructor.knex();
 
       expect(model).to.have.property('model1Relation1');
       expect(model.model1Relation1).to.have.property('model1Relation3');
@@ -542,7 +542,7 @@ module.exports = function (session) {
       expect(model.model1Relation2[1].model2Relation2.model1Prop1).to.equal('child3');
       shouldCheckHooks && checkHooks(model.model1Relation2[1].model2Relation2);
 
-      return knex(Model2.tableName).then(function (rows) {
+      return knex(Model2.tableName).then(rows => {
         // Check that the reference model was only inserted once.
         expect(_.filter(rows, {model_2_prop_1: 'child1'})).to.have.length(1);
       });

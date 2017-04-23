@@ -1,9 +1,10 @@
-var Model = require('../../../../').Model;
+'use strict';
 
-function OwnerModel() {
+const Model = require('../../../../').Model;
+
+class OwnerModel extends Model {
 
 }
 
-module.exports = Model.extend(OwnerModel);
-
 OwnerModel.tableName = 'OwnerModel';
+module.exports = OwnerModel;

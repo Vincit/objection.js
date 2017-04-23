@@ -1,31 +1,31 @@
 'use strict';
 
-var _ = require('lodash');
-var utils = require('../../lib/utils/knexUtils');
-var Model = require('../../').Model;
-var expect = require('expect.js');
-var inheritModel = require('../../lib/model/inheritModel');
-var Promise = require('bluebird');
+const _ = require('lodash');
+const utils = require('../../lib/utils/knexUtils');
+const Model = require('../../').Model;
+const expect = require('expect.js');
+const inheritModel = require('../../lib/model/inheritModel');
+const Promise = require('bluebird');
 
-module.exports = function (session) {
+module.exports = (session) => {
 
-  describe('generated id', function () {
-    var TestModel;
+  describe('generated id', () => {
+    let TestModel;
 
-    before(function () {
+    before(() => {
       return session.knex.schema
         .dropTableIfExists('generated_id_test')
-        .createTable('generated_id_test', function (table) {
+        .createTable('generated_id_test', table => {
           table.string('idCol').primary();
           table.string('value');
         });
     });
 
-    after(function () {
+    after(() => {
       return session.knex.schema.dropTableIfExists('generated_id_test');
     });
 
-    before(function () {
+    before(() => {
       TestModel = function TestModel() {
 
       };
@@ -41,43 +41,43 @@ module.exports = function (session) {
       };
     });
 
-    it('should return the generated id when inserted', function () {
-      return TestModel.query().insert({value: 'hello'}).then(function (ret) {
+    it('should return the generated id when inserted', () => {
+      return TestModel.query().insert({value: 'hello'}).then(ret => {
         expect(ret.idCol).to.equal('someRandomId');
         return session.knex(TestModel.tableName);
-      }).then(function (rows) {
+      }).then(rows => {
         expect(rows[0]).to.eql({value: 'hello', idCol: 'someRandomId'});
       });
     });
 
   });
 
-  describe('zero value in relation column', function () {
-    var Table1;
-    var Table2;
+  describe('zero value in relation column', () => {
+    let Table1;
+    let Table2;
 
-    before(function () {
+    before(() => {
       return session.knex.schema
         .dropTableIfExists('table1')
         .dropTableIfExists('table2')
-        .createTable('table1', function (table) {
+        .createTable('table1', table => {
           table.increments('id').primary();
           table.integer('value').notNullable();
         })
-        .createTable('table2', function (table) {
+        .createTable('table2', table => {
           table.increments('id').primary();
           table.integer('value').notNullable();
         });
     });
 
-    after(function () {
+    after(() => {
       return Promise.all([
         session.knex.schema.dropTableIfExists('table1'),
         session.knex.schema.dropTableIfExists('table2')
       ]);
     });
 
-    before(function () {
+    before(() => {
       Table1 = function TestModel() {
 
       };
@@ -107,7 +107,7 @@ module.exports = function (session) {
       };
     });
 
-    before(function () {
+    before(() => {
       return Promise.all([
         Table1.query().insert({id: 1, value: 0}),
         Table1.query().insert({id: 2, value: 1}),
@@ -116,14 +116,14 @@ module.exports = function (session) {
       ])
     });
 
-    it('should work with zero value', function () {
+    it('should work with zero value', () => {
       return Table1
         .query()
         .findById(1)
-        .then(function (model) {
+        .then(model => {
           return model.$relatedQuery('relation');
         })
-        .then(function (models) {
+        .then(models => {
           expect(models).to.eql([{id: 1, value: 0}]);
         });
     });
@@ -131,23 +131,23 @@ module.exports = function (session) {
   });
 
   if (session.isMySql()) {
-    describe('mysql binary columns', function () {
-      var TestModel;
+    describe('mysql binary columns', () => {
+      let TestModel;
 
-      before(function () {
+      before(() => {
         return session.knex.schema
           .dropTableIfExists('mysql_binary_test')
-          .createTable('mysql_binary_test', function (table) {
+          .createTable('mysql_binary_test', table => {
             table.increments('id').primary();
             table.binary('binary', 4);
           });
       });
 
-      after(function () {
+      after(() => {
         return session.knex.schema.dropTableIfExists('mysql_binary_test');
       });
 
-      before(function () {
+      before(() => {
         TestModel = function TestModel() {
 
         };
@@ -168,18 +168,18 @@ module.exports = function (session) {
         if (typeof a.equals === 'function') return a.equals(b);
         if (a.length !== b.length) return false;
 
-        for (var i = 0; i < a.length; i++) {
+        for (let i = 0; i < a.length; i++) {
           if (a[i] !== b[i]) return false;
         }
 
         return true;
       }
 
-      it('#insert should insert a buffer', function () {
-        return TestModel.query().insert({binary: buffer()}).then(function (ret) {
+      it('#insert should insert a buffer', () => {
+        return TestModel.query().insert({binary: buffer()}).then(ret => {
           expect(bufferEquals(buffer(), ret.binary)).to.equal(true);
           return session.knex(TestModel.tableName);
-        }).then(function (rows) {
+        }).then(rows => {
           expect(bufferEquals(buffer(), rows[0].binary)).to.equal(true);
         });
       });
@@ -187,23 +187,23 @@ module.exports = function (session) {
     });
   }
 
-  describe('model with `length` property', function () {
-    var TestModel;
+  describe('model with `length` property', () => {
+    let TestModel;
 
-    before(function () {
+    before(() => {
       return session.knex.schema
         .dropTableIfExists('model_with_length_test')
-        .createTable('model_with_length_test', function (table) {
+        .createTable('model_with_length_test', table => {
           table.increments('id');
           table.integer('length');
         });
     });
 
-    after(function () {
+    after(() => {
       return session.knex.schema.dropTableIfExists('model_with_length_test');
     });
 
-    before(function () {
+    before(() => {
       TestModel = function TestModel() {
 
       };
@@ -214,20 +214,20 @@ module.exports = function (session) {
       TestModel.knex(session.knex);
     });
 
-    it('should insert', function () {
-      return TestModel.query().insert({length: 10}).then(function (model) {
+    it('should insert', () => {
+      return TestModel.query().insert({length: 10}).then(model => {
         expect(model).to.eql({id: 1, length: 10});
         return session.knex(TestModel.tableName);
-      }).then(function (rows) {
+      }).then(rows => {
         expect(rows.length).to.equal(1);
         expect(rows[0]).to.eql({id: 1, length: 10});
       });
     });
   });
 
-  describe('aggregate methods with relations', function () {
+  describe('aggregate methods with relations', () => {
 
-    beforeEach(function () {
+    beforeEach(() => {
       return session.populate([{
         model1Prop1: 'a',
         model1Relation2: [
@@ -244,7 +244,7 @@ module.exports = function (session) {
       }]);
     });
 
-    it('count of HasManyRelation', function () {
+    it('count of HasManyRelation', () => {
       return session.models.Model1
         .query()
         .select('Model1.*')
@@ -252,7 +252,7 @@ module.exports = function (session) {
         .joinRelation('model1Relation2')
         .groupBy('Model1.id')
         .orderBy('Model1.model1Prop1')
-        .then(function (models) {
+        .then(models => {
           expect(models[0].relCount).to.equal(3);
           expect(models[1].relCount).to.equal(2);
         });
@@ -260,9 +260,9 @@ module.exports = function (session) {
 
   });
 
-  describe('multiple results with a one-to-one relation', function () {
+  describe('multiple results with a one-to-one relation', () => {
 
-    beforeEach(function () {
+    beforeEach(() => {
       // This tests insertGraph.
       return session.populate([{
         id: 1,
@@ -283,8 +283,8 @@ module.exports = function (session) {
       }]);
     });
 
-    it('belongs to one relation', function () {
-      return session.models.Model1.query().whereIn('id', [1, 3]).eager('model1Relation1').then(function (models) {
+    it('belongs to one relation', () => {
+      return session.models.Model1.query().whereIn('id', [1, 3]).eager('model1Relation1').then(models => {
         expect(models).to.eql([{
           id: 1,
           model1Id: 2,
@@ -315,8 +315,8 @@ module.exports = function (session) {
       });
     });
 
-    it('has one relation', function () {
-      return session.models.Model1.query().whereIn('id', [2, 4]).eager('model1Relation1Inverse').then(function (models) {
+    it('has one relation', () => {
+      return session.models.Model1.query().whereIn('id', [2, 4]).eager('model1Relation1Inverse').then(models => {
         expect(models).to.eql([{
           id: 2,
           model1Id: null,
@@ -348,13 +348,13 @@ module.exports = function (session) {
     });
   });
 
-  describe('using unbound models by passing a knex to query', function () {
-    var Model1 = session.unboundModels.Model1;
-    var Model2 = session.unboundModels.Model2;
+  describe('using unbound models by passing a knex to query', () => {
+    let Model1 = session.unboundModels.Model1;
+    let Model2 = session.unboundModels.Model2;
 
-    beforeEach(function () {
+    beforeEach(() => {
       // This tests insertGraph.
-      return session.populate([]).then(function () {
+      return session.populate([]).then(() => {
         return Model1
           .query(session.knex)
           .insertGraph([{
@@ -411,7 +411,7 @@ module.exports = function (session) {
       });
     });
 
-    it('eager', function () {
+    it('eager', () => {
         return Promise.all([
           Model1
             .query(session.knex)
@@ -422,8 +422,8 @@ module.exports = function (session) {
             .findById(1)
             .eagerAlgorithm(Model1.JoinEagerAlgorithm)
             .eager('[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]')
-        ]).then(function (results) {
-          results.forEach(function (models) {
+        ]).then(results => {
+          results.forEach(models => {
             expect(sortRelations(models)).to.eql({
               id: 1,
               model1Id: 2,
@@ -492,26 +492,26 @@ module.exports = function (session) {
         });
     });
 
-    describe('$relatedQuery', function () {
+    describe('$relatedQuery', () => {
 
-      it('fetch', function () {
+      it('fetch', () => {
         return Promise.all([
-          Model1.query(session.knex).findById(1).then(function (model) {
+          Model1.query(session.knex).findById(1).then(model => {
             return model.$relatedQuery('model1Relation1', session.knex);
           }),
 
-          Model1.query(session.knex).findById(2).then(function (model) {
+          Model1.query(session.knex).findById(2).then(model => {
             return model.$relatedQuery('model1Relation1Inverse', session.knex);
           }),
 
-          Model1.query(session.knex).findById(1).then(function (model) {
+          Model1.query(session.knex).findById(1).then(model => {
             return model.$relatedQuery('model1Relation2', session.knex);
           }),
 
-          Model2.query(session.knex).findById(2).then(function (model) {
+          Model2.query(session.knex).findById(2).then(model => {
             return model.$relatedQuery('model2Relation1', session.knex);
           })
-        ]).then(function (results) {
+        ]).then(results => {
           expect(results[0]).to.eql({
             id: 2,
             model1Id: 3,
@@ -562,14 +562,14 @@ module.exports = function (session) {
 
     });
 
-    describe('$query', function () {
+    describe('$query', () => {
 
-      it('fetch', function () {
+      it('fetch', () => {
         return Promise.all([
-          Model1.query(session.knex).findById(1).then(function (model) {
+          Model1.query(session.knex).findById(1).then(model => {
             return model.$query(session.knex);
           })
-        ]).then(function (model) {
+        ]).then(model => {
           expect(model).to.eql([{
             id: 1,
             model1Id: 2,
@@ -580,8 +580,8 @@ module.exports = function (session) {
         });
       });
 
-      it('insert', function () {
-        return Model1.fromJson({model1Prop1: 'foo', id: 100}).$query(session.knex).insert().then(function (model) {
+      it('insert', () => {
+        return Model1.fromJson({model1Prop1: 'foo', id: 100}).$query(session.knex).insert().then(model => {
           expect(model).to.eql({
             id: 100,
             model1Prop1: 'foo',
@@ -591,8 +591,8 @@ module.exports = function (session) {
         });
       });
 
-      it('insertAndFetch', function () {
-        return Model1.fromJson({model1Prop1: 'foo', id: 101}).$query(session.knex).insertAndFetch().then(function (model) {
+      it('insertAndFetch', () => {
+        return Model1.fromJson({model1Prop1: 'foo', id: 101}).$query(session.knex).insertAndFetch().then(model => {
           expect(model).to.eql({
             id: 101,
             model1Id: null,
@@ -606,12 +606,12 @@ module.exports = function (session) {
 
     });
 
-    it('joinRelation (BelongsToOneRelation)', function () {
+    it('joinRelation (BelongsToOneRelation)', () => {
       return Model1
         .query(session.knex)
         .select('Model1.id as id', 'model1Relation1.id as relId')
         .innerJoinRelation('model1Relation1')
-        .then(function (models) {
+        .then(models => {
           expect(_.sortBy(models, 'id')).to.eql([
             {id: 1, relId: 2, $afterGetCalled: 1},
             {id: 2, relId: 3, $afterGetCalled: 1},
@@ -621,12 +621,12 @@ module.exports = function (session) {
         });
     });
 
-    it('joinRelation (ManyToManyRelation)', function () {
+    it('joinRelation (ManyToManyRelation)', () => {
       return Model1
         .query(session.knex)
         .select('Model1.id as id', 'model1Relation3.id_col as relId')
         .innerJoinRelation('model1Relation3')
-        .then(function (models) {
+        .then(models => {
           expect(_.sortBy(models, 'id')).to.eql([
             {id: 5, relId: 2, $afterGetCalled: 1},
             {id: 6, relId: 2, $afterGetCalled: 1}
@@ -634,16 +634,16 @@ module.exports = function (session) {
         });
     });
 
-    it('should fail with a descriptive error message if knex is not provided', function () {
+    it('should fail with a descriptive error message if knex is not provided', () => {
       return Promise.all([
-        Promise.try(function () {
+        Promise.try(() => {
           return Model1
             .query()
             .findById(1)
             .eager('[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]');
         }).reflect(),
 
-        Promise.try(function () {
+        Promise.try(() => {
           return Model1
             .query()
             .findById(1)
@@ -651,40 +651,40 @@ module.exports = function (session) {
             .eager('[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]');
         }).reflect(),
 
-        Promise.try(function () {
+        Promise.try(() => {
           return Model1.query();
         }).reflect(),
 
-        Promise.try(function () {
+        Promise.try(() => {
           return Model1.query().where('id', 1);
         }).reflect(),
 
-        Promise.try(function () {
+        Promise.try(() => {
           return Model1.query().joinRelation('model1Relation1');
         }).reflect(),
 
-        Model1.query(session.knex).findById(1).then(function (model) {
+        Model1.query(session.knex).findById(1).then(model => {
           return model.$relatedQuery('model1Relation1');
         }).reflect(),
 
-        Model1.query(session.knex).findById(2).then(function (model) {
+        Model1.query(session.knex).findById(2).then(model => {
           return model.$relatedQuery('model1Relation1Inverse');
         }).reflect(),
 
-        Model1.query(session.knex).findById(1).then(function (model) {
+        Model1.query(session.knex).findById(1).then(model => {
           return model.$relatedQuery('model1Relation2');
         }).reflect(),
 
-        Model2.query(session.knex).findById(2).then(function (model) {
+        Model2.query(session.knex).findById(2).then(model => {
           return model.$relatedQuery('model2Relation1');
         }).reflect(),
 
-        Model1.query(session.knex).findById(1).then(function (model) {
+        Model1.query(session.knex).findById(1).then(model => {
           return model.$query();
         }).reflect(),
 
-      ]).then(function (results) {
-        results.forEach(function (result) {
+      ]).then(results => {
+        results.forEach(result => {
           expect(result.isRejected()).to.equal(true);
           expect(result.reason().message).to.match(/no database connection available for a query for table .*. You need to bind the model class or the query to a knex instance./);
         })
@@ -692,7 +692,7 @@ module.exports = function (session) {
     });
 
     function sortRelations(models) {
-      Model1.traverse(models, function (model) {
+      Model1.traverse(models, model => {
         if (model.model1Relation2) {
           model.model1Relation2 = _.sortBy(model.model1Relation2, 'idCol');
         }
@@ -707,7 +707,7 @@ module.exports = function (session) {
 
   });
 
-  describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', function () {
+  describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', () => {
     function A() {
 
     }
@@ -774,7 +774,7 @@ module.exports = function (session) {
       }
     };
 
-    beforeEach(function () {
+    beforeEach(() => {
       return session.knex.schema
         .dropTableIfExists('b_c')
         .dropTableIfExists('b_d')
@@ -782,35 +782,35 @@ module.exports = function (session) {
         .dropTableIfExists('a')
         .dropTableIfExists('c')
         .dropTableIfExists('d')
-        .createTable('a', function (table) {
+        .createTable('a', table => {
           table.integer('id').primary();
         })
-        .createTable('b', function (table) {
+        .createTable('b', table => {
           table.integer('id').primary();
           table.integer('aId').references('a.id');
         })
-        .createTable('c', function (table) {
+        .createTable('c', table => {
           table.integer('id').primary();
         })
-        .createTable('d', function (table) {
+        .createTable('d', table => {
           table.integer('id').primary();
         })
-        .createTable('b_c', function (table) {
+        .createTable('b_c', table => {
           table.integer('bId').references('b.id').onDelete('CASCADE');
           table.integer('cId').references('c.id').onDelete('CASCADE');
         })
-        .createTable('b_d', function (table) {
+        .createTable('b_d', table => {
           table.integer('bId').references('b.id').onDelete('CASCADE');
           table.integer('dId').references('d.id').onDelete('CASCADE');
         })
-        .then(function () {
+        .then(() => {
           return Promise.all([
             session.knex('a').insert({id: 1}),
             session.knex('d').insert({id: 1}),
             session.knex('d').insert({id: 2})
-          ]).then(function () {
+          ]).then(() => {
             return session.knex('b').insert({id: 1, aId: 1});
-          }).then(function () {
+          }).then(() => {
             return Promise.all([
               session.knex('b_d').insert({bId: 1, dId: 1}),
               session.knex('b_d').insert({bId: 1, dId: 2})
@@ -819,7 +819,7 @@ module.exports = function (session) {
         });
     });
 
-    afterEach(function () {
+    afterEach(() => {
       return session.knex.schema
         .dropTableIfExists('b_c')
         .dropTableIfExists('b_d')
@@ -829,11 +829,11 @@ module.exports = function (session) {
         .dropTableIfExists('d')
     });
 
-    it('the test', function () {
+    it('the test', () => {
       return A.query(session.knex)
         .eagerAlgorithm(Model.JoinEagerAlgorithm)
         .eager('Bs.[Cs, Ds]')
-        .then(function (results) {
+        .then(results => {
           results[0].Bs[0].Ds = _.sortBy(results[0].Bs[0].Ds, 'id');
 
           expect(results).to.eql([{
@@ -855,24 +855,24 @@ module.exports = function (session) {
     });
   });
 
-  describe('Default values not set with .insertGraph() in 0.7.2 #325', function () {
-    var TestModel;
+  describe('Default values not set with .insertGraph() in 0.7.2 #325', () => {
+    let TestModel;
 
-    before(function () {
+    before(() => {
       return session.knex.schema
         .dropTableIfExists('default_values_note_set_test')
-        .createTable('default_values_note_set_test', function (table) {
+        .createTable('default_values_note_set_test', table => {
           table.increments('id').primary();
           table.string('value1');
           table.string('value2');
         });
     });
 
-    after(function () {
+    after(() => {
       return session.knex.schema.dropTableIfExists('default_values_note_set_test');
     });
 
-    before(function () {
+    before(() => {
       TestModel = function TestModel() {
 
       };
@@ -892,35 +892,35 @@ module.exports = function (session) {
       }
     });
 
-    beforeEach(function () {
+    beforeEach(() => {
       return TestModel.query().delete();
     });
 
-    it('insert should set the defaults', function () {
+    it('insert should set the defaults', () => {
       return TestModel
         .query()
         .insert({value1: 'hello'})
-        .then(function (model) {
+        .then(model => {
           expect(model.value1).to.equal('hello');
           expect(model.value2).to.equal('bar');
           return session.knex(TestModel.tableName);
         })
-        .then(function (rows) {
+        .then(rows => {
           expect(rows[0].value1).to.equal('hello');
           expect(rows[0].value2).to.equal('bar');
         });
     });
 
-    it('insertGraph should set the defaults', function () {
+    it('insertGraph should set the defaults', () => {
       return TestModel
         .query()
         .insertGraph({value1: 'hello'})
-        .then(function (model) {
+        .then(model => {
           expect(model.value1).to.equal('hello');
           expect(model.value2).to.equal('bar');
           return session.knex(TestModel.tableName);
         })
-        .then(function (rows) {
+        .then(rows => {
           expect(rows[0].value1).to.equal('hello');
           expect(rows[0].value2).to.equal('bar');
         });

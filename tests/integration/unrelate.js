@@ -1,52 +1,52 @@
 'use strict';
 
-var _ = require('lodash');
-var expect = require('expect.js');
+const _ = require('lodash');
+const expect = require('expect.js');
 
-module.exports = function (session) {
-  var Model1 = session.models.Model1;
-  var Model2 = session.models.Model2;
+module.exports = (session) => {
+  let Model1 = session.models.Model1;
+  let Model2 = session.models.Model2;
 
-  describe('Model unrelate queries', function () {
+  describe('Model unrelate queries', () => {
 
-    describe('.query()', function () {
+    describe('.query()', () => {
 
-      it('should reject the query', function (done) {
+      it('should reject the query', done => {
         Model1
           .query()
           .unrelate()
-          .then(function () {
+          .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(function () {
+          .catch(() => {
             done();
           });
       });
 
     });
 
-    describe('.$query()', function () {
+    describe('.$query()', () => {
 
-      it('should reject the query', function (done) {
+      it('should reject the query', done => {
         Model1
           .fromJson({id: 1})
           .$query()
           .unrelate()
-          .then(function () {
+          .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(function () {
+          .catch(() => {
             done();
           });
       });
 
     });
 
-    describe('.$relatedQuery().unrelate()', function () {
+    describe('.$relatedQuery().unrelate()', () => {
 
-      describe('belongs to one relation', function () {
+      describe('belongs to one relation', () => {
 
-        beforeEach(function () {
+        beforeEach(() => {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
@@ -64,20 +64,20 @@ module.exports = function (session) {
           }]);
         });
 
-        it('should unrelate', function () {
+        it('should unrelate', () => {
           return Model1
             .query()
             .where('id', 1)
             .first()
-            .then(function (model) {
+            .then(model => {
               return model
                 .$relatedQuery('model1Relation1')
                 .unrelate();
             })
-            .then(function () {
+            .then(() => {
               return session.knex(Model1.tableName).orderBy('id');
             })
-            .then(function (rows) {
+            .then(rows => {
               expect(rows).to.have.length(4);
               expect(rows[0].model1Id).to.equal(null);
               expect(rows[1].model1Id).to.equal(null);
@@ -88,9 +88,9 @@ module.exports = function (session) {
 
       });
 
-      describe('has many relation', function () {
+      describe('has many relation', () => {
 
-        beforeEach(function () {
+        beforeEach(() => {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
@@ -118,21 +118,21 @@ module.exports = function (session) {
           }]);
         });
 
-        it('should unrelate', function () {
+        it('should unrelate', () => {
           return Model1
             .query()
             .where('id', 1)
             .first()
-            .then(function (model) {
+            .then(model => {
               return model
                 .$relatedQuery('model1Relation2')
                 .unrelate()
                 .where('id_col', 2);
             })
-            .then(function () {
+            .then(() => {
               return session.knex(Model2.tableName).orderBy('id_col');
             })
-            .then(function (rows) {
+            .then(rows => {
               expect(rows).to.have.length(4);
               expect(rows[0].model_1_id).to.equal(1);
               expect(rows[1].model_1_id).to.equal(null);
@@ -141,21 +141,21 @@ module.exports = function (session) {
             });
         });
 
-        it('should unrelate multiple', function () {
+        it('should unrelate multiple', () => {
           return Model1
             .query()
             .where('id', 1)
             .first()
-            .then(function (model) {
+            .then(model => {
               return model
                 .$relatedQuery('model1Relation2')
                 .unrelate()
                 .where('id_col', '>', 1);
             })
-            .then(function () {
+            .then(() => {
               return session.knex(Model2.tableName).orderBy('id_col');
             })
-            .then(function (rows) {
+            .then(rows => {
               expect(rows).to.have.length(4);
               expect(rows[0].model_1_id).to.equal(1);
               expect(rows[1].model_1_id).to.equal(null);
@@ -166,9 +166,9 @@ module.exports = function (session) {
 
       });
 
-      describe('many to many relation', function () {
+      describe('many to many relation', () => {
 
-        beforeEach(function () {
+        beforeEach(() => {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
@@ -204,21 +204,21 @@ module.exports = function (session) {
           }]);
         });
 
-        it('should unrelate', function () {
+        it('should unrelate', () => {
           return Model2
             .query()
             .where('id_col', 1)
             .first()
-            .then(function (model) {
+            .then(model => {
               return model
                 .$relatedQuery('model2Relation1')
                 .unrelate()
                 .where('Model1.id', 4);
             })
-            .then(function () {
+            .then(() => {
               return session.knex('Model1Model2').orderBy('id');
             })
-            .then(function (rows) {
+            .then(rows => {
               expect(rows).to.have.length(3);
               expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
               expect(_.filter(rows, {model2Id: 1, model1Id: 4})).to.have.length(0);
@@ -227,21 +227,21 @@ module.exports = function (session) {
             });
         });
 
-        it('should unrelate multiple', function () {
+        it('should unrelate multiple', () => {
           return Model2
             .query()
             .where('id_col', 1)
             .first()
-            .then(function (model) {
+            .then(model => {
               return model
                 .$relatedQuery('model2Relation1')
                 .unrelate()
                 .where('model1Prop1', '>', 'blaa 1');
             })
-            .then(function () {
+            .then(() => {
               return session.knex('Model1Model2').orderBy('id');
             })
-            .then(function (rows) {
+            .then(rows => {
               expect(rows).to.have.length(2);
               expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
               expect(_.filter(rows, {model2Id: 1, model1Id: 4})).to.have.length(0);
@@ -252,9 +252,9 @@ module.exports = function (session) {
 
       });
 
-      describe('has one through relation', function () {
+      describe('has one through relation', () => {
 
-        beforeEach(function () {
+        beforeEach(() => {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
@@ -290,20 +290,20 @@ module.exports = function (session) {
           }]);
         });
 
-        it('should unrelate', function () {
+        it('should unrelate', () => {
           return Model2
             .query()
             .where('id_col', 2)
             .first()
-            .then(function (model) {
+            .then(model => {
               return model
                 .$relatedQuery('model2Relation2')
                 .unrelate();
             })
-            .then(function () {
+            .then(() => {
               return session.knex('Model1Model2One');
             })
-            .then(function (rows) {
+            .then(rows => {
               expect(rows).to.have.length(1);
               expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
             });

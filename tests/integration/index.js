@@ -1,13 +1,12 @@
 'use strict';
 
-var _ = require('lodash');
-var os = require('os');
-var path = require('path');
-var modelTestUtils = require('./utils');
+const os = require('os');
+const path = require('path');
+const TestSession = require('./../../testUtils/TestSession');
 
-describe('integration tests', function () {
+describe('integration tests', () => {
 
-  var testDatabaseConfigs = [{
+  const testDatabaseConfigs = [{
     client: 'sqlite3',
     useNullAsDefault: true,
     connection: {
@@ -29,18 +28,19 @@ describe('integration tests', function () {
     }
   }];
 
-  _.each(testDatabaseConfigs, function (knexConfig) {
+  testDatabaseConfigs.forEach(knexConfig => {
 
-    var session = modelTestUtils.initialize({
+    const session = new TestSession({
       knexConfig: knexConfig
     });
 
-    describe(knexConfig.client, function () {
-      before(function () {
+    describe(knexConfig.client, () => {
+
+      before(() =>  {
         return session.createDb();
       });
 
-      after(function () {
+      after(() => {
         return session.destroy();
       });
 

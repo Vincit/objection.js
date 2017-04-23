@@ -1,9 +1,11 @@
-var expect = require('expect.js');
+'use strict';
 
-describe('main module', function () {
+const expect = require('expect.js');
 
-  it('should be able to load using require', function () {
-    var objection = require('../');
+describe('main module', () => {
+
+  it('should be able to load using require', () => {
+    let objection = require('../');
     expect(objection.Model).to.equal(require('../lib/model/Model'));
     expect(objection.QueryBuilder).to.equal(require('../lib/queryBuilder/QueryBuilder'));
     expect(objection.QueryBuilderBase).to.equal(require('../lib/queryBuilder/QueryBuilderBase'));

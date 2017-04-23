@@ -1,14 +1,14 @@
 'use strict';
 
-var expect = require('expect.js')
+const expect = require('expect.js')
   , ValidationError = require('../../../').ValidationError
   , RelationExpression = require('../../../').RelationExpression;
 
-describe('RelationExpression', function () {
+describe('RelationExpression', () => {
 
-  describe('parse', function () {
+  describe('parse', () => {
 
-    it('empty string', function () {
+    it('empty string', () => {
       testParse('', {
         name: null,
         args: [],
@@ -17,8 +17,8 @@ describe('RelationExpression', function () {
       });
     });
 
-    it('non-string', function () {
-      var expectedResult = {
+    it('non-string', () => {
+      let expectedResult = {
         name: null,
         args: [],
         numChildren: 0,
@@ -33,9 +33,9 @@ describe('RelationExpression', function () {
       testParse([], expectedResult);
     });
 
-    describe('single relation', function () {
+    describe('single relation', () => {
 
-      it('single relation', function () {
+      it('single relation', () => {
         testParse('a', {
           name: null,
           args: [],
@@ -51,7 +51,7 @@ describe('RelationExpression', function () {
         });
       });
 
-      it('list with one value', function () {
+      it('list with one value', () => {
         testParse('[a]', {
           name: null,
           args: [],
@@ -67,7 +67,7 @@ describe('RelationExpression', function () {
         });
       });
 
-      it('weird characters', function () {
+      it('weird characters', () => {
         testParse('_-%§$?+1Aa!€^', {
           name: null,
           args: [],
@@ -85,9 +85,9 @@ describe('RelationExpression', function () {
 
     });
 
-    describe('nested relations', function () {
+    describe('nested relations', () => {
 
-      it('one level', function () {
+      it('one level', () => {
         testParse('a.b', {
           name: null,
           args: [],
@@ -110,7 +110,7 @@ describe('RelationExpression', function () {
         });
       });
 
-      it('two levels', function () {
+      it('two levels', () => {
         testParse('a.b.c', {
           name: null,
           args: [],
@@ -142,7 +142,7 @@ describe('RelationExpression', function () {
 
     });
 
-    it('multiple relations', function () {
+    it('multiple relations', () => {
       testParse('[a, b, c]', {
         name: null,
         args: [],
@@ -170,7 +170,7 @@ describe('RelationExpression', function () {
       });
     });
 
-    it('multiple nested relations', function () {
+    it('multiple nested relations', () => {
       testParse('[a.b, c.d.e, f]', {
         name: null,
         args: [],
@@ -219,7 +219,7 @@ describe('RelationExpression', function () {
       });
     });
 
-    it('deep nesting and nested lists', function () {
+    it('deep nesting and nested lists', () => {
       testParse('[a.[b, c.[d, e.f]], g]', {
         name: null,
         args: [],
@@ -274,7 +274,7 @@ describe('RelationExpression', function () {
       });
     });
 
-    it('arguments', function () {
+    it('arguments', () => {
       testParse('[a(arg1,arg2,arg3), b(arg4) . [c(), d(arg5 arg6), e]]', {
         name: null,
         args: [],
@@ -315,7 +315,7 @@ describe('RelationExpression', function () {
       });
     });
 
-    it('should ignore whitespace', function () {
+    it('should ignore whitespace', () => {
       testParse('\n\r\t  [ a (\narg1\n  arg2,arg3), \n \n b\n(arg4) . [c(), \td (arg5 arg6), e] \r] ', {
         name: null,
         args: [],
@@ -356,7 +356,7 @@ describe('RelationExpression', function () {
       });
     });
 
-    it('should fail gracefully on invalid input', function () {
+    it('should fail gracefully on invalid input', () => {
       testParseFail('.');
       testParseFail('..');
       testParseFail('a.');
@@ -375,9 +375,9 @@ describe('RelationExpression', function () {
 
   });
 
-  describe('#nodesAtPath', function () {
+  describe('#nodesAtPath', () => {
 
-    it('a from a', function () {
+    it('a from a', () => {
       testPath('a', 'a', [{
         name: 'a',
         args: [],
@@ -386,7 +386,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('a from a.a', function () {
+    it('a from a.a', () => {
       testPath('a.b', 'a', [{
         name: 'a',
         args: [],
@@ -402,11 +402,11 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('a.b from a', function () {
+    it('a.b from a', () => {
       testPath('a', 'a.b', []);
     });
 
-    it('a.b from a.b', function () {
+    it('a.b from a.b', () => {
       testPath('a.b', 'a.b', [{
         name: 'b',
         args: [],
@@ -415,7 +415,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('a.b from a.[b, c]', function () {
+    it('a.b from a.[b, c]', () => {
       testPath('a.[b, c]', 'a.b', [{
         name: 'b',
         args: [],
@@ -424,7 +424,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('a.[b, c] from a.[b, c]', function () {
+    it('a.[b, c] from a.[b, c]', () => {
       testPath('a.[b, c]', 'a.[b, c]', [{
         name: 'b',
         args: [],
@@ -438,7 +438,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('a.[b, d] from a.[b, c]', function () {
+    it('a.[b, d] from a.[b, c]', () => {
       testPath('a.[b, c]', 'a.[b, d]', [{
         name: 'b',
         args: [],
@@ -447,7 +447,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('[a, b.c.d.[e, f]] from [a, b.[g, c.[d.[e, f], i], h]]', function () {
+    it('[a, b.c.d.[e, f]] from [a, b.[g, c.[d.[e, f], i], h]]', () => {
       testPath('[a, b.[g, c.[d.[e, f], i], h]]', '[a, b.c.d.[e, f]]', [{
         name: 'a',
         args: [],
@@ -466,7 +466,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('b.c.d.[e, f] from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', function () {
+    it('b.c.d.[e, f] from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', () => {
       testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d.[e, f]', [{
         name: 'e',
         args: ['a1'],
@@ -480,7 +480,7 @@ describe('RelationExpression', function () {
       }]);
     });
 
-    it('b.c.d from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', function () {
+    it('b.c.d from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', () => {
       testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d', [{
         name: 'd',
         args: [],
@@ -504,7 +504,7 @@ describe('RelationExpression', function () {
 
   });
 
-  describe('#merge', function () {
+  describe('#merge', () => {
     testMerge('a', 'b', '[a, b]');
     testMerge('a.b', 'b', '[a.b, b]');
     testMerge('a', 'b.c', '[a, b.c]');
@@ -518,7 +518,7 @@ describe('RelationExpression', function () {
     testMerge('a.a', 'a.^', 'a.^')
   });
 
-  describe('#toString', function () {
+  describe('#toString', () => {
     testToString('a');
     testToString('a.b');
     testToString('a.[b, c]');
@@ -531,7 +531,7 @@ describe('RelationExpression', function () {
     testToString('[a.*, b.c.^]');
   });
 
-  describe('#isSubExpression', function () {
+  describe('#isSubExpression', () => {
     testSubExpression('*', 'a');
     testSubExpression('*', '[a, b]');
     testSubExpression('*', 'a.b');
@@ -642,7 +642,7 @@ describe('RelationExpression', function () {
   }
 
   function testMerge(str1, str2, parsed) {
-    it(str1 + " + " + str2 + " --> " + parsed, function () {
+    it(str1 + " + " + str2 + " --> " + parsed, () => {
       expect(RelationExpression.parse(str1).merge(str2).toString()).to.equal(parsed);
       expect(RelationExpression.parse(str1).merge(RelationExpression.parse(str2)).toString()).to.equal(parsed);
     });
@@ -653,27 +653,27 @@ describe('RelationExpression', function () {
   }
 
   function testToString(str) {
-    it(str, function () {
+    it(str, () => {
       expect(RelationExpression.parse(str).toString()).to.equal(str);
     });
   }
 
   function testParseFail(str) {
-    expect(function () {
+    expect(() => {
       RelationExpression.parse(str);
-    }).to.throwException(function (err) {
+    }).to.throwException(err => {
       expect(err).to.be.a(ValidationError);
     });
   }
 
   function testSubExpression(str, subStr) {
-    it('"' + subStr + '" is a sub expression of "' + str + '"', function () {
+    it('"' + subStr + '" is a sub expression of "' + str + '"', () => {
       expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(true);
     });
   }
 
   function testNotSubExpression(str, subStr) {
-    it('"' + subStr + '" is not a sub expression of "' + str + '"', function () {
+    it('"' + subStr + '" is not a sub expression of "' + str + '"', () => {
       expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(false);
     });
   }

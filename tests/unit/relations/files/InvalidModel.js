@@ -1,3 +1,5 @@
-module.exports = function InvalidModel() {
+'use strict';
+
+module.exports = class InvalidModel {
 
 };

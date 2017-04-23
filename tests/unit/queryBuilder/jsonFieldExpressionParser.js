@@ -1,10 +1,10 @@
 'use strict';
 
-var _ = require('lodash')
+const _ = require('lodash')
   , expect = require('expect.js')
   , parser = require('../../../lib/queryBuilder/parsers/jsonFieldExpressionParser.js');
 
-describe('jsonFieldExpressionParser', function () {
+describe('jsonFieldExpressionParser', () => {
 
   // basic index and field references
   testParsing("col:[1]", ['col', 1]);
@@ -101,31 +101,31 @@ describe('jsonFieldExpressionParser', function () {
   testFail('col:field["fa"]il"]');
   testFail("col:field['fa']il']");
 
-  describe("field expression parser's general options", function () {
-    it("should fail if wrong start rule in parser options", function () {
-      expect(function () {
+  describe("field expression parser's general options", () => {
+    it("should fail if wrong start rule in parser options", () => {
+      expect(() => {
         parser.parse('col', { startRule: 'undefined is not a function' })
       }).to.throwException();
     });
 
-    it("should be able to give start rule as parameter", function () {
-      var result = parser.parse('col', { startRule: 'start' });
+    it("should be able to give start rule as parameter", () => {
+      let result = parser.parse('col', { startRule: 'start' });
       expect(result.columnName).to.be('col');
     });
   });
 });
 
 function testParsing(expr, expected) {
-  it(expr, function () {
-    var result = parser.parse(expr);
-    var resultArray = [result.columnName].concat(_.map(result.access, 'ref'));
+  it(expr, () => {
+    let result = parser.parse(expr);
+    let resultArray = [result.columnName].concat(_.map(result.access, 'ref'));
     expect(JSON.stringify(resultArray)).to.eql(JSON.stringify(expected));
   });
 }
 
 function testFail(expr) {
-  it(expr + " should fail", function () {
-    expect(function () {
+  it(expr + " should fail", () => {
+    expect(() => {
       parser.parse(expr);
     }).to.throwException();
   });

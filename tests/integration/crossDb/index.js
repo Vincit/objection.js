@@ -1,7 +1,9 @@
-var knexUtils = require('../../../lib/utils/knexUtils');
+'use strict';
 
-module.exports = function (session) {
-  describe('cross db', function () {
+const knexUtils = require('../../../lib/utils/knexUtils');
+
+module.exports = (session) => {
+  describe('cross db', () => {
     if (knexUtils.isMySql(session.knex)) {
       require('./mysql')(session);
     }

@@ -1,15 +1,17 @@
-var expect = require('expect.js');
-var KnexQueryBuilder = require('knex/lib/query/builder');
-var KnexRaw = require('knex/lib/raw');
-var Knex = require('knex');
+'use strict';
 
-var modelFactory = require('../../../lib/model/modelFactory');
-var ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
-var QueryBuilderBase = require('../../../').QueryBuilderBase;
-var Model = require('../../../').Model;
-var ref = require('../../../').ref;
+const expect = require('expect.js');
+const KnexQueryBuilder = require('knex/lib/query/builder');
+const KnexRaw = require('knex/lib/raw');
+const Knex = require('knex');
 
-describe('modelFactory', function () {
+const modelFactory = require('../../../lib/model/modelFactory');
+const ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
+const QueryBuilderBase = require('../../../').QueryBuilderBase;
+const Model = require('../../../').Model;
+const ref = require('../../../').ref;
+
+describe('modelFactory', () => {
 
   function Person() {}
   Model.extend(Person);
@@ -39,12 +41,12 @@ describe('modelFactory', function () {
     }
   };
 
-  describe('fromJson', function () {
-    var fromJson = modelFactory.fromJson;
-    var knex = Knex({client: 'pg'});
+  describe('fromJson', () => {
+    let fromJson = modelFactory.fromJson;
+    let knex = Knex({client: 'pg'});
 
-    it('should split json into models and query props (deep)', function () {
-      var json = {
+    it('should split json into models and query props (deep)', () => {
+      let json = {
         name: 'Person 1',
         test1: new QueryBuilderBase(knex),
 
@@ -62,14 +64,14 @@ describe('modelFactory', function () {
         }
       };
 
-      var result = fromJson({
+      let result = fromJson({
         modelClass: Person,
         json: json,
         deep: true
       });
 
-      var model = result.model;
-      var queryProps = result.queryProps;
+      let model = result.model;
+      let queryProps = result.queryProps;
 
       expect(model).to.eql({
         name: 'Person 1',
@@ -89,13 +91,13 @@ describe('modelFactory', function () {
     });
   });
 
-  describe('toDatabaseJson', function () {
-    var fromJson = modelFactory.fromJson;
-    var toDatabaseJson = modelFactory.toDatabaseJson;
-    var knex = Knex({client: 'pg'});
+  describe('toDatabaseJson', () => {
+    let fromJson = modelFactory.fromJson;
+    let toDatabaseJson = modelFactory.toDatabaseJson;
+    let knex = Knex({client: 'pg'});
 
-    it('should merge a model and query props and produce a database json object', function () {
-      var json = {
+    it('should merge a model and query props and produce a database json object', () => {
+      let json = {
         name: 'Person 1',
         test1: new QueryBuilderBase(knex),
 
@@ -113,13 +115,13 @@ describe('modelFactory', function () {
         }
       };
 
-      var res = fromJson({
+      let res = fromJson({
         modelClass: Person,
         json: json,
         deep: true
       });
 
-      var result = toDatabaseJson({
+      let result = toDatabaseJson({
         model: res.model.parent,
         queryProps: res.queryProps
       });
