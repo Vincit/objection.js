@@ -1,7 +1,5 @@
 var expect = require('expect.js');
 
-require('source-map-support').install();
-
 describe('main module', function () {
 
   it('should be able to load using require', function () {
