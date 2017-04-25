@@ -182,26 +182,6 @@ class MinimalModel extends Model {
 module.exports = MinimalModel;
 ```
 
-> ES5:
-
-```js
-var Model = require('objection').Model;
-
-function MinimalModel() {
-  Model.apply(this, arguments);
-}
-
-// Inherit `Model`. This does the basic prototype inheritance but also
-// inherits all the static methods and properties like `Model.query()`
-// and `Model.fromJson()`. This is consistent with ES6 class inheritance.
-Model.extend(MinimalModel);
-
-// After the js class boilerplate, all you need to do is set the table name.
-MinimalModel.tableName = 'SomeTableName';
-
-module.exports = MinimalModel;
-```
-
 > ESNext:
 
 ```js
@@ -315,111 +295,6 @@ class Person extends Model {
     };
   }
 }
-```
-
-> ES5:
-
-```js
-function Person() {
-  Model.apply(this, arguments);
-}
-
-Model.extend(Person);
-module.exports = Person;
-
-// Table name is the only required property.
-Person.tableName = 'Person';
-
-// Custom method.
-Person.prototype.fullName = function () {
-  return this.firstName + ' ' + this.lastName;
-};
-
-// Optional JSON schema. This is not the database schema!
-// Nothing is generated based on this. This is only used
-// for validation. Whenever a model instance is created
-// it is checked against this schema.
-// http://json-schema.org/.
-Person.jsonSchema = {
-  type: 'object',
-  required: ['firstName', 'lastName'],
-
-  properties: {
-    id: {type: 'integer'},
-    parentId: {type: ['integer', 'null']},
-    firstName: {type: 'string', minLength: 1, maxLength: 255},
-    lastName: {type: 'string', minLength: 1, maxLength: 255},
-    age: {type: 'number'},
-
-    // Properties defined as objects or arrays are
-    // automatically converted to JSON strings when
-    // writing to database and back to objects and arrays
-    // when reading from database. To override this
-    // behaviour, you can override the
-    // Person.jsonAttributes property.
-    address: {
-      type: 'object',
-      properties: {
-        street: {type: 'string'},
-        city: {type: 'string'},
-        zipCode: {type: 'string'}
-      }
-    }
-  }
-};
-
-// This object defines the relations to other models.
-Person.relationMappings = {
-  pets: {
-    relation: Model.HasManyRelation,
-    // The related model. This can be either a Model
-    // subclass constructor or an absolute file path
-    // to a module that exports one. We use the file
-    // path version in this example to prevent require
-    // loops.
-    modelClass: __dirname + '/Animal',
-    join: {
-      from: 'Person.id',
-      to: 'Animal.ownerId'
-    }
-  },
-
-  movies: {
-    relation: Model.ManyToManyRelation,
-    modelClass: __dirname + '/Movie',
-    join: {
-      from: 'Person.id',
-      // ManyToMany relation needs the `through` object
-      // to describe the join table.
-      through: {
-        // If you have a model class for the join table
-        // you need to specify it like this:
-        // modelClass: PersonMovie,
-        from: 'Person_Movie.personId',
-        to: 'Person_Movie.movieId'
-      },
-      to: 'Movie.id'
-    }
-  },
-
-  children: {
-    relation: Model.HasManyRelation,
-    modelClass: Person,
-    join: {
-      from: 'Person.id',
-      to: 'Person.parentId'
-    }
-  },
-
-  parent: {
-    relation: Model.BelongsToOneRelation,
-    modelClass: Person,
-    join: {
-      from: 'Person.parentId',
-      to: 'Person.id'
-    }
-  }
-};
 ```
 
 > ESNext:
@@ -965,9 +840,6 @@ Person
     // Only select pets older than 10 years old for children.
     builder.where('age', '>', 10);
   })
-  .then(function () {
-
-  });
 ```
 
 > Relations can also be filtered using named filters like this:
@@ -1156,7 +1028,7 @@ objection.transaction(Person, Animal, (Person, Animal) => {
   return Person
     .query()
     .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-    .then(function () {
+    .then(() => {
       return Animal
         .query()
         .insert({name: 'Scrappy'});
@@ -1198,8 +1070,8 @@ objection.transaction(Person, Person => {
 > that is not bound to the transaction:
 
 ```js
-var Person = require('./models/Person');
-var Animal = require('./models/Animal');
+const Person = require('./models/Person');
+const Animal = require('./models/Animal');
 
 objection.transaction(Person, Person => {
 
@@ -1290,7 +1162,7 @@ objection.transaction.start(Person.knex()).then(transaction => {
   return jennifer
     .$relatedQuery('pets')
     .insert({name: 'Fluffy'});
-}).then(function () {
+}).then(() => {
   return Movie
     .bindTransaction(trx)
     .query()
@@ -1298,7 +1170,7 @@ objection.transaction.start(Person.knex()).then(transaction => {
 }).then(movies => {
   console.log(movies);
   return trx.commit();
-}).catch(function () {
+}).catch(() => {
   return trx.rollback();
 });
 ```
@@ -1320,7 +1192,7 @@ objection.transaction.start(Person.knex()).then(transaction => {
   return jennifer
     .$relatedQuery('pets', trx)
     .insert({name: 'Fluffy'});
-}).then(function () {
+}).then(() => {
   // This is equivalent to `.query(trx)`
   return Movie
     .query()
@@ -1329,7 +1201,7 @@ objection.transaction.start(Person.knex()).then(transaction => {
 }).then(movies => {
   console.log(movies);
   return trx.commit();
-}).catch(function () {
+}).catch(() => {
   return trx.rollback();
 });
 ```
@@ -1337,7 +1209,7 @@ objection.transaction.start(Person.knex()).then(transaction => {
 > This becomes _a lot_ prettier using modern javascript:
 
 ```js
-let trx = await transaction.start(Person.knex());
+const trx = await transaction.start(Person.knex());
 
 try {
   let jennifer = await Person
@@ -1384,14 +1256,14 @@ objection.transaction.start(Person).then(transaction => {
   return jennifer
     .$relatedQuery('pets')
     .insert({name: 'Fluffy'});
-}).then(function () {
+}).then(() => {
   return BoundMovie
     .query()
     .where('name', 'ilike', '%forrest%');
 }).then(movies => {
   console.log(movies);
   return BoundPerson.knex().commit();
-}).catch(function () {
+}).catch(() => {
   return BoundPerson.knex().rollback();
 });
 ```

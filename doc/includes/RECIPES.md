@@ -26,12 +26,6 @@ class Person extends Model {
 }
 ```
 
-> ES5:
-
-```js
-Person.idColumn = 'person_id';
-```
-
 Name of the identifier column can be changed by setting the static [`idColumn`](#idcolumn) property of a model class.
 Composite key can be defined by using an array of column names.
 
@@ -53,22 +47,6 @@ class Person extends Model {
     }
   }
 }
-```
-
-> ES5:
-
-```js
-Person.prototype.$beforeInsert = function () {
-  if (this.id) {
-    throw new objection.ValidationError({
-      id: [{
-        message: 'identifier should not be defined before insert'
-        keyword: null,
-        params: null
-      }]
-    });
-  }
-};
 ```
 
 > Modifying the [Ajv](https://github.com/epoberezkin/ajv) based `jsonSchema` validation:
@@ -187,30 +165,6 @@ class Person extends Model {
     return super.$parseDatabaseJson(json);
   }
 }
-```
-
-> ES5:
-
-```js
-// This is called when an object is serialized to database format.
-Person.prototype.$formatDatabaseJson = function (json) {
-  // Call superclass implementation.
-  json = Model.prototype.$formatDatabaseJson.call(this, json);
-
-  return _.mapKeys(json, function (value, key) {
-    return _.snakeCase(key);
-  });
-};
-
-// This is called when an object is read from database.
-Person.prototype.$parseDatabaseJson = function (json) {
-  json = _.mapKeys(json, function (value, key) {
-    return _.camelCase(key);
-  });
-
-  // Call superclass implementation.
-  return Model.prototype.$parseDatabaseJson.call(this, json);
-};
 ```
 
 > Note that even though column names are mapped when fetching / storing data, one still has to use
@@ -424,18 +378,6 @@ class Person extends Model {
 }
 ```
 
-> ES5:
-
-```js
-Person.prototype.$beforeInsert = function () {
-  this.created_at = new Date().toISOString();
-};
-
-Person.prototype.$beforeUpdate = function () {
-  this.updated_at = new Date().toISOString();
-};
-```
-
 You can implement the `$beforeInsert` and `$beforeUpdate` methods to set the timestamps. If you want to do this for all
 your models, you can simply create common base class that implements these methods.
 
@@ -454,32 +396,6 @@ class MyQueryBuilder extends QueryBuilder {
     }
   }
 }
-
-// Instance of this is created when you call `query()` or `$query()`.
-Person.QueryBuilder = MyQueryBuilder;
-// Instance of this is created when you call `$relatedQuery()`.
-Person.RelatedQueryBuilder = MyQueryBuilder;
-```
-
-> ES5:
-
-```js
-var QueryBuilder = require('objection').QueryBuilder;
-
-function MyQueryBuilder() {
-  QueryBuilder.apply(this, arguments);
-}
-
-QueryBuilder.extend(MyQueryBuilder);
-
-// Some custom method.
-MyQueryBuilder.prototype.upsert = function (model) {
-  if (model.id) {
-    return this.update(model).where('id', model.id);
-  } else {
-    return this.insert(model);
-  }
-};
 
 // Instance of this is created when you call `query()` or `$query()`.
 Person.QueryBuilder = MyQueryBuilder;
