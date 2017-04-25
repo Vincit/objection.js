@@ -5,10 +5,9 @@
   "main": "lib/objection.js",
   "license": "MIT",
   "scripts": {
-    "test": "istanbul --config=.istanbul.yml cover _mocha -- --slow 10 --timeout 15000 --reporter spec --recursive tests",
+    "test": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
     "test-travis": "istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests",
     "test-bail": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
-    "test-only": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
     "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining",
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",

@@ -1225,6 +1225,10 @@ describe('QueryBuilder', () => {
     });
 
     it("should use correct query builders", done => {
+      class M1QueryBuilder extends QueryBuilder {}
+      class M2QueryBuilder extends QueryBuilder {}
+      class M3QueryBuilder extends QueryBuilder {}
+
       class M1 extends Model {
         static get tableName() {
           return 'M1';
@@ -1241,6 +1245,10 @@ describe('QueryBuilder', () => {
               }
             }
           };
+        }
+
+        static get QueryBuilder() {
+          return M1QueryBuilder;
         }
       }
 
@@ -1261,28 +1269,25 @@ describe('QueryBuilder', () => {
             }
           };
         }
+
+        static get QueryBuilder() {
+          return M2QueryBuilder;
+        }
       }
 
       class M3 extends Model {
         static get tableName() {
           return 'M3';
         }
+
+        static get QueryBuilder() {
+          return M3QueryBuilder;
+        }
       }
 
       M1.knex(mockKnex);
       M2.knex(mockKnex);
       M3.knex(mockKnex);
-
-      class M1RelatedBuilder extends QueryBuilder {
-
-      }
-
-      class M2RelatedBuilder extends QueryBuilder {
-
-      }
-
-      M1.RelatedQueryBuilder = M1RelatedBuilder;
-      M2.RelatedQueryBuilder = M2RelatedBuilder;
 
       mockKnexQueryResults = [
         [{id: 1, m1Id: 2, m3Id: 3}],
@@ -1297,10 +1302,10 @@ describe('QueryBuilder', () => {
         .forClass(M1)
         .eager('m2.m3')
         .filterEager('m2', builder => {
-          filter1Check = builder instanceof M1RelatedBuilder;
+          filter1Check = builder instanceof M2QueryBuilder;
         })
         .filterEager('m2.m3', builder => {
-          filter2Check = builder instanceof M2RelatedBuilder;
+          filter2Check = builder instanceof M3QueryBuilder;
         })
         .then(() => {
           expect(executedQueries).to.eql([

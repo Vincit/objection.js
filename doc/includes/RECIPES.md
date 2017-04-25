@@ -397,10 +397,11 @@ class MyQueryBuilder extends QueryBuilder {
   }
 }
 
-// Instance of this is created when you call `query()` or `$query()`.
-Person.QueryBuilder = MyQueryBuilder;
-// Instance of this is created when you call `$relatedQuery()`.
-Person.RelatedQueryBuilder = MyQueryBuilder;
+class Person extends Model {
+  static get QueryBuilder() {
+    return MyQueryBuilder;
+  }
+}
 ```
 
 > Now you can do this:
@@ -412,8 +413,7 @@ Person.query().upsert(person).then(() => {
 ```
 
 You can extend the [`QueryBuilder`](#querybuilder) returned by [`Model.query()`](#query), [`modelInstance.$relatedQuery()`](#_s_relatedquery)
-and [`modelInstance.$query()`](#_s_query) methods by setting the model class's static [`QueryBuilder`](#querybuilder) and/or
-[`RelatedQueryBuilder`](#relatedquerybuilder) property.
+and [`modelInstance.$query()`](#_s_query) methods by setting the model class's static [`QueryBuilder`](#querybuilder).
 
 If you want to set the custom query builder for all model classes you can just set the `QueryBuilder`
 property of the [`Model`](#model) base class. A cleaner option would be to create your own Model subclass, set its [`QueryBuilder`](#querybuilder)

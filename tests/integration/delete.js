@@ -5,8 +5,8 @@ const expect = require('expect.js');
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 
 module.exports = (session) => {
-  let Model1 = session.models.Model1;
-  let Model2 = session.models.Model2;
+  const Model1 = session.models.Model1;
+  const Model2 = session.models.Model2;
 
   describe('Model delete queries', () => {
 

@@ -1236,53 +1236,29 @@ describe('Model', () => {
   });
 
   it('should use Model.QueryBuilder to create `query()` and `$query()`', () => {
-    class MyQueryBuilder extends QueryBuilder {
+    class MyQueryBuilder1 extends QueryBuilder {}
+    class MyQueryBuilder2 extends QueryBuilder {}
 
-    }
+    const Model1 = modelClass('Model1');
+    const Model2 = modelClass('Model2');
 
-    let Model = modelClass('Model');
-
-    Model.relationMappings = {
+    Model1.relationMappings = {
       someRelation: {
         relation: Model.HasManyRelation,
-        modelClass: Model,
+        modelClass: Model2,
         join: {
-          from: 'Model.id',
-          to: 'Model.someId'
+          from: 'Model1.id',
+          to: 'Model2.someId'
         }
       }
     };
 
-    Model.QueryBuilder = MyQueryBuilder;
+    Model1.QueryBuilder = MyQueryBuilder1;
+    Model2.QueryBuilder = MyQueryBuilder2;
 
-    expect(Model.query()).to.be.a(MyQueryBuilder);
-    expect(Model.fromJson({}).$query()).to.be.a(MyQueryBuilder);
-    expect(Model.fromJson({}).$relatedQuery('someRelation')).to.not.be.a(MyQueryBuilder);
-  });
-
-  it('should use Model.RelatedQueryBuilder to create `$relatedQuery()`', () => {
-    class MyQueryBuilder extends QueryBuilder {
-
-    }
-
-    let Model = modelClass('Model');
-
-    Model.relationMappings = {
-      someRelation: {
-        relation: Model.HasManyRelation,
-        modelClass: Model,
-        join: {
-          from: 'Model.id',
-          to: 'Model.someId'
-        }
-      }
-    };
-
-    Model.RelatedQueryBuilder = MyQueryBuilder;
-
-    expect(Model.query()).to.not.be.a(MyQueryBuilder);
-    expect(Model.fromJson({}).$query()).to.not.be.a(MyQueryBuilder);
-    expect(Model.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder);
+    expect(Model1.query()).to.be.a(MyQueryBuilder1);
+    expect(Model1.fromJson({}).$query()).to.be.a(MyQueryBuilder1);
+    expect(Model1.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder2);
   });
 
   describe('traverse() and $traverse()', () => {

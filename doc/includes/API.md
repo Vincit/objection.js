@@ -4660,34 +4660,6 @@ You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
 
 
 
-#### RelatedQueryBuilder
-
-```js
-class Person extends Model {
-  static get RelatedQueryBuilder() {
-    return MyCustomQueryBuilder;
-  }
-}
-```
-
-> ESNext:
-
-```js
-class Person extends Model {
-  static RelatedQueryBuilder = MyCustomQueryBuilder;
-}
-```
-
-[`QueryBuilder`](#querybuilder) subclass to use in [`$relatedQuery`](#_s_relatedquery) method.
-
-This constructor is used whenever a query builder is created using the [`$relatedQuery`](#_s_relatedquery)  method.
-You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
-
-[Usage example](#custom-query-builder).
-
-
-
-
 
 ### Static methods
 
