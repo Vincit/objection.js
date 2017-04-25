@@ -930,8 +930,10 @@ describe('Model', () => {
     expect(Model1.getRelation('relation1').relatedModelClass).to.equal(Model2);
   });
 
-  it('if jsonSchema is given, should remove all but schema properties from database representation', () => {
+  it('if pickJsonSchemaProperties = true and jsonSchema is given, should remove all but schema properties from database representation', () => {
     let Model = modelClass('Model');
+
+    Model.pickJsonSchemaProperties = true;
 
     Model.jsonSchema = {
       type: 'object',
@@ -969,6 +971,7 @@ describe('Model', () => {
   });
 
   it('if pickJsonSchemaProperties = false, should select all properties even if jsonSchema is defined', () => {
+    // pickJsonSchemaProperties = false is the default.
     let Model = modelClass('Model');
 
     Model.jsonSchema = {
@@ -978,8 +981,6 @@ describe('Model', () => {
         prop2: {type: 'string'}
       }
     };
-
-    Model.pickJsonSchemaProperties = false;
 
     let model = Model.fromJson({
       prop1: 10,
