@@ -9,40 +9,6 @@ const ValidationError = require('../../../').ValidationError;
 
 describe('Model', () => {
 
-  describe('extend', () => {
-
-    it('should create a subclass', () => {
-      function Model1() {
-
-      }
-
-      Model.extend(Model1);
-
-      let model = new Model1();
-
-      expect(model).to.be.a(Model1);
-      expect(model).to.be.a(Model);
-    });
-
-    it('should create a subclass of subclass', () => {
-      function Model1() {
-
-      }
-      function Model2() {
-
-      }
-
-      Model.extend(Model1).extend(Model2);
-
-      let model = new Model2();
-
-      expect(model).to.be.a(Model2);
-      expect(model).to.be.a(Model1);
-      expect(model).to.be.a(Model);
-    });
-
-  });
-
   describe('fromJson', () => {
     let Model1;
 
@@ -1234,22 +1200,6 @@ describe('Model', () => {
     expect(sql).to.eql('SELECT * FROM "Model" where "id" = 10');
   });
 
-  it('knex instance is inherited from super classes', () => {
-    let Model1 = modelClass('Model');
-
-    function Model2() { Model1.apply(this, arguments); }
-    Model1.extend(Model2);
-
-    function Model3() { Model2.apply(this, arguments); }
-    Model2.extend(Model3);
-
-    let knexInstance = knex({client: 'pg'});
-    Model1.knex(knexInstance);
-
-    expect(Model2.knex()).to.equal(knexInstance);
-    expect(Model3.knex()).to.equal(knexInstance);
-  });
-
   it('ensureModel should return null for null input', () => {
     let Model = modelClass('Model');
     expect(Model.ensureModel(null)).to.equal(null);
@@ -1597,20 +1547,15 @@ describe('Model', () => {
   });
 
   function modelClass(tableName) {
-    function TestModel() {
-
+    return class TestModel extends Model {
+      static get tableName() {
+        return tableName;
+      }
     }
-    Model.extend(TestModel);
-    TestModel.tableName = tableName;
-    return TestModel;
   }
 
   function createModelClass(proto, staticStuff) {
-    function Model1() {
-
-    }
-
-    Model.extend(Model1);
+    class Model1 extends Model {}
 
     _.merge(Model1.prototype, proto);
     _.merge(Model1, staticStuff);

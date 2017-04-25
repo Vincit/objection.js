@@ -26,19 +26,21 @@ module.exports = (session) => {
     });
 
     before(() => {
-      TestModel = function TestModel() {
+      TestModel = class TestModel extends Model {
+        static get tableName() {
+          return 'generated_id_test';
+        }
 
+        static get idColumn() {
+          return 'idCol';
+        }
+
+        $beforeInsert() {
+          this.idCol = 'someRandomId';
+        }
       };
 
-      Model.extend(TestModel);
-
-      TestModel.tableName = 'generated_id_test';
-      TestModel.idColumn = 'idCol';
       TestModel.knex(session.knex);
-
-      TestModel.prototype.$beforeInsert = function () {
-        this.idCol = 'someRandomId';
-      };
     });
 
     it('should return the generated id when inserted', () => {
@@ -78,33 +80,33 @@ module.exports = (session) => {
     });
 
     before(() => {
-      Table1 = function TestModel() {
+      Table1 = class Table1 extends Model {
+        static get tableName() {
+          return 'table1';
+        }
 
+        static get relationMappings() {
+          return {
+            relation: {
+              relation: Model.HasManyRelation,
+              modelClass: Table2,
+              join: {
+                from: 'table1.value',
+                to: 'table2.value'
+              }
+            }
+          };
+        }
       };
 
-      Table2 = function TestModel() {
-
+      Table2 = class Table2 extends Model {
+        static get tableName() {
+          return 'table2';
+        }
       };
-
-      Model.extend(Table1);
-      Model.extend(Table2);
-
-      Table1.tableName = 'table1';
-      Table2.tableName = 'table2';
 
       Table1.knex(session.knex);
       Table2.knex(session.knex);
-
-      Table1.relationMappings = {
-        relation: {
-          relation: Model.HasManyRelation,
-          modelClass: Table2,
-          join: {
-            from: 'table1.value',
-            to: 'table2.value'
-          }
-        }
-      };
     });
 
     before(() => {
@@ -148,13 +150,12 @@ module.exports = (session) => {
       });
 
       before(() => {
-        TestModel = function TestModel() {
-
+        TestModel = class TestModel extends Model {
+          static get tableName() {
+            return 'mysql_binary_test';
+          }
         };
 
-        Model.extend(TestModel);
-
-        TestModel.tableName = 'mysql_binary_test';
         TestModel.knex(session.knex);
       });
 
@@ -204,13 +205,12 @@ module.exports = (session) => {
     });
 
     before(() => {
-      TestModel = function TestModel() {
-
+      TestModel = class TestModel extends Model {
+        static get tableName() {
+          return 'model_with_length_test';
+        }
       };
 
-      Model.extend(TestModel);
-
-      TestModel.tableName = 'model_with_length_test';
       TestModel.knex(session.knex);
     });
 
@@ -708,71 +708,71 @@ module.exports = (session) => {
   });
 
   describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', () => {
-    function A() {
-
-    }
-
-    Model.extend(A);
-    A.tableName = 'a';
-
-    function B() {
-
-    }
-
-    Model.extend(B);
-    B.tableName = 'b';
-
-    function C() {
-
-    }
-
-    Model.extend(C);
-    C.tableName = 'c';
-
-    function D() {
-
-    }
-
-    Model.extend(D);
-    D.tableName = 'd';
-
-    A.relationMappings = {
-      Bs: {
-        relation: Model.HasManyRelation,
-        modelClass: B,
-        join: {
-          from: 'a.id',
-          to: 'b.aId',
-        },
-      },
-    };
-
-    B.relationMappings = {
-      Cs: {
-        relation: Model.ManyToManyRelation,
-        modelClass: C,
-        join: {
-          from: 'b.id',
-          through: {
-            from: 'b_c.bId',
-            to: 'b_c.cId',
-          },
-          to: 'c.id',
-        },
-      },
-      Ds: {
-        relation: Model.ManyToManyRelation,
-        modelClass: D,
-        join: {
-          from: 'b.id',
-          through: {
-            from: 'b_d.bId',
-            to: 'b_d.dId',
-          },
-          to: 'd.id',
-        },
+    class A extends Model {
+      static get tableName() {
+        return 'a';
       }
-    };
+
+      static get relationMappings() {
+        return {
+          Bs: {
+            relation: Model.HasManyRelation,
+            modelClass: B,
+            join: {
+              from: 'a.id',
+              to: 'b.aId',
+            },
+          },
+        };
+      }
+    }
+
+    class B extends Model {
+      static get tableName() {
+        return 'b';
+      }
+
+      static get relationMappings() {
+        return {
+          Cs: {
+            relation: Model.ManyToManyRelation,
+            modelClass: C,
+            join: {
+              from: 'b.id',
+              through: {
+                from: 'b_c.bId',
+                to: 'b_c.cId',
+              },
+              to: 'c.id',
+            },
+          },
+          Ds: {
+            relation: Model.ManyToManyRelation,
+            modelClass: D,
+            join: {
+              from: 'b.id',
+              through: {
+                from: 'b_d.bId',
+                to: 'b_d.dId',
+              },
+              to: 'd.id',
+            },
+          }
+        };
+      }
+    }
+
+    class C extends Model {
+      static get tableName() {
+        return 'c';
+      }
+    }
+
+    class D extends Model {
+      static get tableName() {
+        return 'd';
+      }
+    }
 
     beforeEach(() => {
       return session.knex.schema
@@ -873,23 +873,24 @@ module.exports = (session) => {
     });
 
     before(() => {
-      TestModel = function TestModel() {
+      TestModel = class TestModel extends Model {
+        static get tableName() {
+          return 'default_values_note_set_test';
+        }
 
+        static get jsonSchema() {
+          return {
+            type: 'object',
+            properties: {
+              id: {type: 'integer'},
+              value1: {type: 'string', default: 'foo'},
+              value2: {type: 'string', default: 'bar'},
+            }
+          };
+        }
       };
 
-      Model.extend(TestModel);
-
-      TestModel.tableName = 'default_values_note_set_test';
       TestModel.knex(session.knex);
-
-      TestModel.jsonSchema = {
-        type: 'object',
-        properties: {
-          id: {type: 'integer'},
-          value1: {type: 'string', default: 'foo'},
-          value2: {type: 'string', default: 'bar'},
-        }
-      }
     });
 
     beforeEach(() => {

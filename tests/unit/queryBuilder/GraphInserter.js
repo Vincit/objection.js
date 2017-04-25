@@ -10,6 +10,7 @@ const _ = require('lodash')
   , RelationExpression = require('../../../').RelationExpression;
 
 describe('GraphInserter', () => {
+
   let mockKnexQueryResult = [];
   let executedQueries = [];
   let mockKnex = null;
@@ -35,102 +36,99 @@ describe('GraphInserter', () => {
   });
 
   beforeEach(() => {
-    Person = function Person() {
+    Person = class Person extends Model {
+      static get tableName() {
+        return 'Person';
+      }
 
-    };
-
-    Animal = function Animal() {
-
-    };
-
-    Movie = function Movie() {
-
-    };
-
-    Model.extend(Person);
-    Model.extend(Animal);
-    Model.extend(Movie);
-  });
-
-  beforeEach(() => {
-    Person.tableName = 'Person';
-
-    Person.relationMappings = {
-      pets: {
-        relation: Model.HasManyRelation,
-        modelClass: Animal,
-        join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
-        }
-      },
-
-      movies: {
-        relation: Model.ManyToManyRelation,
-        modelClass: Movie,
-        join: {
-          from: 'Person.id',
-          through: {
-            extra: ['role'],
-            from: 'Person_Movie.personId',
-            to: 'Person_Movie.movieId'
+      static get relationMappings() {
+        return {
+          pets: {
+            relation: Model.HasManyRelation,
+            modelClass: Animal,
+            join: {
+              from: 'Person.id',
+              to: 'Animal.ownerId'
+            }
           },
-          to: 'Movie.id'
-        }
-      },
 
-      children: {
-        relation: Model.HasManyRelation,
-        modelClass: Person,
-        join: {
-          from: 'Person.id',
-          to: 'Person.parentId'
-        }
-      },
-
-      parent: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Person,
-        join: {
-          from: 'Person.parentId',
-          to: 'Person.id'
-        }
-      }
-    };
-  });
-
-  beforeEach(() => {
-    Animal.tableName = 'Animal';
-
-    Animal.relationMappings = {
-      owner: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Person,
-        join: {
-          from: 'Animal.ownerId',
-          to: 'Person.id'
-        }
-      }
-    };
-  });
-
-  beforeEach(() => {
-    Movie.tableName = 'Movie';
-
-    Movie.relationMappings = {
-      actors: {
-        relation: Model.ManyToManyRelation,
-        modelClass: Person,
-        join: {
-          from: 'Movie.id',
-          through: {
-            from: 'Person_Movie.movieId',
-            to: 'Person_Movie.personId'
+          movies: {
+            relation: Model.ManyToManyRelation,
+            modelClass: Movie,
+            join: {
+              from: 'Person.id',
+              through: {
+                extra: ['role'],
+                from: 'Person_Movie.personId',
+                to: 'Person_Movie.movieId'
+              },
+              to: 'Movie.id'
+            }
           },
-          to: 'Person.id'
-        }
+
+          children: {
+            relation: Model.HasManyRelation,
+            modelClass: Person,
+            join: {
+              from: 'Person.id',
+              to: 'Person.parentId'
+            }
+          },
+
+          parent: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: Person,
+            join: {
+              from: 'Person.parentId',
+              to: 'Person.id'
+            }
+          }
+        };
       }
     };
+
+    Animal = class Animal extends Model {
+      static get tableName() {
+        return 'Animal';
+      }
+
+      static get relationMappings() {
+        return {
+          owner: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: Person,
+            join: {
+              from: 'Animal.ownerId',
+              to: 'Person.id'
+            }
+          }
+        };
+      }
+    };
+
+    Movie = class Movie extends Model {
+      static get tableName() {
+        return 'Movie';
+      }
+
+      static get relationMappings() {
+        return {
+          actors: {
+            relation: Model.ManyToManyRelation,
+            modelClass: Person,
+            join: {
+              from: 'Movie.id',
+              through: {
+                from: 'Person_Movie.movieId',
+                to: 'Person_Movie.personId'
+              },
+              to: 'Person.id'
+            }
+          }
+        };
+      }
+    };
+
   });
 
   it('one Person', () => {

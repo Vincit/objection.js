@@ -38,11 +38,12 @@ describe('QueryBuilder', () => {
     mockKnexQueryResultIndex = 0;
     executedQueries = [];
 
-    TestModel = Model.extend(function TestModel() {
+    TestModel = class TestModel extends Model {
+      static get tableName() {
+        return 'Model';
+      }
+    };
 
-    });
-
-    TestModel.tableName = 'Model';
     TestModel.knex(mockKnex);
   });
 
@@ -984,30 +985,33 @@ describe('QueryBuilder', () => {
   });
 
   it("joinRelation should add join clause to correct place", done => {
-    let M1 = Model.extend(function M1() {
-
-    });
-
-    M1.tableName = 'M1';
-    M1.knex(mockKnex);
-
-    let M2 = Model.extend(function M2() {
-
-    });
-
-    M2.tableName = 'M2';
-    M2.knex(mockKnex);
-
-    M2.relationMappings = {
-      m1: {
-        relation: Model.HasManyRelation,
-        modelClass: M1,
-        join: {
-          from: 'M2.id',
-          to: 'M1.m2Id'
-        }
+    class M1 extends Model {
+      static get tableName() {
+        return 'M1';
       }
-    };
+    }
+
+    class M2 extends Model {
+      static get tableName() {
+        return 'M2';
+      }
+
+      static get relationMappings() {
+        return {
+          m1: {
+            relation: Model.HasManyRelation,
+            modelClass: M1,
+            join: {
+              from: 'M2.id',
+              to: 'M1.m2Id'
+            }
+          }
+        };
+      }
+    }
+
+    M1.knex(mockKnex);
+    M2.knex(mockKnex);
 
     M2
       .query()
@@ -1113,12 +1117,11 @@ describe('QueryBuilder', () => {
   });
 
   it('all query builder methods should work if model is not bound to a knex, when the query is', () => {
-    function UnboundModel() {
-
+    class UnboundModel extends Model {
+      static get tableName() {
+        return 'Bar';
+      }
     }
-
-    Model.extend(UnboundModel);
-    UnboundModel.tableName = 'Bar';
 
     expect(UnboundModel.query(mockKnex).increment("foo", 10).toString()).to.equal('update "Bar" set "foo" = "foo" + 10');
     expect(UnboundModel.query(mockKnex).decrement("foo", 5).toString()).to.equal('update "Bar" set "foo" = "foo" - 5');
@@ -1222,48 +1225,53 @@ describe('QueryBuilder', () => {
     });
 
     it("should use correct query builders", done => {
-      let M1 = Model.extend(function M1() {
+      class M1 extends Model {
+        static get tableName() {
+          return 'M1';
+        }
 
-      });
+        static get relationMappings() {
+          return {
+            m2: {
+              relation: Model.HasManyRelation,
+              modelClass: M2,
+              join: {
+                from: 'M1.id',
+                to: 'M2.m1Id'
+              }
+            }
+          };
+        }
+      }
 
-      M1.tableName = 'M1';
+      class M2 extends Model {
+        static get tableName() {
+          return 'M2';
+        }
+
+        static get relationMappings() {
+          return {
+            m3: {
+              relation: Model.BelongsToOneRelation,
+              modelClass: M3,
+              join: {
+                from: 'M2.m3Id',
+                to: 'M3.id'
+              }
+            }
+          };
+        }
+      }
+
+      class M3 extends Model {
+        static get tableName() {
+          return 'M3';
+        }
+      }
+
       M1.knex(mockKnex);
-
-      let M2 = Model.extend(function M2() {
-
-      });
-
-      M2.tableName = 'M2';
       M2.knex(mockKnex);
-
-      let M3 = Model.extend(function M3() {
-
-      });
-
-      M3.tableName = 'M3';
       M3.knex(mockKnex);
-
-      M1.relationMappings = {
-        m2: {
-          relation: Model.HasManyRelation,
-          modelClass: M2,
-          join: {
-            from: 'M1.id',
-            to: 'M2.m1Id'
-          }
-        }
-      };
-
-      M2.relationMappings = {
-        m3: {
-          relation: Model.BelongsToOneRelation,
-          modelClass: M3,
-          join: {
-            from: 'M2.m3Id',
-            to: 'M3.id'
-          }
-        }
-      };
 
       class M1RelatedBuilder extends QueryBuilder {
 
@@ -1310,27 +1318,30 @@ describe('QueryBuilder', () => {
     });
 
     it("$afterGet should be called after relations have been fetched", done => {
-      let M1 = Model.extend(function M1() {
-
-      });
-
-      M1.prototype.$afterGet = function () {
-        this.ids = _.map(this.someRel, 'id');
-      };
-
-      M1.tableName = 'M1';
-      M1.knex(mockKnex);
-
-      M1.relationMappings = {
-        someRel: {
-          relation: Model.HasManyRelation,
-          modelClass: M1,
-          join: {
-            from: 'M1.id',
-            to: 'M1.m1Id'
-          }
+      class M1 extends Model {
+        static get tableName() {
+          return 'M1';
         }
-      };
+
+        $afterGet() {
+          this.ids = _.map(this.someRel, 'id');
+        }
+
+        static get relationMappings() {
+          return {
+            someRel: {
+              relation: Model.HasManyRelation,
+              modelClass: M1,
+              join: {
+                from: 'M1.id',
+                to: 'M1.m1Id'
+              }
+            }
+          };
+        }
+      }
+
+      M1.knex(mockKnex);
 
       mockKnexQueryResults = [
         [{id: 1}, {id: 2}],

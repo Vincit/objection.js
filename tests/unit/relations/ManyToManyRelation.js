@@ -40,25 +40,26 @@ describe('ManyToManyRelation', () => {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = Model.extend(function OwnerModel () {
+    OwnerModel = class OwnerModel extends Model {
+      static get tableName() {
+        return 'OwnerModel';
+      }
+    };
 
-    });
+    RelatedModel = class RelatedModel extends Model {
+      static get tableName() {
+        return 'RelatedModel';
+      }
+    };
 
-    RelatedModel = Model.extend(function RelatedModel () {
+    JoinModel = class JoinModel extends Model {
+      static get tableName() {
+        return 'JoinModel';
+      }
+    };
 
-    });
-
-    JoinModel = Model.extend(function JoinModel () {
-
-    });
-
-    OwnerModel.tableName = 'OwnerModel';
     OwnerModel.knex(mockKnex);
-
-    RelatedModel.tableName = 'RelatedModel';
     RelatedModel.knex(mockKnex);
-
-    JoinModel.tableName = 'JoinModel';
     JoinModel.knex(mockKnex);
   });
 

@@ -11,6 +11,7 @@ const _ = require('lodash')
   , BelongsToOneRelation = objection.BelongsToOneRelation;
 
 describe('BelongsToOneRelation', () => {
+
   let mockKnexQueryResults = [];
   let executedQueries = [];
   let mockKnex = null;
@@ -38,18 +39,19 @@ describe('BelongsToOneRelation', () => {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = Model.extend(function OwnerModel () {
+    OwnerModel = class extends Model {
+      static get tableName() {
+        return 'OwnerModel';
+      }
+    };
 
-    });
+    RelatedModel = class extends Model {
+      static get tableName() {
+        return 'RelatedModel';
+      }
+    };
 
-    RelatedModel = Model.extend(function RelatedModel () {
-
-    });
-
-    OwnerModel.tableName = 'OwnerModel';
     OwnerModel.knex(mockKnex);
-
-    RelatedModel.tableName = 'RelatedModel';
     RelatedModel.knex(mockKnex);
   });
 

@@ -16,22 +16,23 @@ function expectArraysEqual(arr1, arr2) {
 
 module.exports = (session) => {
 
-  function ModelJson() {
-
-  }
-  Model.extend(ModelJson);
-
-  ModelJson.tableName = 'ModelJson';
-
-  ModelJson.jsonSchema = {
-    type: 'object',
-    properties: {
-      id: { type: 'integer' },
-      name: { type: 'string' },
-      jsonObject: { type: 'object' },
-      jsonArray: { type: 'array' }
+  class ModelJson extends Model {
+    static get tableName() {
+      return 'ModelJson';
     }
-  };
+
+    static get jsonSchema() {
+      return {
+        type: 'object',
+        properties: {
+          id: { type: 'integer' },
+          name: { type: 'string' },
+          jsonObject: { type: 'object' },
+          jsonArray: { type: 'array' }
+        }
+      };
+    }
+  }
 
   let BoundModel = ModelJson.bindKnex(session.knex);
 

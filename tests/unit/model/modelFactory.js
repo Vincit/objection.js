@@ -13,33 +13,39 @@ const ref = require('../../../').ref;
 
 describe('modelFactory', () => {
 
-  function Person() {}
-  Model.extend(Person);
-  Person.tableName = 'Person';
-
-  function Animal() {}
-  Model.extend(Animal);
-  Animal.tableName = 'Animal';
-
-  Person.relationMappings = {
-    parent: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: Person,
-      join: {
-        from: 'Person.parentId',
-        to: 'Person.id'
-      }
-    },
-
-    pets: {
-      relation: Model.HasManyRelation,
-      modelClass: Animal,
-      join: {
-        from: 'Person.id',
-        to: 'Animal.ownerId'
-      }
+  class Person extends Model {
+    static get tableName() {
+      return 'Person';
     }
-  };
+
+    static get relationMappings() {
+      return {
+        parent: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Person,
+          join: {
+            from: 'Person.parentId',
+            to: 'Person.id'
+          }
+        },
+
+        pets: {
+          relation: Model.HasManyRelation,
+          modelClass: Animal,
+          join: {
+            from: 'Person.id',
+            to: 'Animal.ownerId'
+          }
+        }
+      };
+    }
+  }
+
+  class Animal extends Model {
+    static get tableName() {
+      return 'Animal';
+    }
+  }
 
   describe('fromJson', () => {
     let fromJson = modelFactory.fromJson;

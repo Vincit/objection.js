@@ -38,18 +38,19 @@ describe('HasManyRelation', () => {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = Model.extend(function OwnerModel () {
+    OwnerModel = class extends Model {
+      static get tableName() {
+        return 'OwnerModel';
+      }
+    };
 
-    });
+    RelatedModel = class extends Model {
+      static get tableName() {
+        return 'RelatedModel';
+      }
+    };
 
-    RelatedModel = Model.extend(function RelatedModel () {
-
-    });
-
-    OwnerModel.tableName = 'OwnerModel';
     OwnerModel.knex(mockKnex);
-
-    RelatedModel.tableName = 'RelatedModel';
     RelatedModel.knex(mockKnex);
   });
 
