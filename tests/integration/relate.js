@@ -9,22 +9,6 @@ module.exports = (session) => {
 
   describe('Model relate queries', () => {
 
-    describe('.query()', () => {
-
-      it('should reject the query because relate makes no sense in this context', done => {
-        Model1
-          .query()
-          .relate(1)
-          .then(() => {
-            done(new Error('should not get here'));
-          })
-          .catch(() => {
-            done();
-          });
-      });
-
-    });
-
     describe('.$query()', () => {
 
       it('should reject the query because relate makes no sense in this context', done => {

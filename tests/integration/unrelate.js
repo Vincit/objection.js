@@ -9,22 +9,6 @@ module.exports = (session) => {
 
   describe('Model unrelate queries', () => {
 
-    describe('.query()', () => {
-
-      it('should reject the query', done => {
-        Model1
-          .query()
-          .unrelate()
-          .then(() => {
-            done(new Error('should not get here'));
-          })
-          .catch(() => {
-            done();
-          });
-      });
-
-    });
-
     describe('.$query()', () => {
 
       it('should reject the query', done => {
