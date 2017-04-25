@@ -44,21 +44,9 @@ describe('Performance tests', function () {
   });
 
   before(function () {
-    Person = function Person() {
-      Model.apply(this, arguments);
-    };
-
-    Animal = function Animal() {
-      Model.apply(this, arguments);
-    };
-
-    Movie = function Movie() {
-      Model.apply(this, arguments);
-    };
-
-    Model.extend(Person);
-    Model.extend(Animal);
-    Model.extend(Movie);
+    Person = class Person extends Model {}
+    Animal = class Animal extends Model {}
+    Movie = class Movie extends Model {}
   });
 
   before(function () {

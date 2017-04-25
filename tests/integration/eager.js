@@ -8,8 +8,8 @@ const mockKnexFactory = require('../../testUtils/mockKnex');
 const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 
 module.exports = (session) => {
-  let Model1 = session.models.Model1;
-  let Model2 = session.models.Model2;
+  const Model1 = session.models.Model1;
+  const Model2 = session.models.Model2;
 
   describe('Model eager queries', () => {
 
@@ -90,7 +90,7 @@ module.exports = (session) => {
           model1Prop1: 'hello 2',
           model1Prop2: null,
           $afterGetCalled: 1
-        },
+        }
       }]);
 
       expect(models[0]).to.be.a(Model1);
@@ -117,7 +117,7 @@ module.exports = (session) => {
             model1Prop2: null,
             $afterGetCalled : 1
           }
-        },
+        }
       }]);
     });
 
@@ -140,8 +140,8 @@ module.exports = (session) => {
             model1Prop1: 'hello 1',
             model1Prop2: null,
             $afterGetCalled: 1
-          },
-        },
+          }
+        }
       }]);
     });
 
@@ -170,9 +170,9 @@ module.exports = (session) => {
               model1Prop1: 'hello 4',
               model1Prop2: null,
               $afterGetCalled: 1,
-              model1Relation1: null,
-            },
-          },
+              model1Relation1: null
+            }
+          }
         }
       }]);
     }, {disableJoin: true});
@@ -195,8 +195,8 @@ module.exports = (session) => {
             model1Id: 4,
             model1Prop1: 'hello 3',
             model1Prop2: null,
-            $afterGetCalled: 1,
-          },
+            $afterGetCalled: 1
+          }
         }
       }]);
     });
@@ -221,8 +221,8 @@ module.exports = (session) => {
               $afterGetCalled: 1,
               model1Id: null,
               model1Relation1: null
-            },
-          },
+            }
+          }
         }
       }]);
     }, {
@@ -250,9 +250,9 @@ module.exports = (session) => {
             model1Relation1: {
               model1Prop1: 'hello 4',
               $afterGetCalled: 1,
-              model1Relation1: null,
-            },
-          },
+              model1Relation1: null
+            }
+          }
         }
       }]);
     }, {
@@ -294,7 +294,7 @@ module.exports = (session) => {
           model2Prop2: null,
           $afterGetCalled: 1,
           model2Relation2: null
-        }],
+        }]
       }]);
 
       expect(models[0]).to.be.a(Model1);
@@ -328,7 +328,7 @@ module.exports = (session) => {
               model1Id: null,
               model1Prop1: 'hello 9',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterGetCalled: 1
             }
           }
         }, {
@@ -338,7 +338,7 @@ module.exports = (session) => {
           model2Prop2: null,
           $afterGetCalled: 1,
           model2Relation2: null
-        }],
+        }]
       }]);
 
       expect(models[0]).to.be.a(Model1);
@@ -358,7 +358,7 @@ module.exports = (session) => {
           model1Id: 3,
           model1Prop1: 'hello 2',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterGetCalled: 1
         },
 
         model1Relation2: [{
@@ -366,14 +366,14 @@ module.exports = (session) => {
           model1Id: 1,
           model2Prop1: 'hejsan 1',
           model2Prop2: null,
-          $afterGetCalled: 1,
+          $afterGetCalled: 1
         }, {
           idCol: 2,
           model1Id: 1,
           model2Prop1: 'hejsan 2',
           model2Prop2: null,
-          $afterGetCalled: 1,
-        }],
+          $afterGetCalled: 1
+        }]
       }]);
 
       expect(models[0]).to.be.a(Model1);
@@ -393,19 +393,19 @@ module.exports = (session) => {
           model1Id: 3,
           model1Prop1: 'hello 2',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterGetCalled: 1
         },
 
         model1Relation2: [{
           idCol: 2,
           model1Id: 1,
           model2Prop1: 'hejsan 2',
-          $afterGetCalled: 1,
+          $afterGetCalled: 1
         }, {
           idCol: 1,
           model1Id: 1,
           model2Prop1: 'hejsan 1',
-          $afterGetCalled: 1,
+          $afterGetCalled: 1
         }]
       }]);
     }, {
@@ -465,8 +465,8 @@ module.exports = (session) => {
             model1Prop2: null,
             aliasedExtra: 'extra 6',
             $afterGetCalled: 1
-          }],
-        }],
+          }]
+        }]
       }]);
     });
 
@@ -514,8 +514,8 @@ module.exports = (session) => {
             model1Prop2: null,
             aliasedExtra: 'extra 6',
             $afterGetCalled: 1
-          }],
-        }],
+          }]
+        }]
       }]);
     });
 
@@ -571,7 +571,7 @@ module.exports = (session) => {
               model1Id: null,
               model1Prop1: 'hello 7',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterGetCalled: 1
             },
 
             model1Relation2: [{
@@ -579,14 +579,57 @@ module.exports = (session) => {
               model1Id: 6,
               model2Prop1: 'hejsan 3',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterGetCalled: 1
             }]
-          }],
-        }],
+          }]
+        }]
       }]);
     });
 
     describe('JoinEagerAlgorithm', () => {
+
+      it('select should work', () => {
+        return Model1
+          .query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .where('Model1.id', 1)
+          .where('model1Relation2.id_col', 2)
+          .where('model1Relation2:model2Relation1.id', 6)
+          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .then(models => {
+            expect(models).to.eql([{
+              id: 1,
+              model1Prop1: 'hello 1',
+              $afterGetCalled: 1,
+
+              model1Relation1: {
+                id: 2,
+                model1Id: 3,
+                model1Prop1: 'hello 2',
+                model1Prop2: null,
+                $afterGetCalled: 1
+              },
+
+              model1Relation2: [{
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hejsan 2',
+                model2Prop2: null,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  id: 6,
+                  model1Id: 7,
+                  model1Prop1: 'hello 6',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 6',
+                  $afterGetCalled: 1
+                }]
+              }]
+            }]);
+          });
+      });
 
       it('should be able to refer to joined relations with syntax Table:rel1:rel2.col', () => {
         return Model1
@@ -633,8 +676,8 @@ module.exports = (session) => {
                   model1Prop2: null,
                   aliasedExtra: 'extra 6',
                   $afterGetCalled: 1
-                }],
-              }],
+                }]
+              }]
             }]);
           });
       });
@@ -688,8 +731,8 @@ module.exports = (session) => {
                   model1Prop2: null,
                   aliasedExtra: 'extra 6',
                   $afterGetCalled: 1
-                }],
-              }],
+                }]
+              }]
             }]);
           });
       });
@@ -742,9 +785,9 @@ module.exports = (session) => {
                     model1Prop1: 'hello 4',
                     model1Prop2: null,
                     $afterGetCalled: 1,
-                    model1Relation1: null,
-                  },
-                },
+                    model1Relation1: null
+                  }
+                }
               }
             }]);
 
@@ -863,8 +906,8 @@ module.exports = (session) => {
                   model1Prop2: null,
                   aliasedExtra: 'extra 6',
                   $afterGetCalled: 1
-                }],
-              }],
+                }]
+              }]
             }]);
           });
       });
@@ -950,7 +993,7 @@ module.exports = (session) => {
                       $afterGetCalled: 1
                     }]
                   }]
-                }],
+                }]
               }]);
             });
         }));
@@ -995,7 +1038,7 @@ module.exports = (session) => {
                     model1Id: null,
                     model1Prop1: 'hello 7',
                     model1Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterGetCalled: 1
                   },
 
                   model1Relation2: [{
@@ -1003,10 +1046,10 @@ module.exports = (session) => {
                     model1Id: 6,
                     model2Prop1: 'hejsan 3',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterGetCalled: 1
                   }]
-                }],
-              }],
+                }]
+              }]
             }]);
           });
       });

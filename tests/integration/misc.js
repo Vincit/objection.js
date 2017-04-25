@@ -686,7 +686,7 @@ module.exports = (session) => {
       ]).then(results => {
         results.forEach(result => {
           expect(result.isRejected()).to.equal(true);
-          expect(result.reason().message).to.match(/no database connection available for a query for table .*. You need to bind the model class or the query to a knex instance./);
+          expect(result.reason().message).to.match(/no database connection available for a query. You need to bind the model class or the query to a knex instance./);
         })
       });
     });
