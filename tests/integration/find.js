@@ -167,6 +167,26 @@ module.exports = (session) => {
             });
         });
 
+        it('.count()', () => {
+          return Model2
+            .query()
+            .count()
+            .first()
+            .then(res => {
+              expect(res[Object.keys(res)[0]]).to.equal(3);
+            });
+        });
+
+        it('.countDistinct()', () => {
+          return Model2
+            .query()
+            .countDistinct('id_col')
+            .first()
+            .then(res => {
+              expect(res[Object.keys(res)[0]]).to.equal(3);
+            });
+        });
+
         it('complex nested subquery', () => {
           return Model2
             .query()
