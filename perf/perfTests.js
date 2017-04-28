@@ -1,4 +1,6 @@
-var _ = require('lodash')
+'use strict';
+
+const _ = require('lodash')
   , Knex = require('knex')
   , expect = require('expect.js')
   , Promise = require('bluebird')
