@@ -582,7 +582,7 @@ class Person extends Model {
 }
 ```
 
-> `HasOneThroughRelation`: Use this relation when the model is related to a singke model through a join table
+> `HasOneThroughRelation`: Use this relation when the model is related to a single model through a join table
 
 ```js
 class Person extends Model {
