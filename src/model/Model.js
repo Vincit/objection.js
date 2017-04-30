@@ -126,6 +126,10 @@ export default class Model {
    */
   static defaultEagerOptions = null;
 
+  constructor(json, opts) {
+    this.$setJson(json || {}, opts);
+  }
+
   /**
    * @param {*=} id
    * @returns {*}
@@ -686,9 +690,7 @@ export default class Model {
    * @throws ValidationError
    */
   static fromJson(json, options) {
-    let model = new this();
-    model.$setJson(json || {}, options);
-    return model;
+    return new this(json, options);
   }
 
   /**
