@@ -233,6 +233,26 @@ module.exports = (session) => {
           .catch(done);
       });
 
+      it('should allow properties with same names as relations', () => {
+        const Mod = inheritModel(Model1);
+
+        Mod.prototype.$parseJson = function (json, opt) {
+          if (typeof json.model1Relation1 === 'number') {
+            json.model1Prop1 = json.model1Relation1;
+            delete json.model1Relation1;
+          }
+
+          return Model1.prototype.$parseJson.call(this, json, opt);
+        };
+
+        return Mod
+          .query()
+          .insert({model1Prop1: 123, model1Relation1: 666})
+          .then(inserted => {
+            expect(inserted.model1Prop1).to.equal(666);
+          });
+      });
+
     });
 
     describe('.query().insertAndFetch()', () => {
