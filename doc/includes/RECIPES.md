@@ -296,7 +296,7 @@ Person
 ```js
 Person
   .query()
-  .select('parent:parent.name as grandParentName'
+  .select('parent:parent.name as grandParentName')
   .joinRelation('parent.parent')
   .then(people => {
     console.log(people[0].grandParentName);
@@ -353,7 +353,7 @@ jennifer
 
 ```
 
-> Delete all Persons named Jennifer and return the deleted rows in 1 query:
+> Delete all Persons named Jennifer and return the deleted instances in 1 query:
 
 ```js
 Person
@@ -368,7 +368,7 @@ Person
 
 ```
 
-> Delete all of Jennifer's dogs and return the deleted rows in 1 query:
+> Delete all of Jennifer's dogs and return the deleted instances in 1 query:
 
 ```js
 jennifer
@@ -376,16 +376,15 @@ jennifer
   .delete()
   .where({'species': 'dog'})
   .returning('*')
-  .then(deletedDogs => {
-    console.log(deletedDogs.length); // However many dogs Jennifer had
-    console.log(deletedDogs[0].name); // Maybe "Fido"
+  .then(jennsDeletedDogs => {
+    console.log(jennsDeletedDogs.length); // However many dogs Jennifer had
+    console.log(jennsDeletedDogs[0].name); // Maybe "Fido"
   });
 
 ```
 
 Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or
-`update` / `patch` an existing row, __and__ receive the affected row(s) in a single query, thus improving
-efficiency. See the examples for more clarity.
+`update` / `patch` / `delete` a(n) existing row(s), __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
 
 ## Polymorphic associations
 
