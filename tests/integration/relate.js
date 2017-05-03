@@ -60,7 +60,8 @@ module.exports = (session) => {
           return model1
             .$relatedQuery('model1Relation1')
             .relate(model2.id)
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model1.tableName).orderBy('id');
             })
             .then(rows => {
@@ -75,7 +76,8 @@ module.exports = (session) => {
           return model1
             .$relatedQuery('model1Relation1')
             .relate([model2.id])
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model1.tableName).orderBy('id');
             })
             .then(rows => {
@@ -90,7 +92,8 @@ module.exports = (session) => {
           return model1
             .$relatedQuery('model1Relation1')
             .relate({id: model2.id})
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model1.tableName).orderBy('id');
             })
             .then(rows => {
@@ -105,7 +108,8 @@ module.exports = (session) => {
           return model1
             .$relatedQuery('model1Relation1')
             .relate(model2)
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model1.tableName).orderBy('id');
             })
             .then(rows => {
@@ -176,7 +180,8 @@ module.exports = (session) => {
                 .$relatedQuery('model1Relation2')
                 .relate(2);
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(rows => {
@@ -197,7 +202,8 @@ module.exports = (session) => {
                 .$relatedQuery('model1Relation2')
                 .relate([2, 3]);
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(2);
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(rows => {
@@ -218,7 +224,8 @@ module.exports = (session) => {
                 .$relatedQuery('model1Relation2')
                 .relate({idCol: 2});
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(rows => {
@@ -239,7 +246,8 @@ module.exports = (session) => {
                 .$relatedQuery('model1Relation2')
                 .relate([{idCol: 2}, {idCol: 3}]);
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(2);
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(rows => {
@@ -300,7 +308,8 @@ module.exports = (session) => {
                 .$relatedQuery('model2Relation1')
                 .relate(5);
             })
-            .then(() => {
+            .then(res => {
+              expect(res).to.eql({model2Id: 1, model1Id: 5});
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
@@ -324,7 +333,11 @@ module.exports = (session) => {
                   .$relatedQuery('model2Relation1')
                   .relate([5, 6]);
               })
-              .then(() => {
+              .then(res => {
+                expect(res).to.eql([
+                  {model2Id: 1, model1Id: 5},
+                  {model2Id: 1, model1Id: 6}
+                ]);
                 return session.knex('Model1Model2').orderBy('id');
               })
               .then(rows => {
@@ -349,7 +362,8 @@ module.exports = (session) => {
                 .$relatedQuery('model2Relation1')
                 .relate({id: 5});
             })
-            .then(() => {
+            .then(res => {
+              expect(res).to.eql({model2Id: 1, model1Id: 5});
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
@@ -372,7 +386,8 @@ module.exports = (session) => {
                 .$relatedQuery('model2Relation1')
                 .relate({id: 5, aliasedExtra: 'foobar'});
             })
-            .then(() => {
+            .then(res => {
+              expect(res).to.eql({model2Id: 1, model1Id: 5, extra3: 'foobar'});
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
@@ -414,7 +429,8 @@ module.exports = (session) => {
                 .$relatedQuery('model2Relation2')
                 .relate(2);
             })
-            .then(() => {
+            .then(res => {
+              expect(res).to.eql({ model2Id: 1, model1Id: 2});
               return session.knex('Model1Model2One');
             })
             .then(rows => {

@@ -1259,7 +1259,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql(10);
+        expect(result).to.eql({ownerId: 666, relatedId: 10});
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1282,7 +1282,11 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([10, 20, 30]);
+        expect(result).to.eql([ 
+          {ownerId: 666, relatedId: 10},
+          {ownerId: 666, relatedId: 20},
+          {ownerId: 666, relatedId: 30} 
+        ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1305,7 +1309,11 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([{rid: 10}, {rid: 20}, {rid: 30}]);
+        expect(result).to.eql([ 
+          {ownerId: 666, relatedId: 10},
+          {ownerId: 666, relatedId: 20},
+          {ownerId: 666, relatedId: 30} 
+        ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1332,7 +1340,11 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([[33, 44], [33, 55], [66, 77]]);
+        expect(result).to.eql([
+          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44},
+          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55},
+          {ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77}
+        ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1359,7 +1371,11 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([{cid: 33, did: 44}, {cid: 33, did: 55}, {cid: 66, did: 77}]);
+        expect(result).to.eql([
+          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44},
+          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55},
+          {ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77}
+        ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1381,7 +1397,7 @@ describe('ManyToManyRelation', () => {
         .relate(11)
         .then(result => {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql(11);
+          expect(result).to.eql({ ownerId: 666, relatedId: 11 });
           expect(executedQueries[0]).to.eql('insert into "JoinTable" ("ownerId", "relatedId") values (666, 11) returning "relatedId"');
         });
     });
@@ -1399,7 +1415,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar'});
+        expect(result).to.eql({ownerId: 666, relatedId: 10, extra2: 'foo'});
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1414,6 +1430,7 @@ describe('ManyToManyRelation', () => {
   describe('unrelate', () => {
 
     it('should generate a unrelate query', () => {
+      mockKnexQueryResults = [123];
       createModifiedRelation({someColumn: 100});
       let owner = OwnerModel.fromJson({oid: 666});
 
@@ -1427,7 +1444,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({});
+        expect(result).to.eql(123);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());

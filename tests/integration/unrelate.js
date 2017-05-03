@@ -58,7 +58,8 @@ module.exports = (session) => {
                 .$relatedQuery('model1Relation1')
                 .unrelate();
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model1.tableName).orderBy('id');
             })
             .then(rows => {
@@ -113,7 +114,8 @@ module.exports = (session) => {
                 .unrelate()
                 .where('id_col', 2);
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(rows => {
@@ -136,7 +138,8 @@ module.exports = (session) => {
                 .unrelate()
                 .where('id_col', '>', 1);
             })
-            .then(() => {
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(2);
               return session.knex(Model2.tableName).orderBy('id_col');
             })
             .then(rows => {
@@ -199,7 +202,8 @@ module.exports = (session) => {
                 .unrelate()
                 .where('Model1.id', 4);
             })
-            .then(() => {
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
@@ -222,7 +226,8 @@ module.exports = (session) => {
                 .unrelate()
                 .where('model1Prop1', '>', 'blaa 1');
             })
-            .then(() => {
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(2);
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
@@ -284,7 +289,8 @@ module.exports = (session) => {
                 .$relatedQuery('model2Relation2')
                 .unrelate();
             })
-            .then(() => {
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
               return session.knex('Model1Model2One');
             })
             .then(rows => {
