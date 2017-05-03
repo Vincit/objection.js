@@ -329,7 +329,7 @@ module.exports = (session) => {
               .returning('*')
               .then(deletedObjects => {
                 expect(deletedObjects).to.have.length(3);
-                child1 = _.find(deletedObjects, {id_col: 1});
+                child1 = _.find(deletedObjects, {idCol: 1});
                 expectPartEql(child1, {id_col: 1, model_2_prop_1: 'text 1'});
                 return session.knex('model_2').orderBy('id_col');
               })
