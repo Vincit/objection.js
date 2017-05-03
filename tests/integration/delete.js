@@ -92,7 +92,7 @@ module.exports = (session) => {
             .returning('*')
             .then(deletedModels => {
               expect(deletedModels).to.have.length(2);
-              deleted1 = _find(deletedModels, {id: 1});
+              deleted1 = _.find(deletedModels, {id: 1});
               expectPartEql(deleted1, {id: 1, model1Prop1: 'hello 1'});
               return session.knex('Model1').orderBy('id');
             })
@@ -329,7 +329,7 @@ module.exports = (session) => {
               .returning('*')
               .then(deletedObjects => {
                 expect(deletedObjects).to.have.length(3);
-                child1 = _.find(numDeleted, {id_col: 1});
+                child1 = _.find(deletedObjects, {id_col: 1});
                 expectPartEql(child1, {id_col: 1, model_2_prop_1: 'text 1'});
                 return session.knex('model_2').orderBy('id_col');
               })
