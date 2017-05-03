@@ -384,7 +384,7 @@ jennifer
 ```
 
 Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or
-`update` / `patch` / `delete` a(n) existing row(s), __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
+`update` / `patch` / `delete` (an) existing row(s), __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
 
 ## Polymorphic associations
 
