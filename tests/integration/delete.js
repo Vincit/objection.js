@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
+const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 
 module.exports = (session) => {
   const Model1 = session.models.Model1;
@@ -80,6 +81,27 @@ module.exports = (session) => {
           });
       });
 
+      if (isPostgres(session.knex)) {
+        it('should delete and return multiple', () => {
+          let deleted1;
+
+          return Model1
+            .query()
+            .delete()
+            .where('model1Prop1', '<', 'hello 3')
+            .returning('*')
+            .then(deletedModels => {
+              expect(deletedModels).to.have.length(2);
+              deleted1 = _find(deletedModels, {id: 1});
+              expectPartEql(deleted1, {id: 1, model1Prop1: 'hello 1'});
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(1);
+              expectPartEql(rows[0], {id: 3, model1Prop1: 'hello 3'});
+            });
+        });
+      }
     });
 
     describe('.$query().delete()', () => {
@@ -194,6 +216,26 @@ module.exports = (session) => {
             });
         });
 
+        if (isPostgres(session.knex)) {
+          it('should delete and return a related object (1)', () => {
+            return parent1
+              .$relatedQuery('model1Relation1')
+              .delete()
+              .first()
+              .returning('*')
+              .then(deletedObject => {
+                expectPartEql(deletedObject, {id: 2, model1Prop1: 'hello 2'});
+                return session.knex('Model1').orderBy('id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(3);
+                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+                expectPartEql(rows[1], {id: 3, model1Prop1: 'hello 3'});
+                expectPartEql(rows[2], {id: 4, model1Prop1: 'hello 4'});
+              });
+          });
+        }
+
         it('should delete a related object (2)', () => {
           return parent2
             .$relatedQuery('model1Relation1')
@@ -276,6 +318,29 @@ module.exports = (session) => {
               expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
             });
         });
+
+        if (isPostgres(session.knex)) {
+          it('should delete and return all related objects', () => {
+            let child1;
+
+            return parent1
+              .$relatedQuery('model1Relation2')
+              .delete()
+              .returning('*')
+              .then(deletedObjects => {
+                expect(deletedObjects).to.have.length(3);
+                child1 = _.find(numDeleted, {id_col: 1});
+                expectPartEql(child1, {id_col: 1, model_2_prop_1: 'text 1'});
+                return session.knex('model_2').orderBy('id_col');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(3);
+                expectPartEql(rows[0], {id_col: 4, model_2_prop_1: 'text 4'});
+                expectPartEql(rows[1], {id_col: 5, model_2_prop_1: 'text 5'});
+                expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
+              });
+          });
+        }
 
         it('should delete a related object', () => {
           return parent1
