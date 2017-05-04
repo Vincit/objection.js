@@ -657,7 +657,7 @@ select * from "Person" where "id" = 246
 Update queries are created by chaining the [`update`](#update) or [`patch`](#patch) method to the query. The [`patch`](#patch) and [`update`](#update)
 methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper
 method [`patchAndFetchById`](#patchandfetchbyid) and [`updateAndFetchById`](#updateandfetchbyid). On postgresql you can
-simply chain `.returning('*')`.
+simply chain `.returning('*')` or take a look at [this recipe](#postgresql-quot-returning-quot-tricks) for more ideas.
 
 ### Delete queries
 
@@ -678,7 +678,8 @@ Person
 delete from "Person" where lower("firstName") like '%ennif%'
 ```
 
-Delete queries are created by chaining the [`delete`](#delete) method to the query.
+Delete queries are created by chaining the [`delete`](#delete) method to the query.  
+NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](#postgresql-quot-returning-quot-tricks) if you'd like the deleted rows to be returned as Model instances*.
 
 ## Relation queries
 
