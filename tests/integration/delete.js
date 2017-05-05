@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
+const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 
 module.exports = (session) => {
   const Model1 = session.models.Model1;
@@ -80,6 +81,28 @@ module.exports = (session) => {
           });
       });
 
+      if (isPostgres(session.knex)) {
+        it('should delete and return multiple', () => {
+          let deleted1;
+
+          return Model1
+            .query()
+            .delete()
+            .where('model1Prop1', '<', 'hello 3')
+            .returning('*')
+            .then(deletedObjects => {
+              expect(deletedObjects).to.have.length(2);
+              deleted1 = _.find(deletedObjects, {id: 1});
+              expect(deleted1).to.be.a(Model1);
+              expectPartEql(deleted1, {id: 1, model1Prop1: 'hello 1'});
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(1);
+              expectPartEql(rows[0], {id: 3, model1Prop1: 'hello 3'});
+            });
+        });
+      }
     });
 
     describe('.$query().delete()', () => {
@@ -194,6 +217,27 @@ module.exports = (session) => {
             });
         });
 
+        if (isPostgres(session.knex)) {
+          it('should delete and return a related object (1)', () => {
+            return parent1
+              .$relatedQuery('model1Relation1')
+              .delete()
+              .first()
+              .returning('*')
+              .then(deletedObject => {
+                expect(deletedObject).to.be.a(Model1);
+                expectPartEql(deletedObject, {id: 2, model1Prop1: 'hello 2'});
+                return session.knex('Model1').orderBy('id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(3);
+                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+                expectPartEql(rows[1], {id: 3, model1Prop1: 'hello 3'});
+                expectPartEql(rows[2], {id: 4, model1Prop1: 'hello 4'});
+              });
+          });
+        }
+
         it('should delete a related object (2)', () => {
           return parent2
             .$relatedQuery('model1Relation1')
@@ -276,6 +320,30 @@ module.exports = (session) => {
               expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
             });
         });
+
+        if (isPostgres(session.knex)) {
+          it('should delete and return all related objects', () => {
+            let child1;
+
+            return parent1
+              .$relatedQuery('model1Relation2')
+              .delete()
+              .returning('*')
+              .then(deletedObjects => {
+                expect(deletedObjects).to.have.length(3);
+                child1 = _.find(deletedObjects, {idCol: 1});
+                expect(child1).to.be.a(Model2);
+                expectPartEql(child1, {idCol: 1, model2Prop1: 'text 1'});
+                return session.knex('model_2').orderBy('id_col');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(3);
+                expectPartEql(rows[0], {id_col: 4, model_2_prop_1: 'text 4'});
+                expectPartEql(rows[1], {id_col: 5, model_2_prop_1: 'text 5'});
+                expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
+              });
+          });
+        }
 
         it('should delete a related object', () => {
           return parent1
@@ -434,6 +502,35 @@ module.exports = (session) => {
             });
         });
 
+        if (isPostgres(session.knex)) {
+          it('should delete and return multiple objects (1)', () => {
+            let child1;
+
+            return parent2
+              .$relatedQuery('model2Relation1')
+              .delete()
+              .where('model1Prop1', 'like', 'blaa 4')
+              .orWhere('model1Prop1', 'like', 'blaa 6')
+              .returning('*')
+              .then(deletedObjects => {
+                expect(deletedObjects).to.have.length(2);
+                child1 = _.find(deletedObjects, {id: 6});
+                expect(child1).to.be.a(Model1);
+                expectPartEql(child1, {id: 6, model1Prop1: 'blaa 4'});
+                return session.knex('Model1').orderBy('Model1.id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(6);
+                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+                expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+                expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
+                expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
+                expectPartEql(rows[4], {id: 5, model1Prop1: 'blaa 3'});
+                expectPartEql(rows[5], {id: 7, model1Prop1: 'blaa 5'});
+              });
+          });
+        }
+
         it('should delete multiple objects (2)', () => {
           return parent1
             .$relatedQuery('model2Relation1')
@@ -509,6 +606,27 @@ module.exports = (session) => {
               expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
             });
         });
+
+        if (isPostgres(session.knex)) {
+          it('should delete and return the related object', () => {
+            return parent
+              .$relatedQuery('model2Relation2')
+              .delete()
+              .first()
+              .returning('*')
+              .then(deletedObject => {
+                expect(deletedObject).to.be.a(Model1);
+                expectPartEql(deletedObject, {id: 4, model1Prop1: 'blaa 2'});
+                return session.knex('Model1').orderBy('Model1.id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(3);
+                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+                expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+                expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
+              });
+          });
+        }
 
       });
 

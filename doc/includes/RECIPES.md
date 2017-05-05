@@ -262,7 +262,7 @@ the [`joinRelation`](#joinrelation) method family.
 
 ## PostgreSQL "returning" tricks
 
-> Insert and return the data in 1 query:
+> Insert and return a Model instance in 1 query:
 
 ```js
 Person
@@ -271,12 +271,12 @@ Person
   .returning('*')
   .then(jennifer => {
     console.log(jennifer.createdAt); // NOW()-ish
-    console.log(jennifer.id);
+    console.log(jennifer.id); // Sequence ID
   });
 
 ```
 
-> Update a single row by ID and return the data for that row in 1 query:
+> Update a single row by ID and return the updated Model instance in 1 query:
 
 ```js
 Person
@@ -292,7 +292,7 @@ Person
 
 ```
 
-> Update a Model instance and return the data for that instance in 1 query:
+> Patch a Model instance and receive DB updates to Model instance in 1 query:
 
 ```js
 jennifer
@@ -307,7 +307,7 @@ jennifer
 
 ```
 
-> Delete all Persons named Jennifer and return the deleted instances in 1 query:
+> Delete all Persons named Jennifer and return the deleted rows as Model instances in 1 query:
 
 ```js
 Person
@@ -322,7 +322,7 @@ Person
 
 ```
 
-> Delete all of Jennifer's dogs and return the deleted instances in 1 query:
+> Delete all of Jennifer's dogs and return the deleted Model instances in 1 query:
 
 ```js
 jennifer
@@ -338,7 +338,7 @@ jennifer
 ```
 
 Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or
-`update` / `patch` / `delete` (an) existing row(s), __and__ receive the affected row(s) in a single query, thus improving efficiency. See the examples for more clarity.
+`update` / `patch` / `delete` (an) existing row(s), __and__ receive the affected row(s) as Model instances in a single query, thus improving efficiency. See the examples for more clarity.
 
 ## Polymorphic associations
 
