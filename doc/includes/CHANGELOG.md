@@ -1,5 +1,68 @@
 # Changelog
 
+## 0.8.0
+
+### What's new
+
+  * All queries are now started through `Model.query` [#346](https://github.com/Vincit/objection.js/issues/346)
+  * Objection is no longer transpiled using Babel. One of the implications is that you can use a objection github
+    link in package.json to test experimental version.
+  * `count` can now be called without arguments [#364](https://github.com/Vincit/objection.js/issues/364)
+
+### Breaking changes
+
+> Old model definition
+
+```js
+function Person() {
+  Model.apply(this, arguments);
+}
+
+Model.extend(Person);
+
+Person.tableName = 'Person';
+
+Person.prototype.fullName = function () {
+  return this.firstName + ' ' + this.lastName;
+}
+
+// More static and prototype methods.
+```
+
+> Easiest way to migrate to `class` and `extends` keywords
+
+```js
+class Person extends Model {
+
+}
+
+Person.tableName = 'Person';
+
+Person.prototype.fullName = function () {
+  return this.firstName + ' ' + this.lastName;
+}
+
+// More static and prototype methods.
+```
+
+  * Support for node versions below 4.0.0 has been removed. With it the support for legacy class inheritance using `Model.extend` method
+    has also been removed. This means that you need to change your model definitions to use the `class` and `extends` keywords.
+    To achieve this with the minimum amount of changes you can simply swap the constructor function and `Model.extend` to
+    a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right -->
+
+  * The default value of [`pickJsonSchemaProperties`](#pickjsonschemaproperties) was changed to `false`. Before, all properties that
+    were not listed in `jsonSchema` were removed before `insert`, `patch` or `update` (if `jsonSchma` was defined). Starting from
+    this version you need to explicitly set the value to `true`. You may have used this feature without knowing it even exists.
+    If you have weird problems after the update, try to set `objection.Model.pickJsonSchemaProperties = true;` to see
+    if it helps.
+
+  * [`relate`](#pickjsonschemaproperties) and [`unrelate`](#pickjsonschemaproperties) methods now return the result of the
+    underlying query (`patch` in case of `HasManyRelation`, `HasOneRelation`, and `BelongsToOneRelation`. `insert` otherwise).
+    Before the method input was always returned.
+
+  * `Model.RelatedQueryBuilder` is removed. `Model.QueryBuilder` is now used to start all queries for the model.
+    This only affects you if you have defined custom query builders.
+
 ## 0.7.12
 
 ### What's new
@@ -19,7 +82,6 @@
 
  * fix bugs that prevented using `$relatedQuery` and `eager` together with `JoinEagerAlgorithm`
  * typing updates
-
 
 ## 0.7.9
 

@@ -1433,8 +1433,6 @@ mysql -u root -e "CREATE DATABASE objection_test"
 
 ### Develop
 
-Objection uses babel to transpile ESNext into ES5. `npm run build` runs babel and saves the transpiled code to `lib`
-folder. The `lib` folder is not stored in github. `npm test` runs `npm run build` before running the tests. To save
-time you can run the tests using `npm run test-only` command that doesn't invoke `npm run build`. In this case remember
-to build after making changes to the code. The tests are not transpiled. Therefore tests need to be written in ES5
-(until we drop the legacy node support).
+Code and tests need to be written in ES2015 subset supported by node 4.0.0. The best way to make sure of this is
+to develop with the correct node version. [nvm](https://github.com/creationix/nvm) is a great tool for swapping
+between node versions.
