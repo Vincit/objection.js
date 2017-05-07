@@ -120,7 +120,7 @@ module.exports = (session) => {
           };
 
           // Clear the memoized schema.
-          delete Model1.$$hiddenData.memoizedGetJsonSchema;
+          delete Model1.$$jsonSchema;
           expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
         });
 
@@ -128,7 +128,7 @@ module.exports = (session) => {
           Model1.jsonSchema = origSchema;
 
           // Clear the memoized schema.
-          delete Model1.$$hiddenData.memoizedGetJsonSchema;
+          delete Model1.$$jsonSchema;
           expect(Model1.getJsonSchema()).to.equal(origSchema);
         });
 
@@ -230,9 +230,8 @@ module.exports = (session) => {
             }
           };
 
-          // Clear the memoized schema.
-          Model1.$$hiddenData.memoizedGetJsonSchema = undefined;
-          Model2.$$hiddenData.memoizedGetJsonSchema = undefined;
+          delete Model1.$$jsonSchema;
+          delete Model2.$$jsonSchema;
 
           expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
           expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
@@ -280,8 +279,8 @@ module.exports = (session) => {
           };
 
           // Clear the memoized schema.
-          Model1.$$hiddenData.memoizedGetJsonSchema = undefined;
-          Model2.$$hiddenData.memoizedGetJsonSchema = undefined;
+          delete Model1.$$jsonSchema;
+          delete Model2.$$jsonSchema;
 
           expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
           expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
