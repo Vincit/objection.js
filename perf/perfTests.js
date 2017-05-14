@@ -283,8 +283,8 @@ describe('Performance tests', function () {
     });
 
     perfTest({
-      name: '120000 bindTransaction calls',
-      runCount: 120000,
+      name: '100000 bindTransaction calls',
+      runCount: 100000,
       runtimeGoal: 10000,
       test: function () {
         Person.bindTransaction({});
@@ -323,13 +323,11 @@ describe('Performance tests', function () {
       runCount: 20000,
       runtimeGoal: 10000,
       beforeTest: function () {
-        var result = _.map(_.range(RESULT_SIZE), function (idx) {
-          return {
-            firstName: 'Firstname ' + idx,
-            lastName: 'Lastname ' + idx,
-            age: idx
-          };
-        });
+        const result = _.range(RESULT_SIZE).map(idx => ({
+          firstName: 'Firstname ' + idx,
+          lastName: 'Lastname ' + idx,
+          age: idx
+        }));
 
         mockKnex.nextResult = _.constant(result);
         return Person.bindKnex(mockKnex);

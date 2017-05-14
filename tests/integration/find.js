@@ -234,6 +234,21 @@ module.exports = (session) => {
             });
         });
 
+        it('subquery builder in select (array)', () => {
+          return Model1
+            .query()
+            .select(['Model1.*', Model2
+              .query()
+              .sum('model_2_prop_2')
+              .whereRef('Model1.id', 'model_2.model_1_id')
+              .as('sum')])
+            .orderBy('id')
+            .then(models => {
+              expect(_.map(models, 'id')).to.eql([1, 2]);
+              expect(_.map(models, 'sum')).to.eql([60, null]);
+            });
+        });
+
         it('.modify()', () => {
           let builder = Model2.query();
 
