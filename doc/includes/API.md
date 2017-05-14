@@ -4666,6 +4666,10 @@ You can override this to use your own [`QueryBuilder`](#querybuilder) subclass.
 
 #### query
 
+```js
+const queryBuilder = Person.query(transactionOrKnex);
+```
+
 > Read models from the database:
 
 ```js
@@ -4781,7 +4785,7 @@ See the [query examples](#query-examples) section for more examples.
 
 Argument|Type|Description
 --------|----|-------|------------
-transaction|object|Optional transaction for the query.
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
 
 ##### Return value
 
@@ -5705,6 +5709,10 @@ Type|Description
 
 #### $query
 
+```js
+const queryBuilder = person.$query(transactionOrKnex);
+```
+
 > Re-fetch the instance from the database:
 
 ```js
@@ -5745,7 +5753,7 @@ All queries built using the returned builder only affect this instance.
 
 Argument|Type|Description
 --------|----|-------|------------
-transaction|object|Optional transaction for the query.
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
 
 ##### Return value
 
@@ -5759,7 +5767,7 @@ Type|Description
 #### $relatedQuery
 
 ```js
-const builder = model.$relatedQuery(relationName);
+const builder = model.$relatedQuery(relationName, transactionOrKnex);
 ```
 
 > Fetch all models related to a model through a relation. The fetched models are
@@ -5880,7 +5888,7 @@ Use this to build a query that only affects the models related to this instance 
 Argument|Type|Description
 --------|----|-------------------
 relationName|string|The name of the relation to query.
-transaction|object|Optional transaction for the query.
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
 
 ##### Return value
 
