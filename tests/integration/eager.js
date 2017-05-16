@@ -759,7 +759,12 @@ module.exports = (session) => {
           .where('Model1.id', 1)
           .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
           .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .eagerOptions({minimize: true})
+          .eagerOptions({minimize: false})
+          .runBefore((result, builder) => {
+            // Call in runBefore to test the EeagerOperation.clone method.
+            // This doesn't need to be called in a runBefore.
+            builder.eagerOptions({minimize: true});
+          })
           .then(models => {
             expect(models).to.eql([{
               id: 1,
