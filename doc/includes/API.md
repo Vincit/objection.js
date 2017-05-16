@@ -5151,6 +5151,27 @@ traverser|function([`Model`](#model), string, string)|The traverser function tha
 
 
 
+
+#### getRelations
+
+```js
+const relations = Person.getRelations();
+```
+
+Returns a [`Relation`](#relation) object for each relation defined in [`relationMappings`](#relationmappings).
+
+This method is mainly useful for plugin developers and for other generic usages.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Object.&lt;string, [`Relation`](#relation)&gt;|Object whose keys are relation names and values are [`Relation`](#relation) instances.
+
+
+
+
+
 ### Instance methods
 
 
@@ -6550,3 +6571,54 @@ Property|Type|Description
 minimize|boolean|If true the aliases of the joined tables and columns in a join based eager loading are minimized. This is sometimes needed because of identifier length limitations of some database engines. objection throws an exception when a query exceeds the length limit. You need to use this only in those cases.
 separator|string|Separator between relations in nested join based eager query. Defaults to `:`. Dot (`.`) cannot be used at the moment because of the way knex parses the identifiers.
 aliases|Object.&lt;string, string&gt;|Aliases for relations in a join based eager query. Defaults to an empty object.
+
+
+
+## Relation
+
+> Note that `Relation` instances are actually instances of the relation classes used in `relationMappings`. For example:
+
+```js
+class Person extends Model {
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'Person.id',
+          to: 'Animal.ownerId'
+        }
+      }
+    };
+  }
+}
+
+const relations = Person.getRelations();
+
+console.log(relations.pets instanceof Model.HasManyRelation); // --> true
+console.log(relations.pets.name); // --> pets
+console.log(relations.pets.ownerCol); // --> ['id']
+console.log(relations.pets.relatedCol); // --> ['ownerId']
+```
+
+`Relation` is a parsed and normalized instance of a [`RelationMapping`](#relationmapping). `Relation`s can be accessed using the [`getRelations`](#getrelations) method.
+
+There is a `*Prop` and `*Col` version of each key, because models may define conversions between database and external
+property names. Most of the times these fields hold the same values, but in case of a conversion, the conversion has
+been applied to them. The properties are arrays because of composite key support.
+
+Property|Type|Description
+--------|----|-----------
+name|string|Name of the relation. For example `pets` or `children`.
+ownerModelClass|function|The model class that has defined the relation.
+relatedModelClass|function|The model class of the related objects.
+ownerCol|Array&lt;string&gt;|The relation column in the `ownerModelClass`.
+ownerProp|Array&lt;string&gt;|The relation property in the `ownerModelClass`.
+relatedCol|Array&lt;string&gt;|The relation column in the `relatedModelClass`.
+relatedProp|Array&lt;string&gt;|The relation property in the `relatedModelClass`.
+joinTable|string|The name of the join table (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableOwnerCol|Array&lt;string&gt;|The join table column pointing to `ownerCol` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableOwnerProp|Array&lt;string&gt;|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableRelatedCol|Array&lt;string&gt;|The join table property pointing to `relatedCol` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableRelatedProp|Array&lt;string&gt;|The join table property pointing to `relatedProp` (only for `ManyToMany` and `HasOneThrough` relations).

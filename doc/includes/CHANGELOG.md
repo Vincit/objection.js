@@ -8,6 +8,7 @@
   * Objection is no longer transpiled using Babel. One of the implications is that you can use a github
     link in package.json to test experimental versions.
   * `count` can now be called without arguments [#364](https://github.com/Vincit/objection.js/issues/364)
+  * A new [`getRelations`](#getrelations) method for plugin development and other reflection greatness.
 
 ### Breaking changes
 

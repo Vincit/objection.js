@@ -5,7 +5,7 @@ const expect = require('expect.js');
 const Model = require('objection').Model;
 const Knex = require('knex');
 
-var ISO_DATE_REGEX = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
+const ISO_DATE_REGEX = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
 
 describe('example plugin tests', () => {
   let knex;
@@ -86,6 +86,6 @@ describe('example plugin tests', () => {
         expect(jonnifer.createdAt).to.match(ISO_DATE_REGEX);
         expect(jonnifer.modifiedBy).to.equal('bar');
         expect(jonnifer.modifiedAt).to.match(ISO_DATE_REGEX);
-      })
+      });
   });
 });
