@@ -2,8 +2,8 @@
 
 This project serves as the best practices example of an objection.js plugin.
 
-The plugin itself adds a `session` method for `QueryBuilder` and extends a model
-so that it sets `updatedAt`, `updatedBy`, `createdAt` and `createdBy` properties
+The plugin adds a `session` method for `QueryBuilder` and extends a model
+so that it sets `modifiedAt`, `modifiedBy`, `createdAt` and `createdBy` properties
 automatically based on the given session.
 
 Usage example:
