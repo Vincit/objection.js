@@ -1,0 +1,23 @@
+{
+  "name": "objection-plugin-example",
+  "version": "1.0.0",
+  "description": "An example plugin for objection",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --slow 10 --timeout 15000 --reporter spec tests.js"
+  },
+  "peerDependencies": {
+    "objection": "0.x"
+  },
+  "author": "Sami Koskimäki",
+  "license": "MIT",
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "knex": "^0.13.0",
+    "mocha": "^3.4.1",
+    "objection": "^0.7.12"
+  },
+  "dependencies": {
+    "sqlite3": "^3.1.8"
+  }
+}
