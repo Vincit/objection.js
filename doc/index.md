@@ -395,9 +395,7 @@ class Person extends Model {
 }
 ```
 
-Models are created by inheriting from the [`Model`](#model) base class. In objection.js inheritance is done as
-transparently as possible. There is no custom Class abstraction making you wonder what the hell is happening.
-Just plain old ugly prototypal inheritance.
+Models are created by inheriting from the [`Model`](#model) base class.
 
 # Relations
 
@@ -425,6 +423,23 @@ class Person extends Model {
   static relationMappings = {
     animals: {
       relation: Model.HasManyRelation,
+      modelClass: Animal,
+      join: {
+        from: 'person.id',
+        to: 'animal.ownerId'
+      }
+    }
+  }
+}
+```
+
+> `HasOneRelation`: Just like `HasManyRelation` but for one related row
+
+```js
+class Person extends Model {
+  static relationMappings = {
+    animals: {
+      relation: Model.HasOneRelation,
       modelClass: Animal,
       join: {
         from: 'person.id',
