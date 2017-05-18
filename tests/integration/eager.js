@@ -1452,7 +1452,7 @@ module.exports = (session) => {
             .eager('[model1Relation1.model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]')
             .eagerAlgorithm(eagerAlgorithm)
             .then(res => {
-              console.log(Date.now() - t1);
+              console.log('query time', Date.now() - t1);
 
               graph = _.sortBy(graph, 'id');
               res = _.sortBy(res, 'id');

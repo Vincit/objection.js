@@ -14,7 +14,6 @@ class TestSession {
       return;
     }
 
-    convertPostgresBigIntegersToNumber();
     registerUnhandledRejectionHandler();
 
     this.staticInitCalled = true;
@@ -170,28 +169,28 @@ class TestSession {
       .then(() => {
         return knex.schema
           .createTable('Model1', table => {
-            table.bigincrements('id').primary();
-            table.biginteger('model1Id').index();
+            table.increments('id').primary();
+            table.integer('model1Id').index();
             table.string('model1Prop1');
             table.integer('model1Prop2');
           })
           .createTable('model_2', table => {
-            table.bigincrements('id_col').primary();
-            table.biginteger('model_1_id').index();
+            table.increments('id_col').primary();
+            table.integer('model_1_id').index();
             table.string('model_2_prop_1');
             table.integer('model_2_prop_2');
           })
           .createTable('Model1Model2', table => {
-            table.bigincrements('id').primary();
+            table.increments('id').primary();
             table.string('extra1');
             table.string('extra2');
             table.string('extra3');
-            table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+            table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
+            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
           })
           .createTable('Model1Model2One', table => {
-            table.biginteger('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.biginteger('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+            table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
+            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
           });
       })
       .catch(() => {
@@ -280,32 +279,6 @@ function inc(obj, key) {
     obj[key] = 1;
   } else {
     obj[key]++;
-  }
-}
-
-function convertPostgresBigIntegersToNumber() {
-  let pgTypes;
-
-  try {
-    pgTypes = require('pg').types;
-  } catch (err) {
-    // pg not installed. ignore.
-  }
-
-  if (pgTypes) {
-    const MaxSafeInteger = Math.pow(2, 53) - 1;
-
-    // Convert big integers to numbers.
-    pgTypes.setTypeParser(20, val => {
-      if (val === null) {
-        return null;
-      }
-      const number = parseInt(val, 10);
-      if (number > MaxSafeInteger) {
-        throw new Error('node-pg: bigint overflow: ' + number);
-      }
-      return number;
-    });
   }
 }
 

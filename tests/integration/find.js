@@ -173,7 +173,7 @@ module.exports = (session) => {
             .count()
             .first()
             .then(res => {
-              expect(res[Object.keys(res)[0]]).to.equal(3);
+              expect(res[Object.keys(res)[0]]).to.eql(3);
             });
         });
 
@@ -183,7 +183,7 @@ module.exports = (session) => {
             .countDistinct('id_col')
             .first()
             .then(res => {
-              expect(res[Object.keys(res)[0]]).to.equal(3);
+              expect(res[Object.keys(res)[0]]).to.eql(3);
             });
         });
 

@@ -253,8 +253,8 @@ module.exports = (session) => {
         .groupBy('Model1.id')
         .orderBy('Model1.model1Prop1')
         .then(models => {
-          expect(models[0].relCount).to.equal(3);
-          expect(models[1].relCount).to.equal(2);
+          expect(models[0].relCount).to.eql(3);
+          expect(models[1].relCount).to.eql(2);
         });
     });
 
