@@ -6608,6 +6608,10 @@ There is a `*Prop` and `*Col` version of each key, because models may define con
 property names. Most of the times these fields hold the same values, but in case of a conversion, the conversion has
 been applied to them. The properties are arrays because of composite key support.
 
+`Relation` is actually a base class for all relation types `BelongsToOneRelation`, `HasManyRelation` etc. You can use `instanceof` to determine
+the type of the relations (see the example on the right). Note that `HasOneRelation` is a subclass of `HasManyRelation` and `HasOneThroughRelation`
+is a subclass of `ManyToManyRelation`. Arrange your `instanceof` checks accordingly.
+
 Property|Type|Description
 --------|----|-----------
 name|string|Name of the relation. For example `pets` or `children`.
