@@ -1030,7 +1030,7 @@ describe('QueryBuilder', () => {
         .forClass(TestModel)
         .where('id', undefined)
     }).to.throwException(err => {
-      expect(err.message).to.equal("undefined passed as argument #2 for \'where\' operation. Call skipUndefined() method to ignore the undefined values.")
+      expect(err.message).to.equal("undefined passed as argument #1 for \'where\' operation. Call skipUndefined() method to ignore the undefined values.")
     });
 
     expect(() => {
@@ -1038,7 +1038,7 @@ describe('QueryBuilder', () => {
         .forClass(TestModel)
         .orWhere('id', '<', undefined)
     }).to.throwException(err => {
-      expect(err.message).to.equal("undefined passed as argument #3 for \'orWhere\' operation. Call skipUndefined() method to ignore the undefined values.")
+      expect(err.message).to.equal("undefined passed as argument #2 for \'orWhere\' operation. Call skipUndefined() method to ignore the undefined values.")
     });
 
     expect(() => {
@@ -1066,7 +1066,7 @@ describe('QueryBuilder', () => {
         .delete()
         .whereIn('id', [1, undefined, 3])
     }).to.throwException(err => {
-      expect(err.message).to.equal("undefined passed as an item in argument #2 for \'whereIn\' operation. Call skipUndefined() method to ignore the undefined values.")
+      expect(err.message).to.equal("undefined passed as an item in argument #1 for \'whereIn\' operation. Call skipUndefined() method to ignore the undefined values.")
     });
   });
 

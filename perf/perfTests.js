@@ -506,7 +506,7 @@ describe('Performance tests', function () {
         var idx = 0;
 
         mockKnex.nextResult = function () {
-          var res = _.range(idx, idx + RESULT_SIZE);
+          var res = _.range(idx, idx + 100);
           idx += RESULT_SIZE;
           return res;
         };

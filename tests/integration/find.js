@@ -121,6 +121,48 @@ module.exports = (session) => {
             });
         });
 
+        it('.where() with an object', () => {
+          return Model2
+            .query()
+            .where({model_2_prop_2: 20})
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with an object and query builder', () => {
+          return Model2
+            .query()
+            .where({
+              model_2_prop_2: Model2.query().max('model_2_prop_2')
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([30]);
+            });
+        });
+
+        it('.where() with an object and knex query builder', () => {
+          return Model2
+            .query()
+            .where({
+              model_2_prop_2: session.knex('model_2').max('model_2_prop_2')
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([30]);
+            });
+        });
+
+        it('.where() with an object and knex.raw', () => {
+          return Model2
+            .query()
+            .where({
+              model_2_prop_2: session.knex.raw('10 + 10')
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
         it('.orderBy()', () => {
           return Model2
             .query()
