@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/Vincit/objection.js.svg?branch=master)](https://travis-ci.org/Vincit/objection.js) [![Coverage Status](https://coveralls.io/repos/github/Vincit/objection.js/badge.svg?branch=master)](https://coveralls.io/github/Vincit/objection.js?branch=master) [![Join the chat at https://gitter.im/Vincit/objection.js](https://badges.gitter.im/Vincit/objection.js.svg)](https://gitter.im/Vincit/objection.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+![alt text](./doc/images/objection-logo.png);
+
 # [Objection.js](http://vincit.github.io/objection.js)
 
 [Objection.js](http://vincit.github.io/objection.js) is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
