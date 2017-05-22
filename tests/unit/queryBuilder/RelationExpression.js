@@ -375,7 +375,7 @@ describe('RelationExpression', () => {
 
   });
 
-  describe('#nodesAtPath', () => {
+  describe('#rawNodesAtPath', () => {
 
     it('a from a', () => {
       testPath('a', 'a', [{
@@ -649,7 +649,7 @@ describe('RelationExpression', () => {
   }
 
   function testPath(str, path, expected) {
-    expect(RelationExpression.parse(str)._nodesAtPath(path)).to.eql(expected);
+    expect(RelationExpression.parse(str).rawNodesAtPath(path)).to.eql(expected);
   }
 
   function testToString(str) {
