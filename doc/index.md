@@ -1326,6 +1326,52 @@ with an instance of [`ValidationError`](#validationerror).
 
 See [the recipe book](#custom-validation) for instructions if you want to use some other validation library.
 
+# Plugins
+
+## List of plugins and modules for objection
+
+A curated list of good plugins and modules for objection. Only plugins that follow [the best practices](#plugin-development-best-practices) 
+are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best 
+practices are an exception to this rule. If you are a developer or otherwise know of a good plugin/module for objection, please 
+create a pull request or an issue to get it added to this list.
+
+  * *Nothing to see here yet!*
+
+## Plugin development best practices
+
+> Mixin is just a function that takes a class and returns an extended subclass.
+
+```js
+function SomeMixin(Model) {
+  return SomeExtendedModel extends Model {
+    // Your modifications.
+  }
+}
+```
+
+> Mixins can be then applied like this:
+
+```js
+class Person extends SomeMixin(Model) {
+
+}
+```
+
+> Multiple mixins:
+
+```js
+class Person extends SomeMixin(SomeOtherMixin(Model)) {
+
+}
+```
+
+When possible, objection.js plugins should be implemented as [class mixins](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/). 
+A mixin is simply a function that takes a class as an argument and returns a subclass. Plugins should 
+avoid modifying `objection.Model`, `objection.QueryBuilder` or any other global variables directly.
+See the [example plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin) for more
+info. There is also [another example](https://github.com/Vincit/objection.js/tree/master/examples/plugin-with-options)
+that should be followed if your plugin needs options or configuration parameters.
+
 # Contribution guide
 
 ## Issues

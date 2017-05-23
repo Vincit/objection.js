@@ -19,7 +19,7 @@ module.exports = (options) => {
   }, options);
 
   // Return the mixin. If your plugin doesn't take options, you can simply export
-  // the the mixin. The factory function is not needed.
+  // the mixin. The factory function is not needed.
   return (Model) => {
 
     // If your plugin extends the QueryBuilder, you need to extend `Model.QueryBuilder`

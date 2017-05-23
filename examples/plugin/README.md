@@ -10,9 +10,9 @@ Usage example:
 
 ```js
 const Model = require('objection').Model;
-const session = require('path/to/this/example');
+const Session = require('path/to/this/example');
 
-class Person extends session(Model) {
+class Person extends Session(Model) {
   static get tableName() {
     return 'Person';
   }
