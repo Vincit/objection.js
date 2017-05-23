@@ -4,8 +4,8 @@
 
 ### What's new
 
-  * All queries now call `Model.query` to create a `QueryBuilder` instance [#346](https://github.com/Vincit/objection.js/issues/346)
-  * Objection is no longer transpiled using Babel. One of the implications is that you can use a github
+  * All query methods now call `Model.query` to create a `QueryBuilder` instance [#346](https://github.com/Vincit/objection.js/issues/346)
+  * Objection is no longer transpiled. One of the implications is that you can use a github
     link in package.json to test experimental versions.
   * `count` can now be called without arguments [#364](https://github.com/Vincit/objection.js/issues/364)
   * A new [`getRelations`](#getrelations) method for plugin development and other reflection greatness.
@@ -53,15 +53,15 @@ Person.prototype.fullName = function () {
 
   * The default value of [`pickJsonSchemaProperties`](#pickjsonschemaproperties) was changed to `false`. Before, all properties that
     were not listed in `jsonSchema` were removed before `insert`, `patch` or `update` (if `jsonSchma` was defined). Starting from
-    this version you need to explicitly set the value to `true`. You may have used this feature without knowing it even exists.
-    If you have weird problems after the update, try to set `objection.Model.pickJsonSchemaProperties = true;` to see
+    this version you need to explicitly set the value to `true`. You may have been used this feature by accident.
+    If you have weird problems after the update, try setting `objection.Model.pickJsonSchemaProperties = true;` to see
     if it helps.
 
   * [`relate`](#pickjsonschemaproperties) and [`unrelate`](#pickjsonschemaproperties) methods now return the result of the
     underlying query (`patch` in case of `HasManyRelation`, `HasOneRelation`, and `BelongsToOneRelation`. `insert` otherwise).
     Before the method input was always returned.
 
-  * `Model.RelatedQueryBuilder` is removed. `Model.QueryBuilder` is now used to start all queries for the model.
+  * `Model.RelatedQueryBuilder` is removed. `Model.QueryBuilder` is now used to create all query builders for the model.
     This only affects you if you have defined custom query builders.
 
 ## 0.7.12
