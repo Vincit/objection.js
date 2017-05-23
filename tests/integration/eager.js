@@ -1387,10 +1387,11 @@ module.exports = (session) => {
       });
     }
 
+    if (isPostgres(session.knex))
     describe.skip('big data', () => {
       let graph = null;
 
-      beforeEach(function () {
+      before(function () {
         this.timeout(30000);
         let n = 0;
 
