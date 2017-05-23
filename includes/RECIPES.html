@@ -50,11 +50,6 @@ methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<blockquote>
-<p>ES5:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'person_id'</span><span class="p">;</span>
-</code></pre>
 <p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.
 Composite key can be defined by using an array of column names.</p>
 
@@ -76,21 +71,6 @@ Composite key can be defined by using an array of column names.</p>
     <span class="p">}</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</code></pre>
-<blockquote>
-<p>ES5:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span>
-      <span class="na">id</span><span class="p">:</span> <span class="p">[{</span>
-        <span class="na">message</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span>
-        <span class="na">keyword</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-        <span class="na">params</span><span class="p">:</span> <span class="kc">null</span>
-      <span class="p">}]</span>
-    <span class="p">});</span>
-  <span class="p">}</span>
-<span class="p">};</span>
 </code></pre>
 <blockquote>
 <p>Modifying the <a href="https://github.com/epoberezkin/ajv">Ajv</a> based <code class="prettyprint">jsonSchema</code> validation:</p>
@@ -208,29 +188,6 @@ It is completely optional. If you want to use some other validation library you 
 <span class="p">}</span>
 </code></pre>
 <blockquote>
-<p>ES5:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="c1">// This is called when an object is serialized to database format.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Call superclass implementation.</span>
-  <span class="nx">json</span> <span class="o">=</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
-
-  <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">snakeCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">};</span>
-
-<span class="c1">// This is called when an object is read from database.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
-  <span class="p">});</span>
-
-  <span class="c1">// Call superclass implementation.</span>
-  <span class="k">return</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
-<span class="p">};</span>
-</code></pre>
-<blockquote>
 <p>Note that even though column names are mapped when fetching / storing data, one still has to use
 db column names when writing queries:</p>
 </blockquote>
@@ -308,7 +265,7 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'parent:parent.name as grandParentName'</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'parent:parent.name as grandParentName'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'parent.parent'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">grandParentName</span><span class="p">);</span>
@@ -320,7 +277,7 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 <h2 id="postgresql-quot-returning-quot-tricks">PostgreSQL &ldquo;returning&rdquo; tricks</h2>
 
 <blockquote>
-<p>Insert and return the data in 1 query:</p>
+<p>Insert and return a Model instance in 1 query:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
@@ -328,12 +285,12 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span> <span class="c1">// Sequence ID</span>
   <span class="p">});</span>
 
 </code></pre>
 <blockquote>
-<p>Update a single row by ID and return the data for that row in 1 query:</p>
+<p>Update a single row by ID and return the updated Model instance in 1 query:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
@@ -348,7 +305,7 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 
 </code></pre>
 <blockquote>
-<p>Update a Model instance and return the data for that instance in 1 query:</p>
+<p>Patch a Model instance and receive DB updates to Model instance in 1 query:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
@@ -361,9 +318,36 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">});</span>
 
 </code></pre>
+<blockquote>
+<p>Delete all Persons named Jennifer and return the deleted rows as Model instances in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="k">delete</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">deletedJennifers</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many Jennifers there were</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// Maybe "Lawrence"</span>
+  <span class="p">});</span>
+
+</code></pre>
+<blockquote>
+<p>Delete all of Jennifer&rsquo;s dogs and return the deleted Model instances in 1 query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">jennifer</span>
+  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="k">delete</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="s1">'species'</span><span class="p">:</span> <span class="s1">'dog'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many dogs Jennifer had</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span> <span class="c1">// Maybe "Fido"</span>
+  <span class="p">});</span>
+
+</code></pre>
 <p>Because PostgreSQL (and some others) support <code class="prettyprint">returning(&#39;*&#39;)</code> chaining, you can actually <code class="prettyprint">insert</code> a row, or
-<code class="prettyprint">update</code> / <code class="prettyprint">patch</code> an existing row, <strong>and</strong> receive the affected row(s) in a single query, thus improving
-efficiency. See the examples for more clarity.</p>
+<code class="prettyprint">update</code> / <code class="prettyprint">patch</code> / <code class="prettyprint">delete</code> (an) existing row(s), <strong>and</strong> receive the affected row(s) as Model instances in a single query, thus improving efficiency. See the examples for more clarity.</p>
 
 <h2 id="polymorphic-associations">Polymorphic associations</h2>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Issue</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -425,17 +409,6 @@ how to create relations for this setup ➔</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<blockquote>
-<p>ES5:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeInsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">created_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
-<span class="p">};</span>
-
-<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$beforeUpdate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">updated_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
-<span class="p">};</span>
-</code></pre>
 <p>You can implement the <code class="prettyprint">$beforeInsert</code> and <code class="prettyprint">$beforeUpdate</code> methods to set the timestamps. If you want to do this for all
 your models, you can simply create common base class that implements these methods.</p>
 
@@ -453,35 +426,11 @@ your models, you can simply create common base class that implements these metho
   <span class="p">}</span>
 <span class="p">}</span>
 
-<span class="c1">// Instance of this is created when you call `query()` or `$query()`.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
-<span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
-</code></pre>
-<blockquote>
-<p>ES5:</p>
-</blockquote>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">QueryBuilder</span><span class="p">;</span>
-
-<span class="kd">function</span> <span class="nx">MyQueryBuilder</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">MyQueryBuilder</span><span class="p">);</span>
-
-<span class="c1">// Some custom method.</span>
-<span class="nx">MyQueryBuilder</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">upsert</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">model</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">model</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">QueryBuilder</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="c1">// Instance of this is created when you call `query()` or `$query()`.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">QueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
-<span class="c1">// Instance of this is created when you call `$relatedQuery()`.</span>
-<span class="nx">Person</span><span class="p">.</span><span class="nx">RelatedQueryBuilder</span> <span class="o">=</span> <span class="nx">MyQueryBuilder</span><span class="p">;</span>
+<span class="p">}</span>
 </code></pre>
 <blockquote>
 <p>Now you can do this:</p>
@@ -491,8 +440,7 @@ your models, you can simply create common base class that implements these metho
 <span class="p">});</span>
 </code></pre>
 <p>You can extend the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> returned by <a href="#query"><code class="prettyprint">Model.query()</code></a>, <a href="#_s_relatedquery"><code class="prettyprint">modelInstance.$relatedQuery()</code></a>
-and <a href="#_s_query"><code class="prettyprint">modelInstance.$query()</code></a> methods by setting the model class&rsquo;s static <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> and/or
-<a href="#relatedquerybuilder"><code class="prettyprint">RelatedQueryBuilder</code></a> property.</p>
+and <a href="#_s_query"><code class="prettyprint">modelInstance.$query()</code></a> methods by setting the model class&rsquo;s static <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>.</p>
 
 <p>If you want to set the custom query builder for all model classes you can just set the <code class="prettyprint">QueryBuilder</code>
 property of the <a href="#model"><code class="prettyprint">Model</code></a> base class. A cleaner option would be to create your own Model subclass, set its <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>
@@ -609,6 +557,116 @@ class.</p>
 <li><a href="#_s_values"><code class="prettyprint">$values</code></a></li>
 </ul>
 
+<h2 id="indexing-postgresql-jsonb-columns">Indexing PostgreSQL JSONB columns</h2>
+
+<p>Good reading on the subject:</p>
+
+<ul>
+<li><a href="https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/">JSONB type performance in PostgreSQL 9.4</a> and</li>
+<li><a href="http://paquier.xyz/postgresql-2/postgres-9-4-feature-highlight-indexing-jsonb/">Postgres 9.4 feature highlight - Indexing JSON data with jsonb data type</a>.</li>
+</ul>
+
+<h3 id="general-inverted-indexes-a-k-a-gin">General Inverted Indexes a.k.a. GIN</h3>
+
+<p>This is the index type which makes all JSONB set operations fast. All <code class="prettyprint">isSuperset</code> / <code class="prettyprint">isSubset</code> / <code class="prettyprint">hasKeys</code> / <code class="prettyprint">hasValues</code> etc. queries can use this index to speed ’em up. Usually this is the index you want and it may take around 30% extra space on the DB server.</p>
+
+<p>If one likes to use only the subset/superset operators with faster and smaller index one can give an extra <code class="prettyprint">path_ops</code> parameter when creating the index: <a href="https://wiki.postgresql.org/wiki/What's_new_in_PostgreSQL_9.4">“The path_ops index supports only the search path operator <code class="prettyprint">@&gt;</code> (see below), but produces a smaller and faster index for these kinds of searches.”</a>. According to Marco Nenciarini’s post the speed up can be over 600% compared to full GIN index and the size of the index is reduced from ~30% -&gt; ~20%.</p>
+
+<blockquote>
+<p>Full GIN index to speed up all type of json queries:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'CREATE INDEX on ?? USING GIN (??)'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">])</span>
+</code></pre>
+<blockquote>
+<p>Partial GIN index to speed up all subset / superset type of json queries:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'CREATE INDEX on ?? USING GIN (?? jsonb_path_ops)'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'Place'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">])</span>
+</code></pre>
+<h3 id="index-on-expression">Index on Expression</h3>
+
+<p>Another type of index one may use for JSONB field is to create an expression index for example for a certain JSON field inside a column.</p>
+
+<p>You might want to use these if you are using lots of <code class="prettyprint">.where(ref(&#39;jsonColumn:details.name&#39;).castText(), &#39;marilyn&#39;)</code> type of queries, which cannot be sped up with GIN index.</p>
+
+<p>Use of these indexes are more limited, but they are also somewhat faster than using GIN and querying e.g. <code class="prettyprint">{ field: value }</code> with subset operator. GIN indices also takes a lot of space in compared to expression index for certain field. So if you want to make just certain query to go extra fast you may consider using index on expression.</p>
+
+<blockquote>
+<p>An expression index referring an internal <code class="prettyprint">details.name</code> attribute of an object stored in <code class="prettyprint">jsonColumn</code>:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"CREATE INDEX on ?? ((??#&gt;&gt;'{details,name}'))"</span><span class="p">,</span> <span class="p">[</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="s1">'jsonColumn'</span><span class="p">])</span>
+</code></pre>
+<h3 id="complete-migration-example-and-created-tables-indexes">Complete Migration Example and Created Tables / Indexes</h3>
+
+<p>Complete example how to try out different index choices.</p>
+
+<blockquote>
+<p>Migration:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">up</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">knex</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span>
+    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">jsonb</span><span class="p">(</span><span class="s1">'details'</span><span class="p">);</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'homeId'</span><span class="p">).</span><span class="nx">unsigned</span><span class="p">()</span>
+        <span class="p">.</span><span class="nx">references</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">inTable</span><span class="p">(</span><span class="s1">'Place'</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">raw</span><span class="p">(</span>
+      <span class="s1">'CREATE INDEX on ?? USING GIN (??)'</span><span class="p">,</span>
+      <span class="p">[</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="p">.</span><span class="nx">raw</span><span class="p">(</span>
+      <span class="s2">"CREATE INDEX on ?? ((??#&gt;&gt;'{type}'))"</span><span class="p">,</span>
+      <span class="p">[</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Place'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">jsonb</span><span class="p">(</span><span class="s1">'details'</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nx">raw</span><span class="p">(</span>
+      <span class="s1">'CREATE INDEX on ?? USING GIN (?? jsonb_path_ops)'</span><span class="p">,</span>
+      <span class="p">[</span><span class="s1">'Place'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">]</span>
+    <span class="p">);</span>
+<span class="p">};</span>
+</code></pre>
+<blockquote>
+<p>Results following schema:</p>
+</blockquote>
+<pre class="highlight sql"><code><span class="n">objection</span><span class="o">-</span><span class="n">jsonb</span><span class="o">-</span><span class="n">example</span><span class="o">=#</span> <span class="err">\</span><span class="n">d</span> <span class="nv">"Hero"</span>
+            <span class="k">Table</span> <span class="nv">"public.Hero"</span>
+ <span class="k">Column</span>  <span class="o">|</span>          <span class="k">Type</span>
+<span class="c1">---------+------------------------</span>
+ <span class="n">id</span>      <span class="o">|</span> <span class="n">integer</span>
+ <span class="n">name</span>    <span class="o">|</span> <span class="n">character</span> <span class="n">varying</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span>
+ <span class="n">details</span> <span class="o">|</span> <span class="n">jsonb</span>
+ <span class="n">homeId</span>  <span class="o">|</span> <span class="n">integer</span>
+<span class="n">Indexes</span><span class="p">:</span>
+    <span class="nv">"Hero_pkey"</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="n">btree</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+    <span class="nv">"Hero_details_idx"</span> <span class="n">gin</span> <span class="p">(</span><span class="n">details</span><span class="p">)</span>
+    <span class="nv">"Hero_expr_idx"</span> <span class="n">btree</span> <span class="p">((</span><span class="n">details</span> <span class="o">#&gt;&gt;</span> <span class="s1">'{type}'</span><span class="p">::</span><span class="n">text</span><span class="p">[]))</span>
+
+<span class="n">objection</span><span class="o">-</span><span class="n">jsonb</span><span class="o">-</span><span class="n">example</span><span class="o">=#</span> <span class="err">\</span><span class="n">d</span> <span class="nv">"Place"</span>
+           <span class="k">Table</span> <span class="nv">"public.Place"</span>
+ <span class="k">Column</span>  <span class="o">|</span>          <span class="k">Type</span>
+<span class="c1">---------+------------------------</span>
+ <span class="n">id</span>      <span class="o">|</span> <span class="n">integer</span>
+ <span class="n">name</span>    <span class="o">|</span> <span class="n">character</span> <span class="n">varying</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span>
+ <span class="n">details</span> <span class="o">|</span> <span class="n">jsonb</span>
+<span class="n">Indexes</span><span class="p">:</span>
+    <span class="nv">"Place_pkey"</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span> <span class="n">btree</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+    <span class="nv">"Place_details_idx"</span> <span class="n">gin</span> <span class="p">(</span><span class="n">details</span> <span class="n">jsonb_path_ops</span><span class="p">)</span>
+</code></pre>
+<blockquote>
+<p>Expression index is used for example for following query:</p>
+</blockquote>
+<pre class="highlight sql"><code><span class="k">explain</span> <span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"Hero"</span> <span class="k">where</span> <span class="n">details</span><span class="o">#&gt;&gt;</span><span class="s1">'{type}'</span> <span class="o">=</span> <span class="s1">'Hero'</span><span class="p">;</span>
+
+                           <span class="n">QUERY</span> <span class="n">PLAN</span>
+<span class="c1">----------------------------------------------------------------</span>
+ <span class="k">Index</span> <span class="n">Scan</span> <span class="k">using</span> <span class="nv">"Hero_expr_idx"</span> <span class="k">on</span> <span class="nv">"Hero"</span>
+   <span class="k">Index</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">details</span> <span class="o">#&gt;&gt;</span> <span class="s1">'{type}'</span><span class="p">::</span><span class="n">text</span><span class="p">[])</span> <span class="o">=</span> <span class="s1">'Hero'</span><span class="p">::</span><span class="n">text</span><span class="p">)</span>
+</code></pre>
       </div>
       <div class="dark-box">
       </div>

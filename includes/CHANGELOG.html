@@ -30,6 +30,77 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="0-8-0">0.8.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>All query methods now call <code class="prettyprint">Model.query</code> to create a <code class="prettyprint">QueryBuilder</code> instance <a href="https://github.com/Vincit/objection.js/issues/346">#346</a></li>
+<li>Objection is no longer transpiled. One of the implications is that you can use a github
+link in package.json to test experimental versions.</li>
+<li><code class="prettyprint">count</code> can now be called without arguments <a href="https://github.com/Vincit/objection.js/issues/364">#364</a></li>
+<li>A new <a href="#getrelations"><code class="prettyprint">getRelations</code></a> method for plugin development and other reflection greatness.</li>
+</ul>
+
+<h3 id="breaking-changes">Breaking changes</h3>
+
+<blockquote>
+<p>Old model definition</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">Person</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">Model</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Person</span><span class="p">);</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fullName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// More static and prototype methods.</span>
+</code></pre>
+<blockquote>
+<p>Easiest way to migrate to <code class="prettyprint">class</code> and <code class="prettyprint">extends</code> keywords</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+
+<span class="p">}</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+
+<span class="nx">Person</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">fullName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// More static and prototype methods.</span>
+</code></pre>
+<ul>
+<li><p>Support for node versions below 4.0.0 has been removed. With it the support for legacy class inheritance using <code class="prettyprint">Model.extend</code> method
+has also been removed. This means that you need to change your model definitions to use the <code class="prettyprint">class</code> and <code class="prettyprint">extends</code> keywords.
+To achieve this with the minimum amount of changes you can simply swap the constructor function and <code class="prettyprint">Model.extend</code> to
+a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right &ndash;&gt;</p></li>
+<li><p>The default value of <a href="#pickjsonschemaproperties"><code class="prettyprint">pickJsonSchemaProperties</code></a> was changed to <code class="prettyprint">false</code>. Before, all properties that
+were not listed in <code class="prettyprint">jsonSchema</code> were removed before <code class="prettyprint">insert</code>, <code class="prettyprint">patch</code> or <code class="prettyprint">update</code> (if <code class="prettyprint">jsonSchma</code> was defined). Starting from
+this version you need to explicitly set the value to <code class="prettyprint">true</code>. You may have been used this feature by accident.
+If you have weird problems after the update, try setting <code class="prettyprint">objection.Model.pickJsonSchemaProperties = true;</code> to see
+if it helps.</p></li>
+<li><p><a href="#pickjsonschemaproperties"><code class="prettyprint">relate</code></a> and <a href="#pickjsonschemaproperties"><code class="prettyprint">unrelate</code></a> methods now return the result of the
+underlying query (<code class="prettyprint">patch</code> in case of <code class="prettyprint">HasManyRelation</code>, <code class="prettyprint">HasOneRelation</code>, and <code class="prettyprint">BelongsToOneRelation</code>. <code class="prettyprint">insert</code> otherwise).
+Before the method input was always returned.</p></li>
+<li><p><code class="prettyprint">Model.RelatedQueryBuilder</code> is removed. <code class="prettyprint">Model.QueryBuilder</code> is now used to create all query builders for the model.
+This only affects you if you have defined custom query builders.</p></li>
+</ul>
+
+<h2 id="0-7-12">0.7.12</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/345">#345</a></li>
+</ul>
+
 <h2 id="0-7-11">0.7.11</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
