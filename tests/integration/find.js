@@ -163,6 +163,17 @@ module.exports = (session) => {
             });
         });
 
+        it('.where() with a model instance', () => {
+          const where = Model1.fromJson({model1Prop1: 'hello 1'});
+
+          return Model1
+            .query()
+            .where(where)
+            .then(models => {
+              expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1']);
+            });
+        });
+
         it('.orderBy()', () => {
           return Model2
             .query()
