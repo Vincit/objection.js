@@ -225,6 +225,55 @@ module.exports = (session) => {
           })
           .catch(err => {
             expect(err).to.be.a(ValidationError);
+            expect(err).to.be.a(ModelWithSchema.ValidationError);
+
+            return session.knex(Model1.tableName).then(rows => {
+              expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
+              done();
+            })
+          })
+          .catch(done);
+      });
+
+      it('should use `Model.createValidationError` to create the error', done => {
+        class MyError extends Error {
+          constructor(errors) {
+            super('MyError');
+            this.errors = errors;
+          }
+        }
+
+        let ModelWithSchema = subClassWithSchema(Model1, {
+          type: 'object',
+          properties: {
+            id: {type: ['number', 'null']},
+            model1Prop1: {type: 'string'},
+            model1Prop2: {type: 'number'}
+          }
+        });
+
+        ModelWithSchema.createValidationError = (errors) => {
+          return new MyError(errors);
+        };
+
+        ModelWithSchema
+          .query()
+          .insert({model1Prop1: 666})
+          .then(x => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err).to.be.a(MyError);
+            expect(err.errors).to.eql({
+              model1Prop1: [{ 
+                message: 'should be string',
+                keyword: 'type',
+                params: {
+                  type: 'string'
+                }
+              }]
+            });
+
             return session.knex(Model1.tableName).then(rows => {
               expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
               done();

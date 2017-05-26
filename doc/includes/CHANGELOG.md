@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.1
+
+### What's new
+
+  * [`throwIfNotFound`](http://vincit.github.io/objection.js/#throwifnotfound) method for making empty query results throw an exception.
+  * fix error when passing model instance to a `where` method. [#387](https://github.com/Vincit/objection.js/issues/387)
+
 ## 0.8.0
 
 ### What's new

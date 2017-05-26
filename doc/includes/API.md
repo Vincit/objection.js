@@ -3749,6 +3749,39 @@ Type|Description
 
 
 
+#### throwIfNotFound
+
+```js
+const builder = queryBuilder.throwIfNotFound();
+```
+
+```js
+Language
+  .query()
+  .where('name', 'Java')
+  .andWhere('isModern', true)
+  .throwIfNotFound()
+  .catch(err => {
+    // No results found.
+    console.log(err instanceof Language.NotFoundError); // --> true
+  });
+```
+
+Causes a [`Model.NotFoundError`](#notfounderror) to be thrown if the query result is empty.
+
+You can replace `Model.NotFoundError` with your own error by implementing the static 
+[`Model.createNotFoundError(ctx)`](#createnotfounderror) method.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining
+
+
+
+
+
 #### traverse
 
 ```js
@@ -5042,6 +5075,86 @@ the default implementation example.
 Type|Description
 ----|-----------------------------
 [`Validator`](#validator)|The created validator instance
+
+
+
+
+
+#### createNotFoundError
+
+```js
+class BaseModel extends Model {
+  static createNotFoundError(queryContext) {
+    return new MyCustomNotFoundError();
+  }
+}
+```
+
+> The default implementation:
+
+```js
+class Model {
+  static createNotFoundError(queryContext) {
+    return new this.NotFoundError();
+  }
+}
+```
+
+Creates an error thrown by [`throwIfNotFound()`](#throwifnotfound) method. You can override this
+to throw any error you want.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of query that produced the empty result. See [`context`](#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Error`|The created error. [`Model.NotFoundError`](#notfounderror) by default.
+
+
+
+
+
+
+#### createValidationError
+
+```js
+class BaseModel extends Model {
+  static createValidationError(errorHash) {
+    return new MyCustomValidationError(errorHash);
+  }
+}
+```
+
+> The default implementation:
+
+```js
+class Model {
+  static createValidationError(errorHash) {
+    return new this.ValidationError(errorHash);
+  }
+}
+```
+
+Creates an error thrown when validation fails for a model. You can override this
+to throw any error you want.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+errorHash|Object|The failed validations. See [`ValidationError`](#validationerror) documentation for details.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Error`|The created error. [`Model.ValidationError`](#validationerror) by default.
+
 
 
 
@@ -6511,17 +6624,18 @@ method of [`Model`](#model) like in the example to modify the validator.
 ```js
 const ValidationError = require('objection').ValidationError;
 
-throw new ValidationError({ /* see `data` object below */ });
+throw new ValidationError(data);
 ```
 
-Error of this class is thrown if a model validation fails.
+> Or
 
-Property|Type|Description
---------|----|-----------
-statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
-data|Object|Dictionary of errors.
+```js
+const ValidationError = require('objection').Model.ValidationError;
 
-The `data` object should follow this pattern:
+throw new ValidationError(data);
+```
+
+> The `data` object should follow this pattern:
 
 ```js
 {
@@ -6550,7 +6664,43 @@ The `data` object should follow this pattern:
 }
 ```
 
-For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword` string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
+> For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword` 
+> string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
+
+Error of this class is thrown by default if a model validation fails.
+
+You can replace this error by overriding [`Model.createValidationError()`](#createvalidationerror) method.
+
+Property|Type|Description
+--------|----|-----------
+statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
+data|Object|Dictionary of errors.
+
+
+
+
+
+## NotFoundError
+
+```js
+const NotFoundError = require('objection').NotFoundError;
+
+throw new NotFoundError(data);
+```
+
+> Or
+
+```js
+const NotFoundError = require('objection').Model.NotFoundError;
+
+throw new NotFoundError(data);
+```
+
+Error of this class is thrown by default by [`throwIfNotFound()`](#throwifnotfound)
+
+You can replace this error by overriding [`Model.createNotFoundError()`](#createnotfounderror) method.
+
+
 
 
 

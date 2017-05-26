@@ -356,7 +356,7 @@ describe('RelationExpression', () => {
       });
     });
 
-    it('should fail gracefully on invalid input', () => {
+    it('should throw with invalid input', () => {
       testParseFail('.');
       testParseFail('..');
       testParseFail('a.');
@@ -661,9 +661,7 @@ describe('RelationExpression', () => {
   function testParseFail(str) {
     expect(() => {
       RelationExpression.parse(str);
-    }).to.throwException(err => {
-      expect(err).to.be.a(ValidationError);
-    });
+    }).to.throwException();
   }
 
   function testSubExpression(str, subStr) {

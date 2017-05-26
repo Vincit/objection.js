@@ -12,6 +12,7 @@ describe('main module', () => {
     expect(objection.QueryBuilderOperation).to.equal(require('../lib/queryBuilder/operations/QueryBuilderOperation'));
     expect(objection.RelationExpression).to.equal(require('../lib/queryBuilder/RelationExpression'));
     expect(objection.ValidationError).to.equal(require('../lib/model/ValidationError'));
+    expect(objection.NotFoundError).to.equal(require('../lib/model/NotFoundError'));
     expect(objection.Relation).to.equal(require('../lib/relations/Relation'));
     expect(objection.HasManyRelation).to.equal(require('../lib/relations/hasMany/HasManyRelation'));
     expect(objection.HasOneRelation).to.equal(require('../lib/relations/hasOne/HasOneRelation'));

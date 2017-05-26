@@ -240,6 +240,77 @@ module.exports = (session) => {
             });
         });
 
+        it('.throwIfNotFound() with empty result', (done) => {
+          Model1
+            .query()
+            .where('model1Prop1', 'There is no value like me')
+            .throwIfNotFound()
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err).to.be.a(Model1.NotFoundError);
+              done();
+            })
+            .catch(done);
+        });
+
+        it('.throwIfNotFound() with non-empty result', () => {
+          return Model2
+            .query()
+            .throwIfNotFound()
+            .where('model_2_prop_2', '>', 15)
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20, 30]);
+            });
+        });
+
+        it('.throwIfNotFound() with single result', (done) => {
+          Model1
+            .query()
+            .where('model1Prop1', 'There is no value like me')
+            .first()
+            .throwIfNotFound()
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err).to.be.a(Model1.NotFoundError);
+              done();
+            })
+            .catch(done);
+        });
+
+        it('.throwIfNotFound() should throw error returned by `createNotFoundError`', (done) => {
+          class CustomError extends Error {
+            constructor(ctx) {
+              super('CustomError');
+              this.ctx = ctx;
+            }
+          }
+
+          class TestModel extends Model1 {
+            static createNotFoundError(ctx) {
+              return new CustomError(ctx);
+            }
+          }
+
+          TestModel
+            .query()
+            .where('model1Prop1', 'There is no value like me')
+            .mergeContext({foo: 'bar'})
+            .throwIfNotFound()
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err).to.be.a(CustomError);
+              expect(err.ctx).to.eql({foo: 'bar'});
+              done();
+            })
+            .catch(done);
+        });
+
         it('complex nested subquery', () => {
           return Model2
             .query()
