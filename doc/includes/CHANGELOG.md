@@ -58,6 +58,10 @@ Person.prototype.fullName = function () {
     To achieve this with the minimum amount of changes you can simply swap the constructor function and `Model.extend` to
     a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right -->
 
+    Note that this also affects Babel transpilation. You cannot (or need to) use `babel-plugin-transform-es2015-classes` anymore.
+    See the [ESNext example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) as an example of
+    how to setup babel.
+
   * The default value of [`pickJsonSchemaProperties`](#pickjsonschemaproperties) was changed to `false`. Before, all properties that
     were not listed in `jsonSchema` were removed before `insert`, `patch` or `update` (if `jsonSchma` was defined). Starting from
     this version you need to explicitly set the value to `true`. You may have been used this feature by accident.

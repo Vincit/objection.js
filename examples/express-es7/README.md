@@ -8,7 +8,7 @@ npm install
 npm start
 ```
 
-Note that starting from 0.8.0 objection uses native ES2015 classes an no longer supports
+Note that starting from 0.8.0 objection uses native ES2015 classes and no longer supports
 legacy ES5 classes. This also means Babel generated ES5 code. For this reason we need to
 omit the `babel-plugin-transform-es2015-classes` plugin. There is no way to omit plugins
 from presets. That's why the package.json explicitly lists all plugins in Babel `es2015`

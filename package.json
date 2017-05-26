@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -27,6 +27,9 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/vincit/objection.js.git"
+  },
+  "engines": {
+    "node" : ">=4.0.0"
   },
   "keywords": [
     "orm",
