@@ -5,7 +5,9 @@
   "main": "app.js",
 
   "scripts": {
-    "start": "babel-node app"
+    "migrate": "knex migrate:latest",
+    "build": "babel src -d build",
+    "start": " npm run build && npm run migrate && node build/app"
   },
 
   "babel": {
@@ -41,7 +43,19 @@
   "license": "MIT",
 
   "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "express-promise-router": "^1.1.1",
+    "knex": "^0.13.0",
+    "lodash": "^4.17.4",
+    "morgan": "^1.8.2",
+    "objection": "^0.8.0",
+    "sqlite3": "^3.1.8"
+  },
+
+  "devDependencies": {
     "babel-cli": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-check-es2015-constants": "^6.22.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
@@ -62,15 +76,6 @@
     "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "babel-plugin-transform-es2015-typeof-symbol": "^6.23.0",
     "babel-plugin-transform-es2015-unicode-regex": "^6.24.1",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
-    "express-promise-router": "^1.1.1",
-    "knex": "^0.13.0",
-    "lodash": "^4.17.4",
-    "morgan": "^1.8.2",
-    "objection": "^0.8.0",
-    "sqlite3": "^3.1.8"
+    "babel-plugin-transform-async-to-generator": "^6.24.1"    
   }
 }

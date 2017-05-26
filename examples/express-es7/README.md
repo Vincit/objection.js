@@ -4,12 +4,16 @@
 git clone git@github.com:Vincit/objection.js.git objection
 cd objection/examples/express-es7
 npm install
-# We use knex for migrations in this example.
-npm install knex -g
-knex migrate:latest
-# This runs the Babel transpiler and executes the app.
+# This runs the Babel transpiler, runs knex migrations and executes the app.
 npm start
 ```
+
+Note that starting from 0.8.0 objection uses native ES2015 classes an no longer supports
+legacy ES5 classes. This also means Babel generated ES5 code. For this reason we need to
+omit the `babel-plugin-transform-es2015-classes` plugin. There is no way to omit plugins
+from presets. That's why the package.json explicitly lists all plugins in Babel `es2015`
+preset __except__ `babel-plugin-transform-es2015-classes`.
+
 
 `example-requests.sh` file contains a bunch of `curl` commands for you to start playing with the REST API:
 
