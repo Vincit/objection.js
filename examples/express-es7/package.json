@@ -7,7 +7,7 @@
   "scripts": {
     "migrate": "knex migrate:latest",
     "build": "babel src -d build",
-    "start": " npm run build && npm run migrate && node build/app"
+    "start": "npm run build && npm run migrate && node build/app"
   },
 
   "babel": {

@@ -4,7 +4,7 @@
 git clone git@github.com:Vincit/objection.js.git objection
 cd objection/examples/express-es7
 npm install
-# This runs the Babel transpiler, runs knex migrations and executes the app.
+# This runs the Babel transpiler, knex migrations and executes the app.
 npm start
 ```
 
