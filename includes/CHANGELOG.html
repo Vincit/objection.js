@@ -30,6 +30,15 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="0-8-1">0.8.1</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><a href="http://vincit.github.io/objection.js/#throwifnotfound"><code class="prettyprint">throwIfNotFound</code></a> method for making empty query results throw an exception.</li>
+<li>fix error when passing model instance to a <code class="prettyprint">where</code> method. <a href="https://github.com/Vincit/objection.js/issues/387">#387</a></li>
+</ul>
+
 <h2 id="0-8-0">0.8.0</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
@@ -80,7 +89,11 @@ link in package.json to test experimental versions.</li>
 <li><p>Support for node versions below 4.0.0 has been removed. With it the support for legacy class inheritance using <code class="prettyprint">Model.extend</code> method
 has also been removed. This means that you need to change your model definitions to use the <code class="prettyprint">class</code> and <code class="prettyprint">extends</code> keywords.
 To achieve this with the minimum amount of changes you can simply swap the constructor function and <code class="prettyprint">Model.extend</code> to
-a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right &ndash;&gt;</p></li>
+a class definition. You can still define all static and prototype methods and properties the old way. See the example on the right &ndash;&gt;</p>
+
+<p>Note that this also affects Babel transpilation. You cannot (or need to) use <code class="prettyprint">babel-plugin-transform-es2015-classes</code> anymore.
+See the <a href="https://github.com/Vincit/objection.js/tree/master/examples/express-es7">ESNext example project</a> as an example of
+how to setup babel.</p></li>
 <li><p>The default value of <a href="#pickjsonschemaproperties"><code class="prettyprint">pickJsonSchemaProperties</code></a> was changed to <code class="prettyprint">false</code>. Before, all properties that
 were not listed in <code class="prettyprint">jsonSchema</code> were removed before <code class="prettyprint">insert</code>, <code class="prettyprint">patch</code> or <code class="prettyprint">update</code> (if <code class="prettyprint">jsonSchma</code> was defined). Starting from
 this version you need to explicitly set the value to <code class="prettyprint">true</code>. You may have been used this feature by accident.

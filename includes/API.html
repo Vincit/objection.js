@@ -4555,6 +4555,37 @@ The problem with this is that if the result set is empty, we don&rsquo;t get the
 </tr>
 </tbody></table>
 
+<h4 id="throwifnotfound">throwIfNotFound</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">throwIfNotFound</span><span class="p">();</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">Language</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'Java'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">andWhere</span><span class="p">(</span><span class="s1">'isModern'</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">throwIfNotFound</span><span class="p">()</span>
+  <span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">err</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// No results found.</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">Language</span><span class="p">.</span><span class="nx">NotFoundError</span><span class="p">);</span> <span class="c1">// --&gt; true</span>
+  <span class="p">});</span>
+</code></pre>
+<p>Causes a <a href="#notfounderror"><code class="prettyprint">Model.NotFoundError</code></a> to be thrown if the query result is empty.</p>
+
+<p>You can replace <code class="prettyprint">Model.NotFoundError</code> with your own error by implementing the static 
+<a href="#createnotfounderror"><code class="prettyprint">Model.createNotFoundError(ctx)</code></a> method.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining</td>
+</tr>
+</tbody></table>
+
 <h4 id="traverse">traverse</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">,</span> <span class="nx">traverser</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
@@ -5887,6 +5918,104 @@ the default implementation example.</p>
 <tr>
 <td><a href="#validator"><code class="prettyprint">Validator</code></a></td>
 <td>The created validator instance</td>
+</tr>
+</tbody></table>
+
+<h4 id="createnotfounderror">createNotFoundError</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createNotFoundError</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyCustomNotFoundError</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The default implementation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createNotFoundError</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="k">this</span><span class="p">.</span><span class="nx">NotFoundError</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Creates an error thrown by <a href="#throwifnotfound"><code class="prettyprint">throwIfNotFound()</code></a> method. You can override this
+to throw any error you want.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>queryContext</td>
+<td>Object</td>
+<td>The context object of query that produced the empty result. See <a href="#context"><code class="prettyprint">context</code></a>.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">Error</code></td>
+<td>The created error. <a href="#notfounderror"><code class="prettyprint">Model.NotFoundError</code></a> by default.</td>
+</tr>
+</tbody></table>
+
+<h4 id="createvalidationerror">createValidationError</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyCustomValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The default implementation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="k">this</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Creates an error thrown when validation fails for a model. You can override this
+to throw any error you want.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>errorHash</td>
+<td>Object</td>
+<td>The failed validations. See <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> documentation for details.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code class="prettyprint">Error</code></td>
+<td>The created error. <a href="#validationerror"><code class="prettyprint">Model.ValidationError</code></a> by default.</td>
 </tr>
 </tbody></table>
 
@@ -7597,30 +7726,18 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
 <h2 id="validationerror">ValidationError</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">ValidationError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">ValidationError</span><span class="p">;</span>
 
-<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">({</span> <span class="cm">/* see `data` object below */</span> <span class="p">});</span>
+<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
 </code></pre>
-<p>Error of this class is thrown if a model validation fails.</p>
+<blockquote>
+<p>Or</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">ValidationError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">;</span>
 
-<table><thead>
-<tr>
-<th>Property</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>statusCode</td>
-<td>number</td>
-<td>HTTP status code for interop with express error handlers and other libraries that search for status code from errors.</td>
-</tr>
-<tr>
-<td>data</td>
-<td>Object</td>
-<td>Dictionary of errors.</td>
-</tr>
-</tbody></table>
-
+<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</code></pre>
+<blockquote>
 <p>The <code class="prettyprint">data</code> object should follow this pattern:</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">key1</span><span class="p">:</span> <span class="p">[{</span>
     <span class="na">message</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">,</span>
@@ -7646,7 +7763,49 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
   <span class="p">...</span>
 <span class="p">}</span>
 </code></pre>
-<p>For each <code class="prettyprint">key</code>, a list of errors is given. Each error contains the default <code class="prettyprint">message</code> (as returned by the validator), an optional <code class="prettyprint">keyword</code> string to identify the validation rule which didn&rsquo;t pass and a <code class="prettyprint">param</code> object which optionally contains more details about the context of the validation error.</p>
+<blockquote>
+<p>For each <code class="prettyprint">key</code>, a list of errors is given. Each error contains the default <code class="prettyprint">message</code> (as returned by the validator), an optional <code class="prettyprint">keyword</code> 
+string to identify the validation rule which didn&rsquo;t pass and a <code class="prettyprint">param</code> object which optionally contains more details about the context of the validation error.</p>
+</blockquote>
+
+<p>Error of this class is thrown by default if a model validation fails.</p>
+
+<p>You can replace this error by overriding <a href="#createvalidationerror"><code class="prettyprint">Model.createValidationError()</code></a> method.</p>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>statusCode</td>
+<td>number</td>
+<td>HTTP status code for interop with express error handlers and other libraries that search for status code from errors.</td>
+</tr>
+<tr>
+<td>data</td>
+<td>Object</td>
+<td>Dictionary of errors.</td>
+</tr>
+</tbody></table>
+
+<h2 id="notfounderror">NotFoundError</h2>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">NotFoundError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">NotFoundError</span><span class="p">;</span>
+
+<span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundError</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Or</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">NotFoundError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">.</span><span class="nx">NotFoundError</span><span class="p">;</span>
+
+<span class="k">throw</span> <span class="k">new</span> <span class="nx">NotFoundError</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</code></pre>
+<p>Error of this class is thrown by default by <a href="#throwifnotfound"><code class="prettyprint">throwIfNotFound()</code></a></p>
+
+<p>You can replace this error by overriding <a href="#createnotfounderror"><code class="prettyprint">Model.createNotFoundError()</code></a> method.</p>
 
 <h2 id="modeloptions">ModelOptions</h2>
 
