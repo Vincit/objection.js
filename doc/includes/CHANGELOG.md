@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.2
+
+### What's new
+
+  * [`Model.namedFilters`](http://vincit.github.io/objection.js/#namedfilters) object for defining shared filters that can be used by name in eager expressions.
+
 ## 0.8.1
 
 ### What's new

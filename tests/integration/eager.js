@@ -13,7 +13,7 @@ module.exports = (session) => {
 
   describe('Model eager queries', () => {
 
-    before(() => {
+    beforeEach(() => {
       return session.populate([{
         id: 1,
         model1Prop1: 'hello 1',
@@ -89,6 +89,23 @@ module.exports = (session) => {
           model1Id: 3,
           model1Prop1: 'hello 2',
           model1Prop2: null,
+          $afterGetCalled: 1
+        }
+      }]);
+
+      expect(models[0]).to.be.a(Model1);
+      expect(models[0].model1Relation1).to.be.a(Model1);
+    });
+
+    test('model1Relation1(select:model1Prop1)', models => {
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+        model1Relation1: {
+          model1Prop1: 'hello 2',
           $afterGetCalled: 1
         }
       }]);
@@ -584,6 +601,75 @@ module.exports = (session) => {
           }]
         }]
       }]);
+    });
+
+    // This tests the Model.namedFilters feature.
+    test(`[
+      model1Relation1(select:id, localNamedFilter), 
+      model1Relation2.[
+        model2Relation1(select:model1Prop1).[
+          model1Relation1(select:id, select:model1Prop1),
+          model1Relation2
+        ]
+      ]
+    ]`, models => {
+      expect(models).to.eql([{
+        id: 1,
+        model1Id: 2,
+        model1Prop1: 'hello 1',
+        model1Prop2: null,
+        $afterGetCalled: 1,
+
+        model1Relation1: {
+          id: 2,
+          model1Prop2: null,
+          $afterGetCalled: 1
+        },
+
+        model1Relation2: [{
+          idCol: 1,
+          model1Id: 1,
+          model2Prop1: 'hejsan 1',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+          model2Relation1: []
+        }, {
+          idCol: 2,
+          model1Id: 1,
+          model2Prop1: 'hejsan 2',
+          model2Prop2: null,
+          $afterGetCalled: 1,
+
+          model2Relation1: [{
+            model1Prop1: 'hello 5',
+            $afterGetCalled: 1,
+
+            model1Relation1: null,
+            model1Relation2: []
+          }, {
+            model1Prop1: 'hello 6',
+            $afterGetCalled: 1,
+
+            model1Relation1: {
+              id: 7,
+              model1Prop1: 'hello 7',
+              $afterGetCalled: 1
+            },
+
+            model1Relation2: [{
+              idCol: 3,
+              model1Id: 6,
+              model2Prop1: 'hejsan 3',
+              model2Prop2: null,
+              $afterGetCalled: 1
+            }]
+          }]
+        }]
+      }]);
+    }, {
+      filters: {
+        localNamedFilter: (builder) => builder.select('model1Prop2')
+      }
     });
 
     describe('JoinEagerAlgorithm', () => {
@@ -1367,6 +1453,124 @@ module.exports = (session) => {
 
     });
 
+    describe('Multiple parents + ManyToManyRelation', () => {
+
+      beforeEach(() => {
+        return Model2
+          .query()
+          .insertGraph([{
+            idCol: 100,
+            model2Prop1: 'hejsan 1',
+
+            model2Relation1: [{
+              id: 500,
+              model1Prop1: 'hello 5',
+            }, {
+              id: 600,
+              model1Prop1: 'hello 6',
+            }]
+          }, {
+            idCol: 200,
+            model2Prop1: 'hejsan 2',
+
+            model2Relation1: [{
+              id: 700,
+              model1Prop1: 'hello 7',
+            }, {
+              id: 800,
+              model1Prop1: 'hello 8',
+            }]
+          }]);
+      });
+
+      it('should work with WhereInEagerAlgorithm', () => {
+        return Model2
+          .query()
+          .whereIn('id_col', [100, 200])
+          .eagerAlgorithm(Model2.WhereInEagerAlgorithm)
+          .eager('model2Relation1(select)', {
+            select: b => b.select('model1Prop1')
+          })
+          .map(model => {
+            model.model2Relation1 = _.sortBy(model.model2Relation1, 'modle1Prop1');
+            return model; 
+          })
+          .then(models => {
+            expect(models).to.eql([{
+              idCol: 100,
+              model1Id: null,
+              model2Prop1: 'hejsan 1',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+              model2Relation1: [{
+                model1Prop1: 'hello 5',
+                $afterGetCalled: 1
+              }, {
+                model1Prop1: 'hello 6',
+                $afterGetCalled: 1
+              }]
+            }, {
+              idCol: 200,
+              model1Id: null,
+              model2Prop1: 'hejsan 2',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+              model2Relation1: [{
+                model1Prop1: 'hello 7',
+                $afterGetCalled: 1
+              }, {
+                model1Prop1: 'hello 8',
+                $afterGetCalled: 1
+              }]
+            }]);
+          });
+      });
+
+      it('should work with JoinEagerAlgorithm', () => {
+        return Model2
+          .query()
+          .whereIn('id_col', [100, 200])
+          .eagerAlgorithm(Model2.JoinEagerAlgorithm)
+          .eager('model2Relation1(select)', {
+            select: b => b.select('model1Prop1')
+          })
+          .map(model => {
+            model.model2Relation1 = _.sortBy(model.model2Relation1, 'modle1Prop1');
+            return model; 
+          })
+          .then(models => {
+            expect(models).to.eql([{
+              idCol: 100,
+              model1Id: null,
+              model2Prop1: 'hejsan 1',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+              model2Relation1: [{
+                model1Prop1: 'hello 5',
+                $afterGetCalled: 1
+              }, {
+                model1Prop1: 'hello 6',
+                $afterGetCalled: 1
+              }]
+            }, {
+              idCol: 200,
+              model1Id: null,
+              model2Prop1: 'hejsan 2',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+              model2Relation1: [{
+                model1Prop1: 'hello 7',
+                $afterGetCalled: 1
+              }, {
+                model1Prop1: 'hello 8',
+                $afterGetCalled: 1
+              }]
+            }]);
+          });
+      });
+
+    });
+
     if (isPostgres(session.knex)) {
       it('check JoinEagerAlgorithm generated SQL', () => {
         let queries = [];
@@ -1500,9 +1704,10 @@ module.exports = (session) => {
 
     let idCol = opt.Model.getFullIdColumn();
     let testFn = opt.only ? it.only.bind(it) : it;
+    let testName = expr.replace(/\s/g, '');
 
     if (!opt.disableWhereIn) {
-      testFn(expr + ' (QueryBuilder.eager)', () => {
+      testFn(testName + ' (QueryBuilder.eager)', () => {
         return opt.Model
           .query()
           .where(idCol, opt.id)
@@ -1511,7 +1716,7 @@ module.exports = (session) => {
           .then(tester);
       });
 
-      testFn(expr + ' (Model.loadRelated)', () => {
+      testFn(testName + ' (Model.loadRelated)', () => {
         return opt.Model
           .query()
           .where(idCol, opt.id)
@@ -1522,7 +1727,7 @@ module.exports = (session) => {
           .then(tester);
       });
 
-      testFn(expr + ' (Model.$loadRelated)', () => {
+      testFn(testName + ' (Model.$loadRelated)', () => {
         return opt.Model
           .query()
           .where(idCol, opt.id)
@@ -1537,7 +1742,7 @@ module.exports = (session) => {
     }
 
     if (!opt.disableJoin) {
-      testFn(expr + ' (JoinEagerAlgorithm)', () => {
+      testFn(testName + ' (JoinEagerAlgorithm)', () => {
         return opt.Model
           .query()
           .where(idCol, opt.id)
@@ -1559,11 +1764,11 @@ module.exports = (session) => {
     return models => {
       Model1.traverse(models, model => {
         if (model.model1Relation2) {
-          model.model1Relation2 = _.sortBy(model.model1Relation2, 'idCol');
+          model.model1Relation2 = _.sortBy(model.model1Relation2, ['idCol', 'model2Prop1']);
         }
 
         if (model.model2Relation1) {
-          model.model2Relation1 = _.sortBy(model.model2Relation1, 'id');
+          model.model2Relation1 = _.sortBy(model.model2Relation1, ['id', 'model1Prop1']);
         }
       });
 

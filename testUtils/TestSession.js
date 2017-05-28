@@ -41,6 +41,14 @@ class TestSession {
         return 'Model1';
       }
 
+      static get namedFilters() {
+        return {
+          'select:id': (builder) => builder.select('id'),
+          'select:model1Prop1': (builder) => builder.select('model1Prop1'),
+          'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1')
+        };
+      }
+
       static get relationMappings() {
         return {
           model1Relation1: {

@@ -4666,6 +4666,40 @@ Defaults to `null`.
 
 
 
+#### namedFilters
+
+```js
+class Movie extends Model {
+  static get namedFilters() {
+    return {
+      goodMovies: (builder) => builder.where('stars', '>', 3),
+      orderByName: (builder) => builder.orderBy('name')
+    };
+  }
+}
+
+class Animal extends Model {
+  static get namedFilters() {
+    return {
+      dogs: (builder) => builder.where('species', 'dog')
+    };
+  }
+}
+```
+
+> The named filters can be used in any eager query:
+
+```js
+Person
+  .query()
+  .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
+```
+
+Named filters that can be used in any eager query.
+
+
+
+
 #### QueryBuilder
 
 ```js
