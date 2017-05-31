@@ -19,8 +19,7 @@ module.exports = (session) => {
   const Model1 = session.unboundModels.Model1.bindKnex(knex);
   const Model2 = session.unboundModels.Model2.bindKnex(knex);
 
-  if (utils.isPostgres(session.knex))
-  describe.only('table swapping and aliasing', () => {
+  describe('table swapping and aliasing', () => {
     let fullEager;
     let fullEagerResult;
 
@@ -205,7 +204,7 @@ module.exports = (session) => {
           .then(model => {
             if (utils.isPostgres(session.knex)) {
               expect(queries.length).to.equal(1);
-              expect(queries[0].replace(/\s/g, '')).to.equal((`
+              expect(queries[0].replace(/\s/g, '')).to.equal(`
                 select 
                   "someAlias"."id" as "id", 
                   "someAlias"."model1Id" as "model1Id", 
@@ -247,9 +246,8 @@ module.exports = (session) => {
                 left join 
                   "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
                 where 
-                  "someAlias"."id" = 1
-                `).replace(/\s/g, '')
-              );
+                  "someAlias"."id" = 1 
+              `.replace(/\s/g, ''));
             }
 
             expect(model).to.eql(fullEagerResult[0]);
