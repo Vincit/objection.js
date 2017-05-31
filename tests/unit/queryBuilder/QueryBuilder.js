@@ -1050,12 +1050,6 @@ describe('QueryBuilder', () => {
     expect(() => {
       QueryBuilder
         .forClass(TestModel)
-        .deleteById(undefined)
-    }).to.throwException();
-
-    expect(() => {
-      QueryBuilder
-        .forClass(TestModel)
         .delete()
         .whereIn('id', undefined)
     }).to.throwException();
