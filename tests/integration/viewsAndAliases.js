@@ -19,7 +19,7 @@ module.exports = (session) => {
   const Model1 = session.unboundModels.Model1.bindKnex(knex);
   const Model2 = session.unboundModels.Model2.bindKnex(knex);
 
-  describe('table swapping and aliasing', () => {
+  describe('views and aliases', () => {
     let fullEager;
     let fullEagerResult;
 
@@ -170,6 +170,28 @@ module.exports = (session) => {
 
     describe('aliases', () => {
 
+      it('should use alias in joinRelation', () => {
+        return Model1
+          .query()
+          .findById(1)
+          .table('Model1 as someAlias')
+          .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
+          .then(models => {
+            if (utils.isPostgres(session.knex)) {
+              console.log(queries)
+              expect(queries[0].replace(/\s/g, '')).to.equal(`
+                select "someAlias".* 
+                from "Model1" as "someAlias" 
+                inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "someAlias"."model1Id" 
+                inner join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someAlias"."id" 
+                inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someAlias"."id" 
+                inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col" 
+                where "someAlias"."id" = 1
+              `.replace(/\s/g, ''));
+            }
+          });
+      });
+
       it('should use alias for eager queries (WhereInEagerOperation)', () => {
         return Model1
           .query()
@@ -281,7 +303,28 @@ module.exports = (session) => {
             .eagerAlgorithm(Model1.JoinEagerAlgorithm);
         });
 
-        it('swapping table for view for a query should work (WhereInEagerOperation)', () => {
+        it('swapping table into a view for a joinRelation query should work', () => {
+          return Model1
+            .query()
+            .findById(1)
+            .table('someView')
+            .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
+            .then(models => {
+              if (utils.isPostgres(session.knex)) {
+                expect(queries[0].replace(/\s/g, '')).to.equal(`
+                  select "someView".* 
+                  from "someView"
+                  inner join "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
+                  inner join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id" 
+                  inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someView"."id" 
+                  inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col" 
+                  where "someView"."id" = 1
+                `.replace(/\s/g, ''));
+              }
+            });
+        });
+
+        it('swapping table into a view for an eager query should work (WhereInEagerOperation)', () => {
           return Model1
             .query()
             .where('someView.id', 1)
@@ -302,7 +345,7 @@ module.exports = (session) => {
             }); 
         });
 
-        it('swapping table for view for a query should work (JoinEagerAlgorithm)', () => {
+        it('swapping table into a view for an eager query should work (JoinEagerAlgorithm)', () => {
           return Model1
             .query()
             .where('someView.id', 1)
@@ -340,7 +383,7 @@ module.exports = (session) => {
                   "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
                   "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
                 from 
-                  "someView"
+                  "someView" as "someView"
                 left join 
                   "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
                 left join 
@@ -359,6 +402,59 @@ module.exports = (session) => {
               );
 
               expect(model).to.eql(fullEagerResult);
+            }); 
+        });
+
+        it('swapping table into a view for an eager query with filters should work (JoinEagerAlgorithm)', () => {
+          return Model1
+            .query()
+            .where('someView.id', 1)
+            .table('someView')
+            .eager(fullEager)
+            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            .modifyEager('model1Relation1', builder => builder.select('id'))
+            .modifyEager('model1Relation2.model2Relation1', builder => builder.select('id'))
+            .then(sortEager)
+            .then(model => {
+              expect(queries.length).to.equal(1);
+              expect(queries[0].replace(/\s/g, '')).to.equal((`
+                select 
+                  "someView"."id" as "id", 
+                  "someView"."model1Id" as "model1Id", 
+                  "someView"."model1Prop1" as "model1Prop1", 
+                  "someView"."model1Prop2" as "model1Prop2", 
+                  "model1Relation1"."id" as "model1Relation1:id", 
+                  "model1Relation2"."id_col" as "model1Relation2:id_col", 
+                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id", 
+                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1", 
+                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2", 
+                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",  
+                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id", 
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id", 
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1", 
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2", 
+                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col", 
+                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id", 
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
+                from 
+                  "someView" as "someView"
+                left join 
+                  (select "id", "model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
+                left join 
+                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id" 
+                left join 
+                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col" 
+                left join 
+                  (select "id", "model1Id" from "someView") as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id" 
+                left join 
+                  "someView" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id" 
+                left join 
+                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
+                where 
+                  "someView"."id" = 1
+                `).replace(/\s/g, '')
+              );
             }); 
         });
 

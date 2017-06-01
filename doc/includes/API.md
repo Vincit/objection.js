@@ -4984,24 +4984,18 @@ function|The create model subclass constructor
 
 ```js
 const Person = require('./models/Person');
-let transaction;
 
-objection.transaction.start(Person).then(trx => {
-  transaction = trx;
-  return Person
-    .bindTransaction(transaction)
+objection.transaction(Person.knex(), async (trx) => {
+  const TransactingPerson =  Person.bindTransaction(trx);
+
+  await TransactingPerson
     .query()
     .insert({firstName: 'Jennifer'});
-}).then(jennifer => {
-  return Person
-    .bindTransaction(transaction)
+
+  return await TransactingPerson
     .query()
     .patch({lastName: 'Lawrence'})
     .where('id', jennifer.id);
-}).then(() => {
-  return transaction.commit();
-}).catch(() => {
-  return transaction.rollback();
 });
 ```
 
