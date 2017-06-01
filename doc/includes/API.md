@@ -4983,7 +4983,7 @@ function|The create model subclass constructor
 #### bindTransaction
 
 ```js
-cons Person = require('./models/Person');
+const Person = require('./models/Person');
 let transaction;
 
 objection.transaction.start(Person).then(trx => {
