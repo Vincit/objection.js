@@ -91,7 +91,14 @@ module.exports = (session) => {
     beforeEach(() => {
       queries.splice(0, queries.length);
 
-      fullEager = '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]';
+      fullEager = `[
+        model1Relation1, 
+        model1Relation2.model2Relation1.[
+          model1Relation1, 
+          model1Relation2
+        ]
+      ]`;
+
       // The result we should get for `fullEager`.
       fullEagerResult = [{
         id: 1,
@@ -178,7 +185,6 @@ module.exports = (session) => {
           .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
           .then(models => {
             if (utils.isPostgres(session.knex)) {
-              console.log(queries)
               expect(queries[0].replace(/\s/g, '')).to.equal(`
                 select "someAlias".* 
                 from "Model1" as "someAlias" 
@@ -201,14 +207,20 @@ module.exports = (session) => {
           .then(sortEager)
           .then(model => {
             if (utils.isPostgres(session.knex)) {
-              expect(queries.sort()).to.eql([
-                'select "model_2".* from "model_2" where "model_2"."model_1_id" in (1)',
-                'select "model_2".* from "model_2" where "model_2"."model_1_id" in (5, 6)',
-                'select "someAlias".* from "Model1" as "someAlias" where "someAlias"."id" = 1',
-                'select "someAlias".* from "Model1" as "someAlias" where "someAlias"."id" in (2)',
-                'select "someAlias".* from "Model1" as "someAlias" where "someAlias"."id" in (7)',
-                'select "someAlias".*, "Model1Model2"."extra3" as "aliasedExtra", "Model1Model2"."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "Model1Model2"."model1Id" = "someAlias"."id" where "Model1Model2"."model2Id" in (2, 1)'
-              ]);
+              queries.sort();
+
+              const expectedQueries = [
+                /select "model_2"\.\* from "model_2" where "model_2"\."model_1_id" in \(1\)/,
+                /select "model_2"\.\* from "model_2" where "model_2"\."model_1_id" in (\(5, 6\)|\(6, 5\))/,
+                /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" = 1/,
+                /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(2\)/,
+                /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(7\)/,
+                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "Model1Model2"\."model1Id" = "someAlias"\."id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+              ];
+
+              expectedQueries.forEach((expectedQuery, i) => {
+                expect(queries[i]).to.match(expectedQuery);
+              });
             }
 
             expect(model).to.eql(fullEagerResult[0]);
@@ -332,14 +344,20 @@ module.exports = (session) => {
             .eager(fullEager)
             .then(sortEager)
             .then(model => {
-              expect(queries.sort()).to.eql([
-                'select "model_2".* from "model_2" where "model_2"."model_1_id" in (1)',
-                'select "model_2".* from "model_2" where "model_2"."model_1_id" in (5, 6)',
-                'select "someView".* from "someView" where "someView"."id" = 1',
-                'select "someView".* from "someView" where "someView"."id" in (2)',
-                'select "someView".* from "someView" where "someView"."id" in (7)',
-                'select "someView".*, "Model1Model2"."extra3" as "aliasedExtra", "Model1Model2"."model2Id" as "objectiontmpjoin0" from "someView" inner join "Model1Model2" on "Model1Model2"."model1Id" = "someView"."id" where "Model1Model2"."model2Id" in (2, 1)'
-              ]);
+              queries.sort();
+
+              const expectedQueries = [
+                /select "model_2"\.\* from "model_2" where "model_2"\."model_1_id" in \(1\)/,
+                /select "model_2"\.\* from "model_2" where "model_2"\."model_1_id" in (\(5, 6\)|\(6, 5\))/,
+                /select "someView"\.\* from "someView" where "someView"\."id" = 1/,
+                /select "someView"\.\* from "someView" where "someView"\."id" in \(2\)/,
+                /select "someView"\.\* from "someView" where "someView"\."id" in \(7\)/,
+                /select "someView"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "someView" inner join "Model1Model2" on "Model1Model2"\."model1Id" = "someView"\."id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+              ];
+
+              expectedQueries.forEach((expectedQuery, i) => {
+                expect(queries[i]).to.match(expectedQuery);
+              });
 
               expect(model).to.eql(fullEagerResult);
             }); 
