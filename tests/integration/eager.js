@@ -1492,7 +1492,7 @@ module.exports = (session) => {
             select: b => b.select('model1Prop1')
           })
           .map(model => {
-            model.model2Relation1 = _.sortBy(model.model2Relation1, 'modle1Prop1');
+            model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
             return model; 
           })
           .then(models => {
