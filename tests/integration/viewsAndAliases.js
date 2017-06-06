@@ -227,6 +227,35 @@ module.exports = (session) => {
           }); 
       });
 
+      it('should use alias for eager queries (WhereInEagerOperation) (alias method)', () => {
+        return Model1
+          .query()
+          .findById(1)
+          .alias('someAlias')
+          .eager(fullEager)
+          .then(sortEager)
+          .then(model => {
+            if (utils.isPostgres(session.knex)) {
+              queries.sort();
+
+              const expectedQueries = [
+                /select "model_2"\.\* from "model_2" where "model_2"\."model_1_id" in \(1\)/,
+                /select "model_2"\.\* from "model_2" where "model_2"\."model_1_id" in (\(5, 6\)|\(6, 5\))/,
+                /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" = 1/,
+                /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(2\)/,
+                /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(7\)/,
+                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "Model1Model2"\."model1Id" = "someAlias"\."id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+              ];
+
+              expectedQueries.forEach((expectedQuery, i) => {
+                expect(queries[i]).to.match(expectedQuery);
+              });
+            }
+
+            expect(model).to.eql(fullEagerResult[0]);
+          }); 
+      });
+
       it('should use alias for eager queries (JoinEagerAlgorithm)', () => {
         return Model1
           .query()
