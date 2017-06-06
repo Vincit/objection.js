@@ -10,6 +10,7 @@ const _ = require('lodash')
 describe('Relation', () => {
   let OwnerModel = null;
   let RelatedModel = null;
+  let RelatedModelNamedExport = null;
 
   beforeEach(() => {
     delete require.cache[__dirname + '/files/OwnerModel.js'];
@@ -17,6 +18,7 @@ describe('Relation', () => {
 
     OwnerModel = require(__dirname + '/files/OwnerModel');
     RelatedModel = require(__dirname + '/files/RelatedModel');
+    RelatedModelNamedExport = require(__dirname + '/files/RelatedModelNamedExport').RelatedModel;
   });
 
   it('should accept a Model subclass as modelClass', () => {
@@ -59,7 +61,7 @@ describe('Relation', () => {
     expect(relation.relatedProp).to.eql(['ownerId']);
   });
 
-  it('should accept a relative path to a Model subclass as modelClass (resolved using Model.modelPaths', () => {
+  it('should accept a relative path to a Model subclass as modelClass (resolved using Model.modelPaths)', () => {
     OwnerModel.modelPaths = [__dirname + '/files/'];
     let relation = new Relation('testRelation', OwnerModel);
 
@@ -74,6 +76,26 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerCol).to.eql(['id']);
+    expect(relation.ownerProp).to.eql(['id']);
+    expect(relation.relatedCol).to.eql(['ownerId']);
+    expect(relation.relatedProp).to.eql(['ownerId']);
+  });
+
+  it('should accept a module with named exports', () => {
+    let relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: __dirname + '/files/RelatedModelNamedExport',
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModelNamedExport);
     expect(relation.ownerCol).to.eql(['id']);
     expect(relation.ownerProp).to.eql(['id']);
     expect(relation.relatedCol).to.eql(['ownerId']);
@@ -114,6 +136,23 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one.');
+    });
+  });
+
+  it('should fail if modelClass resolves to a module that exports multiple model classes', () => {
+    let relation = new Relation('testRelation', OwnerModel);
+
+    expect(() => {
+      relation.setMapping({
+        relation: Relation,
+        modelClass: __dirname + '/files/InvalidModelManyNamedModels',
+        join: {
+          from: 'OwnerModel.id',
+          to: 'ownerId'
+        }
+      });
+    }).to.throwException(err => {
+      expect(err.message).to.match(/OwnerModel\.relationMappings\.testRelation: modelClass path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./);
     });
   });
 
@@ -354,14 +393,24 @@ describe('Relation', () => {
   it('relatedCol and ownerCol should be in database format', () => {
     let relation = new Relation('testRelation', OwnerModel);
 
-    OwnerModel.tableName = 'owner_model';
+    Object.defineProperty(OwnerModel, 'tableName', {
+      get() {
+        return 'owner_model';
+      }
+    });
+
     OwnerModel.prototype.$parseDatabaseJson = json => {
       return _.mapKeys(json, (value, key) => {
         return _.camelCase(key);
       });
     };
 
-    RelatedModel.tableName = 'related-model';
+    Object.defineProperty(RelatedModel, 'tableName', {
+      get() {
+        return 'related-model';
+      }
+    });
+
     RelatedModel.prototype.$parseDatabaseJson = json => {
       return _.mapKeys(json, (value, key) => {
         return _.camelCase(key);
@@ -388,8 +437,17 @@ describe('Relation', () => {
   it('should allow relations on tables under a schema', () => {
     let relation = new Relation('testRelation', OwnerModel);
     
-    OwnerModel.tableName = 'schema1.owner_model';
-    RelatedModel.tableName = 'schema2.related_model';
+    Object.defineProperty(OwnerModel, 'tableName', {
+      get() {
+        return 'schema1.owner_model';
+      }
+    });
+
+    Object.defineProperty(RelatedModel, 'tableName', {
+      get() {
+        return 'schema2.related_model';
+      }
+    });
 
     relation.setMapping({
       relation: Relation,

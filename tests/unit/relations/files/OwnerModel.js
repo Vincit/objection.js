@@ -3,8 +3,9 @@
 const Model = require('../../../../').Model;
 
 class OwnerModel extends Model {
-
+  static get tableName() {
+    return this.name;
+  }
 }
 
-OwnerModel.tableName = 'OwnerModel';
 module.exports = OwnerModel;

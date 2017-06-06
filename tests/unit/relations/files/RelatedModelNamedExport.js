@@ -8,4 +8,8 @@ class RelatedModel extends Model {
   }
 }
 
-module.exports = RelatedModel;
+module.exports = {
+  someCrap: 42,
+  RelatedModel,
+  moreUselessShit: {}
+};
