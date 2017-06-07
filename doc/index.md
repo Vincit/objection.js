@@ -117,7 +117,7 @@ Model.knex(knex);
 // Create database schema. You should use knex migration files to do this. We
 // create it here for simplicity.
 const schemaPromise = knex.schema.createTableIfNotExists('Person', table => {
-  table.integer('id').primary();
+  table.increments('id').primary();
   table.string('firstName');
 });
 
