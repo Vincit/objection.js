@@ -140,7 +140,7 @@ npm start
 <span class="c1">// Create database schema. You should use knex migration files to do this. We</span>
 <span class="c1">// create it here for simplicity.</span>
 <span class="kr">const</span> <span class="nx">schemaPromise</span> <span class="o">=</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTableIfNotExists</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">,</span> <span class="nx">table</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
+  <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
   <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">);</span>
 <span class="p">});</span>
 
@@ -3066,6 +3066,46 @@ join columns to null.</p>
 </tr>
 </tbody></table>
 
+<h4 id="alias">alias</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">alias</span><span class="p">(</span><span class="nx">alias</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">alias</span><span class="p">(</span><span class="s1">'p'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'p.id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as parent'</span><span class="p">,</span> <span class="s1">'parent.id'</span><span class="p">,</span> <span class="s1">'p.parentId'</span><span class="p">)</span>
+</code></pre>
+<p>Give an alias for the table to be used in the query.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>alias</td>
+<td>string</td>
+<td>Table alias for the query.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="increment">increment</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-increment">knex documentation</a></p>
@@ -5526,6 +5566,40 @@ to the relations:</p>
   <span class="p">});</span>
 </code></pre>
 <blockquote>
+<p>Reusable named filters can be defined for a model class using <a href="#namedfilters"><code class="prettyprint">namedFilters</code></a></p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">orderByAge</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+      <span class="p">},</span>
+      <span class="na">onlyDogs</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children(orderByAge).[pets(onlyDogs, orderByName), movies]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+<blockquote>
 <p>Filters can also be registered using the <a href="#modifyeager"><code class="prettyprint">modifyEager</code></a> method:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
@@ -7479,6 +7553,33 @@ fields <a href="#eageroptions">here</a>.</p>
 
 <p>Defaults to <code class="prettyprint">null</code>.</p>
 
+<h4 id="namedfilters">namedFilters</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Movie</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">goodMovies</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'stars'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+      <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">dogs</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The named filters can be used in any eager query:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[movies(goodMovies, orderByName).actors, pets(dogs)]'</span><span class="p">)</span>
+</code></pre>
+<p>Named filters that can be used in any eager query.</p>
+
 <h4 id="querybuilder">QueryBuilder</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">QueryBuilder</span><span class="p">()</span> <span class="p">{</span>
@@ -7761,25 +7862,19 @@ a multi-tenant system. See the <a href="#multi-tenancy">multi tenancy recipe</a>
 </tbody></table>
 
 <h4 id="bindtransaction">bindTransaction</h4>
-<pre class="highlight javascript"><code><span class="nx">cons</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./models/Person'</span><span class="p">);</span>
-<span class="kd">let</span> <span class="nx">transaction</span><span class="p">;</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Person</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./models/Person'</span><span class="p">);</span>
 
-<span class="nx">objection</span><span class="p">.</span><span class="nx">transaction</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">Person</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">trx</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">transaction</span> <span class="o">=</span> <span class="nx">trx</span><span class="p">;</span>
-  <span class="k">return</span> <span class="nx">Person</span>
-    <span class="p">.</span><span class="nx">bindTransaction</span><span class="p">(</span><span class="nx">transaction</span><span class="p">)</span>
+<span class="nx">objection</span><span class="p">.</span><span class="nx">transaction</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">knex</span><span class="p">(),</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">trx</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">TransactingPerson</span> <span class="o">=</span>  <span class="nx">Person</span><span class="p">.</span><span class="nx">bindTransaction</span><span class="p">(</span><span class="nx">trx</span><span class="p">);</span>
+
+  <span class="nx">await</span> <span class="nx">TransactingPerson</span>
     <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">});</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">Person</span>
-    <span class="p">.</span><span class="nx">bindTransaction</span><span class="p">(</span><span class="nx">transaction</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="nx">await</span> <span class="nx">TransactingPerson</span>
     <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
     <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span>
-<span class="p">}).</span><span class="k">catch</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">rollback</span><span class="p">();</span>
 <span class="p">});</span>
 </code></pre>
 <p>Alias for <a href="#bindknex"><code class="prettyprint">bindKnex</code></a>.</p>
@@ -9961,6 +10056,16 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-8-2">0.8.2</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><a href="http://vincit.github.io/objection.js/#namedfilters"><code class="prettyprint">Model.namedFilters</code></a> object for defining shared filters that can be used by name in eager expressions.</li>
+<li>Full support for views and table aliases in eager, join, joinRelation etc. <a href="https://github.com/Vincit/objection.js/issues/181">#181</a></li>
+<li>Fix <code class="prettyprint">bindTransaction</code> bug with <code class="prettyprint">ManyToManyRelation</code> junction tables <a href="https://github.com/Vincit/objection.js/issues/395">#395</a></li>
+</ul>
 
 <h2 id="0-8-1">0.8.1</h2>
 
