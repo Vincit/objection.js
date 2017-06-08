@@ -11,6 +11,7 @@ describe('RelationExpression', () => {
     it('empty string', () => {
       testParse('', {
         name: null,
+        alias: null,
         args: [],
         numChildren: 0,
         children: {}
@@ -20,6 +21,7 @@ describe('RelationExpression', () => {
     it('non-string', () => {
       let expectedResult = {
         name: null,
+        alias: null,
         args: [],
         numChildren: 0,
         children: {}
@@ -38,11 +40,13 @@ describe('RelationExpression', () => {
       it('single relation', () => {
         testParse('a', {
           name: null,
+          alias: null,
           args: [],
           numChildren: 1,
           children: {
             a: {
               name: 'a',
+              alias: 'a',
               args: [],
               numChildren: 0,
               children: {}
@@ -54,11 +58,13 @@ describe('RelationExpression', () => {
       it('list with one value', () => {
         testParse('[a]', {
           name: null,
+          alias: null,
           args: [],
           numChildren: 1,
           children: {
             a: {
               name: 'a',
+              alias: 'a',
               args: [],
               numChildren: 0,
               children: {}
@@ -70,11 +76,13 @@ describe('RelationExpression', () => {
       it('weird characters', () => {
         testParse('_-%§$?+1Aa!€^', {
           name: null,
+          alias: null,
           args: [],
           numChildren: 1,
           children: {
             "_-%§$?+1Aa!€^": {
               name: '_-%§$?+1Aa!€^',
+              alias: '_-%§$?+1Aa!€^',
               args: [],
               numChildren: 0,
               children: {}
@@ -90,16 +98,19 @@ describe('RelationExpression', () => {
       it('one level', () => {
         testParse('a.b', {
           name: null,
+          alias: null,
           args: [],
           numChildren: 1,
           children: {
             a: {
               name: 'a',
+              alias: 'a',  
               args: [],
               numChildren: 1,
               children: {
                 b: {
                   name: 'b',
+                  alias: 'b',
                   args: [],
                   numChildren: 0,
                   children: {}
@@ -113,21 +124,25 @@ describe('RelationExpression', () => {
       it('two levels', () => {
         testParse('a.b.c', {
           name: null,
+          alias: null,
           args: [],
           numChildren: 1,
           children: {
             a: {
               name: 'a',
+              alias: 'a',
               args: [],
               numChildren: 1,
               children: {
                 b: {
                   name: 'b',
+                  alias: 'b',
                   args: [],
                   numChildren: 1,
                   children: {
                     c: {
                       name: 'c',
+                      alias: 'c',
                       args: [],
                       numChildren: 0,
                       children: {}
@@ -145,23 +160,27 @@ describe('RelationExpression', () => {
     it('multiple relations', () => {
       testParse('[a, b, c]', {
         name: null,
+        alias: null,
         args: [],
         numChildren: 3,
         children: {
           a: {
             name: 'a',
+            alias: 'a',
             args: [],
             numChildren: 0,
             children: {}
           },
           b: {
             name: 'b',
+            alias: 'b',
             args: [],
             numChildren: 0,
             children: {}
           },
           c: {
             name: 'c',
+            alias: 'c',
             args: [],
             numChildren: 0,
             children: {}
@@ -173,16 +192,19 @@ describe('RelationExpression', () => {
     it('multiple nested relations', () => {
       testParse('[a.b, c.d.e, f]', {
         name: null,
+        alias: null,
         args: [],
         numChildren: 3,
         children: {
           a: {
             name: 'a',
+            alias: 'a',
             args: [],
             numChildren: 1,
             children: {
               b: {
                 name: 'b',
+                alias: 'b',
                 args: [],
                 numChildren: 0,
                 children: {}
@@ -191,16 +213,19 @@ describe('RelationExpression', () => {
           },
           c: {
             name: 'c',
+            alias: 'c',
             args: [],
             numChildren: 1,
             children: {
               d: {
                 name: 'd',
+                alias: 'd',
                 args: [],
                 numChildren: 1,
                 children: {
                   e: {
                     name: 'e',
+                    alias: 'e',
                     args: [],
                     numChildren: 0,
                     children: {}
@@ -211,6 +236,7 @@ describe('RelationExpression', () => {
           },
           f: {
             name: 'f',
+            alias: 'f',
             args: [],
             numChildren: 0,
             children: {}
@@ -222,38 +248,45 @@ describe('RelationExpression', () => {
     it('deep nesting and nested lists', () => {
       testParse('[a.[b, c.[d, e.f]], g]', {
         name: null,
+        alias: null,
         args: [],
         numChildren: 2,
         children: {
           a: {
             name: 'a',
+            alias: 'a',
             args: [],
             numChildren: 2,
             children: {
               b: {
                 name: 'b',
+                alias: 'b',
                 args: [],
                 numChildren: 0,
                 children: []
               },
               c: {
                 name: 'c',
+                alias: 'c',
                 args: [],
                 numChildren: 2,
                 children: {
                   d: {
                     name: 'd',
+                    alias: 'd',
                     args: [],
                     numChildren: 0,
                     children: []
                   },
                   e: {
                     name: 'e',
+                    alias: 'e',
                     args: [],
                     numChildren: 1,
                     children: {
                       f: {
                         name: 'f',
+                        alias: 'f',
                         args: [],
                         numChildren: 0,
                         children: {}
@@ -266,6 +299,7 @@ describe('RelationExpression', () => {
           },
           g: {
             name: 'g',
+            alias: 'g',
             args: [],
             numChildren: 0,
             children: {}
@@ -277,34 +311,40 @@ describe('RelationExpression', () => {
     it('arguments', () => {
       testParse('[a(arg1,arg2,arg3), b(arg4) . [c(), d(arg5 arg6), e]]', {
         name: null,
+        alias: null,
         args: [],
         numChildren: 2,
         children: {
           a: {
             name: 'a',
+            alias: 'a',
             args: ['arg1', 'arg2', 'arg3'],
             numChildren: 0,
             children: {}
           },
           b: {
             name: 'b',
+            alias: 'b',
             args: ['arg4'],
             numChildren: 3,
             children: {
               c: {
                 name: 'c',
+                alias: 'c',
                 args: [],
                 numChildren: 0,
                 children: {}
               },
               d: {
                 name: 'd',
+                alias: 'd',
                 args: ['arg5', 'arg6'],
                 numChildren: 0,
                 children: {}
               },
               e: {
                 name: 'e',
+                alias: 'e',
                 args: [],
                 numChildren: 0,
                 children: {}
@@ -315,37 +355,192 @@ describe('RelationExpression', () => {
       });
     });
 
+    it('alias', () => {
+      testParse('a as b', {
+        name: null,
+        alias: null,
+        args: [],
+        numChildren: 1,
+        children: {
+          b: {
+            name: 'a',
+            alias: 'b',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
+      });
+
+      testParse('aasb', {
+        name: null,
+        alias: null,
+        args: [],
+        numChildren: 1,
+        children: {
+          aasb: {
+            name: 'aasb',
+            alias: 'aasb',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
+      });
+
+      testParse('[  as , b]', {
+        name: null,
+        alias: null,
+        args: [],
+        numChildren: 2,
+        children: {
+          as: {
+            name: 'as',
+            alias: 'as',
+            args: [],
+            numChildren: 0,
+            children: {}
+          },
+
+          b: {
+            name: 'b',
+            alias: 'b',
+            args: [],
+            numChildren: 0,
+            children: {}
+          }
+        }
+      });
+
+      testParse(`a as aa.[
+        b as bb,
+        c as cc  
+      ]`, {
+        name: null,
+        alias: null,
+        args: [],
+        numChildren: 1,
+        children: {
+          aa: {
+            name: 'a',
+            alias: 'aa',
+            args: [],
+            numChildren: 2,
+
+            children: {
+              bb: {
+                name: 'b',
+                alias: 'bb',
+                args: [],
+                numChildren: 0,
+                children: {}
+              },
+              cc: {
+                name: 'c',
+                alias: 'cc',
+                args: [],
+                numChildren: 0,
+                children: {}
+              }
+            }
+          }
+        }
+      });
+
+      testParse(`a(f1, f2) as aa . [
+        c(f3, f4) as cc,
+        b as bb .[
+          e,
+          f as ff
+        ]
+      ]`, {
+        name: null,
+        alias: null,
+        args: [],
+        numChildren: 1,
+        children: {
+          aa: {
+            name: 'a',
+            alias: 'aa',
+            args: ['f1', 'f2'],
+            numChildren: 2,
+
+            children: {
+              cc: {
+                name: 'c',
+                alias: 'cc',
+                args: ['f3', 'f4'],
+                numChildren: 0,
+                children: {}
+              },
+
+              bb: {
+                name: 'b',
+                alias: 'bb',
+                args: [],
+                numChildren: 2,
+
+                children: {
+                  e: {
+                    name: 'e',
+                    alias: 'e',
+                    args: [],
+                    numChildren: 0,
+                    children: {}
+                  },
+
+                  ff: {
+                    name: 'f',
+                    alias: 'ff',
+                    args: [],
+                    numChildren: 0,
+                    children: {}
+                  },
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+
     it('should ignore whitespace', () => {
       testParse('\n\r\t  [ a (\narg1\n  arg2,arg3), \n \n b\n(arg4) . [c(), \td (arg5 arg6), e] \r] ', {
         name: null,
+        alias: null,
         args: [],
         numChildren: 2,
         children: {
           a: {
             name: 'a',
+            alias: 'a',
             args: ['arg1', 'arg2', 'arg3'],
             numChildren: 0,
             children: {}
           },
           b: {
             name: 'b',
+            alias: 'b',
             args: ['arg4'],
             numChildren: 3,
             children: {
               c: {
                 name: 'c',
+                alias: 'c',
                 args: [],
                 numChildren: 0,
                 children: {}
               },
               d: {
                 name: 'd',
+                alias: 'd',
                 args: ['arg5', 'arg6'],
                 numChildren: 0,
                 children: {}
               },
               e: {
                 name: 'e',
+                alias: 'e',
                 args: [],
                 numChildren: 0,
                 children: {}
@@ -371,6 +566,9 @@ describe('RelationExpression', () => {
       testParseFail('a.[.]');
       testParseFail('a.[.b]');
       testParseFail('[a,,b]');
+      // Alias tests
+      testParseFail('a asb')
+      testParseFail('aas b')
     });
 
   });
@@ -380,6 +578,7 @@ describe('RelationExpression', () => {
     it('a from a', () => {
       testPath('a', 'a', [{
         name: 'a',
+        alias: 'a',
         args: [],
         numChildren: 0,
         children: {}
@@ -389,11 +588,13 @@ describe('RelationExpression', () => {
     it('a from a.a', () => {
       testPath('a.b', 'a', [{
         name: 'a',
+        alias: 'a',
         args: [],
         numChildren: 1,
         children: {
           b: {
             name: 'b',
+            alias: 'b',
             args: [],
             numChildren: 0,
             children: {}
@@ -409,6 +610,7 @@ describe('RelationExpression', () => {
     it('a.b from a.b', () => {
       testPath('a.b', 'a.b', [{
         name: 'b',
+        alias: 'b',
         args: [],
         numChildren: 0,
         children: {}
@@ -418,6 +620,7 @@ describe('RelationExpression', () => {
     it('a.b from a.[b, c]', () => {
       testPath('a.[b, c]', 'a.b', [{
         name: 'b',
+        alias: 'b',
         args: [],
         numChildren: 0,
         children: {}
@@ -427,11 +630,13 @@ describe('RelationExpression', () => {
     it('a.[b, c] from a.[b, c]', () => {
       testPath('a.[b, c]', 'a.[b, c]', [{
         name: 'b',
+        alias: 'b',
         args: [],
         numChildren: 0,
         children: {}
       }, {
         name: 'c',
+        alias: 'c',
         args: [],
         numChildren: 0,
         children: {}
@@ -441,6 +646,7 @@ describe('RelationExpression', () => {
     it('a.[b, d] from a.[b, c]', () => {
       testPath('a.[b, c]', 'a.[b, d]', [{
         name: 'b',
+        alias: 'b',
         args: [],
         numChildren: 0,
         children: {}
@@ -450,16 +656,19 @@ describe('RelationExpression', () => {
     it('[a, b.c.d.[e, f]] from [a, b.[g, c.[d.[e, f], i], h]]', () => {
       testPath('[a, b.[g, c.[d.[e, f], i], h]]', '[a, b.c.d.[e, f]]', [{
         name: 'a',
+        alias: 'a',
         args: [],
         numChildren: 0,
         children: {}
       }, {
         name: 'e',
+        alias: 'e',
         args: [],
         numChildren: 0,
         children: {}
       }, {
         name: 'f',
+        alias: 'f',
         args: [],
         numChildren: 0,
         children: {}
@@ -469,11 +678,13 @@ describe('RelationExpression', () => {
     it('b.c.d.[e, f] from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', () => {
       testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d.[e, f]', [{
         name: 'e',
+        alias: 'e',
         args: ['a1'],
         numChildren: 0,
         children: {}
       }, {
         name: 'f',
+        alias: 'f',
         args: ['a2'],
         numChildren: 0,
         children: {}
@@ -483,17 +694,20 @@ describe('RelationExpression', () => {
     it('b.c.d from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', () => {
       testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d', [{
         name: 'd',
+        alias: 'd',
         args: [],
         numChildren: 2,
         children: {
           e: {
             name: 'e',
+            alias: 'e',
             args: ['a1'],
             numChildren: 0,
             children: {}
           },
           f: {
             name: 'f',
+            alias: 'f',
             args: ['a2'],
             numChildren: 0,
             children: {}

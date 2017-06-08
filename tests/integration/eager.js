@@ -918,20 +918,14 @@ module.exports = (session) => {
           .catch(done);
       });
 
-      it('should fail if given missing relation', done => {
-        Model1
-          .query()
-          .where('id', 1)
-          .eager('invalidRelation')
-          .then(() => {
-            done(new Error('should not get here'));
-          })
-          .catch(error => {
-            expect(error).to.be.a(ValidationError);
-            expect(error.data).to.have.property('eager');
-            done();
-          })
-          .catch(done);
+      it('should fail if given missing relation', () => {
+        expect(() => {
+          Model1
+            .query()
+            .where('id', 1)
+            .eager('invalidRelation')
+            .then(() => {});
+        }).to.throwException();
       });
 
     });
@@ -1641,6 +1635,73 @@ module.exports = (session) => {
               }]
             }]);
           });
+      });
+
+    });
+
+    describe('aliases', () => {
+
+      it('aliases in eager expressions should work', () => {
+        return Promise.map([/*Model1.WhereInEagerAlgorithm, */Model1.JoinEagerAlgorithm], eagerAlgo => {
+          return Model1
+            .query()
+            .where('Model1.id', 1)
+            .select('Model1.id')
+            .eagerAlgorithm(eagerAlgo)
+            .eager(`[
+              model1Relation1(f1) as a, 
+              model1Relation2(f2) as b .[
+                model2Relation1(f1) as c,
+                model2Relation1(f1) as d
+              ]
+            ]`, {
+              f1: builder => builder.select('Model1.id'),
+              f2: builder => builder.select('model_2.id_col')
+            })
+            .first()
+            .then(model => {          
+              model.b = _.sortBy(model.b, 'idCol');
+              model.b[1].c = _.sortBy(model.b[1].c, 'id');
+              model.b[1].d = _.sortBy(model.b[1].d, 'id');
+
+              expect(model).to.eql({
+                id: 1,
+                $afterGetCalled: 1,
+
+                a: {
+                  id: 2,
+                  $afterGetCalled: 1
+                },
+
+                b: [{
+                  idCol: 1,
+                  $afterGetCalled: 1,
+
+                  c: [],
+                  d: []
+                },{
+                  idCol: 2,
+                  $afterGetCalled: 1,
+
+                  c: [{
+                    id: 5,
+                    $afterGetCalled: 1
+                  }, {
+                    id: 6,
+                    $afterGetCalled: 1
+                  }],
+
+                  d: [{
+                    id: 5,
+                    $afterGetCalled: 1
+                  }, {
+                    id: 6,
+                    $afterGetCalled: 1
+                  }]
+                }]
+              });
+            });
+        }, {concurrency: 1});
       });
 
     });

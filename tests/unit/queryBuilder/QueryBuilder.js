@@ -1123,6 +1123,25 @@ describe('QueryBuilder', () => {
 
   describe('eager and allowEager' , () => {
 
+    beforeEach(() => {
+      const rel = {
+        relation: TestModel.BelongsToOneRelation,
+        modelClass: TestModel,
+        join: {
+          from: 'Model.foo',
+          to: 'Model.id'
+        }
+      };
+
+      TestModel.relationMappings = {
+        a: rel,
+        b: rel,
+        c: rel,
+        d: rel,
+        e: rel
+      };
+    });
+
     it("allowEager('a').eager('a(f1)') should be ok", done => {
       QueryBuilder
         .forClass(TestModel)
