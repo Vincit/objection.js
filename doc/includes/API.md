@@ -949,6 +949,36 @@ Type|Description
 
 
 
+#### alias
+
+```js
+const builder = queryBuilder.alias(alias);
+```
+
+```js
+Person
+  .query()
+  .alias('p')
+  .where('p.id', 1)
+  .join('Person as parent', 'parent.id', 'p.parentId')
+```
+
+Give an alias for the table to be used in the query.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+alias|string|Table alias for the query.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
 
 #### increment
 
@@ -2920,6 +2950,41 @@ Person
       builder.where('species', 'dog');
     }
   })
+  .then(people => {
+    console.log(people[0].children[0].pets[0].name);
+    console.log(people[0].children[0].movies[0].id);
+  });
+```
+
+> Reusable named filters can be defined for a model class using [`namedFilters`](#namedfilters)
+
+```js
+class Person extends Model {
+  static get namedFilters() {
+    return {
+      orderByAge: (builder) => {
+        builder.orderBy('age');
+      }
+    };
+  }
+}
+
+class Animal extends Model {
+  static get namedFilters() {
+    return {
+      orderByName: (builder) => {
+        builder.orderBy('name');
+      },
+      onlyDogs: (builder) => {
+        builder.where('species', 'dog');
+      }
+    };
+  }
+}
+
+Person
+  .query()
+  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]')
   .then(people => {
     console.log(people[0].children[0].pets[0].name);
     console.log(people[0].children[0].movies[0].id);

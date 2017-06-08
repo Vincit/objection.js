@@ -5,6 +5,7 @@
 ### What's new
 
   * [`Model.namedFilters`](http://vincit.github.io/objection.js/#namedfilters) object for defining shared filters that can be used by name in eager expressions.
+  * Full support for views and table aliases in eager, join, joinRelation etc. [#181](https://github.com/Vincit/objection.js/issues/181)
 
 ## 0.8.1
 
