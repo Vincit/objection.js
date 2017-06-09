@@ -1090,6 +1090,80 @@ module.exports = (session) => {
         }));
       });
 
+      it('should implicitly add selects for join columns if they are aliased in filterEager/modifyEager', () => {
+        // Does not yet work for JoinEagerAlgorithm.
+
+        return Model1
+          .query()
+          .where('Model1.id', 1)
+          .column('Model1.model1Prop1')
+          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+          .filterEager('model1Relation2', builder => {
+            builder.select('model_2_prop_1', 'id_col as x1', 'model_1_id as x2');
+          })
+          .filterEager('model1Relation2.model2Relation1', builder => {
+            builder.select('model1Prop1', 'Model1.id as y1', 'Model1.model1Id as y2');
+          })
+          .filterEager('model1Relation2.model2Relation1.model1Relation1', builder => {
+            builder.select('model1Prop1', 'Model1.id as y1', 'Model1.model1Id as y2');
+          })
+          .filterEager('model1Relation2.model2Relation1.model1Relation2', builder => {
+            builder.select('model_2_prop_1', 'id_col as x1', 'model_1_id as x2');
+          })
+          .then(models => {
+            models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'model2Prop1');
+            models[0].model1Relation2[1].model2Relation1 = _.sortBy(models[0].model1Relation2[1].model2Relation1 , 'model1Prop1');
+
+            expect(models).to.eql([{
+              model1Prop1: 'hello 1',
+              $afterGetCalled: 1,
+
+              model1Relation2: [{
+                model2Prop1: 'hejsan 1',
+                $afterGetCalled: 1,
+                x1: 1,
+                x2: 1,
+
+                model2Relation1: []
+              }, {
+                model2Prop1: 'hejsan 2',
+                $afterGetCalled: 1,
+                x1: 2,
+                x2: 1,
+
+                model2Relation1: [{
+                  model1Prop1: 'hello 5',
+                  $afterGetCalled: 1,
+                  y1: 5,
+                  y2: null,
+
+                  model1Relation1: null,
+                  model1Relation2: []
+                }, {
+                  model1Prop1: 'hello 6',
+                  $afterGetCalled: 1,
+                  y1: 6,
+                  y2: 7,
+
+                  model1Relation1: {
+                    model1Prop1: 'hello 7',
+                    $afterGetCalled: 1,
+                    y1: 7,
+                    y2: null
+                  },
+
+                  model1Relation2: [{
+                    model2Prop1: 'hejsan 3',
+                    $afterGetCalled: 1,
+                    x1: 3,
+                    x2: 6
+                  }]
+                }]
+              }]
+            }]);
+          });
+      });
+
       it('should filter the eager query using relation expressions as paths (JoinEagerAlgorithm)', () => {
         return Model1
           .query()
