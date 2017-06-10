@@ -31,7 +31,17 @@
         <h1 id="recipe-book">Recipe book</h1>
 
 <h2 id="raw-queries">Raw queries</h2>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s2">`?? || ' ' || ??`</span><span class="p">,</span> <span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">),</span> <span class="s1">'Arnold Schwarzenegger'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random()'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">childAgeSums</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
   <span class="p">.</span><span class="nx">groupBy</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">)</span>
@@ -39,9 +49,46 @@
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
-<p>To write raw SQL queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. There are also some helper
-methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>. The <a href="#raw"><code class="prettyprint">raw</code></a> method works just like the
-<a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>. And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
+<p>To mix raw SQL with queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> function from the main module 
+or the <code class="prettyprint">raw</code> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. The only difference between
+these two is that the <code class="prettyprint">raw</code> function from the main module doesn&rsquo;t depend on knex
+where as <code class="prettyprint">Model.raw()</code> will throw if the model doesn&rsquo;t have a knex instance installed.
+Both of these functions work just like the <a href="http://knexjs.org/#Raw">knex&rsquo;s raw method</a>. 
+And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
+
+<p>There are also some helper methods such as <a href="#whereraw"><code class="prettyprint">whereRaw</code></a> in the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>.</p>
+
+<h2 id="json-queries">JSON queries</h2>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">ref</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
+
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
+    <span class="s1">'id'</span><span class="p">,</span>
+    <span class="nx">ref</span><span class="p">(</span><span class="s1">'jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
+    <span class="nx">ref</span><span class="p">(</span><span class="s1">'jsonColumn:details.age'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
+  <span class="p">])</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Animal'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Person.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.name'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.jsonData:details.ageLimit'</span><span class="p">));</span>
+</code></pre>
+<blockquote>
+<p>Individual json fields can be updated like this:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span>
+    <span class="s1">'jsonColumn:details.name'</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+    <span class="s1">'jsonColumn:details.age'</span><span class="p">:</span> <span class="mi">29</span>
+  <span class="p">});</span>
+</code></pre>
+<p>You can use the <a href="#ref"><code class="prettyprint">ref</code></a> function from the main module to refer to json columns
+in queries. There is also a bunch of query building methods that have <code class="prettyprint">Json</code> in their
+names. Check them out too.</p>
+
+<p>See <a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a> for more information about how to refer to
+json fields.</p>
+
+<p>Json queries currently only work with postgres.</p>
 
 <h2 id="change-id-column">Change id column</h2>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -167,20 +214,24 @@ It is completely optional. If you want to use some other validation library you 
 <blockquote>
 <p>snake_case/camelCase conversion:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="c1">// It's a good idea to memoize the conversion functions.</span>
+<span class="kr">const</span> <span class="nx">snakeCase</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">memoize</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">snakeCase</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">camelCase</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">memoize</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">camelCase</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="c1">// This is called when an object is serialized to database format.</span>
   <span class="nx">$formatDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">json</span> <span class="o">=</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$formatDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
 
     <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">snakeCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">snakeCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
     <span class="p">});</span>
   <span class="p">}</span>
 
   <span class="c1">// This is called when an object is read from database.</span>
   <span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
     <span class="p">});</span>
 
     <span class="k">return</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>

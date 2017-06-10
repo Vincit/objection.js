@@ -88,11 +88,12 @@ a normal promise would.</p>
 <h4 id="ref">ref</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">ref</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">ref</span><span class="p">;</span>
 </code></pre>
-<p>Factory function that returns <code class="prettyprint">ReferenceBuilder</code> instance, which makes it easier to refer
-tables, columns, json attributes and add casting to referred columns wihtout need to use
-Model.raw() directly.</p>
+<p>Factory function that returns a <code class="prettyprint">ReferenceBuilder</code> instance, that makes it easier to refer
+to tables, columns, json attributes and add casting to referred columns wihtout need to use
+raw queries.</p>
 
-<p><code class="prettyprint">ref()</code> can be passed to all <code class="prettyprint">QueryBuilder</code> APIs which supports <code class="prettyprint">Model.raw()</code> arguments.</p>
+<p>See <a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a> for more information about how to refer to
+json fields.</p>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">ref</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
 
 <span class="nx">Model</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
@@ -154,11 +155,20 @@ reference will be json type.</p>
 <p>The same as <code class="prettyprint">ref()</code> but allows one to tell in which format certain javascript literal
 should be passed to database engine.</p>
 
-<h4 id="raw-not-implemented-yet">raw() (Not implemented yet)</h4>
+<h4 id="raw">raw</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 
-<p>Wrapper for raw, which will be evaluated lazily in stage where <code class="prettyprint">Model</code> or query is
-already bound to knex connection. Also understands <code class="prettyprint">ref()</code> and <code class="prettyprint">lit()</code> instances as
-bound parameters.</p>
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s2">`?? || ' ' || ??`</span><span class="p">,</span> <span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">),</span> <span class="s1">'Arnold Schwarzenegger'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random()'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">childAgeSums</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+<p>Wrapper for knex raw query that doens&rsquo;t depend on knex. Instances returned by
+<code class="prettyprint">raw</code> are converted to knex raw instances when the query is executed.</p>
 
 <h3 id="query-building-methods">Query building methods</h3>
 
@@ -7624,7 +7634,7 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 
 <h2 id="fieldexpression">FieldExpression</h2>
 
-<p>Field expressions allow one to refer to separate JSONB fields inside columns.</p>
+<p>Field expressions allow one to refer to JSONB fields inside columns.</p>
 
 <p>Syntax: <code class="prettyprint">&lt;column reference&gt;[:&lt;json field reference&gt;]</code></p>
 
