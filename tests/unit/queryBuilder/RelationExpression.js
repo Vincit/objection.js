@@ -735,6 +735,8 @@ describe('RelationExpression', () => {
   describe('#toString', () => {
     testToString('a');
     testToString('a.b');
+    testToString('a as b.b as c');
+    testToString('a as b.[b as c, d as e]');
     testToString('a.[b, c]');
     testToString('a.[b, c.d]');
     testToString('[a, b]');
@@ -849,6 +851,11 @@ describe('RelationExpression', () => {
     testNotSubExpression('a.^3', 'a.^');
     testNotSubExpression('a.^3', 'a.^4');
     testNotSubExpression('a.^3', 'a.a.a.a');
+
+    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', 'a as aa');
+    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', '[a as aa, b as bb]');
+    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', 'a as aa . c as cc');
+    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', 'a as aa . c as cc . d as dd');
   });
 
   function testParse(str, parsed) {
