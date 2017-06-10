@@ -55,11 +55,12 @@ Type|Description
 const ref = require('objection').ref;
 ```
 
-Factory function that returns `ReferenceBuilder` instance, which makes it easier to refer
-tables, columns, json attributes and add casting to referred columns wihtout need to use
-Model.raw() directly.
+Factory function that returns a `ReferenceBuilder` instance, that makes it easier to refer
+to tables, columns, json attributes and add casting to referred columns wihtout need to use
+raw queries.
 
-`ref()` can be passed to all `QueryBuilder` APIs which supports `Model.raw()` arguments.
+See [`FieldExpression`](#fieldexpression) for more information about how to refer to
+json fields.
 
 ```js
 import { ref } from 'objection';
@@ -124,11 +125,23 @@ As format to tell which name will be used for reference for example in `.select(
 The same as `ref()` but allows one to tell in which format certain javascript literal
 should be passed to database engine.
 
-#### raw() (Not implemented yet)
+#### raw
 
-Wrapper for raw, which will be evaluated lazily in stage where `Model` or query is
-already bound to knex connection. Also understands `ref()` and `lit()` instances as
-bound parameters.
+```js
+const { raw } = require('objection');
+
+Person
+  .query()
+  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
+  .orderBy(raw('random()'))
+  .then(childAgeSums => {
+    console.log(childAgeSums[0].childAgeSum);
+  });
+```
+
+Wrapper for knex raw query that doens't depend on knex. Instances returned by
+`raw` are converted to knex raw instances when the query is executed.
 
 
 
@@ -6502,7 +6515,7 @@ Call this method to rollback the transaction.
 
 ## FieldExpression
 
-Field expressions allow one to refer to separate JSONB fields inside columns.
+Field expressions allow one to refer to JSONB fields inside columns.
 
 Syntax: `<column reference>[:<json field reference>]`
 

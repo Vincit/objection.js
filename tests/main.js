@@ -21,6 +21,8 @@ describe('main module', () => {
     expect(objection.ManyToManyRelation).to.equal(require('../lib/relations/manyToMany/ManyToManyRelation'));
     expect(objection.transaction).to.equal(require('../lib/transaction'));
     expect(objection.transaction.start).to.equal(require('../lib/transaction').start);
+    expect(objection.ref).to.equal(require('../lib/queryBuilder/ReferenceBuilder').ref);
+    expect(objection.raw).to.equal(require('../lib/queryBuilder/RawBuilder').raw);
     expect(objection.Promise).to.equal(require('bluebird'));
     expect(objection.Validator).to.equal(require('../lib/model/Validator'));
     expect(objection.AjvValidator).to.equal(require('../lib/model/AjvValidator'));

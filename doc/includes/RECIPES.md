@@ -3,6 +3,19 @@
 ## Raw queries
 
 ```js
+const { raw } = require('objection');
+
+Person
+  .query()
+  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
+  .orderBy(raw('random()'))
+  .then(childAgeSums => {
+    console.log(childAgeSums[0].childAgeSum);
+  });
+```
+
+```js
 Person
   .query()
   .select(Person.raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
@@ -12,9 +25,50 @@ Person
   });
 ```
 
-To write raw SQL queries, use the [`raw`](#raw) method of any [`Model`](#model) subclass. There are also some helper
-methods such as [`whereRaw`](#whereraw) in the [`QueryBuilder`](#querybuilder). The [`raw`](#raw) method works just like the
-[knex's raw method](http://knexjs.org/#Raw). And of course you can just use `knex.raw()`.
+To mix raw SQL with queries, use the [`raw`](#raw) function from the main module 
+or the `raw` method of any [`Model`](#model) subclass. The only difference between
+these two is that the `raw` function from the main module doesn't depend on knex
+where as `Model.raw()` will throw if the model doesn't have a knex instance installed.
+Both of these functions work just like the [knex's raw method](http://knexjs.org/#Raw). 
+And of course you can just use `knex.raw()`.
+
+There are also some helper methods such as [`whereRaw`](#whereraw) in the [`QueryBuilder`](#querybuilder).
+
+## JSON queries
+
+```js
+import { ref } from 'objection';
+
+Person
+  .query()
+  .select([
+    'id',
+    ref('jsonColumn:details.name').castText().as('name'),
+    ref('jsonColumn:details.age').castInt().as('age')
+  ])
+  .join('Animal', ref('Person.jsonColumn:details.name').castText(), '=', ref('Animal.name'))
+  .where('age', '>', ref('Animal.jsonData:details.ageLimit'));
+```
+
+> Individual json fields can be updated like this:
+
+```js
+Person
+  .query()
+  .patch({
+    'jsonColumn:details.name': 'Jennifer',
+    'jsonColumn:details.age': 29
+  });
+```
+
+You can use the [`ref`](#ref) function from the main module to refer to json columns
+in queries. There is also a bunch of query building methods that have `Json` in their
+names. Check them out too.
+
+See [`FieldExpression`](#fieldexpression) for more information about how to refer to
+json fields.
+
+Json queries currently only work with postgres.
 
 ## Change id column
 
@@ -146,20 +200,24 @@ It is completely optional. If you want to use some other validation library you 
 > snake_case/camelCase conversion:
 
 ```js
+// It's a good idea to memoize the conversion functions.
+const snakeCase = _.memoize(_.snakeCase);
+const camelCase = _.memoize(_.camelCase);
+
 class Person extends Model {
   // This is called when an object is serialized to database format.
   $formatDatabaseJson(json) {
     json = super.$formatDatabaseJson(json);
 
     return _.mapKeys(json, (value, key) => {
-      return _.snakeCase(key);
+      return snakeCase(key);
     });
   }
 
   // This is called when an object is read from database.
   $parseDatabaseJson(json) {
     json = _.mapKeys(json, function (value, key) {
-      return _.camelCase(key);
+      return camelCase(key);
     });
 
     return super.$parseDatabaseJson(json);

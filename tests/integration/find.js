@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const raw = require('../../').raw;
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
@@ -340,6 +341,41 @@ module.exports = (session) => {
                 concatProp: 'hejsan 310',
                 $afterGetCalled: 1
               });
+            });
+        });
+
+        it('raw in select', () => {
+          return Model2
+            .query()
+            .select('model_2.*', raw('?? + ? as ??', 'model_2_prop_2', 10, 'model_2_prop_2'))
+            .orderBy('id_col')
+            .then(models => {
+              expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+              expect(_.map(models, 'model2Prop2')).to.eql([40, 30, 20]);
+            });
+        });
+
+        it('raw in where', () => {
+          return Model2
+            .query()
+            .where('model_2_prop_2', raw(':value', {value: 20}))
+            .orderBy('id_col')
+            .then(models => {
+              expect(_.map(models, 'idCol')).to.eql([2]);
+              expect(_.map(models, 'model2Prop2')).to.eql([20]);
+            });
+        });
+
+        it('raw in where object', () => {
+          return Model2
+            .query()
+            .where({
+              model_2_prop_2: raw('?', [20])
+            })
+            .orderBy('id_col')
+            .then(models => {
+              expect(_.map(models, 'idCol')).to.eql([2]);
+              expect(_.map(models, 'model2Prop2')).to.eql([20]);
             });
         });
 
