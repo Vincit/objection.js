@@ -1036,7 +1036,7 @@ module.exports = (session) => {
           });
       });
 
-      it('test', () => {
+      it('test 1', () => {
         return Page
           .query()
           .findById(1)
@@ -1077,6 +1077,22 @@ module.exports = (session) => {
                 }]
               }]
             });
+          });
+      });
+
+      it('test 2', () => {
+        return Page
+          .query()
+          .joinRelation('parents.parents')
+          .select('parents:parents.page_id as id', ref('object_data:name').from('parents:parents').as('name'))
+          .orderBy('parents:parents.page_id')
+          .then(models => {
+            expect(models).to.eql([
+              { id: 4, name: '1_1_1' },
+              { id: 5, name: '1_1_2' },
+              { id: 6, name: '1_2_1' },
+              { id: 7, name: '1_2_2' } 
+            ]);
           });
       });
     });
