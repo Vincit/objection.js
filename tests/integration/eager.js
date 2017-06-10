@@ -1875,6 +1875,16 @@ module.exports = (session) => {
             tester([result]);
           });
       });
+
+      testFn(testName + ' (NaiveEagerAlgorithm)', () => {
+        return opt.Model
+          .query()
+          .where(idCol, opt.id)
+          .eagerAlgorithm(Model1.NaiveEagerAlgorithm)
+          .eager(expr, opt.filters)
+          .then(sortRelations(opt.disableSort))
+          .then(tester);
+      });
     }
 
     if (!opt.disableJoin) {
