@@ -1399,7 +1399,7 @@ are accepted on this list. Other modules like plugins for other frameworks and t
 practices are an exception to this rule. If you are a developer or otherwise know of a good plugin/module for objection, please 
 create a pull request or an issue to get it added to this list.
 
-  * *Nothing to see here yet!*
+  * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
 
 ## Plugin development best practices
 
