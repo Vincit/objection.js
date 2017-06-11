@@ -3731,7 +3731,7 @@ rows in a flattened format. For example the result set of the eager expression <
 <p><b>NaiveEagerAlgorithm</b></p>
 
 <p>This algorithm naively fetches the relations using a separate query for each model. For example relation expression 
-<code class="prettyprint">children.children</code> will cause 101 queries to be performed assuming a result set of 10 each having 10 children each 
+<code class="prettyprint">children.children</code> will cause 111 queries to be performed assuming a result set of 10 each having 10 children each 
 having 10 children. For small result sets this doesn&rsquo;t matter. The clear benefit of this algorithm is that there are 
 no limitations. You can use <code class="prettyprint">offset</code>, <code class="prettyprint">limit</code>, <code class="prettyprint">min</code>, <code class="prettyprint">max</code> etc. in <code class="prettyprint">modifyEager</code>. You can for example fetch only the 
 youngest child for each parent. </p>
