@@ -882,6 +882,68 @@ Person
   });
 ```
 
+> Reusable named filters can be defined for models using [`namedFilters`](#namedfilters)
+
+```js
+// Person.js
+
+class Person extends Model {
+  static get namedFilters() {
+    return {
+      orderByAge: (builder) => {
+        builder.orderBy('age');
+      }
+    };
+  }
+}
+
+// Animal.js
+
+class Animal extends Model {
+  static get namedFilters() {
+    return {
+      orderByName: (builder) => {
+        builder.orderBy('name');
+      },
+      onlyDogs: (builder) => {
+        builder.where('species', 'dog');
+      }
+    };
+  }
+}
+
+// somewhereElse.js
+
+Person
+  .query()
+  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]')
+  .then(people => {
+    console.log(people[0].children[0].pets[0].name);
+    console.log(people[0].children[0].movies[0].id);
+  });
+```
+
+> Relations can be aliased using `as` keyword:
+
+```js
+Person
+  .query()
+  .eager(`[
+    children(orderByAge) as kids .[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats
+
+      movies.[
+        actors
+      ]
+    ]
+  ]`)
+  .then(people => {
+    console.log(people[0].kids[0].dogs[0].name);
+    console.log(people[0].kids[0].movies[0].id);
+  });
+```
+
 > Example usage for [`allowEager`](#alloweager) in an express route:
 
 ```js
@@ -935,7 +997,7 @@ In addition to the [`eager`](#eager) method, relations can be fetched using the 
 By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)).
 You can choose to use a join based eager loading algorithm that only performs one single query to fetch thw whole
 eager tree. You can select which algorithm to use per query using [`eagerAlgorithm`](#eageralgorithm) method or
-per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. Both algorithms
+per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. All algorithms
 have their strengths and weaknesses, which are discussed in detail [here](#eager).
 
 ## Graph inserts

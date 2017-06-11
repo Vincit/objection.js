@@ -2917,7 +2917,7 @@ the available algorithms [here](#eager).
 
 Argument|Type|Description
 --------|----|-------|------------
-algo|EagerAlgorithm|The eager loading algorithm to use. Either `Model.JoinEagerAlgorithm` or `Model.WhereInEagerAlgorithm`.
+algo|EagerAlgorithm|The eager loading algorithm to use. One of `Model.JoinEagerAlgorithm`, `Model.WhereInEagerAlgorithm` and `Model.NaiveEagerAlgorithm`.
 
 ##### Return value
 
@@ -3028,6 +3028,27 @@ Person
   });
 ```
 
+> Relations can be given aliases using the `as` keyword:
+
+```js
+Person
+  .query()
+  .eager(`[
+    children(orderByAge) as kids .[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats
+
+      movies.[
+        actors
+      ]
+    ]
+  ]`)
+  .then(people => {
+    console.log(people[0].kids[0].dogs[0].name);
+    console.log(people[0].kids[0].movies[0].id);
+  });
+```
+
 > The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
 
 ```js
@@ -3068,9 +3089,9 @@ for more info on the relation expression language.
 
 You can choose the way objection performs the eager loading by using [`eagerAlgorithm`](#eageralgorithm) method
 on a query builder or by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property of a model. The
-two algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) and `Model.JoinEagerAlgorithm`.
-Both have their strengths and weaknesses. We will go through the main differences below. You can always see the
-executed SQL by calling the [`debug`](#debug) method for the query builder.
+three algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) `Model.JoinEagerAlgorithm`
+and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main 
+differences below. You can always see the executed SQL by calling the [`debug`](#debug) method for the query builder.
 
 <b>WhereInEagerAlgorithm</b>
 
@@ -3082,7 +3103,7 @@ in detail in [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading
 Limitations:
 
  * Relations cannot be referred in the query because they are not joined.
- * `limit` and `page` methods will work incorrectly when applied to a relation using `filterEager`,
+ * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyEager`,
    because they will be applied on a query that fetches relations for multiple parents. You can use
    `limit` and `page` for the root query.
 
@@ -3094,9 +3115,17 @@ must be separated by `:` character (dot is not used because of the way knex pars
 
 Limitations:
 
- * `limit` and `page` methods will work incorrectly because the will limit the result set which contains all the result
+ * `limit` and `page` methods will work incorrectly because they will limit the result set that contains all the result
    rows in a flattened format. For example the result set of the eager expression `children.children` will have
    `10 * 10 * 10` rows assuming the you fetched 10 models that all had 10 children that all had 10 children.
+
+<b>NaiveEagerAlgorithm</b>
+
+This algorithm naively fetches the relations using a separate query for each model. For example relation expression 
+`children.children` will cause 1000 queries to be performed assuming a result set of 10 each having 10 children each 
+having 10 children. For small result sets this doesn't matter. The clear benefit of this algorithm is that there are 
+no limitations. You can use `offset`, `limit`, `min`, `max` etc. in `modifyEager`. You can for example fetch only the 
+youngest child for each parent. 
 
 <b>Performance differences</b>
 
@@ -3105,7 +3134,8 @@ the round trip time to the database server is significant. On the other hand the
 trivial to parse into a tree structure while the result of `JoinEagerAlgorithm` needs some complex parsing which
 can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment.
 You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured
-real-life problem. Don't optimize prematurely!
+real-life problem. Don't optimize prematurely! `NaiveEagerAlgorithm` is by far the slowest. It should only be used for 
+cases where performance doesn't matter and when it is the only option to get the job done.
 
 ##### Arguments
 
@@ -6590,11 +6620,44 @@ Person
 > like this:
 
 ```js
-children(arg1, arg2).[movies.actors(arg3), pets]
+Person
+  .query()
+  .eager(`children(arg1, arg2).[movies.actors(arg3), pets]`)
 ```
 
-> In this example `children` relation had arguments `arg1` and `arg2` and `actors` relation had
-> the argument `arg3`.
+> You can spread eager expressions to multiple lines and add whitespace:
+
+```js
+Person
+  .query()
+  .eager(`[
+    children.[
+      pets,
+      movies.actors.[
+        pets, 
+        children
+      ]
+    ]
+  ]`)
+```
+
+> Eager expressions can be aliased using `as` keyword:
+
+```js
+Person
+  .query()
+  .eager(`[
+    children as kids.[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats,
+
+      movies.actors.[
+        pets, 
+        children as kids
+      ]
+    ]
+  ]`)
+```
 
 Relation expression is a simple DSL for expressing relation trees.
 
@@ -6606,6 +6669,7 @@ These are all valid relation expressions:
  * `[children.movies, pets]`
  * `[children.[movies, pets], pets]`
  * `[children.[movies.actors.[children, pets], pets], pets]`
+ * `[children as kids, pets(filterDogs) as dogs]`
 
 There are two tokens that have special meaning: `*` and `^`. `*` means "all relations recursively" and
 `^` means "this relation recursively".
@@ -6617,7 +6681,7 @@ Expression `parent.^` is equivalent to `parent.parent.parent.parent...` up to th
 has results for the `parent` relation. The recursion can be limited to certain depth by giving the depth after
 the `^` character. For example `parent.^3` is equal to `parent.parent.parent`.
 
-
+Relations can be aliased using the `as` keyword.
 
 
 ## Validator

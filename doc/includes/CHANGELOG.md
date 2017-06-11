@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.3
+
+### What's new
+
+  * [`NaiveEagerAlogrithm`](http://vincit.github.io/objection.js/#eager)
+  * [Aliases in relation expressions](http://vincit.github.io/objection.js/#relationexpression) [#402](https://github.com/Vincit/objection.js/issues/402)
+  * New lazily evaluated `raw` function. [#275](https://github.com/Vincit/objection.js/issues/275)
+
 ## 0.8.2
 
 ### What's new

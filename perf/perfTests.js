@@ -18,6 +18,46 @@ if (typeof describe == 'undefined') {
   global.it = global.mockMocha.it;
 }
 
+function Plugin1(Model) {
+  return class extends Model {
+    foo() {
+      return 10;
+    }
+  };
+}
+
+function Plugin2(Model) {
+  return class extends Model {
+    bar() {
+      return 20;
+    }
+  };
+}
+
+function Plugin3(Model) {
+  return class extends Model {
+    baz() {
+      return 30;
+    }
+  };
+}
+
+function Plugin4(Model) {
+  return class extends Model {
+    spam() {
+      return 40;
+    }
+  };
+}
+
+function Plugin5(Model) {
+  return class extends Model {
+    eggs() {
+      return 50;
+    }
+  };
+}
+
 describe('Performance tests', function () {
   var mockKnex = null;
 
@@ -46,9 +86,11 @@ describe('Performance tests', function () {
   });
 
   before(function () {
-    Person = class Person extends Model {}
-    Animal = class Animal extends Model {}
-    Movie = class Movie extends Model {}
+    const BaseClass = Plugin1(Plugin2(Plugin3(Plugin4(Plugin5(Model)))));
+
+    Person = class Person extends BaseClass {}
+    Animal = class Animal extends BaseClass {}
+    Movie = class Movie extends BaseClass {}
   });
 
   before(function () {
