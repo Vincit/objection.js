@@ -3528,7 +3528,7 @@ the available algorithms <a href="#eager">here</a>.</p>
 <tr>
 <td>algo</td>
 <td>EagerAlgorithm</td>
-<td>The eager loading algorithm to use. Either <code class="prettyprint">Model.JoinEagerAlgorithm</code> or <code class="prettyprint">Model.WhereInEagerAlgorithm</code>.</td>
+<td>The eager loading algorithm to use. One of <code class="prettyprint">Model.JoinEagerAlgorithm</code>, <code class="prettyprint">Model.WhereInEagerAlgorithm</code> and <code class="prettyprint">Model.NaiveEagerAlgorithm</code>.</td>
 </tr>
 </tbody></table>
 
@@ -3638,6 +3638,26 @@ to the relations:</p>
   <span class="p">});</span>
 </code></pre>
 <blockquote>
+<p>Relations can be given aliases using the <code class="prettyprint">as</code> keyword:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s2">`[
+    children(orderByAge) as kids .[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats
+
+      movies.[
+        actors
+      ]
+    ]
+  ]`</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">kids</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">dogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">kids</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
+  <span class="p">});</span>
+</code></pre>
+<blockquote>
 <p>The eager queries are optimized to avoid the N + 1 query problem. Consider this query:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
@@ -3674,9 +3694,9 @@ for more info on the relation expression language.</p>
 
 <p>You can choose the way objection performs the eager loading by using <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method
 on a query builder or by setting the <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> property of a model. The
-two algorithms currently available are <code class="prettyprint">Model.WhereInEagerAlgorithm</code> (the default) and <code class="prettyprint">Model.JoinEagerAlgorithm</code>.
-Both have their strengths and weaknesses. We will go through the main differences below. You can always see the
-executed SQL by calling the <a href="#debug"><code class="prettyprint">debug</code></a> method for the query builder.</p>
+three algorithms currently available are <code class="prettyprint">Model.WhereInEagerAlgorithm</code> (the default) <code class="prettyprint">Model.JoinEagerAlgorithm</code>
+and <code class="prettyprint">Model.NaiveEagerAlgorithm</code>. All three have their strengths and weaknesses. We will go through the main 
+differences below. You can always see the executed SQL by calling the <a href="#debug"><code class="prettyprint">debug</code></a> method for the query builder.</p>
 
 <p><b>WhereInEagerAlgorithm</b></p>
 
@@ -3689,7 +3709,7 @@ in detail in <a href="https://www.vincit.fi/en/blog/nested-eager-loading-and-ins
 
 <ul>
 <li>Relations cannot be referred in the query because they are not joined.</li>
-<li><code class="prettyprint">limit</code> and <code class="prettyprint">page</code> methods will work incorrectly when applied to a relation using <code class="prettyprint">filterEager</code>,
+<li><code class="prettyprint">limit</code> and <code class="prettyprint">page</code> methods will work incorrectly when applied to a relation using <code class="prettyprint">modifyEager</code>,
 because they will be applied on a query that fetches relations for multiple parents. You can use
 <code class="prettyprint">limit</code> and <code class="prettyprint">page</code> for the root query.</li>
 </ul>
@@ -3703,10 +3723,18 @@ must be separated by <code class="prettyprint">:</code> character (dot is not us
 <p>Limitations:</p>
 
 <ul>
-<li><code class="prettyprint">limit</code> and <code class="prettyprint">page</code> methods will work incorrectly because the will limit the result set which contains all the result
+<li><code class="prettyprint">limit</code> and <code class="prettyprint">page</code> methods will work incorrectly because they will limit the result set that contains all the result
 rows in a flattened format. For example the result set of the eager expression <code class="prettyprint">children.children</code> will have
 <code class="prettyprint">10 * 10 * 10</code> rows assuming the you fetched 10 models that all had 10 children that all had 10 children.</li>
 </ul>
+
+<p><b>NaiveEagerAlgorithm</b></p>
+
+<p>This algorithm naively fetches the relations using a separate query for each model. For example relation expression 
+<code class="prettyprint">children.children</code> will cause 1000 queries to be performed assuming a result set of 10 each having 10 children each 
+having 10 children. For small result sets this doesn&rsquo;t matter. The clear benefit of this algorithm is that there are 
+no limitations. You can use <code class="prettyprint">offset</code>, <code class="prettyprint">limit</code>, <code class="prettyprint">min</code>, <code class="prettyprint">max</code> etc. in <code class="prettyprint">modifyEager</code>. You can for example fetch only the 
+youngest child for each parent. </p>
 
 <p><b>Performance differences</b></p>
 
@@ -3715,7 +3743,8 @@ the round trip time to the database server is significant. On the other hand the
 trivial to parse into a tree structure while the result of <code class="prettyprint">JoinEagerAlgorithm</code> needs some complex parsing which
 can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment.
 You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured
-real-life problem. Don&rsquo;t optimize prematurely!</p>
+real-life problem. Don&rsquo;t optimize prematurely! <code class="prettyprint">NaiveEagerAlgorithm</code> is by far the slowest. It should only be used for 
+cases where performance doesn&rsquo;t matter and when it is the only option to get the job done.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -7707,13 +7736,42 @@ of functions in objection.js. For example:</p>
 <p>Relation expressions can have arguments. Arguments are listed in parenthesis after the relation names
 like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">children</span><span class="p">(</span><span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">).[</span><span class="nx">movies</span><span class="p">.</span><span class="nx">actors</span><span class="p">(</span><span class="nx">arg3</span><span class="p">),</span> <span class="nx">pets</span><span class="p">]</span>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s2">`children(arg1, arg2).[movies.actors(arg3), pets]`</span><span class="p">)</span>
 </code></pre>
 <blockquote>
-<p>In this example <code class="prettyprint">children</code> relation had arguments <code class="prettyprint">arg1</code> and <code class="prettyprint">arg2</code> and <code class="prettyprint">actors</code> relation had
-the argument <code class="prettyprint">arg3</code>.</p>
+<p>You can spread eager expressions to multiple lines and add whitespace:</p>
 </blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s2">`[
+    children.[
+      pets,
+      movies.actors.[
+        pets, 
+        children
+      ]
+    ]
+  ]`</span><span class="p">)</span>
+</code></pre>
+<blockquote>
+<p>Eager expressions can be aliased using <code class="prettyprint">as</code> keyword:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s2">`[
+    children as kids.[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats,
 
+      movies.actors.[
+        pets, 
+        children as kids
+      ]
+    ]
+  ]`</span><span class="p">)</span>
+</code></pre>
 <p>Relation expression is a simple DSL for expressing relation trees.</p>
 
 <p>These are all valid relation expressions:</p>
@@ -7725,6 +7783,7 @@ the argument <code class="prettyprint">arg3</code>.</p>
 <li><code class="prettyprint">[children.movies, pets]</code></li>
 <li><code class="prettyprint">[children.[movies, pets], pets]</code></li>
 <li><code class="prettyprint">[children.[movies.actors.[children, pets], pets], pets]</code></li>
+<li><code class="prettyprint">[children as kids, pets(filterDogs) as dogs]</code></li>
 </ul>
 
 <p>There are two tokens that have special meaning: <code class="prettyprint">*</code> and <code class="prettyprint">^</code>. <code class="prettyprint">*</code> means &ldquo;all relations recursively&rdquo; and
@@ -7736,6 +7795,8 @@ The <code class="prettyprint">*</code> token must be used with caution or you wi
 <p>Expression <code class="prettyprint">parent.^</code> is equivalent to <code class="prettyprint">parent.parent.parent.parent...</code> up to the point a relation no longer
 has results for the <code class="prettyprint">parent</code> relation. The recursion can be limited to certain depth by giving the depth after
 the <code class="prettyprint">^</code> character. For example <code class="prettyprint">parent.^3</code> is equal to <code class="prettyprint">parent.parent.parent</code>.</p>
+
+<p>Relations can be aliased using the <code class="prettyprint">as</code> keyword.</p>
 
 <h2 id="validator">Validator</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Validator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Validator</span><span class="p">;</span>
