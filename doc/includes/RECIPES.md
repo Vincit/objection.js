@@ -89,7 +89,7 @@ Composite key can be defined by using an array of column names.
 
 ```js
 class Person extends Model {
-  beforeInsert() {
+  $beforeInsert() {
     if (this.id) {
       throw new objection.ValidationError({
         id: [{
