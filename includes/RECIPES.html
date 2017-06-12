@@ -106,7 +106,7 @@ Composite key can be defined by using an array of column names.</p>
 <p>Additional validation:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">beforeInsert</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">$beforeInsert</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span>
         <span class="na">id</span><span class="p">:</span> <span class="p">[{</span>
