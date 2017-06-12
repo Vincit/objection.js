@@ -3122,7 +3122,7 @@ Limitations:
 <b>NaiveEagerAlgorithm</b>
 
 This algorithm naively fetches the relations using a separate query for each model. For example relation expression 
-`children.children` will cause 1000 queries to be performed assuming a result set of 10 each having 10 children each 
+`children.children` will cause 111 queries to be performed assuming a result set of 10 each having 10 children each 
 having 10 children. For small result sets this doesn't matter. The clear benefit of this algorithm is that there are 
 no limitations. You can use `offset`, `limit`, `min`, `max` etc. in `modifyEager`. You can for example fetch only the 
 youngest child for each parent. 
