@@ -78,6 +78,29 @@ module.exports = (session) => {
           });
       });
 
+      it('should ignore non-objects in relation properties', () => {
+        let model = {
+          model1Prop1: 'hello 3',
+          model1Relation1: 1,
+          model1Relation2: [1, 2, null, 4, undefined]
+        };
+
+        return Model1
+          .query()
+          .insert(model)
+          .then(inserted => {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.$beforeInsertCalled).to.equal(1);
+            expect(inserted.$afterInsertCalled).to.equal(1);
+            expect(inserted.id).to.eql(3);
+            expect(inserted.model1Prop1).to.equal('hello 3');
+            return session.knex(Model1.tableName);
+          })
+          .then(rows => {
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
       it('should insert new model with identifier', () => {
         let model = Model1.fromJson({id: 1000, model1Prop1: 'hello 3'});
 

@@ -95,6 +95,27 @@ module.exports = (session) => {
           });
       });
 
+      it('should ignore non-objects in relation properties', () => {
+        return Model1
+          .query()
+          .patch({
+            model1Prop1: 'updated text',
+            model1Relation1: 1,
+            model1Relation2: [1, 2, null, undefined, 5]
+          })
+          .where('id', '=', 2)
+          .then(numUpdated => {
+            expect(numUpdated).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(rows => {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'updated text'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
       it('should accept subqueries and raw expressions (1)', () => {
         return Model1
           .query()

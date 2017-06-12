@@ -13,7 +13,7 @@ describe('Model', () => {
     let Model1;
 
     beforeEach(() => {
-      Model1 = createModelClass();
+      Model1 = modelClass('Model1');
     });
 
     it('should copy attributes to the created object', () => {
@@ -476,6 +476,141 @@ describe('Model', () => {
         Model1.fromJson(new Int16Array(100));
       }).to.throwException();
     });
+
+    it('should parse relations into Model instances and remove them from database representation', () => {
+      let Model2 = modelClass('Model2');
+
+      Model1.relationMappings = {
+        relation1: {
+          relation: Model.HasManyRelation,
+          modelClass: Model2,
+          join: {
+            from: 'Model1.id',
+            to: 'Model2.model1Id'
+          }
+        },
+        relation2: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Model1,
+          join: {
+            from: 'Model1.id',
+            to: 'Model1.model1Id'
+          }
+        }
+      };
+
+      let model = Model1.fromJson({
+        id: 10,
+        model1Id: 13,
+        relation1: [
+          {id: 11, model1Id: 10},
+          {id: 12, model1Id: 10}
+        ],
+        relation2: {id: 13, model1Id: null}
+      });
+
+      expect(model.relation1[0]).to.be.a(Model2);
+      expect(model.relation1[1]).to.be.a(Model2);
+      expect(model.relation2).to.be.a(Model1);
+
+      let json = model.$toDatabaseJson();
+
+      expect(json).to.not.have.property('relation1');
+      expect(json).to.not.have.property('relation2');
+
+      json = model.$toJson();
+
+      expect(json).to.have.property('relation1');
+      expect(json).to.have.property('relation2');
+    });
+
+    it('should NOT parse relations into Model instances if skipParseRelations option is given', () => {
+      let Model2 = modelClass('Model2');
+
+      Model1.relationMappings = {
+        relation1: {
+          relation: Model.HasManyRelation,
+          modelClass: Model2,
+          join: {
+            from: 'Model1.id',
+            to: 'Model2.model1Id'
+          }
+        },
+        relation2: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Model1,
+          join: {
+            from: 'Model1.id',
+            to: 'Model1.model1Id'
+          }
+        }
+      };
+
+      let model = Model1.fromJson({
+        id: 10,
+        model1Id: 13,
+        relation1: [
+          {id: 11, model1Id: 10},
+          {id: 12, model1Id: 10}
+        ],
+        relation2: {id: 13, model1Id: null}
+      }, {skipParseRelations: true});
+
+      expect(model.relation1[0]).not.to.be.a(Model2);
+      expect(model.relation1[1]).not.to.be.a(Model2);
+      expect(model.relation2).not.to.be.a(Model1);
+    });
+
+    it('should NOT try to parse non-object relations into Model instances', () => {
+      let Model2 = modelClass('Model2');
+
+      Model1.relationMappings = {
+        relation1: {
+          relation: Model.HasManyRelation,
+          modelClass: Model2,
+          join: {
+            from: 'Model1.id',
+            to: 'Model2.model1Id'
+          }
+        },
+        relation2: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Model1,
+          join: {
+            from: 'Model1.id',
+            to: 'Model1.model1Id'
+          }
+        }
+      };
+
+      let model = Model1.fromJson({
+        id: 10,
+        model1Id: 13,
+        relation1: [1, 2, '3', null, undefined, 6],
+        relation2: '5'
+      }, {skipParseRelations: true});
+
+      expect(model.relation1).to.eql([1, 2, '3', null, undefined, 6])
+      expect(model.relation2).to.eql('5')
+    });
+
+    it('null relations should be null in the result', () => {
+      let Model = modelClass('Model');
+
+      Model.relationMappings = {
+        someRelation: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Model,
+          join: {
+            from: 'Model.id',
+            to: 'Model.model1Id'
+          }
+        }
+      };
+
+      let model = Model.fromJson({a: 1, b: 2, someRelation: null});
+      expect(model.someRelation).to.equal(null);
+    });
   });
 
   describe('fromDatabaseJson', () => {
@@ -862,92 +997,6 @@ describe('Model', () => {
     });
   });
 
-  it('should parse relations into Model instances and remove them from database representation', () => {
-    let Model1 = modelClass('Model1');
-    let Model2 = modelClass('Model2');
-
-    Model1.relationMappings = {
-      relation1: {
-        relation: Model.HasManyRelation,
-        modelClass: Model2,
-        join: {
-          from: 'Model1.id',
-          to: 'Model2.model1Id'
-        }
-      },
-      relation2: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Model1,
-        join: {
-          from: 'Model1.id',
-          to: 'Model1.model1Id'
-        }
-      }
-    };
-
-    let model = Model1.fromJson({
-      id: 10,
-      model1Id: 13,
-      relation1: [
-        {id: 11, model1Id: 10},
-        {id: 12, model1Id: 10}
-      ],
-      relation2: {id: 13, model1Id: null}
-    });
-
-    expect(model.relation1[0]).to.be.a(Model2);
-    expect(model.relation1[1]).to.be.a(Model2);
-    expect(model.relation2).to.be.a(Model1);
-
-    let json = model.$toDatabaseJson();
-
-    expect(json).to.not.have.property('relation1');
-    expect(json).to.not.have.property('relation2');
-
-    json = model.$toJson();
-
-    expect(json).to.have.property('relation1');
-    expect(json).to.have.property('relation2');
-  });
-
-  it('should NOT parse relations into Model instances if skipParseRelations option is given', () => {
-    let Model1 = modelClass('Model1');
-    let Model2 = modelClass('Model2');
-
-    Model1.relationMappings = {
-      relation1: {
-        relation: Model.HasManyRelation,
-        modelClass: Model2,
-        join: {
-          from: 'Model1.id',
-          to: 'Model2.model1Id'
-        }
-      },
-      relation2: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Model1,
-        join: {
-          from: 'Model1.id',
-          to: 'Model1.model1Id'
-        }
-      }
-    };
-
-    let model = Model1.fromJson({
-      id: 10,
-      model1Id: 13,
-      relation1: [
-        {id: 11, model1Id: 10},
-        {id: 12, model1Id: 10}
-      ],
-      relation2: {id: 13, model1Id: null}
-    }, {skipParseRelations: true});
-
-    expect(model.relation1[0]).not.to.be.a(Model2);
-    expect(model.relation1[1]).not.to.be.a(Model2);
-    expect(model.relation2).not.to.be.a(Model1);
-  });
-
   it('relationMappings can be a function', () => {
     let Model1 = modelClass('Model1');
     let Model2 = modelClass('Model2');
@@ -1211,24 +1260,6 @@ describe('Model', () => {
 
     expect(model.$toJson(false)).to.eql({a: 1, b: 2, someRelation: {a: 3, b: 4}});
     expect(model.$toJson(true)).to.eql({a: 1, b: 2});
-  });
-
-  it('null relations should be null in the result', () => {
-    let Model = modelClass('Model');
-
-    Model.relationMappings = {
-      someRelation: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Model,
-        join: {
-          from: 'Model.id',
-          to: 'Model.model1Id'
-        }
-      }
-    };
-
-    let model = Model.fromJson({a: 1, b: 2, someRelation: null});
-    expect(model.someRelation).to.equal(null);
   });
 
   it('raw method should be a shortcut to knex().raw', () => {
