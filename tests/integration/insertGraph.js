@@ -6,7 +6,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
 const ValidationError = require('../../').ValidationError;
-const inheritModel = require('../../lib/model/inheritModel');
+const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 
 module.exports = (session) => {
   let Model1 = session.models.Model1;

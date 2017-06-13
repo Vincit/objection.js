@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const inheritModel = require('../../lib/model/inheritModel');
+const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const ValidationError = require('../../').ValidationError;
 

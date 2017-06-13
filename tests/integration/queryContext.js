@@ -5,7 +5,7 @@ const Promise = require('bluebird');
 
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
-const inheritModel = require('../../lib/model/inheritModel');
+const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const knexMocker = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
