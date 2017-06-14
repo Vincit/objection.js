@@ -1432,7 +1432,7 @@ describe('QueryBuilder', () => {
 function createFindOperation(builder, whereObj) {
   let method = new QueryBuilderOperation("find");
 
-  method.onBuild = knexBuilder => {
+  method.onBuildKnex = knexBuilder => {
     knexBuilder.where(whereObj);
   };
 
@@ -1448,7 +1448,7 @@ function createInsertOperation(builder, mergeWithModel) {
     return true;
   };
 
-  method.onBuild = function (knexBuilder) {
+  method.onBuildKnex = function (knexBuilder) {
     let json = _.merge(this.model, mergeWithModel);
     knexBuilder.insert(json);
   };
@@ -1465,7 +1465,7 @@ function createUpdateOperation(builder, mergeWithModel) {
     return true;
   };
 
-  method.onBuild = function (knexBuilder) {
+  method.onBuildKnex = function (knexBuilder) {
     let json = _.merge(this.model, mergeWithModel);
     knexBuilder.update(json);
   };
@@ -1477,7 +1477,7 @@ function createDeleteOperation(builder, whereObj) {
   let method = new QueryBuilderOperation("delete");
   method.isWriteOperation = true;
 
-  method.onBuild = knexBuilder => {
+  method.onBuildKnex = knexBuilder => {
     knexBuilder.delete().where(whereObj);
   };
 
