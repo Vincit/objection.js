@@ -18,6 +18,15 @@ describe('integration tests', () => {
       host: '127.0.0.1',
       user: 'objection',
       database: 'objection_test'
+    },
+    pool: {
+      min: 2,
+      max: 50,
+      afterCreate: function (conn, cb) {
+        conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, function (err) {
+          cb(err, conn);
+        });
+      }
     }
   }, {
     client: 'postgres',

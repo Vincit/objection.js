@@ -672,6 +672,72 @@ module.exports = (session) => {
       }
     });
 
+    it('should work with zero id', () => {
+      return Promise.map([Model1.JoinEagerAlgorithm, Model1.NaiveEagerAlgorithm, Model1.WhereInEagerAlgorithm], algo => {
+        return session
+          .populate([{
+            id: 0,
+            model1Prop1: 'hello 0',
+
+            model1Relation1: {
+              id: 1,
+              model1Prop1: 'hello 1'
+            },
+
+            model1Relation2: [{
+              idCol: 0,
+              model2Prop1: 'hejsan 1',
+
+              model2Relation1: [{
+                id: 2,
+                model1Prop1: 'hello 2'
+              }]
+            }]
+          }])
+          .then(() => {
+            return Model1
+              .query()
+              .where('Model1.id', 0)
+              .eager('[model1Relation1, model1Relation2.model2Relation1]')
+              .eagerAlgorithm(algo)
+          })
+          .then(models => {
+            expect(models).to.eql([{
+              id: 0,
+              model1Prop1: 'hello 0',
+              model1Prop2: null,
+              model1Id: 1,
+              $afterGetCalled: 1,
+
+              model1Relation1: {
+                id: 1,
+                model1Prop1: 'hello 1',
+                model1Prop2: null,
+                model1Id: null,
+                $afterGetCalled: 1
+              },
+
+              model1Relation2: [{
+                idCol: 0,
+                model2Prop1: 'hejsan 1',
+                model2Prop2: null,
+                model1Id: 0,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  id: 2,
+                  model1Prop1: 'hello 2',
+                  model1Prop2: null,
+                  aliasedExtra: null,
+                  model1Id: null,
+                  $afterGetCalled: 1
+                }]
+              }]
+            }]);
+          });
+      }, {concurrency: 1});
+    });
+
     describe('JoinEagerAlgorithm', () => {
 
       it('select should work', () => {
