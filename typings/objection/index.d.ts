@@ -528,6 +528,8 @@ declare module "objection" {
       callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, boundModel4Class: MC4, boundModel5Class: MC5) => Promise<T>
     ): Promise<T>;
 
+    <T>(knex: knex, callback: (trx: Transaction) => Promise<T>): Promise<T>;
+
   }
 
   export const transaction: transaction
