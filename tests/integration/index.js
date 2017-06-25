@@ -22,8 +22,8 @@ describe('integration tests', () => {
     pool: {
       min: 2,
       max: 50,
-      afterCreate: function (conn, cb) {
-        conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, function (err) {
+      afterCreate: (conn, cb) => {
+        conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, (err) => {
           cb(err, conn);
         });
       }
