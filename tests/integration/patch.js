@@ -7,6 +7,7 @@ const Promise = require('bluebird');
 const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const ValidationError = require('../../').ValidationError;
+const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
@@ -454,6 +455,50 @@ module.exports = (session) => {
             expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
           });
       });
+
+      if (isPostgres(session.knex)) {
+        it('should work with returning', () => {
+          let model = Model1.fromJson({id: 1});
+
+          return model
+            .$query()
+            .patch({model1Prop1: 'updated text'})
+            .returning('model1Prop1', 'model1Prop2')
+            .then(patched => {
+              const expected = {model1Prop1: 'updated text', model1Prop2: null};
+              expect(patched).to.be.a(Model1);
+              expect(patched).to.eql(expected);
+              expect(model).to.eql(Object.assign({}, expected, {id: 1}));
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(2);
+              expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            });
+        });
+
+        it('should work with returning *', () => {
+          const model = Model1.fromJson({id: 1});
+
+          return model
+            .$query()
+            .patch({model1Prop1: 'updated text'})
+            .returning('*')
+            .then(patched => {
+              const expected = {id: 1, model1Id: null, model1Prop1: 'updated text', model1Prop2: null};
+              expect(patched).to.be.a(Model1);
+              expect(patched).to.eql(expected);
+              expect(model).to.eql(expected);
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(2);
+              expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            });
+        });
+      }
 
       it('should patch a model (2)', () => {
         return Model1
