@@ -130,7 +130,7 @@ export default function (router) {
         throwNotFound();
       }
        
-      return await person
+      return person
         .$relatedQuery('movies', trx)
         .insert(req.body); 
     });
