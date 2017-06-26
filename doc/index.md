@@ -1129,7 +1129,7 @@ try {
       .query(trx)
       .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
 
-    return await jennifer
+    return jennifer
       .$relatedQuery('pets', trx)
       .insert({name: 'Scrappy'});
   });

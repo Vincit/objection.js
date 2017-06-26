@@ -5100,7 +5100,7 @@ objection.transaction(Person.knex(), async (trx) => {
     .query()
     .insert({firstName: 'Jennifer'});
 
-  return await TransactingPerson
+  return TransactingPerson
     .query()
     .patch({lastName: 'Lawrence'})
     .where('id', jennifer.id);
