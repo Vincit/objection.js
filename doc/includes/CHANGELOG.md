@@ -8,6 +8,7 @@
     [`mergeJoinEager`](http://vincit.github.io/objection.js/#mergejoineager) and [`mergeNaiveEager`](http://vincit.github.io/objection.js/#mergenaiveeager).
   * New shorthand method [`findOne`](http://vincit.github.io/objection.js/#findone)
   * New reflection method [`isFindQuery`](http://vincit.github.io/objection.js/#isfindquery)
+  * ManyToMany extra properties can now be updated [#413](https://github.com/Vincit/objection.js/issues/413)
 
 ## 0.8.3
 
