@@ -531,6 +531,8 @@ module.exports = (session) => {
             .insert({model1Prop1: 'inserted'})
             .then($inserted => {
               inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(1);
+              expect(inserted.$afterInsertCalled).to.equal(1);
               expect(inserted.id).to.equal(3);
               expect(inserted).to.be.a(Model1);
               expect(inserted.model1Prop1).to.equal('inserted');
@@ -606,6 +608,36 @@ module.exports = (session) => {
               return parent1
                 .$relatedQuery('model1Relation1Inverse')
                 .insert(Model1.fromJson({model1Prop1: 'test'}));
+            })
+            .then($inserted => {
+              inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(1);
+              expect(inserted.$afterInsertCalled).to.equal(1);
+              expect(inserted.id).to.equal(3);
+              expect(inserted).to.be.a(Model1);
+              expect(inserted.model1Prop1).to.equal('test');
+              expect(parent1.model1Relation1Inverse).to.equal(inserted);
+              return session.knex('Model1');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(3);
+              expect(_.find(rows, {id: inserted.id}).model1Id).to.equal(parent1.id);
+              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+            });
+        });
+
+        it('should accept json', () => {
+          let inserted = null;
+
+          // First check that there is nothing in the relation.
+          return parent1
+            .$relatedQuery('model1Relation1Inverse')
+            .then(model => {
+              expect(model).to.eql(undefined);
+
+              return parent1
+                .$relatedQuery('model1Relation1Inverse')
+                .insert({model1Prop1: 'test'});
             })
             .then($inserted => {
               inserted = $inserted;
@@ -707,6 +739,8 @@ module.exports = (session) => {
             })
             .then($inserted => {
               inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(1);
+              expect(inserted.$afterInsertCalled).to.equal(1);
               expect(inserted.idCol).to.equal(3);
               expect(inserted).to.be.a(Model2);
               expect(inserted.model2Prop1).to.equal('test');
@@ -780,6 +814,10 @@ module.exports = (session) => {
               })
               .then($inserted => {
                 inserted = $inserted;
+                expect(inserted[0].$beforeInsertCalled).to.equal(1);
+                expect(inserted[0].$afterInsertCalled).to.equal(1);
+                expect(inserted[1].$beforeInsertCalled).to.equal(1);
+                expect(inserted[1].$afterInsertCalled).to.equal(1);
                 expect(inserted[0].idCol).to.equal(3);
                 expect(inserted[1].idCol).to.equal(4);
                 expect(inserted[0]).to.be.a(Model2);
@@ -894,6 +932,8 @@ module.exports = (session) => {
             })
             .then($inserted => {
               inserted = $inserted;
+              expect(inserted.$beforeInsertCalled).to.equal(1);
+              expect(inserted.$afterInsertCalled).to.equal(1);
               expect(inserted.id).to.equal(5);
               expect(inserted).to.be.a(Model1);
               expect(inserted.model1Prop1).to.equal('test');
@@ -973,6 +1013,10 @@ module.exports = (session) => {
               })
               .then($inserted => {
                 inserted = $inserted;
+                expect(inserted[0].$beforeInsertCalled).to.equal(1);
+                expect(inserted[0].$afterInsertCalled).to.equal(1);
+                expect(inserted[1].$beforeInsertCalled).to.equal(1);
+                expect(inserted[1].$afterInsertCalled).to.equal(1);
                 expect(inserted[0].id).to.equal(5);
                 expect(inserted[1].id).to.equal(6);
                 expect(inserted[0]).to.be.a(Model1);

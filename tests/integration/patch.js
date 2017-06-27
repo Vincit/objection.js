@@ -8,6 +8,7 @@ const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const ValidationError = require('../../').ValidationError;
 const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
+const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
   const Model1 = session.models.Model1;
@@ -71,6 +72,10 @@ module.exports = (session) => {
           .where('id_col', '=', 1)
           .then(numUpdated => {
             expect(numUpdated).to.equal(1);
+            expect(model.$beforeUpdateCalled).to.equal(1);
+            expect(model.$beforeUpdateOptions).to.eql({patch: true});
+            expect(model.$afterUpdateCalled).to.equal(1);
+            expect(model.$afterUpdateOptions).to.eql({patch: true});
             return session.knex('model_2').orderBy('id_col');
           })
           .then(rows => {
@@ -292,6 +297,10 @@ module.exports = (session) => {
           .query()
           .patchAndFetchById(2, model)
           .then(fetchedModel => {
+            expect(model.$beforeUpdateCalled).to.equal(1);
+            expect(model.$beforeUpdateOptions).to.eql({patch: true});
+            expect(model.$afterUpdateCalled).to.equal(1);
+            expect(model.$afterUpdateOptions).to.eql({patch: true});
             expect(fetchedModel).to.equal(model);
             expect(fetchedModel).eql({
               id: 2,
@@ -510,15 +519,23 @@ module.exports = (session) => {
         });
 
         it('should patch a related object (1)', () => {
+          const model = Model1.fromJson({model1Prop1: 'updated text'});
+
           return parent1
             .$relatedQuery('model1Relation1')
-            .patch({model1Prop1: 'updated text'})
+            .patch(model)
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
               return session.knex('Model1').orderBy('id');
             })
             .then(rows => {
               expect(rows).to.have.length(4);
+
+              expect(model.$beforeUpdateCalled).to.equal(1);
+              expect(model.$beforeUpdateOptions).to.eql({patch: true});
+              expect(model.$afterUpdateCalled).to.equal(1);
+              expect(model.$afterUpdateOptions).to.eql({patch: true});
+
               expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
               expectPartEql(rows[1], {id: 2, model1Prop1: 'updated text'});
               expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
@@ -595,12 +612,20 @@ module.exports = (session) => {
         });
 
         it('should patch a related object', () => {
+          const model = Model2.fromJson({model2Prop1: 'updated text'});
+
           return parent1
             .$relatedQuery('model1Relation2')
-            .patch({model2Prop1: 'updated text'})
+            .patch(model)
             .where('id_col', 2)
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
+          
+              expect(model.$beforeUpdateCalled).to.equal(1);
+              expect(model.$beforeUpdateOptions).to.eql({patch: true});
+              expect(model.$afterUpdateCalled).to.equal(1);
+              expect(model.$afterUpdateOptions).to.eql({patch: true});
+
               return session.knex('model_2').orderBy('id_col');
             })
             .then(rows => {
@@ -733,12 +758,20 @@ module.exports = (session) => {
         });
 
         it('should patch a related object', () => {
+          const model = Model1.fromJson({model1Prop1: 'updated text'});
+
           return parent1
             .$relatedQuery('model2Relation1')
-            .patch({model1Prop1: 'updated text'})
+            .patch(model)
             .where('Model1.id', 5)
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
+
+              expect(model.$beforeUpdateCalled).to.equal(1);
+              expect(model.$beforeUpdateOptions).to.eql({patch: true});
+              expect(model.$afterUpdateCalled).to.equal(1);
+              expect(model.$afterUpdateOptions).to.eql({patch: true});
+
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
@@ -987,6 +1020,178 @@ module.exports = (session) => {
 
     });
 
+    describe('hooks', () => {
+      let ModelOne;
+      let ModelTwo;
+
+      let beforeUpdateCalled = '';
+      let afterUpdateCalled = '';
+      let beforeUpdateOpt = null;
+      let afterUpdateOpt = null;
+
+      before(() => {
+        // Create a new knex object by wrapping session.knex so that we get a new
+        // instance instead of a cached one from `bindKnex`.
+        const knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
+          return oldImpl.apply(this, args);
+        });
+
+        ModelOne = session.unboundModels.Model1.bindKnex(knex);
+        ModelTwo = ModelOne.getRelation('model1Relation2').relatedModelClass;
+
+        expect(ModelOne).to.not.equal(Model1); 
+        expect(ModelTwo).to.not.equal(Model2);
+        expect(ModelOne).to.not.equal(session.unboundModels.Model1); 
+        expect(ModelTwo).to.not.equal(session.unboundModels.Model2);
+
+        ModelOne.prototype.$beforeUpdate = function (opt, ctx) {
+          beforeUpdateCalled += 'ModelOne';
+          beforeUpdateOpt = _.cloneDeep(opt);
+        };
+
+        ModelOne.prototype.$afterUpdate = function (opt, ctx) {
+          afterUpdateCalled += 'ModelOne';
+          afterUpdateOpt = _.cloneDeep(opt);
+        };
+
+        ModelTwo.prototype.$beforeUpdate = function (opt, ctx) {
+          beforeUpdateCalled += 'ModelTwo';
+          beforeUpdateOpt = _.cloneDeep(opt);
+        };
+
+        ModelTwo.prototype.$afterUpdate = function (opt, ctx) {
+          afterUpdateCalled += 'ModelTwo';
+          afterUpdateOpt = _.cloneDeep(opt);
+        };
+      });
+
+      beforeEach(() => {
+        beforeUpdateCalled = '';
+        afterUpdateCalled = '';
+        beforeUpdateOpt = null;
+        afterUpdateOpt = null;
+      });
+
+      beforeEach(() => {
+        return session.populate([{
+          id: 1,
+          model1Prop1: 'hello 1',
+
+          model1Relation1: {
+            id: 2,
+            model1Prop1: 'hello 2'
+          },
+
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'foo 1'
+          }],
+
+          model1Relation3: [{
+            idCol: 2,
+            model2Prop1: 'foo 2'
+          }],
+        }]);
+      });
+
+      it('.query().patch()', () => {
+        return ModelOne
+          .query()
+          .findById(1)
+          .patch({model1Prop1: 'updated text'})
+          .then(() => {
+            expect(beforeUpdateCalled).to.equal('ModelOne');
+            expect(beforeUpdateOpt).to.eql({patch: true});
+            expect(afterUpdateCalled).to.equal('ModelOne');
+            expect(afterUpdateOpt).to.eql({patch: true});
+          });
+      });
+
+      it('.$query().patch()', () => {
+        return ModelOne
+          .query()
+          .findById(1)
+          .then(model => {
+            return model.$query().patch({model1Prop1: 'updated text'})
+          })
+          .then(() => {
+            expect(beforeUpdateCalled).to.equal('ModelOne');
+            expect(beforeUpdateOpt).to.eql({
+              patch: true, 
+              old: {
+                $afterGetCalled: 1,
+                id: 1,
+                model1Id: 2,
+                model1Prop1: 'hello 1',
+                model1Prop2: null
+              }
+            });
+
+            expect(afterUpdateCalled).to.equal('ModelOne');
+            expect(afterUpdateOpt).to.eql({
+              patch: true, 
+              old: {
+                $afterGetCalled: 1,
+                id: 1,
+                model1Id: 2,
+                model1Prop1: 'hello 1',
+                model1Prop2: null
+              }
+            });
+          });
+      });
+
+      describe('$relatedQuery().patch()', () => {
+
+        it('belongs to one relation', () => {
+          return ModelOne
+            .query()
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation1').patch({model1Prop1: 'updated text'})
+            })
+            .then(() => {
+              expect(beforeUpdateCalled).to.equal('ModelOne');
+              expect(beforeUpdateOpt).to.eql({patch: true});
+              expect(afterUpdateCalled).to.equal('ModelOne');
+              expect(afterUpdateOpt).to.eql({patch: true});
+            });
+        });
+
+        it('has many relation', () => {
+          return ModelOne
+            .query()
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation2').patch({model2Prop1: 'updated text'})
+            })
+            .then(() => {
+              expect(beforeUpdateCalled).to.equal('ModelTwo');
+              expect(beforeUpdateOpt).to.eql({patch: true});
+              expect(afterUpdateCalled).to.equal('ModelTwo');
+              expect(afterUpdateOpt).to.eql({patch: true});
+            });
+        });
+
+        it('many to many relation', () => {
+          return ModelOne
+            .query()
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation3').patch({model2Prop1: 'updated text'})
+            })
+            .then(() => {
+              expect(beforeUpdateCalled).to.equal('ModelTwo');
+              expect(beforeUpdateOpt).to.eql({patch: true});
+              expect(afterUpdateCalled).to.equal('ModelTwo');
+              expect(afterUpdateOpt).to.eql({patch: true});
+            });
+        });
+
+      });
+
+    });
+
     function subClassWithSchema(Model, schema) {
       let SubModel = inheritModel(Model);
       SubModel.jsonSchema = schema;
@@ -994,4 +1199,5 @@ module.exports = (session) => {
     }
 
   });
+
 };
