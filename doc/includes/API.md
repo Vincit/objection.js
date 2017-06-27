@@ -180,6 +180,42 @@ Type|Description
 
 
 
+
+#### findOne
+
+```js
+const builder = queryBuilder.findOne(...whereArgs);
+```
+
+```js
+Person.query().findOne({firstName: 'Jennifer', lastName: 'Lawrence'});
+```
+
+```js
+Person.query().findOne('age', '>', 20);
+```
+
+```js
+Person.query().findOne(raw('random() < 0.5'));
+```
+
+Shorthand for `where(...whereArgs).first()`.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+whereArgs|...any|Anything the [`where`](#where) method accepts.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### insert
 
 ```js
@@ -2767,6 +2803,23 @@ boolean|false if the query will never be executed.
 
 
 
+#### isFindQuery
+
+```js
+const isFindQuery = queryBuilder.isFindQuery();
+```
+
+Returns true if the query is read-only.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query is read-only.
+
+
+
+
 #### runBefore
 
 ```js
@@ -3152,6 +3205,17 @@ Type|Description
 
 
 
+#### joinEager
+
+Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).eager(expr)`.
+
+
+
+#### naiveEager
+
+Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).eager(expr)`.
+
+
 
 #### mergeEager
 
@@ -3201,6 +3265,17 @@ Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
+
+
+#### mergeJoinEager
+
+Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).mergeEager(expr)`.
+
+
+
+#### mergeNaiveEager
+
+Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).mergeEager(expr)`.
 
 
 

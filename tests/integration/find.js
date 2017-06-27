@@ -97,7 +97,7 @@ module.exports = (session) => {
           });
       });
 
-      describe('knex methods', () => {
+      describe('query builder methods', () => {
 
         it('.select()', () => {
           return Model2
@@ -119,6 +119,24 @@ module.exports = (session) => {
             .where('model_2_prop_2', '>', 15)
             .then(models => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20, 30]);
+            });
+        });
+
+        it('.findOne()', () => {
+          return Model2
+            .query()
+            .findOne('model_2_prop_2', '>', 20)
+            .then(model => {
+              expect(model.model2Prop2).to.eql(30);
+            });
+        });
+
+        it('.findById()', () => {
+          return Model2
+            .query()
+            .findById(2)
+            .then(model => {
+              expect(model.model2Prop2).to.eql(20);
             });
         });
 

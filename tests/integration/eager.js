@@ -672,6 +672,110 @@ module.exports = (session) => {
       }
     });
 
+    it('joinEager shorthand', () => {
+      return Model1
+        .query()
+        .findById(1)
+        .joinEager('model1Relation1')
+        .modify(builder => {
+          expect(builder.eagerOperationFactory()).to.equal(Model1.JoinEagerAlgorithm);
+        })
+        .then(model => {
+          expect(model).to.eql({
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1
+            }
+          });
+        });
+    });
+
+    it('mergeJoinEager shorthand', () => {
+      return Model1
+        .query()
+        .findById(1)
+        .mergeJoinEager('model1Relation1')
+        .modify(builder => {
+          expect(builder.eagerOperationFactory()).to.equal(Model1.JoinEagerAlgorithm);
+        })
+        .then(model => {
+          expect(model).to.eql({
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1
+            }
+          });
+        });
+    });
+
+    it('naiveEager shorthand', () => {
+      return Model1
+        .query()
+        .findById(1)
+        .naiveEager('model1Relation1')
+        .modify(builder => {
+          expect(builder.eagerOperationFactory()).to.equal(Model1.NaiveEagerAlgorithm);
+        })
+        .then(model => {
+          expect(model).to.eql({
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1
+            }
+          });
+        });
+    });
+
+    it('mergeNaiveEager shorthand', () => {
+      return Model1
+        .query()
+        .findById(1)
+        .mergeNaiveEager('model1Relation1')
+        .modify(builder => {
+          expect(builder.eagerOperationFactory()).to.equal(Model1.NaiveEagerAlgorithm);
+        })
+        .then(model => {
+          expect(model).to.eql({
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1
+            }
+          });
+        });
+    });
+
     it('should work with zero id', () => {
       return Promise.map([Model1.JoinEagerAlgorithm, Model1.NaiveEagerAlgorithm, Model1.WhereInEagerAlgorithm], algo => {
         return session

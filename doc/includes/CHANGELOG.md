@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.4
+
+### What's new
+
+  * New shorthand methods [`joinEager`](http://vincit.github.io/objection.js/#joineager), [`naiveEager`](http://vincit.github.io/objection.js/#naiveeager), 
+    [`mergeJoinEager`](http://vincit.github.io/objection.js/#mergejoineager) and [`mergeNaiveEager`](http://vincit.github.io/objection.js/#mergenaiveeager).
+  * New shorthand method [`findOne`](http://vincit.github.io/objection.js/#findone)
+  * New reflection method [`isFindQuery`](http://vincit.github.io/objection.js/#isfindquery)
+
 ## 0.8.3
 
 ### What's new
