@@ -1,11 +1,13 @@
 'use strict';
 
 const _ = require('lodash');
+const raw = require('../../').raw;
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const ValidationError = require('../../').ValidationError;
+const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
 
 module.exports = (session) => {
   const Model1 = session.models.Model1;
@@ -643,9 +645,11 @@ module.exports = (session) => {
           return session.populate([{
             id: 1,
             model1Prop1: 'hello 1',
+
             model1Relation2: [{
               idCol: 1,
               model2Prop1: 'text 1',
+
               model2Relation1: [{
                 id: 3,
                 model1Prop1: 'blaa 1',
@@ -659,13 +663,32 @@ module.exports = (session) => {
                 model1Prop1: 'blaa 3',
                 model1Prop2: 4
               }]
+            }],
+
+            model1Relation3: [{
+              idCol: 3,
+              model2Prop1: 'foo 1',
+              extra1: 'extra 11',
+              extra2: 'extra 21'
+            }, {
+              idCol: 4,
+              model2Prop1: 'foo 2',
+              extra1: 'extra 12',
+              extra2: 'extra 22'
+            }, {
+              idCol: 5,
+              model2Prop1: 'foo 3',
+              extra1: 'extra 13',
+              extra2: 'extra 23'
             }]
           }, {
             id: 2,
             model1Prop1: 'hello 2',
+
             model1Relation2: [{
               idCol: 2,
               model2Prop1: 'text 2',
+
               model2Relation1: [{
                 id: 6,
                 model1Prop1: 'blaa 4',
@@ -679,6 +702,23 @@ module.exports = (session) => {
                 model1Prop1: 'blaa 6',
                 model1Prop2: 1
               }]
+            }],
+
+            model1Relation3: [{
+              idCol: 6,
+              model2Prop1: 'foo 4',
+              extra1: 'extra 14',
+              extra2: 'extra 24'
+            }, {
+              idCol: 7,
+              model2Prop1: 'foo 5',
+              extra1: 'extra 15',
+              extra2: 'extra 25'
+            }, {
+              idCol: 8,
+              model2Prop1: 'foo 6',
+              extra1: 'extra 16',
+              extra2: 'extra 26'
             }]
           }]);
         });
@@ -711,6 +751,132 @@ module.exports = (session) => {
               expectPartEql(rows[5], {id: 6, model1Prop1: 'blaa 4'});
               expectPartEql(rows[6], {id: 7, model1Prop1: 'blaa 5'});
               expectPartEql(rows[7], {id: 8, model1Prop1: 'blaa 6'});
+            });
+        });
+
+        it('should patch a related object with extras', () => {
+          return Model1
+            .query()
+            .findById(1)
+            .then(parent => {
+              return parent
+                .$relatedQuery('model1Relation3')
+                .where('id_col', '>', 3)
+                .patch({
+                  model2Prop1: 'iam updated', 
+                  extra1: 'updated extra 1',
+                  // Test query properties. sqlite doesn't have `concat` function. Use a literal for it.
+                  extra2: isSqlite(session.knex) 
+                    ? 'updated extra 2' 
+                    : raw(`CONCAT('updated extra ', '2')`)
+                })
+                .where('id_col', '<', 5)
+                .then(numUpdated => {
+                  expect(numUpdated).to.equal(1);
+
+                  return [
+                    session.knex('model_2').orderBy('id_col'),
+                    session.knex('Model1Model2').select('model1Id', 'model2Id', 'extra1', 'extra2').orderBy(['model1Id', 'model2Id'])
+                  ];
+                })
+                .spread((model2, model1Model2) => {
+                  expect(model2.length).to.equal(8);
+                  expect(model1Model2.length).to.equal(12);
+
+                  expectPartEql(model2[0], {id_col: 1, model_2_prop_1: 'text 1'});
+                  expectPartEql(model2[1], {id_col: 2, model_2_prop_1: 'text 2'});
+                  expectPartEql(model2[2], {id_col: 3, model_2_prop_1: 'foo 1'});
+                  expectPartEql(model2[3], {id_col: 4, model_2_prop_1: 'iam updated'});
+                  expectPartEql(model2[4], {id_col: 5, model_2_prop_1: 'foo 3'});
+                  expectPartEql(model2[5], {id_col: 6, model_2_prop_1: 'foo 4'});
+                  expectPartEql(model2[6], {id_col: 7, model_2_prop_1: 'foo 5'});
+                  expectPartEql(model2[7], {id_col: 8, model_2_prop_1: 'foo 6'});
+
+                  expectPartEql(model1Model2[0], {model1Id: 1, extra1: 'extra 11', extra2: 'extra 21'});
+                  expectPartEql(model1Model2[1], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
+                  expectPartEql(model1Model2[2], {model1Id: 1, extra1: 'extra 13', extra2: 'extra 23'});
+                  expectPartEql(model1Model2[3], {model1Id: 2, extra1: 'extra 14', extra2: 'extra 24'});
+                  expectPartEql(model1Model2[4], {model1Id: 2, extra1: 'extra 15', extra2: 'extra 25'});
+                  expectPartEql(model1Model2[5], {model1Id: 2, extra1: 'extra 16', extra2: 'extra 26'});
+
+                  expectPartEql(model1Model2[6], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[7], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[8], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[9], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[10], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[11], {extra1: null, extra2: null});
+                });
+            })
+        });
+
+        it('should patch all related objects with extras', () => {
+          return Model1
+            .query()
+            .findById(1)
+            .then(parent => {
+              return parent
+                .$relatedQuery('model1Relation3')
+                .patch({
+                  model2Prop1: 'iam updated', 
+                  extra1: 'updated extra 1', 
+                  extra2: 'updated extra 2'
+                })
+                .then(numUpdated => {
+                  expect(numUpdated).to.equal(3);
+
+                  return [
+                    session.knex('model_2').orderBy('id_col'),
+                    session.knex('Model1Model2').select('model1Id', 'model2Id', 'extra1', 'extra2').orderBy(['model1Id', 'model2Id'])
+                  ];
+                })
+                .spread((model2, model1Model2) => {
+                  expect(model2.length).to.equal(8);
+                  expect(model1Model2.length).to.equal(12);
+
+                  expectPartEql(model2[0], {id_col: 1, model_2_prop_1: 'text 1'});
+                  expectPartEql(model2[1], {id_col: 2, model_2_prop_1: 'text 2'});
+                  expectPartEql(model2[2], {id_col: 3, model_2_prop_1: 'iam updated'});
+                  expectPartEql(model2[3], {id_col: 4, model_2_prop_1: 'iam updated'});
+                  expectPartEql(model2[4], {id_col: 5, model_2_prop_1: 'iam updated'});
+                  expectPartEql(model2[5], {id_col: 6, model_2_prop_1: 'foo 4'});
+                  expectPartEql(model2[6], {id_col: 7, model_2_prop_1: 'foo 5'});
+                  expectPartEql(model2[7], {id_col: 8, model_2_prop_1: 'foo 6'});
+
+                  expectPartEql(model1Model2[0], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
+                  expectPartEql(model1Model2[1], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
+                  expectPartEql(model1Model2[2], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
+                  expectPartEql(model1Model2[3], {model1Id: 2, extra1: 'extra 14', extra2: 'extra 24'});
+                  expectPartEql(model1Model2[4], {model1Id: 2, extra1: 'extra 15', extra2: 'extra 25'});
+                  expectPartEql(model1Model2[5], {model1Id: 2, extra1: 'extra 16', extra2: 'extra 26'});
+
+                  expectPartEql(model1Model2[6], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[7], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[8], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[9], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[10], {extra1: null, extra2: null});
+                  expectPartEql(model1Model2[11], {extra1: null, extra2: null});
+                });
+            })
+        });
+
+        it('should patch all related objects', () => {
+          return parent2
+            .$relatedQuery('model2Relation1')
+            .patch({model1Prop1: 'updated text', model1Prop2: 123})
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(3);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(8);
+              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+              expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
+              expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
+              expectPartEql(rows[4], {id: 5, model1Prop1: 'blaa 3'});
+              expectPartEql(rows[5], {id: 6, model1Prop1: 'updated text', model1Prop2: 123});
+              expectPartEql(rows[6], {id: 7, model1Prop1: 'updated text', model1Prop2: 123});
+              expectPartEql(rows[7], {id: 8, model1Prop1: 'updated text', model1Prop2: 123});
             });
         });
 

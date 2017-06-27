@@ -86,7 +86,7 @@ describe('Performance tests', function () {
   });
 
   before(function () {
-    const BaseClass = Plugin1(Plugin2(Plugin3(Plugin4(Plugin5(Model)))));
+    const BaseClass = Model;//Plugin1(Plugin2(Plugin3(Plugin4(Plugin5(Model)))));
 
     Person = class Person extends BaseClass {}
     Animal = class Animal extends BaseClass {}
