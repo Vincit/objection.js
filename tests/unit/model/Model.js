@@ -949,7 +949,7 @@ describe('Model', () => {
 
   });
 
-  describe.only('virtualAttributes', () => {
+  describe('virtualAttributes', () => {
 
     it('should include getters', () => {
       class Model1 extends Model {
