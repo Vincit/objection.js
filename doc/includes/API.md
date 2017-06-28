@@ -3922,6 +3922,12 @@ Person
 
 If the result is an array, selects the first item.
 
+NOTE: This doesn't add `limit 1` to the query by default. You can override
+the [`Model.useLimitInFirst`](#uselimitinfirst) property to change this
+behaviour.
+
+Also see [`findById`](#findbyid) and [`findOne`](#findone) shorthand methods.
+
 ##### Return value
 
 Type|Description
