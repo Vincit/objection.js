@@ -949,27 +949,22 @@ describe('Model', () => {
 
   });
 
-  describe('virtualAttributes', () => {
-    let Model1;
-
-    beforeEach(() => {
-      Model1 = createModelClass();
-    });
+  describe.only('virtualAttributes', () => {
 
     it('should include getters', () => {
-      Object.defineProperty(Model1.prototype, "foo", {
-        get: function () {
+      class Model1 extends Model {
+        get foo() {
           return this.a + this.b;
         }
-      });
 
-      Object.defineProperty(Model1.prototype, "bar", {
-        get: function () {
+        get bar() {
           return this.a + this.b;
         }
-      });
 
-      Model1.virtualAttributes = ['foo'];
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+      }
 
       expect(Model1.fromJson({a: 100, b: 10}).toJSON()).to.eql({
         a: 100,
@@ -979,21 +974,64 @@ describe('Model', () => {
     });
 
     it('should include methods', () => {
-      Model1.prototype.foo = function () {
-        return this.a + this.b;
-      };
+      class Model1 extends Model {
+        foo() {
+          return this.a + this.b;
+        }
 
-      Model1.prototype.bar = function () {
-        return this.a + this.b;
-      };
+        bar() {
+          return this.a + this.b;
+        }
 
-      Model1.virtualAttributes = ['foo'];
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+      }
 
       expect(Model1.fromJson({a: 100, b: 10}).toJSON()).to.eql({
         a: 100,
         b: 10,
         foo: 110
       })
+    });
+
+    it('should not try to set readonly virtuals', () => {
+      class Model1 extends Model {
+        get foo() {
+          return this.a + this.b;
+        }
+
+        get bar() {
+          return this.c;
+        }
+
+        set bar(c) {
+          this.c = c;
+        }
+
+        baz() {
+          return 2 * this.a;
+        }
+
+        static get virtualAttributes() {
+          return ['foo', 'bar', 'baz'];
+        }
+      }
+
+      expect(Model1.fromJson({
+        a: 10, 
+        b: 100,
+        bar: 1000,
+        foo: 200,
+        baz: 300 
+      }).toJSON()).to.eql({
+        a: 10,
+        b: 100,
+        c: 1000,
+        foo: 110,
+        bar: 1000,
+        baz: 20,
+      });
     });
   });
 
