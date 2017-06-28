@@ -211,6 +211,44 @@ should be passed to database engine.</p>
 </tr>
 </tbody></table>
 
+<h4 id="findone">findOne</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(...</span><span class="nx">whereArgs</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random() &lt; 0.5'</span><span class="p">));</span>
+</code></pre>
+<p>Shorthand for <code class="prettyprint">where(...whereArgs).first()</code>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>whereArgs</td>
+<td>&hellip;any</td>
+<td>Anything the <a href="#where"><code class="prettyprint">where</code></a> method accepts.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="insert">insert</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">modelsOrObjects</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
@@ -3349,6 +3387,25 @@ this method merges the objects.</p>
 </tr>
 </tbody></table>
 
+<h4 id="isfindquery">isFindQuery</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isFindQuery</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isFindQuery</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query is read-only.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query is read-only.</td>
+</tr>
+</tbody></table>
+
 <h4 id="runbefore">runBefore</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">runBefore</span><span class="p">(</span><span class="nx">runBefore</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
@@ -3781,6 +3838,14 @@ cases where performance doesn&rsquo;t matter and when it is the only option to g
 </tr>
 </tbody></table>
 
+<h4 id="joineager">joinEager</h4>
+
+<p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.JoinEagerAlgorithm).eager(expr)</code>.</p>
+
+<h4 id="naiveeager">naiveEager</h4>
+
+<p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.NaiveEagerAlgorithm).eager(expr)</code>.</p>
+
 <h4 id="mergeeager">mergeEager</h4>
 
 <blockquote>
@@ -3840,6 +3905,14 @@ expression to the existing expression.</p>
 <td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
+
+<h4 id="mergejoineager">mergeJoinEager</h4>
+
+<p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.JoinEagerAlgorithm).mergeEager(expr)</code>.</p>
+
+<h4 id="mergenaiveeager">mergeNaiveEager</h4>
+
+<p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.NaiveEagerAlgorithm).mergeEager(expr)</code>.</p>
 
 <h4 id="alloweager">allowEager</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">allowEager</span><span class="p">(</span><span class="nx">relationExpression</span><span class="p">);</span>
@@ -5915,7 +5988,7 @@ a multi-tenant system. See the <a href="#multi-tenancy">multi tenancy recipe</a>
     <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">});</span>
 
-  <span class="k">return</span> <span class="nx">await</span> <span class="nx">TransactingPerson</span>
+  <span class="k">return</span> <span class="nx">TransactingPerson</span>
     <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
     <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
     <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
