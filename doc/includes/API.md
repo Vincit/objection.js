@@ -392,7 +392,7 @@ Person
 > many-to-many relation `movies`.
 
 > If you need to refer to a model already in the database from a many-to-many relation
-> you can use special properties `#dbRef` like this:
+> you can use the special property `#dbRef` like this:
 
 ```js
 Person
@@ -4879,6 +4879,21 @@ Person
 ```
 
 Named filters that can be used in any eager query.
+
+
+
+
+#### useLimitInFirst
+
+```js
+class Animal extends Model {
+  static get useLimitInFirst() {
+    return true;
+  }
+}
+```
+
+If true, `limit(1)` is added to the query when `first()` is called. Defaults to `false`.
 
 
 

@@ -1121,6 +1121,26 @@ describe('QueryBuilder', () => {
     expect(UnboundModel.query(mockKnex).decrement("foo", 5).toString()).to.equal('update "Bar" set "foo" = "foo" - 5');
   });
 
+  it('first should not add limit(1) by default', () => {
+    return TestModel
+      .query()
+      .first()
+      .then(model => {
+        expect(executedQueries[0]).to.equal('select "Model".* from "Model"');
+      });
+  });
+
+  it('first should add limit(1) if Model.useLimitInFirst = true', () => {
+    TestModel.useLimitInFirst = true;
+
+    return TestModel
+      .query()
+      .first()
+      .then(model => {
+        expect(executedQueries[0]).to.equal('select "Model".* from "Model" limit 1');
+      });
+  });
+
   describe('eager and allowEager' , () => {
 
     beforeEach(() => {

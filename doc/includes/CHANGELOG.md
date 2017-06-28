@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.5
+
+### What's new
+
+  * Add [`Model.useLimitInFirst`](http://vincit.github.io/objection.js/#uselimitinfirst) configuration flag.
+
 ## 0.8.4
 
 ### What's new
