@@ -9807,6 +9807,21 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <p>Called before a model is deleted.</p>
 
 <p>You can return a promise from this function if you need to do asynchronous stuff.</p>
