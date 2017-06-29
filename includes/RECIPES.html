@@ -449,6 +449,9 @@ custom filters for relations. Let&rsquo;s assume we have tables <code class="pre
 the foreign key and <code class="prettyprint">commentableType</code> to hold the related model type. Check out the first example for
 how to create relations for this setup ➔</p>
 
+<p>This kind of associations don&rsquo;t have referential integrity and should be avoided if possible. Instead, consider
+using the <em>exclusive arc table</em> pattern discussed <a href="https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442">here</a>.</p>
+
 <h2 id="timestamps">Timestamps</h2>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">$beforeInsert</span><span class="p">()</span> <span class="p">{</span>
@@ -498,11 +501,17 @@ property of the <a href="#model"><code class="prettyprint">Model</code></a> base
 property and inherit all your models from the custom Model class.</p>
 
 <h2 id="multi-tenancy">Multi-tenancy</h2>
+
+<p>By default, the examples guide you to setup the database connection by setting the knex object of the <a href="#model"><code class="prettyprint">Model</code></a> base
+class. This doesn&rsquo;t fly if you want to select the database based on the request as it sets the connection globally. There
+are (at least) two patterns for dealing with this kind of setup:</p>
+
+<h3 id="model-binding-pattern">Model binding pattern</h3>
 <pre class="highlight javascript"><code><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">((</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="c1">// Function that parses the tenant id from path, header, query parameter etc.</span>
   <span class="c1">// and returns an instance of knex. You should cache the knex instances and</span>
   <span class="c1">// not create a new one for each query.</span>
-  <span class="kd">var</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">getDatabaseForRequest</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
+  <span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">getDatabaseForRequest</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
 
   <span class="nx">req</span><span class="p">.</span><span class="nx">models</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">Person</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">bindKnex</span><span class="p">(</span><span class="nx">knex</span><span class="p">),</span>
@@ -512,14 +521,40 @@ property and inherit all your models from the custom Model class.</p>
 
   <span class="nx">next</span><span class="p">();</span>
 <span class="p">});</span>
-</code></pre>
-<p>By default, the examples guide you to setup the database connection by setting the knex object of the <a href="#model"><code class="prettyprint">Model</code></a> base
-class. This doesn&rsquo;t fly if you want to select the database based on the request as it sets the connection globally.</p>
 
+<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/people'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">req</span><span class="p">.</span><span class="nx">models</span><span class="p">.</span><span class="nx">Person</span>
+    <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">people</span><span class="p">));</span>
+<span class="p">});</span>
+</code></pre>
 <p>If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
 <code class="prettyprint">req.models</code> hash and then <em>always</em> use the models through <code class="prettyprint">req.models</code> instead of requiring them directly. What
 <a href="#bindknex"><code class="prettyprint">bindKnex</code></a> method actually does is that it creates an anonymous subclass of the model class and sets its
 knex connection. That way the database connection doesn&rsquo;t change for the other requests that are currently being executed.</p>
+
+<h3 id="database-passing-pattern">Database passing pattern</h3>
+<pre class="highlight javascript"><code><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">((</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Function that parses the tenant id from path, header, query parameter etc.</span>
+  <span class="c1">// and returns an instance of knex. You should cache the knex instances and</span>
+  <span class="c1">// not create a new one for each query.</span>
+  <span class="nx">req</span><span class="p">.</span><span class="nx">knex</span> <span class="o">=</span> <span class="nx">getDatabaseForRequest</span><span class="p">(</span><span class="nx">req</span><span class="p">);</span>
+  <span class="nx">next</span><span class="p">();</span>
+<span class="p">});</span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/people'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">Person</span>
+    <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">knex</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">people</span><span class="p">));</span>
+<span class="p">});</span>
+</code></pre>
+<p>Another option is to add the knex instance to the request using a middleware and not bind models at all (not even using <code class="prettyprint">Model.knex()</code>).
+The knex instance can be passed to <a href="#query"><code class="prettyprint">query</code></a>, <a href="#_s_query"><code class="prettyprint">$query</code></a>, and <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery</code></a> methods 
+as the last argument. This pattern forces you to design your services and helper methods in a way that you always need to pass
+in a knex instance. A great thing about this is that you can pass a transaction object instead. (the knex/objection transaction 
+object is a query builder just like the normal knex instance). This gives you a fine grained control over your transactions.</p>
 
 <h2 id="sql-clause-precedence-and-parentheses">SQL clause precedence and parentheses</h2>
 <pre class="highlight javascript"><code><span class="nx">Person</span>

@@ -4727,6 +4727,12 @@ The problem with this is that if the result set is empty, we don&rsquo;t get the
 </code></pre>
 <p>If the result is an array, selects the first item.</p>
 
+<p>NOTE: This doesn&rsquo;t add <code class="prettyprint">limit 1</code> to the query by default. You can override
+the <a href="#uselimitinfirst"><code class="prettyprint">Model.useLimitInFirst</code></a> property to change this
+behaviour.</p>
+
+<p>Also see <a href="#findbyid"><code class="prettyprint">findById</code></a> and <a href="#findone"><code class="prettyprint">findOne</code></a> shorthand methods.</p>
+
 <h5 id="return-value">Return value</h5>
 
 <table><thead>
@@ -5696,6 +5702,15 @@ fields <a href="#eageroptions">here</a>.</p>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[movies(goodMovies, orderByName).actors, pets(dogs)]'</span><span class="p">)</span>
 </code></pre>
 <p>Named filters that can be used in any eager query.</p>
+
+<h4 id="uselimitinfirst">useLimitInFirst</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">useLimitInFirst</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>If true, <code class="prettyprint">limit(1)</code> is added to the query when <code class="prettyprint">first()</code> is called. Defaults to <code class="prettyprint">false</code>.</p>
 
 <h4 id="querybuilder">QueryBuilder</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -7360,6 +7375,21 @@ to the relations:</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <p>Called before a model is inserted into the database.</p>
 
 <p>You can return a promise from this function if you need to do asynchronous stuff. You can
@@ -7403,6 +7433,21 @@ you need to do insert specific validation.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <p>Called after a model has been inserted into the database.</p>
 
 <p>You can return a promise from this function if you need to do asynchronous stuff.</p>
@@ -7441,6 +7486,21 @@ you need to do insert specific validation.</p>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -7514,6 +7574,21 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -7631,6 +7706,21 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
 <p>Called after a model is deleted.</p>
 
 <p>You can return a promise from this function if you need to do asynchronous stuff.</p>
@@ -7671,6 +7761,21 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// This can always be done even if there is no running transaction. In that</span>
+    <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This </span>
+    <span class="c1">// makes sure that the query is not executed outside the original query's</span>
+    <span class="c1">// transaction.</span>
+    <span class="k">return</span> <span class="nx">SomeModel</span>
+      <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
