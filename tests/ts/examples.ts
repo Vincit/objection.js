@@ -1,6 +1,6 @@
 // tslint:disable:no-unused-variable
 import * as knex from 'knex';
-import * as objection from 'objection';
+import * as objection from '../../typings/objection';
 
 // This file exercises the Objection.js typings.
 
@@ -238,7 +238,7 @@ objection.transaction(Movie, Person, Animal, Comment, PersonActor, async (TxMovi
   }
 });
 
-objection.transaction.start(Person).then((trx: objection.Transaction) => {
+objection.transaction.start(Person).then(trx => {
   const TxPerson: typeof Person = Person.bindTransaction(trx)
   TxPerson.query()
     .then(() => trx.commit())

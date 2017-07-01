@@ -1,23 +1,19 @@
 {
   "compilerOptions": {
     "allowJs": false,
+    "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "noEmit": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitUseStrict": false,
+    "strict": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true,
-    "noEmit": true,
-    "target": "es6",
-    "typeRoots": [
-      "typings",
-      "node_modules/@types"
-    ]
+    "target": "es6"
   },
   "files": [
     "tests/ts/examples.ts"
   ]
 }
-
