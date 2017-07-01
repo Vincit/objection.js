@@ -1,14 +1,15 @@
-// Type definitions for objection v0.6.1
+// Type definitions for objection v0.8.4
 // Project: Objection.js <http://vincit.github.io/objection.js/>
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
 /// <reference types="node" />
 /// <reference types="knex" />
 
-declare module "objection" {
+import * as knex from "knex";
 
-  import * as knex from "knex";
+export = Objection;
 
+declare namespace Objection {
   export interface ModelOptions {
     patch: boolean;
     skipValidation: boolean;
@@ -44,9 +45,8 @@ declare module "objection" {
     relation: Relation;
     modelClass: typeof Model | String;
     join: RelationJoin;
-    modify?: <T>(queryBuilder: QueryBuilder<T>) => {};
-    filter?: <T>(queryBuilder: QueryBuilder<T>) => {};
-    orderBy?: string;
+    modify?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
+    filter?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
   }
 
   export interface EagerAlgorithm {
@@ -136,8 +136,8 @@ declare module "objection" {
    * This is a hack to support referencing a given Model subclass constructor.
    * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
-  interface ModelClass<T extends Model> {
-    new(): T;
+  interface ModelClass<M extends Model> {
+    new(): M;
     tableName: string;
     jsonSchema: JsonSchema;
     idColumn: string | string[];
@@ -163,21 +163,21 @@ declare module "objection" {
     HasManyRelation: Relation;
     ManyToManyRelation: Relation;
 
-    query(trx?: Transaction): QueryBuilder<T>;
+    query(trx?: Transaction<M>): QueryBuilder<M>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
-    knexQuery(): QueryBuilder<T>;
+    knexQuery(): QueryBuilder<M>;
 
     bindKnex(knex: knex): this;
-    bindTransaction(transaction: Transaction): this;
-    extend<S>(subclass: S): S & this;
+    bindTransaction(transaction: Transaction<M>): this;
+    extend<S>(subclass: { new(): S }): this & { new(...args: any[]): M & S };
 
-    fromJson(json: Object, opt?: ModelOptions): T;
-    fromDatabaseJson(row: Object): T;
+    fromJson(json: Object, opt?: ModelOptions): M;
+    fromDatabaseJson(row: Object): M;
 
     omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    loadRelated(models: (Model | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
+    loadRelated(models: (Model | Object)[], expression: RelationExpression, filters?: Filters<M>): Promise<M[]>;
 
     traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
@@ -214,26 +214,26 @@ declare module "objection" {
 
     // "{ new(): T }" 
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
-    static query<T>(this: { new (): T }, trx?: Transaction): QueryBuilder<T>;
+    static query<T>(this: { new(): T }, trx?: Transaction<T>): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new (): T }): QueryBuilder<T>;
+    static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
 
     static bindKnex<T>(this: T, knex: knex): T;
-    static bindTransaction<T>(this: T, transaction: Transaction): T;
+    static bindTransaction<T>(this: T, transaction: Transaction<T>): T;
 
     // TODO: It'd be nicer to expose an actual T&S union class here: 
     static extend<M extends Model, S>(
-      this: { new (): M },
-      subclass: { new (): S }
-    ): ModelClass<M> & { new (...args: any[]): M & S };
+      this: ModelClass<M>,
+      subclass: { new(): S }
+    ): ModelClass<M> & { new(...args: any[]): M & S };
 
     static fromJson<T>(this: T, json: Object, opt?: ModelOptions): T;
     static fromDatabaseJson<T>(this: T, row: Object): T;
 
     static omitImpl(f: (obj: Object, prop: string) => void): void;
 
-    static loadRelated<T>(this: { new (): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
+    static loadRelated<T>(this: { new(): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
 
     static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
@@ -263,14 +263,14 @@ declare module "objection" {
     /**
      * AKA `reload` in ActiveRecord parlance
      */
-    $query(trx?: Transaction): QueryBuilderSingle<this>;
+    $query(trx?: Transaction<this>): QueryBuilderSingle<this>;
 
     /**
      * Users need to explicitly type these calls, as the relationName doesn't
      * indicate the type (and if it returned Model directly, Partial<Model>
      * guards are worthless)
      */
-    $relatedQuery<M extends Model>(relationName: string, transaction?: Transaction): QueryBuilder<M>;
+    $relatedQuery<M extends Model>(relationName: string, transaction?: Transaction<M>): QueryBuilder<M>;
 
     $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
 
@@ -456,7 +456,7 @@ declare module "objection" {
 
     skipUndefined(): this;
 
-    transacting(transation: Transaction): this;
+    transacting(transation: Transaction<T>): this;
 
     clone(): this;
 
@@ -490,8 +490,8 @@ declare module "objection" {
     omit(properties: string[]): this;
   }
 
-  export interface transaction {
-    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
+  export interface transaction<T> {
+    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction<T>>;
 
     <MC extends ModelClass<any>, T>(
       modelClass: MC,
@@ -528,29 +528,20 @@ declare module "objection" {
       callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, boundModel4Class: MC4, boundModel5Class: MC5) => Promise<T>
     ): Promise<T>;
 
-    <T>(knex: knex, callback: (trx: Transaction) => Promise<T>): Promise<T>;
+    <T>(knex: knex, callback: (trx: Transaction<T>) => Promise<T>): Promise<T>;
 
   }
 
-  export const transaction: transaction
-
-  export interface Transaction {
-    commit(): void;
-    rollback(): void;
-  }
+  export const transaction: transaction<any>
 
   type Raw = knex.Raw
 
   //
-  // Lifted from knex's index.d.ts, to change the signatures 
-  // to return Objection's typed QueryBuilder wrapper:
+  // Partial revision of
+  // https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/master/types/knex/index.d.ts,
+  // to change the signatures to return Objection's typed QueryBuilder wrapper:
   //
 
-  /**
-   * Value encompasses any where clause operand.
-   * `null` is valid and represents SQL `NULL`. Also see `WhereNull`.
-   * `undefined` is not valid, most likely resulting from programmer error.
-   */
   type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw | null;
   type ColumnName<T> = string | Raw | QueryBuilder<T>;
   type TableName<T> = string | Raw | QueryBuilder<T>;
@@ -576,6 +567,11 @@ declare module "objection" {
     outerJoin: Join<T>;
     fullOuterJoin: Join<T>;
     crossJoin: Join<T>;
+
+    // Withs
+    with: With<T>;
+    withRaw: WithRaw<T>;
+    withWrapped: WithWrapped<T>;
 
     // Wheres
     where: Where<T>;
@@ -627,35 +623,40 @@ declare module "objection" {
     orHaving: Having<T>;
     orHavingRaw: RawQueryBuilder<T>;
 
+    // Clear
+    clearSelect(): this;
+    clearWhere(): this;
+
     // Paging
     offset(offset: number): this;
     limit(limit: number): this;
 
     // Aggregation
     count(columnName?: string): this;
+    countDistinct(columnName?: string): this;
     min(columnName: string): this;
     max(columnName: string): this;
     sum(columnName: string): this;
+    sumDistinct(columnName: string): this;
     avg(columnName: string): this;
+    avgDistinct(columnName: string): this;
     increment(columnName: string, amount?: number): this;
     decrement(columnName: string, amount?: number): this;
 
-    // Others
-    first(...columns: string[]): QueryBuilderOption<T>;
-    first<T>(...columns: string[]): QueryBuilderOption<T>;
+    // NOTE: deleted `first` declarations, as it's already defined above
 
     debug(enabled?: boolean): this;
     pluck(column: string): this;
 
+    // NOTE: deleted `update` declarations, as it's already defined above
+
     returning(column: string | string[]): this;
 
     del(returning?: string | string[]): this;
-    del<T>(returning?: string | string[]): QueryBuilderOption<T>;
     delete(returning?: string | string[]): this;
-    delete<T>(returning?: string | string[]): QueryBuilderOption<T>;
     truncate(): this;
 
-    transacting(trx: Transaction): this;
+    transacting(trx: Transaction<T>): this;
     connection(connection: any): this;
 
     clone(): this;
@@ -679,48 +680,37 @@ declare module "objection" {
 
   interface Join<T> {
     (raw: Raw): QueryBuilder<T>;
-    (tableName: string, columns: { [key: string]: string | Raw }): QueryBuilder<T>;
-    (tableName: string, callback: Function): QueryBuilder<T>;
+    <T1>(tableName: TableName<T1>, clause: (this: knex.JoinClause) => void): QueryBuilder<T>;
+    <T1>(tableName: TableName<T1>, columns: { [key: string]: string | number | Raw }): QueryBuilder<T>;
     <T1>(tableName: TableName<T1>, raw: Raw): QueryBuilder<T>;
     <T1>(tableName: TableName<T1>, column1: string, column2: string): QueryBuilder<T>;
     <T1>(tableName: TableName<T1>, column1: string, raw: Raw): QueryBuilder<T>;
     <T1>(tableName: TableName<T1>, column1: string, operator: string, column2: string): QueryBuilder<T>;
   }
 
-  interface JoinClause {
-    on(raw: Raw): JoinClause;
-    on(callback: Function): JoinClause;
-    on(columns: { [key: string]: string | Raw }): JoinClause;
-    on(column1: string, column2: string): JoinClause;
-    on(column1: string, raw: Raw): JoinClause;
-    on(column1: string, operator: string, column2: string): JoinClause;
-    andOn(raw: Raw): JoinClause;
-    andOn(callback: Function): JoinClause;
-    andOn(columns: { [key: string]: string | Raw }): JoinClause;
-    andOn(column1: string, column2: string): JoinClause;
-    andOn(column1: string, raw: Raw): JoinClause;
-    andOn(column1: string, operator: string, column2: string): JoinClause;
-    orOn(raw: Raw): JoinClause;
-    orOn(callback: Function): JoinClause;
-    orOn(columns: { [key: string]: string | Raw }): JoinClause;
-    orOn(column1: string, column2: string): JoinClause;
-    orOn(column1: string, raw: Raw): JoinClause;
-    orOn(column1: string, operator: string, column2: string): JoinClause;
-    using(column: string | string[] | Raw | { [key: string]: string | Raw }): JoinClause;
-    type(type: string): JoinClause;
-  }
-
   interface JoinRaw<T> {
     (tableName: string, binding?: Value): QueryBuilder<T>;
   }
 
+  interface With<T> extends WithRaw<T>, WithWrapped<T> {
+  }
+
+  interface WithRaw<T> {
+    (alias: string, raw: Raw): QueryBuilder<T>;
+    (alias: string, sql: string, bindings?: Value[] | Object): QueryBuilder<T>;
+  }
+
+  interface WithWrapped<T> {
+    (alias: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
+  }
+
   interface Where<T> extends WhereRaw<T>, WhereWrapped<T>, WhereNull<T> {
     (raw: Raw): QueryBuilder<T>;
-    <T1>(callback: (queryBuilder: QueryBuilder<T1>) => any): QueryBuilder<T>;
+    (callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
     (object: Object): QueryBuilder<T>;
     (columnName: string, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, value: Value): QueryBuilder<T>;
-    <T1>(columnName: string | Raw, operator: string, query: QueryBuilder<T1>): QueryBuilder<T>;
+    (columnName: string | Raw, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
   }
 
   interface WhereRaw<T> extends RawQueryBuilder<T> {
@@ -738,7 +728,7 @@ declare module "objection" {
   interface WhereIn<T> {
     (columnName: string, values: Value[]): QueryBuilder<T>;
     (columnName: string, callback: Function): QueryBuilder<T>;
-    <T1>(columnName: string, query: QueryBuilder<T1>): QueryBuilder<T>;
+    (columnName: string, query: QueryBuilder<T>): QueryBuilder<T>;
   }
 
   interface WhereBetween<T> {
@@ -747,7 +737,7 @@ declare module "objection" {
 
   interface WhereExists<T> {
     (callback: Function): QueryBuilder<T>;
-    <T1>(query: QueryBuilder<T1>): QueryBuilder<T>;
+    (query: QueryBuilder<T>): QueryBuilder<T>;
   }
 
   interface WhereNull<T> {
@@ -787,6 +777,44 @@ declare module "objection" {
     (sql: string, ...bindings: Value[]): QueryBuilder<T>;
     (sql: string, bindings: Value[]): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
+  }
+
+  //
+  // QueryBuilder
+  //
+
+  interface QueryBuilder<T> extends QueryInterface<T>, ChainableInterface<T> {
+    or: this;
+    and: this;
+
+    //TODO: Promise?
+    columnInfo(column?: string): Promise<knex.ColumnInfo>;
+
+    forUpdate(): this;
+    forShare(): this;
+
+    toSQL(): knex.Sql;
+
+    on(event: string, callback: Function): this;
+  }
+
+  //
+  // Chainable interface
+  //
+
+  interface ChainableInterface<T> extends Promise<T[]> {
+    toQuery(): string;
+    options(options: any): QueryBuilder<T>;
+    stream(options?: any, callback?: (builder: QueryBuilder<T>) => any): QueryBuilder<T>;
+    stream(callback?: (builder: QueryBuilder<T>) => any): QueryBuilder<T>;
+    pipe(writable: any): QueryBuilder<T>;
+    exec(callback: Function): QueryBuilder<T>;
+  }
+
+  interface Transaction<T> extends knex {
+    savepoint(transactionScope: (trx: Transaction<T>) => any): Promise<any>;
+    commit(value?: any): QueryBuilder<T>;
+    rollback(error?: any): QueryBuilder<T>;
   }
 
   // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
