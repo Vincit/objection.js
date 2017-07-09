@@ -6352,6 +6352,22 @@ class Person extends Model {
 }
 ```
 
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $beforeInsert(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
 Called before a model is inserted into the database.
 
 You can return a promise from this function if you need to do asynchronous stuff. You can
@@ -6383,6 +6399,22 @@ class Person extends Model {
 }
 ```
 
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $afterInsert(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
 Called after a model has been inserted into the database.
 
 You can return a promise from this function if you need to do asynchronous stuff.
@@ -6408,6 +6440,22 @@ Type|Description
 class Person extends Model {
   $beforeUpdate(opt, queryContext) {
     return doPossiblyAsyncStuff();
+  }
+}
+```
+
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $beforeUpdate(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
   }
 }
 ```
@@ -6471,6 +6519,22 @@ class Person extends Model {
 }
 ```
 
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $afterUpdate(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
 > Note that the the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
@@ -6527,6 +6591,22 @@ class Person extends Model {
 }
 ```
 
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $beforeDelete(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
 Called before a model is deleted.
 
 You can return a promise from this function if you need to do asynchronous stuff.
@@ -6558,6 +6638,22 @@ class Person extends Model {
 }
 ```
 
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $afterDelete(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
 Called after a model is deleted.
 
 You can return a promise from this function if you need to do asynchronous stuff.
@@ -6585,6 +6681,22 @@ Type|Description
 class Person extends Model {
   $afterGet(queryContext) {
     return doPossiblyAsyncStuff();
+  }
+}
+```
+
+> The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $afterGet(queryContext) {
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This 
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
   }
 }
 ```

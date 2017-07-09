@@ -451,6 +451,9 @@ custom filters for relations. Let's assume we have tables `Comment`, `Issue` and
 the foreign key and `commentableType` to hold the related model type. Check out the first example for
 how to create relations for this setup ➔
 
+This kind of associations don't have referential integrity and should be avoided if possible. Instead, consider
+using the _exclusive arc table_ pattern discussed [here](https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442).
+
 ## Timestamps
 
 ```js
@@ -508,12 +511,18 @@ property and inherit all your models from the custom Model class.
 
 ## Multi-tenancy
 
+By default, the examples guide you to setup the database connection by setting the knex object of the [`Model`](#model) base
+class. This doesn't fly if you want to select the database based on the request as it sets the connection globally. There
+are (at least) two patterns for dealing with this kind of setup:
+
+### Model binding pattern
+
 ```js
 app.use((req, res, next) => {
   // Function that parses the tenant id from path, header, query parameter etc.
   // and returns an instance of knex. You should cache the knex instances and
   // not create a new one for each query.
-  var knex = getDatabaseForRequest(req);
+  const knex = getDatabaseForRequest(req);
 
   req.models = {
     Person: Person.bindKnex(knex),
@@ -523,15 +532,44 @@ app.use((req, res, next) => {
 
   next();
 });
-```
 
-By default, the examples guide you to setup the database connection by setting the knex object of the [`Model`](#model) base
-class. This doesn't fly if you want to select the database based on the request as it sets the connection globally.
+app.get('/people', (req, res) => {
+  req.models.Person
+    .query()
+    .findById(req.params.id)
+    .then(people => res.send(people));
+});
+```
 
 If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
 `req.models` hash and then _always_ use the models through `req.models` instead of requiring them directly. What
 [`bindKnex`](#bindknex) method actually does is that it creates an anonymous subclass of the model class and sets its
 knex connection. That way the database connection doesn't change for the other requests that are currently being executed.
+
+### Database passing pattern
+
+```js
+app.use((req, res, next) => {
+  // Function that parses the tenant id from path, header, query parameter etc.
+  // and returns an instance of knex. You should cache the knex instances and
+  // not create a new one for each query.
+  req.knex = getDatabaseForRequest(req);
+  next();
+});
+
+app.get('/people', (req, res) => {
+  Person
+    .query(req.knex)
+    .findById(req.params.id)
+    .then(people => res.send(people));
+});
+```
+
+Another option is to add the knex instance to the request using a middleware and not bind models at all (not even using `Model.knex()`).
+The knex instance can be passed to [`query`](#query), [`$query`](#_s_query), and [`$relatedQuery`](#_s_relatedquery) methods 
+as the last argument. This pattern forces you to design your services and helper methods in a way that you always need to pass
+in a knex instance. A great thing about this is that you can pass a transaction object instead. (the knex/objection transaction 
+object is a query builder just like the normal knex instance). This gives you a fine grained control over your transactions.
 
 ## SQL clause precedence and parentheses
 
