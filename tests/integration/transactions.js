@@ -310,6 +310,113 @@ module.exports = (session) => {
 
     });
 
+    it('should rollback if an error occurs (5)', done => {
+      transaction(Model1.knex(), trx => {
+
+        return Model1
+          .query(trx)
+          .insertGraph([{
+            model1Prop1: 'a',
+            model1Relation1: {
+              model1Prop1: 'b'
+            },
+            model1Relation2: [{
+              model2Prop1: 'c',
+              model2Relation1: [{
+                model1Prop1: 'd'
+              }]
+            }]
+          }])
+          .then(models => {
+            return models[0]
+              .$relatedQuery('model1Relation2', trx)
+              .insert({model2Prop1: 'e'})
+              .return(models);
+          })
+          .then(models => {
+            return models[0]
+              .$relatedQuery('model1Relation2')
+              .transacting(trx)
+              .insert({model2Prop1: 'f'})
+              .return(models);
+          })
+          .then(models => {
+            expect(models[0].$query(trx).knex() === trx);
+          })
+          .then(() => {
+            throw new Error('whoops');
+          });
+
+      }).catch(err => {
+        expect(err.message).to.equal('whoops');
+
+        return [
+          session.knex('Model1'),
+          session.knex('model_2'),
+          session.knex('Model1Model2')
+        ];
+      }).spread((rows1, rows2, rows3) => {
+        expect(rows1).to.have.length(0);
+        expect(rows2).to.have.length(0);
+        expect(rows3).to.have.length(0);
+        done();
+      }).catch(done);
+    });
+
+    it('should rollback if an error rollback method is called', done => {
+      transaction(Model1.knex(), trx => {
+
+        Model1
+          .query(trx)
+          .insertGraph([{
+            model1Prop1: 'a',
+            model1Relation1: {
+              model1Prop1: 'b'
+            },
+            model1Relation2: [{
+              model2Prop1: 'c',
+              model2Relation1: [{
+                model1Prop1: 'd'
+              }]
+            }]
+          }])
+          .then(models => {
+            return models[0]
+              .$relatedQuery('model1Relation2', trx)
+              .insert({model2Prop1: 'e'})
+              .return(models);
+          })
+          .then(models => {
+            return models[0]
+              .$relatedQuery('model1Relation2')
+              .transacting(trx)
+              .insert({model2Prop1: 'f'})
+              .return(models);
+          })
+          .then(models => {
+            expect(models[0].$query(trx).knex() === trx);
+          })
+          .then(() => {
+            trx.rollback(new Error('whoops'));
+          });
+
+      }).catch(err => {
+        expect(err.message).to.equal('whoops');
+
+        return [
+          session.knex('Model1'),
+          session.knex('model_2'),
+          session.knex('Model1Model2')
+        ];
+      }).spread((rows1, rows2, rows3) => {
+        expect(rows1).to.have.length(0);
+        expect(rows2).to.have.length(0);
+        expect(rows3).to.have.length(0);
+
+        done();
+      }).catch(done);
+    });
+
     it('should skip queries after rollback', done => {
       transaction(Model1, Model1 => {
 
