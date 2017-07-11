@@ -1812,7 +1812,7 @@ module.exports = (session) => {
     describe('aliases', () => {
 
       it('aliases in eager expressions should work', () => {
-        return Promise.map([/*Model1.WhereInEagerAlgorithm, */Model1.JoinEagerAlgorithm], eagerAlgo => {
+        return Promise.map([Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm], eagerAlgo => {
           return Model1
             .query()
             .where('Model1.id', 1)
@@ -1869,6 +1869,33 @@ module.exports = (session) => {
                     $afterGetCalled: 1
                   }]
                 }]
+              });
+            });
+        }, {concurrency: 1});
+      });
+
+      it('alias method should work', () => {
+        return Promise.map([/*Model1.WhereInEagerAlgorithm, */Model1.JoinEagerAlgorithm], eagerAlgo => {
+          return Model1
+            .query()
+            .alias('m1')
+            .select('m1.id')
+            .eagerAlgorithm(eagerAlgo)
+            .eager(`[
+              model1Relation1(f1) as a
+            ]`, {
+              f1: builder => builder.select('id')
+            })
+            .findOne({'m1.id': 1})
+            .then(model => {          
+              expect(model).to.eql({
+                id: 1,
+                $afterGetCalled: 1,
+
+                a: {
+                  id: 2,
+                  $afterGetCalled: 1
+                }
               });
             });
         }, {concurrency: 1});

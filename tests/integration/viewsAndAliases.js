@@ -430,7 +430,7 @@ module.exports = (session) => {
                   "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
                   "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
                 from 
-                  "someView" as "someView"
+                  "someView"
                 left join 
                   "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
                 left join 
@@ -485,7 +485,7 @@ module.exports = (session) => {
                   "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
                   "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
                 from 
-                  "someView" as "someView"
+                  "someView"
                 left join 
                   (select "id", "model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
                 left join 

@@ -68,6 +68,7 @@ describe('integration tests', () => {
       require('./compositeKeys')(session);
       require('./crossDb')(session);
       require('./viewsAndAliases')(session);
+      require('./schema')(session);
 
       if (knexConfig.client === 'postgres') {
         require('./jsonQueries')(session);
