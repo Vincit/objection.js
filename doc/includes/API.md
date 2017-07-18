@@ -4241,7 +4241,7 @@ For the purposes of this explanation, let's define three data layouts:
 2. `internal`: The data layout of a model instance.
 3. `external`: The data layout after calling `model.toJSON()`.
 
-Whenever data is converted from on layout to another, converter methods are called:
+Whenever data is converted from one layout to another, converter methods are called:
 
 1. `database` -> [`$parseDatabaseJson`](#_s_parsedatabasejson) -> `internal`
 2. `internal` -> [`$formatDatabaseJson`](#_s_formatdatabasejson) -> `database`
