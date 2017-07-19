@@ -267,14 +267,17 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 
   <span class="c1">// This object defines the relations to other models.</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Import models here to prevent require loops.</span>
+    <span class="kr">const</span> <span class="nx">Animal</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Animal'</span><span class="p">);</span>
+    <span class="kr">const</span> <span class="nx">Movie</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Movie'</span><span class="p">);</span>
+
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="c1">// The related model. This can be either a Model</span>
         <span class="c1">// subclass constructor or an absolute file path</span>
-        <span class="c1">// to a module that exports one. We use the file</span>
-        <span class="c1">// path version here to prevent require loops.</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
+        <span class="c1">// to a module that exports one.</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
@@ -283,7 +286,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 
       <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
-        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
           <span class="c1">// ManyToMany relation needs the `through` object</span>
@@ -951,7 +954,7 @@ to be one of:</p>
 <a href="#_s_loadrelated"><code class="prettyprint">$loadRelated</code></a> methods.</p>
 
 <p>By default eager loading is done using multiple separate queries (for details see <a href="https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/">this blog post</a>).
-You can choose to use a join based eager loading algorithm that only performs one single query to fetch thw whole
+You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole
 eager tree. You can select which algorithm to use per query using <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method or
 per model by setting the <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> property. All algorithms
 have their strengths and weaknesses, which are discussed in detail <a href="#eager">here</a>.</p>
@@ -1340,6 +1343,7 @@ practices are an exception to this rule. If you are a developer or otherwise kno
 create a pull request or an issue to get it added to this list.</p>
 
 <ul>
+<li><a href="https://github.com/seegno/objection-guid">objection-guid</a> - automatic guid for your models</li>
 <li><a href="https://github.com/scoutforpets/objection-password">objection-password</a> - automatic password hashing for your models</li>
 <li><a href="https://github.com/oscaroox/objection-visibility">objection-visibility</a> - whitelist/blacklist your model properties</li>
 </ul>
@@ -3486,6 +3490,24 @@ join columns to null.</p>
 <h4 id="into">into</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-into">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="with">with</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-with">knex documentation</a></p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -7227,7 +7249,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 <li><code class="prettyprint">external</code>: The data layout after calling <code class="prettyprint">model.toJSON()</code>.</li>
 </ol>
 
-<p>Whenever data is converted from on layout to another, converter methods are called:</p>
+<p>Whenever data is converted from one layout to another, converter methods are called:</p>
 
 <ol>
 <li><code class="prettyprint">database</code> -&gt; <a href="#_s_parsedatabasejson"><code class="prettyprint">$parseDatabaseJson</code></a> -&gt; <code class="prettyprint">internal</code></li>
@@ -10469,6 +10491,14 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-8-5">0.8.5</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Add <a href="http://vincit.github.io/objection.js/#uselimitinfirst"><code class="prettyprint">Model.useLimitInFirst</code></a> configuration flag.</li>
+</ul>
 
 <h2 id="0-8-4">0.8.4</h2>
 

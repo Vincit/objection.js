@@ -1357,6 +1357,24 @@ join columns to null.</p>
 </tr>
 </tbody></table>
 
+<h4 id="with">with</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-with">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="withschema">withSchema</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-withSchema">knex documentation</a></p>
@@ -5083,7 +5101,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 <li><code class="prettyprint">external</code>: The data layout after calling <code class="prettyprint">model.toJSON()</code>.</li>
 </ol>
 
-<p>Whenever data is converted from on layout to another, converter methods are called:</p>
+<p>Whenever data is converted from one layout to another, converter methods are called:</p>
 
 <ol>
 <li><code class="prettyprint">database</code> -&gt; <a href="#_s_parsedatabasejson"><code class="prettyprint">$parseDatabaseJson</code></a> -&gt; <code class="prettyprint">internal</code></li>
