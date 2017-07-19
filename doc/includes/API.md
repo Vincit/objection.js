@@ -1172,6 +1172,19 @@ Type|Description
 
 
 
+#### with
+
+See [knex documentation](http://knexjs.org/#Builder-with)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### withSchema
 
 See [knex documentation](http://knexjs.org/#Builder-withSchema)
