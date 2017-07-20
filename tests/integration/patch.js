@@ -451,8 +451,21 @@ module.exports = (session) => {
     });
 
     describe('.$query().patchAndFetch()', () => {
+      let ModelOne;
+      let queries = [];
+
+      before(() => {
+        const knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
+          queries.push(this.toString());
+          return oldImpl.apply(this, args);
+        });
+
+        ModelOne = session.unboundModels.Model1.bindKnex(knex);
+      });
 
       beforeEach(() => {
+        queries = [];
+
         return session.populate([{
           id: 1,
           model1Prop1: 'hello 1'
@@ -463,7 +476,7 @@ module.exports = (session) => {
       });
 
       it('should patch and fetch a model', () => {
-        let model = Model1.fromJson({id: 1});
+        let model = ModelOne.fromJson({id: 1});
 
         return model
           .$query()
@@ -474,6 +487,14 @@ module.exports = (session) => {
             expect(updated.model1Prop1).to.equal('hello 1');
             expect(updated.model1Prop2).to.equal(10);
             expectPartEql(model, {id: 1, model1Prop1: 'hello 1', model1Prop2: 10, model1Id: null});
+
+            if (session.isPostgres()) {
+              expect(queries).to.eql([
+                'update "Model1" set "model1Prop2" = 10 where "Model1"."id" = 1',
+                'select "Model1".* from "Model1" where "Model1"."id" = 1'
+              ]);
+            }
+
             return session.knex('Model1').orderBy('id');
           })
           .then(rows => {
