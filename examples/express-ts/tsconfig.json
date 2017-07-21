@@ -2,20 +2,17 @@
   "compilerOptions": {
     "allowJs": false,
     "allowUnreachableCode": false,
-    "forceConsistentCasingInFileNames": true,
+    "alwaysStrict": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noImplicitUseStrict": false,
+    "strict": true,
     "strictNullChecks": true,
     "target": "es6",
     "rootDir": "src",
     "outDir": "lib"
-  },
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

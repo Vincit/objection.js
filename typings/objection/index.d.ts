@@ -3,8 +3,6 @@
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
 /// <reference types="node" />
-/// <reference types="knex" />
-
 import * as knex from "knex";
 
 export = Objection;
@@ -22,7 +20,7 @@ declare namespace Objection {
     message: string;
   }
 
-  export type RelationMappings = { [relationName: string]: RelationMapping };
+  export interface RelationMappings { [relationName: string]: RelationMapping; }
 
   interface Relation {
     // TODO should this be something other than a tagging interface?
@@ -43,7 +41,7 @@ declare namespace Objection {
 
   export interface RelationMapping {
     relation: Relation;
-    modelClass: typeof Model | String;
+    modelClass: typeof Model | string;
     join: RelationJoin;
     modify?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
     filter?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
@@ -69,16 +67,18 @@ declare namespace Objection {
    */
   type RelationExpression = string;
 
-  type FilterFunction = <T>(queryBuilder: QueryBuilder<T>) => void;
+  interface FilterFunction<T> {
+    (queryBuilder: QueryBuilder<T>): void;
+  }
 
-  type FilterExpression = { [namedFilter: string]: FilterFunction };
+  interface FilterExpression<T> { [namedFilter: string]: FilterFunction<T>; }
 
   interface RelationExpressionMethod {
     <T>(relationExpression: RelationExpression): QueryBuilder<T>;
   }
 
   interface TraverserFunction {
-    /** 
+    /**
      * Called if model is in a relation of some other model.
      * @param model the model itself
      * @param parentModel the parent model
@@ -93,13 +93,13 @@ declare namespace Objection {
 
   type IdOrIds = Id | Ids;
 
-  type RelationOptions = { alias: boolean | string };
+  interface RelationOptions { alias: boolean | string; }
 
   interface JoinRelation {
     <T>(relationName: string, opt?: RelationOptions): QueryBuilder<T>;
   }
 
-  type JsonObjectOrFieldExpression = Object | Object[] | FieldExpression;
+  type JsonObjectOrFieldExpression = object | object[] | FieldExpression;
 
   interface WhereJson<T> {
     (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: JsonObjectOrFieldExpression): QueryBuilder<T>;
@@ -110,15 +110,25 @@ declare namespace Objection {
   }
 
   interface WhereJsonExpression<T> {
-    (fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder<T>;
+    (
+      fieldExpression: FieldExpression,
+      keys: string | string[]
+    ): QueryBuilder<T>;
   }
 
   interface WhereJsonField<T> {
-    (fieldExpression: FieldExpression, operator: string, value: boolean | number | string | null): QueryBuilder<T>;
+    (
+      fieldExpression: FieldExpression,
+      operator: string,
+      value: boolean | number | string | null
+    ): QueryBuilder<T>;
   }
 
   interface ModifyEager<T1> {
-    <T2>(relationExpression: string | RelationExpression, modifier: (builder: QueryBuilder<T2>) => void): QueryBuilder<T1>;
+    <T2>(
+      relationExpression: string | RelationExpression,
+      modifier: (builder: QueryBuilder<T2>) => void
+    ): QueryBuilder<T1>;
   }
 
   interface BluebirdMapper<T, Result> {
@@ -126,11 +136,11 @@ declare namespace Objection {
   }
 
   interface NodeStyleCallback {
-    (err: any, result?: any): void
+    (err: any, result?: any): void;
   }
 
-  type Filters<T> = { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void };
-  type Properties = { [propertyName: string]: boolean };
+  interface Filters<T> { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void; }
+  interface Properties { [propertyName: string]: boolean; }
 
   /**
    * This is a hack to support referencing a given Model subclass constructor.
@@ -172,12 +182,16 @@ declare namespace Objection {
     bindTransaction(transaction: Transaction<M>): this;
     extend<S>(subclass: { new(): S }): this & { new(...args: any[]): M & S };
 
-    fromJson(json: Object, opt?: ModelOptions): M;
-    fromDatabaseJson(row: Object): M;
+    fromJson(json: object, opt?: ModelOptions): M;
+    fromDatabaseJson(row: object): M;
 
-    omitImpl(f: (obj: Object, prop: string) => void): void;
+    omitImpl(f: (obj: object, prop: string) => void): void;
 
-    loadRelated(models: (Model | Object)[], expression: RelationExpression, filters?: Filters<M>): Promise<M[]>;
+    loadRelated(
+      models: (Model | object)[],
+      expression: RelationExpression,
+      filters?: Filters<M>
+    ): Promise<M[]>;
 
     traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
@@ -212,7 +226,7 @@ declare namespace Objection {
     static JoinEagerAlgorithm: () => any;
     static WhereInEagerAlgorithm: () => any;
 
-    // "{ new(): T }" 
+    // "{ new(): T }"
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
     static query<T>(this: { new(): T }, trx?: Transaction<T>): QueryBuilder<T>;
     static knex(knex?: knex): knex;
@@ -222,18 +236,23 @@ declare namespace Objection {
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction<T>): T;
 
-    // TODO: It'd be nicer to expose an actual T&S union class here: 
+    // TODO: It'd be nicer to expose an actual T&S union class here:
     static extend<M extends Model, S>(
       this: ModelClass<M>,
       subclass: { new(): S }
     ): ModelClass<M> & { new(...args: any[]): M & S };
 
-    static fromJson<T>(this: T, json: Object, opt?: ModelOptions): T;
-    static fromDatabaseJson<T>(this: T, row: Object): T;
+    static fromJson<T>(this: T, json: object, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: T, row: object): T;
 
-    static omitImpl(f: (obj: Object, prop: string) => void): void;
+    static omitImpl(f: (obj: object, prop: string) => void): void;
 
-    static loadRelated<T>(this: { new(): T }, models: (T | Object)[], expression: RelationExpression, filters?: Filters<T>): Promise<T[]>;
+    static loadRelated<T>(
+      this: { new(): T },
+      models: (T | object)[],
+      expression: RelationExpression,
+      filters?: Filters<T>
+    ): Promise<T[]>;
 
     static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
@@ -241,21 +260,21 @@ declare namespace Objection {
     $id(): any;
     $id(id: any): void;
 
-    $beforeValidate(jsonSchema: JsonSchema, json: Object, opt: ModelOptions): JsonSchema;
-    $validate(): void // may throw ValidationError if validation fails
-    $afterValidate(json: Object, opt: ModelOptions): void; // may throw ValidationError if validation fails
+    $beforeValidate(jsonSchema: JsonSchema, json: object, opt: ModelOptions): JsonSchema;
+    $validate(): void; // may throw ValidationError if validation fails
+    $afterValidate(json: object, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
-    $toDatabaseJson(): Object;
-    $toJson(): Object;
-    toJSON(): Object;
-    $parseDatabaseJson(json: Object): Object;
-    $formatDatabaseJson(json: Object): Object;
-    $parseJson(json: Object, opt?: ModelOptions): Object;
-    $formatJson(json: Object): Object;
-    $setJson(json: Object, opt?: ModelOptions): this;
-    $setDatabaseJson(json: Object): this;
+    $toDatabaseJson(): object;
+    $toJson(): object;
+    toJSON(): object;
+    $parseDatabaseJson(json: object): object;
+    $formatDatabaseJson(json: object): object;
+    $parseJson(json: object, opt?: ModelOptions): object;
+    $formatJson(json: object): object;
+    $setJson(json: object, opt?: ModelOptions): this;
+    $setDatabaseJson(json: object): this;
 
-    $set(obj: Object): this;
+    $set(obj: object): this;
     $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
     $clone(): this;
@@ -280,10 +299,10 @@ declare namespace Objection {
     $knex(): knex;
     $transaction(): knex;
 
-    $beforeInsert(queryContext: Object): Promise<any> | void;
-    $afterInsert(queryContext: Object): Promise<any> | void;
-    $afterUpdate(opt: ModelOptions, queryContext: Object): Promise<any> | void;
-    $beforeUpdate(opt: ModelOptions, queryContext: Object): Promise<any> | void;
+    $beforeInsert(queryContext: object): Promise<any> | void;
+    $afterInsert(queryContext: object): Promise<any> | void;
+    $afterUpdate(opt: ModelOptions, queryContext: object): Promise<any> | void;
+    $beforeUpdate(opt: ModelOptions, queryContext: object): Promise<any> | void;
   }
 
   export class QueryBuilder<T> {
@@ -328,13 +347,13 @@ declare namespace Objection {
     insertAndFetch(modelsOrObjects?: Partial<T>[]): QueryBuilder<T>;
 
     insertGraph: Insert<T>;
-    insertGraphAndFetch: InsertGraphAndFetch<T>
+    insertGraphAndFetch: InsertGraphAndFetch<T>;
 
     /**
      * insertWithRelated is an alias for insertGraph.
      */
     insertWithRelated: Insert<T>;
-    insertWithRelatedAndFetch: InsertGraphAndFetch<T>
+    insertWithRelatedAndFetch: InsertGraphAndFetch<T>;
 
     /**
      * @return a Promise of the number of updated rows
@@ -377,7 +396,7 @@ declare namespace Objection {
     // TODO: modify does not exist in current knex documentation: http://knexjs.org/#Builder-modify
 
     // TODO: the return value of this method matches the knex typescript and documentation.
-    // The Objection documentation incorrectly states this returns a QueryBuilder.  
+    // The Objection documentation incorrectly states this returns a QueryBuilder.
     columnInfo(column?: string): Promise<knex.ColumnInfo>;
 
     whereRef(leftRef: string, operator: string, rightRef: string): this;
@@ -385,8 +404,7 @@ declare namespace Objection {
     whereComposite(column: string, value: any): this;
     whereComposite(columns: string[], operator: string, values: any[]): this;
     whereComposite(columns: string[], operator: string, values: any[]): this;
-    whereInComposite(column: string, values: any[]): this;
-    whereInComposite(columns: string[], values: any[]): this;
+    whereInComposite(column: string | string[], values: any[]): this;
 
     whereJsonEquals: WhereJson<T>;
     whereJsonNotEquals: WhereJson<T>;
@@ -423,12 +441,12 @@ declare namespace Objection {
     whereJsonHasAll: WhereJsonExpression<T>;
     orWhereJsonHasAll: WhereJsonExpression<T>;
 
-    whereJsonField: WhereJsonField<T>
+    whereJsonField: WhereJsonField<T>;
     orWhereJsonField: WhereJsonField<T>;
 
     // Non-query methods:
 
-    context(queryContext: Object): this;
+    context(queryContext: object): this;
 
     reject(reason: any): this;
     resolve(value: any): this;
@@ -440,7 +458,7 @@ declare namespace Objection {
     runAfter(fn: (builder: this) => void): this;
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
-    eager(relationExpression: RelationExpression, filters?: FilterExpression): this;
+    eager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
 
     allowEager: RelationExpressionMethod;
     modifyEager: ModifyEager<T>;
@@ -460,13 +478,13 @@ declare namespace Objection {
 
     clone(): this;
 
-    execute(): Promise<any>
+    execute(): Promise<any>;
 
     // We get `then` and `catch` by extending Promise
 
-    map<T, Result>(mapper: BluebirdMapper<T, Result>): Promise<Result[]>
+    map<V, Result>(mapper: BluebirdMapper<V, Result>): Promise<Result[]>;
 
-    return<T>(returnValue: T): Promise<T>
+    return<V>(returnValue: V): Promise<V>;
 
     bind(context: any): Promise<any>;
 
@@ -493,48 +511,67 @@ declare namespace Objection {
   export interface transaction<T> {
     start(knexOrModel: knex | ModelClass<any>): Promise<Transaction<T>>;
 
-    <MC extends ModelClass<any>, T>(
+    <MC extends ModelClass<any>, V>(
       modelClass: MC,
-      callback: (boundModelClass: MC) => Promise<T>
-    ): Promise<T>;
+      callback: (boundModelClass: MC) => Promise<V>
+    ): Promise<V>;
 
-    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, T>(
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, V>(
       modelClass1: MC1,
       modelClass2: MC2,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2) => Promise<T>
-    ): Promise<T>;
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2) => Promise<V>
+    ): Promise<V>;
 
-    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, T>(
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, V>(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3) => Promise<T>
-    ): Promise<T>;
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3) => Promise<V>
+    ): Promise<V>;
 
-    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, MC4 extends ModelClass<any>, T>(
+    <MC1 extends ModelClass<any>,
+      MC2 extends ModelClass<any>,
+      MC3 extends ModelClass<any>,
+      MC4 extends ModelClass<any>,
+      V>(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
       modelClass4: MC4,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, boundModel4Class: MC4) => Promise<T>
-    ): Promise<T>;
+      callback: (
+        boundModel1Class: MC1,
+        boundModel2Class: MC2,
+        boundModel3Class: MC3,
+        boundModel4Class: MC4
+      ) => Promise<V>
+    ): Promise<V>;
 
-    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, MC4 extends ModelClass<any>, MC5 extends ModelClass<any>, T>(
+    <MC1 extends ModelClass<any>,
+      MC2 extends ModelClass<any>,
+      MC3 extends ModelClass<any>,
+      MC4 extends ModelClass<any>,
+      MC5 extends ModelClass<any>,
+      V>(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
       modelClass4: MC4,
       modelClass5: MC5,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, boundModel4Class: MC4, boundModel5Class: MC5) => Promise<T>
-    ): Promise<T>;
+      callback: (
+        boundModel1Class: MC1,
+        boundModel2Class: MC2,
+        boundModel3Class: MC3,
+        boundModel4Class: MC4,
+        boundModel5Class: MC5
+      ) => Promise<V>
+    ): Promise<V>;
 
-    <T>(knex: knex, callback: (trx: Transaction<T>) => Promise<T>): Promise<T>;
-
+    <V>(knex: knex, callback: (trx: Transaction<any>) => Promise<V>): Promise<V>;
   }
 
-  export const transaction: transaction<any>
+  export const transaction: transaction<any>;
 
-  type Raw = knex.Raw
+  type Raw = knex.Raw;
 
   //
   // Partial revision of
@@ -614,7 +651,7 @@ declare namespace Objection {
 
     // Union
     union: Union<T>;
-    unionAll(callback: Function): this;
+    unionAll(callback: () => void): this;
 
     // Having
     having: Having<T>;
@@ -671,7 +708,7 @@ declare namespace Objection {
 
   interface Table<T> {
     (tableName: string): QueryBuilder<T>;
-    (callback: Function): QueryBuilder<T>;
+    (callback: () => void): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
   }
 
@@ -697,7 +734,7 @@ declare namespace Objection {
 
   interface WithRaw<T> {
     (alias: string, raw: Raw): QueryBuilder<T>;
-    (alias: string, sql: string, bindings?: Value[] | Object): QueryBuilder<T>;
+    (alias: string, sql: string, bindings?: Value[] | object): QueryBuilder<T>;
   }
 
   interface WithWrapped<T> {
@@ -707,7 +744,7 @@ declare namespace Objection {
   interface Where<T> extends WhereRaw<T>, WhereWrapped<T>, WhereNull<T> {
     (raw: Raw): QueryBuilder<T>;
     (callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
-    (object: Object): QueryBuilder<T>;
+    (object: object): QueryBuilder<T>;
     (columnName: string, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
@@ -718,7 +755,7 @@ declare namespace Objection {
   }
 
   interface WhereWrapped<T> {
-    (callback: Function): QueryBuilder<T>;
+    (callback: () => void): QueryBuilder<T>;
   }
 
   interface WhereNull<T> {
@@ -727,7 +764,7 @@ declare namespace Objection {
 
   interface WhereIn<T> {
     (columnName: string, values: Value[]): QueryBuilder<T>;
-    (columnName: string, callback: Function): QueryBuilder<T>;
+    (columnName: string, callback: () => void): QueryBuilder<T>;
     (columnName: string, query: QueryBuilder<T>): QueryBuilder<T>;
   }
 
@@ -736,7 +773,7 @@ declare namespace Objection {
   }
 
   interface WhereExists<T> {
-    (callback: Function): QueryBuilder<T>;
+    (callback: () => void): QueryBuilder<T>;
     (query: QueryBuilder<T>): QueryBuilder<T>;
   }
 
@@ -756,10 +793,10 @@ declare namespace Objection {
   }
 
   interface Union<T> {
-    (callback: Function, wrap?: boolean): QueryBuilder<T>;
-    (callbacks: Function[], wrap?: boolean): QueryBuilder<T>;
-    (...callbacks: Function[]): QueryBuilder<T>;
-    // (...callbacks: Function[], wrap?: boolean): QueryInterface;
+    (callback: () => void, wrap?: boolean): QueryBuilder<T>;
+    (callbacks: (() => void)[], wrap?: boolean): QueryBuilder<T>;
+    (...callbacks: (() => void)[]): QueryBuilder<T>;
+    // (...callbacks: () => void[], wrap?: boolean): QueryInterface;
   }
 
   interface Having<T> extends RawQueryBuilder<T>, WhereWrapped<T> {
@@ -787,7 +824,6 @@ declare namespace Objection {
     or: this;
     and: this;
 
-    //TODO: Promise?
     columnInfo(column?: string): Promise<knex.ColumnInfo>;
 
     forUpdate(): this;
@@ -795,7 +831,7 @@ declare namespace Objection {
 
     toSQL(): knex.Sql;
 
-    on(event: string, callback: Function): this;
+    on(event: string, callback: () => void): this;
   }
 
   //
@@ -808,7 +844,7 @@ declare namespace Objection {
     stream(options?: any, callback?: (builder: QueryBuilder<T>) => any): QueryBuilder<T>;
     stream(callback?: (builder: QueryBuilder<T>) => any): QueryBuilder<T>;
     pipe(writable: any): QueryBuilder<T>;
-    exec(callback: Function): QueryBuilder<T>;
+    exec(callback: () => void): QueryBuilder<T>;
   }
 
   interface Transaction<T> extends knex {
@@ -844,7 +880,7 @@ declare namespace Objection {
    */
 
   export interface JsonSchema {
-    $ref?: string
+    $ref?: string;
     /////////////////////////////////////////////////
     // Schema Metadata
     /////////////////////////////////////////////////
@@ -852,25 +888,25 @@ declare namespace Objection {
      * This is important because it tells refs where
      * the root of the document is located
      */
-    id?: string
+    id?: string;
     /**
      * It is recommended that the meta-schema is
      * included in the root of any JSON Schema
      */
-    $schema?: JsonSchema
+    $schema?: JsonSchema;
     /**
      * Title of the schema
      */
-    title?: string
+    title?: string;
     /**
      * Schema description
      */
-    description?: string
+    description?: string;
     /**
      * Default json for the object represented by
      * this schema
      */
-    default?: any
+    default?: any;
 
     /////////////////////////////////////////////////
     // Number Validation
@@ -879,60 +915,60 @@ declare namespace Objection {
      * The value must be a multiple of the number
      * (e.g. 10 is a multiple of 5)
      */
-    multipleOf?: number
-    maximum?: number
+    multipleOf?: number;
+    maximum?: number;
     /**
      * If true maximum must be > value, >= otherwise
      */
-    exclusiveMaximum?: boolean
-    minimum?: number
+    exclusiveMaximum?: boolean;
+    minimum?: number;
     /**
      * If true minimum must be < value, <= otherwise
      */
-    exclusiveMinimum?: boolean
+    exclusiveMinimum?: boolean;
 
     /////////////////////////////////////////////////
     // String Validation
     /////////////////////////////////////////////////
-    maxLength?: number
-    minLength?: number
+    maxLength?: number;
+    minLength?: number;
     /**
      * This is a regex string that the value must
      * conform to
      */
-    pattern?: string
+    pattern?: string;
 
     /////////////////////////////////////////////////
     // Array Validation
     /////////////////////////////////////////////////
-    additionalItems?: boolean | JsonSchema
-    items?: JsonSchema | JsonSchema[]
-    maxItems?: number
-    minItems?: number
-    uniqueItems?: boolean
+    additionalItems?: boolean | JsonSchema;
+    items?: JsonSchema | JsonSchema[];
+    maxItems?: number;
+    minItems?: number;
+    uniqueItems?: boolean;
 
     /////////////////////////////////////////////////
     // Object Validation
     /////////////////////////////////////////////////
-    maxProperties?: number
-    minProperties?: number
-    required?: string[]
-    additionalProperties?: boolean | JsonSchema
+    maxProperties?: number;
+    minProperties?: number;
+    required?: string[];
+    additionalProperties?: boolean | JsonSchema;
     /**
      * Holds simple JSON Schema definitions for
      * referencing from elsewhere.
      */
-    definitions?: { [key: string]: JsonSchema }
+    definitions?: { [key: string]: JsonSchema };
     /**
      * The keys that can exist on the object with the
      * json schema that should validate their value
      */
-    properties?: { [property: string]: JsonSchema }
+    properties?: { [property: string]: JsonSchema };
     /**
      * The key of this object is a regex for which
      * properties the schema applies to
      */
-    patternProperties?: { [pattern: string]: JsonSchema }
+    patternProperties?: { [pattern: string]: JsonSchema };
     /**
      * If the key is present as a property then the
      * string of properties must also be present.
@@ -940,7 +976,7 @@ declare namespace Objection {
      * also be valid for the object if the key is
      * present.
      */
-    dependencies?: { [key: string]: JsonSchema | string[] }
+    dependencies?: { [key: string]: JsonSchema | string[] };
 
     /////////////////////////////////////////////////
     // Generic
@@ -951,23 +987,23 @@ declare namespace Objection {
      * {"type": "string",
      *  "enum": ["red", "green", "blue"]}
      */
-    enum?: any[]
+    enum?: any[];
     /**
      * The basic type of this schema, can be one of
      * [string, number, object, array, boolean, null]
      * or an array of the acceptable types
      */
-    type?: string | string[]
+    type?: string | string[];
 
     /////////////////////////////////////////////////
     // Combining Schemas
     /////////////////////////////////////////////////
-    allOf?: JsonSchema[]
-    anyOf?: JsonSchema[]
-    oneOf?: JsonSchema[]
+    allOf?: JsonSchema[];
+    anyOf?: JsonSchema[];
+    oneOf?: JsonSchema[];
     /**
      * The entity being validated must not match this schema
      */
-    not?: JsonSchema
+    not?: JsonSchema;
   }
 }
