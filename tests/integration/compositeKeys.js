@@ -214,6 +214,20 @@ module.exports = (session) => {
           });
       });
 
+      it('whereNotInComposite should fetch multiple models by composite id', () => {
+        return A
+          .query()
+          .whereNotInComposite(['id1', 'id2'], [[1, '2'], [2, '3'], [3, '3']])
+          .debug()
+          .orderBy(['id1', 'id2'])
+          .then((models) => {
+            expect(models).to.eql([
+              {id1: 1, id2: '1', aval: 'a', bid3: null, bid4: null},
+              {id1: 2, id2: '2', aval: 'c', bid3: null, bid4: null}
+            ]);
+          });
+      });
+
     });
 
     describe('update', () => {
