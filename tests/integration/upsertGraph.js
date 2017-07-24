@@ -3,11 +3,10 @@
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
-
-const UpsertGraph = require('../../lib/queryBuilder/graphUpserter/UpsertGraph');
+const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
-  const Model1 = session.models.Model1;
+  const Model1 = session.unboundModels.Model1;
 
   describe('upsertGraph', () => {
 
@@ -95,10 +94,39 @@ module.exports = (session) => {
       };
 
       return transaction(session.knex, trx => {
+        const sql = [];
+
+        // Wrap the transaction to catch the executed sql.
+        trx = mockKnexFactory(trx, function (mock, oldImpl, args) {
+          sql.push(this.toString());
+          return oldImpl.apply(this, args);
+        });
+
         return Model1
           .query(trx)
           .upsertGraph(upsert)
           .then(result => {
+            if (session.isPostgres()) {
+              expect(sql).to.eql([ 
+                'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2)',
+                'select "Model1"."id" from "Model1" where "Model1"."id" in (3)',
+                'select "model_2"."model_1_id", "model_2"."id_col" from "model_2" where "model_2"."model_1_id" in (2)',
+                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (2, 1)',
+
+                'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                'insert into "model_2" ("model_1_id", "model_2_prop_1") values (2, \'inserted hasMany\') returning "id_col"',
+                'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
+
+                'update "Model1" set "id" = 2, "model1Id" = 3, "model1Prop1" = \'updated root 2\' where "Model1"."id" = 2',
+                'update "Model1" set "id" = 3, "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
+                'update "model_2" set "id_col" = 1, "model_1_id" = 2, "model_2_prop_1" = \'updated hasMany 1\' where "model_2"."id_col" = 1 and "model_2"."model_1_id" in (2)',
+                'update "Model1" set "id" = 4, "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
+
+                'delete from "model_2" where "model_2"."id_col" in (2) and "model_2"."model_1_id" in (2)',
+                'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)' 
+              ]);
+            }
+
             // Fetch the graph from the database.
             return Model1
               .query(trx)
@@ -293,6 +321,7 @@ module.exports = (session) => {
     // * with and without foreign keys in the input graph
     // * ids in relations that don't belong there
     // * works if id is generated in beforeInsert
+    // * raw and subqueries
 
   });
 
