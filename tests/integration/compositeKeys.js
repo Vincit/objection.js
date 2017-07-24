@@ -218,7 +218,6 @@ module.exports = (session) => {
         return A
           .query()
           .whereNotInComposite(['id1', 'id2'], [[1, '2'], [2, '3'], [3, '3']])
-          .debug()
           .orderBy(['id1', 'id2'])
           .then((models) => {
             expect(models).to.eql([

@@ -57,6 +57,7 @@ describe('integration tests', () => {
       require('./find')(session);
       require('./insert')(session);
       require('./insertGraph')(session);
+      require('./upsertGraph')(session);
       require('./update')(session);
       require('./patch')(session);
       require('./delete')(session);

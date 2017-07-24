@@ -842,6 +842,52 @@ module.exports = (session) => {
       }, {concurrency: 1});
     });
 
+    it('keepImplicitJoinProps', () => {
+      return Model1
+        .query()
+        .select('id')
+        .findById(1)
+        .eager('[model1Relation1, model1Relation2.model2Relation1]')
+        .internalOptions({ keepImplicitJoinProps: true })
+        .modifyEager('model1Relation1', qb => qb.select('Model1.id'))
+        .modifyEager('model1Relation2', qb => qb.select('model_2.id_col').orderBy('model_2.id_col'))
+        .modifyEager('model1Relation2.model2Relation1', qb => qb.select('Model1.id').orderBy('Model1.id'))
+        .then(res => {
+          expect(res).to.eql({
+            id: 1,
+            model1Id: 2,
+            $afterGetCalled: 1,
+
+            model1Relation1: {
+              id: 2,
+              $afterGetCalled: 1
+            },
+
+            model1Relation2: [{
+              idCol: 1,
+              model1Id: 1,
+              $afterGetCalled: 1,
+
+              model2Relation1: []
+            }, {
+              idCol: 2,
+              model1Id: 1,
+              $afterGetCalled: 1,
+
+              model2Relation1: [{
+                id: 5,
+                $afterGetCalled: 1,
+                objectiontmpjoin0: 2
+              }, {
+                id: 6,
+                $afterGetCalled: 1,
+                objectiontmpjoin0: 2
+              }]
+            }]
+          });
+        })
+    });
+
     describe('JoinEagerAlgorithm', () => {
 
       it('select should work', () => {
