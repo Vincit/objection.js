@@ -1404,6 +1404,7 @@ create a pull request or an issue to get it added to this list.
 
   * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
   * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
+  * [objection-unique](https://github.com/seegno/objection-unique) - Unique validation for your models
   * [objection-visibility](https://github.com/oscaroox/objection-visibility) - whitelist/blacklist your model properties
 
 ## Plugin development best practices
