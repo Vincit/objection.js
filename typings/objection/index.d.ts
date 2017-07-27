@@ -765,7 +765,7 @@ declare namespace Objection {
   interface WhereIn<T> {
     (columnName: string, values: Value[]): QueryBuilder<T>;
     (columnName: string, callback: () => void): QueryBuilder<T>;
-    (columnName: string, query: QueryBuilder<T>): QueryBuilder<T>;
+    (columnName: string, query: QueryBuilder<any>): QueryBuilder<T>;
   }
 
   interface WhereBetween<T> {
@@ -774,7 +774,7 @@ declare namespace Objection {
 
   interface WhereExists<T> {
     (callback: () => void): QueryBuilder<T>;
-    (query: QueryBuilder<T>): QueryBuilder<T>;
+    (query: QueryBuilder<any>): QueryBuilder<T>;
   }
 
   interface WhereNull<T> {
