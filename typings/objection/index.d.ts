@@ -173,13 +173,13 @@ declare namespace Objection {
     HasManyRelation: Relation;
     ManyToManyRelation: Relation;
 
-    query(trx?: Transaction<M>): QueryBuilder<M>;
+    query(trx?: Transaction): QueryBuilder<M>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
     knexQuery(): QueryBuilder<M>;
 
     bindKnex(knex: knex): this;
-    bindTransaction(transaction: Transaction<M>): this;
+    bindTransaction(transaction: Transaction): this;
     extend<S>(subclass: { new(): S }): this & { new(...args: any[]): M & S };
 
     fromJson(json: object, opt?: ModelOptions): M;
@@ -228,13 +228,13 @@ declare namespace Objection {
 
     // "{ new(): T }"
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
-    static query<T>(this: { new(): T }, trx?: Transaction<T>): QueryBuilder<T>;
+    static query<T>(this: { new(): T }, trx?: Transaction): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
 
     static bindKnex<T>(this: T, knex: knex): T;
-    static bindTransaction<T>(this: T, transaction: Transaction<T>): T;
+    static bindTransaction<T>(this: T, transaction: Transaction): T;
 
     // TODO: It'd be nicer to expose an actual T&S union class here:
     static extend<M extends Model, S>(
@@ -282,14 +282,14 @@ declare namespace Objection {
     /**
      * AKA `reload` in ActiveRecord parlance
      */
-    $query(trx?: Transaction<this>): QueryBuilderSingle<this>;
+    $query(trx?: Transaction): QueryBuilderSingle<this>;
 
     /**
      * Users need to explicitly type these calls, as the relationName doesn't
      * indicate the type (and if it returned Model directly, Partial<Model>
      * guards are worthless)
      */
-    $relatedQuery<M extends Model>(relationName: string, transaction?: Transaction<M>): QueryBuilder<M>;
+    $relatedQuery<M extends Model>(relationName: string, transaction?: Transaction): QueryBuilder<M>;
 
     $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
 
@@ -474,7 +474,7 @@ declare namespace Objection {
 
     skipUndefined(): this;
 
-    transacting(transation: Transaction<T>): this;
+    transacting(transation: Transaction): this;
 
     clone(): this;
 
@@ -509,7 +509,7 @@ declare namespace Objection {
   }
 
   export interface transaction<T> {
-    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction<T>>;
+    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
 
     <MC extends ModelClass<any>, V>(
       modelClass: MC,
@@ -566,7 +566,7 @@ declare namespace Objection {
       ) => Promise<V>
     ): Promise<V>;
 
-    <V>(knex: knex, callback: (trx: Transaction<any>) => Promise<V>): Promise<V>;
+    <V>(knex: knex, callback: (trx: Transaction) => Promise<V>): Promise<V>;
   }
 
   export const transaction: transaction<any>;
@@ -693,7 +693,7 @@ declare namespace Objection {
     delete(returning?: string | string[]): this;
     truncate(): this;
 
-    transacting(trx: Transaction<T>): this;
+    transacting(trx: Transaction): this;
     connection(connection: any): this;
 
     clone(): this;
@@ -847,10 +847,10 @@ declare namespace Objection {
     exec(callback: () => void): QueryBuilder<T>;
   }
 
-  interface Transaction<T> extends knex {
-    savepoint(transactionScope: (trx: Transaction<T>) => any): Promise<any>;
-    commit(value?: any): QueryBuilder<T>;
-    rollback(error?: any): QueryBuilder<T>;
+  interface Transaction extends knex {
+    savepoint(transactionScope: (trx: Transaction) => any): Promise<any>;
+    commit<T>(value?: any): QueryBuilder<T>;
+    rollback<T>(error?: any): QueryBuilder<T>;
   }
 
   // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
