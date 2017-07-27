@@ -275,3 +275,13 @@ new Person()
   .$relatedQuery<Movie>('movies')
   .insert({ title: 'Total Recall' })
 
+// Vefiry whereIn accepts a queryBuilder of any
+const whereInSubquery = Movie.query().select('name');
+
+Person
+  .query()
+  .whereIn('firstName', whereInSubquery);
+
+Person
+  .query()
+  .whereExists(whereInSubquery);
