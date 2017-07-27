@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
-    "test-travis": "istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests && test-typings",
+    "test-travis": "istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests && npm run test-typings",
     "test-bail": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
     "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining",
     "test-typings": "tsc --noEmit",
