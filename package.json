@@ -58,6 +58,7 @@
   },
   "devDependencies": {
     "@types/knex": "^0.0.55",
+    "@types/node": "^8.0.17",
     "coveralls": "^2.13.1",
     "expect.js": "^0.3.1",
     "fs-extra": "3.0.1",
