@@ -113,6 +113,9 @@ module.exports = (session) => {
                 'select "model_2"."model_1_id", "model_2"."id_col" from "model_2" where "model_2"."model_1_id" in (2)',
                 'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (2, 1)',
 
+                'delete from "model_2" where "model_2"."id_col" in (2) and "model_2"."model_1_id" in (2)',
+                'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
+
                 'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
                 'insert into "model_2" ("model_1_id", "model_2_prop_1") values (2, \'inserted hasMany\') returning "id_col"',
                 'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
@@ -120,10 +123,7 @@ module.exports = (session) => {
                 'update "Model1" set "id" = 2, "model1Id" = 3, "model1Prop1" = \'updated root 2\' where "Model1"."id" = 2',
                 'update "Model1" set "id" = 3, "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
                 'update "model_2" set "id_col" = 1, "model_1_id" = 2, "model_2_prop_1" = \'updated hasMany 1\' where "model_2"."id_col" = 1 and "model_2"."model_1_id" in (2)',
-                'update "Model1" set "id" = 4, "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
-
-                'delete from "model_2" where "model_2"."id_col" in (2) and "model_2"."model_1_id" in (2)',
-                'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)' 
+                'update "Model1" set "id" = 4, "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)' 
               ]);
             }
 
@@ -307,6 +307,58 @@ module.exports = (session) => {
                 model_2_prop_1: 'hasMany 2',
                 model_2_prop_2: null 
               });
+            });
+          });
+      });
+    });
+
+    it('should delete and insert belongsToOneRelation', () => {
+      const upsert = {
+        // the root gets updated because it has an id
+        id: 2,
+        model1Prop1: 'updated root 2',
+
+        // The model with id 3 should get deleted and this new one inserted.
+        model1Relation1: {
+          model1Prop1: 'inserted belongsToOne'
+        }
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert)
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(2)
+              .eager('model1Relation1')
+          })
+          .then(result => {
+            const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
+            // Remove a bunch of useless columns so that they don't uglify the following assert.
+            Model1.traverse(result, (model) => delProps.forEach(prop => delete model[prop]));
+
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 8,
+              model1Prop1: "updated root 2",
+
+              model1Relation1: {
+                id: 8,
+                model1Id: null,
+                model1Prop1: "inserted belongsToOne"
+              }
+            });
+
+            return Promise.all([
+              trx('Model1'),
+              trx('model_2')
+            ])
+            .spread((model1Rows, model2Rows) => {
+              // Row 3 should be deleted.
+              expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
             });
           });
       });
