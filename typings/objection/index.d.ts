@@ -172,6 +172,7 @@ declare namespace Objection {
     HasOneRelation: Relation;
     HasManyRelation: Relation;
     ManyToManyRelation: Relation;
+    HasOneThroughRelation: Relation;
 
     query(trx?: Transaction<M>): QueryBuilder<M>;
     knex(knex?: knex): knex;
@@ -222,6 +223,7 @@ declare namespace Objection {
     static HasOneRelation: Relation;
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
+    static HasOneThroughRelation: Relation;
 
     static JoinEagerAlgorithm: () => any;
     static WhereInEagerAlgorithm: () => any;
