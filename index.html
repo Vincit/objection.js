@@ -1345,6 +1345,7 @@ create a pull request or an issue to get it added to this list.</p>
 <ul>
 <li><a href="https://github.com/seegno/objection-guid">objection-guid</a> - automatic guid for your models</li>
 <li><a href="https://github.com/scoutforpets/objection-password">objection-password</a> - automatic password hashing for your models</li>
+<li><a href="https://github.com/seegno/objection-unique">objection-unique</a> - Unique validation for your models</li>
 <li><a href="https://github.com/oscaroox/objection-visibility">objection-visibility</a> - whitelist/blacklist your model properties</li>
 </ul>
 
@@ -9998,27 +9999,42 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 
 <h2 id="transaction">transaction</h2>
 
-<p>See the section on <a href="#transaction-callback">transaction callback</a></p>
+<p>See the section about <a href="#passing-around-a-transaction-object">transactions</a></p>
 
 <h3 id="methods">Methods</h3>
 
 <h4 id="start">start</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">trx</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">transaction</span><span class="p">.</span><span class="nx">start</span><span class="p">(</span><span class="nx">Model</span><span class="p">.</span><span class="nx">knex</span><span class="p">());</span>
 
-<p>See the section on <a href="#transaction-object">transaction object</a></p>
+<span class="k">try</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doStuff</span><span class="p">(</span><span class="nx">trx</span><span class="p">);</span>
+  <span class="nx">await</span> <span class="nx">trx</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">trx</span><span class="p">.</span><span class="nx">rollback</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+<p>Starts a transaction and returns a <a href="#transactionobject">transaction object</a>. If you use this method, you must
+explicitly remember to call <code class="prettyprint">trx.commit()</code> or <code class="prettyprint">trx.rollback(err)</code>.</p>
 
 <h2 id="transactionobject">TransactionObject</h2>
 
-<p>See the section on <a href="#transaction-object">transaction object</a></p>
+<p>This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be 
+<a href="#passing-around-a-transaction-object">passed to objection queries</a> and <a href="#binding-models-to-a-transaction">models can be bound to it</a></p>
+
+<p>See the section about <a href="#passing-around-a-transaction-object">transactions</a> for more info and examples.</p>
 
 <h3 id="instance-methods">Instance methods</h3>
 
 <h4 id="commit">commit</h4>
-
-<p>Call this method to commit the transaction.</p>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">trx</span><span class="p">.</span><span class="nx">commit</span><span class="p">();</span>
+</code></pre>
+<p>Call this method to commit the transaction. This only needs to be called if you use <code class="prettyprint">transaction.start()</code> method.</p>
 
 <h4 id="rollback">rollback</h4>
-
-<p>Call this method to rollback the transaction.</p>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">trx</span><span class="p">.</span><span class="nx">rollback</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+</code></pre>
+<p>Call this method to rollback the transaction. This only needs to be called if you use <code class="prettyprint">transaction.start()</code> method.
+You need to pass the error to the method as the only argument.</p>
 
 <h2 id="fieldexpression">FieldExpression</h2>
 
