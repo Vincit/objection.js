@@ -6737,30 +6737,55 @@ Type|Description
 
 ## transaction
 
-See the section on [transaction callback](#transaction-callback)
+See the section about [transactions](#passing-around-a-transaction-object)
 
 ### Methods
 
 #### start
 
-See the section on [transaction object](#transaction-object)
+```js
+const trx = await transaction.start(Model.knex());
+
+try {
+  await doStuff(trx);
+  await trx.commit();
+} catch (err) {
+  await trx.rollback(err);
+}
+```
+
+Starts a transaction and returns a [transaction object](#transactionobject). If you use this method, you must
+explicitly remember to call `trx.commit()` or `trx.rollback(err)`.
 
 
 
 
 ## TransactionObject
 
-See the section on [transaction object](#transaction-object)
+This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be 
+[passed to objection queries](#passing-around-a-transaction-object) and [models can be bound to it](#binding-models-to-a-transaction)
+
+See the section about [transactions](#passing-around-a-transaction-object) for more info and examples.
 
 ### Instance methods
 
 #### commit
 
-Call this method to commit the transaction.
+```js
+const promise = trx.commit();
+```
+
+Call this method to commit the transaction. This only needs to be called if you use `transaction.start()` method.
 
 #### rollback
 
-Call this method to rollback the transaction.
+```js
+const promise = trx.rollback(error);
+```
+
+Call this method to rollback the transaction. This only needs to be called if you use `transaction.start()` method.
+You need to pass the error to the method as the only argument.
+
 
 
 
