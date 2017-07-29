@@ -7,6 +7,7 @@ const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
   const Model1 = session.unboundModels.Model1;
+  const NONEXISTENT_ID = 1000;
 
   describe('upsertGraph', () => {
 
@@ -74,7 +75,6 @@ module.exports = (session) => {
 
           // update id=4
           // delete id=5
-          // relate id=6 
           // and insert one new
           model2Relation1: [{
             id: 4,
@@ -82,10 +82,6 @@ module.exports = (session) => {
           }, {
             // This is the new row.
             model1Prop1: 'inserted manyToMany'
-          }, {
-            // This will get related because it has an id
-            // that doesn't currently exist in the relation.
-            id: 6
           }]
         }, {
           // This is the new row.
@@ -118,7 +114,7 @@ module.exports = (session) => {
 
                 'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
                 'insert into "model_2" ("model_1_id", "model_2_prop_1") values (2, \'inserted hasMany\') returning "id_col"',
-                'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
+                'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
 
                 'update "Model1" set "id" = 2, "model1Id" = 3, "model1Prop1" = \'updated root 2\' where "Model1"."id" = 2',
                 'update "Model1" set "id" = 3, "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
@@ -135,11 +131,8 @@ module.exports = (session) => {
               .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
               .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
           })
+          .then(omitIrrelevantProps)
           .then(result => {
-            const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
-            // Remove a bunch of useless columns so that they don't uglify the following assert.
-            Model1.traverse(result, (model) => delProps.forEach(prop => delete model[prop]));
-
             expect(result).to.eql({
               id: 2,
               model1Id: 3,
@@ -160,10 +153,6 @@ module.exports = (session) => {
                   id: 4,
                   model1Id: null,
                   model1Prop1: "updated manyToMany 1",
-                }, {
-                  id: 6,
-                  model1Id: null,
-                  model1Prop1: "manyToMany 3",
                 }, {
                   id: 8,
                   model1Id: null,
@@ -191,7 +180,7 @@ module.exports = (session) => {
       });
     });
 
-    it('should insert new, update existing and unrelate missing if `unrelate` option is true', () => {
+    it('should insert new, update existing relate unrelated adn unrelate missing if `unrelate` and `relate` options are true', () => {
       const upsert = {
         // the root gets updated because it has an id
         id: 2,
@@ -231,7 +220,7 @@ module.exports = (session) => {
       return transaction(session.knex, trx => {
         return Model1
           .query(trx)
-          .upsertGraph(upsert, {unrelate: true})
+          .upsertGraph(upsert, {unrelate: true, relate: true})
           .then(result => {
             // Fetch the graph from the database.
             return Model1
@@ -241,11 +230,8 @@ module.exports = (session) => {
               .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
               .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
           })
+          .then(omitIrrelevantProps)
           .then(result => {
-            const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
-            // Remove a bunch of useless columns so that they don't uglify the following assert.
-            Model1.traverse(result, (model) => delProps.forEach(prop => delete model[prop]));
-
             expect(result).to.eql({
               id: 2,
               model1Id: null,
@@ -335,11 +321,8 @@ module.exports = (session) => {
               .findById(2)
               .eager('model1Relation1')
           })
+          .then(omitIrrelevantProps)
           .then(result => {
-            const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
-            // Remove a bunch of useless columns so that they don't uglify the following assert.
-            Model1.traverse(result, (model) => delProps.forEach(prop => delete model[prop]));
-
             expect(result).to.eql({
               id: 2,
               model1Id: 8,
@@ -364,6 +347,55 @@ module.exports = (session) => {
       });
     });
 
+    it('should fail if given nonexistent id in root', done => {
+      const upsert = {
+        // This doesn't exist.
+        id: NONEXISTENT_ID,
+        model1Prop1: 'updated root 2',
+
+        model1Relation1: {
+          model1Prop1: 'inserted belongsToOne'
+        }
+      };
+
+      transaction(session.knex, trx => {
+        return Model1.query(trx).upsertGraph(upsert)
+      }).then(() => {
+        next(new Error('should not get here'));
+      }).catch(err => {
+        expect(err.message).to.equal('one or more of the root models (ids=[1000]) were not found');
+        return session.knex('Model1').whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
+      }).then(rows => {
+        expect(rows).to.have.length(0);
+        done();
+      }).catch(done);
+    });
+
+    it('should fail if given nonexistent id in a relation (without relate=true option)', done => {
+      const upsert = {
+        id: 2,
+        model1Prop1: 'updated root 2',
+
+        // id 1000 is not related to id 2. This will thrown an error.
+        model1Relation1: {
+          id: NONEXISTENT_ID,
+          model1Prop1: 'inserted belongsToOne'
+        }
+      };
+
+      transaction(session.knex, trx => {
+        return Model1.query(trx).upsertGraph(upsert)
+      }).then(() => {
+        next(new Error('should not get here'));
+      }).catch(err => {
+        expect(err.message).to.equal('model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate: true option');
+        return session.knex('Model1').whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
+      }).then(rows => {
+        expect(rows).to.have.length(0);
+        done();
+      }).catch(done);
+    });
+
     // tests TODO:
     // 
     // * validations for updates and inserts
@@ -376,5 +408,13 @@ module.exports = (session) => {
     // * raw and subqueries
 
   });
+
+  function omitIrrelevantProps(model) {
+    const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
+    // Remove a bunch of useless columns so that they don't uglify the following assert.
+    Model1.traverse(model, (model) => delProps.forEach(prop => delete model[prop]));
+    
+    return model;
+  }
 
 };
