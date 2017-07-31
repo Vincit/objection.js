@@ -3,6 +3,7 @@
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
+const ValidationError = require('../../').ValidationError;
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
@@ -173,6 +174,10 @@ module.exports = (session) => {
             .spread((model1Rows, model2Rows) => {
               // Row 5 should be deleted.
               expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+              // Row 6 should NOT be deleted even thought its parent is.
+              expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+              // Row 7 should NOT be deleted  even thought its parent is.
+              expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
               // Row 2 should be deleted.
               expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
             });
@@ -396,6 +401,151 @@ module.exports = (session) => {
       }).catch(done);
     });
 
+    it('allowUpsert should limit the relations that can be upserted', () => {
+      const errors = [];
+
+      const upsert = {
+        // the root gets updated because it has an id
+        id: 2,
+        model1Prop1: 'updated root 2',
+
+        // unrelate
+        model1Relation1: null,
+
+        // update idCol=1
+        // unrelate idCol=2
+        // and insert one new
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: 'updated hasMany 1',
+
+          // update id=4
+          // unrelate id=5
+          // relate id=6 
+          // and insert one new
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: 'updated manyToMany 1'
+          }, {
+            // This is the new row.
+            model1Prop1: 'inserted manyToMany'
+          }, {
+            // This will get related because it has an id
+            // that doesn't currently exist in the relation.
+            id: 6
+          }]
+        }, {
+          // This is the new row.
+          model2Prop1: 'inserted hasMany',
+        }]
+      };
+
+      // This should fail.
+      return Model1
+        .query(session.knex)
+        .upsertGraph(upsert, {unrelate: true, relate: true})
+        .allowUpsert('[model1Relation1, model1Relation2]')
+        .catch(err => {
+          errors.push(err);
+
+          // This should also fail.
+          return Model1
+            .query(session.knex)
+            .upsertGraph(upsert, {unrelate: true, relate: true})
+            .allowUpsert('[model1Relation2.model2Relation1]')
+        })
+        .catch(err => {
+          errors.push(err);
+          
+          // This should succeed.
+          return Model1
+            .query(session.knex)
+            .upsertGraph(upsert, {unrelate: true, relate: true})
+            .allowUpsert('[model1Relation1, model1Relation2.model2Relation1]')
+        })
+        .then(result => {
+          // Fetch the graph from the database.
+          return Model1
+            .query(session.knex)
+            .findById(2)
+            .eager('[model1Relation1, model1Relation2.model2Relation1]')
+            .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+            .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+        })
+        .then(omitIrrelevantProps)
+        .then(result => {
+          expect(errors.length).to.equal(2);
+
+          errors.forEach(error => {
+            expect(error).to.be.a(ValidationError);
+            expect(error.data.allowedRelations).to.equal('trying to upsert an unallowed relation');
+          });
+
+          expect(result).to.eql({
+            id: 2,
+            model1Id: null,
+            model1Prop1: "updated root 2",
+
+            model1Relation1: null,
+
+            model1Relation2: [{
+              idCol: 1,
+              model1Id: 2,
+              model2Prop1: "updated hasMany 1",
+
+              model2Relation1: [{
+                id: 4,
+                model1Id: null,
+                model1Prop1: "updated manyToMany 1",
+              }, {
+                id: 6,
+                model1Id: null,
+                model1Prop1: "manyToMany 3",
+              }, {
+                id: 8,
+                model1Id: null,
+                model1Prop1: "inserted manyToMany",
+              }]
+            }, {
+              idCol: 3,
+              model1Id: 2,
+              model2Prop1: "inserted hasMany",
+              model2Relation1: []
+            }]
+          });
+
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model_2')
+          ])
+          .spread((model1Rows, model2Rows) => {
+            // Row 3 should NOT be deleted.
+            expect(model1Rows.find(it => it.id == 3)).to.eql({ 
+              id: 3,
+              model1Id: null,
+              model1Prop1: 'belongsToOne',
+              model1Prop2: null
+            });
+
+            // Row 5 should NOT be deleted.
+            expect(model1Rows.find(it => it.id == 5)).to.eql({ 
+              id: 5,
+              model1Id: null,
+              model1Prop1: 'manyToMany 2',
+              model1Prop2: null
+            });
+
+            // Row 2 should NOT be deleted.
+            expect(model2Rows.find(it => it.id_col == 2)).to.eql({ 
+              id_col: 2,
+              model_1_id: null,
+              model_2_prop_1: 'hasMany 2',
+              model_2_prop_2: null 
+            });
+          });
+        });
+    });
+
     // tests TODO:
     // 
     // * validations for updates and inserts
@@ -403,7 +553,6 @@ module.exports = (session) => {
     // * transaction
     // * composite keys
     // * with and without foreign keys in the input graph
-    // * ids in relations that don't belong there
     // * works if id is generated in beforeInsert
     // * raw and subqueries
 
