@@ -1,5 +1,6 @@
 'use strict';
 
+const raw = require('../../').raw;
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
@@ -8,6 +9,7 @@ const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = (session) => {
   const Model1 = session.unboundModels.Model1;
+  const Model2 = session.unboundModels.Model2;
   const NONEXISTENT_ID = 1000;
 
   describe('upsertGraph', () => {
@@ -582,6 +584,107 @@ module.exports = (session) => {
         });
     });
 
+    it('raw sql and subqueries should work', () => {
+      const upsert = {
+        // the root gets updated because it has an id
+        id: 2,
+        model1Prop1: raw("10 + 20"),
+
+        // update
+        model1Relation1: {
+          id: 3,
+          model1Prop1: Model2.query(session.knex).min('id_col')
+        },
+
+        // update idCol=1
+        // delete idCol=2
+        // and insert one new
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: session.knex.raw("50 * 100"),
+
+          // update id=4
+          // delete id=5
+          // and insert one new
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: session.knex.raw("30 * 100"),
+          }, {
+            // This is the new row.
+            model1Prop1: Model2.query(session.knex).min('id_col')
+          }]
+        }, {
+          // This is the new row.
+          model2Prop1: session.knex('Model1').min('id').where('id', '>', 1),
+        }]
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert)
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(2)
+              .eager('[model1Relation1, model1Relation2.model2Relation1]')
+              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 3,
+              model1Prop1: "30",
+
+              model1Relation1: {
+                id: 3,
+                model1Id: null,
+                model1Prop1: "1",
+              },
+
+              model1Relation2: [{
+                idCol: 1,
+                model1Id: 2,
+                model2Prop1: "5000",
+
+                model2Relation1: [{
+                  id: 4,
+                  model1Id: null,
+                  model1Prop1: "3000",
+                }, {
+                  id: 8,
+                  model1Id: null,
+                  model1Prop1: "1",
+                }]
+              }, {
+                idCol: 3,
+                model1Id: 2,
+                model2Prop1: "2",
+                model2Relation1: []
+              }]
+            });
+
+            return Promise.all([
+              trx('Model1'),
+              trx('model_2')
+            ])
+            .spread((model1Rows, model2Rows) => {
+              // Row 5 should be deleted.
+              expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+              // Row 6 should NOT be deleted even thought its parent is.
+              expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+              // Row 7 should NOT be deleted  even thought its parent is.
+              expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
+              // Row 2 should be deleted.
+              expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
+            });
+          });
+      });
+    });
+
     describe('validation and transactions', () => {
 
       before(() => {
@@ -793,7 +896,6 @@ module.exports = (session) => {
     // * composite keys
     // * with and without foreign keys in the input graph
     // * works if id is generated in beforeInsert
-    // * raw and subqueries
 
   });
 
