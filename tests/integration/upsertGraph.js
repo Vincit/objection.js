@@ -11,48 +11,63 @@ module.exports = (session) => {
   const NONEXISTENT_ID = 1000;
 
   describe('upsertGraph', () => {
+    let population;
 
     beforeEach(() => {
-      return session.populate([{
+      population = [{
         id: 1,
-        model1Prop1: 'root 1'
+        model1Id: null,
+        model1Prop1: 'root 1',
+
+        model1Relation1: null,
+        model1Relation2: []
       }, {
         id: 2,
+        model1Id: 3,
         model1Prop1: 'root 2',
         
         // This is a BelongsToOneRelation
         model1Relation1: {
           id: 3,
+          model1Id: null,
           model1Prop1: 'belongsToOne'
         },
 
         // This is a HasManyRelation
         model1Relation2: [{
           idCol: 1,
+          model1Id: 2,
           model2Prop1: 'hasMany 1',
 
           // This is a ManyToManyRelation
           model2Relation1: [{
             id: 4,
+            model1Id: null,
             model1Prop1: 'manyToMany 1'
           }, {
             id: 5,
+            model1Id: null,
             model1Prop1: 'manyToMany 2'
           }]
         }, {
           idCol: 2,
+          model1Id: 2,
           model2Prop1: 'hasMany 2',
 
           // This is a ManyToManyRelation
           model2Relation1: [{
             id: 6,
+            model1Id: null,
             model1Prop1: 'manyToMany 3'
           }, {
             id: 7,
+            model1Id: null,
             model1Prop1: 'manyToMany 4'
           }]
         }]
-      }]);
+      }];
+
+      return session.populate(population);
     });
 
     it('by default, should insert new, update existing and delete missing', () => {
@@ -546,11 +561,215 @@ module.exports = (session) => {
         });
     });
 
+    describe('validation and transactions', () => {
+
+      before(() => {
+        Model1.$$jsonSchema = {
+          type: 'object',
+          properties: {
+            model1Prop1: {type: ['string', 'null']}
+          }
+        };
+      });
+
+      after(() => {
+        delete Model1.$$jsonSchema;
+      });
+
+      it('should validate (also tests transactions)', () => {
+        const fails = [{
+          id: 2,
+          // This fails because of invalid type.
+          model1Prop1: 100,
+
+          model1Relation1: {
+            id: 3,
+            model1Prop1: 'updated belongsToOne'
+          },
+
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'updated hasMany 1',
+
+            model2Relation1: [{
+              id: 4,
+              model1Prop1: 'updated manyToMany 1'
+            }, {
+              model1Prop1: 'inserted manyToMany'
+            }]
+          }, {
+            model2Prop1: 'inserted hasMany',
+          }]
+        }, {
+          id: 2,
+          model1Prop1: 'updated root 2',
+
+          model1Relation1: {
+            id: 3,
+            // This fails because of invalid type.
+            model1Prop1: 100,
+          },
+
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'updated hasMany 1',
+
+            model2Relation1: [{
+              id: 4,
+              model1Prop1: 'updated manyToMany 1'
+            }, {
+              model1Prop1: 'inserted manyToMany'
+            }]
+          }, {
+            model2Prop1: 'inserted hasMany',
+          }]
+        }, {
+          id: 2,
+          model1Prop1: 'updated root 2',
+
+          model1Relation1: {
+            id: 3,
+            model1Prop1: 'updated belongsToOne'
+          },
+
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'updated hasMany 1',
+
+            model2Relation1: [{
+              id: 4,
+              model1Prop1: 'updated manyToMany 1'
+            }, {
+              // This is the new row that fails because of invalid type.
+              model1Prop1: 100
+            }]
+          }, {
+            model2Prop1: 'inserted hasMany',
+          }]
+        }];
+
+        const success = {
+          // the root gets updated because it has an id
+          id: 2,
+          model1Prop1: 'updated root 2',
+
+          // update
+          model1Relation1: {
+            id: 3,
+            model1Prop1: 'updated belongsToOne'
+          },
+
+          // update idCol=1
+          // delete idCol=2
+          // and insert one new
+          model1Relation2: [{
+            idCol: 1,
+            model2Prop1: 'updated hasMany 1',
+
+            // update id=4
+            // delete id=5
+            // and insert one new
+            model2Relation1: [{
+              id: 4,
+              model1Prop1: 'updated manyToMany 1'
+            }, {
+              // This is the new row.
+              model1Prop1: 'inserted manyToMany'
+            }]
+          }, {
+            // This is the new row.
+            model2Prop1: 'inserted hasMany',
+          }]
+        };
+
+        return Promise.map(fails, fail => {
+          return transaction(session.knex, trx => Model1.query(trx).upsertGraph(fail)).reflect();
+        }).then(results => {
+          // Check that all transactions have failed because of a validation error.
+          results.forEach(res => {
+            expect(res.isRejected()).to.equal(true);
+            expect(res.reason().data.model1Prop1[0].message).to.equal('should be string,null')
+          });
+        
+          return Model1
+            .query(session.knex)
+            .orderBy('id')
+            .whereIn('id', [1, 2])
+            .eager('[model1Relation1, model1Relation2.model2Relation1]')
+            .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+            .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+
+        }).then(db => {
+          // Check that the transactions worked and the database was in no way modified.
+          expect(omitIrrelevantProps(db)).to.eql(population);
+
+          return transaction(session.knex, trx => {
+            return Model1
+              .query(trx)
+              .upsertGraph(success)
+              .then(result => {
+                // Fetch the graph from the database.
+                return Model1
+                  .query(trx)
+                  .findById(2)
+                  .eager('[model1Relation1, model1Relation2.model2Relation1]')
+                  .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+                  .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+              })
+              .then(omitIrrelevantProps)
+              .then(omitIds)
+              .then(result => {
+                expect(result).to.eql({
+                  model1Id: 3,
+                  model1Prop1: "updated root 2",
+
+                  model1Relation1: {
+                    model1Id: null,
+                    model1Prop1: "updated belongsToOne",
+                  },
+
+                  model1Relation2: [{
+                    model1Id: 2,
+                    model2Prop1: "updated hasMany 1",
+
+                    model2Relation1: [{
+                      model1Id: null,
+                      model1Prop1: "updated manyToMany 1",
+                    }, {
+                      model1Id: null,
+                      model1Prop1: "inserted manyToMany",
+                    }]
+                  }, {
+                    model1Id: 2,
+                    model2Prop1: "inserted hasMany",
+                    model2Relation1: []
+                  }]
+                });
+
+                return Promise.all([
+                  trx('Model1'),
+                  trx('model_2')
+                ])
+                .spread((model1Rows, model2Rows) => {
+                  // Row 5 should be deleted.
+                  expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+                  // Row 6 should NOT be deleted even thought its parent is.
+                  expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+                  // Row 7 should NOT be deleted  even thought its parent is.
+                  expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
+                  // Row 2 should be deleted.
+                  expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
+                });
+              });
+          });
+        });
+      });
+
+    });
+
     // tests TODO:
     // 
-    // * validations for updates and inserts
     // * hooks
-    // * transaction
     // * composite keys
     // * with and without foreign keys in the input graph
     // * works if id is generated in beforeInsert
@@ -560,8 +779,20 @@ module.exports = (session) => {
 
   function omitIrrelevantProps(model) {
     const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
-    // Remove a bunch of useless columns so that they don't uglify the following assert.
-    Model1.traverse(model, (model) => delProps.forEach(prop => delete model[prop]));
+
+    Model1.traverse(model, (model) => {
+      delProps.forEach(prop => delete model[prop])
+    });
+    
+    return model;
+  }
+
+  function omitIds(model) {
+    const delProps = ['id', 'idCol'];
+
+    Model1.traverse(model, (model) => {
+      delProps.forEach(prop => delete model[prop])
+    });
     
     return model;
   }
