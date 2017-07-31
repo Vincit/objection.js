@@ -139,6 +139,27 @@ module.exports = (session) => {
               ]);
             }
 
+            expect(result.$beforeUpdateCalled).to.equal(1);
+            expect(result.$afterUpdateCalled).to.equal(1);
+
+            expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
+            expect(result.model1Relation1.$afterUpdateCalled).to.equal(1);
+
+            expect(result.model1Relation2[0].$beforeUpdateCalled).to.equal(1);
+            expect(result.model1Relation2[0].$afterUpdateCalled).to.equal(1);
+
+            expect(result.model1Relation2[1].$beforeUpdateCalled).to.equal(undefined);
+            expect(result.model1Relation2[1].$afterUpdateCalled).to.equal(undefined);
+
+            expect(result.model1Relation2[1].$beforeInsertCalled).to.equal(1);
+            expect(result.model1Relation2[1].$afterInsertCalled).to.equal(1);
+
+            expect(result.model1Relation2[0].model2Relation1[0].$beforeUpdateCalled).to.equal(1);
+            expect(result.model1Relation2[0].model2Relation1[0].$afterUpdateCalled).to.equal(1);
+
+            expect(result.model1Relation2[0].model2Relation1[1].$beforeInsertCalled).to.equal(1);
+            expect(result.model1Relation2[0].model2Relation1[1].$afterInsertCalled).to.equal(1);
+
             // Fetch the graph from the database.
             return Model1
               .query(trx)
@@ -769,7 +790,6 @@ module.exports = (session) => {
 
     // tests TODO:
     // 
-    // * hooks
     // * composite keys
     // * with and without foreign keys in the input graph
     // * works if id is generated in beforeInsert
