@@ -3179,6 +3179,8 @@ This algorithm uses joins to fetch the whole eager tree using one single query. 
 in the root query (see the last example). The related tables can be referred using the relation name. Nested relations
 must be separated by `:` character (dot is not used because of the way knex parses identifiers).
 
+When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
+
 Limitations:
 
  * `limit` and `page` methods will work incorrectly because they will limit the result set that contains all the result
