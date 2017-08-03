@@ -275,7 +275,6 @@ new Person()
   .$relatedQuery<Movie>('movies')
   .insert({ title: 'Total Recall' })
 
-
 // Verify if is possible transaction class can be shared across models
 objection.transaction(Person.knex(), async trx => {
   await Person.query(trx).insert({ firstName: 'Name' });
@@ -294,3 +293,14 @@ objection.transaction.start(Person).then(trx => {
     .then(() => trx.commit())
     .catch(() => trx.rollback());
 });
+
+// Vefiry whereIn accepts a queryBuilder of any
+const whereInSubquery = Movie.query().select('name');
+
+Person
+  .query()
+  .whereIn('firstName', whereInSubquery);
+
+Person
+  .query()
+  .whereExists(whereInSubquery);
