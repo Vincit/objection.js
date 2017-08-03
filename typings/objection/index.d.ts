@@ -849,8 +849,8 @@ declare namespace Objection {
 
   interface Transaction extends knex {
     savepoint(transactionScope: (trx: Transaction) => any): Promise<any>;
-    commit<T>(value?: any): QueryBuilder<T>;
-    rollback<T>(error?: any): QueryBuilder<T>;
+    commit<T>(value?: any): Promise<T>;
+    rollback<T>(error?: any): Promise<T>;
   }
 
   // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
