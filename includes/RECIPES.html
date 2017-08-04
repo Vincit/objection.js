@@ -753,6 +753,222 @@ class.</p>
  <span class="k">Index</span> <span class="n">Scan</span> <span class="k">using</span> <span class="nv">"Hero_expr_idx"</span> <span class="k">on</span> <span class="nv">"Hero"</span>
    <span class="k">Index</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">details</span> <span class="o">#&gt;&gt;</span> <span class="s1">'{type}'</span><span class="p">::</span><span class="n">text</span><span class="p">[])</span> <span class="o">=</span> <span class="s1">'Hero'</span><span class="p">::</span><span class="n">text</span><span class="p">)</span>
 </code></pre>
+<h2 id="ternary-relationships">Ternary relationships</h2>
+
+<p>Assume we have the following Models:</p>
+
+<ol>
+<li>user <code class="prettyprint">(id, first_name, last_name)</code></li>
+<li>group <code class="prettyprint">(id, name)</code></li>
+<li>permission <code class="prettyprint">(id, label)</code></li>
+<li>user_group_permission <code class="prettyprint">(user_id, group_id, permission_id, extra_attribute)</code></li>
+</ol>
+
+<p>Here&rsquo;s how you could create your models:</p>
+<pre class="highlight javascript"><code><span class="c1">// User.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"user"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">groups</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Group"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"group.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">permissions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Permission"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"permission.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">User</span><span class="p">;</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// Group.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Group</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"group"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">users</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./User"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"group.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"user.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">permissions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Permission"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"group.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"permission.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Group</span><span class="p">;</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// Permission.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Permission</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"permission"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">users</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./User"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"permission.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"user.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">groups</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Group"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"permission.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"group.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Permission</span><span class="p">;</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// UserGroupPermission.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">UserGroupPermission</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"user_group_permission"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="s2">"user_id"</span><span class="p">,</span> <span class="s2">"group_id"</span><span class="p">,</span> <span class="s2">"permission_id"</span><span class="p">];</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./User"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span><span class="p">,</span>
+          <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"user.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">group</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Group"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span><span class="p">,</span>
+          <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"group.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">permission</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Permission"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span><span class="p">,</span>
+          <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"permission.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">UserGroupPermission</span><span class="p">;</span>
+</code></pre>
+<p>Here&rsquo;s how you can query your models:</p>
+
+<ul>
+<li><code class="prettyprint">.*JoinRelation()</code></li>
+</ul>
+<pre class="highlight javascript"><code><span class="nx">UserGroupPermission</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span>
+    <span class="s2">"first_name"</span><span class="p">,</span>
+    <span class="s2">"last_name"</span><span class="p">,</span>
+    <span class="s2">"label"</span><span class="p">,</span>
+    <span class="s2">"extra_attribute"</span>
+  <span class="p">)</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s2">"[user, permission]"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s2">"group_id"</span><span class="p">,</span> <span class="s2">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span><span class="p">);</span>
+<span class="cm">/* 
+{
+  first_name: ... ,
+  last_name: ... ,
+  label: ... ,
+  extra_attribute: ...
+}
+*/</span>
+</code></pre>
+<ul>
+<li><code class="prettyprint">.eager()</code></li>
+</ul>
+<pre class="highlight javascript"><code><span class="nx">UserGroupPermission</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s2">"[user, permission]"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s2">"group_id"</span><span class="p">,</span> <span class="s2">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span><span class="p">);</span>
+<span class="cm">/* 
+{
+  user: {
+    first_name: ... ,
+    last_name: ...
+  },
+  group: {
+    name: ...
+  },
+  permission: {
+    label: ...
+  },
+  extra_attribute: ...
+}
+*/</span>
+</code></pre>
+<p>Read more about ternary relationships on <a href="https://github.com/Vincit/objection.js/issues/179">this issue</a>.</p>
+
       </div>
       <div class="dark-box">
       </div>

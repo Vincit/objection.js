@@ -53,7 +53,7 @@ are supported by objection.js. <strong>SQLite3</strong>, <strong>Postgres</stron
 <ul>
 <li><strong>An easy declarative way of <a href="#models">defining models</a> and relationships between them</strong></li>
 <li><strong>Simple and fun way to <a href="#query-examples">fetch, insert, update and delete</a> objects using the full power of SQL</strong></li>
-<li><strong>Powerful mechanisms for <a href="#eager-loading">eager loading</a> and <a href="#graph-inserts">inserting object graphs</a></strong></li>
+<li><strong>Powerful mechanisms for <a href="#eager-loading">eager loading</a>, <a href="#graph-inserts">inserting</a> and <a href="#graph-upserts">upserting</a> object graphs</strong></li>
 <li><strong>A way to <a href="#documents">store complex documents</a> as single rows</strong></li>
 <li><strong>Completely <a href="https://github.com/petkaantonov/bluebird">Promise</a> based API</strong></li>
 <li><strong>Easy to use <a href="#transactions">transactions</a></strong></li>
@@ -1044,7 +1044,192 @@ works like <a href="#allowinsert"><code class="prettyprint">allowEager</code></a
 be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all
 inserted rows and not just the first or the last one.</p>
 
+<p><code class="prettyprint">insertGraph</code> operation is <strong>not</strong> atomic by default! You need to start a transaction and pass it to the query using any
+of the supported ways. See the section about <a href="#transactions">transactions</a> for more information.</p>
+
 <p>You can read more about graph inserts from <a href="https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/">this blog post</a>.</p>
+
+<h1 id="graph-upserts">Graph upserts</h1>
+
+<blockquote>
+<p>For the following examples, assume this is the content of the database:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="p">[{</span>
+  <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+  <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+  <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Aniston'</span><span class="p">,</span>
+
+  <span class="c1">// This is a BelongsToOneRelation</span>
+  <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Nancy'</span><span class="p">,</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Dow'</span>
+  <span class="p">},</span>
+
+  <span class="c1">// This is a HasManyRelation</span>
+  <span class="na">pets</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="s1">'Doggo'</span><span class="p">,</span>
+    <span class="na">species</span><span class="p">:</span> <span class="s1">'Dog'</span><span class="p">,</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="s1">'Kat'</span><span class="p">,</span>
+    <span class="na">species</span><span class="p">:</span> <span class="s1">'Cat'</span><span class="p">,</span>
+  <span class="p">}],</span>
+
+  <span class="c1">// This is a ManyToManyRelation</span>
+  <span class="na">movies</span><span class="p">:</span> <span class="p">[{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span> <span class="s1">'Horrible Bosses'</span><span class="p">,</span>
+
+    <span class="na">reviews</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="na">title</span><span class="p">:</span> <span class="s1">'Meh'</span><span class="p">,</span>
+      <span class="na">stars</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+      <span class="na">text</span><span class="p">:</span> <span class="s1">'Meh'</span>
+    <span class="p">}]</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">2</span>
+    <span class="na">name</span><span class="p">:</span> <span class="s1">'Wanderlust'</span><span class="p">,</span>
+
+    <span class="na">reviews</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="na">title</span><span class="p">:</span> <span class="s1">'Brilliant'</span><span class="p">,</span>
+      <span class="na">stars</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+      <span class="na">text</span><span class="p">:</span> <span class="s1">'Makes me want to travel'</span>
+    <span class="p">}]</span>
+  <span class="p">}]</span>
+<span class="p">}]</span>
+</code></pre>
+<blockquote>
+<p>By default <code class="prettyprint">upsertGraph</code> method updates the objects that have an id, inserts objects that don&rsquo;t have an id and deletes
+all objects that are not present. Off course the delete only applies to relations and not the root. Here&rsquo;s a basic example:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">upsertGraph</span><span class="p">({</span>
+    <span class="c1">// This updates the `Jennifer Aniston` person since the id property is present.</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jonnifer'</span><span class="p">,</span>
+
+    <span class="na">parent</span><span class="p">:</span> <span class="p">{</span>
+      <span class="c1">// This also gets updated since the id property is present. If no id was given</span>
+      <span class="c1">// here, Nancy Dow would get deleted, a new Person John Aniston would</span>
+      <span class="c1">// get inserted and related to Jennifer.</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+      <span class="na">firstName</span><span class="p">:</span> <span class="s1">'John'</span><span class="p">,</span>
+      <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Aniston'</span>
+    <span class="p">},</span>
+
+    <span class="c1">// Notice that Kat the Cat is not listed in `pets`. It will get deleted.</span>
+    <span class="na">pets</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="c1">// Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice</span>
+      <span class="c1">// that there is no id!</span>
+      <span class="na">name</span><span class="p">:</span> <span class="s1">'Wolfgang'</span><span class="p">,</span>
+      <span class="na">species</span><span class="p">:</span> <span class="s1">'Dog'</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="c1">// It turns out Doggo is a cat. Update it.</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="na">species</span><span class="p">:</span> <span class="s1">'Cat'</span><span class="p">,</span>
+    <span class="p">}],</span>
+
+    <span class="c1">// Notice that Wanderlust is missing from the list. It will get deleted.</span>
+    <span class="c1">// It is also worth mentioning that the Wanderlust's `reviews` or any</span>
+    <span class="c1">// other relations are __not__ recursively deleted (unless you have</span>
+    <span class="c1">// defined `ON DELETE CASCADE` or other hooks in the db).</span>
+    <span class="na">movies</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+
+      <span class="c1">// Upsert graphs can be arbitrarily deep.</span>
+      <span class="na">reviews</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="c1">// Update a review.</span>
+        <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="na">stars</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="s1">'Even more Meh'</span>
+      <span class="p">},</span> <span class="p">{</span>
+        <span class="c1">// And insert another one.</span>
+        <span class="na">stars</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="na">title</span><span class="p">:</span> <span class="s1">'Loved it'</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="s1">'Best movie ever'</span>
+      <span class="p">},</span> <span class="p">{</span>
+        <span class="c1">// And insert a third one.</span>
+        <span class="na">stars</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="na">title</span><span class="p">:</span> <span class="s1">'4 / 5'</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="s1">'Would see again'</span>
+      <span class="p">}]</span>
+    <span class="p">}]</span>
+  <span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>By giving <code class="prettyprint">relate: true</code> and/or <code class="prettyprint">unrelate: true</code> options as the second argument, you can change the behaviour so that instead of
+inserting and deleting rows, they are related and/or unrelated. Rows with no id still get inserted, but rows that have an id and
+are not currently related, get related.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">relate</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="na">unrelate</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">};</span>
+
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">upsertGraph</span><span class="p">({</span>
+    <span class="c1">// This updates the `Jennifer Aniston` person since the id property is present.</span>
+    <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jonnifer'</span><span class="p">,</span>
+
+    <span class="c1">// Unrelate the parent. This doesn't delete it.</span>
+    <span class="na">parent</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+
+    <span class="c1">// Notice that Kat the Cat is not listed in `pets`. It will get unrelated.</span>
+    <span class="na">pets</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="c1">// Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice</span>
+      <span class="c1">// that there is no id!</span>
+      <span class="na">name</span><span class="p">:</span> <span class="s1">'Wolfgang'</span><span class="p">,</span>
+      <span class="na">species</span><span class="p">:</span> <span class="s1">'Dog'</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="c1">// It turns out Doggo is a cat. Update it.</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="na">species</span><span class="p">:</span> <span class="s1">'Cat'</span><span class="p">,</span>
+    <span class="p">}],</span>
+
+    <span class="c1">// Notice that Wanderlust is missing from the list. It will get unrelated.</span>
+    <span class="na">movies</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+
+      <span class="c1">// Upsert graphs can be arbitrarily deep.</span>
+      <span class="na">reviews</span><span class="p">:</span> <span class="p">[{</span>
+        <span class="c1">// Update a review.</span>
+        <span class="na">id</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="na">stars</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="s1">'Even more Meh'</span>
+      <span class="p">},</span> <span class="p">{</span>
+        <span class="c1">// And insert another one.</span>
+        <span class="na">stars</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="na">title</span><span class="p">:</span> <span class="s1">'Loved it'</span><span class="p">,</span>
+        <span class="na">text</span><span class="p">:</span> <span class="s1">'Best movie ever'</span>
+      <span class="p">}]</span>
+    <span class="p">},</span> <span class="p">{</span>
+      <span class="c1">// This is some existing movie that isn't currently related to Jennifer.</span>
+      <span class="c1">// It will get related.</span>
+      <span class="na">id</span><span class="p">:</span> <span class="mi">1253</span>
+    <span class="p">}]</span>
+  <span class="p">},</span> <span class="nx">options</span><span class="p">);</span>
+</code></pre>
+<p>Arbitrary relation graphs can be upserted (insert + update + delete) using the <a href="#upsertgraph"><code class="prettyprint">upsertGraph</code></a> method. This is best explained using
+examples, so check them out ➔.</p>
+
+<p>The <code class="prettyprint">upsertGraph</code> method works a little different than the other update and patch methods. When using <code class="prettyprint">upsertGraph</code> any <code class="prettyprint">where</code> or <code class="prettyprint">having</code> method
+is ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.</p>
+
+<p><code class="prettyprint">upsertGraph</code> uses <code class="prettyprint">insertGraph</code> under the hood for inserts. That means that you can insert object graphs for relations and use all <code class="prettyprint">insertGraph</code>
+features like <code class="prettyprint">#ref</code> references.</p>
+
+<p><code class="prettyprint">upsertGraph</code> operation is <strong>not</strong> atomic by default! You need to start a transaction and pass it to the query using any
+of the supported ways. See the section about <a href="#transactions">transactions</a> for more information.</p>
+
+<p>See the <a href="#allowupsert"><code class="prettyprint">allowUpsert</code></a> method if you need to limit  which relations can be modified using
+<a href="#upsertgraph"><code class="prettyprint">upsertGraph</code></a> method to avoid security issues. <a href="#allowupsert"><code class="prettyprint">allowUpsert</code></a>
+works like <a href="#allowinsert"><code class="prettyprint">allowEager</code></a>.</p>
 
 <h1 id="transactions">Transactions</h1>
 
@@ -2177,6 +2362,222 @@ class.</p>
  <span class="k">Index</span> <span class="n">Scan</span> <span class="k">using</span> <span class="nv">"Hero_expr_idx"</span> <span class="k">on</span> <span class="nv">"Hero"</span>
    <span class="k">Index</span> <span class="n">Cond</span><span class="p">:</span> <span class="p">((</span><span class="n">details</span> <span class="o">#&gt;&gt;</span> <span class="s1">'{type}'</span><span class="p">::</span><span class="n">text</span><span class="p">[])</span> <span class="o">=</span> <span class="s1">'Hero'</span><span class="p">::</span><span class="n">text</span><span class="p">)</span>
 </code></pre>
+<h2 id="ternary-relationships">Ternary relationships</h2>
+
+<p>Assume we have the following Models:</p>
+
+<ol>
+<li>user <code class="prettyprint">(id, first_name, last_name)</code></li>
+<li>group <code class="prettyprint">(id, name)</code></li>
+<li>permission <code class="prettyprint">(id, label)</code></li>
+<li>user_group_permission <code class="prettyprint">(user_id, group_id, permission_id, extra_attribute)</code></li>
+</ol>
+
+<p>Here&rsquo;s how you could create your models:</p>
+<pre class="highlight javascript"><code><span class="c1">// User.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">User</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"user"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">groups</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Group"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"group.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">permissions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Permission"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"permission.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">User</span><span class="p">;</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// Group.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Group</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"group"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">users</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./User"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"group.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"user.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">permissions</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Permission"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"group.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"permission.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Group</span><span class="p">;</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// Permission.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Permission</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"permission"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">users</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./User"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"permission.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"user.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">groups</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Group"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"permission.id"</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span><span class="p">,</span>
+            <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"group.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Permission</span><span class="p">;</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// UserGroupPermission.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"objection"</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">UserGroupPermission</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">"user_group_permission"</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[</span><span class="s2">"user_id"</span><span class="p">,</span> <span class="s2">"group_id"</span><span class="p">,</span> <span class="s2">"permission_id"</span><span class="p">];</span> <span class="p">}</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">user</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./User"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.user_id"</span><span class="p">,</span>
+          <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"user.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">group</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Group"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.group_id"</span><span class="p">,</span>
+          <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"group.id"</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="na">permission</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"./Permission"</span><span class="p">),</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s2">"user_group_permission.permission_id"</span><span class="p">,</span>
+          <span class="na">extra</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extra_attribute"</span><span class="p">],</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s2">"permission.id"</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">UserGroupPermission</span><span class="p">;</span>
+</code></pre>
+<p>Here&rsquo;s how you can query your models:</p>
+
+<ul>
+<li><code class="prettyprint">.*JoinRelation()</code></li>
+</ul>
+<pre class="highlight javascript"><code><span class="nx">UserGroupPermission</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span>
+    <span class="s2">"first_name"</span><span class="p">,</span>
+    <span class="s2">"last_name"</span><span class="p">,</span>
+    <span class="s2">"label"</span><span class="p">,</span>
+    <span class="s2">"extra_attribute"</span>
+  <span class="p">)</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s2">"[user, permission]"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s2">"group_id"</span><span class="p">,</span> <span class="s2">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span><span class="p">);</span>
+<span class="cm">/* 
+{
+  first_name: ... ,
+  last_name: ... ,
+  label: ... ,
+  extra_attribute: ...
+}
+*/</span>
+</code></pre>
+<ul>
+<li><code class="prettyprint">.eager()</code></li>
+</ul>
+<pre class="highlight javascript"><code><span class="nx">UserGroupPermission</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s2">"[user, permission]"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s2">"group_id"</span><span class="p">,</span> <span class="s2">"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"</span><span class="p">);</span>
+<span class="cm">/* 
+{
+  user: {
+    first_name: ... ,
+    last_name: ...
+  },
+  group: {
+    name: ...
+  },
+  permission: {
+    label: ...
+  },
+  extra_attribute: ...
+}
+*/</span>
+</code></pre>
+<p>Read more about ternary relationships on <a href="https://github.com/Vincit/objection.js/issues/179">this issue</a>.</p>
+
           <h1 id="api-reference">API reference</h1>
 
 <h2 id="querybuilder">QueryBuilder</h2>
@@ -2867,6 +3268,40 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 <td>modelOrObject</td>
 <td>Object&#124;<a href="#model"><code class="prettyprint">Model</code></a></td>
 <td>The update object</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="upsertgraph">upsertGraph</h4>
+
+<p>See the <a href="#graph-upserts">section about graph upserts</a></p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>graph</td>
+<td>Object&#124;<a href="#model"><code class="prettyprint">Model</code></a>&#124;Array.&lt;Object&gt;&#124;Array.&lt;<a href="#model"><code class="prettyprint">Model</code></a>&gt;</td>
+<td>Graph to upsert.</td>
 </tr>
 </tbody></table>
 
@@ -5944,6 +6379,8 @@ because they will be applied on a query that fetches relations for multiple pare
 in the root query (see the last example). The related tables can be referred using the relation name. Nested relations
 must be separated by <code class="prettyprint">:</code> character (dot is not used because of the way knex parses identifiers).</p>
 
+<p>When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.</p>
+
 <p>Limitations:</p>
 
 <ul>
@@ -6262,6 +6699,10 @@ section about <a href="#eager-queries">eager queries</a> for more information on
 <td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
+
+<h4 id="allowupsert">allowUpsert</h4>
+
+<p>Just like <a href="#allowinsert"><code class="prettyprint">allowInsert</code></a> but this one works with <a href="#upsertgraph"><code class="prettyprint">upsertGraph</code></a>.</p>
 
 <h4 id="modelclass">modelClass</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">modelClass</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">modelClass</span><span class="p">();</span>
@@ -10507,6 +10948,16 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-8-6">0.8.6</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Finally: the first version of <a href="#graph-upserts"><code class="prettyprint">upsertGraph</code></a> method! Please open issues about bugs, WTFs and missing features.</li>
+<li>Strip readonly virtual properties in fromJson &amp; friends <a href="https://github.com/Vincit/objection.js/issues/432">#432</a></li>
+<li>Fixed <a href="https://github.com/Vincit/objection.js/issues/439">#439</a></li>
+</ul>
 
 <h2 id="0-8-5">0.8.5</h2>
 

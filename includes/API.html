@@ -735,6 +735,40 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 </tr>
 </tbody></table>
 
+<h4 id="upsertgraph">upsertGraph</h4>
+
+<p>See the <a href="#graph-upserts">section about graph upserts</a></p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>graph</td>
+<td>Object&#124;<a href="#model"><code class="prettyprint">Model</code></a>&#124;Array.&lt;Object&gt;&#124;Array.&lt;<a href="#model"><code class="prettyprint">Model</code></a>&gt;</td>
+<td>Graph to upsert.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="patch">patch</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">patch</span><span class="p">(</span><span class="nx">modelOrObject</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
@@ -3795,6 +3829,8 @@ because they will be applied on a query that fetches relations for multiple pare
 in the root query (see the last example). The related tables can be referred using the relation name. Nested relations
 must be separated by <code class="prettyprint">:</code> character (dot is not used because of the way knex parses identifiers).</p>
 
+<p>When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.</p>
+
 <p>Limitations:</p>
 
 <ul>
@@ -4113,6 +4149,10 @@ section about <a href="#eager-queries">eager queries</a> for more information on
 <td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
+
+<h4 id="allowupsert">allowUpsert</h4>
+
+<p>Just like <a href="#allowinsert"><code class="prettyprint">allowInsert</code></a> but this one works with <a href="#upsertgraph"><code class="prettyprint">upsertGraph</code></a>.</p>
 
 <h4 id="modelclass">modelClass</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">modelClass</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">modelClass</span><span class="p">();</span>
