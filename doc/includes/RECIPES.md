@@ -800,7 +800,7 @@ class User extends Model {
     return {
       groups: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("Group"),
+        modelClass: require("./Group"),
         join: {
           from: "user.id",
           through: {
@@ -813,7 +813,7 @@ class User extends Model {
       },
       permissions: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("Permission"),
+        modelClass: require("./Permission"),
         join: {
           from: "user.id",
           through: {
@@ -841,7 +841,7 @@ class Group extends Model {
     return {
       users: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("User"),
+        modelClass: require("./User"),
         join: {
           from: "group.id",
           through: {
@@ -854,7 +854,7 @@ class Group extends Model {
       },
       permissions: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("Permission"),
+        modelClass: require("./Permission"),
         join: {
           from: "group.id",
           through: {
@@ -882,7 +882,7 @@ class Permission extends Model {
     return {
       users: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("User"),
+        modelClass: require("./User"),
         join: {
           from: "permission.id",
           through: {
@@ -895,7 +895,7 @@ class Permission extends Model {
       },
       groups: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("Group"),
+        modelClass: require("./Group"),
         join: {
           from: "permission.id",
           through: {
@@ -924,7 +924,7 @@ class UserGroupPermission extends Model {
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require("User"),
+        modelClass: require("./User"),
         join: {
           from: "user_group_permission.user_id",
           extra: ["extra_attribute"],
@@ -933,7 +933,7 @@ class UserGroupPermission extends Model {
       },
       group: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require("Group"),
+        modelClass: require("./Group"),
         join: {
           from: "user_group_permission.group_id",
           extra: ["extra_attribute"],
@@ -942,7 +942,7 @@ class UserGroupPermission extends Model {
       },
       permission: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require("Permission"),
+        modelClass: require("./Permission"),
         join: {
           from: "user_group_permission.permission_id",
           extra: ["extra_attribute"],
@@ -969,8 +969,7 @@ UserGroupPermission
     "label",
     "extra_attribute"
   )
-  .joinRelation("user")
-  .joinRelation("permission")
+  .joinRelation("[user, permission]")
   .where("group_id", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
 /* 
 {
