@@ -300,6 +300,22 @@ module.exports = (session) => {
             .catch(done);
         });
 
+        it('.throwIfNotFound() with result equal to 0', (done) => {
+          Model1
+            .query()
+            .where('model1Prop1', 'There is no value like me')
+            .delete()
+            .throwIfNotFound()
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err).to.be.a(Model1.NotFoundError);
+              done();
+            })
+            .catch(done);
+        });
+
         it('.throwIfNotFound() should throw error returned by `createNotFoundError`', (done) => {
           class CustomError extends Error {
             constructor(ctx) {
