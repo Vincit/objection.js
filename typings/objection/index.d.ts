@@ -357,24 +357,15 @@ declare namespace Objection {
     insertWithRelated: Insert<T>;
     insertWithRelatedAndFetch: InsertGraphAndFetch<T>;
 
-    /**
-     * @return a Promise of the number of updated rows
-     */
-    update(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
+    update(modelOrObject: Partial<T>): QueryBuilder<T>;
     updateAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
     updateAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
-    /**
-     * @return a Promise of the number of patched rows
-     */
-    patch(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
+    patch(modelOrObject: Partial<T>): QueryBuilder<T>;
     patchAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
     patchAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
-    /**
-     * @return a Promise of the number of deleted rows
-     */
-    deleteById(idOrIds: IdOrIds): QueryBuilderSingle<number>;
+    deleteById(idOrIds: IdOrIds): QueryBuilderSingle<T>;
 
     relate<M extends Model>(ids: IdOrIds | Partial<M> | Partial<M>[]): this;
     unrelate(): this;
