@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.6
+
+### What's new
+
+  * Finally: the first version of [`upsertGraph`](#graph-upserts) method! Please open issues about bugs, WTFs and missing features.
+  * Strip readonly virtual properties in fromJson & friends [#432](https://github.com/Vincit/objection.js/issues/432)
+  * Fixed [#439](https://github.com/Vincit/objection.js/issues/439)
+
 ## 0.8.5
 
 ### What's new
