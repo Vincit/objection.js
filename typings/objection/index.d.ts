@@ -334,6 +334,12 @@ declare namespace Objection {
     (): this;
   }
 
+  interface Upsert<T> {
+    (modelsOrObjects?: Array<Partial<T>>): QueryBuilder<T>;
+    (modelOrObject?: Partial<T>): QueryBuilderSingle<T>;
+    (): this;
+  }
+
   interface InsertGraphAndFetch<T> {
     (modelsOrObjects?: Partial<T>): QueryBuilderSingle<T>;
     (modelsOrObjects?: Partial<T>[]): QueryBuilder<T>;
@@ -343,6 +349,7 @@ declare namespace Objection {
 
     findById(id: Id): QueryBuilderOption<T>;
     findById(idOrIds: IdOrIds): this;
+    findOne(where: object): QueryBuilderOption<T>;
 
     insert: Insert<T>;
     insertAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
@@ -370,6 +377,8 @@ declare namespace Objection {
     patch(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
     patchAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
     patchAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
+
+    upsertGraph: Upsert<T>;
 
     /**
      * @return a Promise of the number of deleted rows
@@ -461,13 +470,22 @@ declare namespace Objection {
     runAfter(fn: (builder: this) => void): this;
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
+
     eager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+    mergeEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+
+    joinEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+    mergeJoinEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+
+    naiveEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+    mergeNaiveEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
 
     allowEager: RelationExpressionMethod;
     modifyEager: ModifyEager<T>;
     filterEager: ModifyEager<T>;
 
     allowInsert: RelationExpressionMethod;
+    allowUpsert: RelationExpressionMethod;
 
     modelClass(): typeof Model;
 

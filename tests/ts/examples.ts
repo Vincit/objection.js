@@ -22,11 +22,15 @@ class Person extends objection.Model {
   }
 
   static async firstWithLastName(lastName: string): Promise<Person | undefined> {
-    return this.query().where('lastName', lastName).first()
+    return this.query().where({lastName: lastName}).first()
   }
 
   static async findById(id: number): Promise<Person | undefined> {
     return this.query().findById(id)
+  }
+
+  static async findWithFirstName(firstname: string): Promise<Person | undefined> {
+    return this.query().findOne({firstName: firstname})
   }
 
   async loadMovies(): Promise<this> {
