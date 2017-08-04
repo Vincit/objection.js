@@ -894,8 +894,6 @@ module.exports = (session) => {
     // tests TODO:
     // 
     // * composite keys
-    // * with and without foreign keys in the input graph
-    // * works if id is generated in beforeInsert
 
   });
 

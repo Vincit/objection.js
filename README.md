@@ -13,7 +13,7 @@ What objection.js gives you:
 
  * **An easy declarative way of [defining models](http://vincit.github.io/objection.js/#models) and relationships between them**
  * **Simple and fun way to [fetch, insert, update and delete](http://vincit.github.io/objection.js/#query-examples) objects using the full power of SQL**
- * **Powerful mechanisms for [eager loading](http://vincit.github.io/objection.js/#eager-loading) and [inserting object graphs](http://vincit.github.io/objection.js/#graph-inserts)**
+ * **Powerful mechanisms for [eager loading](http://vincit.github.io/objection.js/#eager-loading), [inserting](http://vincit.github.io/objection.js/#graph-inserts) and [upserting](http://vincit.github.io/objection.js/#graph-upserts) object graphs**
  * **A way to [store complex documents](http://vincit.github.io/objection.js/#documents) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
  * **Easy to use [transactions](http://vincit.github.io/objection.js/#transactions)**

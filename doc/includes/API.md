@@ -655,6 +655,26 @@ Type|Description
 
 
 
+#### upsertGraph
+
+See the [section about graph upserts](#graph-upserts)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+graph|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Graph to upsert.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+
 #### patch
 
 ```js
@@ -3444,6 +3464,11 @@ Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
 
+
+
+#### allowUpsert
+
+Just like [`allowInsert`](#allowinsert) but this one works with [`upsertGraph`](#upsertgraph).
 
 
 

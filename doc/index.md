@@ -29,7 +29,7 @@ What objection.js gives you:
 
  * **An easy declarative way of [defining models](#models) and relationships between them**
  * **Simple and fun way to [fetch, insert, update and delete](#query-examples) objects using the full power of SQL**
- * **Powerful mechanisms for [eager loading](#eager-loading) and [inserting object graphs](#graph-inserts)**
+ * **Powerful mechanisms for [eager loading](#eager-loading), [inserting](#graph-inserts) and [upserting](#graph-upserts) object graphs**
  * **A way to [store complex documents](#documents) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
  * **Easy to use [transactions](#transactions)**
@@ -1091,7 +1091,195 @@ If you are using Postgres the inserts are done in batches for maximum performanc
 be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all
 inserted rows and not just the first or the last one.
 
+`insertGraph` operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any
+of the supported ways. See the section about [transactions](#transactions) for more information.
+
 You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
+
+# Graph upserts
+
+> For the following examples, assume this is the content of the database:
+
+```js
+[{
+  id: 1,
+  firstName: 'Jennifer',
+  lastName: 'Aniston',
+
+  // This is a BelongsToOneRelation
+  parent: {
+    id: 2,
+    firstName: 'Nancy',
+    lastName: 'Dow'
+  },
+
+  // This is a HasManyRelation
+  pets: [{
+    id: 1,
+    name: 'Doggo',
+    species: 'Dog',
+  }, {
+    id: 2,
+    name: 'Kat',
+    species: 'Cat',
+  }],
+
+  // This is a ManyToManyRelation
+  movies: [{
+    id: 1,
+    name: 'Horrible Bosses',
+
+    reviews: [{
+      id: 1,
+      title: 'Meh',
+      stars: 3,
+      text: 'Meh'
+    }]
+  }, {
+    id: 2
+    name: 'Wanderlust',
+
+    reviews: [{
+      id: 2,
+      title: 'Brilliant',
+      stars: 5,
+      text: 'Makes me want to travel'
+    }]
+  }]
+}]
+```
+
+> By default `upsertGraph` method updates the objects that have an id, inserts objects that don't have an id and deletes
+> all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
+
+```js
+Person
+  .query()
+  .upsertGraph({
+    // This updates the `Jennifer Aniston` person since the id property is present.
+    id: 1,
+    firstName: 'Jonnifer',
+
+    parent: {
+      // This also gets updated since the id property is present. If no id was given
+      // here, Nancy Dow would get deleted, a new Person John Aniston would
+      // get inserted and related to Jennifer.
+      id: 2,
+      firstName: 'John',
+      lastName: 'Aniston'
+    },
+
+    // Notice that Kat the Cat is not listed in `pets`. It will get deleted.
+    pets: [{
+      // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
+      // that there is no id!
+      name: 'Wolfgang',
+      species: 'Dog'
+    }, {
+      // It turns out Doggo is a cat. Update it.
+      id: 1,
+      species: 'Cat',
+    }],
+
+    // Notice that Wanderlust is missing from the list. It will get deleted.
+    // It is also worth mentioning that the Wanderlust's `reviews` or any
+    // other relations are __not__ recursively deleted (unless you have
+    // defined `ON DELETE CASCADE` or other hooks in the db).
+    movies: [{
+      id: 1,
+
+      // Upsert graphs can be arbitrarily deep.
+      reviews: [{
+        // Update a review.
+        id: 1,
+        stars: 2,
+        text: 'Even more Meh'
+      }, {
+        // And insert another one.
+        stars: 5,
+        title: 'Loved it',
+        text: 'Best movie ever'
+      }, {
+        // And insert a third one.
+        stars: 4,
+        title: '4 / 5',
+        text: 'Would see again'
+      }]
+    }]
+  });
+```
+
+> By giving `relate: true` and/or `unrelate: true` options as the second argument, you can change the behaviour so that instead of
+> inserting and deleting rows, they are related and/or unrelated. Rows with no id still get inserted, but rows that have an id and
+> are not currently related, get related.
+
+```js
+const options = {
+  relate: true,
+  unrelate: true
+};
+
+Person
+  .query()
+  .upsertGraph({
+    // This updates the `Jennifer Aniston` person since the id property is present.
+    id: 1,
+    firstName: 'Jonnifer',
+
+    // Unrelate the parent. This doesn't delete it.
+    parent: null,
+
+    // Notice that Kat the Cat is not listed in `pets`. It will get unrelated.
+    pets: [{
+      // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
+      // that there is no id!
+      name: 'Wolfgang',
+      species: 'Dog'
+    }, {
+      // It turns out Doggo is a cat. Update it.
+      id: 1,
+      species: 'Cat',
+    }],
+
+    // Notice that Wanderlust is missing from the list. It will get unrelated.
+    movies: [{
+      id: 1,
+
+      // Upsert graphs can be arbitrarily deep.
+      reviews: [{
+        // Update a review.
+        id: 1,
+        stars: 2,
+        text: 'Even more Meh'
+      }, {
+        // And insert another one.
+        stars: 5,
+        title: 'Loved it',
+        text: 'Best movie ever'
+      }]
+    }, {
+      // This is some existing movie that isn't currently related to Jennifer.
+      // It will get related.
+      id: 1253
+    }]
+  }, options);
+```
+
+Arbitrary relation graphs can be upserted (insert + update + delete) using the [`upsertGraph`](#upsertgraph) method. This is best explained using
+examples, so check them out ➔.
+
+The `upsertGraph` method works a little different than the other update and patch methods. When using `upsertGraph` any `where` or `having` method
+is ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
+
+`upsertGraph` uses `insertGraph` under the hood for inserts. That means that you can insert object graphs for relations and use all `insertGraph`
+features like `#ref` references.
+
+`upsertGraph` operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any
+of the supported ways. See the section about [transactions](#transactions) for more information.
+
+See the [`allowUpsert`](#allowupsert) method if you need to limit  which relations can be modified using
+[`upsertGraph`](#upsertgraph) method to avoid security issues. [`allowUpsert`](#allowupsert)
+works like [`allowEager`](#allowinsert).
 
 # Transactions
 
