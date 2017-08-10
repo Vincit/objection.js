@@ -305,6 +305,9 @@ declare namespace Objection {
     $afterInsert(queryContext: object): Promise<any> | void;
     $afterUpdate(opt: ModelOptions, queryContext: object): Promise<any> | void;
     $beforeUpdate(opt: ModelOptions, queryContext: object): Promise<any> | void;
+    $afterGet(queryContext: object): Promise<any> | void;
+    $beforeDelete(queryContext: object): Promise<any> | void;
+    $afterDelete(queryContext: object): Promise<any> | void;
   }
 
   export class QueryBuilder<T> {
