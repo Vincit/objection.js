@@ -57,6 +57,11 @@ declare namespace Objection {
     aliases?: string[];
   }
 
+  export interface QueryContext {
+    transaction: Transaction,
+    [key: string]: any 
+  }
+
   /**
    * @see http://vincit.github.io/objection.js/#fieldexpression
    */
@@ -225,8 +230,9 @@ declare namespace Objection {
     static ManyToManyRelation: Relation;
     static HasOneThroughRelation: Relation;
 
-    static JoinEagerAlgorithm: () => any;
-    static WhereInEagerAlgorithm: () => any;
+    static JoinEagerAlgorithm: EagerAlgorithm;
+    static WhereInEagerAlgorithm: EagerAlgorithm
+    static NaiveEagerAlgorithm: EagerAlgorithm;
 
     // "{ new(): T }"
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
@@ -301,13 +307,13 @@ declare namespace Objection {
     $knex(): knex;
     $transaction(): knex;
 
-    $beforeInsert(queryContext: object): Promise<any> | void;
-    $afterInsert(queryContext: object): Promise<any> | void;
-    $afterUpdate(opt: ModelOptions, queryContext: object): Promise<any> | void;
-    $beforeUpdate(opt: ModelOptions, queryContext: object): Promise<any> | void;
-    $afterGet(queryContext: object): Promise<any> | void;
-    $beforeDelete(queryContext: object): Promise<any> | void;
-    $afterDelete(queryContext: object): Promise<any> | void;
+    $beforeInsert(queryContext: QueryContext): Promise<any> | void;
+    $afterInsert(queryContext: QueryContext): Promise<any> | void;
+    $afterUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<any> | void;
+    $beforeUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<any> | void;
+    $afterGet(queryContext: QueryContext): Promise<any> | void;
+    $beforeDelete(queryContext: QueryContext): Promise<any> | void;
+    $afterDelete(queryContext: QueryContext): Promise<any> | void;
   }
 
   export class QueryBuilder<T> {
@@ -461,6 +467,7 @@ declare namespace Objection {
     // Non-query methods:
 
     context(queryContext: object): this;
+    mergeContext(queryContext: object): this;
 
     reject(reason: any): this;
     resolve(value: any): this;

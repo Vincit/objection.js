@@ -47,6 +47,10 @@ class Person extends objection.Model {
     // that we can subsequently cast to Animal:
     return pets as Animal[]
   }
+
+  async $beforeInsert(queryContext: objection.QueryContext) {
+    console.log(queryContext.someCustomValue)
+  }
 }
 
 class Movie extends objection.Model {
@@ -176,6 +180,8 @@ const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123,
 const patchedModel: Promise<Person> = Person.query().patchAndFetch({})
 const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {})
 
+const eager: Promise<Person[]> = Person.query().eagerAlgorithm(Person.NaiveEagerAlgorithm).eager('foo.bar')
+
 // non-wrapped methods:
 
 const modelFromQuery: typeof objection.Model = qb.modelClass();
@@ -201,6 +207,10 @@ qb = qb.context({
   runBefore: qbcb,
   runAfter: qbcb,
   onBuild: qbcb
+});
+
+qb = qb.mergeContext({
+  foo: 'bar'
 });
 
 qb = qb.runBefore(qbcb);
