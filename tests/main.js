@@ -26,6 +26,9 @@ describe('main module', () => {
     expect(objection.Promise).to.equal(require('bluebird'));
     expect(objection.Validator).to.equal(require('../lib/model/Validator'));
     expect(objection.AjvValidator).to.equal(require('../lib/model/AjvValidator'));
+    expect(objection.mixin).to.equal(require('../lib/utils/mixin').mixin);
+    expect(objection.compose).to.equal(require('../lib/utils/mixin').compose);
+    expect(objection.lodash).to.equal(require('lodash'));
   });
 
 });

@@ -216,7 +216,7 @@ class Person extends Model {
 
   // This is called when an object is read from database.
   $parseDatabaseJson(json) {
-    json = _.mapKeys(json, function (value, key) {
+    json = _.mapKeys(json, (value, key) => {
       return camelCase(key);
     });
 
@@ -711,9 +711,9 @@ Complete example how to try out different index choices.
 > Migration:
 
 ```js
-exports.up = function (knex) {
+exports.up = (knex) => {
   return knex.schema
-    .createTable('Hero', function (table) {
+    .createTable('Hero', (table) => {
       table.increments('id').primary();
       table.string('name');
       table.jsonb('details');
@@ -728,7 +728,7 @@ exports.up = function (knex) {
       "CREATE INDEX on ?? ((??#>>'{type}'))",
       ['Hero', 'details']
     )
-    .createTable('Place', function (table) {
+    .createTable('Place', (table) => {
       table.increments('id').primary();
       table.string('name');
       table.jsonb('details');

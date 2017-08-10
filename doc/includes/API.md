@@ -1,5 +1,51 @@
 # API reference
 
+## The main module
+
+```js
+const mainModule = require('objection');
+const { Model, ref } = require('objection');
+```
+
+The main module is what you get when you import objection. It has a bunch of fields that are all
+documented elsewhere in the API docs. Here's a list of the fields and links to their docs.
+
+### Fields
+
+<h4 id="objection-model">Model</h4>
+
+[The model base class.](#model)
+
+<h4 id="objection-transaction">transaction</h4>
+
+[The transaction function.](#transactions)
+
+<h4 id="objection-ref">ref</h4>
+
+[The ref helper function.](#ref)
+
+<h4 id="objection-raw">raw</h4>
+
+[The raw helper function.](#raw)
+
+<h4 id="objection-mixin">mixin</h4>
+
+[The mixin helper](#plugins) for applying plugins. See the examples behind this link.
+
+<h4 id="objection-compose">compose</h4>
+
+[The compose helper](#plugins) for applying plugins. See the examples behind this link.
+
+<h4 id="objection-lodash">lodash</h4>
+
+[Lodash utility library](https://lodash.com/) used in objection. Useful for plugin developers so that
+they don't have to add it as a dependency.
+
+<h4 id="objection-promise">Promise</h4>
+
+[Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used in objection. Useful for plugin developers so that
+they don't have to add it as a dependency.
+
 ## QueryBuilder
 
 Query builder for Models.

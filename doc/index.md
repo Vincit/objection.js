@@ -1601,9 +1601,10 @@ create a pull request or an issue to get it added to this list.
 
 ```js
 function SomeMixin(Model) {
-  return SomeExtendedModel extends Model {
+  // The returned class should have no name.
+  return class extends Model {
     // Your modifications.
-  }
+  };
 }
 ```
 
@@ -1619,6 +1620,48 @@ class Person extends SomeMixin(Model) {
 
 ```js
 class Person extends SomeMixin(SomeOtherMixin(Model)) {
+
+}
+```
+
+> There are a couple of helpers in objection main module for applying multiple mixins.
+
+```js
+const { mixin, Model } = require('objection');
+
+class Person extends mixin(Model, [
+  SomeMixin, 
+  SomeOtherMixin,
+  EvenMoreMixins,
+  LolSoManyMixins,
+  ImAMixinWithOptions({foo: 'bar'})
+]) {
+
+}
+```
+
+```js
+const { compose, Model } = require('objection');
+
+const mixins = compose(
+  SomeMixin, 
+  SomeOtherMixin,
+  EvenMoreMixins,
+  LolSoManyMixins,
+  ImAMixinWithOptions({foo: 'bar'})
+);
+
+class Person extends mixins(Model) {
+
+}
+```
+
+> Mixins can also be used as decorators:
+
+```js
+@SomeMixin
+@MixinWithOptions({foo: 'bar'})
+class Person extends Model {
 
 }
 ```

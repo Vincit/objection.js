@@ -1147,6 +1147,7 @@ module.exports = (session) => {
               expect(_.filter(rows, {model1Id: inserted.id, model2Id: parent.idCol})).to.have.length(1);
             });
         });
+
       });
 
     });

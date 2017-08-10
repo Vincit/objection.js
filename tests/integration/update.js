@@ -315,7 +315,7 @@ module.exports = (session) => {
       });
 
       it('should update a model (1)', () => {
-        let model = Model1.fromJson({id: 1});
+        const model = Model1.fromJson({id: 1});
 
         return model
           .$query()
@@ -333,7 +333,7 @@ module.exports = (session) => {
       });
 
       it('should update a model (2)', () => {
-        let model = Model1.fromJson({id: 1, model1Prop1: 'updated text'});
+        const model = Model1.fromJson({id: 1, model1Prop1: 'updated text'});
 
         return model
           .$query()

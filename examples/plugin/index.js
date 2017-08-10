@@ -24,7 +24,11 @@ module.exports = (Model) => {
     }
   }
 
-  class SessionModel extends Model {
+  // A Plugin always needs to return the extended model class.
+  //
+  // IMPORTANT: Don't give a name for the returned class! This way the returned
+  // class inherits the super class's name (starting from node 8).
+  return class extends Model {
 
     // Make our model use the extended QueryBuilder.
     static get QueryBuilder() {
@@ -58,8 +62,5 @@ module.exports = (Model) => {
         }
       });
     }
-  }
-
-  // A Plugin always needs to return the extended model class.
-  return SessionModel;
+  };
 };
