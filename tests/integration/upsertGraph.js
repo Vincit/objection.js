@@ -690,8 +690,11 @@ module.exports = (session) => {
       before(() => {
         Model1.$$jsonSchema = {
           type: 'object',
+          required: ['model1Prop1', 'model1Prop2'],
+
           properties: {
-            model1Prop1: {type: ['string', 'null']}
+            model1Prop1: {type: ['string', 'null']},
+            model1Prop2: {type: ['integer', 'null']}
           }
         };
       });
@@ -719,10 +722,11 @@ module.exports = (session) => {
               id: 4,
               model1Prop1: 'updated manyToMany 1'
             }, {
-              model1Prop1: 'inserted manyToMany'
+              model1Prop1: 'inserted manyToMany',
+              model1Prop2: 10
             }]
           }, {
-            model2Prop1: 'inserted hasMany',
+            model2Prop1: 'inserted hasMany'
           }]
         }, {
           id: 2,
@@ -742,10 +746,11 @@ module.exports = (session) => {
               id: 4,
               model1Prop1: 'updated manyToMany 1'
             }, {
-              model1Prop1: 'inserted manyToMany'
+              model1Prop1: 'inserted manyToMany',
+              model1Prop2: 10
             }]
           }, {
-            model2Prop1: 'inserted hasMany',
+            model2Prop1: 'inserted hasMany'
           }]
         }, {
           id: 2,
@@ -765,10 +770,11 @@ module.exports = (session) => {
               model1Prop1: 'updated manyToMany 1'
             }, {
               // This is the new row that fails because of invalid type.
-              model1Prop1: 100
+              model1Prop1: 100,
+              model1Prop2: 10
             }]
           }, {
-            model2Prop1: 'inserted hasMany',
+            model2Prop1: 'inserted hasMany'
           }]
         }];
 
@@ -798,7 +804,8 @@ module.exports = (session) => {
               model1Prop1: 'updated manyToMany 1'
             }, {
               // This is the new row.
-              model1Prop1: 'inserted manyToMany'
+              model1Prop1: 'inserted manyToMany',
+              model1Prop2: 10
             }]
           }, {
             // This is the new row.

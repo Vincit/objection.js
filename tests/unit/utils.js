@@ -55,10 +55,18 @@ describe('utils', () => {
 
       expect(y.f()).to.equal(2);
 
+      if (process.version >= 'v8.0.0') {
+        expect(Y.name).to.equal('X');
+      }
+
       const Z = mixin(X, [m1, m2]);
       const z = new Z();
 
       expect(z.f()).to.equal(2);
+
+      if (process.version >= 'v8.0.0') {
+        expect(Z.name).to.equal('X');
+      }
     });
 
   });
@@ -88,10 +96,18 @@ describe('utils', () => {
 
       expect(y.f()).to.equal(2);
 
+      if (process.version >= 'v8.0.0') {
+        expect(Y.name).to.equal('X');
+      }
+
       const Z = m4(X);
       const z = new Z();
 
       expect(z.f()).to.equal(2);
+
+      if (process.version >= 'v8.0.0') {
+        expect(Z.name).to.equal('X');
+      }
     });
 
   });
