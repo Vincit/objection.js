@@ -230,7 +230,7 @@ It is completely optional. If you want to use some other validation library you 
 
   <span class="c1">// This is called when an object is read from database.</span>
   <span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
     <span class="p">});</span>
 
@@ -688,9 +688,9 @@ class.</p>
 <blockquote>
 <p>Migration:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">up</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">knex</span><span class="p">)</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">up</span> <span class="o">=</span> <span class="p">(</span><span class="nx">knex</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span>
-    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">jsonb</span><span class="p">(</span><span class="s1">'details'</span><span class="p">);</span>
@@ -705,7 +705,7 @@ class.</p>
       <span class="s2">"CREATE INDEX on ?? ((??#&gt;&gt;'{type}'))"</span><span class="p">,</span>
       <span class="p">[</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">]</span>
     <span class="p">)</span>
-    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Place'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Place'</span><span class="p">,</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">jsonb</span><span class="p">(</span><span class="s1">'details'</span><span class="p">);</span>

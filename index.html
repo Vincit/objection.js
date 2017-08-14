@@ -1540,9 +1540,10 @@ create a pull request or an issue to get it added to this list.</p>
 <p>Mixin is just a function that takes a class and returns an extended subclass.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kd">function</span> <span class="nx">SomeMixin</span><span class="p">(</span><span class="nx">Model</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">SomeExtendedModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="c1">// The returned class should have no name.</span>
+  <span class="k">return</span> <span class="kr">class</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
     <span class="c1">// Your modifications.</span>
-  <span class="p">}</span>
+  <span class="p">};</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
@@ -1556,6 +1557,43 @@ create a pull request or an issue to get it added to this list.</p>
 <p>Multiple mixins:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">SomeMixin</span><span class="p">(</span><span class="nx">SomeOtherMixin</span><span class="p">(</span><span class="nx">Model</span><span class="p">))</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>There are a couple of helpers in objection main module for applying multiple mixins.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">mixin</span><span class="p">,</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">mixin</span><span class="p">(</span><span class="nx">Model</span><span class="p">,</span> <span class="p">[</span>
+  <span class="nx">SomeMixin</span><span class="p">,</span> 
+  <span class="nx">SomeOtherMixin</span><span class="p">,</span>
+  <span class="nx">EvenMoreMixins</span><span class="p">,</span>
+  <span class="nx">LolSoManyMixins</span><span class="p">,</span>
+  <span class="nx">ImAMixinWithOptions</span><span class="p">({</span><span class="na">foo</span><span class="p">:</span> <span class="s1">'bar'</span><span class="p">})</span>
+<span class="p">])</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">compose</span><span class="p">,</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">mixins</span> <span class="o">=</span> <span class="nx">compose</span><span class="p">(</span>
+  <span class="nx">SomeMixin</span><span class="p">,</span> 
+  <span class="nx">SomeOtherMixin</span><span class="p">,</span>
+  <span class="nx">EvenMoreMixins</span><span class="p">,</span>
+  <span class="nx">LolSoManyMixins</span><span class="p">,</span>
+  <span class="nx">ImAMixinWithOptions</span><span class="p">({</span><span class="na">foo</span><span class="p">:</span> <span class="s1">'bar'</span><span class="p">})</span>
+<span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">mixins</span><span class="p">(</span><span class="nx">Model</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>Mixins can also be used as decorators:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="p">@</span><span class="nd">SomeMixin</span>
+<span class="p">@</span><span class="nd">MixinWithOptions</span><span class="p">({</span><span class="na">foo</span><span class="p">:</span> <span class="s1">'bar'</span><span class="p">})</span>
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
 
 <span class="p">}</span>
 </code></pre>
@@ -1839,7 +1877,7 @@ It is completely optional. If you want to use some other validation library you 
 
   <span class="c1">// This is called when an object is read from database.</span>
   <span class="nx">$parseDatabaseJson</span><span class="p">(</span><span class="nx">json</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">mapKeys</span><span class="p">(</span><span class="nx">json</span><span class="p">,</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="k">return</span> <span class="nx">camelCase</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
     <span class="p">});</span>
 
@@ -2297,9 +2335,9 @@ class.</p>
 <blockquote>
 <p>Migration:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">up</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">knex</span><span class="p">)</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="nx">exports</span><span class="p">.</span><span class="nx">up</span> <span class="o">=</span> <span class="p">(</span><span class="nx">knex</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="k">return</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span>
-    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">jsonb</span><span class="p">(</span><span class="s1">'details'</span><span class="p">);</span>
@@ -2314,7 +2352,7 @@ class.</p>
       <span class="s2">"CREATE INDEX on ?? ((??#&gt;&gt;'{type}'))"</span><span class="p">,</span>
       <span class="p">[</span><span class="s1">'Hero'</span><span class="p">,</span> <span class="s1">'details'</span><span class="p">]</span>
     <span class="p">)</span>
-    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Place'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'Place'</span><span class="p">,</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
       <span class="nx">table</span><span class="p">.</span><span class="nx">jsonb</span><span class="p">(</span><span class="s1">'details'</span><span class="p">);</span>
@@ -2579,6 +2617,49 @@ class.</p>
 <p>Read more about ternary relationships on <a href="https://github.com/Vincit/objection.js/issues/179">this issue</a>.</p>
 
           <h1 id="api-reference">API reference</h1>
+
+<h2 id="the-main-module">The main module</h2>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">mainModule</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+</code></pre>
+<p>The main module is what you get when you import objection. It has a bunch of fields that are all
+documented elsewhere in the API docs. Here&rsquo;s a list of the fields and links to their docs.</p>
+
+<h3 id="fields">Fields</h3>
+
+<h4 id="objection-model">Model</h4>
+
+<p><a href="#model">The model base class.</a></p>
+
+<h4 id="objection-transaction">transaction</h4>
+
+<p><a href="#transactions">The transaction function.</a></p>
+
+<h4 id="objection-ref">ref</h4>
+
+<p><a href="#ref">The ref helper function.</a></p>
+
+<h4 id="objection-raw">raw</h4>
+
+<p><a href="#raw">The raw helper function.</a></p>
+
+<h4 id="objection-mixin">mixin</h4>
+
+<p><a href="#plugins">The mixin helper</a> for applying plugins. See the examples behind this link.</p>
+
+<h4 id="objection-compose">compose</h4>
+
+<p><a href="#plugins">The compose helper</a> for applying plugins. See the examples behind this link.</p>
+
+<h4 id="objection-lodash">lodash</h4>
+
+<p><a href="https://lodash.com/">Lodash utility library</a> used in objection. Useful for plugin developers so that
+they don&rsquo;t have to add it as a dependency.</p>
+
+<h4 id="objection-promise">Promise</h4>
+
+<p><a href="http://bluebirdjs.com/docs/getting-started.html">Bluebird promise library</a> used in objection. Useful for plugin developers so that
+they don&rsquo;t have to add it as a dependency.</p>
 
 <h2 id="querybuilder">QueryBuilder</h2>
 
@@ -10948,6 +11029,17 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 </tbody></table>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-8-7">0.8.7</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li><code class="prettyprint">throwIfNotFound</code> now also throws when update or delete doesn&rsquo;t change any rows.</li>
+<li><a href="#mixin"><code class="prettyprint">mixin</code></a> and <a href="#compose"><code class="prettyprint">compose</code></a> helpers for applying multiple plugins. <a href="https://github.com/Vincit/objection.js/issues/475">#475</a> <a href="https://github.com/Vincit/objection.js/issues/473">#473</a></li>
+<li>Typing updates <a href="https://github.com/Vincit/objection.js/issues/474">#474</a> <a href="https://github.com/Vincit/objection.js/issues/479">#479</a></li>
+<li><code class="prettyprint">upsertGraph</code> now validates patched models correctly. <a href="https://github.com/Vincit/objection.js/issues/477">#477</a></li>
+</ul>
 
 <h2 id="0-8-6">0.8.6</h2>
 

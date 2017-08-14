@@ -30,6 +30,49 @@
       <div class="content">
         <h1 id="api-reference">API reference</h1>
 
+<h2 id="the-main-module">The main module</h2>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">mainModule</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+</code></pre>
+<p>The main module is what you get when you import objection. It has a bunch of fields that are all
+documented elsewhere in the API docs. Here&rsquo;s a list of the fields and links to their docs.</p>
+
+<h3 id="fields">Fields</h3>
+
+<h4 id="objection-model">Model</h4>
+
+<p><a href="#model">The model base class.</a></p>
+
+<h4 id="objection-transaction">transaction</h4>
+
+<p><a href="#transactions">The transaction function.</a></p>
+
+<h4 id="objection-ref">ref</h4>
+
+<p><a href="#ref">The ref helper function.</a></p>
+
+<h4 id="objection-raw">raw</h4>
+
+<p><a href="#raw">The raw helper function.</a></p>
+
+<h4 id="objection-mixin">mixin</h4>
+
+<p><a href="#plugins">The mixin helper</a> for applying plugins. See the examples behind this link.</p>
+
+<h4 id="objection-compose">compose</h4>
+
+<p><a href="#plugins">The compose helper</a> for applying plugins. See the examples behind this link.</p>
+
+<h4 id="objection-lodash">lodash</h4>
+
+<p><a href="https://lodash.com/">Lodash utility library</a> used in objection. Useful for plugin developers so that
+they don&rsquo;t have to add it as a dependency.</p>
+
+<h4 id="objection-promise">Promise</h4>
+
+<p><a href="http://bluebirdjs.com/docs/getting-started.html">Bluebird promise library</a> used in objection. Useful for plugin developers so that
+they don&rsquo;t have to add it as a dependency.</p>
+
 <h2 id="querybuilder">QueryBuilder</h2>
 
 <p>Query builder for Models.</p>
