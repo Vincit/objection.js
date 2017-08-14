@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.7
+
+### What's new
+
+  * `throwIfNotFound` now also throws when update or delete doesn't delete any rows.
+  * [`mixin`](#mixin) and [`compose`](#compose) helpers for applying multiple plugins. [#475](https://github.com/Vincit/objection.js/issues/475) [#473](https://github.com/Vincit/objection.js/issues/473)
+  * Typing updates [#474](https://github.com/Vincit/objection.js/issues/474) [#479](https://github.com/Vincit/objection.js/issues/479)
+  * `upsertGraph` now validates patched models correctly. [#477](https://github.com/Vincit/objection.js/issues/477)
+
 ## 0.8.6
 
 ### What's new
