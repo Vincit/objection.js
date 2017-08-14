@@ -57,9 +57,14 @@ declare namespace Objection {
     aliases?: string[];
   }
 
+  export interface UpsertOptions {
+    relate?: boolean;
+    unrelate?: boolean;
+  }
+
   export interface QueryContext {
-    transaction: Transaction,
-    [key: string]: any 
+    transaction: Transaction;
+    [key: string]: any;
   }
 
   /**
@@ -344,9 +349,8 @@ declare namespace Objection {
   }
 
   interface Upsert<T> {
-    (modelsOrObjects?: Array<Partial<T>>): QueryBuilder<T>;
-    (modelOrObject?: Partial<T>): QueryBuilderSingle<T>;
-    (): this;
+    (modelsOrObjects?: Array<Partial<T>>, options?: UpsertOptions): QueryBuilder<T>;
+    (modelOrObject?: Partial<T>, options?: UpsertOptions): QueryBuilderSingle<T>;
   }
 
   interface InsertGraphAndFetch<T> {

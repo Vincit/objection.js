@@ -172,6 +172,11 @@ const rowsDeleted2: Promise<number> = qb.deleteById([123, 456])
 const insertedModel: Promise<Person> = Person.query().insertAndFetch({})
 const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([new Person(), new Person()])
 
+const upsertModel1: Promise<Person> = Person.query().upsertGraph({})
+const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, {relate: true})
+const upsertModels1: Promise<Person[]> = Person.query().upsertGraph([])
+const upsertModels2: Promise<Person[]> = Person.query().upsertGraph([], {unrelate: true})
+
 const insertedGraphAndFetchOne: Promise<Person> = Person.query().insertGraphAndFetch(new Person())
 const insertedGraphAndFetchSome: Promise<Person[]> = Person.query().insertGraphAndFetch([new Person(), new Person()])
 const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch(new Person())
