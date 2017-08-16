@@ -1463,7 +1463,7 @@ function createInsertOperation(builder, mergeWithModel) {
   let method = new QueryBuilderOperation("insert");
   method.isWriteOperation = true;
 
-  method.call = function (builder, args) {
+  method.onAdd = function (builder, args) {
     this.model = args[0];
     return true;
   };
@@ -1480,7 +1480,7 @@ function createUpdateOperation(builder, mergeWithModel) {
   let method = new QueryBuilderOperation("update");
   method.isWriteOperation = true;
 
-  method.call = function (builder, args) {
+  method.onAdd = function (builder, args) {
     this.model = args[0];
     return true;
   };
