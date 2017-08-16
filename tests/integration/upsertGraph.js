@@ -74,8 +74,9 @@ module.exports = (session) => {
 
     it('by default, should insert new, update existing and delete missing', () => {
       const upsert = {
-        // Nothing is doen for the root since it only has an id.
+        // Nothing is done for the root since it only has an ids.
         id: 2,
+        model1Id: 3,
 
         // update
         model1Relation1: {
