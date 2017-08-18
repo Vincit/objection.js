@@ -1020,6 +1020,14 @@ module.exports = (session) => {
             expectIdsEqual(results, [1]);
           });
       });
+
+      it('should work with range', () => {
+        return BoundModel.query().range(0, 1).whereJsonHasAny("jsonObject:b", '2').then(result => {
+          expect(result.results).to.have.length(1);
+          expect(result.total).to.equal(1);
+          expect(result.results[0].id).to.equal('7');
+        });
+      });
     });
 
     describe('.whereJsonField(fieldExpr, operator, value)', () => {

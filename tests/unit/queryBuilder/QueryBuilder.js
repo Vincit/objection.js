@@ -660,7 +660,7 @@ describe('QueryBuilder', () => {
         expect(executedQueries).to.have.length(1);
         expect(res).to.equal(123);
         // resultSize should cancel the groupBy call since it doesn't affect the outcome.
-        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as temp');
+        expect(executedQueries[0]).to.equal('select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"');
         done();
       })
       .catch(done);
@@ -676,7 +676,7 @@ describe('QueryBuilder', () => {
       .then(res => {
         expect(executedQueries).to.have.length(2);
         expect(executedQueries).to.eql([
-          "select count(*) as \"count\" from (select \"Model\".* from \"Model\" where \"test\" = 100) as temp",
+          "select count(*) as \"count\" from (select \"Model\".* from \"Model\" where \"test\" = 100) as \"temp\"",
           "select \"Model\".* from \"Model\" where \"test\" = 100 order by \"order\" asc limit 101 offset 100"
         ]);
         expect(res.total).to.equal(123);
@@ -696,7 +696,7 @@ describe('QueryBuilder', () => {
       .then(res => {
         expect(executedQueries).to.have.length(2);
         expect(executedQueries).to.eql([
-          "select count(*) as \"count\" from (select \"Model\".* from \"Model\" where \"test\" = 100) as temp",
+          "select count(*) as \"count\" from (select \"Model\".* from \"Model\" where \"test\" = 100) as \"temp\"",
           "select \"Model\".* from \"Model\" where \"test\" = 100 order by \"order\" asc limit 100 offset 1000"
         ]);
         expect(res.total).to.equal(123);
