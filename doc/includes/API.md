@@ -6168,9 +6168,19 @@ const queryBuilder = person.$query(transactionOrKnex);
 > Re-fetch the instance from the database:
 
 ```js
-person.$query().then(person => {
-  console.log(person);
+person.$query().then(reFetchedPerson => {
+  // Note that `person` did not get modified by the fetch.
+  console.log(reFetchedPerson);
 });
+
+// If you need to refresh the same instance you can do this:
+person.$query().then(reFetchedPerson => {
+  // Note that `person` did not get modified by the fetch.
+  person.$set(reFetchedPerson);
+});
+
+// Or this:
+person = await person.$query();
 ```
 
 > Insert a new model to database:
