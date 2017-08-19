@@ -322,6 +322,91 @@ module.exports = (session) => {
           });
       });
 
+      it('should work with `eager` method', () => {
+        let model = Model1.fromJson({model1Prop1: 'updated text'});
+
+        return Model1
+          .query()
+          .patchAndFetchById(1, model)
+          .eager('model1Relation2')
+          .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+          .then(fetchedModel => {
+            expect(fetchedModel).eql({
+              id: 1,
+              model1Prop1: 'updated text',
+              model1Prop2: null,
+              model1Id: null,
+              $beforeUpdateCalled: true,
+              $beforeUpdateOptions: {patch: true},
+              $afterUpdateCalled: true,
+              $afterUpdateOptions: {patch: true},
+
+              model1Relation2: [{ 
+                idCol: 1,
+                model1Id: 1,
+                model2Prop1: 'text 1',
+                model2Prop2: 2,
+                $afterGetCalled: 1 
+              }, { 
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'text 2',
+                model2Prop2: 1,
+                $afterGetCalled: 1
+              }]
+            });
+
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(rows => {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
+      it('should work with `pick` method', () => {
+        let model = Model1.fromJson({model1Prop1: 'updated text'});
+
+        return Model1
+          .query()
+          .patchAndFetchById(1, model)
+          .eager('model1Relation2')
+          .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+          .pick(Model2, ['idCol', 'model1Id'])
+          .then(fetchedModel => {
+            expect(fetchedModel).eql({
+              id: 1,
+              model1Prop1: 'updated text',
+              model1Prop2: null,
+              model1Id: null,
+              $beforeUpdateCalled: true,
+              $beforeUpdateOptions: {patch: true},
+              $afterUpdateCalled: true,
+              $afterUpdateOptions: {patch: true},
+
+              model1Relation2: [{ 
+                idCol: 1,
+                model1Id: 1,
+                $afterGetCalled: 1
+              }, { 
+                idCol: 2,
+                model1Id: 1,
+                $afterGetCalled: 1
+              }]
+            });
+
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(rows => {
+            expect(rows).to.have.length(3);
+            expectPartEql(rows[0], {id: 1, model1Prop1: 'updated text'});
+            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+          });
+      });
+
       it('should fetch nothing if nothing is updated', () => {
         return Model1
           .query()
