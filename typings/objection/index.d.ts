@@ -743,7 +743,7 @@ declare namespace Objection {
 
   interface Table<T> {
     (tableName: string): QueryBuilder<T>;
-    (callback: () => void): QueryBuilder<T>;
+    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
   }
 
@@ -783,6 +783,7 @@ declare namespace Objection {
     (columnName: string, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
+    (columnName: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
   }
 
   interface WhereRaw<T> extends RawQueryBuilder<T> {
@@ -790,7 +791,7 @@ declare namespace Objection {
   }
 
   interface WhereWrapped<T> {
-    (callback: () => void): QueryBuilder<T>;
+    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
   }
 
   interface WhereNull<T> {
@@ -799,7 +800,7 @@ declare namespace Objection {
 
   interface WhereIn<T> {
     (columnName: string, values: Value[]): QueryBuilder<T>;
-    (columnName: string, callback: () => void): QueryBuilder<T>;
+    (columnName: string, callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
     (columnName: string, query: QueryBuilder<any>): QueryBuilder<T>;
   }
 
@@ -808,7 +809,7 @@ declare namespace Objection {
   }
 
   interface WhereExists<T> {
-    (callback: () => void): QueryBuilder<T>;
+    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
     (query: QueryBuilder<any>): QueryBuilder<T>;
   }
 
