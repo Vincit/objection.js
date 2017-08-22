@@ -9,8 +9,8 @@ export = Objection;
 
 declare namespace Objection {
   export interface ModelOptions {
-    patch: boolean;
-    skipValidation: boolean;
+    patch?: boolean;
+    skipValidation?: boolean;
   }
 
   export class ValidationError extends Error {
