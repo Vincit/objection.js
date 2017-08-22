@@ -471,6 +471,7 @@ declare namespace Objection {
     // Non-query methods:
 
     context(queryContext: object): this;
+    context(): QueryContext;
     mergeContext(queryContext: object): this;
 
     reject(reason: any): this;
