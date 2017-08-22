@@ -1218,23 +1218,26 @@ module.exports = (session) => {
     describe('QueryBuilder.modifyEager', () => {
 
       it('should filter the eager query using relation expressions as paths', () => {
-        return Model1
-          .query()
-          .where('id', 1)
-          .modifyEager('model1Relation2.model2Relation1', builder => {
-            builder.where('Model1.id', 6);
-          })
-          .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
-          .filterEager('model1Relation2', builder => {
-            builder.where('model_2_prop_1', 'hejsan 2');
-          })
-          .then(models => {
-            expect(models[0].model1Relation2).to.have.length(1);
-            expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 2');
+        return Promise.all([Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map(eagerAlgo => {
+          return Model1
+            .query()
+            .eagerAlgorithm(eagerAlgo)
+            .where('Model1.id', 1)
+            .modifyEager('model1Relation2.model2Relation1', builder => {
+              builder.where('Model1.id', 6);
+            })
+            .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
+            .filterEager('model1Relation2', builder => {
+              builder.where('model_2_prop_1', 'hejsan 2');
+            })
+            .then(models => {
+              expect(models[0].model1Relation2).to.have.length(1);
+              expect(models[0].model1Relation2[0].model2Prop1).to.equal('hejsan 2');
 
-            expect(models[0].model1Relation2[0].model2Relation1).to.have.length(1);
-            expect(models[0].model1Relation2[0].model2Relation1[0].id).to.equal(6);
-          });
+              expect(models[0].model1Relation2[0].model2Relation1).to.have.length(1);
+              expect(models[0].model1Relation2[0].model2Relation1[0].id).to.equal(6);
+            });
+        }));
       });
 
       it('should implicitly add selects for join columns if they are omitted in filterEager/modifyEager', () => {

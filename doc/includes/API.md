@@ -1056,6 +1056,9 @@ Doesn't delete the models. Only removes the connection. For ManyToMany relations
 deletes the join column from the join table. For other relation types this sets the
 join columns to null.
 
+Note that, unlike for `relate`, you shouldn't pass arguments for the `unrelate` method.
+Use `unrelate` like `delete` and filter the rows using the returned query builder.
+
 ##### Return value
 
 Type|Description

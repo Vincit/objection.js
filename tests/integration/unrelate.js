@@ -51,8 +51,7 @@ module.exports = (session) => {
         it('should unrelate', () => {
           return Model1
             .query()
-            .where('id', 1)
-            .first()
+            .findById(1)
             .then(model => {
               return model
                 .$relatedQuery('model1Relation1')
@@ -69,6 +68,25 @@ module.exports = (session) => {
               expect(rows[2].model1Id).to.equal(4);
               expect(rows[3].model1Id).to.equal(null);
             });
+        });
+
+        it('should fail if arguments are given', (done) => {
+          Model1
+            .query()
+            .findById(1)
+            .then(model => {
+              return model
+                .$relatedQuery('model1Relation1')
+                .unrelate(1);
+            })
+            .then(numUpdated => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err.message).to.equal(`Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`);
+              done();
+            })
+            .catch(done);
         });
 
       });
@@ -151,6 +169,25 @@ module.exports = (session) => {
             });
         });
 
+        it('should fail if arguments are given', (done) => {
+          Model1
+            .query()
+            .findById(1)
+            .then(model => {
+              return model
+                .$relatedQuery('model1Relation2')
+                .unrelate([1, 2])
+            })
+            .then(numUpdated => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err.message).to.equal(`Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`);
+              done();
+            })
+            .catch(done);
+        });
+
       });
 
       describe('many to many relation', () => {
@@ -218,8 +255,7 @@ module.exports = (session) => {
         it('should unrelate multiple', () => {
           return Model2
             .query()
-            .where('id_col', 1)
-            .first()
+            .findById(1)
             .then(model => {
               return model
                 .$relatedQuery('model2Relation1')
@@ -237,6 +273,25 @@ module.exports = (session) => {
               expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(0);
               expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
             });
+        });
+
+        it('should fail if arguments are given', (done) => {
+          Model2
+            .query()
+            .findById(1)
+            .then(model => {
+              return model
+                .$relatedQuery('model2Relation1')
+                .unrelate([1, 2])
+            })
+            .then(numUpdated => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err.message).to.equal(`Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`);
+              done();
+            })
+            .catch(done);
         });
 
       });
