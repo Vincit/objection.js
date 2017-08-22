@@ -1,7 +1,6 @@
 node_modules
 .history
 .idea
-package-lock.json
 testCoverage
 examples/*/*.db
 examples/express-es7/build
