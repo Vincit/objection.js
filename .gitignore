@@ -8,3 +8,4 @@ examples/express-es7/build
 *.DS_Store
 profiling
 npm-debug.log*
+.vscode

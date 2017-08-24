@@ -125,7 +125,7 @@ module.exports = (session) => {
                 'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2)',
                 'select "Model1"."id" from "Model1" where "Model1"."id" in (3)',
                 'select "model_2"."model_1_id", "model_2"."id_col" from "model_2" where "model_2"."model_1_id" in (2)',
-                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1Model2"."model1Id" = "Model1"."id" where "Model1Model2"."model2Id" in (2, 1)',
+                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (2, 1)',
 
                 'delete from "model_2" where "model_2"."id_col" in (2) and "model_2"."model_1_id" in (2)',
                 'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',

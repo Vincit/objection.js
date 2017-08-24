@@ -1,11 +1,12 @@
 'use strict';
 
-const _ = require('lodash')
-  , knex = require('knex')
-  , expect = require('expect.js')
-  , objection = require('../../../')
-  , Model = objection.Model
-  , Relation = objection.Relation;
+const _ = require('lodash');
+const knex = require('knex');
+const expect = require('expect.js');
+const objection = require('../../../');
+
+const Model = objection.Model
+const Relation = objection.Relation;
 
 describe('Relation', () => {
   let OwnerModel = null;
@@ -35,10 +36,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['id']);
-    expect(relation.ownerProp).to.eql(['id']);
-    expect(relation.relatedCol).to.eql(['ownerId']);
-    expect(relation.relatedProp).to.eql(['ownerId']);
+    expect(relation.ownerProp.cols()).to.eql(['id']);
+    expect(relation.ownerProp.props()).to.eql(['id']);
+    expect(relation.relatedProp.cols()).to.eql(['ownerId']);
+    expect(relation.relatedProp.props()).to.eql(['ownerId']);
   });
 
   it('should accept a path to a Model subclass as modelClass', () => {
@@ -55,10 +56,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['id']);
-    expect(relation.ownerProp).to.eql(['id']);
-    expect(relation.relatedCol).to.eql(['ownerId']);
-    expect(relation.relatedProp).to.eql(['ownerId']);
+    expect(relation.ownerProp.cols()).to.eql(['id']);
+    expect(relation.ownerProp.props()).to.eql(['id']);
+    expect(relation.relatedProp.cols()).to.eql(['ownerId']);
+    expect(relation.relatedProp.props()).to.eql(['ownerId']);
   });
 
   it('should accept a relative path to a Model subclass as modelClass (resolved using Model.modelPaths)', () => {
@@ -76,10 +77,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['id']);
-    expect(relation.ownerProp).to.eql(['id']);
-    expect(relation.relatedCol).to.eql(['ownerId']);
-    expect(relation.relatedProp).to.eql(['ownerId']);
+    expect(relation.ownerProp.cols()).to.eql(['id']);
+    expect(relation.ownerProp.props()).to.eql(['id']);
+    expect(relation.relatedProp.cols()).to.eql(['ownerId']);
+    expect(relation.relatedProp.props()).to.eql(['ownerId']);
   });
 
   it('should accept a module with named exports', () => {
@@ -96,10 +97,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModelNamedExport);
-    expect(relation.ownerCol).to.eql(['id']);
-    expect(relation.ownerProp).to.eql(['id']);
-    expect(relation.relatedCol).to.eql(['ownerId']);
-    expect(relation.relatedProp).to.eql(['ownerId']);
+    expect(relation.ownerProp.cols()).to.eql(['id']);
+    expect(relation.ownerProp.props()).to.eql(['id']);
+    expect(relation.relatedProp.cols()).to.eql(['ownerId']);
+    expect(relation.relatedProp.props()).to.eql(['ownerId']);
   });
 
   it('should accept a composite key as an array of columns', () => {
@@ -116,10 +117,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['name', 'dateOfBirth']);
-    expect(relation.ownerProp).to.eql(['name', 'dateOfBirth']);
-    expect(relation.relatedCol).to.eql(['ownerName', 'ownerDateOfBirth']);
-    expect(relation.relatedProp).to.eql(['ownerName', 'ownerDateOfBirth']);
+    expect(relation.ownerProp.cols()).to.eql(['name', 'dateOfBirth']);
+    expect(relation.ownerProp.props()).to.eql(['name', 'dateOfBirth']);
+    expect(relation.relatedProp.cols()).to.eql(['ownerName', 'ownerDateOfBirth']);
+    expect(relation.relatedProp.props()).to.eql(['ownerName', 'ownerDateOfBirth']);
   });
 
   it('should fail if modelClass is not a subclass of Model', () => {
@@ -287,7 +288,7 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.');
     });
   });
 
@@ -321,7 +322,7 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the related model table.');
+      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.');
     });
   });
 
@@ -384,10 +385,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['id']);
-    expect(relation.ownerProp).to.eql(['id']);
-    expect(relation.relatedCol).to.eql(['ownerId']);
-    expect(relation.relatedProp).to.eql(['ownerId']);
+    expect(relation.ownerProp.cols()).to.eql(['id']);
+    expect(relation.ownerProp.props()).to.eql(['id']);
+    expect(relation.relatedProp.cols()).to.eql(['ownerId']);
+    expect(relation.relatedProp.props()).to.eql(['ownerId']);
   });
 
   it('relatedCol and ownerCol should be in database format', () => {
@@ -428,10 +429,10 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['id_col']);
-    expect(relation.ownerProp).to.eql(['idCol']);
-    expect(relation.relatedCol).to.eql(['owner-id']);
-    expect(relation.relatedProp).to.eql(['ownerId']);
+    expect(relation.ownerProp.cols()).to.eql(['id_col']);
+    expect(relation.ownerProp.props()).to.eql(['idCol']);
+    expect(relation.relatedProp.cols()).to.eql(['owner-id']);
+    expect(relation.relatedProp.props()).to.eql(['ownerId']);
   });
 
   it('should allow relations on tables under a schema', () => {
@@ -460,9 +461,9 @@ describe('Relation', () => {
 
     expect(relation.ownerModelClass).to.equal(OwnerModel);
     expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerCol).to.eql(['id']);
-    expect(relation.ownerProp).to.eql(['id']);
-    expect(relation.relatedCol).to.eql(['owner_id']);
-    expect(relation.relatedProp).to.eql(['owner_id']);
+    expect(relation.ownerProp.cols()).to.eql(['id']);
+    expect(relation.ownerProp.props()).to.eql(['id']);
+    expect(relation.relatedProp.cols()).to.eql(['owner_id']);
+    expect(relation.relatedProp.props()).to.eql(['owner_id']);
   })
 });

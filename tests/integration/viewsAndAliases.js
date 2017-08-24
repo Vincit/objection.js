@@ -215,7 +215,7 @@ module.exports = (session) => {
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" = 1/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(2\)/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(7\)/,
-                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "Model1Model2"\."model1Id" = "someAlias"\."id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "someAlias"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
               ];
 
               expectedQueries.forEach((expectedQuery, i) => {
@@ -244,7 +244,7 @@ module.exports = (session) => {
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" = 1/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(2\)/,
                 /select "someAlias"\.\* from "Model1" as "someAlias" where "someAlias"\."id" in \(7\)/,
-                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "Model1Model2"\."model1Id" = "someAlias"\."id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+                /select "someAlias"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "Model1" as "someAlias" inner join "Model1Model2" on "someAlias"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
               ];
 
               expectedQueries.forEach((expectedQuery, i) => {
@@ -381,7 +381,7 @@ module.exports = (session) => {
                 /select "someView"\.\* from "someView" where "someView"\."id" = 1/,
                 /select "someView"\.\* from "someView" where "someView"\."id" in \(2\)/,
                 /select "someView"\.\* from "someView" where "someView"\."id" in \(7\)/,
-                /select "someView"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "someView" inner join "Model1Model2" on "Model1Model2"\."model1Id" = "someView"\."id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
+                /select "someView"\.\*, "Model1Model2"\."extra3" as "aliasedExtra", "Model1Model2"\."model2Id" as "objectiontmpjoin0" from "someView" inner join "Model1Model2" on "someView"\."id" = "Model1Model2"\."model1Id" where "Model1Model2"\."model2Id" in (\(1, 2\)|\(2, 1\))/
               ];
 
               expectedQueries.forEach((expectedQuery, i) => {

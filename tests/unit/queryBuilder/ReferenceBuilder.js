@@ -1,8 +1,8 @@
 'use strict';
 
-const expect = require('expect.js')
-  , ref = require('../../../').ref
-  , ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
+const expect = require('expect.js');
+const ref = require('../../../').ref;
+const ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
 
 describe('ReferenceBuilder', () => {
   it('fail if reference cannot be parsed', () => {
@@ -14,6 +14,11 @@ describe('ReferenceBuilder', () => {
     let reference = ref('Awwww.ItWorks');
     expect(reference instanceof ReferenceBuilder).to.be.ok();
     expect(reference.toRawArgs()).to.eql(['??', ['Awwww.ItWorks']]);
+  });
+
+  it('table method should replace table', () => {
+    let reference = ref('Table.Column').table('Foo')
+    expect(reference.toRawArgs()).to.eql(['??', ['Foo.Column']]);
   });
 
   it('should allow plain knex reference + casting', () => {
