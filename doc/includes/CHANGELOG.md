@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.8
+
+### What's new
+
+  * Typing updates: [#489](https://github.com/Vincit/objection.js/issues/489) [#487](https://github.com/Vincit/objection.js/issues/487)
+  * Improve `resultSize` method. [#213](https://github.com/Vincit/objection.js/issues/213)
+  * Avoid unnecessary updates in upsertGraph [#480](https://github.com/Vincit/objection.js/issues/480)
+
 ## 0.8.7
 
 ### What's new
@@ -27,7 +35,7 @@
 
 ### What's new
 
-  * New shorthand methods [`joinEager`](http://vincit.github.io/objection.js/#joineager), [`naiveEager`](http://vincit.github.io/objection.js/#naiveeager), 
+  * New shorthand methods [`joinEager`](http://vincit.github.io/objection.js/#joineager), [`naiveEager`](http://vincit.github.io/objection.js/#naiveeager),
     [`mergeJoinEager`](http://vincit.github.io/objection.js/#mergejoineager) and [`mergeNaiveEager`](http://vincit.github.io/objection.js/#mergenaiveeager).
   * New shorthand method [`findOne`](http://vincit.github.io/objection.js/#findone)
   * New reflection method [`isFindQuery`](http://vincit.github.io/objection.js/#isfindquery)
