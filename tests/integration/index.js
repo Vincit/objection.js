@@ -73,6 +73,7 @@ describe('integration tests', () => {
 
       if (knexConfig.client === 'postgres') {
         require('./jsonQueries')(session);
+        require('./jsonRelations')(session);
       }
     });
   });
