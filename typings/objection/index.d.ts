@@ -549,20 +549,20 @@ declare namespace Objection {
 
     <MC extends ModelClass<any>, V>(
       modelClass: MC,
-      callback: (boundModelClass: MC) => Promise<V>
+      callback: (boundModelClass: MC, trx?: Transaction) => Promise<V>
     ): Promise<V>;
 
     <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, V>(
       modelClass1: MC1,
       modelClass2: MC2,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2) => Promise<V>
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, trx?: Transaction) => Promise<V>
     ): Promise<V>;
 
     <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, MC3 extends ModelClass<any>, V>(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3) => Promise<V>
+      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, trx?: Transaction) => Promise<V>
     ): Promise<V>;
 
     <MC1 extends ModelClass<any>,
@@ -578,7 +578,8 @@ declare namespace Objection {
         boundModel1Class: MC1,
         boundModel2Class: MC2,
         boundModel3Class: MC3,
-        boundModel4Class: MC4
+        boundModel4Class: MC4,
+        trx?: Transaction
       ) => Promise<V>
     ): Promise<V>;
 
@@ -598,7 +599,8 @@ declare namespace Objection {
         boundModel2Class: MC2,
         boundModel3Class: MC3,
         boundModel4Class: MC4,
-        boundModel5Class: MC5
+        boundModel5Class: MC5,
+        trx?: Transaction
       ) => Promise<V>
     ): Promise<V>;
 
