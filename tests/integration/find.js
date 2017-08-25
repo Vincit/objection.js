@@ -37,7 +37,7 @@ module.exports = (session) => {
         }]);
       });
 
-      it('should return all rows when no knex methods are chained', () => {
+      it('should return all rows when no knex m§ethods are chained', () => {
         return Model1
           .query()
           .then(models => {
@@ -258,6 +258,76 @@ module.exports = (session) => {
               expect(res[Object.keys(res)[0]]).to.eql(3);
             });
         });
+
+        if (session.isPostgres()) {
+          it('smoke test for various methods', () => {
+            // This test doesn't actually test that the methods work. Knex has tests
+            // for these. This is a smoke test in case of typos and such.
+            return Model2
+              .query()
+              .clearSelect()
+              .clearWhere()
+              .columns('model_2.model_2_prop_2')
+              .forUpdate()
+              .forShare()
+              .whereNot('model_2.id_col', 1)
+              .orWhereNot('model_2.id_col', 2)
+              .whereRaw('model_2.id_col is null')
+              .orWhereRaw('model_2.id_col is null')
+              .whereExists(Model2.query())
+              .orWhereExists(Model2.query())
+              .whereNotExists(Model2.query())
+              .orWhereNotExists(Model2.query())
+              .orWhereIn('model_2.id_col', [1, 2, 3])
+              .whereNotIn('model_2.id_col', [1, 2, 3])
+              .orWhereNotIn('model_2.id_col', [1, 2, 3])
+              .whereNull('model_2.id_col')
+              .orWhereNull('model_2.id_col')
+              .orWhereNotNull('model_2.id_col')
+              .andWhereBetween('model_2.id_col', [0, 1])
+              .whereNotBetween('model_2.id_col', [0, 1])
+              .andWhereNotBetween('model_2.id_col', [0, 1])
+              .orWhereBetween('model_2.id_col', [0, 1])
+              .orWhereNotBetween('model_2.id_col', [0, 1])
+              .orderByRaw('model_2.id_col')
+              .into('model_2')
+              .table('model_2')
+              .joinRaw('inner join model_2 as m1 on m1.model_2_prop_2 = 1')
+              .leftOuterJoin('model_2 as m2', join => join
+                .onBetween('m2.model_2_prop_2', [1, 2])
+                .onNotBetween('m2.model_2_prop_2', [1, 2])
+                .orOnBetween('m2.model_2_prop_2', [1, 2])
+                .orOnNotBetween('m2.model_2_prop_2', [1, 2])
+                .onIn('m2.model_2_prop_2', [1, 2])
+                .onNotIn('m2.model_2_prop_2', [1, 2])
+                .orOnIn('m2.model_2_prop_2', [1, 2])
+                .andOnIn('m2.model_2_prop_2', [1, 2])
+                .orOnNotIn('m2.model_2_prop_2', [1, 2])
+                .onNull('m2.model_2_prop_2')
+                .orOnNull('m2.model_2_prop_2')
+                .onNotNull('m2.model_2_prop_2')
+                .orOnNotNull('m2.model_2_prop_2')
+                .onExists(Model2.query())
+                .orOnExists(Model2.query())
+                .onNotExists(Model2.query())
+                .orOnNotExists(Model2.query())
+                .andOnExists(Model2.query())
+                .andOnNotExists(Model2.query())
+                .andOnBetween('m2.model_2_prop_2', [1, 2])
+                .andOnNotBetween('m2.model_2_prop_2', [1, 2])
+                .andOn('m2.model_2_prop_2', 1)
+                .orOnNotIn('m2.model_2_prop_2', [1, 2])
+                .andOnNotIn('m2.model_2_prop_2', [1, 2])
+                .andOnNull('m2.model_2_prop_2')
+                .andOnNotNull('m2.model_2_prop_2')
+              )
+              .rightJoin('model_2 as m3', 'm3.model_2_prop_2', 'm1.model_2_prop_2')
+              .rightOuterJoin('model_2 as m4', 'm4.model_2_prop_2', 'm1.model_2_prop_2')
+              .fullOuterJoin('model_2 as m6', 'm6.model_2_prop_2', 'm1.model_2_prop_2')
+              .crossJoin('model_2 as m7')
+              .whereWrapped('model_2.id_col < 10');
+          });
+        }
 
         it('.throwIfNotFound() with empty result', (done) => {
           Model1
