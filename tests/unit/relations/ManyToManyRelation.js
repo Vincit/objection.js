@@ -136,7 +136,7 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTable).to.equal('JoinModel');
     expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerId']);
     expect(relation.joinTableRelatedProp.props()).to.eql(['relatedId']);
-    expect(classUtils.isSubclassOf(relation.joinTableModelClass(mockKnex), JoinModel)).to.equal(true);
+    expect(classUtils.isSubclassOf(relation.joinModelClass(mockKnex), JoinModel)).to.equal(true);
   });
 
   it('should accept an absolute file path to a join model in join.through object', () => {
@@ -159,7 +159,7 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTable).to.equal('JoinModel');
     expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerId']);
     expect(relation.joinTableRelatedProp.cols()).to.eql(['relatedId']);
-    expect(classUtils.isSubclassOf(relation.joinTableModelClass(mockKnex), require('./files/JoinModel'))).to.equal(true);
+    expect(classUtils.isSubclassOf(relation.joinModelClass(mockKnex), require('./files/JoinModel'))).to.equal(true);
   });
 
   it('should accept a composite keys in join.through object (1)', () => {
@@ -1262,10 +1262,10 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([ 
+        expect(result).to.eql([
           {ownerId: 666, relatedId: 10},
           {ownerId: 666, relatedId: 20},
-          {ownerId: 666, relatedId: 30} 
+          {ownerId: 666, relatedId: 30}
         ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -1289,10 +1289,10 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([ 
+        expect(result).to.eql([
           {ownerId: 666, relatedId: 10},
           {ownerId: 666, relatedId: 20},
-          {ownerId: 666, relatedId: 30} 
+          {ownerId: 666, relatedId: 30}
         ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());

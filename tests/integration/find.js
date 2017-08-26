@@ -2,9 +2,11 @@
 
 const _ = require('lodash');
 const raw = require('../../').raw;
+const ref = require('../../').ref;
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
+const QueryBuilderOperation = require('../../').QueryBuilderOperation;
 
 module.exports = (session) => {
   let Model1 = session.models.Model1;
@@ -265,11 +267,23 @@ module.exports = (session) => {
             // for these. This is a smoke test in case of typos and such.
             return Model2
               .query()
+              .with('wm1', builder => builder
+                .insert({a: 1})
+                .update({a: 2})
+                .delete()
+                .del()
+                .table('model_2')
+                .clear(QueryBuilderOperation)
+                .select('*')
+                .from('model_2')
+              )
               .clearSelect()
               .clearWhere()
               .columns('model_2.model_2_prop_2')
               .forUpdate()
               .forShare()
+              .where(raw('? = ?', ref('model_2.id_col'), ref('model_2.model_2_prop_2')))
+              .where(raw('? in (?)', ref('model_2.id_col'), Model1.query().select('id')))
               .whereNot('model_2.id_col', 1)
               .orWhereNot('model_2.id_col', 2)
               .whereRaw('model_2.id_col is null')

@@ -437,7 +437,7 @@ describe('Relation', () => {
 
   it('should allow relations on tables under a schema', () => {
     let relation = new Relation('testRelation', OwnerModel);
-    
+
     Object.defineProperty(OwnerModel, 'tableName', {
       get() {
         return 'schema1.owner_model';
