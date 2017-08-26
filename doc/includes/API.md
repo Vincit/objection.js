@@ -3225,7 +3225,7 @@ for more info on the relation expression language.
 You can choose the way objection performs the eager loading by using [`eagerAlgorithm`](#eageralgorithm) method
 on a query builder or by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property of a model. The
 three algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) `Model.JoinEagerAlgorithm`
-and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main 
+and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main
 differences below. You can always see the executed SQL by calling the [`debug`](#debug) method for the query builder.
 
 <b>WhereInEagerAlgorithm</b>
@@ -3258,11 +3258,11 @@ Limitations:
 
 <b>NaiveEagerAlgorithm</b>
 
-This algorithm naively fetches the relations using a separate query for each model. For example relation expression 
-`children.children` will cause 111 queries to be performed assuming a result set of 10 each having 10 children each 
-having 10 children. For small result sets this doesn't matter. The clear benefit of this algorithm is that there are 
-no limitations. You can use `offset`, `limit`, `min`, `max` etc. in `modifyEager`. You can for example fetch only the 
-youngest child for each parent. 
+This algorithm naively fetches the relations using a separate query for each model. For example relation expression
+`children.children` will cause 111 queries to be performed assuming a result set of 10 each having 10 children each
+having 10 children. For small result sets this doesn't matter. The clear benefit of this algorithm is that there are
+no limitations. You can use `offset`, `limit`, `min`, `max` etc. in `modifyEager`. You can for example fetch only the
+youngest child for each parent.
 
 <b>Performance differences</b>
 
@@ -3271,7 +3271,7 @@ the round trip time to the database server is significant. On the other hand the
 trivial to parse into a tree structure while the result of `JoinEagerAlgorithm` needs some complex parsing which
 can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment.
 You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured
-real-life problem. Don't optimize prematurely! `NaiveEagerAlgorithm` is by far the slowest. It should only be used for 
+real-life problem. Don't optimize prematurely! `NaiveEagerAlgorithm` is by far the slowest. It should only be used for
 cases where performance doesn't matter and when it is the only option to get the job done.
 
 ##### Arguments
@@ -4047,7 +4047,7 @@ Language
 
 Causes a [`Model.NotFoundError`](#notfounderror) to be thrown if the query result is empty.
 
-You can replace `Model.NotFoundError` with your own error by implementing the static 
+You can replace `Model.NotFoundError` with your own error by implementing the static
 [`Model.createNotFoundError(ctx)`](#createnotfounderror) method.
 
 ##### Return value
@@ -5145,7 +5145,7 @@ See the [query examples](#query-examples) section for more examples.
 
 Argument|Type|Description
 --------|----|-------|------------
-transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. for a query. Falsy values are ignored.
 
 ##### Return value
 
@@ -5499,7 +5499,7 @@ The default implementation `delete`s the property.
 #### loadRelated
 
 ```js
-const promise = Person.loadRelated(models, expression, filters);
+const promise = Person.loadRelated(models, expression, filters, transactionOrKnex);
 ```
 
 > Examples:
@@ -5540,6 +5540,7 @@ Argument|Type|Description
 models|Array.&lt;[`Model`](#model)&#124;Object&gt;|
 expression|string&#124;[`RelationExpression`](#relationexpression)|The relation expression
 filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional named filters
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
 
 ##### Return value
 
@@ -6367,7 +6368,7 @@ Type|Description
 #### $loadRelated
 
 ```js
-const builder = modelInstance.$loadRelated(expression, filters);
+const builder = modelInstance.$loadRelated(expression, filters, transactionOrKnex);
 ```
 
 > Examples:
@@ -6410,6 +6411,7 @@ Argument|Type|Description
 --------|----|-------------------
 expression|string&#124;[`RelationExpression`](#relationexpression)|The relation expression
 filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional named filters
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
 
 ##### Return value
 
@@ -6457,7 +6459,7 @@ class Person extends Model {
 class Person extends Model {
   $beforeInsert(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6504,7 +6506,7 @@ class Person extends Model {
 class Person extends Model {
   $afterInsert(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6549,7 +6551,7 @@ class Person extends Model {
 class Person extends Model {
   $beforeUpdate(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6624,7 +6626,7 @@ class Person extends Model {
 class Person extends Model {
   $afterUpdate(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6696,7 +6698,7 @@ class Person extends Model {
 class Person extends Model {
   $beforeDelete(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6743,7 +6745,7 @@ class Person extends Model {
 class Person extends Model {
   $afterDelete(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6790,7 +6792,7 @@ class Person extends Model {
 class Person extends Model {
   $afterGet(queryContext) {
     // This can always be done even if there is no running transaction. In that
-    // case `queryContext.transaction` returns the normal knex instance. This 
+    // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
     return SomeModel
@@ -6848,7 +6850,7 @@ explicitly remember to call `trx.commit()` or `trx.rollback(err)`.
 
 ## TransactionObject
 
-This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be 
+This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be
 [passed to objection queries](#passing-around-a-transaction-object) and [models can be bound to it](#binding-models-to-a-transaction)
 
 See the section about [transactions](#passing-around-a-transaction-object) for more info and examples.
@@ -6966,7 +6968,7 @@ Person
     children.[
       pets,
       movies.actors.[
-        pets, 
+        pets,
         children
       ]
     ]
@@ -6984,7 +6986,7 @@ Person
       pets(filterCats) as cats,
 
       movies.actors.[
-        pets, 
+        pets,
         children as kids
       ]
     ]
@@ -7166,7 +7168,7 @@ throw new ValidationError(data);
 }
 ```
 
-> For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword` 
+> For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword`
 > string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
 
 Error of this class is thrown by default if a model validation fails.

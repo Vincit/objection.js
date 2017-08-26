@@ -287,6 +287,14 @@ module.exports = (session) => {
               .return(models);
           })
           .then(models => {
+            return Model1
+              .query(trx)
+              .findById(models[0].id)
+              .then(it => it.$loadRelated('model1Relation1', null, trx))
+              .then(it => expect(it.model1Relation1.model1Prop1).to.equal('b'))
+              .return(models);
+          })
+          .then(models => {
             expect(models[0].$query(trx).knex() === trx);
           })
           .then(() => {
@@ -338,6 +346,14 @@ module.exports = (session) => {
               .$relatedQuery('model1Relation2')
               .transacting(trx)
               .insert({model2Prop1: 'f'})
+              .return(models);
+          })
+          .then(models => {
+            return Model1
+              .query(trx)
+              .findById(models[0].id)
+              .then(it => it.$loadRelated('model1Relation1', null, trx))
+              .then(it => expect(it.model1Relation1.model1Prop1).to.equal('b'))
               .return(models);
           })
           .then(models => {
