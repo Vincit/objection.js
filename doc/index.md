@@ -443,7 +443,7 @@ class Person extends Model {
 ```js
 class Person extends Model {
   static relationMappings = {
-    animals: {
+    animal: {
       relation: Model.HasOneRelation,
       modelClass: Animal,
       join: {
@@ -698,7 +698,7 @@ Person
 delete from "Person" where lower("firstName") like '%ennif%'
 ```
 
-Delete queries are created by chaining the [`delete`](#delete) method to the query.  
+Delete queries are created by chaining the [`delete`](#delete) method to the query.
 NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](#postgresql-quot-returning-quot-tricks) if you'd like the deleted rows to be returned as Model instances*.
 
 ## Relation queries
@@ -1337,7 +1337,7 @@ console.log('Jennifer and Scrappy were successfully inserted');
 
 ```js
 // `db` can be either a transaction or a knex instance or even
-// `null` or `undefined` if you have globally set the knex 
+// `null` or `undefined` if you have globally set the knex
 // instance using `Model.knex(knex)`.
 function insertPersonAndPet(person, pet, db) {
   return Person
@@ -1365,8 +1365,8 @@ The transaction is committed if the promise returned from the callback is resolv
 is rejected or an error is thrown inside the callback the transaction is rolled back.
 
 Transactions in javascript are a bit of a PITA if you are used to threaded frameworks and languages like java. In those
-a single chain of operations (for example a single request) is handled in a dedicated thread. Transactions are usually 
-started for the whole thread and every database operation you perform after the start automatically takes part in the  
+a single chain of operations (for example a single request) is handled in a dedicated thread. Transactions are usually
+started for the whole thread and every database operation you perform after the start automatically takes part in the
 transaction because they can access the thread local transaction and the framework can be sure that no other chain of
 operations (no other request) uses the same transaction.
 
@@ -1481,11 +1481,11 @@ objection.transaction(Person, (Person, trx) => {
 ```
 
 The second way to use transactions avoids passing around a transaction object by "binding" model
-classes to a transaction. You pass all models you want to bind as arguments to the `objection.transaction` 
-method and as the last argument you provide a callback that receives __copies__ of the models that have 
-been bound to a newly started transaction. All queries started through the bound copies take part in the 
-transaction and you don't need to pass around a transaction object. Note that the models passed to the 
-callback are actual copies of the models passed as arguments to `objection.transaction` and starting a 
+classes to a transaction. You pass all models you want to bind as arguments to the `objection.transaction`
+method and as the last argument you provide a callback that receives __copies__ of the models that have
+been bound to a newly started transaction. All queries started through the bound copies take part in the
+transaction and you don't need to pass around a transaction object. Note that the models passed to the
+callback are actual copies of the models passed as arguments to `objection.transaction` and starting a
 query through any other object will __not__ be executed inside a transaction.
 
 Originally we advertised this way of doing transactions as a remedy to the transaction passing
@@ -1585,9 +1585,9 @@ See [the recipe book](#custom-validation) for instructions if you want to use so
 
 ## List of plugins and modules for objection
 
-A curated list of good plugins and modules for objection. Only plugins that follow [the best practices](#plugin-development-best-practices) 
-are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best 
-practices are an exception to this rule. If you are a developer or otherwise know of a good plugin/module for objection, please 
+A curated list of good plugins and modules for objection. Only plugins that follow [the best practices](#plugin-development-best-practices)
+are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best
+practices are an exception to this rule. If you are a developer or otherwise know of a good plugin/module for objection, please
 create a pull request or an issue to get it added to this list.
 
   * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
@@ -1616,6 +1616,18 @@ class Person extends SomeMixin(Model) {
 }
 ```
 
+> This __doesn't__ work since mixins never modify the input:
+
+```js
+// This does absolutely nothing.
+SomeMixin(Model);
+
+// Doesn't work!
+class Person extends Model {
+
+}
+```
+
 > Multiple mixins:
 
 ```js
@@ -1630,7 +1642,7 @@ class Person extends SomeMixin(SomeOtherMixin(Model)) {
 const { mixin, Model } = require('objection');
 
 class Person extends mixin(Model, [
-  SomeMixin, 
+  SomeMixin,
   SomeOtherMixin,
   EvenMoreMixins,
   LolSoManyMixins,
@@ -1644,7 +1656,7 @@ class Person extends mixin(Model, [
 const { compose, Model } = require('objection');
 
 const mixins = compose(
-  SomeMixin, 
+  SomeMixin,
   SomeOtherMixin,
   EvenMoreMixins,
   LolSoManyMixins,
@@ -1666,8 +1678,8 @@ class Person extends Model {
 }
 ```
 
-When possible, objection.js plugins should be implemented as [class mixins](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/). 
-A mixin is simply a function that takes a class as an argument and returns a subclass. Plugins should 
+When possible, objection.js plugins should be implemented as [class mixins](http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/).
+A mixin is simply a function that takes a class as an argument and returns a subclass. Plugins should
 avoid modifying `objection.Model`, `objection.QueryBuilder` or any other global variables directly.
 See the [example plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin) for more
 info. There is also [another example](https://github.com/Vincit/objection.js/tree/master/examples/plugin-with-options)

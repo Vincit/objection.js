@@ -4529,6 +4529,8 @@ A model class can be defined for a relation in [`relationMappings`](#relationmap
 #### relationMappings
 
 ```js
+const { Model, ref } = require('objection');
+
 class Person extends Model {
   static get relationMappings() {
     return {
@@ -4537,7 +4539,12 @@ class Person extends Model {
         modelClass: Animal,
         join: {
           from: 'Person.id',
-          to: 'Animal.ownerId'
+          // Any of the `to` and `from` fields can also be
+          // references to nested fields (or arrays of references).
+          // Here the relation is created between `Person.id` and
+          // `Animal.json.details.ownerId` properties. The reference
+          // must be casted to the same type as the other key.
+          to: ref('Animal.json:details.ownerId').castInt()
         }
       },
 
@@ -4582,6 +4589,8 @@ class Person extends Model {
 > ESNext:
 
 ```js
+import { Model, ref } from 'objection';
+
 class Person extends Model {
   static relationMappings = {
     pets: {
@@ -4589,7 +4598,12 @@ class Person extends Model {
       modelClass: Animal,
       join: {
         from: 'Person.id',
-        to: 'Animal.ownerId'
+        // Any of the `to` and `from` fields can also be
+        // references to nested fields (or arrays of references).
+        // Here the relation is created between `Person.id` and
+        // `Animal.json.details.ownerId` properties. The reference
+        // must be casted to the same type as the other key.
+        to: ref('Animal.json:details.ownerId').castInt()
       }
     },
 
@@ -4636,8 +4650,8 @@ relationMappings is an object (or a function that returns an object) whose keys 
 The `join` property in addition to the relation type define how the models are related to one
 another. The `from` and `to` properties of the `join` object define the database columns through which the
 models are associated. Note that neither of these columns need to be primary keys. They can be any
-columns. In the case of ManyToManyRelation also the join table needs to be defined. This is
-done using the `through` object.
+columns. In fact they can even be fields inside JSON columns (using the [`ref`](#ref) helper). In the
+case of ManyToManyRelation also the join table needs to be defined. This is done using the `through` object.
 
 The `modelClass` passed to the relation mappings is the class of the related model. It can be one of the following:
 
@@ -4663,16 +4677,16 @@ filter|function([`QueryBuilder`](#querybuilder))|Alias for modify.
 
 Property|Type|Description
 --------|----|-----------
-from|string&#124;Array.&lt;string&gt;|The relation column in the owner table. Must be given with the table name. For example `Person.id`. Composite key can be specified using an array of columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column.
-to|string&#124;Array.&lt;string&gt;|The relation column in the related table. Must be given with the table name. For example `Movie.id`. Composite key can be specified using an array of columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column.
+from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The relation column in the owner table. Must be given with the table name. For example `Person.id`. Composite key can be specified using an array of columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [`ref`](#ref) helper.
+to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The relation column in the related table. Must be given with the table name. For example `Movie.id`. Composite key can be specified using an array of columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [`ref`](#ref) helper.
 through|[`RelationThrough`](#relationthrough)|Describes the join table if the models are related through one.
 
 ##### RelationThrough
 
 Property|Type|Description
 --------|----|-----------
-from|string&#124;Array.&lt;string&gt;|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
-to|string&#124;Array.&lt;string&gt;|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`.
+from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
+to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
 modelClass|string&#124;ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
 extra|Array.&lt;string&gt;&#124;Object|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
 
@@ -7252,15 +7266,13 @@ const relations = Person.getRelations();
 
 console.log(relations.pets instanceof Model.HasManyRelation); // --> true
 console.log(relations.pets.name); // --> pets
-console.log(relations.pets.ownerCol); // --> ['id']
-console.log(relations.pets.relatedCol); // --> ['ownerId']
+console.log(relations.pets.ownerProp.cols); // --> ['id']
+console.log(relations.pets.relatedProp.cols); // --> ['ownerId']
 ```
 
 `Relation` is a parsed and normalized instance of a [`RelationMapping`](#relationmapping). `Relation`s can be accessed using the [`getRelations`](#getrelations) method.
 
-There is a `*Prop` and `*Col` version of each key, because models may define conversions between database and external
-property names. Most of the times these fields hold the same values, but in case of a conversion, the conversion has
-been applied to them. The properties are arrays because of composite key support.
+`Relation` holds a [`RelationProperty`](#relationproperty) instance for each property that is used to create the relationship between two tables.
 
 `Relation` is actually a base class for all relation types `BelongsToOneRelation`, `HasManyRelation` etc. You can use `instanceof` to determine
 the type of the relations (see the example on the right). Note that `HasOneRelation` is a subclass of `HasManyRelation` and `HasOneThroughRelation`
@@ -7271,12 +7283,85 @@ Property|Type|Description
 name|string|Name of the relation. For example `pets` or `children`.
 ownerModelClass|function|The model class that has defined the relation.
 relatedModelClass|function|The model class of the related objects.
-ownerCol|Array&lt;string&gt;|The relation column in the `ownerModelClass`.
-ownerProp|Array&lt;string&gt;|The relation property in the `ownerModelClass`.
-relatedCol|Array&lt;string&gt;|The relation column in the `relatedModelClass`.
-relatedProp|Array&lt;string&gt;|The relation property in the `relatedModelClass`.
+ownerProp|[`RelationProperty`](#relationproperty)]|The relation property in the `ownerModelClass`.
+relatedProp|[`RelationProperty`](#relationproperty)|The relation property in the `relatedModelClass`.
 joinTable|string|The name of the join table (only for `ManyToMany` and `HasOneThrough` relations).
-joinTableOwnerCol|Array&lt;string&gt;|The join table column pointing to `ownerCol` (only for `ManyToMany` and `HasOneThrough` relations).
-joinTableOwnerProp|Array&lt;string&gt;|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).
-joinTableRelatedCol|Array&lt;string&gt;|The join table property pointing to `relatedCol` (only for `ManyToMany` and `HasOneThrough` relations).
-joinTableRelatedProp|Array&lt;string&gt;|The join table property pointing to `relatedProp` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableOwnerProp|[`RelationProperty`](#relationproperty)|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableRelatedProp|[`RelationProperty`](#relationproperty)|The join table property pointing to `relatedProp` (only for `ManyToMany` and `HasOneThrough` relations).
+
+## RelationProperty
+
+Represents a property that is used to create relationship between two tables. A single `RelationProperty` instance can represent
+composite key. In addition to a table column, A `RelationProperty` can represent a nested field inside a column (for example a jsonb column).
+
+### Properties
+
+Property|Type|Description
+--------|----|-----------
+size|number|The number of columns. In case of composite key, this is greater than one.
+modelClass|function|The model class that owns the property.
+props|Array&lt;string&gt;|The column names converted to "external" format. For example if `modelClass` defines a snake_case to camelCase conversion, these names are in camelCase. Note that a `RelationProperty` may actually point to a sub-properties of the columns in case they are of json or some other non-scalar type. This array always contains only the converted column names. Use `getProp(obj, idx)` method to get the actual value from an object.
+cols|Array&lt;string&gt;|The column names in the database format. For example if `modelClass` defines a snake_case to camelCase conversion, these names are in snake_case. Note that a `RelationProperty` may actually point to a sub-properties of the columns in case they are of json or some other non-scalar type. This array always contains only the column names.
+
+### Methods
+
+#### getProp
+
+```js
+const value = property.getProp(obj, index);
+```
+
+Gets this property's index:th value from an object. For example if the property represents a composite key `[a, b.d.e, c]`
+and obj is `{a: 1, b: {d: {e: 2}}, c: 3}` then `getProp(obj, 1)` would return `2`.
+
+#### setProp
+
+```js
+const value = property.setProp(obj, index, value);
+```
+
+Sets this property's index:th value in an object. For example if the property represents a composite key `[a, b.d.e, c]`
+and obj is `{a: 1, b: {d: {e: 2}}, c: 3}` then `setProp(obj, 1, 'foo')` would mutate `obj` into `{a: 1, b: {d: {e: 'foo'}}, c: 3}`.
+
+#### fullCol
+
+```js
+const col = property.fullCol(builder, index);
+```
+
+Returns the property's index:th column name with the correct table reference. Something like `"Table.column"`.
+The first argument must be an objection [`QueryBuilder`](#querybuilder) instance.
+
+<h4 id="relationproperty-ref">ref</h4>
+
+```js
+const ref = property.ref(builder, index);
+```
+
+> Allows you to do things like this:
+
+```js
+const builder = Person.query();
+const ref = property.ref(builder, 0);
+builder.where(ref, '>', 10);
+```
+
+Returns a [`ReferenceBuilder`](#ref) instance that points to the index:th column.
+
+#### patch
+
+```js
+property.patch(patchObj, index, value);
+```
+
+> Allows you to do things like this:
+
+```js
+const builder = Person.query();
+const patch = {};
+property.patch(patch, 0, 'foo');
+builder.patch(patch);
+```
+
+Appends an update operation for the index:th column into `patchObj` object.
+
