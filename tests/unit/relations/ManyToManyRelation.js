@@ -112,8 +112,8 @@ describe('ManyToManyRelation', () => {
     });
 
     expect(relation.joinTable).to.equal('JoinModel');
-    expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerId']);
-    expect(relation.joinTableRelatedProp.cols()).to.eql(['relatedId']);
+    expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
+    expect(relation.joinTableRelatedProp.cols).to.eql(['relatedId']);
   });
 
   it('should accept a join model in join.through object', () => {
@@ -134,8 +134,8 @@ describe('ManyToManyRelation', () => {
     });
 
     expect(relation.joinTable).to.equal('JoinModel');
-    expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerId']);
-    expect(relation.joinTableRelatedProp.props()).to.eql(['relatedId']);
+    expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
+    expect(relation.joinTableRelatedProp.props).to.eql(['relatedId']);
     expect(classUtils.isSubclassOf(relation.joinModelClass(mockKnex), JoinModel)).to.equal(true);
   });
 
@@ -157,8 +157,8 @@ describe('ManyToManyRelation', () => {
     });
 
     expect(relation.joinTable).to.equal('JoinModel');
-    expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerId']);
-    expect(relation.joinTableRelatedProp.cols()).to.eql(['relatedId']);
+    expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
+    expect(relation.joinTableRelatedProp.cols).to.eql(['relatedId']);
     expect(classUtils.isSubclassOf(relation.joinModelClass(mockKnex), require('./files/JoinModel'))).to.equal(true);
   });
 
@@ -179,8 +179,8 @@ describe('ManyToManyRelation', () => {
     });
 
     expect(relation.joinTable).to.equal('JoinModel');
-    expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerName', 'ownerDateOfBirth']);
-    expect(relation.joinTableRelatedProp.cols()).to.eql(['relatedId']);
+    expect(relation.joinTableOwnerProp.cols).to.eql(['ownerName', 'ownerDateOfBirth']);
+    expect(relation.joinTableRelatedProp.cols).to.eql(['relatedId']);
   });
 
   it('should accept a composite keys in join.through object (2)', () => {
@@ -200,8 +200,8 @@ describe('ManyToManyRelation', () => {
     });
 
     expect(relation.joinTable).to.equal('JoinModel');
-    expect(relation.joinTableOwnerProp.cols()).to.eql(['ownerName', 'ownerDateOfBirth']);
-    expect(relation.joinTableRelatedProp.cols()).to.eql(['relatedA', 'relatedB']);
+    expect(relation.joinTableOwnerProp.cols).to.eql(['ownerName', 'ownerDateOfBirth']);
+    expect(relation.joinTableRelatedProp.cols).to.eql(['relatedA', 'relatedB']);
   });
 
   it('should fail if join.through.modelClass is not a subclass of Model', () => {
