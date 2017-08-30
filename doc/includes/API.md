@@ -1,5 +1,8 @@
 # API reference
 
+
+
+
 ## The main module
 
 ```js
@@ -7,48 +10,89 @@ const mainModule = require('objection');
 const { Model, ref } = require('objection');
 ```
 
-The main module is what you get when you import objection. It has a bunch of fields that are all
-documented elsewhere in the API docs. Here's a list of the fields and links to their docs.
+The main module is what you get when you import objection. It has a bunch of properties that are all
+documented elsewhere in the API docs.
 
-### Fields
+
+
+
+### Properties
 
 <h4 id="objection-model">Model</h4>
+
+```js
+const { Model } = require('objection');
+```
 
 [The model base class.](#model)
 
 <h4 id="objection-transaction">transaction</h4>
 
+```js
+const { transaction } = require('objection');
+```
+
 [The transaction function.](#transactions)
 
 <h4 id="objection-ref">ref</h4>
+
+```js
+const { ref } = require('objection');
+```
 
 [The ref helper function.](#ref)
 
 <h4 id="objection-raw">raw</h4>
 
+```js
+const { raw } = require('objection');
+```
+
 [The raw helper function.](#raw)
 
 <h4 id="objection-lit">lit</h4>
+
+```js
+const { lit } = require('objection');
+```
 
 [The lit helper function.](#lit)
 
 <h4 id="objection-mixin">mixin</h4>
 
+```js
+const { mixin } = require('objection');
+```
+
 [The mixin helper](#plugins) for applying plugins. See the examples behind this link.
 
 <h4 id="objection-compose">compose</h4>
+
+```js
+const { compose } = require('objection');
+```
 
 [The compose helper](#plugins) for applying plugins. See the examples behind this link.
 
 <h4 id="objection-lodash">lodash</h4>
 
-[Lodash utility library](https://lodash.com/) used in objection. Useful for plugin developers so that
-they don't have to add it as a dependency.
+```js
+const { lodash } = require('objection');
+```
+
+[Lodash utility library](https://lodash.com/) used internally by objection.
 
 <h4 id="objection-promise">Promise</h4>
 
-[Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used in objection. Useful for plugin developers so that
-they don't have to add it as a dependency.
+```js
+const { Promise } = require('objection');
+```
+
+[Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used internally by objection.
+
+
+
+
 
 ## QueryBuilder
 
@@ -2789,6 +2833,58 @@ queryContext|Object|The object to merge into the query context.
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+
+#### tableNameFor
+
+```js
+const tableName = queryBuilder.tableNameFor(modelClass);
+```
+
+Returns the table name for a given model class for the query. Usually the table name can be fetched
+through `Model.tableName` but if the source table has been changed for example using the [`QueryBuilder#table`](#table)
+method `tableNameFor` will return the correct value.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+modelClass|function|A model class.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The source table (or view) name for `modelClass`.
+
+
+
+
+
+#### tableRefFor
+
+```js
+const tableRef = queryBuilder.tableRefFor(modelClass);
+```
+
+Returns the name that should be used to refer to the `modelClass`'s table in the query.
+Usually a table can be referred to using its name, but `tableRefFor` can return a different
+value for example in case an alias has been given.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------|------------
+modelClass|function|A model class.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The name that should be used to refer to a table in the query.
 
 
 
