@@ -28,6 +28,10 @@ documented elsewhere in the API docs. Here's a list of the fields and links to t
 
 [The raw helper function.](#raw)
 
+<h4 id="objection-lit">lit</h4>
+
+[The lit helper function.](#lit)
+
 <h4 id="objection-mixin">mixin</h4>
 
 [The mixin helper](#plugins) for applying plugins. See the examples behind this link.
@@ -95,18 +99,14 @@ Type|Description
 
 ### Global query building helpers
 
+
+
+
 #### ref
 
 ```js
 const ref = require('objection').ref;
 ```
-
-Factory function that returns a `ReferenceBuilder` instance, that makes it easier to refer
-to tables, columns, json attributes and add casting to referred columns wihtout need to use
-raw queries.
-
-See [`FieldExpression`](#fieldexpression) for more information about how to refer to
-json fields.
 
 ```js
 import { ref } from 'objection';
@@ -121,55 +121,29 @@ Model.query()
   .where('age', '>', ref('OtherModel.ageLimit'));
 ```
 
-#### ReferenceBuilder methods
+Factory function that returns a [`ReferenceBuilder`](#referencebuilder) instance, that makes it easier to refer
+to tables, columns, json attributes etc. `ReferenceBuilder` can also used to type cast and alias the references.
 
-##### castText()
+See [`FieldExpression`](#fieldexpression) for more information about how to refer to json fields.
 
-Cast reference to sql type `text`.
 
-##### castInt()
 
-Cast reference to sql type `integer`.
 
-##### castBigInt()
+#### lit
 
-Cast reference to sql type `bigint`.
+```js
+import { lit, ref } from 'objection';
 
-##### castFloat()
+Model
+  .query()
+  .where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}))
+```
 
-Cast reference to sql type `float`.
+Factory function that returns a [`LiteralBuilder`](#literalbuilder) instance. `LiteralBuilder`
+helps build literals of different types.
 
-##### castDecimal()
 
-Cast reference to sql type `decimal`.
 
-##### castReal()
-
-Cast reference to sql type `real`.
-
-##### castBool()
-
-Cast reference to sql type `boolean`.
-
-##### castType(sqlType)
-
-Give custom casting type to which referenced value is casted to.
-
-`.castType('mytype') => CAST(?? as mytype)`
-
-##### castJson()
-
-In addition to other casts wrap reference to_jsonb() function so that final value
-reference will be json type.
-
-##### as(as)
-
-As format to tell which name will be used for reference for example in `.select(ref('age').as('yougness'))`
-
-#### lit() (Not implemented yet)
-
-The same as `ref()` but allows one to tell in which format certain javascript literal
-should be passed to database engine.
 
 #### raw
 
@@ -186,8 +160,10 @@ Person
   });
 ```
 
-Wrapper for knex raw query that doens't depend on knex. Instances returned by
-`raw` are converted to knex raw instances when the query is executed.
+Factory function that returns a [`RawBuilder`](#rawbuilder) instance. `RawBuilder` is a
+wrapper for knex raw query that doens't depend on knex. Instances of `RawBuilder` are
+converted to knex raw instances lazily when the query is executed.
+
 
 
 
@@ -7365,3 +7341,113 @@ builder.patch(patch);
 
 Appends an update operation for the index:th column into `patchObj` object.
 
+
+
+
+
+## ReferenceBuilder
+
+An instance of this is returned from the [`ref`](#ref) helper function.
+
+### Methods
+
+#### castText
+
+Cast reference to sql type `text`.
+
+#### castInt
+
+Cast reference to sql type `integer`.
+
+#### castBigInt
+
+Cast reference to sql type `bigint`.
+
+#### castFloat
+
+Cast reference to sql type `float`.
+
+#### castDecimal
+
+Cast reference to sql type `decimal`.
+
+#### castReal
+
+Cast reference to sql type `real`.
+
+#### castBool
+
+Cast reference to sql type `boolean`.
+
+#### castType
+
+Give custom type to which referenced value is casted to.
+
+`.castType('mytype') --> CAST(?? as mytype)`
+
+#### castJson
+
+In addition to other casts wrap reference to_jsonb() function so that final value
+reference will be json type.
+
+#### as
+
+Gives an alias for the reference `.select(ref('age').as('yougness'))`
+
+
+
+
+
+## LiteralBuilder
+
+An instance of this is returned from the [`lit`](#lit) helper function. If an object
+is given as a value, it is casted to json by default.
+
+### Methods
+
+#### castText
+
+Cast to sql type `text`.
+
+#### castInt
+
+Cast to sql type `integer`.
+
+#### castBigInt
+
+Cast to sql type `bigint`.
+
+#### castFloat
+
+Cast to sql type `float`.
+
+#### castDecimal
+
+Cast to sql type `decimal`.
+
+#### castReal
+
+Cast to sql type `real`.
+
+#### castBool
+
+Cast to sql type `boolean`.
+
+#### castType
+
+Cast to custom type
+
+`.castType('mytype') --> CAST(?? as mytype)`
+
+#### castJson
+
+Converts the value to json (jsonb in case of postgresql). The default
+cast type for object values.
+
+#### castArray
+
+Converts the value to an array literal.
+
+#### as
+
+Gives an alias for the reference `.select(ref('age').as('yougness'))`
