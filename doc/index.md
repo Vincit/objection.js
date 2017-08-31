@@ -1590,6 +1590,7 @@ are accepted on this list. Other modules like plugins for other frameworks and t
 practices are an exception to this rule. If you are a developer or otherwise know of a good plugin/module for objection, please
 create a pull request or an issue to get it added to this list.
 
+  * [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for you models
   * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
   * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
   * [objection-unique](https://github.com/seegno/objection-unique) - Unique validation for your models
