@@ -757,15 +757,22 @@ Person
   });
 ```
 
-> You can also give raw expressions, subqueries and `ref()` as values like this:
+> You can also give raw expressions, subqueries and `ref()` as values and [`FieldExpressions`](#fieldexpression) as keys:
 
 ```js
+const {ref, raw} = require('objection');
+
 Person
   .query()
   .patch({
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'"),
-    oldLastName: ref('lastName')
+    // You can use knex.raw instead of `raw()` if
+    // you prefer.
+    firstName: raw("'Jenni' || 'fer'"),
+    oldLastName: ref('lastName'),
+    // This updates a value nested deep inside a
+    // json column `detailsJsonColumn`.
+    'detailsJsonColumn:address.street': 'Elm street'
   });
 ```
 
