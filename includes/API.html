@@ -1182,6 +1182,9 @@ the case of many-to-many relation, creates a join row to the join table.</p>
 deletes the join column from the join table. For other relation types this sets the
 join columns to null.</p>
 
+<p>Note that, unlike for <code class="prettyprint">relate</code>, you shouldn&rsquo;t pass arguments for the <code class="prettyprint">unrelate</code> method.
+Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">delete</code> and filter the rows using the returned query builder.</p>
+
 <h5 id="return-value">Return value</h5>
 
 <table><thead>
@@ -7184,9 +7187,19 @@ they are cloned using their <code class="prettyprint">$clone()</code> method.</p
 <blockquote>
 <p>Re-fetch the instance from the database:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">person</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">reFetchedPerson</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Note that `person` did not get modified by the fetch.</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">reFetchedPerson</span><span class="p">);</span>
 <span class="p">});</span>
+
+<span class="c1">// If you need to refresh the same instance you can do this:</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">reFetchedPerson</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Note that `person` did not get modified by the fetch.</span>
+  <span class="nx">person</span><span class="p">.</span><span class="nx">$set</span><span class="p">(</span><span class="nx">reFetchedPerson</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Or this:</span>
+<span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">();</span>
 </code></pre>
 <blockquote>
 <p>Insert a new model to database:</p>

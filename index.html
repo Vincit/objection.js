@@ -3770,6 +3770,9 @@ the case of many-to-many relation, creates a join row to the join table.</p>
 deletes the join column from the join table. For other relation types this sets the
 join columns to null.</p>
 
+<p>Note that, unlike for <code class="prettyprint">relate</code>, you shouldn&rsquo;t pass arguments for the <code class="prettyprint">unrelate</code> method.
+Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">delete</code> and filter the rows using the returned query builder.</p>
+
 <h5 id="return-value">Return value</h5>
 
 <table><thead>
@@ -9772,9 +9775,19 @@ they are cloned using their <code class="prettyprint">$clone()</code> method.</p
 <blockquote>
 <p>Re-fetch the instance from the database:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">person</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">reFetchedPerson</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Note that `person` did not get modified by the fetch.</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">reFetchedPerson</span><span class="p">);</span>
 <span class="p">});</span>
+
+<span class="c1">// If you need to refresh the same instance you can do this:</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span><span class="nx">reFetchedPerson</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// Note that `person` did not get modified by the fetch.</span>
+  <span class="nx">person</span><span class="p">.</span><span class="nx">$set</span><span class="p">(</span><span class="nx">reFetchedPerson</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Or this:</span>
+<span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">person</span><span class="p">.</span><span class="nx">$query</span><span class="p">();</span>
 </code></pre>
 <blockquote>
 <p>Insert a new model to database:</p>
@@ -11030,6 +11043,24 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 
           <h1 id="changelog">Changelog</h1>
 
+<h2 id="0-8-9">0.8.9</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Fix <a href="https://github.com/Vincit/objection.js/issues/502">#502</a></li>
+</ul>
+
+<h2 id="0-8-8">0.8.8</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Typing updates: <a href="https://github.com/Vincit/objection.js/issues/489">#489</a> <a href="https://github.com/Vincit/objection.js/issues/487">#487</a></li>
+<li>Improve <code class="prettyprint">resultSize</code> method. <a href="https://github.com/Vincit/objection.js/issues/213">#213</a></li>
+<li>Avoid unnecessary updates in upsertGraph <a href="https://github.com/Vincit/objection.js/issues/480">#480</a></li>
+</ul>
+
 <h2 id="0-8-7">0.8.7</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
@@ -11064,7 +11095,7 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
 
 <ul>
-<li>New shorthand methods <a href="http://vincit.github.io/objection.js/#joineager"><code class="prettyprint">joinEager</code></a>, <a href="http://vincit.github.io/objection.js/#naiveeager"><code class="prettyprint">naiveEager</code></a>, 
+<li>New shorthand methods <a href="http://vincit.github.io/objection.js/#joineager"><code class="prettyprint">joinEager</code></a>, <a href="http://vincit.github.io/objection.js/#naiveeager"><code class="prettyprint">naiveEager</code></a>,
 <a href="http://vincit.github.io/objection.js/#mergejoineager"><code class="prettyprint">mergeJoinEager</code></a> and <a href="http://vincit.github.io/objection.js/#mergenaiveeager"><code class="prettyprint">mergeNaiveEager</code></a>.</li>
 <li>New shorthand method <a href="http://vincit.github.io/objection.js/#findone"><code class="prettyprint">findOne</code></a></li>
 <li>New reflection method <a href="http://vincit.github.io/objection.js/#isfindquery"><code class="prettyprint">isFindQuery</code></a></li>
