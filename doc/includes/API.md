@@ -2806,7 +2806,7 @@ for more information about the hooks.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 queryContext|Object|The query context object
 
 ##### Return value
@@ -2832,7 +2832,7 @@ this method merges the objects.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 queryContext|Object|The object to merge into the query context.
 
 ##### Return value
@@ -2858,7 +2858,7 @@ method `tableNameFor` will return the correct value.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 modelClass|function|A model class.
 
 ##### Return value
@@ -2884,7 +2884,7 @@ value for example in case an alias has been given.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 modelClass|function|A model class.
 
 ##### Return value
@@ -2907,8 +2907,8 @@ Skips the database query and "fakes" an error result.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
-reson||The rejection reason
+--------|----|--------------------
+reson| |The rejection reason
 
 ##### Return value
 
@@ -2930,8 +2930,8 @@ Skips the database query and "fakes" a result.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
-value||The resolve value
+--------|----|--------------------
+value| |The resolve value
 
 ##### Return value
 
@@ -3014,7 +3014,7 @@ chained like [`then`](#then) methods of a promise.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 runBefore|function(any, [`QueryBuilder`](#querybuilder))|The function to be executed.
 
 ##### Return value
@@ -3056,7 +3056,7 @@ from these. You should _only_ call the query building methods of the builder pro
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 onBuild|function([`QueryBuilder`](#querybuilder))|The function to be executed.
 
 ##### Return value
@@ -3099,7 +3099,7 @@ registered using the [`then`](#then) method. Multiple functions can be chained l
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 runAfter|function(*, [`QueryBuilder`](#querybuilder))|The function to be executed.
 
 ##### Return value
@@ -3130,7 +3130,7 @@ the available algorithms [here](#eager).
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 algo|EagerAlgorithm|The eager loading algorithm to use. One of `Model.JoinEagerAlgorithm`, `Model.WhereInEagerAlgorithm` and `Model.NaiveEagerAlgorithm`.
 
 ##### Return value
@@ -3356,7 +3356,7 @@ cases where performance doesn't matter and when it is the only option to get the
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The eager expression
 filters|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The named filter functions for the expression
 
@@ -3418,7 +3418,7 @@ expression to the existing expression.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The eager expression
 filters|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The named filter functions for the expression
 
@@ -3468,7 +3468,7 @@ parameters of a http request.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The allowed eager expression
 
 ##### Return value
@@ -3528,7 +3528,7 @@ Person
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 pathExpression|string&#124;[`RelationExpression`](#relationexpression)|Expression that specifies the queries for which to give the filter.
 modifier|function([`QueryBuilder`](#querybuilder)|The modifier function.
 
@@ -3583,7 +3583,7 @@ section about [eager queries](#eager-queries) for more information on relation e
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The allowed eager expression
 
 ##### Return value
@@ -3690,7 +3690,7 @@ Sets the transaction for a query.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 transaction|object|A transaction object
 
 ##### Return value
@@ -3820,7 +3820,7 @@ Executes the query and calls `return(returnValue)` for the returned promise.
 
 Argument|Type|Default|Description
 --------|----|-------|------------
-returnValue||undefined|Return value
+returnValue| |undefined|Return value
 
 ##### Return value
 
@@ -3844,7 +3844,7 @@ Executes the query and calls `bind(context)` for the returned promise.
 
 Argument|Type|Default|Description
 --------|----|-------|------------
-context||undefined|Bind context
+context| |undefined|Bind context
 
 ##### Return value
 
@@ -3965,7 +3965,7 @@ The problem with this is that if the result set is empty, we don't get the total
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|-------------------
 page|number|The index of the page to return
 pageSize|number|The page size
 
@@ -4025,7 +4025,7 @@ The problem with this is that if the result set is empty, we don't get the total
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 start|number|The index of the first result (inclusive)
 end|number|The index of the last result (inclusive)
 
@@ -4060,7 +4060,7 @@ If the result is an array, plucks a property from each object.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 propertyName|string|The name of the property to pluck
 
 ##### Return value
@@ -4179,7 +4179,7 @@ function is only called for the models of that class.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 modelClass|[`Model`](#model)|The optional model class filter. If given, the traverser function is only called for models of this class.
 traverser|function([`Model`](#model), [`Model`](#model), string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
 
@@ -4228,7 +4228,7 @@ instances and `id` and `name` properties of all `Animal` instances.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 modelClass|[`Model`](#model)|The optional model class filter
 properties|Array.&lt;string&gt;|The properties to pick
 
@@ -4276,7 +4276,7 @@ and `species` properties of all `Animal` instances.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 modelClass|[`Model`](#model)|The optional model class filter
 properties|Array.&lt;string&gt;|The properties to omit
 
@@ -5237,7 +5237,7 @@ See the [query examples](#query-examples) section for more examples.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. for a query. Falsy values are ignored.
 
 ##### Return value
@@ -6311,7 +6311,7 @@ All queries built using the returned builder only affect this instance.
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
 
 ##### Return value
