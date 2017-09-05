@@ -129,7 +129,7 @@ Create QueryBuilder for a Model subclass. You rarely need to call this. Query bu
 ##### Arguments
 
 Argument|Type|Description
---------|----|-------|------------
+--------|----|--------------------
 modelClass|[`Model`](#model)|A Model class constructor
 
 ##### Return value
