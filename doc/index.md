@@ -1583,18 +1583,23 @@ See [the recipe book](#custom-validation) for instructions if you want to use so
 
 # Plugins
 
-## List of plugins and modules for objection
-
-A curated list of good plugins and modules for objection. Only plugins that follow [the best practices](#plugin-development-best-practices)
+A curated list of plugins and modules for objection. Only plugins that follow [the best practices](#plugin-development-best-practices)
 are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best
 practices are an exception to this rule. If you are a developer or otherwise know of a good plugin/module for objection, please
 create a pull request or an issue to get it added to this list.
+
+## 3rd party plugins
 
   * [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for you models
   * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
   * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
   * [objection-unique](https://github.com/seegno/objection-unique) - Unique validation for your models
   * [objection-visibility](https://github.com/oscaroox/objection-visibility) - whitelist/blacklist your model properties
+
+## Other 3rd party modules
+
+ * [objection-filter](https://github.com/tandg-digital/objection-filter) - API filtering on data and related models
+ * [objection-graphql](https://github.com/vincit/objection-graphql) - Automatically generates rich graphql schema for objection models
 
 ## Plugin development best practices
 
@@ -1684,7 +1689,7 @@ A mixin is simply a function that takes a class as an argument and returns a sub
 avoid modifying `objection.Model`, `objection.QueryBuilder` or any other global variables directly.
 See the [example plugin](https://github.com/Vincit/objection.js/tree/master/examples/plugin) for more
 info. There is also [another example](https://github.com/Vincit/objection.js/tree/master/examples/plugin-with-options)
-that should be followed if your plugin needs options or configuration parameters.
+that should be followed if your plugin takes options or configuration parameters.
 
 # Contribution guide
 
