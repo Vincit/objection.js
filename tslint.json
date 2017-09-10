@@ -1,8 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "extends": ["tslint:recommended"],
   "jsRules": {},
   "rules": {
     "class-name": false,
@@ -10,12 +8,16 @@
     "max-classes-per-file": [false],
     "member-access": [false],
     "member-ordering": [false],
+    "no-console": false,
     "no-namespace": [false],
-    "no-empty-interface": [false],
     "no-unused-expression": [false],
+    "object-literal-sort-keys": [
+      false
+    ],
+    "quotemark": ["single"],
     "semicolon": [true, "always"],
     "space-before-function-paren": [false],
-    "trailing-comma": [false, "always"],
+    "trailing-comma": [false],
     "array-type": [false, "array-simple"],
     "unified-signatures": false
   },
