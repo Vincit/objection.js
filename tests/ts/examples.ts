@@ -238,7 +238,7 @@ qb = qb.runBefore(qbcb);
 qb = qb.reject('fail');
 qb = qb.resolve('success');
 
-objection.transaction(Person, (TxPerson) => {
+objection.transaction(Person, TxPerson => {
   const n: number = new TxPerson().examplePersonMethod('hello');
   return Promise.resolve('yay');
 });
@@ -285,7 +285,7 @@ objection.transaction(
   }
 );
 
-objection.transaction.start(Person).then((trx) => {
+objection.transaction.start(Person).then(trx => {
   const TxPerson: typeof Person = Person.bindTransaction(trx);
   TxPerson.query()
     .then(() => trx.commit())
@@ -320,19 +320,19 @@ Person.query().insert({ firstName: 'Chuck' });
 new Person().$relatedQuery<Movie>('movies').insert({ title: 'Total Recall' });
 
 // Verify if is possible transaction class can be shared across models
-objection.transaction(Person.knex(), async (trx) => {
+objection.transaction(Person.knex(), async trx => {
   await Person.query(trx).insert({ firstName: 'Name' });
   await Movie.query(trx).insert({ title: 'Total Recall' });
 });
 
-objection.transaction<Person>(Person.knex(), async (trx) => {
+objection.transaction<Person>(Person.knex(), async trx => {
   const person = await Person.query(trx).insert({ firstName: 'Name' });
   await Movie.query(trx).insert({ title: 'Total Recall' });
 
   return person;
 });
 
-objection.transaction.start(Person).then((trx) => {
+objection.transaction.start(Person).then(trx => {
   Movie.query(trx)
     .then(() => trx.commit())
     .catch(() => trx.rollback());
@@ -344,3 +344,10 @@ const whereInSubquery = Movie.query().select('name');
 Person.query().whereIn('firstName', whereInSubquery);
 
 Person.query().whereExists(whereInSubquery);
+
+// Example of raw select, where, and orderby from docs:
+
+Person.query()
+  .select(objection.raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .where(objection.raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
+  .orderBy(objection.raw('random()'));
