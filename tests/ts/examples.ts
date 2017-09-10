@@ -14,27 +14,29 @@ class Person extends objection.Model {
   examplePersonMethod = (arg: string) => 1;
 
   static async truncate(): Promise<void> {
-    await this.query().truncate()
+    await this.query().truncate();
   }
 
   static async withLastName(lastName: string): Promise<Person[]> {
-    return this.query().where('lastName', lastName)
+    return this.query().where('lastName', lastName);
   }
 
   static async firstWithLastName(lastName: string): Promise<Person | undefined> {
-    return this.query().where({lastName: lastName}).first()
+    return this.query()
+      .where({ lastName })
+      .first();
   }
 
   static async findById(id: number): Promise<Person | undefined> {
-    return this.query().findById(id)
+    return this.query().findById(id);
   }
 
   static async findWithFirstName(firstname: string): Promise<Person | undefined> {
-    return this.query().findOne({firstName: firstname})
+    return this.query().findOne({ firstName: firstname });
   }
 
   async loadMovies(): Promise<this> {
-    return this.$loadRelated('movies')
+    return this.$loadRelated('movies');
   }
 
   async reload(): Promise<this> {
@@ -43,13 +45,13 @@ class Person extends objection.Model {
 
   async petsWithId(petId: number): Promise<Animal[]> {
     // Types can't look at strings and give strong types, so this must be a Model[] promise:
-    const pets: objection.Model[] = await this.$relatedQuery('pets').where('id', petId)
+    const pets: objection.Model[] = await this.$relatedQuery('pets').where('id', petId);
     // that we can subsequently cast to Animal:
-    return pets as Animal[]
+    return pets as Animal[];
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
-    console.log(queryContext.someCustomValue)
+    console.log(queryContext.someCustomValue);
   }
 }
 
@@ -76,11 +78,11 @@ const BoundPerson: typeof Person = Person.bindKnex(k);
 // With expected static methods:
 Person.bindKnex(k).truncate();
 
-// The Model subclass is interpreted correctly to be constructable 
+// The Model subclass is interpreted correctly to be constructable
 
 const examplePerson: Person = new BoundPerson();
 
-// and to have expected sublcass fields 
+// and to have expected sublcass fields
 
 examplePerson.firstName = 'example';
 examplePerson.lastName = 'person';
@@ -93,7 +95,9 @@ const exampleResult: number = examplePerson.examplePersonMethod('hello');
 
 const personId = examplePerson.$id();
 const exampleJsonPerson: Person = examplePerson.$setJson({ id: 'hello' });
-const exampleDatabaseJsonPerson: Person = examplePerson.$setDatabaseJson({ id: 'hello' });
+const exampleDatabaseJsonPerson: Person = examplePerson.$setDatabaseJson({
+  id: 'hello'
+});
 const omitPersonFromKey: Person = examplePerson.$omit('lastName');
 const omitPersonFromObj: Person = examplePerson.$omit({ firstName: true });
 const pickPersonFromKey: Person = examplePerson.$pick('lastName');
@@ -102,18 +106,18 @@ const clonePerson: Person = examplePerson.$clone();
 
 // static methods from Model should return the subclass type
 
-Person.loadRelated([new Person()], 'movies').then((people: Person[]) => { });
+const people: Promise<Person[]> = Person.loadRelated([new Person()], 'movies');
 
 class Actor {
-  canAct: boolean
+  canAct: boolean;
 }
 
 // test .extend:
 const PersonActor = Person.extend(Actor);
 
-const pa = new PersonActor()
-pa.firstName = 'chuck'
-pa.canAct = false
+const pa = new PersonActor();
+pa.firstName = 'chuck';
+pa.canAct = false;
 
 // Optional<Person> typing for findById():
 
@@ -161,31 +165,43 @@ qb = qb.joinRelation('table', { alias: false });
 
 // signature-changing QueryBuilder methods:
 
-const rowInserted: Promise<Person> = qb.insert({ firstName: 'bob' })
-const rowsInserted: Promise<Person[]> = qb.insert([{ firstName: 'alice' }, { firstName: 'bob' }])
-const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({})
-const rowsUpdated: Promise<number> = qb.update({})
-const rowsPatched: Promise<number> = qb.patch({})
-const rowsDeleted: Promise<number> = qb.deleteById(123)
-const rowsDeleted2: Promise<number> = qb.deleteById([123, 456])
+const rowInserted: Promise<Person> = qb.insert({ firstName: 'bob' });
+const rowsInserted: Promise<Person[]> = qb.insert([{ firstName: 'alice' }, { firstName: 'bob' }]);
+const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({});
+const rowsUpdated: Promise<number> = qb.update({});
+const rowsPatched: Promise<number> = qb.patch({});
+const rowsDeleted: Promise<number> = qb.deleteById(123);
+const rowsDeleted2: Promise<number> = qb.deleteById([123, 456]);
 
-const insertedModel: Promise<Person> = Person.query().insertAndFetch({})
-const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([new Person(), new Person()])
+const insertedModel: Promise<Person> = Person.query().insertAndFetch({});
+const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([
+  new Person(),
+  new Person()
+]);
 
-const upsertModel1: Promise<Person> = Person.query().upsertGraph({})
-const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, {relate: true})
-const upsertModels1: Promise<Person[]> = Person.query().upsertGraph([])
-const upsertModels2: Promise<Person[]> = Person.query().upsertGraph([], {unrelate: true})
+const upsertModel1: Promise<Person> = Person.query().upsertGraph({});
+const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, { relate: true });
+const upsertModels1: Promise<Person[]> = Person.query().upsertGraph([]);
+const upsertModels2: Promise<Person[]> = Person.query().upsertGraph([], {
+  unrelate: true
+});
 
-const insertedGraphAndFetchOne: Promise<Person> = Person.query().insertGraphAndFetch(new Person())
-const insertedGraphAndFetchSome: Promise<Person[]> = Person.query().insertGraphAndFetch([new Person(), new Person()])
-const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch(new Person())
-const updatedModel: Promise<Person> = Person.query().updateAndFetch({})
-const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {})
-const patchedModel: Promise<Person> = Person.query().patchAndFetch({})
-const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {})
+const insertedGraphAndFetchOne: Promise<Person> = Person.query().insertGraphAndFetch(new Person());
+const insertedGraphAndFetchSome: Promise<Person[]> = Person.query().insertGraphAndFetch([
+  new Person(),
+  new Person()
+]);
+const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch(
+  new Person()
+);
+const updatedModel: Promise<Person> = Person.query().updateAndFetch({});
+const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {});
+const patchedModel: Promise<Person> = Person.query().patchAndFetch({});
+const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {});
 
-const eager: Promise<Person[]> = Person.query().eagerAlgorithm(Person.NaiveEagerAlgorithm).eager('foo.bar')
+const eager: Promise<Person[]> = Person.query()
+  .eagerAlgorithm(Person.NaiveEagerAlgorithm)
+  .eager('foo.bar');
 
 // non-wrapped methods:
 
@@ -193,10 +209,9 @@ const modelFromQuery: typeof objection.Model = qb.modelClass();
 
 const sql: string = qb.toSql();
 
-qb = qb.whereJsonEquals(
-  'Person.jsonColumnName:details.names[1]',
-  { details: { names: ['First', 'Second', 'Last'] } }
-);
+qb = qb.whereJsonEquals('Person.jsonColumnName:details.names[1]', {
+  details: { names: ['First', 'Second', 'Last'] }
+});
 qb = qb.whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
 qb = qb.whereJsonEquals('additionalData:myDogs[0]', { name: 'peter' });
 qb = qb.whereJsonNotEquals('jsonObject:a', 'jsonObject:b');
@@ -206,11 +221,11 @@ function noop() {
   // no-op
 }
 
-const qbcb = (qb: objection.QueryBuilder<Person>) => noop()
+const qbcb = (ea: objection.QueryBuilder<Person>) => noop();
 
 qb = qb.context({
-  runBefore: qbcb,
   runAfter: qbcb,
+  runBefore: qbcb,
   onBuild: qbcb
 });
 
@@ -239,26 +254,39 @@ objection.transaction(Movie, Person, Animal, async (TxMovie, TxPerson, TxAnimal)
   const s: string = new TxAnimal().species;
 });
 
-objection.transaction(Movie, Person, Animal, Comment, async (TxMovie, TxPerson, TxAnimal, TxComment) => {
-  const t: string = new TxMovie().title;
-  const n: number = new TxPerson().examplePersonMethod('hello');
-  const s: string = new TxAnimal().species;
-  const c: string = new TxComment().comment
-});
-
-objection.transaction(Movie, Person, Animal, Comment, PersonActor, async (TxMovie, TxPerson, TxAnimal, TxComment, TxPersonActor) => {
-  const t: string = new TxMovie().title;
-  const n: number = new TxPerson().examplePersonMethod('hello');
-  const s: string = new TxAnimal().species;
-  const c: string = new TxComment().comment
-  const pa = new TxPersonActor()
-  if (pa.canAct) {
-    const n: number = pa.examplePersonMethod('arg')
+objection.transaction(
+  Movie,
+  Person,
+  Animal,
+  Comment,
+  async (TxMovie, TxPerson, TxAnimal, TxComment) => {
+    const t: string = new TxMovie().title;
+    const n: number = new TxPerson().examplePersonMethod('hello');
+    const s: string = new TxAnimal().species;
+    const c: string = new TxComment().comment;
   }
-});
+);
 
-objection.transaction.start(Person).then(trx => {
-  const TxPerson: typeof Person = Person.bindTransaction(trx)
+objection.transaction(
+  Movie,
+  Person,
+  Animal,
+  Comment,
+  PersonActor,
+  async (TxMovie, TxPerson, TxAnimal, TxComment, TxPersonActor) => {
+    const t: string = new TxMovie().title;
+    const n: number = new TxPerson().examplePersonMethod('hello');
+    const s: string = new TxAnimal().species;
+    const c: string = new TxComment().comment;
+    const tpa = new TxPersonActor();
+    if (tpa.canAct) {
+      const ea: number = pa.examplePersonMethod('arg');
+    }
+  }
+);
+
+objection.transaction.start(Person).then((trx) => {
+  const TxPerson: typeof Person = Person.bindTransaction(trx);
   TxPerson.query()
     .then(() => trx.commit())
     .catch(() => trx.rollback());
@@ -272,9 +300,10 @@ const p: Promise<string> = qb.then(() => 'done');
 // Verify that we can insert a partial model and relate a partial movie
 Person.query()
   .insertAndFetch({ firstName: 'Jim' })
-  .then((p: Person) => {
+  .then((ea: Person) => {
     console.log(`Inserted ${p}`);
-    p.$loadRelated('movies')
+    ea
+      .$loadRelated('movies')
       .relate<Movie>({ title: 'Total Recall' })
       .then((pWithMovie: Person) => {
         console.log(`Related ${pWithMovie}`);
@@ -283,31 +312,27 @@ Person.query()
 
 // Verify we can call `.insert` with a Partial<Person>:
 
-Person
-  .query()
-  .insert({ firstName: 'Chuck' })
+Person.query().insert({ firstName: 'Chuck' });
 
-// Verify we can call `.insert` via $relatedQuery 
+// Verify we can call `.insert` via $relatedQuery
 // (albeit with a cast to Movie):
 
-new Person()
-  .$relatedQuery<Movie>('movies')
-  .insert({ title: 'Total Recall' })
+new Person().$relatedQuery<Movie>('movies').insert({ title: 'Total Recall' });
 
 // Verify if is possible transaction class can be shared across models
-objection.transaction(Person.knex(), async trx => {
+objection.transaction(Person.knex(), async (trx) => {
   await Person.query(trx).insert({ firstName: 'Name' });
   await Movie.query(trx).insert({ title: 'Total Recall' });
 });
 
-objection.transaction<Person>(Person.knex(), async trx => {
+objection.transaction<Person>(Person.knex(), async (trx) => {
   const person = await Person.query(trx).insert({ firstName: 'Name' });
   await Movie.query(trx).insert({ title: 'Total Recall' });
 
   return person;
 });
 
-objection.transaction.start(Person).then(trx => {
+objection.transaction.start(Person).then((trx) => {
   Movie.query(trx)
     .then(() => trx.commit())
     .catch(() => trx.rollback());
@@ -316,10 +341,6 @@ objection.transaction.start(Person).then(trx => {
 // Vefiry whereIn accepts a queryBuilder of any
 const whereInSubquery = Movie.query().select('name');
 
-Person
-  .query()
-  .whereIn('firstName', whereInSubquery);
+Person.query().whereIn('firstName', whereInSubquery);
 
-Person
-  .query()
-  .whereExists(whereInSubquery);
+Person.query().whereExists(whereInSubquery);
