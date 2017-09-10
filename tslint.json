@@ -3,6 +3,7 @@
   "extends": ["tslint:recommended"],
   "jsRules": {},
   "rules": {
+    "arrow-parens": false,
     "class-name": false,
     "interface-name": [false],
     "max-classes-per-file": [false],

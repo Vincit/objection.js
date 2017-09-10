@@ -1,4 +1,4 @@
-// Type definitions for objection v0.8.4
+// Type definitions for objection v0.9.0
 // Project: Objection.js <http://vincit.github.io/objection.js/>
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
@@ -8,6 +8,9 @@ import * as knex from "knex";
 export = Objection;
 
 declare namespace Objection {
+
+  const raw: knex.RawBuilder
+
   export interface ModelOptions {
     patch?: boolean;
     skipValidation?: boolean;
@@ -783,7 +786,7 @@ declare namespace Objection {
     (raw: Raw): QueryBuilder<T>;
     (callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
     (object: object): QueryBuilder<T>;
-    (columnName: string, value: Value): QueryBuilder<T>;
+    (columnName: string | Raw, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, value: Value): QueryBuilder<T>;
     (columnName: string | Raw, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
     (columnName: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
@@ -828,7 +831,7 @@ declare namespace Objection {
   }
 
   interface OrderBy<T> {
-    (columnName: string, direction?: string): QueryBuilder<T>;
+    (columnName: string | Raw, direction?: string): QueryBuilder<T>;
   }
 
   interface Union<T> {
