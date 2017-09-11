@@ -43,13 +43,7 @@ declare namespace Objection {
 
   export interface Literal extends Castable {}
 
-  export interface Reference extends Castable {
-    readonly expression: string;
-    readonly reference: string | null;
-    readonly column: string | null;
-    readonly tableName: string | null;
-    readonly fullColumn: string | null;
-  }
+  export interface Reference extends Castable {}
 
   export interface ModelOptions {
     patch?: boolean;
