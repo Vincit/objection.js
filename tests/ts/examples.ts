@@ -345,9 +345,30 @@ Person.query().whereIn('firstName', whereInSubquery);
 
 Person.query().whereExists(whereInSubquery);
 
-// Example of raw select, where, and orderby from docs:
+const { lit, raw, ref } = objection;
+
+// RawBuilder:
 
 Person.query()
-  .select(objection.raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
-  .where(objection.raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
-  .orderBy(objection.raw('random()'));
+  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
+  .orderBy(raw('random()'));
+
+// ReferenceBuilder:
+// @see http://vincit.github.io/objection.js/#ref75
+// https://github.com/Vincit/objection.js/blob/master/doc/includes/API.md#global-query-building-helpers
+Person.query()
+  .select([
+    'id',
+    ref('Model.jsonColumn:details.name')
+      .castText()
+      .as('name'),
+    ref('Model.jsonColumn:details.age')
+      .castInt()
+      .as('age')
+  ])
+  .join('OtherModel', ref('Model.jsonColumn:details.name').castText(), '=', ref('OtherModel.name'))
+  .where('age', '>', ref('OtherModel.ageLimit'));
+
+// LiteralBuilder:
+Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));

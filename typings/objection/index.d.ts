@@ -3,13 +3,53 @@
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
 /// <reference types="node" />
-import * as knex from "knex";
+import * as knex from 'knex';
 
 export = Objection;
 
 declare namespace Objection {
+  const lit: LiteralBuilder;
+  const raw: knex.RawBuilder;
+  const ref: ReferenceBuilder;
 
-  const raw: knex.RawBuilder
+  interface LiteralObject {
+    [key: string]: Value
+  }
+
+  export interface LiteralBuilder {
+    (value: string | LiteralObject): Literal;
+  }
+
+  export interface ReferenceBuilder {
+    (expression: string): Reference;
+  }
+
+  type SQLType = 'text' | 'integer' | 'bigint' | 'float' | 'decimal' | 'real' | 'boolean';
+
+  interface Castable {
+    readonly cast: SQLType;
+    castText(): this;
+    castInt(): this;
+    castBigInt(): this;
+    castFloat(): this;
+    castDecimal(): this;
+    castReal(): this;
+    castBool(): this;
+    castJson(): this;
+    castArray(): this;
+    castType(sqlType: SQLType | string): this;
+    as(alias: string): this;
+  }
+
+  export interface Literal extends Castable {}
+
+  export interface Reference extends Castable {
+    readonly expression: string;
+    readonly reference: string | null;
+    readonly column: string | null;
+    readonly tableName: string | null;
+    readonly fullColumn: string | null;
+  }
 
   export interface ModelOptions {
     patch?: boolean;
@@ -195,7 +235,6 @@ declare namespace Objection {
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
     extend<S>(subclass: { new(): S }): this & { new(...args: any[]): M & S };
-
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
 
@@ -239,7 +278,7 @@ declare namespace Objection {
     static HasOneThroughRelation: Relation;
 
     static JoinEagerAlgorithm: EagerAlgorithm;
-    static WhereInEagerAlgorithm: EagerAlgorithm
+    static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
     // "{ new(): T }"
@@ -248,7 +287,6 @@ declare namespace Objection {
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
-
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
@@ -621,8 +659,8 @@ declare namespace Objection {
   //
 
   type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw | null;
-  type ColumnName<T> = string | Raw | QueryBuilder<T>;
-  type TableName<T> = string | Raw | QueryBuilder<T>;
+  type ColumnName<T> = string | Raw | Reference | QueryBuilder<T>;
+  type TableName<T> = string | Raw | Reference | QueryBuilder<T>;
 
   interface QueryInterface<T> {
     select: Select<T>;
@@ -759,11 +797,11 @@ declare namespace Objection {
   interface Join<T> {
     (raw: Raw): QueryBuilder<T>;
     <T1>(tableName: TableName<T1>, clause: (this: knex.JoinClause) => void): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, columns: { [key: string]: string | number | Raw }): QueryBuilder<T>;
+    <T1>(tableName: TableName<T1>, columns: { [key: string]: string | number | Raw | Reference }): QueryBuilder<T>;
     <T1>(tableName: TableName<T1>, raw: Raw): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, column1: string, column2: string): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, column1: string, raw: Raw): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, column1: string, operator: string, column2: string): QueryBuilder<T>;
+    <T1>(tableName: TableName<T1>, column1: string | Reference, column2: string): QueryBuilder<T>;
+    <T1>(tableName: TableName<T1>, column1: string | Reference, raw: Raw): QueryBuilder<T>;
+    <T1>(tableName: TableName<T1>, column1: string | Reference, operator: string, column2: string | Reference): QueryBuilder<T>;
   }
 
   interface JoinRaw<T> {
@@ -786,9 +824,9 @@ declare namespace Objection {
     (raw: Raw): QueryBuilder<T>;
     (callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
     (object: object): QueryBuilder<T>;
-    (columnName: string | Raw, value: Value): QueryBuilder<T>;
-    (columnName: string | Raw, operator: string, value: Value): QueryBuilder<T>;
-    (columnName: string | Raw, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
+    (columnName: string | Raw | Reference, value: Value | Literal): QueryBuilder<T>;
+    (columnName: string | Raw | Reference, operator: string, value: Value | Literal): QueryBuilder<T>;
+    (columnName: string | Raw | Reference, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
     (columnName: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
   }
 
@@ -827,8 +865,7 @@ declare namespace Objection {
     (columnName: string, values: Value[]): QueryBuilder<T>;
   }
 
-  interface GroupBy<T> extends RawQueryBuilder<T>, ColumnNameQueryBuilder<T> {
-  }
+  interface GroupBy<T> extends RawQueryBuilder<T>, ColumnNameQueryBuilder<T> {}
 
   interface OrderBy<T> {
     (columnName: string | Raw, direction?: string): QueryBuilder<T>;
