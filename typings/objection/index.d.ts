@@ -221,7 +221,7 @@ declare namespace Objection {
     ManyToManyRelation: Relation;
     HasOneThroughRelation: Relation;
 
-    query(trx?: Transaction): QueryBuilder<M>;
+    query(trxOrKnex?: Transaction | knex): QueryBuilder<M>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
     knexQuery(): QueryBuilder<M>;
@@ -277,7 +277,7 @@ declare namespace Objection {
 
     // "{ new(): T }"
     // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
-    static query<T>(this: { new(): T }, trx?: Transaction): QueryBuilder<T>;
+    static query<T>(this: { new(): T }, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
@@ -330,14 +330,14 @@ declare namespace Objection {
     /**
      * AKA `reload` in ActiveRecord parlance
      */
-    $query(trx?: Transaction): QueryBuilderSingle<this>;
+    $query(trxOrKnex?: Transaction | knex): QueryBuilderSingle<this>;
 
     /**
      * Users need to explicitly type these calls, as the relationName doesn't
      * indicate the type (and if it returned Model directly, Partial<Model>
      * guards are worthless)
      */
-    $relatedQuery<M extends Model>(relationName: string, transaction?: Transaction): QueryBuilder<M>;
+    $relatedQuery<M extends Model>(relationName: string, trxOrKnex?: Transaction | knex): QueryBuilder<M>;
 
     $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
 
