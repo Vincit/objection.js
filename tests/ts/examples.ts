@@ -372,3 +372,11 @@ Person.query()
 
 // LiteralBuilder:
 Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
+
+// .query, .$query, and .$relatedQuery can take a Knex instance to support
+// multitenancy
+
+const peep123: Promise<Person | undefined> = BoundPerson.query(k).findById(123);
+
+new Person().$query(k).execute();
+new Person().$relatedQuery("pets", k).execute();
