@@ -119,13 +119,27 @@ module.exports = (session) => {
         return Model1
           .query(trx)
           .upsertGraph(upsert)
+          // Sort all result by id to make the SQL we test below consistent.
+          .mergeContext({
+            onBuild(builder) {
+              if (!builder.isFindQuery()) {
+                return;
+              }
+
+              if (builder.modelClass().tableName === 'Model1') {
+                builder.orderBy('Model1.id');
+              } else if (builder.modelClass().tableName === 'model_2') {
+                builder.orderBy('model_2.id_col');
+              }
+            }
+          })
           .then(result => {
             if (session.isPostgres()) {
               expect(sql).to.eql([
-                'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2)',
-                'select "Model1"."id" from "Model1" where "Model1"."id" in (3)',
-                'select "model_2"."model_1_id", "model_2"."id_col" from "model_2" where "model_2"."model_1_id" in (2)',
-                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (2, 1)',
+                'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc',
+                'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                'select "model_2"."model_1_id", "model_2"."id_col" from "model_2" where "model_2"."model_1_id" in (2) order by "model_2"."id_col" asc',
+                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
 
                 'delete from "model_2" where "model_2"."id_col" in (2) and "model_2"."model_1_id" in (2)',
                 'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
