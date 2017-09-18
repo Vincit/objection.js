@@ -6642,7 +6642,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $beforeUpdate(queryContext) {
+  $beforeUpdate(opt, queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -6717,7 +6717,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $afterUpdate(queryContext) {
+  $afterUpdate(opt, queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
