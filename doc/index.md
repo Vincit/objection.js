@@ -1188,7 +1188,8 @@ Person
     movies: [{
       id: 1,
 
-      // Upsert graphs can be arbitrarily deep.
+      // Upsert graphs can be arbitrarily deep. This modifies the
+      // reviews of "Horrible Bosses".
       reviews: [{
         // Update a review.
         id: 1,
@@ -1245,7 +1246,8 @@ Person
     movies: [{
       id: 1,
 
-      // Upsert graphs can be arbitrarily deep.
+      // Upsert graphs can be arbitrarily deep. This modifies the
+      // reviews of "Horrible Bosses".
       reviews: [{
         // Update a review.
         id: 1,
@@ -1268,8 +1270,8 @@ Person
 Arbitrary relation graphs can be upserted (insert + update + delete) using the [`upsertGraph`](#upsertgraph) method. This is best explained using
 examples, so check them out ➔.
 
-The `upsertGraph` method works a little different than the other update and patch methods. When using `upsertGraph` any `where` or `having` method
-is ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
+The `upsertGraph` method works a little different than the other update and patch methods. When using `upsertGraph` any `where` or `having` methods
+are ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
 
 `upsertGraph` uses `insertGraph` under the hood for inserts. That means that you can insert object graphs for relations and use all `insertGraph`
 features like `#ref` references.
@@ -1279,7 +1281,7 @@ of the supported ways. See the section about [transactions](#transactions) for m
 
 See the [`allowUpsert`](#allowupsert) method if you need to limit  which relations can be modified using
 [`upsertGraph`](#upsertgraph) method to avoid security issues. [`allowUpsert`](#allowupsert)
-works like [`allowEager`](#allowinsert).
+works like [`allowInsert`](#allowinsert).
 
 # Transactions
 

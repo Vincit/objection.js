@@ -437,6 +437,75 @@ module.exports = (session) => {
       });
     });
 
+    it('should insert with an id instead of throwing an error if `insertMissing` option is true', () => {
+      const upsert = {
+        id: 2,
+
+        // update idCol=1
+        // delete idCol=2
+        // and insert one new
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: 'updated hasMany 1',
+
+          // update id=4
+          // delete id=5
+          // and insert one new
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: 'updated manyToMany 1'
+          }, {
+            // This is the new row with an id.
+            id: 1000,
+            model1Prop1: 'inserted manyToMany'
+          }]
+        }, {
+          // This is the new row with an id.
+          idCol: 1000,
+          model2Prop1: 'inserted hasMany',
+        }]
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1.query(trx).upsertGraph(upsert, {insertMissing: true});
+      }).then(result => {
+        // Fetch the graph from the database.
+        return Model1
+          .query(session.knex)
+          .findById(2)
+          .eager('model1Relation2.model2Relation1')
+          .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+          .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+      }).then(omitIrrelevantProps).then(result => {
+        expect(result).to.eql({
+          id: 2,
+          model1Id: 3,
+          model1Prop1: "root 2",
+
+          model1Relation2: [{
+            idCol: 1,
+            model1Id: 2,
+            model2Prop1: "updated hasMany 1",
+
+            model2Relation1: [{
+              id: 4,
+              model1Id: null,
+              model1Prop1: "updated manyToMany 1",
+            }, {
+              id: 1000,
+              model1Id: null,
+              model1Prop1: "inserted manyToMany",
+            }]
+          }, {
+            idCol: 1000,
+            model1Id: 2,
+            model2Prop1: "inserted hasMany",
+            model2Relation1: []
+          }]
+        });
+      });
+    });
+
     it('should fail if given nonexistent id in root', done => {
       const upsert = {
         // This doesn't exist.
@@ -478,7 +547,7 @@ module.exports = (session) => {
       }).then(() => {
         next(new Error('should not get here'));
       }).catch(err => {
-        expect(err.message).to.equal('model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate: true option');
+        expect(err.message).to.equal('model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate: true option. If you want to insert it with an id, use the insertMissing: true option');
         return session.knex('Model1').whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
       }).then(rows => {
         expect(rows).to.have.length(0);

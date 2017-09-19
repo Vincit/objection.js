@@ -342,13 +342,13 @@ module.exports = (session) => {
               $afterUpdateCalled: true,
               $afterUpdateOptions: {patch: true},
 
-              model1Relation2: [{ 
+              model1Relation2: [{
                 idCol: 1,
                 model1Id: 1,
                 model2Prop1: 'text 1',
                 model2Prop2: 2,
-                $afterGetCalled: 1 
-              }, { 
+                $afterGetCalled: 1
+              }, {
                 idCol: 2,
                 model1Id: 1,
                 model2Prop1: 'text 2',
@@ -387,11 +387,11 @@ module.exports = (session) => {
               $afterUpdateCalled: true,
               $afterUpdateOptions: {patch: true},
 
-              model1Relation2: [{ 
+              model1Relation2: [{
                 idCol: 1,
                 model1Id: 1,
                 $afterGetCalled: 1
-              }, { 
+              }, {
                 idCol: 2,
                 model1Id: 1,
                 $afterGetCalled: 1
@@ -771,7 +771,7 @@ module.exports = (session) => {
             .where('id_col', 2)
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
-          
+
               expect(model.$beforeUpdateCalled).to.equal(1);
               expect(model.$beforeUpdateOptions).to.eql({patch: true});
               expect(model.$afterUpdateCalled).to.equal(1);
@@ -947,11 +947,11 @@ module.exports = (session) => {
                 .$relatedQuery('model1Relation3')
                 .where('id_col', '>', 3)
                 .patch({
-                  model2Prop1: 'iam updated', 
+                  model2Prop1: 'iam updated',
                   extra1: 'updated extra 1',
                   // Test query properties. sqlite doesn't have `concat` function. Use a literal for it.
-                  extra2: isSqlite(session.knex) 
-                    ? 'updated extra 2' 
+                  extra2: isSqlite(session.knex)
+                    ? 'updated extra 2'
                     : raw(`CONCAT('updated extra ', '2')`)
                 })
                 .where('id_col', '<', 5)
@@ -1001,8 +1001,8 @@ module.exports = (session) => {
               return parent
                 .$relatedQuery('model1Relation3')
                 .patch({
-                  model2Prop1: 'iam updated', 
-                  extra1: 'updated extra 1', 
+                  model2Prop1: 'iam updated',
+                  extra1: 'updated extra 1',
                   extra2: 'updated extra 2'
                 })
                 .then(numUpdated => {
@@ -1190,9 +1190,9 @@ module.exports = (session) => {
         ModelOne = session.unboundModels.Model1.bindKnex(knex);
         ModelTwo = ModelOne.getRelation('model1Relation2').relatedModelClass;
 
-        expect(ModelOne).to.not.equal(Model1); 
+        expect(ModelOne).to.not.equal(Model1);
         expect(ModelTwo).to.not.equal(Model2);
-        expect(ModelOne).to.not.equal(session.unboundModels.Model1); 
+        expect(ModelOne).to.not.equal(session.unboundModels.Model1);
         expect(ModelTwo).to.not.equal(session.unboundModels.Model2);
 
         ModelOne.prototype.$beforeUpdate = function (opt, ctx) {
@@ -1268,7 +1268,7 @@ module.exports = (session) => {
           .then(() => {
             expect(beforeUpdateCalled).to.equal('ModelOne');
             expect(beforeUpdateOpt).to.eql({
-              patch: true, 
+              patch: true,
               old: {
                 $afterGetCalled: 1,
                 id: 1,
@@ -1280,7 +1280,7 @@ module.exports = (session) => {
 
             expect(afterUpdateCalled).to.equal('ModelOne');
             expect(afterUpdateOpt).to.eql({
-              patch: true, 
+              patch: true,
               old: {
                 $afterGetCalled: 1,
                 id: 1,

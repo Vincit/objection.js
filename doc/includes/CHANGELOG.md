@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.9.0
+
+### What's new
+
+ * Relations can now be defined using keys inside JSON columns. See the examples [here](http://vincit.github.io/objection.js/#relationmappings).
+ * [`lit`](http://vincit.github.io/objection.js/#lit) helper function [#275](https://github.com/Vincit/objection.js/issues/275)
+ * Fixes for [`upsertGraph`](http://vincit.github.io/objection.js/#upsertgraph) when using composite keys. [#517](https://github.com/Vincit/objection.js/issues/517)
+
+### Breaking changes
+
+ * Instance update/patch with `returning` now return a single object instead of an array. [#423](https://github.com/Vincit/objection.js/issues/423)
+
+ * Because of the support for JSON relations [the `Relation` class](http://vincit.github.io/objection.js/#relation)
+   has changed a bit.
+
 ## 0.8.8
 
 ### What's new

@@ -723,6 +723,10 @@ Type|Description
 
 #### upsertGraph
 
+```js
+const builder = queryBuilder.upsertGraph(modelOrObject, options);
+```
+
 See the [section about graph upserts](#graph-upserts)
 
 ##### Arguments
@@ -730,6 +734,7 @@ See the [section about graph upserts](#graph-upserts)
 Argument|Type|Description
 --------|----|--------------------
 graph|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Graph to upsert.
+options|[`UpsertGraphOptions`](#upsertgraphoptions)|Optional options.
 
 ##### Return value
 
@@ -7321,6 +7326,17 @@ aliases|Object.&lt;string, string&gt;|Aliases for relations in a join based eage
 
 
 
+
+## UpsertGraphOptions
+
+Property|Type|Description
+--------|----|-----------
+relate|boolean|If true, relations are related instead of inserted. See the examples [here](#graph-upserts).
+unrelate|boolean|If true, relations are unrelated instead of deleted. See the examples [here](#graph-upserts).
+insertMissing|boolean|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. See the examples [here](#graph-upserts).
+
+
+
 ## Relation
 
 > Note that `Relation` instances are actually instances of the relation classes used in `relationMappings`. For example:
@@ -7362,7 +7378,7 @@ Property|Type|Description
 name|string|Name of the relation. For example `pets` or `children`.
 ownerModelClass|function|The model class that has defined the relation.
 relatedModelClass|function|The model class of the related objects.
-ownerProp|[`RelationProperty`](#relationproperty)]|The relation property in the `ownerModelClass`.
+ownerProp|[`RelationProperty`](#relationproperty)|The relation property in the `ownerModelClass`.
 relatedProp|[`RelationProperty`](#relationproperty)|The relation property in the `relatedModelClass`.
 joinTable|string|The name of the join table (only for `ManyToMany` and `HasOneThrough` relations).
 joinTableOwnerProp|[`RelationProperty`](#relationproperty)|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).

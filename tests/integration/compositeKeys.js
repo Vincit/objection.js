@@ -267,6 +267,227 @@ module.exports = (session) => {
 
     });
 
+    describe('upsertGraph', () => {
+
+      beforeEach(() => {
+        return A.query().insertGraph({
+          id1: 1,
+          id2: '1',
+          aval: 'val1',
+
+          b: {
+            id3: 1,
+            id4: '1',
+            bval: 'val2',
+
+            a: [{
+              id1: 1,
+              id2: '2',
+              aval: 'val3',
+            }, {
+              id1: 2,
+              id2: '2',
+              aval: 'val4',
+            }]
+          },
+
+          ba: [{
+            id3: 2,
+            id4: '1',
+            bval: 'val5',
+          }, {
+            id3: 2,
+            id4: '2',
+            bval: 'val6',
+          }
+        ]
+        });
+      });
+
+      afterEach(() => {
+        return Promise.all([
+          session.knex('A').delete(),
+          session.knex('B').delete(),
+          session.knex('A_B').delete()
+        ]);
+      });
+
+      it('should work when `insertMissing` option is true', () => {
+        return A
+          .query()
+          .debug()
+          .upsertGraph({
+            // update
+            id1: 1,
+            id2: '1',
+            aval: 'x',
+
+            b: {
+              // update
+              id3: 1,
+              id4: '1',
+              bval: 'z',
+
+              // [2, '2'] is deleted
+              a: [{
+                // This is the root. Note that a is simply b in reverse.
+                // We need to mention the root here so that is doesn't
+                // get deleted.
+                id1: 1,
+                id2: '1'
+              }, {
+                // update
+                id1: 1,
+                id2: '2',
+                aval: 'w'
+              }, {
+                // insert
+                id1: 400,
+                id2: '600',
+                aval: 'new a'
+              }]
+            },
+
+            // [2, '2'] is deleted
+            ba: [{
+              // update
+              id3: 2,
+              id4: '1',
+              bval: 'y'
+            }, {
+              // insert
+              id3: 200,
+              id4: '300',
+              bval: 'new b'
+            }]
+          }, {insertMissing: true})
+          .then(() => {
+            return A.query()
+              .findById([1, '1'])
+              .eager('[b.a, ba]')
+              .modifyEager('b.a', qb => qb.orderBy(['id1', 'id2']))
+              .modifyEager('ba', qb => qb.orderBy(['id3', 'id4']))
+          })
+          .then(model => {
+            expect(model).to.eql({
+              id1: 1,
+              id2: '1',
+              aval: 'x',
+              bid3: 1,
+              bid4: '1',
+
+              b: {
+                id3: 1,
+                id4: '1',
+                bval: 'z',
+
+                a: [{
+                  id1: 1,
+                  id2: '1',
+                  aval: 'x',
+                  bid3: 1,
+                  bid4: '1',
+                }, {
+                  id1: 1,
+                  id2: '2',
+                  bid3: 1,
+                  bid4: '1',
+                  aval: 'w',
+                }, {
+                  id1: 400,
+                  id2: '600',
+                  bid3: 1,
+                  bid4: '1',
+                  aval: 'new a',
+                }]
+              },
+
+              ba: [{
+                id3: 2,
+                id4: '1',
+                bval: 'y'
+              }, {
+                id3: 200,
+                id4: '300',
+                bval: 'new b'
+              }]
+            });
+
+            return Promise.all([
+              session.knex('A').orderBy(['id1', 'id2']),
+              session.knex('B').orderBy(['id3', 'id4'])
+            ])
+          })
+          .spread((a, b) => {
+            expect(a).to.eql([
+              {id1: 1, id2: '1', aval: 'x', bid3: 1, bid4: '1'},
+              {id1: 1, id2: '2', aval: 'w', bid3: 1, bid4: '1'},
+              {id1: 400, id2: '600', aval: 'new a', bid3: 1, bid4: '1'}
+            ]);
+
+            expect(b).to.eql([
+              { id3: 1, id4: '1', bval: 'z' },
+              { id3: 2, id4: '1', bval: 'y' },
+              { id3: 200, id4: '300', bval: 'new b' }
+            ]);
+          });
+      });
+
+      it('should insert if partial id is given', () => {
+        const upsert = A.fromJson({
+          id1: 1,
+          id2: '1',
+          aval: 'aUpdated',
+
+          ba: [{
+            id3: 2,
+            id4: '1',
+            bval: 'bUpdated'
+          }, {
+            id4: '3',
+            bval: 'bNew'
+          }]
+        });
+
+        // Add the other key just before it is actually inserted
+        // so that we don't insert a row with null id.
+        upsert.ba[1].$beforeInsert = function () {
+          this.id3 = 2;
+        };
+
+        return A
+          .query()
+          .upsertGraph(upsert)
+          .then(model => {
+            return A
+              .query()
+              .findById([1, '1'])
+              .eager('ba')
+              .modifyEager('ba', qb => qb.orderBy(['id3', 'id4']));
+          })
+          .then(model => {
+            expect(model).to.eql({
+              id1: 1,
+              id2: '1',
+              aval: 'aUpdated',
+              bid3: 1,
+              bid4: '1',
+
+              ba: [{
+                id3: 2,
+                id4: '1',
+                bval: 'bUpdated'
+              }, {
+                id3: 2,
+                id4: '3',
+                bval: 'bNew'
+              }]
+            });
+          });
+      });
+
+    });
+
     describe('delete', () => {
 
       beforeEach(() => {
