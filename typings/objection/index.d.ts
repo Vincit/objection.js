@@ -223,7 +223,7 @@ declare namespace Objection {
     query(trxOrKnex?: Transaction | knex): QueryBuilder<M>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
-    knexQuery(): QueryBuilder<M>;
+    knexQuery(): knex.QueryBuilder
 
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
@@ -278,7 +278,7 @@ declare namespace Objection {
     static query<T>(this: { new(): T }, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
+    static knexQuery<T>(this: { new(): T }): knex.QueryBuilder;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
@@ -880,37 +880,6 @@ declare namespace Objection {
     (sql: string, ...bindings: Value[]): QueryBuilder<T>;
     (sql: string, bindings: Value[]): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
-  }
-
-  //
-  // QueryBuilder
-  //
-
-  interface QueryBuilder<T> extends QueryInterface<T>, ChainableInterface<T> {
-    or: this;
-    and: this;
-
-    columnInfo(column?: string): Promise<knex.ColumnInfo>;
-
-    forUpdate(): this;
-    forShare(): this;
-
-    toSQL(): knex.Sql;
-
-    on(event: string, callback: () => void): this;
-  }
-
-  //
-  // Chainable interface
-  //
-
-  interface ChainableInterface<T> extends Promise<T[]> {
-    toQuery(): string;
-    options(options: any): QueryBuilder<T>;
-    stream(options?: any, callback?: (builder: QueryBuilder<T>) => any): QueryBuilder<T>;
-    stream(callback?: (builder: QueryBuilder<T>) => any): QueryBuilder<T>;
-    pipe(writable: any): QueryBuilder<T>;
-    exec(callback: () => void): QueryBuilder<T>;
   }
 
   interface Transaction extends knex {
