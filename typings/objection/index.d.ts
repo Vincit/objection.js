@@ -210,7 +210,6 @@ declare namespace Objection {
     defaultEagerAlgorithm?: EagerAlgorithm;
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
-    RelatedQueryBuilder: typeof QueryBuilder;
 
     raw: knex.RawBuilder;
     fn: knex.FunctionHelper;
