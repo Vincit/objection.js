@@ -112,13 +112,6 @@ class Actor {
   canAct: boolean;
 }
 
-// test .extend:
-const PersonActor = Person.extend(Actor);
-
-const pa = new PersonActor();
-pa.firstName = 'chuck';
-pa.canAct = false;
-
 // Optional<Person> typing for findById():
 
 function byId(id: number): Promise<Person | undefined> {
@@ -272,16 +265,11 @@ objection.transaction(
   Person,
   Animal,
   Comment,
-  PersonActor,
-  async (TxMovie, TxPerson, TxAnimal, TxComment, TxPersonActor) => {
+  async (TxMovie, TxPerson, TxAnimal, TxComment) => {
     const t: string = new TxMovie().title;
     const n: number = new TxPerson().examplePersonMethod('hello');
     const s: string = new TxAnimal().species;
     const c: string = new TxComment().comment;
-    const tpa = new TxPersonActor();
-    if (tpa.canAct) {
-      const ea: number = pa.examplePersonMethod('arg');
-    }
   }
 );
 

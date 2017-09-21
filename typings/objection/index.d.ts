@@ -228,7 +228,6 @@ declare namespace Objection {
 
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
-    extend<S>(subclass: { new(): S }): this & { new(...args: any[]): M & S };
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
 
@@ -283,12 +282,6 @@ declare namespace Objection {
     static knexQuery<T>(this: { new(): T }): QueryBuilder<T>;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
-
-    // TODO: It'd be nicer to expose an actual T&S union class here:
-    static extend<M extends Model, S>(
-      this: ModelClass<M>,
-      subclass: { new(): S }
-    ): ModelClass<M> & { new(...args: any[]): M & S };
 
     static fromJson<T>(this: T, json: object, opt?: ModelOptions): T;
     static fromDatabaseJson<T>(this: T, row: object): T;
@@ -357,7 +350,6 @@ declare namespace Objection {
   }
 
   export class QueryBuilder<T> {
-    static extend(subclassConstructor: FunctionConstructor): void;
     static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
