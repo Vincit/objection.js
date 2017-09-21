@@ -64,14 +64,14 @@ declare namespace Objection {
   }
 
   export interface RelationJoin {
-    from: string | string[];
-    to: string | string[];
+    from: string | Reference | (string | Reference)[];
+    to: string | Reference | (string | Reference)[];
     through?: RelationThrough;
   }
 
   export interface RelationThrough {
-    from: string | string[];
-    to: string | string[];
+    from: string | Reference | (string | Reference)[];
+    to: string | Reference | (string | Reference)[];
     modelClass?: string | typeof Model;
     extra?: string[];
   }

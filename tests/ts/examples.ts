@@ -57,6 +57,21 @@ class Person extends objection.Model {
 
 class Movie extends objection.Model {
   title: string;
+
+  static relationMappings = {
+    actors: {
+      relation: objection.Model.ManyToManyRelation,
+      modelClass: Person,
+      join: {
+        from: ['Movie.id1', 'Model.id2'],
+        through: {
+          from: 'Actors.movieId',
+          to: objection.ref('Actors.personId').castInt()
+        },
+        to: [objection.ref('Person.id1'), 'Person.id2']
+      }
+    }
+  };
 }
 
 class Animal extends objection.Model {
