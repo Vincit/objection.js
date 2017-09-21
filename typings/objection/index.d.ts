@@ -385,6 +385,8 @@ declare namespace Objection {
   }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
+    modify(func: (builder: this) => void): this;
+    modify(namedFilter: string): this;
 
     findById(id: Id): QueryBuilderOption<T>;
     findById(idOrIds: IdOrIds): this;
