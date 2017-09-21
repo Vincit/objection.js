@@ -17,7 +17,7 @@ declare namespace Objection {
   }
 
   export interface LiteralBuilder {
-    (value: string | LiteralObject): Literal;
+    (value: Value | LiteralObject): Literal;
   }
 
   export interface ReferenceBuilder {
