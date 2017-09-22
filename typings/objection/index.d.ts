@@ -235,7 +235,8 @@ declare namespace Objection {
     loadRelated(
       models: (Model | object)[],
       expression: RelationExpression,
-      filters?: Filters<M>
+      filters?: Filters<M>,
+      trxOrKnex?: Transaction | knex
     ): Promise<M[]>;
 
     traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
@@ -291,7 +292,8 @@ declare namespace Objection {
       this: { new(): T },
       models: (T | object)[],
       expression: RelationExpression,
-      filters?: Filters<T>
+      filters?: Filters<T>,
+      trxOrKnex?: Transaction | knex
     ): Promise<T[]>;
 
     static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
@@ -331,7 +333,7 @@ declare namespace Objection {
      */
     $relatedQuery<M extends Model>(relationName: string, trxOrKnex?: Transaction | knex): QueryBuilder<M>;
 
-    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>): QueryBuilderSingle<this>;
+    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>, trxOrKnex?: Transaction | knex): QueryBuilderSingle<this>;
 
     $traverse(traverser: TraverserFunction): void;
     $traverse(filterConstructor: this, traverser: TraverserFunction): void;
