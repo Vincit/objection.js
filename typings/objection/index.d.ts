@@ -45,6 +45,11 @@ declare namespace Objection {
 
   export interface Reference extends Castable {}
 
+  export interface Page<T> {
+    total: number;
+    results: T[];
+  }
+
   export interface ModelOptions {
     patch?: boolean;
     skipValidation?: boolean;
@@ -370,6 +375,11 @@ declare namespace Objection {
    */
   export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
 
+  /**
+   * QueryBuilder with a page result.
+   */
+  export interface QueryBuilderPage<T> extends QueryBuilderBase<T>, Promise<Page<T>> { }
+
   interface Insert<T> {
     (modelsOrObjects?: Array<Partial<T>>): QueryBuilder<T>;
     (modelOrObject?: Partial<T>): QueryBuilderSingle<T>;
@@ -560,8 +570,8 @@ declare namespace Objection {
 
     resultSize(): Promise<number>;
 
-    page(page: number, pageSize: number): this;
-    range(start: number, end: number): this;
+    page(page: number, pageSize: number): QueryBuilderPage<T>;
+    range(start: number, end: number): QueryBuilderPage<T>;
     pluck(propertyName: string): this;
     first(): QueryBuilderOption<T>;
 

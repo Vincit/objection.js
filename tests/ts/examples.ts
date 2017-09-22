@@ -207,9 +207,15 @@ const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123,
 const patchedModel: Promise<Person> = Person.query().patchAndFetch({});
 const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {});
 
-const eager: Promise<Person[]> = Person.query()
+const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eager('foo.bar');
+
+const rowsPage: Promise<{total: number, results: Person[]}> = Person.query()
+  .page(1, 10)
+
+const rowsRange: Promise<objection.Page<Person>> = Person.query()
+  .range(1, 10);
 
 // non-wrapped methods:
 
