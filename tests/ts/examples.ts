@@ -2,6 +2,8 @@
 import * as knex from 'knex';
 import * as objection from '../../typings/objection';
 
+const { lit, raw, ref } = objection;
+
 // This file exercises the Objection.js typings.
 
 // These calls are WHOLLY NONSENSICAL and are for TypeScript testing only.
@@ -66,9 +68,9 @@ class Movie extends objection.Model {
         from: ['Movie.id1', 'Model.id2'],
         through: {
           from: 'Actors.movieId',
-          to: objection.ref('Actors.personId').castInt()
+          to: ref('Actors.personId').castInt()
         },
-        to: [objection.ref('Person.id1'), 'Person.id2']
+        to: [ref('Person.id1'), 'Person.id2']
       }
     }
   };
@@ -160,6 +162,7 @@ qb = qb.increment('column_name', 2);
 qb = qb.decrement('column_name', 1);
 qb = qb.select('column1');
 qb = qb.select('column1', 'column2', 'column3');
+qb = qb.select(['column1', 'column2'])
 qb = qb.forUpdate();
 qb = qb.as('column_name');
 qb = qb.column('column_name');
@@ -170,6 +173,8 @@ qb = qb.join('tablename', 'column1', '=', 'column2');
 qb = qb.outerJoin('tablename', 'column1', '=', 'column2');
 qb = qb.joinRelation('table');
 qb = qb.joinRelation('table', { alias: false });
+qb = qb.where(raw('random()', 1, '2'));
+qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 
 // signature-changing QueryBuilder methods:
 
@@ -178,8 +183,9 @@ const rowsInserted: Promise<Person[]> = qb.insert([{ firstName: 'alice' }, { fir
 const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({});
 const rowsUpdated: Promise<number> = qb.update({});
 const rowsPatched: Promise<number> = qb.patch({});
-const rowsDeleted: Promise<number> = qb.deleteById(123);
-const rowsDeleted2: Promise<number> = qb.deleteById([123, 456]);
+const rowsDeleted: Promise<number> = qb.delete();
+const rowsDeletedById: Promise<number> = qb.deleteById(123);
+const rowsDeletedByIds: Promise<number> = qb.deleteById([123, 456]);
 
 const insertedModel: Promise<Person> = Person.query().insertAndFetch({});
 const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([
@@ -216,6 +222,34 @@ const rowsPage: Promise<{total: number, results: Person[]}> = Person.query()
 
 const rowsRange: Promise<objection.Page<Person>> = Person.query()
   .range(1, 10);
+
+// `retuning` should change the return value from number to T[]
+const rowsUpdateReturning: Promise<Person[]> = Person.query()
+  .update({})
+  .returning('*');
+
+const rowPatchReturningFirst: Promise<Person | undefined> = Person.query()
+  .patch({})
+  .returning('*')
+  .first();
+
+// `retuning` should change the return value from number to T[]
+const rowsDeleteReturning: Promise<Person[]> = Person.query()
+  .delete()
+  .returning('*')
+
+const rowsDeleteReturningFirst: Promise<Person | undefined> = Person.query()
+  .delete()
+  .returning('*')
+  .first()
+
+const rowInsertReturning: Promise<Person | undefined> = Person.query()
+  .insert({})
+  .returning('*')
+
+const rowsInsertReturning: Promise<Person[]> = Person.query()
+  .insert([{}])
+  .returning('*')
 
 // non-wrapped methods:
 
@@ -286,11 +320,12 @@ objection.transaction(
   Person,
   Animal,
   Comment,
-  async (TxMovie, TxPerson, TxAnimal, TxComment) => {
+  async (TxMovie, TxPerson, TxAnimal, TxComment, trx) => {
     const t: string = new TxMovie().title;
     const n: number = new TxPerson().examplePersonMethod('hello');
     const s: string = new TxAnimal().species;
     const c: string = new TxComment().comment;
+    Movie.query(trx);
   }
 );
 
@@ -326,7 +361,9 @@ Person.query().insert({ firstName: 'Chuck' });
 // Verify we can call `.insert` via $relatedQuery
 // (albeit with a cast to Movie):
 
-new Person().$relatedQuery<Movie>('movies').insert({ title: 'Total Recall' });
+const relatedQueryResult: Promise<Movie> = new Person()
+  .$relatedQuery<Movie>('movies')
+  .insert({ title: 'Total Recall' });
 
 // Verify if is possible transaction class can be shared across models
 objection.transaction(Person.knex(), async trx => {
@@ -337,6 +374,7 @@ objection.transaction(Person.knex(), async trx => {
 objection.transaction<Person>(Person.knex(), async trx => {
   const person = await Person.query(trx).insert({ firstName: 'Name' });
   await Movie.query(trx).insert({ title: 'Total Recall' });
+  await person.$loadRelated('movies', {}, trx);
 
   return person;
 });
@@ -347,14 +385,17 @@ objection.transaction.start(Person).then(trx => {
     .catch(() => trx.rollback());
 });
 
-// Vefiry whereIn accepts a queryBuilder of any
-const whereInSubquery = Movie.query().select('name');
+// Vefiry where methods take a queryBuilder of any.
+const whereSubQuery = Movie.query().select('name');
 
-Person.query().whereIn('firstName', whereInSubquery);
-
-Person.query().whereExists(whereInSubquery);
-
-const { lit, raw, ref } = objection;
+Person.query().whereIn('firstName', whereSubQuery);
+Person.query().where('foo', whereSubQuery);
+Person.query().whereExists(whereSubQuery);
+Person.query().where(builder => {
+  builder
+    .whereBetween('age', [30, 40])
+    .orWhereIn('lastName', whereSubQuery)
+});
 
 // RawBuilder:
 
@@ -381,6 +422,8 @@ Person.query()
 
 // LiteralBuilder:
 Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
+Person.query().where('age', '>', lit(10))
+Person.query().where('firstName', lit('Jennifer').castText())
 
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy

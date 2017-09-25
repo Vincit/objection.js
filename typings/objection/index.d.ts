@@ -24,10 +24,7 @@ declare namespace Objection {
     (expression: string): Reference;
   }
 
-  type SQLType = 'text' | 'integer' | 'bigint' | 'float' | 'decimal' | 'real' | 'boolean';
-
   interface Castable {
-    readonly cast: SQLType;
     castText(): this;
     castInt(): this;
     castBigInt(): this;
@@ -37,7 +34,7 @@ declare namespace Objection {
     castBool(): this;
     castJson(): this;
     castArray(): this;
-    castType(sqlType: SQLType | string): this;
+    castType(sqlType: string): this;
     as(alias: string): this;
   }
 
@@ -102,6 +99,7 @@ declare namespace Objection {
   export interface UpsertOptions {
     relate?: boolean;
     unrelate?: boolean;
+    insertMissing?: boolean;
   }
 
   export interface QueryContext {
@@ -365,6 +363,34 @@ declare namespace Objection {
   export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, Promise<T> { }
 
   /**
+   * Query builder for update operations
+   */
+  export interface QueryBuilderUpdate<T> extends QueryBuilderBase<T>, Promise<number> {
+    returning(columns: string | string[]): QueryBuilder<T>
+  }
+
+  /**
+   * Query builder for delete operations
+   */
+  export interface QueryBuilderDelete<T> extends QueryBuilderBase<T>, Promise<number> {
+    returning(columns: string | string[]): QueryBuilder<T>
+  }
+
+  /**
+   * Query builder for batch insert operations
+   */
+  export interface QueryBuilderInsert<T> extends QueryBuilderBase<T>, Promise<T[]> {
+    returning(columns: string | string[]): this;
+  }
+
+  /**
+   * Query builder for single insert operations
+   */
+  export interface QueryBuilderInsertSingle<T> extends QueryBuilderBase<T>, Promise<T> {
+    returning(columns: string | string[]): this;
+  }
+
+  /**
    * QueryBuilder with zero or one expected result
    * (Using the Scala `Option` terminology)
    */
@@ -381,8 +407,8 @@ declare namespace Objection {
   export interface QueryBuilderPage<T> extends QueryBuilderBase<T>, Promise<Page<T>> { }
 
   interface Insert<T> {
-    (modelsOrObjects?: Array<Partial<T>>): QueryBuilder<T>;
-    (modelOrObject?: Partial<T>): QueryBuilderSingle<T>;
+    (modelsOrObjects?: Array<Partial<T>>): QueryBuilderInsert<T>;
+    (modelOrObject?: Partial<T>): QueryBuilderInsertSingle<T>;
     (): this;
   }
 
@@ -392,8 +418,8 @@ declare namespace Objection {
   }
 
   interface InsertGraphAndFetch<T> {
-    (modelsOrObjects?: Partial<T>): QueryBuilderSingle<T>;
-    (modelsOrObjects?: Partial<T>[]): QueryBuilder<T>;
+    (modelsOrObjects?: Partial<T>): QueryBuilderInsertSingle<T>;
+    (modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
   }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
@@ -405,8 +431,8 @@ declare namespace Objection {
     findOne(where: object): QueryBuilderOption<T>;
 
     insert: Insert<T>;
-    insertAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
-    insertAndFetch(modelsOrObjects?: Partial<T>[]): QueryBuilder<T>;
+    insertAndFetch(modelOrObject: Partial<T>): QueryBuilderInsertSingle<T>;
+    insertAndFetch(modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
 
     insertGraph: Insert<T>;
     insertGraphAndFetch: InsertGraphAndFetch<T>;
@@ -420,14 +446,14 @@ declare namespace Objection {
     /**
      * @return a Promise of the number of updated rows
      */
-    update(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
+    update(modelOrObject: Partial<T>): QueryBuilderUpdate<T>;
     updateAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
     updateAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
     /**
      * @return a Promise of the number of patched rows
      */
-    patch(modelOrObject: Partial<T>): QueryBuilderSingle<number>;
+    patch(modelOrObject: Partial<T>): QueryBuilderUpdate<T>;
     patchAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
     patchAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
@@ -436,7 +462,7 @@ declare namespace Objection {
     /**
      * @return a Promise of the number of deleted rows
      */
-    deleteById(idOrIds: IdOrIds): QueryBuilderSingle<number>;
+    deleteById(idOrIds: IdOrIds): QueryBuilderDelete<T>;
 
     relate<M extends Model>(ids: IdOrIds | Partial<M> | Partial<M>[]): this;
     unrelate(): this;
@@ -465,10 +491,11 @@ declare namespace Objection {
 
     whereRef(leftRef: string, operator: string, rightRef: string): this;
     orWhereRef(leftRef: string, operator: string, rightRef: string): this;
-    whereComposite(column: string, value: any): this;
-    whereComposite(columns: string[], operator: string, values: any[]): this;
-    whereComposite(columns: string[], operator: string, values: any[]): this;
-    whereInComposite(column: string | string[], values: any[]): this;
+    whereComposite(column: ColumnRef, value: Value | QueryBuilder<any>): this;
+    whereComposite(column: ColumnRef[], value: Value[] | QueryBuilder<any>): this;
+    whereComposite(column: ColumnRef, operator: string, value: Value | QueryBuilder<any>): this;
+    whereComposite(column: ColumnRef[], operator: string, value: Value[] | QueryBuilder<any>): this;
+    whereInComposite(column: ColumnRef, values: Value[] | QueryBuilder<any>): this;
 
     whereJsonEquals: WhereJson<T>;
     whereJsonNotEquals: WhereJson<T>;
@@ -554,19 +581,17 @@ declare namespace Objection {
 
     clone(): this;
 
-    execute(): Promise<any>;
-
     // We get `then` and `catch` by extending Promise
 
+    execute(): Promise<T>;
     map<V, Result>(mapper: BluebirdMapper<V, Result>): Promise<Result[]>;
-
     return<V>(returnValue: V): Promise<V>;
+    bind(context: any): Promise<T>;
+    reflect(): Promise<T>;
 
-    bind(context: any): Promise<any>;
+    asCallback(callback: NodeStyleCallback): Promise<T>;
 
-    asCallback(callback: NodeStyleCallback): Promise<any>;
-
-    nodeify(callback: NodeStyleCallback): Promise<any>;
+    nodeify(callback: NodeStyleCallback): Promise<T>;
 
     resultSize(): Promise<number>;
 
@@ -657,9 +682,9 @@ declare namespace Objection {
   // to change the signatures to return Objection's typed QueryBuilder wrapper:
   //
 
-  type Value = string | number | boolean | Date | string[] | number[] | Date[] | boolean[] | Buffer | Raw | null;
-  type ColumnName<T> = string | Raw | Reference | QueryBuilder<T>;
-  type TableName<T> = string | Raw | Reference | QueryBuilder<T>;
+  type Value = string | number | boolean | Date | string[] | number[] | boolean[] | Date[] | null | Buffer | Raw | Literal;
+  type ColumnRef = string | Raw | Reference | QueryBuilder<any>;
+  type TableName = string | Raw | Reference | QueryBuilder<any>;
 
   interface QueryInterface<T> {
     select: Select<T>;
@@ -721,22 +746,38 @@ declare namespace Objection {
 
     // Group by
     groupBy: GroupBy<T>;
-    groupByRaw: RawQueryBuilder<T>;
+    groupByRaw: RawMethod<T>;
 
     // Order by
     orderBy: OrderBy<T>;
-    orderByRaw: RawQueryBuilder<T>;
+    orderByRaw: RawMethod<T>;
 
     // Union
     union: Union<T>;
     unionAll(callback: () => void): this;
 
     // Having
-    having: Having<T>;
-    andHaving: Having<T>;
-    havingRaw: RawQueryBuilder<T>;
-    orHaving: Having<T>;
-    orHavingRaw: RawQueryBuilder<T>;
+    having: Where<T>;
+    andHaving: Where<T>;
+    orHaving: Where<T>;
+    havingRaw: WhereRaw<T>;
+    orHavingRaw: WhereRaw<T>;
+    havingIn: WhereIn<T>;
+    orHavingIn: WhereIn<T>;
+    havingNotIn: WhereIn<T>
+    orHavingNotIn: WhereIn<T>
+    havingNull: WhereNull<T>
+    orHavingNull: WhereNull<T>
+    havingNotNull: WhereNull<T>
+    orHavingNotNull: WhereNull<T>
+    havingExists: WhereExists<T>
+    orHavingExists: WhereExists<T>
+    havingNotExists: WhereExists<T>
+    orHavingNotExists: WhereExists<T>
+    havingBetween: WhereBetween<T>
+    orHavingBetween: WhereBetween<T>
+    havingNotBetween: WhereBetween<T>
+    orHavingNotBetween: WhereBetween<T>
 
     // Clear
     clearSelect(): this;
@@ -758,17 +799,11 @@ declare namespace Objection {
     increment(columnName: string, amount?: number): this;
     decrement(columnName: string, amount?: number): this;
 
-    // NOTE: deleted `first` declarations, as it's already defined above
-
     debug(enabled?: boolean): this;
     pluck(column: string): this;
 
-    // NOTE: deleted `update` declarations, as it's already defined above
-
-    returning(column: string | string[]): this;
-
-    del(returning?: string | string[]): this;
-    delete(returning?: string | string[]): this;
+    del(): QueryBuilderDelete<T>;
+    delete(): QueryBuilderDelete<T>;
     truncate(): this;
 
     transacting(trx: Transaction): this;
@@ -778,58 +813,51 @@ declare namespace Objection {
   }
 
   interface As<T> {
-    (columnName: string): QueryBuilder<T>;
+    (alias: string): QueryBuilder<T>;
   }
 
-  interface Select<T> extends ColumnNameQueryBuilder<T> {
-  }
+  interface Select<T> extends ColumnNamesMethod<T> {}
 
   interface Table<T> {
-    (tableName: string): QueryBuilder<T>;
+    (tableName: TableName): QueryBuilder<T>;
     (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
-    (raw: Raw): QueryBuilder<T>;
   }
 
-  interface Distinct<T> extends ColumnNameQueryBuilder<T> {
-  }
+  interface Distinct<T> extends ColumnNamesMethod<T> {}
 
   interface Join<T> {
     (raw: Raw): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, clause: (this: knex.JoinClause) => void): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, columns: { [key: string]: string | number | Raw | Reference }): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, raw: Raw): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, column1: string | Reference, column2: string): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, column1: string | Reference, raw: Raw): QueryBuilder<T>;
-    <T1>(tableName: TableName<T1>, column1: string | Reference, operator: string, column2: string | Reference): QueryBuilder<T>;
+    (tableName: TableName, clause: (this: knex.JoinClause, join: knex.JoinClause) => void): QueryBuilder<T>;
+    (tableName: TableName, columns: { [key: string]: string | number | Raw | Reference }): QueryBuilder<T>;
+    (tableName: TableName, raw: Raw): QueryBuilder<T>;
+    (tableName: TableName, column1: ColumnRef, column2: ColumnRef): QueryBuilder<T>;
+    (tableName: TableName, column1: ColumnRef, operator: string, column2: ColumnRef): QueryBuilder<T>;
   }
 
   interface JoinRaw<T> {
-    (tableName: string, binding?: Value): QueryBuilder<T>;
+    (sql: string, bindings?: any): QueryBuilder<T>;
   }
 
-  interface With<T> extends WithRaw<T>, WithWrapped<T> {
-  }
+  interface With<T> extends WithRaw<T>, WithWrapped<T> {}
 
   interface WithRaw<T> {
-    (alias: string, raw: Raw): QueryBuilder<T>;
-    (alias: string, sql: string, bindings?: Value[] | object): QueryBuilder<T>;
+    (alias: string, raw: Raw): QueryBuilder<T>;join: knex.JoinClause,
+    (alias: string, sql: string, bindings?: any): QueryBuilder<T>;
   }
 
   interface WithWrapped<T> {
     (alias: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
   }
 
-  interface Where<T> extends WhereRaw<T>, WhereWrapped<T>, WhereNull<T> {
-    (raw: Raw): QueryBuilder<T>;
-    (callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
+  interface Where<T> extends WhereRaw<T> {
+    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
     (object: object): QueryBuilder<T>;
-    (columnName: string | Raw | Reference, value: Value | Literal): QueryBuilder<T>;
-    (columnName: string | Raw | Reference, operator: string, value: Value | Literal): QueryBuilder<T>;
-    (columnName: string | Raw | Reference, operator: string, query: QueryBuilder<T>): QueryBuilder<T>;
-    (columnName: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
+    (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
+    (column: ColumnRef, operator: string, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
+    (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
   }
 
-  interface WhereRaw<T> extends RawQueryBuilder<T> {
+  interface WhereRaw<T> extends RawMethod<T> {
     (condition: boolean): QueryBuilder<T>;
   }
 
@@ -838,66 +866,54 @@ declare namespace Objection {
   }
 
   interface WhereNull<T> {
-    (columnName: string): QueryBuilder<T>;
+    (column: ColumnRef): QueryBuilder<T>;
   }
 
   interface WhereIn<T> {
-    (columnName: string, values: Value[]): QueryBuilder<T>;
-    (columnName: string, callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
-    (columnName: string, query: QueryBuilder<any>): QueryBuilder<T>;
+    (column: ColumnRef, values: Value[]): QueryBuilder<T>;
+    (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+    (column: ColumnRef, query: QueryBuilder<any>): QueryBuilder<T>;
   }
 
   interface WhereBetween<T> {
-    (columnName: string, range: [Value, Value]): QueryBuilder<T>;
+    (column: ColumnRef, range: [Value, Value]): QueryBuilder<T>;
   }
 
   interface WhereExists<T> {
-    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+    (callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
     (query: QueryBuilder<any>): QueryBuilder<T>;
+    (raw: Raw): QueryBuilder<T>;
   }
 
-  interface WhereNull<T> {
-    (columnName: string): QueryBuilder<T>;
-  }
-
-  interface WhereIn<T> {
-    (columnName: string, values: Value[]): QueryBuilder<T>;
-  }
-
-  interface GroupBy<T> extends RawQueryBuilder<T>, ColumnNameQueryBuilder<T> {}
+  interface GroupBy<T> extends RawMethod<T>, ColumnNamesMethod<T> {}
 
   interface OrderBy<T> {
-    (columnName: string | Raw, direction?: string): QueryBuilder<T>;
+    (column: ColumnRef, direction?: string): QueryBuilder<T>;
   }
 
   interface Union<T> {
     (callback: () => void, wrap?: boolean): QueryBuilder<T>;
     (callbacks: (() => void)[], wrap?: boolean): QueryBuilder<T>;
     (...callbacks: (() => void)[]): QueryBuilder<T>;
-    // (...callbacks: () => void[], wrap?: boolean): QueryInterface;
-  }
-
-  interface Having<T> extends RawQueryBuilder<T>, WhereWrapped<T> {
-    (tableName: string, column1: string, operator: string, column2: string): QueryBuilder<T>;
   }
 
   // commons
 
-  interface ColumnNameQueryBuilder<T> {
-    (...columnNames: ColumnName<T>[]): QueryBuilder<T>;
-    (columnNames: ColumnName<T>[]): QueryBuilder<T>;
+  interface ColumnNamesMethod<T> {
+    (...columnNames: ColumnRef[]): QueryBuilder<T>;
+    (columnNames: ColumnRef[]): QueryBuilder<T>;
   }
 
-  interface RawQueryBuilder<T> {
-    (sql: string, ...bindings: Value[]): QueryBuilder<T>;
-    (sql: string, bindings: Value[]): QueryBuilder<T>;
+  interface RawMethod<T> {
+    (sql: string, ...bindings: any[]): QueryBuilder<T>;
+    (sql: string, bindings: any): QueryBuilder<T>;
     (raw: Raw): QueryBuilder<T>;
   }
 
   interface Transaction extends knex {
     savepoint(transactionScope: (trx: Transaction) => any): Promise<any>;
     commit<T>(value?: any): Promise<T>;
-    rollback<T>(error?: any): Promise<T>;
+    rollback<T>(error?: Error): Promise<T>;
   }
 
   // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
