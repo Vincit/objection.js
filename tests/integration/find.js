@@ -184,6 +184,75 @@ module.exports = (session) => {
             });
         });
 
+        it('.where() with an object and objection.raw', () => {
+          return Model2
+            .query()
+            .where({
+              model_2_prop_2: raw('10 + 10')
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with objection.raw and a subquery builder', () => {
+          return Model2
+            .query()
+            .where('id_col', raw('?', Model2.query().select('id_col').where('model_2_prop_2', 20)))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with objection.raw and a subquery builder in an object', () => {
+          return Model2
+            .query()
+            .where('id_col', raw(':subQuery', {
+              subQuery: Model2.query().select('id_col').where('model_2_prop_2', 20)
+            }))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with objection.raw and a nested mess of things', () => {
+          return Model2
+            .query()
+            .where('id_col', raw(':nestedMess', {
+              nestedMess: raw('?', Model2.query().select('id_col').where('model_2_prop_2', 20))
+            }))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with objection.raw and a knex subquery builder', () => {
+          return Model2
+            .query()
+            .where('id_col', raw('?', Model2.query().select('id_col').where('model_2_prop_2', 20).build()))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with objection.raw and a subquery builder (array bindings)', () => {
+          return Model2
+            .query()
+            .where('id_col', raw('?', [Model2.query().select('id_col').where('model_2_prop_2', 20)]))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with objection.raw and a knex subquery builder (array bindings)', () => {
+          return Model2
+            .query()
+            .where('id_col', raw('?', [Model2.query().select('id_col').where('model_2_prop_2', 20).build()]))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
         it('.where() with a model instance', () => {
           const where = Model1.fromJson({model1Prop1: 'hello 1'});
 

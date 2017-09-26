@@ -315,7 +315,6 @@ module.exports = (session) => {
       it('should work when `insertMissing` option is true', () => {
         return A
           .query()
-          .debug()
           .upsertGraph({
             // update
             id1: 1,
