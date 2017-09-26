@@ -154,8 +154,8 @@ module.exports = (session) => {
               ]);
             }
 
-            expect(result.$beforeUpdateCalled).to.equal(undefined);
-            expect(result.$afterUpdateCalled).to.equal(undefined);
+            expect(result.$beforeUpdateCalled).to.equal(1);
+            expect(result.$afterUpdateCalled).to.equal(1);
 
             expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
             expect(result.model1Relation1.$afterUpdateCalled).to.equal(1);
@@ -383,6 +383,71 @@ module.exports = (session) => {
                 model_2_prop_1: 'hasMany 2',
                 model_2_prop_2: null
               });
+            });
+          });
+      });
+    });
+
+    it('should update with solely id and relational property(existing)', () => {
+      const upsert = {
+        id: 1,
+        // This is a BelongsToOneRelation
+        model1Relation1: { id: 3 },
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert, { relate: true, unrelate: true })
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(result.id)
+              .eager('model1Relation1')
+              .select('id')
+              .modifyEager('model1Relation1', qb => qb.select('id'));
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 1,
+              model1Relation1: {
+                id: 3,
+              }
+            });
+          });
+      });
+    });
+
+    it('should update with solely id and relation property(new)', () => {
+      const model1Prop1 = 'new';
+      const upsert = {
+        id: 1,
+        // This is a BelongsToOneRelation
+        model1Relation1: { model1Prop1 },
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert, { relate: true, unrelate: true })
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(result.id)
+              .eager('model1Relation1')
+              .select('id')
+              .modifyEager('model1Relation1', qb => qb.select('model1Prop1'));
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 1,
+              model1Relation1: {
+                model1Prop1,
+              }
             });
           });
       });
