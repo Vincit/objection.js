@@ -154,8 +154,8 @@ module.exports = (session) => {
               ]);
             }
 
-            expect(result.$beforeUpdateCalled).to.equal(1);
-            expect(result.$afterUpdateCalled).to.equal(1);
+            expect(result.$beforeUpdateCalled).to.equal(undefined);
+            expect(result.$afterUpdateCalled).to.equal(undefined);
 
             expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
             expect(result.model1Relation1.$afterUpdateCalled).to.equal(1);
@@ -232,6 +232,27 @@ module.exports = (session) => {
               // Row 2 should be deleted.
               expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
             });
+          });
+      });
+    });
+
+    it('should update root only if belongsToOne relation change', () => {
+      const upsert = {
+        id: 1,
+        // update BelongsToOneRelation
+        model1Relation1: { id: 3 },
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert, { relate: true })
+          .then(result => {
+            expect(result.$beforeUpdateCalled).to.equal(1);
+            expect(result.$afterUpdateCalled).to.equal(1);
+
+            expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
+            expect(result.model1Relation1.$afterUpdateCalled).to.equal(undefined);
           });
       });
     });
