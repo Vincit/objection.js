@@ -48,7 +48,7 @@ declare namespace Objection {
     // See https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
     <A>(
       a: new () => A
-    ): { new (): A};
+    ): { new (): A };
 
     <A, B>(
       a: new () => A,

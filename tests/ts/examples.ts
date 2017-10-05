@@ -217,7 +217,7 @@ const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eager('foo.bar');
 
-const rowsPage: Promise<{ total: number, results: Person[] }> = Person.query().page(1, 10);
+const rowsPage: Promise<{ total: number; results: Person[] }> = Person.query().page(1, 10);
 
 const rowsRange: Promise<objection.Page<Person>> = Person.query().range(1, 10);
 
@@ -390,9 +390,7 @@ Person.query().whereIn('firstName', whereSubQuery);
 Person.query().where('foo', whereSubQuery);
 Person.query().whereExists(whereSubQuery);
 Person.query().where(builder => {
-  builder
-    .whereBetween('age', [30, 40])
-    .orWhereIn('lastName', whereSubQuery);
+  builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
 
 // RawBuilder:
@@ -456,6 +454,10 @@ function takesComment(_: Comment) {
   //
 }
 
+// (these thunks provide variable scoping to isolate examples)
+
+// .compose tests:
+
 () => {
   const AnimalPerson = objection.compose(Animal, Person);
   const o = new AnimalPerson();
@@ -480,6 +482,8 @@ function takesComment(_: Comment) {
   takesComment(o);
 };
 
+// .mixin tests:
+
 () => {
   const AnimalPerson = objection.mixin(Animal, [Person]);
   const o = new AnimalPerson();
@@ -502,4 +506,22 @@ function takesComment(_: Comment) {
   takesAnimal(o);
   takesMovie(o);
   takesComment(o);
+};
+
+() => {
+  class Plugin {
+    plug() {
+      //
+    }
+  }
+  class PluggablePerson extends objection.mixin(objection.Model, [Person, Plugin]) {
+    unplug() {
+      //
+    }
+  }
+  const pp = new PluggablePerson();
+  pp.plug();
+  pp.$knex();
+  pp.firstName = 'bob';
+  pp.unplug();
 };
