@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@types/knex": "^0.0.61",
-    "@types/node": "^8.0.28",
+    "@types/node": "^8.0.32",
     "coveralls": "^2.13.1",
     "expect.js": "^0.3.1",
     "fs-extra": "3.0.1",
@@ -70,6 +70,6 @@
     "pg": "^6.2.2",
     "sqlite3": "^3.1.8",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.2"
+    "typescript": "^2.5.3"
   }
 }
