@@ -15,36 +15,6 @@ class Person extends objection.Model {
   lastName: string;
   examplePersonMethod = (arg: string) => 1;
 
-  static async truncate(): Promise<void> {
-    await this.query().truncate();
-  }
-
-  static async withLastName(lastName: string): Promise<Person[]> {
-    return this.query().where('lastName', lastName);
-  }
-
-  static async firstWithLastName(lastName: string): Promise<Person | undefined> {
-    return this.query()
-      .where({ lastName })
-      .first();
-  }
-
-  static async findById(id: number): Promise<Person | undefined> {
-    return this.query().findById(id);
-  }
-
-  static async findWithFirstName(firstname: string): Promise<Person | undefined> {
-    return this.query().findOne({ firstName: firstname });
-  }
-
-  async loadMovies(): Promise<this> {
-    return this.$loadRelated('movies');
-  }
-
-  async reload(): Promise<this> {
-    return this.$query();
-  }
-
   async petsWithId(petId: number): Promise<Animal[]> {
     // Types can't look at strings and give strong types, so this must be a Model[] promise:
     const pets: objection.Model[] = await this.$relatedQuery('pets').where('id', petId);
@@ -56,6 +26,54 @@ class Person extends objection.Model {
     console.log(queryContext.someCustomValue);
   }
 }
+
+const takesVoid = (v: void) => 1;
+
+const takesPerson = (person: Person) => {
+  person.examplePersonMethod("");
+};
+const takesMaybePerson = (_: Person | undefined) => 1;
+const takesPeople = (_: Person[]) => 1;
+
+async function takesPersonClass(PersonClass: typeof Person) {
+  takesPerson(new PersonClass());
+  takesMaybePerson(await PersonClass.query().findById(123));
+}
+
+const lastName = "Lawrence";
+
+// Note that at least with TypeScript 2.3 or earlier, type assertions made
+// on an instance will coerce the assignment to the instance type, which
+// means `const p: Person = somethingThatReturnsAny()` will compile.
+
+// It also seems that Promise types are not as rigorously asserted as their
+// resolved types, hence these async/await blocks:
+
+async () => {
+  takesPeople(await Person.query().where('lastName', lastName));
+  takesPeople(await Person.query().where({lastName}));
+  takesMaybePerson(await Person.query().findById(123));
+  takesMaybePerson(await Person.query().findById("uid"));
+};
+
+// .where().first is equivalent to .findOne:
+async () => {
+  takesMaybePerson(await Person.query().where('raw SQL constraint').first());
+  takesMaybePerson(await Person.query().where('lastName', lastName).first());
+  takesMaybePerson(await Person.query().where('lastName', ">", lastName).first());
+  takesMaybePerson(await Person.query().where({lastName}).first());
+
+  takesMaybePerson(await Person.query().findOne('raw SQL constraint'));
+  takesMaybePerson(await Person.query().findOne('lastName', lastName));
+  takesMaybePerson(await Person.query().findOne('lastName', ">", lastName));
+  takesMaybePerson(await Person.query().findOne({lastName}));
+};
+
+// instance methods:
+async () => {
+  takesPerson(await new Person().$loadRelated("movies"));
+  takesPerson(await new Person().$query());
+};
 
 class Movie extends objection.Model {
   title: string;
@@ -90,24 +108,12 @@ const k: knex = knex({});
 
 // bindKnex returns the proper Model subclass:
 
-const BoundPerson: typeof Person = Person.bindKnex(k);
-
-// With expected static methods:
-Person.bindKnex(k).truncate();
+const BoundPerson = Person.bindKnex(k);
+takesPersonClass(BoundPerson);
 
 // The Model subclass is interpreted correctly to be constructable
 
-const examplePerson: Person = new BoundPerson();
-
-// and to have expected sublcass fields
-
-examplePerson.firstName = 'example';
-examplePerson.lastName = 'person';
-
-// and methods
-
-const exampleResult: number = examplePerson.examplePersonMethod('hello');
-
+const examplePerson = new BoundPerson();
 // and inherited methods from Model
 
 const personId = examplePerson.$id();
@@ -162,7 +168,7 @@ qb = qb.increment('column_name', 2);
 qb = qb.decrement('column_name', 1);
 qb = qb.select('column1');
 qb = qb.select('column1', 'column2', 'column3');
-qb = qb.select(['column1', 'column2'])
+qb = qb.select(['column1', 'column2']);
 qb = qb.forUpdate();
 qb = qb.as('column_name');
 qb = qb.column('column_name');
@@ -217,11 +223,9 @@ const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eager('foo.bar');
 
-const rowsPage: Promise<{total: number, results: Person[]}> = Person.query()
-  .page(1, 10)
+const rowsPage: Promise<{ total: number; results: Person[] }> = Person.query().page(1, 10);
 
-const rowsRange: Promise<objection.Page<Person>> = Person.query()
-  .range(1, 10);
+const rowsRange: Promise<objection.Page<Person>> = Person.query().range(1, 10);
 
 // `retuning` should change the return value from number to T[]
 const rowsUpdateReturning: Promise<Person[]> = Person.query()
@@ -236,20 +240,20 @@ const rowPatchReturningFirst: Promise<Person | undefined> = Person.query()
 // `retuning` should change the return value from number to T[]
 const rowsDeleteReturning: Promise<Person[]> = Person.query()
   .delete()
-  .returning('*')
+  .returning('*');
 
 const rowsDeleteReturningFirst: Promise<Person | undefined> = Person.query()
   .delete()
   .returning('*')
-  .first()
+  .first();
 
 const rowInsertReturning: Promise<Person | undefined> = Person.query()
   .insert({})
-  .returning('*')
+  .returning('*');
 
 const rowsInsertReturning: Promise<Person[]> = Person.query()
   .insert([{}])
-  .returning('*')
+  .returning('*');
 
 // non-wrapped methods:
 
@@ -392,9 +396,7 @@ Person.query().whereIn('firstName', whereSubQuery);
 Person.query().where('foo', whereSubQuery);
 Person.query().whereExists(whereSubQuery);
 Person.query().where(builder => {
-  builder
-    .whereBetween('age', [30, 40])
-    .orWhereIn('lastName', whereSubQuery)
+  builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
 
 // RawBuilder:
@@ -422,8 +424,8 @@ Person.query()
 
 // LiteralBuilder:
 Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
-Person.query().where('age', '>', lit(10))
-Person.query().where('firstName', lit('Jennifer').castText())
+Person.query().where('age', '>', lit(10));
+Person.query().where('firstName', lit('Jennifer').castText());
 
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy
@@ -431,4 +433,7 @@ Person.query().where('firstName', lit('Jennifer').castText())
 const peep123: Promise<Person | undefined> = BoundPerson.query(k).findById(123);
 
 new Person().$query(k).execute();
-new Person().$relatedQuery("pets", k).execute();
+new Person().$relatedQuery('pets', k).execute();
+
+takesPerson(Person.fromJson({firstName: 'jennifer', lastName: 'Lawrence'}));
+takesPerson(Person.fromDatabaseJson({firstName: 'jennifer', lastName: 'Lawrence'}));
