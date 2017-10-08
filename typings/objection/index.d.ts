@@ -193,8 +193,9 @@ declare namespace Objection {
   interface Properties { [propertyName: string]: boolean; }
 
   /**
-   * This is a hack to support referencing a given Model subclass constructor.
-   * See https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
+   * ModelClass is a TypeScript hack to support referencing a Model
+   * subclass constructor and not losing access to static members. See
+   * https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
   interface ModelClass<M extends Model> {
     new(): M;
@@ -230,6 +231,7 @@ declare namespace Objection {
 
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
+
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
 
@@ -282,12 +284,13 @@ declare namespace Objection {
     static query<T>(this: { new(): T }, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new(): T }): knex.QueryBuilder;
+    static knexQuery(): knex.QueryBuilder;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
-    static fromJson<T>(this: T, json: object, opt?: ModelOptions): T;
-    static fromDatabaseJson<T>(this: T, row: object): T;
+    // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
+    static fromJson<T>(this: { new(): T }, json: object, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: { new(): T }, row: object): T;
 
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
@@ -428,7 +431,8 @@ declare namespace Objection {
 
     findById(id: Id): QueryBuilderOption<T>;
     findById(idOrIds: IdOrIds): this;
-    findOne(where: object): QueryBuilderOption<T>;
+    /** findOne is shorthand for .where(...whereArgs).first() */
+    findOne: FindOne<T>;
 
     insert: Insert<T>;
     insertAndFetch(modelOrObject: Partial<T>): QueryBuilderInsertSingle<T>;
@@ -855,6 +859,17 @@ declare namespace Objection {
     (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
     (column: ColumnRef, operator: string, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
     (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+  }
+
+  interface FindOne<T> {
+    (condition: boolean): QueryBuilderOption<T>;
+    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilderOption<T>;
+    (object: object): QueryBuilderOption<T>;
+    (sql: string, ...bindings: any[]): QueryBuilderOption<T>;
+    (sql: string, bindings: any): QueryBuilderOption<T>;
+    (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilderOption<T>;
+    (column: ColumnRef, operator: string, value: Value | Reference | QueryBuilder<any>): QueryBuilderOption<T>;
+    (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilderOption<T>;
   }
 
   interface WhereRaw<T> extends RawMethod<T> {
