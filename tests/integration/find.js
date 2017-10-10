@@ -786,6 +786,21 @@ module.exports = (session) => {
           });
       });
 
+      it('aliases should work with eager expression `a.b`', () => {
+        return Model1
+          .query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .leftJoinRelation('model1Relation1 as a . model1Relation2 as b')
+          .where('a:b.model_2_prop_1', 'hejsan 4')
+          .first()
+          .then(model => {
+            expect(model.toJSON()).to.eql({
+              id: 3,
+              model1Prop1: 'hello 3'
+            });
+          });
+      });
+
       it('should join an eager expression `a.a.b`', () => {
         return Model1
           .query()

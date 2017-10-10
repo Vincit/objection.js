@@ -605,7 +605,7 @@ module.exports = (session) => {
 
     // This tests the Model.namedFilters feature.
     test(`[
-      model1Relation1(select:id, localNamedFilter), 
+      model1Relation1(select:id, localNamedFilter),
       model1Relation2.[
         model2Relation1(select:model1Prop1).[
           model1Relation1(select:id, select:model1Prop1),
@@ -1780,7 +1780,7 @@ module.exports = (session) => {
           })
           .map(model => {
             model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
-            return model; 
+            return model;
           })
           .then(models => {
             expect(models).to.eql([{
@@ -1823,7 +1823,7 @@ module.exports = (session) => {
           })
           .map(model => {
             model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
-            return model; 
+            return model;
           })
           .then(models => {
             expect(models).to.eql([{
@@ -1868,7 +1868,7 @@ module.exports = (session) => {
             .select('Model1.id')
             .eagerAlgorithm(eagerAlgo)
             .eager(`[
-              model1Relation1(f1) as a, 
+              model1Relation1(f1) as a,
               model1Relation2(f2) as b .[
                 model2Relation1(f1) as c,
                 model2Relation1(f1) as d
@@ -1878,7 +1878,7 @@ module.exports = (session) => {
               f2: builder => builder.select('model_2.id_col')
             })
             .first()
-            .then(model => {          
+            .then(model => {
               model.b = _.sortBy(model.b, 'idCol');
               model.b[1].c = _.sortBy(model.b[1].c, 'id');
               model.b[1].d = _.sortBy(model.b[1].d, 'id');
@@ -1923,8 +1923,59 @@ module.exports = (session) => {
         }, {concurrency: 1});
       });
 
+      it('aliases should alias the joined tables when using joinEager', () => {
+        return Model1
+          .query()
+          .findById(1)
+          .select('Model1.id')
+          .joinEager(`[
+            model1Relation1(f1) as a,
+            model1Relation2(f2) as b .[
+              model2Relation1(f1) as c,
+              model2Relation1(f1) as d
+            ]
+          ]`, {
+            f1: builder => builder.select('Model1.id'),
+            f2: builder => builder.select('model_2.id_col')
+          })
+          .where('b:d.id', 6)
+          .then(model => {
+            model.b = _.sortBy(model.b, 'idCol');
+            model.b[0].c = _.sortBy(model.b[0].c, 'id');
+            model.b[0].d = _.sortBy(model.b[0].d, 'id');
+
+            expect(model).to.eql({
+              id: 1,
+              $afterGetCalled: 1,
+
+              a: {
+                id: 2,
+                $afterGetCalled: 1
+              },
+
+              b: [{
+                idCol: 2,
+                $afterGetCalled: 1,
+
+                c: [{
+                  id: 5,
+                  $afterGetCalled: 1
+                }, {
+                  id: 6,
+                  $afterGetCalled: 1
+                }],
+
+                d: [{
+                  id: 6,
+                  $afterGetCalled: 1
+                }]
+              }]
+            });
+          });
+      });
+
       it('alias method should work', () => {
-        return Promise.map([/*Model1.WhereInEagerAlgorithm, */Model1.JoinEagerAlgorithm], eagerAlgo => {
+        return Promise.map([Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm], eagerAlgo => {
           return Model1
             .query()
             .alias('m1')
@@ -1936,7 +1987,7 @@ module.exports = (session) => {
               f1: builder => builder.select('id')
             })
             .findOne({'m1.id': 1})
-            .then(model => {          
+            .then(model => {
               expect(model).to.eql({
                 id: 1,
                 $afterGetCalled: 1,
