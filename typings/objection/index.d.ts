@@ -11,6 +11,8 @@ declare namespace Objection {
   const lit: LiteralBuilder;
   const raw: knex.RawBuilder;
   const ref: ReferenceBuilder;
+  const compose: Compose;
+  const mixin: Mixin;
 
   interface LiteralObject {
     [key: string]: Value
@@ -41,6 +43,30 @@ declare namespace Objection {
   export interface Literal extends Castable {}
 
   export interface Reference extends Castable {}
+
+  // "{ new(): T }"
+  // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
+  export interface Constructor<M> {
+    new(...args: any[]): M;
+  }
+
+  export interface Plugin {
+    <M extends typeof Model>(modelClass: M): M;
+  }
+
+  export interface Compose {
+    (...plugins: Plugin[]): Plugin;
+    (plugins: Plugin[]): Plugin;
+  }
+
+  export interface Mixin {
+    // Using ModelClass<M> causes TS 2.5 to render ModelClass<any> rather
+    // than an identity function type. <M extends typeof Model> retains the
+    // model subclass type in the return value, without requiring the user
+    // to type the Mixin call.
+    <M extends typeof Model>(modelClass: M, ...plugins: Plugin[]): M;
+    <M extends typeof Model>(modelClass: M, plugins: Plugin[]): M;
+  }
 
   export interface Page<T> {
     total: number;
@@ -197,8 +223,7 @@ declare namespace Objection {
    * subclass constructor and not losing access to static members. See
    * https://github.com/Microsoft/TypeScript/issues/5863#issuecomment-242782664
    */
-  interface ModelClass<M extends Model> {
-    new(): M;
+  interface ModelClass<M extends Model> extends Constructor<M> {
     tableName: string;
     jsonSchema: JsonSchema;
     idColumn: string | string[];
@@ -248,6 +273,8 @@ declare namespace Objection {
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
   }
 
+  // TS 2.5 doesn't support interfaces with static methods or fields, so
+  // this must be declared as a class:
   export class Model {
     static tableName: string;
     static jsonSchema: JsonSchema;
@@ -279,9 +306,7 @@ declare namespace Objection {
     static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
-    // "{ new(): T }"
-    // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
-    static query<T>(this: { new(): T }, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
+    static query<T>(this: Constructor<T>, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery(): knex.QueryBuilder;
@@ -289,13 +314,13 @@ declare namespace Objection {
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
-    static fromJson<T>(this: { new(): T }, json: object, opt?: ModelOptions): T;
-    static fromDatabaseJson<T>(this: { new(): T }, row: object): T;
+    static fromJson<T>(this: Constructor<T>, json: object, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: Constructor<T>, row: object): T;
 
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
     static loadRelated<T>(
-      this: { new(): T },
+      this: Constructor<T>,
       models: (T | object)[],
       expression: RelationExpression,
       filters?: Filters<T>,
