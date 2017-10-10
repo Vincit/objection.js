@@ -11,6 +11,8 @@ declare namespace Objection {
   const lit: LiteralBuilder;
   const raw: knex.RawBuilder;
   const ref: ReferenceBuilder;
+  const compose: Compose;
+  const mixin: Mixin;
 
   interface LiteralObject {
     [key: string]: Value
@@ -41,6 +43,128 @@ declare namespace Objection {
   export interface Literal extends Castable {}
 
   export interface Reference extends Castable {}
+
+  export interface Compose {
+    // See https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
+    <A>(
+      a: new () => A
+    ): { new (): A };
+
+    <A, B>(
+      a: new () => A,
+      b: new () => B
+    ): { new (): A & B };
+
+    <A, B, C>(
+      a: new () => A,
+      b: new () => B,
+      c: new () => C
+    ): { new (): A & B & C };
+
+    <A, B, C, D>(
+      a: new () => A,
+      b: new () => B,
+      c: new () => C,
+      d: new () => D
+    ): { new (): A & B & C & D };
+
+    <A, B, C, D, E>(
+      a: new () => A,
+      b: new () => B,
+      c: new () => C,
+      d: new () => D,
+      e: new () => E
+    ): { new (): A & B & C & D & E };
+
+    <A, B, C, D, E, F>(
+      a: new () => A,
+      b: new () => B,
+      c: new () => C,
+      d: new () => D,
+      e: new () => E,
+      f: new () => F
+    ): { new (): A & B & C & D & E & F };
+
+    <A, B, C, D, E, F, G>(
+      a: new () => A,
+      b: new () => B,
+      c: new () => C,
+      d: new () => D,
+      e: new () => E,
+      f: new () => F,
+      g: new () => G
+    ): { new (): A & B & C & D & E & F & G };
+
+    <A, B, C, D, E, F, G, H>(
+      a: new () => A,
+      b: new () => B,
+      c: new () => C,
+      d: new () => D,
+      e: new () => E,
+      f: new () => F,
+      g: new () => G,
+      h: new () => H
+    ): { new (): A & B & C & D & E & F & G & H };
+  }
+  export interface Mixin {
+    // See https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
+    <M, A>(
+      m: new () => M,
+      arr: [new () => A]
+    ): { 
+      new (): M & A;
+    };
+
+    <M, A, B>(
+      m: new () => M,
+      arr: [new () => A, new () => B]
+    ): {
+      new (): M & A & B;
+    };
+
+    <M, A, B, C>(
+      m: new () => M,
+      arr: [new () => A, new () => B, new () => C]
+    ): {
+      new (): M & A & B & C;
+    };
+
+    <M, A, B, C, D>(
+      m: new () => M,
+      arr: [new () => A, new () => B, new () => C, new () => D]
+    ): {
+      new (): M & A & B & C & D;
+    };
+
+    <M, A, B, C, D, E>(
+      m: new () => M,
+      arr: [new () => A, new () => B, new () => C, new () => D, new () => E]
+    ): {
+      new (): M & A & B & C & D & E;
+    };
+
+    <M, A, B, C, D, E, F>(
+      m: new () => M,
+      arr: [new () => A, new () => B, new () => C, new () => D, new () => E, new () => F]
+    ): {
+      new (): M & A & B & C & D & E & F;
+    };
+
+    <M, A, B, C, D, E, F, G>(
+      m: new () => M,
+      arr: [new () => A, new () => B, new () => C, new () => D, new () => E, new () => F, new () => G]
+    ): {
+      new (): M & A & B & C & D & E & F & G;
+    };
+
+    <M, A, B, C, D, E, F, G, H>(
+      m: new () => M,
+      arr: [new () => A, new () => B, new () => C, new () => D, new () => E, new () => F, new () => G, new () => H]
+    ): {
+      new (): M & A & B & C & D & E & F & G & H;
+    };
+  }
+
 
   export interface Page<T> {
     total: number;
@@ -282,7 +406,7 @@ declare namespace Objection {
     static query<T>(this: { new(): T }, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
-    static knexQuery<T>(this: { new(): T }): knex.QueryBuilder;
+    static knexQuery(): knex.QueryBuilder;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 

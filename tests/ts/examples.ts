@@ -162,7 +162,7 @@ qb = qb.increment('column_name', 2);
 qb = qb.decrement('column_name', 1);
 qb = qb.select('column1');
 qb = qb.select('column1', 'column2', 'column3');
-qb = qb.select(['column1', 'column2'])
+qb = qb.select(['column1', 'column2']);
 qb = qb.forUpdate();
 qb = qb.as('column_name');
 qb = qb.column('column_name');
@@ -217,11 +217,9 @@ const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eager('foo.bar');
 
-const rowsPage: Promise<{total: number, results: Person[]}> = Person.query()
-  .page(1, 10)
+const rowsPage: Promise<{ total: number; results: Person[] }> = Person.query().page(1, 10);
 
-const rowsRange: Promise<objection.Page<Person>> = Person.query()
-  .range(1, 10);
+const rowsRange: Promise<objection.Page<Person>> = Person.query().range(1, 10);
 
 // `retuning` should change the return value from number to T[]
 const rowsUpdateReturning: Promise<Person[]> = Person.query()
@@ -236,20 +234,20 @@ const rowPatchReturningFirst: Promise<Person | undefined> = Person.query()
 // `retuning` should change the return value from number to T[]
 const rowsDeleteReturning: Promise<Person[]> = Person.query()
   .delete()
-  .returning('*')
+  .returning('*');
 
 const rowsDeleteReturningFirst: Promise<Person | undefined> = Person.query()
   .delete()
   .returning('*')
-  .first()
+  .first();
 
 const rowInsertReturning: Promise<Person | undefined> = Person.query()
   .insert({})
-  .returning('*')
+  .returning('*');
 
 const rowsInsertReturning: Promise<Person[]> = Person.query()
   .insert([{}])
-  .returning('*')
+  .returning('*');
 
 // non-wrapped methods:
 
@@ -392,9 +390,7 @@ Person.query().whereIn('firstName', whereSubQuery);
 Person.query().where('foo', whereSubQuery);
 Person.query().whereExists(whereSubQuery);
 Person.query().where(builder => {
-  builder
-    .whereBetween('age', [30, 40])
-    .orWhereIn('lastName', whereSubQuery)
+  builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
 
 // RawBuilder:
@@ -422,8 +418,8 @@ Person.query()
 
 // LiteralBuilder:
 Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
-Person.query().where('age', '>', lit(10))
-Person.query().where('firstName', lit('Jennifer').castText())
+Person.query().where('age', '>', lit(10));
+Person.query().where('firstName', lit('Jennifer').castText());
 
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy
@@ -431,4 +427,101 @@ Person.query().where('firstName', lit('Jennifer').castText())
 const peep123: Promise<Person | undefined> = BoundPerson.query(k).findById(123);
 
 new Person().$query(k).execute();
-new Person().$relatedQuery("pets", k).execute();
+new Person().$relatedQuery('pets', k).execute();
+
+async function asyncExamples(value: number | undefined) {
+  // verify: @drew-r: QueryBuilder.resultSize(): Promise<Number> but
+  // objection returns a string for this as far as I can tell.
+  const resultSize: number = await Person.query().resultSize();
+
+  // verify: @drew-r: We also can't use undefined values in where followed
+  // by skipUndefined because of the way Value works.
+  const person: Person | undefined = await Person.query()
+    .where('id', value)
+    .first();
+}
+
+function takesPerson(_: Person) {
+  //
+}
+function takesAnimal(_: Animal) {
+  //
+}
+function takesMovie(_: Movie) {
+  //
+}
+function takesComment(_: Comment) {
+  //
+}
+
+// (these thunks provide variable scoping to isolate examples)
+
+// .compose tests:
+
+() => {
+  const AnimalPerson = objection.compose(Animal, Person);
+  const o = new AnimalPerson();
+  takesPerson(o);
+  takesAnimal(o);
+};
+
+() => {
+  const AnimalPersonMovie = objection.compose(Animal, Person, Movie);
+  const o = new AnimalPersonMovie();
+  takesPerson(o);
+  takesAnimal(o);
+  takesMovie(o);
+};
+
+() => {
+  const AnimalPersonMovieComment = objection.compose(Animal, Person, Movie, Comment);
+  const o = new AnimalPersonMovieComment();
+  takesPerson(o);
+  takesAnimal(o);
+  takesMovie(o);
+  takesComment(o);
+};
+
+// .mixin tests:
+
+() => {
+  const AnimalPerson = objection.mixin(Animal, [Person]);
+  const o = new AnimalPerson();
+  takesPerson(o);
+  takesAnimal(o);
+};
+
+() => {
+  const AnimalPersonMovie = objection.mixin(Animal, [Person, Movie]);
+  const o = new AnimalPersonMovie();
+  takesPerson(o);
+  takesAnimal(o);
+  takesMovie(o);
+};
+
+() => {
+  const AnimalPersonMovieComment = objection.mixin(Animal, [Person, Movie, Comment]);
+  const o = new AnimalPersonMovieComment();
+  takesPerson(o);
+  takesAnimal(o);
+  takesMovie(o);
+  takesComment(o);
+};
+
+() => {
+  class Plugin {
+    plug() {
+      //
+    }
+  }
+  class PluggablePerson extends objection.mixin(objection.Model, [Person, Plugin]) {
+    unplug() {
+      //
+    }
+  }
+  const pp = new PluggablePerson();
+  pp.plug();
+  pp.$knex();
+  pp.firstName = 'bob';
+  pp.unplug();
+};
