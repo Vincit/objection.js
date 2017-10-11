@@ -7,6 +7,8 @@ exports.up = function (knex) {
       table.string('lastName');
       table.integer('age');
       table.json('address');
+      table.bigInteger("createdAt").notNullable();
+      table.bigInteger("updatedAt").notNullable();
     })
     .createTable('Movie', function (table) {
       table.increments('id').primary();

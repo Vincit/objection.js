@@ -14,6 +14,8 @@ export default class Person extends Model {
   lastName: string;
   age: number;
   address: Address;
+  createdAt: Date;
+  updatedAt: Date;
 
   // Table name is the only required property.
   static tableName = 'Person';
@@ -95,4 +97,46 @@ export default class Person extends Model {
   examplePersonMethod(arg: string): number {
     return 1;
   }
+
+  //
+  // Example of numeric timestamps. Presumably this would be in a base
+  // class or a mixin, and not just one of your leaf models.
+  //
+
+  $beforeInsert() {
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
+  }
+
+  $beforeUpdate() {
+    this.updatedAt = new Date();
+  }
+
+  $parseDatabaseJson(json: object) {
+    json = super.$parseDatabaseJson(json);
+    toDate(json, 'createdAt');
+    toDate(json, 'updatedAt');
+    return json;
+  }
+
+  $formatDatabaseJson(json: object) {
+    json = super.$formatDatabaseJson(json);
+    toTime(json, 'createdAt');
+    toTime(json, 'updatedAt');
+    return json;
+  }
+}
+
+function toDate(obj: any, fieldName: string): any {
+  if (obj != null && typeof obj[fieldName] === 'number') {
+    obj[fieldName] = new Date(obj[fieldName]);
+  }
+  return obj;
+}
+
+function toTime(obj: any, fieldName: string): any {
+  if (obj != null && obj[fieldName] != null && obj[fieldName].getTime) {
+    obj[fieldName] = obj[fieldName].getTime();
+  }
+  return obj;
 }

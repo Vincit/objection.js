@@ -6,7 +6,7 @@
   version "3.5.15"
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.15.tgz#7232b263a5f91530d52116102d33b2ce2410ccba"
 
-"@types/body-parser@^1.16.4":
+"@types/body-parser@^1.16.5":
   version "1.16.5"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.16.5.tgz#d2b7daefab84e0afa9d3fae0935bc7355b6320af"
   dependencies:
@@ -19,7 +19,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/express@*", "@types/express@^4.0.36":
+"@types/express@*", "@types/express@^4.0.37":
   version "4.0.37"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.0.37.tgz#625ac3765169676e01897ca47011c26375784971"
   dependencies:
@@ -33,7 +33,7 @@
     "@types/bluebird" "*"
     "@types/node" "*"
 
-"@types/lodash@^4.14.70":
+"@types/lodash@^4.14.77":
   version "4.14.77"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.77.tgz#0bc699413e84d6ed5d927ca30ea0f0a890b42d75"
 
@@ -41,7 +41,7 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-2.0.0.tgz#5a7306e367c539b9f6543499de8dd519fac37a8b"
 
-"@types/morgan@^1.7.32":
+"@types/morgan@^1.7.33":
   version "1.7.33"
   resolved "https://registry.yarnpkg.com/@types/morgan/-/morgan-1.7.33.tgz#149a1f07335d3e51d01753493e6d7173f94f4766"
   dependencies:
@@ -58,7 +58,7 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/sqlite3@^3.1.0":
+"@types/sqlite3@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@types/sqlite3/-/sqlite3-3.1.1.tgz#f9b707c574e8d2f73d6c41aaa86e28b6ef85a324"
   dependencies:
@@ -193,7 +193,7 @@ bluebird@^3.4.6, bluebird@^3.5.0:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.5.1.tgz#d9551f9de98f1fcda1e683d17ee91a0602ee2eb9"
 
-body-parser@1.18.2, body-parser@^1.17.2:
+body-parser@1.18.2, body-parser@^1.18.2:
   version "1.18.2"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.2.tgz#87678a19d84b47d859b83199bd59bce222b10454"
   dependencies:
@@ -416,7 +416,7 @@ express-promise-router@^2.0.0:
     lodash "^4.13.1"
     methods "^1.0.0"
 
-express@^4.15.3:
+express@^4.16.2:
   version "4.16.2"
   resolved "https://registry.yarnpkg.com/express/-/express-4.16.2.tgz#e35c6dfe2d64b7dca0a5cd4f21781be3299e076c"
   dependencies:
@@ -958,7 +958,7 @@ minimist@~1.1.0:
   dependencies:
     minimist "0.0.8"
 
-morgan@^1.8.2:
+morgan@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.9.0.tgz#d01fa6c65859b76fcf31b3cb53a3821a311d8051"
   dependencies:
@@ -1256,7 +1256,7 @@ resolve@^1.1.6, resolve@^1.1.7, resolve@^1.3.2:
   dependencies:
     path-parse "^1.0.5"
 
-rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1:
+rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1, rimraf@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.2.tgz#2ed8150d24a16ea8651e6d6ef0f47c4158ce7a36"
   dependencies:
@@ -1319,7 +1319,7 @@ sntp@1.x.x:
   dependencies:
     hoek "2.x.x"
 
-sqlite3@^3.1.8:
+sqlite3@^3.1.13:
   version "3.1.13"
   resolved "https://registry.yarnpkg.com/sqlite3/-/sqlite3-3.1.13.tgz#d990a05627392768de6278bafd1a31fdfe907dd9"
   dependencies:
@@ -1431,7 +1431,7 @@ tslint-eslint-rules@^4.0.0:
     tslib "^1.0.0"
     tsutils "^1.4.0"
 
-tslint@^5.5.0:
+tslint@^5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.7.0.tgz#c25e0d0c92fa1201c2bc30e844e08e682b4f3552"
   dependencies:
@@ -1473,7 +1473,7 @@ type-is@~1.6.15:
     media-typer "0.3.0"
     mime-types "~2.1.15"
 
-typescript@^2.4.2:
+typescript@^2.5.3:
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.5.3.tgz#df3dcdc38f3beb800d4bc322646b04a3f6ca7f0d"
 
