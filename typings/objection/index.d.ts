@@ -385,36 +385,40 @@ declare namespace Objection {
     static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
+  export interface ThrowIfNotFound {
+    throwIfNotFound(): this;
+  }
+
   /**
    * QueryBuilder with one expected result
    */
-  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, Promise<T> { }
+  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> { }
 
   /**
    * Query builder for update operations
    */
-  export interface QueryBuilderUpdate<T> extends QueryBuilderBase<T>, Promise<number> {
-    returning(columns: string | string[]): QueryBuilder<T>
+  export interface QueryBuilderUpdate<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<number> {
+    returning(columns: string | string[]): QueryBuilder<T>;
   }
 
   /**
    * Query builder for delete operations
    */
-  export interface QueryBuilderDelete<T> extends QueryBuilderBase<T>, Promise<number> {
-    returning(columns: string | string[]): QueryBuilder<T>
+  export interface QueryBuilderDelete<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<number> {
+    returning(columns: string | string[]): QueryBuilder<T>;
   }
 
   /**
    * Query builder for batch insert operations
    */
-  export interface QueryBuilderInsert<T> extends QueryBuilderBase<T>, Promise<T[]> {
+  export interface QueryBuilderInsert<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> {
     returning(columns: string | string[]): this;
   }
 
   /**
    * Query builder for single insert operations
    */
-  export interface QueryBuilderInsertSingle<T> extends QueryBuilderBase<T>, Promise<T> {
+  export interface QueryBuilderInsertSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> {
     returning(columns: string | string[]): this;
   }
 
@@ -422,26 +426,30 @@ declare namespace Objection {
    * QueryBuilder with zero or one expected result
    * (Using the Scala `Option` terminology)
    */
-  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Promise<T | undefined> { }
+  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Promise<T | undefined> {
+    throwIfNotFound(): QueryBuilderSingle<T>;
+  }
 
   /**
    * QueryBuilder with zero or more expected results
    */
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, Promise<T[]> { }
+  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> { 
+  }
 
   /**
    * QueryBuilder with a page result.
    */
-  export interface QueryBuilderPage<T> extends QueryBuilderBase<T>, Promise<Page<T>> { }
+  export interface QueryBuilderPage<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<Page<T>> { 
+  }
 
   interface Insert<T> {
-    (modelsOrObjects?: Array<Partial<T>>): QueryBuilderInsert<T>;
+    (modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
     (modelOrObject?: Partial<T>): QueryBuilderInsertSingle<T>;
     (): this;
   }
 
   interface Upsert<T> {
-    (modelsOrObjects?: Array<Partial<T>>, options?: UpsertOptions): QueryBuilder<T>;
+    (modelsOrObjects?: Partial<T>[], options?: UpsertOptions): QueryBuilder<T>;
     (modelOrObject?: Partial<T>, options?: UpsertOptions): QueryBuilderSingle<T>;
   }
 

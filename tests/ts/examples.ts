@@ -179,6 +179,22 @@ let qb: objection.QueryBuilder<Person> = BoundPerson.query().where(
   'foo'
 );
 
+// QueryBuilder.throwIfNotFound makes an option query return exactly one:
+
+async () => {
+  const q = () => Person.query().findOne({lastName});
+  takesMaybePerson(await q());
+  takesPerson(await q().throwIfNotFound());
+};
+
+// QueryBuilder.throwIfNotFound does nothing for array results:
+
+async () => {
+  const q = () => Person.query().where({lastName});
+  takesPeople(await q());
+  takesPeople(await q().throwIfNotFound());
+};
+
 // Note that the QueryBuilder chaining done in this file
 // is done to verify that the return value is assignable to a QueryBuilder
 // (fewer characters than having each line `const qbNNN: QueryBuilder =`):
