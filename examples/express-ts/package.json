@@ -4,6 +4,7 @@
   "description": "Objection.js express TypeScript example",
   "main": "app.js",
   "scripts": {
+    "clean": "rimraf example.db lib",
     "lint": "tslint src/**/*.ts",
     "compile": "tsc",
     "start": "tsc && node lib/app.js"
@@ -14,24 +15,25 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
     "express-promise-router": "^2.0.0",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
-    "morgan": "^1.8.2",
+    "morgan": "^1.9.0",
     "objection": "../..",
-    "sqlite3": "^3.1.8"
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.16.4",
-    "@types/express": "^4.0.36",
+    "@types/body-parser": "^1.16.5",
+    "@types/express": "^4.0.37",
     "@types/knex": "^0.0.62",
-    "@types/lodash": "^4.14.70",
-    "@types/morgan": "^1.7.32",
-    "@types/sqlite3": "^3.1.0",
-    "tslint": "^5.5.0",
+    "@types/lodash": "^4.14.77",
+    "@types/morgan": "^1.7.33",
+    "@types/sqlite3": "^3.1.1",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.7.0",
     "tslint-config-standard": "^6.0.1",
-    "typescript": "^2.4.2"
+    "typescript": "^2.5.3"
   }
 }
