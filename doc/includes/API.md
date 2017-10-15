@@ -247,6 +247,38 @@ Type|Description
 
 
 
+#### findByIds
+
+```js
+const builder = queryBuilder.findByIds([id1, id2]);
+```
+
+```js
+Person.query().findByIds([1, 2]);
+```
+
+> Composite key:
+
+```js
+Person.query().findByIds([[1, '10'], [2, '10']]);
+```
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+id|any&#124; Array.&lt;any&gt;|
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+
 #### findOne
 
 ```js
