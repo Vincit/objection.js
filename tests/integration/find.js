@@ -142,6 +142,16 @@ module.exports = (session) => {
             });
         });
 
+        it('.findByIds()', () => {
+          return Model2
+            .query()
+            .findByIds([1, 2])
+            .then(models => {
+              expect(models[0].model2Prop1).to.eql('hejsan 1');
+              expect(models[1].model2Prop1).to.eql('hejsan 2');
+            });
+        });
+
         it('.where() with an object', () => {
           return Model2
             .query()
