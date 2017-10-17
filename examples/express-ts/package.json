@@ -10,9 +10,7 @@
     "start": "tsc && node lib/app.js"
   },
   "author": "Sami Koskimäki",
-  "contributors": [
-    "Matthew McEachen <https://github.com/mceachen>"
-  ],
+  "contributors": ["Matthew McEachen <https://github.com/mceachen>"],
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",

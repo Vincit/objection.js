@@ -13,7 +13,5 @@
     "strictNullChecks": true,
     "target": "es6"
   },
-  "files": [
-    "tests/ts/examples.ts"
-  ]
+  "files": ["tests/ts/examples.ts"]
 }

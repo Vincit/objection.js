@@ -8,7 +8,6 @@ const knexUtils = require('../lib/utils/knexUtils');
 const transaction = require('../').transaction;
 
 class TestSession {
-
   static init() {
     if (this.staticInitCalled) {
       return;
@@ -25,7 +24,9 @@ class TestSession {
     this.opt = opt;
     this.knex = this.createKnex(opt);
     this.unboundModels = this.createModels();
-    this.models = _.mapValues(this.unboundModels, model => model.bindKnex(this.knex));
+    this.models = _.mapValues(this.unboundModels, model =>
+      model.bindKnex(this.knex)
+    );
   }
 
   createKnex() {
@@ -43,9 +44,9 @@ class TestSession {
 
       static get namedFilters() {
         return {
-          'select:id': (builder) => builder.select('id'),
-          'select:model1Prop1': (builder) => builder.select('model1Prop1'),
-          'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1')
+          'select:id': builder => builder.select('id'),
+          'select:model1Prop1': builder => builder.select('model1Prop1'),
+          'orderBy:model1Prop1': builder => builder.orderBy('model1Prop1')
         };
       }
 
@@ -151,8 +152,16 @@ class TestSession {
       ['$afterInsert', 1],
       ['$beforeDelete', 1],
       ['$afterDelete', 1],
-      ['$beforeUpdate', 5, (self, args) => self.$beforeUpdateOptions = _.cloneDeep(args[0])],
-      ['$afterUpdate', 1, (self, args) => self.$afterUpdateOptions = _.cloneDeep(args[0])],
+      [
+        '$beforeUpdate',
+        5,
+        (self, args) => (self.$beforeUpdateOptions = _.cloneDeep(args[0]))
+      ],
+      [
+        '$afterUpdate',
+        1,
+        (self, args) => (self.$afterUpdateOptions = _.cloneDeep(args[0]))
+      ],
       ['$afterGet', 1]
     ].forEach(hook => {
       Model1.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
@@ -193,26 +202,56 @@ class TestSession {
             table.string('extra1');
             table.string('extra2');
             table.string('extra3');
-            table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+            table
+              .integer('model1Id')
+              .unsigned()
+              .notNullable()
+              .references('id')
+              .inTable('Model1')
+              .onDelete('CASCADE')
+              .index();
+            table
+              .integer('model2Id')
+              .unsigned()
+              .notNullable()
+              .references('id_col')
+              .inTable('model_2')
+              .onDelete('CASCADE')
+              .index();
           })
           .createTable('Model1Model2One', table => {
-            table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+            table
+              .integer('model1Id')
+              .unsigned()
+              .notNullable()
+              .references('id')
+              .inTable('Model1')
+              .onDelete('CASCADE')
+              .index();
+            table
+              .integer('model2Id')
+              .unsigned()
+              .notNullable()
+              .references('id_col')
+              .inTable('model_2')
+              .onDelete('CASCADE')
+              .index();
           });
       })
       .catch(() => {
-        throw new Error('Could not connect to '
-          + opt.knexConfig.client
-          + '. Make sure the server is running and the database '
-          + opt.knexConfig.connection.database
-          + ' is created. You can see the test database configurations from file '
-          + path.join(__dirname, 'index.js'));
+        throw new Error(
+          'Could not connect to ' +
+            opt.knexConfig.client +
+            '. Make sure the server is running and the database ' +
+            opt.knexConfig.connection.database +
+            ' is created. You can see the test database configurations from file ' +
+            path.join(__dirname, 'index.js')
+        );
       });
   }
 
   populate(data) {
-    return transaction(this.knex, (trx) => {
+    return transaction(this.knex, trx => {
       return trx('Model1Model2')
         .delete()
         .then(() => trx('Model1Model2One').delete())
@@ -220,23 +259,48 @@ class TestSession {
         .then(() => trx('model_2').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
-          return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).map(table => {
-            const idCol = (_.find(this.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
+          return Promise.resolve([
+            'Model1',
+            'model_2',
+            'Model1Model2'
+          ]).map(table => {
+            const idCol = (_.find(this.models, {tableName: table}) || {
+              idColumn: 'id'
+            }).idColumn;
 
-            return trx(table).max(idCol).then(res => {
-              const maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
+            return trx(table)
+              .max(idCol)
+              .then(res => {
+                const maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
 
-              // Reset sequence.
-              if (knexUtils.isSqlite(trx)) {
-                return trx.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
-              } else if (knexUtils.isPostgres(trx)) {
-                return trx.raw('ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
-              } else if (knexUtils.isMySql(trx)) {
-                return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
-              } else {
-                throw new Error('sequence truncate not implemented for the given database');
-              }
-            });
+                // Reset sequence.
+                if (knexUtils.isSqlite(trx)) {
+                  return trx.raw(
+                    'UPDATE sqlite_sequence SET seq = ' +
+                      maxId +
+                      ' WHERE name = "' +
+                      table +
+                      '"'
+                  );
+                } else if (knexUtils.isPostgres(trx)) {
+                  return trx.raw(
+                    'ALTER SEQUENCE "' +
+                      table +
+                      '_' +
+                      idCol +
+                      '_seq" RESTART WITH ' +
+                      (maxId + 1)
+                  );
+                } else if (knexUtils.isMySql(trx)) {
+                  return trx.raw(
+                    'ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1)
+                  );
+                } else {
+                  throw new Error(
+                    'sequence truncate not implemented for the given database'
+                  );
+                }
+              });
           });
         })
         .then(() => data);
@@ -272,7 +336,7 @@ TestSession.unhandledRejectionHandlers = [];
 // Creates an asynchronous hook that waits for `delay` milliseconds
 // and then increments a `${name}Called` property.
 function createHook(name, delay, extraAction) {
-  return function () {
+  return function() {
     const args = arguments;
 
     return Promise.delay(delay).then(() => {

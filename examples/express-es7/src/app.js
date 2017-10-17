@@ -30,7 +30,9 @@ registerApi(router);
 // property that is sent as the status code of the response.
 app.use((err, req, res, next) => {
   if (err) {
-    res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});
+    res
+      .status(err.statusCode || err.status || 500)
+      .send(err.data || err.message || {});
   } else {
     next();
   }

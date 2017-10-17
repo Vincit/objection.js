@@ -4,8 +4,7 @@ const expect = require('expect.js');
 const Model = require('../../../').Model;
 const utils = require('../../../lib/utils/knexUtils');
 
-module.exports = (session) => {
-
+module.exports = session => {
   if (session.isMySql()) {
     describe('mysql binary columns', () => {
       let TestModel;
@@ -51,15 +50,16 @@ module.exports = (session) => {
       }
 
       it('#insert should insert a buffer', () => {
-        return TestModel.query().insert({binary: buffer()}).then(ret => {
-          expect(bufferEquals(buffer(), ret.binary)).to.equal(true);
-          return session.knex(TestModel.tableName);
-        }).then(rows => {
-          expect(bufferEquals(buffer(), rows[0].binary)).to.equal(true);
-        });
+        return TestModel.query()
+          .insert({binary: buffer()})
+          .then(ret => {
+            expect(bufferEquals(buffer(), ret.binary)).to.equal(true);
+            return session.knex(TestModel.tableName);
+          })
+          .then(rows => {
+            expect(bufferEquals(buffer(), rows[0].binary)).to.equal(true);
+          });
       });
-
     });
   }
-
 };

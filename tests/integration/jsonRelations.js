@@ -7,14 +7,12 @@ const expect = require('expect.js');
 const sortBy = require('lodash/sortBy');
 const mapValues = require('lodash/mapValues');
 
-module.exports = (session) => {
-
+module.exports = session => {
   describe('JSON relations', () => {
-
     class BaseModel extends Model {
       static get namedFilters() {
         return ['name', 'id', 'json'].reduce((obj, prop) => {
-          obj[prop] = (qb) => qb.select(prop);
+          obj[prop] = qb => qb.select(prop);
           return obj;
         }, {});
       }
@@ -43,7 +41,7 @@ module.exports = (session) => {
               from: 'Person.id',
               through: {
                 from: ref('PersonMovie.json:personId').castInt(),
-                to: ref('PersonMovie.json:movieId').castInt(),
+                to: ref('PersonMovie.json:movieId').castInt()
               },
               to: 'Movie.id'
             }
@@ -98,22 +96,22 @@ module.exports = (session) => {
         .dropTableIfExists('Movie')
         .dropTableIfExists('Animal')
         .dropTableIfExists('Person')
-        .createTable('Person', (table) => {
+        .createTable('Person', table => {
           table.increments('id').primary();
           table.string('name');
           table.jsonb('json');
         })
-        .createTable('Animal', (table) => {
+        .createTable('Animal', table => {
           table.increments('id').primary();
           table.string('name');
           table.jsonb('json');
         })
-        .createTable('Movie', (table) => {
+        .createTable('Movie', table => {
           table.increments('id').primary();
           table.string('name');
           table.jsonb('json');
         })
-        .createTable('PersonMovie', (table) => {
+        .createTable('PersonMovie', table => {
           table.jsonb('json');
         });
     });
@@ -127,8 +125,7 @@ module.exports = (session) => {
     });
 
     beforeEach(() => {
-      return Animal
-        .query()
+      return Animal.query()
         .delete()
         .then(() => Movie.query().delete())
         .then(() => session.knex('PersonMovie').delete())
@@ -136,9 +133,8 @@ module.exports = (session) => {
     });
 
     beforeEach(() => {
-      return Person
-        .query()
-        .insertGraph([{
+      return Person.query().insertGraph([
+        {
           name: 'Arnold',
 
           favoritePet: {
@@ -148,63 +144,70 @@ module.exports = (session) => {
             }
           },
 
-          movies: [{
-            name: 'Terminator'
-          }, {
-            name: 'Terminator 2'
-          }]
-        }, {
+          movies: [
+            {
+              name: 'Terminator'
+            },
+            {
+              name: 'Terminator 2'
+            }
+          ]
+        },
+        {
           name: 'Brad',
 
           favoritePet: {
             name: 'Cato'
           },
 
-          movies: [{
-            name: 'Inglorious bastards'
-          }]
-        }]);
+          movies: [
+            {
+              name: 'Inglorious bastards'
+            }
+          ]
+        }
+      ]);
     });
 
     describe('eager', () => {
-
       it('eager', () => {
-        return Person
-          .query()
+        return Person.query()
           .findOne({'Person.name': 'Arnold'})
           .select('Person.name')
-          .eager(`[
+          .eager(
+            `[
             movies(name),
             favoritePet(name).[
               peopleWhoseFavoriteIAm(name),
               favoritePerson(name),
             ]
-          ]`)
+          ]`
+          )
           .then(sortRelations)
           .then(person => {
             expect(person).to.eql({
-              "name": "Arnold",
+              name: 'Arnold',
 
-              "favoritePet": {
-                "name": "Fluffy",
+              favoritePet: {
+                name: 'Fluffy',
 
-                "peopleWhoseFavoriteIAm": [
+                peopleWhoseFavoriteIAm: [
                   {
-                    "name": "Arnold",
+                    name: 'Arnold'
                   }
                 ],
 
-                "favoritePerson": {
-                  "name": "Brad"
+                favoritePerson: {
+                  name: 'Brad'
                 }
               },
 
-              "movies": [
+              movies: [
                 {
-                  "name": "Terminator"
+                  name: 'Terminator'
                 },
                 {
-                  "name": "Terminator 2"
+                  name: 'Terminator 2'
                 }
               ]
             });
@@ -212,150 +215,171 @@ module.exports = (session) => {
       });
 
       it('joinEager', () => {
-        return Person
-          .query()
+        return Person.query()
           .findOne({'Person.name': 'Arnold'})
           .select('Person.name')
-          .joinEager(`[
+          .joinEager(
+            `[
             movies(name),
             favoritePet(name).[
               peopleWhoseFavoriteIAm(name),
               favoritePerson(name),
             ]
-          ]`)
+          ]`
+          )
           .then(sortRelations)
           .then(person => {
             expect(person).to.eql({
-              "name": "Arnold",
+              name: 'Arnold',
 
-              "favoritePet": {
-                "name": "Fluffy",
+              favoritePet: {
+                name: 'Fluffy',
 
-                "peopleWhoseFavoriteIAm": [
+                peopleWhoseFavoriteIAm: [
                   {
-                    "name": "Arnold",
+                    name: 'Arnold'
                   }
                 ],
 
-                "favoritePerson": {
-                  "name": "Brad"
+                favoritePerson: {
+                  name: 'Brad'
                 }
               },
 
-              "movies": [
+              movies: [
                 {
-                  "name": "Terminator"
+                  name: 'Terminator'
                 },
                 {
-                  "name": "Terminator 2"
+                  name: 'Terminator 2'
                 }
               ]
             });
           });
       });
-
     });
 
     describe('$relatedQuery', () => {
-
       describe('belongs to one relation', () => {
-
         it('insert', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
             .then(it => it.$relatedQuery('favoritePet').insert({name: 'Doggo'}))
-            .then(() => Person.query().findOne({name: 'Arnold'}).eager('favoritePet'))
+            .then(() =>
+              Person.query()
+                .findOne({name: 'Arnold'})
+                .eager('favoritePet')
+            )
             .then(person => {
-              expect(person.json.stuff.favoritePetId).to.equal(person.favoritePet.id);
+              expect(person.json.stuff.favoritePetId).to.equal(
+                person.favoritePet.id
+              );
             });
         });
 
         it('find', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
             .then(it => it.$relatedQuery('favoritePet').select('name'))
             .then(pet => {
               expect(pet).to.eql({
-                "name": "Fluffy"
+                name: 'Fluffy'
               });
             });
         });
 
         it('patch', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
-            .then(it => it.$relatedQuery('favoritePet').patch({json: {updated: true}}))
-            .then(() => Animal.query().select('json', 'name').orderBy('name'))
+            .then(it =>
+              it.$relatedQuery('favoritePet').patch({json: {updated: true}})
+            )
+            .then(() =>
+              Animal.query()
+                .select('json', 'name')
+                .orderBy('name')
+            )
             .then(pets => {
               expect(pets).to.eql([
                 {
-                  "json": null,
-                  "name": "Cato"
+                  json: null,
+                  name: 'Cato'
                 },
                 {
-                  "json": {
-                    "updated": true
+                  json: {
+                    updated: true
                   },
-                  "name": "Fluffy"
+                  name: 'Fluffy'
                 }
               ]);
             });
         });
 
         it('relate', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
             .then(it => it.$relatedQuery('favoritePet').relate(123))
-            .then(() => Person.query().eager('favoritePet').orderBy('name'))
+            .then(() =>
+              Person.query()
+                .eager('favoritePet')
+                .orderBy('name')
+            )
             .then(people => {
               const brad = find(people, {name: 'Brad'});
               const ardnold = find(people, {name: 'Arnold'});
 
               expect(ardnold.json.stuff.favoritePetId).to.equal(123);
-              expect(brad.json.stuff.favoritePetId).to.equal(brad.favoritePet.id);
+              expect(brad.json.stuff.favoritePetId).to.equal(
+                brad.favoritePet.id
+              );
             });
         });
 
         it('unrelate', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
             .then(it => it.$relatedQuery('favoritePet').unrelate())
-            .then(() => Person.query().eager('favoritePet').orderBy('name'))
+            .then(() =>
+              Person.query()
+                .eager('favoritePet')
+                .orderBy('name')
+            )
             .then(people => {
               const brad = find(people, {name: 'Brad'});
               const ardnold = find(people, {name: 'Arnold'});
 
               expect(ardnold.json.stuff.favoritePetId).to.equal(null);
-              expect(brad.json.stuff.favoritePetId).to.equal(brad.favoritePet.id);
+              expect(brad.json.stuff.favoritePetId).to.equal(
+                brad.favoritePet.id
+              );
             });
         });
-
       });
 
       describe('has many relation', () => {
-
         it('insert', () => {
-          return Animal
-            .query()
+          return Animal.query()
             .findOne({name: 'Fluffy'})
-            .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').insert({name: 'Jorge'}))
-            .then(() => Animal.query().findOne({name: 'Fluffy'}).eager('peopleWhoseFavoriteIAm(name)').select('name'))
+            .then(it =>
+              it.$relatedQuery('peopleWhoseFavoriteIAm').insert({name: 'Jorge'})
+            )
+            .then(() =>
+              Animal.query()
+                .findOne({name: 'Fluffy'})
+                .eager('peopleWhoseFavoriteIAm(name)')
+                .select('name')
+            )
             .then(sortRelations)
             .then(pet => {
               expect(pet).to.eql({
-                "name": "Fluffy",
+                name: 'Fluffy',
 
-                "peopleWhoseFavoriteIAm": [
+                peopleWhoseFavoriteIAm: [
                   {
-                    "name": "Arnold"
+                    name: 'Arnold'
                   },
                   {
-                    "name": "Jorge"
+                    name: 'Jorge'
                   }
                 ]
               });
@@ -363,99 +387,133 @@ module.exports = (session) => {
         });
 
         it('find', () => {
-          return Animal
-            .query()
+          return Animal.query()
             .findOne({name: 'Fluffy'})
-            .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').select('name'))
-            .then(pet => {
-              expect(pet).to.eql([{
-                "name": "Arnold"
-              }]);
-            });
-        });
-
-        it('patch', () => {
-          return Animal
-            .query()
-            .findOne({name: 'Fluffy'})
-            .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').patch({name: 'Arnold the second'}))
-            .then(() => Person.query().select('name').orderBy('name'))
+            .then(it =>
+              it.$relatedQuery('peopleWhoseFavoriteIAm').select('name')
+            )
             .then(pet => {
               expect(pet).to.eql([
                 {
-                  "name": "Arnold the second"
+                  name: 'Arnold'
+                }
+              ]);
+            });
+        });
+
+        it('patch', () => {
+          return Animal.query()
+            .findOne({name: 'Fluffy'})
+            .then(it =>
+              it
+                .$relatedQuery('peopleWhoseFavoriteIAm')
+                .patch({name: 'Arnold the second'})
+            )
+            .then(() =>
+              Person.query()
+                .select('name')
+                .orderBy('name')
+            )
+            .then(pet => {
+              expect(pet).to.eql([
+                {
+                  name: 'Arnold the second'
                 },
                 {
-                  "name": "Brad"
+                  name: 'Brad'
                 }
               ]);
             });
         });
 
         it('relate', () => {
-          return Animal
-            .query()
+          return Animal.query()
             .findOne({name: 'Fluffy'})
             .then(it => [it, Person.query().findOne({name: 'Brad'})])
-            .spread((fluffy, brad) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
-            .then(() => Animal.query().findOne({name: 'Fluffy'}).eager('peopleWhoseFavoriteIAm(name)'))
+            .spread((fluffy, brad) =>
+              fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad)
+            )
+            .then(() =>
+              Animal.query()
+                .findOne({name: 'Fluffy'})
+                .eager('peopleWhoseFavoriteIAm(name)')
+            )
             .then(sortRelations)
             .then(pet => {
               expect(pet.peopleWhoseFavoriteIAm).to.eql([
                 {
-                  "name": "Arnold"
+                  name: 'Arnold'
                 },
                 {
-                  "name": "Brad"
+                  name: 'Brad'
                 }
               ]);
             });
         });
 
         it('unrelate', () => {
-          return Animal
-            .query()
+          return Animal.query()
             .findOne({name: 'Fluffy'})
             .then(it => [it, Person.query().findOne({name: 'Brad'})])
-            .spread((fluffy, brad) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad).return(fluffy))
-            .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').unrelate().where('name', 'Arnold'))
-            .then(() => Animal.query().findOne({name: 'Fluffy'}).eager('peopleWhoseFavoriteIAm(name)'))
+            .spread((fluffy, brad) =>
+              fluffy
+                .$relatedQuery('peopleWhoseFavoriteIAm')
+                .relate(brad)
+                .return(fluffy)
+            )
+            .then(it =>
+              it
+                .$relatedQuery('peopleWhoseFavoriteIAm')
+                .unrelate()
+                .where('name', 'Arnold')
+            )
+            .then(() =>
+              Animal.query()
+                .findOne({name: 'Fluffy'})
+                .eager('peopleWhoseFavoriteIAm(name)')
+            )
             .then(sortRelations)
             .then(pet => {
               expect(pet.peopleWhoseFavoriteIAm).to.eql([
                 {
-                  "name": "Brad"
+                  name: 'Brad'
                 }
               ]);
 
-              return Person.query().findOne({name: 'Arnold'}).select('json')
+              return Person.query()
+                .findOne({name: 'Arnold'})
+                .select('json');
             })
             .then(arnold => {
               expect(arnold.json.stuff.favoritePetId).to.equal(null);
-            })
+            });
         });
-
       });
 
       describe('many to many relation', () => {
-
         it('insert', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Brad'})
-            .then(it => it.$relatedQuery('movies').insert({name: 'Seven years in Tibet'}))
-            .then(() => Person.query().findOne({name: 'Brad'}).eager('movies(name)').select('name'))
+            .then(it =>
+              it.$relatedQuery('movies').insert({name: 'Seven years in Tibet'})
+            )
+            .then(() =>
+              Person.query()
+                .findOne({name: 'Brad'})
+                .eager('movies(name)')
+                .select('name')
+            )
             .then(sortRelations)
             .then(pet => {
               expect(pet).to.eql({
-                "name": "Brad",
+                name: 'Brad',
 
-                "movies": [
+                movies: [
                   {
-                    "name": "Inglorious bastards"
+                    name: 'Inglorious bastards'
                   },
                   {
-                    "name": "Seven years in Tibet"
+                    name: 'Seven years in Tibet'
                   }
                 ]
               });
@@ -463,89 +521,122 @@ module.exports = (session) => {
         });
 
         it('find', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
-            .then(it => it.$relatedQuery('movies').select('name').orderBy('name'))
+            .then(it =>
+              it
+                .$relatedQuery('movies')
+                .select('name')
+                .orderBy('name')
+            )
             .then(movies => {
               expect(movies).to.eql([
                 {
-                  "name": "Terminator"
+                  name: 'Terminator'
                 },
                 {
-                  "name": "Terminator 2"
+                  name: 'Terminator 2'
                 }
               ]);
             });
         });
 
         it('patch', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
-            .then(it => it.$relatedQuery('movies').patch({name: 'Some terminator'}))
-            .then(() => Movie.query().select('name').orderBy('name'))
+            .then(it =>
+              it.$relatedQuery('movies').patch({name: 'Some terminator'})
+            )
+            .then(() =>
+              Movie.query()
+                .select('name')
+                .orderBy('name')
+            )
             .then(movies => {
               expect(movies).to.eql([
                 {
-                  "name": "Inglorious bastards"
+                  name: 'Inglorious bastards'
                 },
                 {
-                  "name": "Some terminator"
+                  name: 'Some terminator'
                 },
                 {
-                  "name": "Some terminator"
+                  name: 'Some terminator'
                 }
               ]);
             });
         });
 
         it('relate', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
-            .then(it => [it, Movie.query().findOne({name: 'Inglorious bastards'})])
-            .spread((arnold, bastards) => arnold.$relatedQuery('movies').relate(bastards.id))
-            .then(() => Person.query().select('name').findOne({name: 'Arnold'}).eager('movies(name)'))
+            .then(it => [
+              it,
+              Movie.query().findOne({name: 'Inglorious bastards'})
+            ])
+            .spread((arnold, bastards) =>
+              arnold.$relatedQuery('movies').relate(bastards.id)
+            )
+            .then(() =>
+              Person.query()
+                .select('name')
+                .findOne({name: 'Arnold'})
+                .eager('movies(name)')
+            )
             .then(sortRelations)
             .then(person => {
               expect(person.movies).to.eql([
                 {
-                  "name": "Inglorious bastards"
+                  name: 'Inglorious bastards'
                 },
                 {
-                  "name": "Terminator"
+                  name: 'Terminator'
                 },
                 {
-                  "name": "Terminator 2"
+                  name: 'Terminator 2'
                 }
               ]);
             });
         });
 
         it('unrelate', () => {
-          return Person
-            .query()
+          return Person.query()
             .findOne({name: 'Arnold'})
-            .then(it => [it, Movie.query().findOne({name: 'Inglorious bastards'})])
-            .spread((arnold, bastards) => arnold.$relatedQuery('movies').relate(bastards.id).return(arnold))
-            .then(arnold => arnold.$relatedQuery('movies').unrelate().where('name', 'Terminator'))
-            .then(() => Person.query().select('name').findOne({name: 'Arnold'}).eager('movies(name)'))
+            .then(it => [
+              it,
+              Movie.query().findOne({name: 'Inglorious bastards'})
+            ])
+            .spread((arnold, bastards) =>
+              arnold
+                .$relatedQuery('movies')
+                .relate(bastards.id)
+                .return(arnold)
+            )
+            .then(arnold =>
+              arnold
+                .$relatedQuery('movies')
+                .unrelate()
+                .where('name', 'Terminator')
+            )
+            .then(() =>
+              Person.query()
+                .select('name')
+                .findOne({name: 'Arnold'})
+                .eager('movies(name)')
+            )
             .then(sortRelations)
             .then(person => {
               expect(person.movies).to.eql([
                 {
-                  "name": "Inglorious bastards"
+                  name: 'Inglorious bastards'
                 },
                 {
-                  "name": "Terminator 2"
+                  name: 'Terminator 2'
                 }
               ]);
             });
         });
-
       });
-
     });
 
     function sortRelations(obj) {
@@ -559,7 +650,5 @@ module.exports = (session) => {
 
       return obj;
     }
-
   });
-
 };

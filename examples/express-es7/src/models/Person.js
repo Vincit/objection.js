@@ -30,7 +30,7 @@ export default class Person extends Model {
       }
     }
   };
-  
+
   // This object defines the relations to other models.
   static relationMappings = {
     pets: {

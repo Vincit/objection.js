@@ -56,8 +56,7 @@ describe('example plugin tests', () => {
       }
     }
 
-    return Person
-      .query(knex)
+    return Person.query(knex)
       .session(session)
       .insert({name: 'Jennifer'})
       .then(jennifer => {
@@ -75,8 +74,7 @@ describe('example plugin tests', () => {
       }
     }
 
-    return Person
-      .query(knex)
+    return Person.query(knex)
       .session({userId: 'foo'})
       .insert({name: 'Jennifer'})
       .then(jennifer => {
@@ -90,12 +88,12 @@ describe('example plugin tests', () => {
         expect(jonnifer.createdAt).to.match(ISO_DATE_REGEX);
         expect(jonnifer.modifiedBy).to.equal('bar');
         expect(jonnifer.modifiedAt).to.match(ISO_DATE_REGEX);
-      })
+      });
   });
 
   it('should not add `modifiedBy` or `createdBy` if `options.setModifiedBy` and `options.setCreatedBy` are false', () => {
     const sessionPlugin = sessionPluginFactory({
-      setModifiedBy: false, 
+      setModifiedBy: false,
       setCreatedBy: false
     });
 
@@ -105,8 +103,7 @@ describe('example plugin tests', () => {
       }
     }
 
-    return Person
-      .query(knex)
+    return Person.query(knex)
       .session({userId: 'foo'})
       .insert({name: 'Jennifer'})
       .then(jennifer => {

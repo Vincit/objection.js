@@ -3,8 +3,7 @@
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
-module.exports = (session) => {
-
+module.exports = session => {
   describe('zero value in relation column', () => {
     let Table1;
     let Table2;
@@ -66,12 +65,11 @@ module.exports = (session) => {
         Table1.query().insert({id: 2, value: 1}),
         Table2.query().insert({id: 1, value: 0}),
         Table2.query().insert({id: 2, value: 1})
-      ])
+      ]);
     });
 
     it('should work with zero value', () => {
-      return Table1
-        .query()
+      return Table1.query()
         .findById(1)
         .then(model => {
           return model.$relatedQuery('relation');
@@ -80,7 +78,5 @@ module.exports = (session) => {
           expect(models).to.eql([{id: 1, value: 0}]);
         });
     });
-
   });
-
 };

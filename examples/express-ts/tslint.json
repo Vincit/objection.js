@@ -3,8 +3,6 @@
   "rules": {
     "semicolon": [true, "always"],
     "space-before-function-paren": false,
-    "member-ordering": [
-      "fields-first"
-    ]
+    "member-ordering": ["fields-first"]
   }
 }
