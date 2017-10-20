@@ -11,7 +11,7 @@ const registerApi = require('./api');
 const Model = require('objection').Model;
 
 // Adds yield support for express router.
-require('express-yields')
+require('express-yields');
 
 // Initialize knex.
 const knex = Knex(knexConfig.development);
@@ -33,7 +33,9 @@ registerApi(app);
 // property that is sent as the status code of the response.
 app.use((err, req, res, next) => {
   if (err) {
-    res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});
+    res
+      .status(err.statusCode || err.status || 500)
+      .send(err.data || err.message || {});
   } else {
     next();
   }

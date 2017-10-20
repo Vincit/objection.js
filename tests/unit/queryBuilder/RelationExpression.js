@@ -1,13 +1,11 @@
 'use strict';
 
-const expect = require('expect.js')
-  , ValidationError = require('../../../').ValidationError
-  , RelationExpression = require('../../../').RelationExpression;
+const expect = require('expect.js'),
+  ValidationError = require('../../../').ValidationError,
+  RelationExpression = require('../../../').RelationExpression;
 
 describe('RelationExpression', () => {
-
   describe('parse', () => {
-
     it('empty string', () => {
       testParse('', {
         name: null,
@@ -36,7 +34,6 @@ describe('RelationExpression', () => {
     });
 
     describe('single relation', () => {
-
       it('single relation', () => {
         testParse('a', {
           name: null,
@@ -80,7 +77,7 @@ describe('RelationExpression', () => {
           args: [],
           numChildren: 1,
           children: {
-            "_-%§$?+1Aa!€^": {
+            '_-%§$?+1Aa!€^': {
               name: '_-%§$?+1Aa!€^',
               alias: '_-%§$?+1Aa!€^',
               args: [],
@@ -90,11 +87,9 @@ describe('RelationExpression', () => {
           }
         });
       });
-
     });
 
     describe('nested relations', () => {
-
       it('one level', () => {
         testParse('a.b', {
           name: null,
@@ -104,7 +99,7 @@ describe('RelationExpression', () => {
           children: {
             a: {
               name: 'a',
-              alias: 'a',  
+              alias: 'a',
               args: [],
               numChildren: 1,
               children: {
@@ -154,7 +149,6 @@ describe('RelationExpression', () => {
           }
         });
       });
-
     });
 
     it('multiple relations', () => {
@@ -412,143 +406,152 @@ describe('RelationExpression', () => {
         }
       });
 
-      testParse(`a as aa.[
+      testParse(
+        `a as aa.[
         b as bb,
         c as cc  
-      ]`, {
-        name: null,
-        alias: null,
-        args: [],
-        numChildren: 1,
-        children: {
-          aa: {
-            name: 'a',
-            alias: 'aa',
-            args: [],
-            numChildren: 2,
+      ]`,
+        {
+          name: null,
+          alias: null,
+          args: [],
+          numChildren: 1,
+          children: {
+            aa: {
+              name: 'a',
+              alias: 'aa',
+              args: [],
+              numChildren: 2,
 
-            children: {
-              bb: {
-                name: 'b',
-                alias: 'bb',
-                args: [],
-                numChildren: 0,
-                children: {}
-              },
-              cc: {
-                name: 'c',
-                alias: 'cc',
-                args: [],
-                numChildren: 0,
-                children: {}
-              }
-            }
-          }
-        }
-      });
-
-      testParse(`a(f1, f2) as aa . [
-        c(f3, f4) as cc,
-        b as bb .[
-          e,
-          f as ff
-        ]
-      ]`, {
-        name: null,
-        alias: null,
-        args: [],
-        numChildren: 1,
-        children: {
-          aa: {
-            name: 'a',
-            alias: 'aa',
-            args: ['f1', 'f2'],
-            numChildren: 2,
-
-            children: {
-              cc: {
-                name: 'c',
-                alias: 'cc',
-                args: ['f3', 'f4'],
-                numChildren: 0,
-                children: {}
-              },
-
-              bb: {
-                name: 'b',
-                alias: 'bb',
-                args: [],
-                numChildren: 2,
-
-                children: {
-                  e: {
-                    name: 'e',
-                    alias: 'e',
-                    args: [],
-                    numChildren: 0,
-                    children: {}
-                  },
-
-                  ff: {
-                    name: 'f',
-                    alias: 'ff',
-                    args: [],
-                    numChildren: 0,
-                    children: {}
-                  },
+              children: {
+                bb: {
+                  name: 'b',
+                  alias: 'bb',
+                  args: [],
+                  numChildren: 0,
+                  children: {}
+                },
+                cc: {
+                  name: 'c',
+                  alias: 'cc',
+                  args: [],
+                  numChildren: 0,
+                  children: {}
                 }
               }
             }
           }
         }
-      });
-    });
+      );
 
-    it('should ignore whitespace', () => {
-      testParse('\n\r\t  [ a (\narg1\n  arg2,arg3), \n \n b\n(arg4) . [c(), \td (arg5 arg6), e] \r] ', {
-        name: null,
-        alias: null,
-        args: [],
-        numChildren: 2,
-        children: {
-          a: {
-            name: 'a',
-            alias: 'a',
-            args: ['arg1', 'arg2', 'arg3'],
-            numChildren: 0,
-            children: {}
-          },
-          b: {
-            name: 'b',
-            alias: 'b',
-            args: ['arg4'],
-            numChildren: 3,
-            children: {
-              c: {
-                name: 'c',
-                alias: 'c',
-                args: [],
-                numChildren: 0,
-                children: {}
-              },
-              d: {
-                name: 'd',
-                alias: 'd',
-                args: ['arg5', 'arg6'],
-                numChildren: 0,
-                children: {}
-              },
-              e: {
-                name: 'e',
-                alias: 'e',
-                args: [],
-                numChildren: 0,
-                children: {}
+      testParse(
+        `a(f1, f2) as aa . [
+        c(f3, f4) as cc,
+        b as bb .[
+          e,
+          f as ff
+        ]
+      ]`,
+        {
+          name: null,
+          alias: null,
+          args: [],
+          numChildren: 1,
+          children: {
+            aa: {
+              name: 'a',
+              alias: 'aa',
+              args: ['f1', 'f2'],
+              numChildren: 2,
+
+              children: {
+                cc: {
+                  name: 'c',
+                  alias: 'cc',
+                  args: ['f3', 'f4'],
+                  numChildren: 0,
+                  children: {}
+                },
+
+                bb: {
+                  name: 'b',
+                  alias: 'bb',
+                  args: [],
+                  numChildren: 2,
+
+                  children: {
+                    e: {
+                      name: 'e',
+                      alias: 'e',
+                      args: [],
+                      numChildren: 0,
+                      children: {}
+                    },
+
+                    ff: {
+                      name: 'f',
+                      alias: 'ff',
+                      args: [],
+                      numChildren: 0,
+                      children: {}
+                    }
+                  }
+                }
               }
             }
           }
         }
-      });
+      );
+    });
+
+    it('should ignore whitespace', () => {
+      testParse(
+        '\n\r\t  [ a (\narg1\n  arg2,arg3), \n \n b\n(arg4) . [c(), \td (arg5 arg6), e] \r] ',
+        {
+          name: null,
+          alias: null,
+          args: [],
+          numChildren: 2,
+          children: {
+            a: {
+              name: 'a',
+              alias: 'a',
+              args: ['arg1', 'arg2', 'arg3'],
+              numChildren: 0,
+              children: {}
+            },
+            b: {
+              name: 'b',
+              alias: 'b',
+              args: ['arg4'],
+              numChildren: 3,
+              children: {
+                c: {
+                  name: 'c',
+                  alias: 'c',
+                  args: [],
+                  numChildren: 0,
+                  children: {}
+                },
+                d: {
+                  name: 'd',
+                  alias: 'd',
+                  args: ['arg5', 'arg6'],
+                  numChildren: 0,
+                  children: {}
+                },
+                e: {
+                  name: 'e',
+                  alias: 'e',
+                  args: [],
+                  numChildren: 0,
+                  children: {}
+                }
+              }
+            }
+          }
+        }
+      );
     });
 
     it('should throw with invalid input', () => {
@@ -567,40 +570,42 @@ describe('RelationExpression', () => {
       testParseFail('a.[.b]');
       testParseFail('[a,,b]');
       // Alias tests
-      testParseFail('a asb')
-      testParseFail('aas b')
+      testParseFail('a asb');
+      testParseFail('aas b');
     });
-
   });
 
   describe('#rawNodesAtPath', () => {
-
     it('a from a', () => {
-      testPath('a', 'a', [{
-        name: 'a',
-        alias: 'a',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('a', 'a', [
+        {
+          name: 'a',
+          alias: 'a',
+          args: [],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('a from a.a', () => {
-      testPath('a.b', 'a', [{
-        name: 'a',
-        alias: 'a',
-        args: [],
-        numChildren: 1,
-        children: {
-          b: {
-            name: 'b',
-            alias: 'b',
-            args: [],
-            numChildren: 0,
-            children: {}
+      testPath('a.b', 'a', [
+        {
+          name: 'a',
+          alias: 'a',
+          args: [],
+          numChildren: 1,
+          children: {
+            b: {
+              name: 'b',
+              alias: 'b',
+              args: [],
+              numChildren: 0,
+              children: {}
+            }
           }
         }
-      }]);
+      ]);
     });
 
     it('a.b from a', () => {
@@ -608,114 +613,131 @@ describe('RelationExpression', () => {
     });
 
     it('a.b from a.b', () => {
-      testPath('a.b', 'a.b', [{
-        name: 'b',
-        alias: 'b',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('a.b', 'a.b', [
+        {
+          name: 'b',
+          alias: 'b',
+          args: [],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('a.b from a.[b, c]', () => {
-      testPath('a.[b, c]', 'a.b', [{
-        name: 'b',
-        alias: 'b',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('a.[b, c]', 'a.b', [
+        {
+          name: 'b',
+          alias: 'b',
+          args: [],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('a.[b, c] from a.[b, c]', () => {
-      testPath('a.[b, c]', 'a.[b, c]', [{
-        name: 'b',
-        alias: 'b',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }, {
-        name: 'c',
-        alias: 'c',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('a.[b, c]', 'a.[b, c]', [
+        {
+          name: 'b',
+          alias: 'b',
+          args: [],
+          numChildren: 0,
+          children: {}
+        },
+        {
+          name: 'c',
+          alias: 'c',
+          args: [],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('a.[b, d] from a.[b, c]', () => {
-      testPath('a.[b, c]', 'a.[b, d]', [{
-        name: 'b',
-        alias: 'b',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('a.[b, c]', 'a.[b, d]', [
+        {
+          name: 'b',
+          alias: 'b',
+          args: [],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('[a, b.c.d.[e, f]] from [a, b.[g, c.[d.[e, f], i], h]]', () => {
-      testPath('[a, b.[g, c.[d.[e, f], i], h]]', '[a, b.c.d.[e, f]]', [{
-        name: 'a',
-        alias: 'a',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }, {
-        name: 'e',
-        alias: 'e',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }, {
-        name: 'f',
-        alias: 'f',
-        args: [],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('[a, b.[g, c.[d.[e, f], i], h]]', '[a, b.c.d.[e, f]]', [
+        {
+          name: 'a',
+          alias: 'a',
+          args: [],
+          numChildren: 0,
+          children: {}
+        },
+        {
+          name: 'e',
+          alias: 'e',
+          args: [],
+          numChildren: 0,
+          children: {}
+        },
+        {
+          name: 'f',
+          alias: 'f',
+          args: [],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('b.c.d.[e, f] from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', () => {
-      testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d.[e, f]', [{
-        name: 'e',
-        alias: 'e',
-        args: ['a1'],
-        numChildren: 0,
-        children: {}
-      }, {
-        name: 'f',
-        alias: 'f',
-        args: ['a2'],
-        numChildren: 0,
-        children: {}
-      }]);
+      testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d.[e, f]', [
+        {
+          name: 'e',
+          alias: 'e',
+          args: ['a1'],
+          numChildren: 0,
+          children: {}
+        },
+        {
+          name: 'f',
+          alias: 'f',
+          args: ['a2'],
+          numChildren: 0,
+          children: {}
+        }
+      ]);
     });
 
     it('b.c.d from [a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', () => {
-      testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d', [{
-        name: 'd',
-        alias: 'd',
-        args: [],
-        numChildren: 2,
-        children: {
-          e: {
-            name: 'e',
-            alias: 'e',
-            args: ['a1'],
-            numChildren: 0,
-            children: {}
-          },
-          f: {
-            name: 'f',
-            alias: 'f',
-            args: ['a2'],
-            numChildren: 0,
-            children: {}
+      testPath('[a, b.[g, c.[d.[e(a1), f(a2)], i], h]]', 'b.c.d', [
+        {
+          name: 'd',
+          alias: 'd',
+          args: [],
+          numChildren: 2,
+          children: {
+            e: {
+              name: 'e',
+              alias: 'e',
+              args: ['a1'],
+              numChildren: 0,
+              children: {}
+            },
+            f: {
+              name: 'f',
+              alias: 'f',
+              args: ['a2'],
+              numChildren: 0,
+              children: {}
+            }
           }
         }
-      }]);
+      ]);
     });
-
   });
 
   describe('#merge', () => {
@@ -725,11 +747,15 @@ describe('RelationExpression', () => {
     testMerge('[a, b]', '[b, c]', '[a, b, c]');
     testMerge('a.b', 'a.c', 'a.[b, c]');
     testMerge('[a.b, d]', 'a.c', '[a.[b, c], d]');
-    testMerge('a.[c, d.e, g]', 'a.[c.l, d.[e.m, n], f]', 'a.[c.l, d.[e.m, n], g, f]');
+    testMerge(
+      'a.[c, d.e, g]',
+      'a.[c.l, d.[e.m, n], f]',
+      'a.[c.l, d.[e.m, n], g, f]'
+    );
     testMerge('a.^4', 'a.^3', 'a.^4');
     testMerge('a.^', 'a.^6', 'a.^');
     testMerge('a.^6', 'a.^', 'a.^');
-    testMerge('a.a', 'a.^', 'a.^')
+    testMerge('a.a', 'a.^', 'a.^');
   });
 
   describe('#toString', () => {
@@ -853,9 +879,18 @@ describe('RelationExpression', () => {
     testNotSubExpression('a.^3', 'a.a.a.a');
 
     testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', 'a as aa');
-    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', '[a as aa, b as bb]');
-    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', 'a as aa . c as cc');
-    testSubExpression('[a as aa.[c as cc . d as dd], b as bb]', 'a as aa . c as cc . d as dd');
+    testSubExpression(
+      '[a as aa.[c as cc . d as dd], b as bb]',
+      '[a as aa, b as bb]'
+    );
+    testSubExpression(
+      '[a as aa.[c as cc . d as dd], b as bb]',
+      'a as aa . c as cc'
+    );
+    testSubExpression(
+      '[a as aa.[c as cc . d as dd], b as bb]',
+      'a as aa . c as cc . d as dd'
+    );
   });
 
   function testParse(str, parsed) {
@@ -863,9 +898,17 @@ describe('RelationExpression', () => {
   }
 
   function testMerge(str1, str2, parsed) {
-    it(str1 + " + " + str2 + " --> " + parsed, () => {
-      expect(RelationExpression.parse(str1).merge(str2).toString()).to.equal(parsed);
-      expect(RelationExpression.parse(str1).merge(RelationExpression.parse(str2)).toString()).to.equal(parsed);
+    it(str1 + ' + ' + str2 + ' --> ' + parsed, () => {
+      expect(
+        RelationExpression.parse(str1)
+          .merge(str2)
+          .toString()
+      ).to.equal(parsed);
+      expect(
+        RelationExpression.parse(str1)
+          .merge(RelationExpression.parse(str2))
+          .toString()
+      ).to.equal(parsed);
     });
   }
 
@@ -887,14 +930,17 @@ describe('RelationExpression', () => {
 
   function testSubExpression(str, subStr) {
     it('"' + subStr + '" is a sub expression of "' + str + '"', () => {
-      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(true);
+      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(
+        true
+      );
     });
   }
 
   function testNotSubExpression(str, subStr) {
     it('"' + subStr + '" is not a sub expression of "' + str + '"', () => {
-      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(false);
+      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(
+        false
+      );
     });
   }
-
 });

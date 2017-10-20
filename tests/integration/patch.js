@@ -11,41 +11,45 @@ const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
-module.exports = (session) => {
+module.exports = session => {
   const Model1 = session.models.Model1;
   const Model2 = session.models.Model2;
 
   describe('Model patch queries', () => {
-
     describe('.query().patch()', () => {
-
       beforeEach(() => {
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1',
-          model1Relation2: [{
-            idCol: 1,
-            model2Prop1: 'text 1',
-            model2Prop2: 2
-          }, {
-            idCol: 2,
-            model2Prop1: 'text 2',
-            model2Prop2: 1
-          }]
-        }, {
-          id: 2,
-          model1Prop1: 'hello 2'
-        }, {
-          id: 3,
-          model1Prop1: 'hello 3'
-        }]);
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Prop1: 'text 1',
+                model2Prop2: 2
+              },
+              {
+                idCol: 2,
+                model2Prop1: 'text 2',
+                model2Prop2: 1
+              }
+            ]
+          },
+          {
+            id: 2,
+            model1Prop1: 'hello 2'
+          },
+          {
+            id: 3,
+            model1Prop1: 'hello 3'
+          }
+        ]);
       });
 
       it('should patch a model (1)', () => {
         let model = Model1.fromJson({model1Prop1: 'updated text'});
 
-        return Model1
-          .query()
+        return Model1.query()
           .patch(model)
           .where('id', '=', 2)
           .then(numUpdated => {
@@ -67,8 +71,7 @@ module.exports = (session) => {
       it('should patch a model (2)', () => {
         let model = Model2.fromJson({model2Prop1: 'updated text'});
 
-        return Model2
-          .query()
+        return Model2.query()
           .patch(model)
           .where('id_col', '=', 1)
           .then(numUpdated => {
@@ -81,14 +84,21 @@ module.exports = (session) => {
           })
           .then(rows => {
             expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'updated text', model_2_prop_2: 2});
-            expectPartEql(rows[1], {id_col: 2, model_2_prop_1: 'text 2', model_2_prop_2: 1});
+            expectPartEql(rows[0], {
+              id_col: 1,
+              model_2_prop_1: 'updated text',
+              model_2_prop_2: 2
+            });
+            expectPartEql(rows[1], {
+              id_col: 2,
+              model_2_prop_1: 'text 2',
+              model_2_prop_2: 1
+            });
           });
       });
 
       it('should accept json', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .patch({model1Prop1: 'updated text'})
           .where('id', '=', 2)
           .then(numUpdated => {
@@ -104,8 +114,7 @@ module.exports = (session) => {
       });
 
       it('should ignore non-objects in relation properties', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .patch({
             model1Prop1: 'updated text',
             model1Relation1: 1,
@@ -125,10 +134,12 @@ module.exports = (session) => {
       });
 
       it('should accept subqueries and raw expressions (1)', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .patch({
-            model1Prop1: Model2.raw('(select max(??) from ??)', ["model_2_prop_1", "model_2"]),
+            model1Prop1: Model2.raw('(select max(??) from ??)', [
+              'model_2_prop_1',
+              'model_2'
+            ]),
             model1Prop2: Model2.query().sum('model_2_prop_2')
           })
           .where('id', '=', 1)
@@ -138,15 +149,18 @@ module.exports = (session) => {
           })
           .then(rows => {
             expect(rows).to.have.length(3);
-            expectPartEql(rows[0], {id: 1, model1Prop1: 'text 2', model1Prop2: 3});
+            expectPartEql(rows[0], {
+              id: 1,
+              model1Prop1: 'text 2',
+              model1Prop2: 3
+            });
             expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
             expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
           });
       });
 
       it('should accept subqueries and raw expressions (2)', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .patch({
             model1Prop1: 'Morten',
             model1Prop2: Model2.knexQuery().sum('model_2_prop_2')
@@ -158,15 +172,18 @@ module.exports = (session) => {
           })
           .then(rows => {
             expect(rows).to.have.length(3);
-            expectPartEql(rows[0], {id: 1, model1Prop1: 'Morten', model1Prop2: 3});
+            expectPartEql(rows[0], {
+              id: 1,
+              model1Prop1: 'Morten',
+              model1Prop2: 3
+            });
             expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
             expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
           });
       });
 
       it('should patch multiple', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .patch({model1Prop1: 'updated text'})
           .where('model1Prop1', '<', 'hello 3')
           .then(numUpdated => {
@@ -182,8 +199,7 @@ module.exports = (session) => {
       });
 
       it('increment should create patch', () => {
-        return Model2
-          .query()
+        return Model2.query()
           .increment('model2Prop2', 10)
           .where('id_col', '=', 2)
           .then(numUpdated => {
@@ -198,8 +214,7 @@ module.exports = (session) => {
       });
 
       it('decrement should create patch', () => {
-        return Model2
-          .query()
+        return Model2.query()
           .decrement('model2Prop2', 10)
           .where('id_col', '=', 2)
           .then(numUpdated => {
@@ -224,8 +239,7 @@ module.exports = (session) => {
           }
         });
 
-        ModelWithSchema
-          .query()
+        ModelWithSchema.query()
           .patch({model1Prop1: 100})
           .then(() => {
             done(new Error('should not get here'));
@@ -235,7 +249,11 @@ module.exports = (session) => {
             return session.knex(Model1.tableName);
           })
           .then(rows => {
-            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql([
+              'hello 1',
+              'hello 2',
+              'hello 3'
+            ]);
             done();
           })
           .catch(done);
@@ -252,50 +270,57 @@ module.exports = (session) => {
           }
         });
 
-        ModelWithSchema
-          .query()
+        ModelWithSchema.query()
           .patch({model1Prop1: 'text'})
           .then(() => {
             return session.knex(Model1.tableName);
           })
           .then(rows => {
-            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['text', 'text', 'text']);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql([
+              'text',
+              'text',
+              'text'
+            ]);
             done();
           })
-          .catch(done)
+          .catch(done);
       });
-
     });
 
     describe('.query().patchAndFetchById()', () => {
-
       beforeEach(() => {
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1',
-          model1Relation2: [{
-            idCol: 1,
-            model2Prop1: 'text 1',
-            model2Prop2: 2
-          }, {
-            idCol: 2,
-            model2Prop1: 'text 2',
-            model2Prop2: 1
-          }]
-        }, {
-          id: 2,
-          model1Prop1: 'hello 2'
-        }, {
-          id: 3,
-          model1Prop1: 'hello 3'
-        }]);
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Prop1: 'text 1',
+                model2Prop2: 2
+              },
+              {
+                idCol: 2,
+                model2Prop1: 'text 2',
+                model2Prop2: 1
+              }
+            ]
+          },
+          {
+            id: 2,
+            model1Prop1: 'hello 2'
+          },
+          {
+            id: 3,
+            model1Prop1: 'hello 3'
+          }
+        ]);
       });
 
       it('should patch and fetch a model', () => {
         let model = Model1.fromJson({model1Prop1: 'updated text'});
 
-        return Model1
-          .query()
+        return Model1.query()
           .patchAndFetchById(2, model)
           .then(fetchedModel => {
             expect(model.$beforeUpdateCalled).to.equal(1);
@@ -326,8 +351,7 @@ module.exports = (session) => {
       it('should work with `eager` method', () => {
         let model = Model1.fromJson({model1Prop1: 'updated text'});
 
-        return Model1
-          .query()
+        return Model1.query()
           .patchAndFetchById(1, model)
           .eager('model1Relation2')
           .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
@@ -342,19 +366,22 @@ module.exports = (session) => {
               $afterUpdateCalled: true,
               $afterUpdateOptions: {patch: true},
 
-              model1Relation2: [{
-                idCol: 1,
-                model1Id: 1,
-                model2Prop1: 'text 1',
-                model2Prop2: 2,
-                $afterGetCalled: 1
-              }, {
-                idCol: 2,
-                model1Id: 1,
-                model2Prop1: 'text 2',
-                model2Prop2: 1,
-                $afterGetCalled: 1
-              }]
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model1Id: 1,
+                  model2Prop1: 'text 1',
+                  model2Prop2: 2,
+                  $afterGetCalled: 1
+                },
+                {
+                  idCol: 2,
+                  model1Id: 1,
+                  model2Prop1: 'text 2',
+                  model2Prop2: 1,
+                  $afterGetCalled: 1
+                }
+              ]
             });
 
             return session.knex('Model1').orderBy('id');
@@ -370,8 +397,7 @@ module.exports = (session) => {
       it('should work with `pick` method', () => {
         let model = Model1.fromJson({model1Prop1: 'updated text'});
 
-        return Model1
-          .query()
+        return Model1.query()
           .patchAndFetchById(1, model)
           .eager('model1Relation2')
           .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
@@ -387,15 +413,18 @@ module.exports = (session) => {
               $afterUpdateCalled: true,
               $afterUpdateOptions: {patch: true},
 
-              model1Relation2: [{
-                idCol: 1,
-                model1Id: 1,
-                $afterGetCalled: 1
-              }, {
-                idCol: 2,
-                model1Id: 1,
-                $afterGetCalled: 1
-              }]
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model1Id: 1,
+                  $afterGetCalled: 1
+                },
+                {
+                  idCol: 2,
+                  model1Id: 1,
+                  $afterGetCalled: 1
+                }
+              ]
             });
 
             return session.knex('Model1').orderBy('id');
@@ -409,8 +438,7 @@ module.exports = (session) => {
       });
 
       it('should fetch nothing if nothing is updated', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .patchAndFetchById(2, {model1Prop1: 'updated text'})
           .where('id', -1)
           .then(fetchedModel => {
@@ -427,15 +455,17 @@ module.exports = (session) => {
     });
 
     describe('.$query().patch()', () => {
-
       beforeEach(() => {
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1'
-        }, {
-          id: 2,
-          model1Prop1: 'hello 2'
-        }]);
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1'
+          },
+          {
+            id: 2,
+            model1Prop1: 'hello 2'
+          }
+        ]);
       });
 
       it('should patch a model (1)', () => {
@@ -443,7 +473,10 @@ module.exports = (session) => {
 
         return model
           .$query()
-          .patch({model1Prop1: 'updated text', undefinedShouldBeIgnored: undefined})
+          .patch({
+            model1Prop1: 'updated text',
+            undefinedShouldBeIgnored: undefined
+          })
           .then(numUpdated => {
             expect(numUpdated).to.equal(1);
             expect(model.model1Prop1).to.equal('updated text');
@@ -486,7 +519,12 @@ module.exports = (session) => {
             .patch({model1Prop1: 'updated text'})
             .returning('*')
             .then(patched => {
-              const expected = {id: 1, model1Id: null, model1Prop1: 'updated text', model1Prop2: null};
+              const expected = {
+                id: 1,
+                model1Id: null,
+                model1Prop1: 'updated text',
+                model1Prop2: null
+              };
               expect(patched).to.be.a(Model1);
               expect(patched).to.eql(expected);
               expect(model).to.eql(expected);
@@ -501,8 +539,7 @@ module.exports = (session) => {
       }
 
       it('should patch a model (2)', () => {
-        return Model1
-          .fromJson({id: 1, model1Prop1: 'updated text'})
+        return Model1.fromJson({id: 1, model1Prop1: 'updated text'})
           .$query()
           .patch()
           .then(numUpdated => {
@@ -519,15 +556,20 @@ module.exports = (session) => {
       it('should pass the old values to $beforeUpdate and $afterUpdate hooks in options.old', () => {
         let patch = Model1.fromJson({model1Prop1: 'updated text'});
 
-        return Model1
-          .fromJson({id: 1})
+        return Model1.fromJson({id: 1})
           .$query()
           .patch(patch)
           .then(() => {
             expect(patch.$beforeUpdateCalled).to.equal(1);
-            expect(patch.$beforeUpdateOptions).to.eql({patch: true, old: {id: 1}});
+            expect(patch.$beforeUpdateOptions).to.eql({
+              patch: true,
+              old: {id: 1}
+            });
             expect(patch.$afterUpdateCalled).to.equal(1);
-            expect(patch.$afterUpdateOptions).to.eql({patch: true, old: {id: 1}});
+            expect(patch.$afterUpdateOptions).to.eql({
+              patch: true,
+              old: {id: 1}
+            });
             return session.knex('Model1').orderBy('id');
           })
           .then(rows => {
@@ -538,8 +580,11 @@ module.exports = (session) => {
       });
 
       it('omitting a field should remove it from the patch', () => {
-        return Model1
-          .fromJson({id: 1, model1Prop1: 'updated text', thisShouldBeRemoved: 1000})
+        return Model1.fromJson({
+          id: 1,
+          model1Prop1: 'updated text',
+          thisShouldBeRemoved: 1000
+        })
           .$omit('thisShouldBeRemoved')
           .$query()
           .patch()
@@ -557,7 +602,7 @@ module.exports = (session) => {
       it('model edits in $beforeUpdate should get into database query', () => {
         let model = Model1.fromJson({id: 1});
 
-        model.$beforeUpdate = function () {
+        model.$beforeUpdate = function() {
           let self = this;
           return Promise.delay(1).then(() => {
             self.model1Prop1 = 'updated text';
@@ -577,7 +622,6 @@ module.exports = (session) => {
             expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
           });
       });
-
     });
 
     describe('.$query().patchAndFetch()', () => {
@@ -585,7 +629,11 @@ module.exports = (session) => {
       let queries = [];
 
       before(() => {
-        const knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
+        const knex = mockKnexFactory(session.knex, function(
+          mock,
+          oldImpl,
+          args
+        ) {
           queries.push(this.toString());
           return oldImpl.apply(this, args);
         });
@@ -596,13 +644,16 @@ module.exports = (session) => {
       beforeEach(() => {
         queries = [];
 
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1'
-        }, {
-          id: 2,
-          model1Prop1: 'hello 2'
-        }]);
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1'
+          },
+          {
+            id: 2,
+            model1Prop1: 'hello 2'
+          }
+        ]);
       });
 
       it('should patch and fetch a model', () => {
@@ -616,7 +667,12 @@ module.exports = (session) => {
             expect(updated.model1Id).to.equal(null);
             expect(updated.model1Prop1).to.equal('hello 1');
             expect(updated.model1Prop2).to.equal(10);
-            expectPartEql(model, {id: 1, model1Prop1: 'hello 1', model1Prop2: 10, model1Id: null});
+            expectPartEql(model, {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Prop2: 10,
+              model1Id: null
+            });
 
             if (session.isPostgres()) {
               expect(queries).to.eql([
@@ -629,44 +685,51 @@ module.exports = (session) => {
           })
           .then(rows => {
             expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1', model1Prop2: 10});
-            expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2', model1Prop2: null});
+            expectPartEql(rows[0], {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Prop2: 10
+            });
+            expectPartEql(rows[1], {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Prop2: null
+            });
           });
       });
-
     });
 
     describe('.$relatedQuery().patch()', () => {
-
       describe('belongs to one relation', () => {
         let parent1;
         let parent2;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation1: {
-              id: 2,
-              model1Prop1: 'hello 2'
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation1: {
+                id: 2,
+                model1Prop1: 'hello 2'
+              }
+            },
+            {
+              id: 3,
+              model1Prop1: 'hello 3',
+              model1Relation1: {
+                id: 4,
+                model1Prop1: 'hello 4'
+              }
             }
-          }, {
-            id: 3,
-            model1Prop1: 'hello 3',
-            model1Relation1: {
-              id: 4,
-              model1Prop1: 'hello 4'
-            }
-          }]);
+          ]);
         });
 
         beforeEach(() => {
-          return Model1
-            .query()
-            .then(parents => {
-              parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 3});
-            });
+          return Model1.query().then(parents => {
+            parent1 = _.find(parents, {id: 1});
+            parent2 = _.find(parents, {id: 3});
+          });
         });
 
         it('should patch a related object (1)', () => {
@@ -707,10 +770,13 @@ module.exports = (session) => {
               expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
               expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
               expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
-              expectPartEql(rows[3], {id: 4, model1Prop1: 'updated text', model1Prop2: 1000});
+              expectPartEql(rows[3], {
+                id: 4,
+                model1Prop1: 'updated text',
+                model1Prop2: 1000
+              });
             });
         });
-
       });
 
       describe('has many relation', () => {
@@ -718,48 +784,57 @@ module.exports = (session) => {
         let parent2;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
-              model2Prop2: 6
-            }, {
-              idCol: 2,
-              model2Prop1: 'text 2',
-              model2Prop2: 5
-            }, {
-              idCol: 3,
-              model2Prop1: 'text 3',
-              model2Prop2: 4
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 4,
-              model2Prop1: 'text 4',
-              model2Prop2: 3
-            }, {
-              idCol: 5,
-              model2Prop1: 'text 5',
-              model2Prop2: 2
-            }, {
-              idCol: 6,
-              model2Prop1: 'text 6',
-              model2Prop2: 1
-            }]
-          }]);
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Prop2: 6
+                },
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Prop2: 5
+                },
+                {
+                  idCol: 3,
+                  model2Prop1: 'text 3',
+                  model2Prop2: 4
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 4,
+                  model2Prop1: 'text 4',
+                  model2Prop2: 3
+                },
+                {
+                  idCol: 5,
+                  model2Prop1: 'text 5',
+                  model2Prop2: 2
+                },
+                {
+                  idCol: 6,
+                  model2Prop1: 'text 6',
+                  model2Prop2: 1
+                }
+              ]
+            }
+          ]);
         });
 
         beforeEach(() => {
-          return Model1
-            .query()
-            .then(parents => {
-              parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 2});
-            });
+          return Model1.query().then(parents => {
+            parent1 = _.find(parents, {id: 1});
+            parent2 = _.find(parents, {id: 2});
+          });
         });
 
         it('should patch a related object', () => {
@@ -782,7 +857,11 @@ module.exports = (session) => {
             .then(rows => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1'});
-              expectPartEql(rows[1], {id_col: 2, model_2_prop_1: 'updated text', model_2_prop_2: 5});
+              expectPartEql(rows[1], {
+                id_col: 2,
+                model_2_prop_1: 'updated text',
+                model_2_prop_2: 5
+              });
               expectPartEql(rows[2], {id_col: 3, model_2_prop_1: 'text 3'});
               expectPartEql(rows[3], {id_col: 4, model_2_prop_1: 'text 4'});
               expectPartEql(rows[4], {id_col: 5, model_2_prop_1: 'text 5'});
@@ -803,14 +882,21 @@ module.exports = (session) => {
             .then(rows => {
               expect(rows).to.have.length(6);
               expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1'});
-              expectPartEql(rows[1], {id_col: 2, model_2_prop_1: 'updated text', model_2_prop_2: 5});
-              expectPartEql(rows[2], {id_col: 3, model_2_prop_1: 'updated text', model_2_prop_2: 4});
+              expectPartEql(rows[1], {
+                id_col: 2,
+                model_2_prop_1: 'updated text',
+                model_2_prop_2: 5
+              });
+              expectPartEql(rows[2], {
+                id_col: 3,
+                model_2_prop_1: 'updated text',
+                model_2_prop_2: 4
+              });
               expectPartEql(rows[3], {id_col: 4, model_2_prop_1: 'text 4'});
               expectPartEql(rows[4], {id_col: 5, model_2_prop_1: 'text 5'});
               expectPartEql(rows[5], {id_col: 6, model_2_prop_1: 'text 6'});
             });
         });
-
       });
 
       describe('many to many relation', () => {
@@ -818,94 +904,115 @@ module.exports = (session) => {
         let parent2;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
 
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
 
-              model2Relation1: [{
-                id: 3,
-                model1Prop1: 'blaa 1',
-                model1Prop2: 6
-              }, {
-                id: 4,
-                model1Prop1: 'blaa 2',
-                model1Prop2: 5
-              }, {
-                id: 5,
-                model1Prop1: 'blaa 3',
-                model1Prop2: 4
-              }]
-            }],
+                  model2Relation1: [
+                    {
+                      id: 3,
+                      model1Prop1: 'blaa 1',
+                      model1Prop2: 6
+                    },
+                    {
+                      id: 4,
+                      model1Prop1: 'blaa 2',
+                      model1Prop2: 5
+                    },
+                    {
+                      id: 5,
+                      model1Prop1: 'blaa 3',
+                      model1Prop2: 4
+                    }
+                  ]
+                }
+              ],
 
-            model1Relation3: [{
-              idCol: 3,
-              model2Prop1: 'foo 1',
-              extra1: 'extra 11',
-              extra2: 'extra 21'
-            }, {
-              idCol: 4,
-              model2Prop1: 'foo 2',
-              extra1: 'extra 12',
-              extra2: 'extra 22'
-            }, {
-              idCol: 5,
-              model2Prop1: 'foo 3',
-              extra1: 'extra 13',
-              extra2: 'extra 23'
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
+              model1Relation3: [
+                {
+                  idCol: 3,
+                  model2Prop1: 'foo 1',
+                  extra1: 'extra 11',
+                  extra2: 'extra 21'
+                },
+                {
+                  idCol: 4,
+                  model2Prop1: 'foo 2',
+                  extra1: 'extra 12',
+                  extra2: 'extra 22'
+                },
+                {
+                  idCol: 5,
+                  model2Prop1: 'foo 3',
+                  extra1: 'extra 13',
+                  extra2: 'extra 23'
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
 
-            model1Relation2: [{
-              idCol: 2,
-              model2Prop1: 'text 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
 
-              model2Relation1: [{
-                id: 6,
-                model1Prop1: 'blaa 4',
-                model1Prop2: 3
-              }, {
-                id: 7,
-                model1Prop1: 'blaa 5',
-                model1Prop2: 2
-              }, {
-                id: 8,
-                model1Prop1: 'blaa 6',
-                model1Prop2: 1
-              }]
-            }],
+                  model2Relation1: [
+                    {
+                      id: 6,
+                      model1Prop1: 'blaa 4',
+                      model1Prop2: 3
+                    },
+                    {
+                      id: 7,
+                      model1Prop1: 'blaa 5',
+                      model1Prop2: 2
+                    },
+                    {
+                      id: 8,
+                      model1Prop1: 'blaa 6',
+                      model1Prop2: 1
+                    }
+                  ]
+                }
+              ],
 
-            model1Relation3: [{
-              idCol: 6,
-              model2Prop1: 'foo 4',
-              extra1: 'extra 14',
-              extra2: 'extra 24'
-            }, {
-              idCol: 7,
-              model2Prop1: 'foo 5',
-              extra1: 'extra 15',
-              extra2: 'extra 25'
-            }, {
-              idCol: 8,
-              model2Prop1: 'foo 6',
-              extra1: 'extra 16',
-              extra2: 'extra 26'
-            }]
-          }]);
+              model1Relation3: [
+                {
+                  idCol: 6,
+                  model2Prop1: 'foo 4',
+                  extra1: 'extra 14',
+                  extra2: 'extra 24'
+                },
+                {
+                  idCol: 7,
+                  model2Prop1: 'foo 5',
+                  extra1: 'extra 15',
+                  extra2: 'extra 25'
+                },
+                {
+                  idCol: 8,
+                  model2Prop1: 'foo 6',
+                  extra1: 'extra 16',
+                  extra2: 'extra 26'
+                }
+              ]
+            }
+          ]);
         });
 
         beforeEach(() => {
-          return Model2
-            .query()
-            .then(parents => {
-              parent1 = _.find(parents, {idCol: 1});
-              parent2 = _.find(parents, {idCol: 2});
-            });
+          return Model2.query().then(parents => {
+            parent1 = _.find(parents, {idCol: 1});
+            parent2 = _.find(parents, {idCol: 2});
+          });
         });
 
         it('should patch a related object', () => {
@@ -939,8 +1046,7 @@ module.exports = (session) => {
         });
 
         it('should patch a related object with extras', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .findById(1)
             .then(parent => {
               return parent
@@ -960,28 +1066,79 @@ module.exports = (session) => {
 
                   return [
                     session.knex('model_2').orderBy('id_col'),
-                    session.knex('Model1Model2').select('model1Id', 'model2Id', 'extra1', 'extra2').orderBy(['model1Id', 'model2Id'])
+                    session
+                      .knex('Model1Model2')
+                      .select('model1Id', 'model2Id', 'extra1', 'extra2')
+                      .orderBy(['model1Id', 'model2Id'])
                   ];
                 })
                 .spread((model2, model1Model2) => {
                   expect(model2.length).to.equal(8);
                   expect(model1Model2.length).to.equal(12);
 
-                  expectPartEql(model2[0], {id_col: 1, model_2_prop_1: 'text 1'});
-                  expectPartEql(model2[1], {id_col: 2, model_2_prop_1: 'text 2'});
-                  expectPartEql(model2[2], {id_col: 3, model_2_prop_1: 'foo 1'});
-                  expectPartEql(model2[3], {id_col: 4, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[4], {id_col: 5, model_2_prop_1: 'foo 3'});
-                  expectPartEql(model2[5], {id_col: 6, model_2_prop_1: 'foo 4'});
-                  expectPartEql(model2[6], {id_col: 7, model_2_prop_1: 'foo 5'});
-                  expectPartEql(model2[7], {id_col: 8, model_2_prop_1: 'foo 6'});
+                  expectPartEql(model2[0], {
+                    id_col: 1,
+                    model_2_prop_1: 'text 1'
+                  });
+                  expectPartEql(model2[1], {
+                    id_col: 2,
+                    model_2_prop_1: 'text 2'
+                  });
+                  expectPartEql(model2[2], {
+                    id_col: 3,
+                    model_2_prop_1: 'foo 1'
+                  });
+                  expectPartEql(model2[3], {
+                    id_col: 4,
+                    model_2_prop_1: 'iam updated'
+                  });
+                  expectPartEql(model2[4], {
+                    id_col: 5,
+                    model_2_prop_1: 'foo 3'
+                  });
+                  expectPartEql(model2[5], {
+                    id_col: 6,
+                    model_2_prop_1: 'foo 4'
+                  });
+                  expectPartEql(model2[6], {
+                    id_col: 7,
+                    model_2_prop_1: 'foo 5'
+                  });
+                  expectPartEql(model2[7], {
+                    id_col: 8,
+                    model_2_prop_1: 'foo 6'
+                  });
 
-                  expectPartEql(model1Model2[0], {model1Id: 1, extra1: 'extra 11', extra2: 'extra 21'});
-                  expectPartEql(model1Model2[1], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
-                  expectPartEql(model1Model2[2], {model1Id: 1, extra1: 'extra 13', extra2: 'extra 23'});
-                  expectPartEql(model1Model2[3], {model1Id: 2, extra1: 'extra 14', extra2: 'extra 24'});
-                  expectPartEql(model1Model2[4], {model1Id: 2, extra1: 'extra 15', extra2: 'extra 25'});
-                  expectPartEql(model1Model2[5], {model1Id: 2, extra1: 'extra 16', extra2: 'extra 26'});
+                  expectPartEql(model1Model2[0], {
+                    model1Id: 1,
+                    extra1: 'extra 11',
+                    extra2: 'extra 21'
+                  });
+                  expectPartEql(model1Model2[1], {
+                    model1Id: 1,
+                    extra1: 'updated extra 1',
+                    extra2: 'updated extra 2'
+                  });
+                  expectPartEql(model1Model2[2], {
+                    model1Id: 1,
+                    extra1: 'extra 13',
+                    extra2: 'extra 23'
+                  });
+                  expectPartEql(model1Model2[3], {
+                    model1Id: 2,
+                    extra1: 'extra 14',
+                    extra2: 'extra 24'
+                  });
+                  expectPartEql(model1Model2[4], {
+                    model1Id: 2,
+                    extra1: 'extra 15',
+                    extra2: 'extra 25'
+                  });
+                  expectPartEql(model1Model2[5], {
+                    model1Id: 2,
+                    extra1: 'extra 16',
+                    extra2: 'extra 26'
+                  });
 
                   expectPartEql(model1Model2[6], {extra1: null, extra2: null});
                   expectPartEql(model1Model2[7], {extra1: null, extra2: null});
@@ -990,12 +1147,11 @@ module.exports = (session) => {
                   expectPartEql(model1Model2[10], {extra1: null, extra2: null});
                   expectPartEql(model1Model2[11], {extra1: null, extra2: null});
                 });
-            })
+            });
         });
 
         it('should patch all related objects with extras', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .findById(1)
             .then(parent => {
               return parent
@@ -1010,28 +1166,79 @@ module.exports = (session) => {
 
                   return [
                     session.knex('model_2').orderBy('id_col'),
-                    session.knex('Model1Model2').select('model1Id', 'model2Id', 'extra1', 'extra2').orderBy(['model1Id', 'model2Id'])
+                    session
+                      .knex('Model1Model2')
+                      .select('model1Id', 'model2Id', 'extra1', 'extra2')
+                      .orderBy(['model1Id', 'model2Id'])
                   ];
                 })
                 .spread((model2, model1Model2) => {
                   expect(model2.length).to.equal(8);
                   expect(model1Model2.length).to.equal(12);
 
-                  expectPartEql(model2[0], {id_col: 1, model_2_prop_1: 'text 1'});
-                  expectPartEql(model2[1], {id_col: 2, model_2_prop_1: 'text 2'});
-                  expectPartEql(model2[2], {id_col: 3, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[3], {id_col: 4, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[4], {id_col: 5, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[5], {id_col: 6, model_2_prop_1: 'foo 4'});
-                  expectPartEql(model2[6], {id_col: 7, model_2_prop_1: 'foo 5'});
-                  expectPartEql(model2[7], {id_col: 8, model_2_prop_1: 'foo 6'});
+                  expectPartEql(model2[0], {
+                    id_col: 1,
+                    model_2_prop_1: 'text 1'
+                  });
+                  expectPartEql(model2[1], {
+                    id_col: 2,
+                    model_2_prop_1: 'text 2'
+                  });
+                  expectPartEql(model2[2], {
+                    id_col: 3,
+                    model_2_prop_1: 'iam updated'
+                  });
+                  expectPartEql(model2[3], {
+                    id_col: 4,
+                    model_2_prop_1: 'iam updated'
+                  });
+                  expectPartEql(model2[4], {
+                    id_col: 5,
+                    model_2_prop_1: 'iam updated'
+                  });
+                  expectPartEql(model2[5], {
+                    id_col: 6,
+                    model_2_prop_1: 'foo 4'
+                  });
+                  expectPartEql(model2[6], {
+                    id_col: 7,
+                    model_2_prop_1: 'foo 5'
+                  });
+                  expectPartEql(model2[7], {
+                    id_col: 8,
+                    model_2_prop_1: 'foo 6'
+                  });
 
-                  expectPartEql(model1Model2[0], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
-                  expectPartEql(model1Model2[1], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
-                  expectPartEql(model1Model2[2], {model1Id: 1, extra1: 'updated extra 1', extra2: 'updated extra 2'});
-                  expectPartEql(model1Model2[3], {model1Id: 2, extra1: 'extra 14', extra2: 'extra 24'});
-                  expectPartEql(model1Model2[4], {model1Id: 2, extra1: 'extra 15', extra2: 'extra 25'});
-                  expectPartEql(model1Model2[5], {model1Id: 2, extra1: 'extra 16', extra2: 'extra 26'});
+                  expectPartEql(model1Model2[0], {
+                    model1Id: 1,
+                    extra1: 'updated extra 1',
+                    extra2: 'updated extra 2'
+                  });
+                  expectPartEql(model1Model2[1], {
+                    model1Id: 1,
+                    extra1: 'updated extra 1',
+                    extra2: 'updated extra 2'
+                  });
+                  expectPartEql(model1Model2[2], {
+                    model1Id: 1,
+                    extra1: 'updated extra 1',
+                    extra2: 'updated extra 2'
+                  });
+                  expectPartEql(model1Model2[3], {
+                    model1Id: 2,
+                    extra1: 'extra 14',
+                    extra2: 'extra 24'
+                  });
+                  expectPartEql(model1Model2[4], {
+                    model1Id: 2,
+                    extra1: 'extra 15',
+                    extra2: 'extra 25'
+                  });
+                  expectPartEql(model1Model2[5], {
+                    model1Id: 2,
+                    extra1: 'extra 16',
+                    extra2: 'extra 26'
+                  });
 
                   expectPartEql(model1Model2[6], {extra1: null, extra2: null});
                   expectPartEql(model1Model2[7], {extra1: null, extra2: null});
@@ -1040,7 +1247,7 @@ module.exports = (session) => {
                   expectPartEql(model1Model2[10], {extra1: null, extra2: null});
                   expectPartEql(model1Model2[11], {extra1: null, extra2: null});
                 });
-            })
+            });
         });
 
         it('should patch all related objects', () => {
@@ -1058,9 +1265,21 @@ module.exports = (session) => {
               expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
               expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
               expectPartEql(rows[4], {id: 5, model1Prop1: 'blaa 3'});
-              expectPartEql(rows[5], {id: 6, model1Prop1: 'updated text', model1Prop2: 123});
-              expectPartEql(rows[6], {id: 7, model1Prop1: 'updated text', model1Prop2: 123});
-              expectPartEql(rows[7], {id: 8, model1Prop1: 'updated text', model1Prop2: 123});
+              expectPartEql(rows[5], {
+                id: 6,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
+              expectPartEql(rows[6], {
+                id: 7,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
+              expectPartEql(rows[7], {
+                id: 8,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
             });
         });
 
@@ -1081,9 +1300,17 @@ module.exports = (session) => {
               expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
               expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
               expectPartEql(rows[4], {id: 5, model1Prop1: 'blaa 3'});
-              expectPartEql(rows[5], {id: 6, model1Prop1: 'updated text', model1Prop2: 123});
+              expectPartEql(rows[5], {
+                id: 6,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
               expectPartEql(rows[6], {id: 7, model1Prop1: 'blaa 5'});
-              expectPartEql(rows[7], {id: 8, model1Prop1: 'updated text', model1Prop2: 123});
+              expectPartEql(rows[7], {
+                id: 8,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
             });
         });
 
@@ -1101,8 +1328,16 @@ module.exports = (session) => {
               expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
               expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
               expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
-              expectPartEql(rows[3], {id: 4, model1Prop1: 'updated text', model1Prop2: 123});
-              expectPartEql(rows[4], {id: 5, model1Prop1: 'updated text', model1Prop2: 123});
+              expectPartEql(rows[3], {
+                id: 4,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
+              expectPartEql(rows[4], {
+                id: 5,
+                model1Prop1: 'updated text',
+                model1Prop2: 123
+              });
               expectPartEql(rows[5], {id: 6, model1Prop1: 'blaa 4'});
               expectPartEql(rows[6], {id: 7, model1Prop1: 'blaa 5'});
               expectPartEql(rows[7], {id: 8, model1Prop1: 'blaa 6'});
@@ -1114,41 +1349,46 @@ module.exports = (session) => {
         let parent;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
 
-              model2Relation2: {
-                id: 3,
-                model1Prop1: 'blaa 1',
-                model1Prop2: 6
-              }
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 2,
-              model2Prop1: 'text 2',
+                  model2Relation2: {
+                    id: 3,
+                    model1Prop1: 'blaa 1',
+                    model1Prop2: 6
+                  }
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
 
-              model2Relation2: {
-                id: 7,
-                model1Prop1: 'blaa 5',
-                model1Prop2: 2
-              }
-            }]
-          }]);
+                  model2Relation2: {
+                    id: 7,
+                    model1Prop1: 'blaa 5',
+                    model1Prop2: 2
+                  }
+                }
+              ]
+            }
+          ]);
         });
 
         beforeEach(() => {
-          return Model2
-            .query()
-            .then(parents => {
-              parent = _.find(parents, {idCol: 1});
-            });
+          return Model2.query().then(parents => {
+            parent = _.find(parents, {idCol: 1});
+          });
         });
 
         it('should patch the related object', () => {
@@ -1168,7 +1408,6 @@ module.exports = (session) => {
             });
         });
       });
-
     });
 
     describe('hooks', () => {
@@ -1183,7 +1422,11 @@ module.exports = (session) => {
       before(() => {
         // Create a new knex object by wrapping session.knex so that we get a new
         // instance instead of a cached one from `bindKnex`.
-        const knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
+        const knex = mockKnexFactory(session.knex, function(
+          mock,
+          oldImpl,
+          args
+        ) {
           return oldImpl.apply(this, args);
         });
 
@@ -1195,22 +1438,22 @@ module.exports = (session) => {
         expect(ModelOne).to.not.equal(session.unboundModels.Model1);
         expect(ModelTwo).to.not.equal(session.unboundModels.Model2);
 
-        ModelOne.prototype.$beforeUpdate = function (opt, ctx) {
+        ModelOne.prototype.$beforeUpdate = function(opt, ctx) {
           beforeUpdateCalled += 'ModelOne';
           beforeUpdateOpt = _.cloneDeep(opt);
         };
 
-        ModelOne.prototype.$afterUpdate = function (opt, ctx) {
+        ModelOne.prototype.$afterUpdate = function(opt, ctx) {
           afterUpdateCalled += 'ModelOne';
           afterUpdateOpt = _.cloneDeep(opt);
         };
 
-        ModelTwo.prototype.$beforeUpdate = function (opt, ctx) {
+        ModelTwo.prototype.$beforeUpdate = function(opt, ctx) {
           beforeUpdateCalled += 'ModelTwo';
           beforeUpdateOpt = _.cloneDeep(opt);
         };
 
-        ModelTwo.prototype.$afterUpdate = function (opt, ctx) {
+        ModelTwo.prototype.$afterUpdate = function(opt, ctx) {
           afterUpdateCalled += 'ModelTwo';
           afterUpdateOpt = _.cloneDeep(opt);
         };
@@ -1224,30 +1467,35 @@ module.exports = (session) => {
       });
 
       beforeEach(() => {
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1',
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1',
 
-          model1Relation1: {
-            id: 2,
-            model1Prop1: 'hello 2'
-          },
+            model1Relation1: {
+              id: 2,
+              model1Prop1: 'hello 2'
+            },
 
-          model1Relation2: [{
-            idCol: 1,
-            model2Prop1: 'foo 1'
-          }],
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Prop1: 'foo 1'
+              }
+            ],
 
-          model1Relation3: [{
-            idCol: 2,
-            model2Prop1: 'foo 2'
-          }],
-        }]);
+            model1Relation3: [
+              {
+                idCol: 2,
+                model2Prop1: 'foo 2'
+              }
+            ]
+          }
+        ]);
       });
 
       it('.query().patch()', () => {
-        return ModelOne
-          .query()
+        return ModelOne.query()
           .findById(1)
           .patch({model1Prop1: 'updated text'})
           .then(() => {
@@ -1259,11 +1507,10 @@ module.exports = (session) => {
       });
 
       it('.$query().patch()', () => {
-        return ModelOne
-          .query()
+        return ModelOne.query()
           .findById(1)
           .then(model => {
-            return model.$query().patch({model1Prop1: 'updated text'})
+            return model.$query().patch({model1Prop1: 'updated text'});
           })
           .then(() => {
             expect(beforeUpdateCalled).to.equal('ModelOne');
@@ -1293,13 +1540,13 @@ module.exports = (session) => {
       });
 
       describe('$relatedQuery().patch()', () => {
-
         it('belongs to one relation', () => {
-          return ModelOne
-            .query()
+          return ModelOne.query()
             .findById(1)
             .then(model => {
-              return model.$relatedQuery('model1Relation1').patch({model1Prop1: 'updated text'})
+              return model
+                .$relatedQuery('model1Relation1')
+                .patch({model1Prop1: 'updated text'});
             })
             .then(() => {
               expect(beforeUpdateCalled).to.equal('ModelOne');
@@ -1310,11 +1557,12 @@ module.exports = (session) => {
         });
 
         it('has many relation', () => {
-          return ModelOne
-            .query()
+          return ModelOne.query()
             .findById(1)
             .then(model => {
-              return model.$relatedQuery('model1Relation2').patch({model2Prop1: 'updated text'})
+              return model
+                .$relatedQuery('model1Relation2')
+                .patch({model2Prop1: 'updated text'});
             })
             .then(() => {
               expect(beforeUpdateCalled).to.equal('ModelTwo');
@@ -1325,11 +1573,12 @@ module.exports = (session) => {
         });
 
         it('many to many relation', () => {
-          return ModelOne
-            .query()
+          return ModelOne.query()
             .findById(1)
             .then(model => {
-              return model.$relatedQuery('model1Relation3').patch({model2Prop1: 'updated text'})
+              return model
+                .$relatedQuery('model1Relation3')
+                .patch({model2Prop1: 'updated text'});
             })
             .then(() => {
               expect(beforeUpdateCalled).to.equal('ModelTwo');
@@ -1338,9 +1587,7 @@ module.exports = (session) => {
               expect(afterUpdateOpt).to.eql({patch: true});
             });
         });
-
       });
-
     });
 
     function subClassWithSchema(Model, schema) {
@@ -1348,7 +1595,5 @@ module.exports = (session) => {
       SubModel.jsonSchema = schema;
       return SubModel;
     }
-
   });
-
 };

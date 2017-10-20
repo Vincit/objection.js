@@ -12,9 +12,7 @@
     "no-console": false,
     "no-namespace": [false],
     "no-unused-expression": [false],
-    "object-literal-sort-keys": [
-      false
-    ],
+    "object-literal-sort-keys": [false],
     "quotemark": ["single"],
     "semicolon": [true, "always"],
     "space-before-function-paren": [false],

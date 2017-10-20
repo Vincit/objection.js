@@ -25,7 +25,12 @@ function expectPartialEqual(result, partial) {
     result.forEach((value, idx) => {
       expectPartialEqual(result[idx], partial[idx]);
     });
-  } else if (_.isObject(result) && !Array.isArray(partial) && _.isObject(partial) && !Array.isArray(result)) {
+  } else if (
+    _.isObject(result) &&
+    !Array.isArray(partial) &&
+    _.isObject(partial) &&
+    !Array.isArray(result)
+  ) {
     var partialKeys = _.keys(partial);
     expect(_.pick(result, partialKeys)).to.eql(partial);
   } else {

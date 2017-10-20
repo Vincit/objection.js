@@ -8,7 +8,6 @@ const QueryBuilder = require('../../../').QueryBuilder;
 const ValidationError = require('../../../').ValidationError;
 
 describe('Model', () => {
-
   describe('fromJson', () => {
     let Model1;
 
@@ -47,7 +46,7 @@ describe('Model', () => {
       let json = {a: 1};
       let options = {b: 2};
 
-      Model1.prototype.$parseJson = function (jsn, opt) {
+      Model1.prototype.$parseJson = function(jsn, opt) {
         ++calls;
         expect(jsn).to.eql(json);
         expect(opt).to.eql(options);
@@ -145,7 +144,6 @@ describe('Model', () => {
         expect(exp).to.be.a(ValidationError);
         expect(exp.data).to.have.property('c.e[0]');
       });
-
     });
 
     it('should call $validate if jsonSchema is defined', () => {
@@ -161,7 +159,7 @@ describe('Model', () => {
         }
       };
 
-      Model1.prototype.$validate = function (jsn, opt) {
+      Model1.prototype.$validate = function(jsn, opt) {
         Model.prototype.$validate.call(this, jsn, opt);
 
         ++calls;
@@ -172,7 +170,7 @@ describe('Model', () => {
       expect(() => {
         Model1.fromJson(json, options);
       }).not.to.throwException(err => {
-        console.log(err.stack)
+        console.log(err.stack);
       });
 
       expect(calls).to.equal(1);
@@ -181,7 +179,7 @@ describe('Model', () => {
     it('should only call jsonSchema once if jsonSchema is a getter', () => {
       let calls = 0;
 
-      Object.defineProperty(Model1, "jsonSchema", {
+      Object.defineProperty(Model1, 'jsonSchema', {
         get: () => {
           ++calls;
           return {
@@ -220,7 +218,7 @@ describe('Model', () => {
         }
       };
 
-      Model1.prototype.$beforeValidate = function (schema, jsn, opt) {
+      Model1.prototype.$beforeValidate = function(schema, jsn, opt) {
         ++calls;
 
         expect(opt).to.eql(options);
@@ -251,7 +249,7 @@ describe('Model', () => {
         }
       };
 
-      Model1.prototype.$afterValidate = function (jsn, opt) {
+      Model1.prototype.$afterValidate = function(jsn, opt) {
         ++calls;
         expect(opt).to.eql(options);
         expect(jsn).to.eql(json);
@@ -293,7 +291,6 @@ describe('Model', () => {
       expect(() => {
         Model1.fromJson({b: 1}, {patch: true});
       }).not.to.throwException();
-
     });
 
     it('should skip validation if options.skipValidation == true', () => {
@@ -502,10 +499,7 @@ describe('Model', () => {
       let model = Model1.fromJson({
         id: 10,
         model1Id: 13,
-        relation1: [
-          {id: 11, model1Id: 10},
-          {id: 12, model1Id: 10}
-        ],
+        relation1: [{id: 11, model1Id: 10}, {id: 12, model1Id: 10}],
         relation2: {id: 13, model1Id: null}
       });
 
@@ -546,15 +540,15 @@ describe('Model', () => {
         }
       };
 
-      let model = Model1.fromJson({
-        id: 10,
-        model1Id: 13,
-        relation1: [
-          {id: 11, model1Id: 10},
-          {id: 12, model1Id: 10}
-        ],
-        relation2: {id: 13, model1Id: null}
-      }, {skipParseRelations: true});
+      let model = Model1.fromJson(
+        {
+          id: 10,
+          model1Id: 13,
+          relation1: [{id: 11, model1Id: 10}, {id: 12, model1Id: 10}],
+          relation2: {id: 13, model1Id: null}
+        },
+        {skipParseRelations: true}
+      );
 
       expect(model.relation1[0]).not.to.be.a(Model2);
       expect(model.relation1[1]).not.to.be.a(Model2);
@@ -583,15 +577,18 @@ describe('Model', () => {
         }
       };
 
-      let model = Model1.fromJson({
-        id: 10,
-        model1Id: 13,
-        relation1: [1, 2, '3', null, undefined, 6],
-        relation2: '5'
-      }, {skipParseRelations: true});
+      let model = Model1.fromJson(
+        {
+          id: 10,
+          model1Id: 13,
+          relation1: [1, 2, '3', null, undefined, 6],
+          relation2: '5'
+        },
+        {skipParseRelations: true}
+      );
 
-      expect(model.relation1).to.eql([1, 2, '3', null, undefined, 6])
-      expect(model.relation2).to.eql('5')
+      expect(model.relation1).to.eql([1, 2, '3', null, undefined, 6]);
+      expect(model.relation2).to.eql('5');
     });
 
     it('null relations should be null in the result', () => {
@@ -648,7 +645,6 @@ describe('Model', () => {
       expect(model.c).to.equal(3);
       expect(calls).to.equal(1);
     });
-
   });
 
   describe('$toJson', () => {
@@ -659,7 +655,11 @@ describe('Model', () => {
     });
 
     it('should return the internal representation by default', () => {
-      expect(Model1.fromJson({a: 1, b: 2, c: {d: [1, 3]}}).$toJson()).to.eql({a: 1, b: 2, c: {d: [1, 3]}});
+      expect(Model1.fromJson({a: 1, b: 2, c: {d: [1, 3]}}).$toJson()).to.eql({
+        a: 1,
+        b: 2,
+        c: {d: [1, 3]}
+      });
     });
 
     it('should call $formatJson', () => {
@@ -693,11 +693,15 @@ describe('Model', () => {
       model.b = Model2.fromJson({c: 2});
       model.e = [Model2.fromJson({f: 100})];
 
-      expect(model.$toJson()).to.eql({a: 1, b: {c: 2, d: 3}, e: [{f:100, d:3}]});
+      expect(model.$toJson()).to.eql({
+        a: 1,
+        b: {c: 2, d: 3},
+        e: [{f: 100, d: 3}]
+      });
     });
 
     it('should return a deep copy', () => {
-      let json = {a: 1, b: [{c:2}], d: {e: 'str'}};
+      let json = {a: 1, b: [{c: 2}], d: {e: 'str'}};
       let model = Model1.fromJson(json);
       let output = model.$toJson();
 
@@ -732,7 +736,6 @@ describe('Model', () => {
       expect(model.$toJson()).to.eql({a: 1});
       expect(model).to.eql({a: 1, b: 2, c: 3});
     });
-
   });
 
   describe('$toDatabaseJson', () => {
@@ -743,7 +746,9 @@ describe('Model', () => {
     });
 
     it('should return then internal representation by default', () => {
-      expect(Model1.fromJson({a: 1, b: 2, c: {d: [1, 3]}}).$toDatabaseJson()).to.eql({a: 1, b: 2, c: {d: [1, 3]}});
+      expect(
+        Model1.fromJson({a: 1, b: 2, c: {d: [1, 3]}}).$toDatabaseJson()
+      ).to.eql({a: 1, b: 2, c: {d: [1, 3]}});
     });
 
     it('should call $formatDatabaseJson', () => {
@@ -777,11 +782,15 @@ describe('Model', () => {
       model.b = Model2.fromJson({c: 2});
       model.e = [Model2.fromJson({f: 100})];
 
-      expect(model.$toDatabaseJson()).to.eql({a: 1, b: {c: 2, d: 3}, e: [{f:100, d:3}]});
+      expect(model.$toDatabaseJson()).to.eql({
+        a: 1,
+        b: {c: 2, d: 3},
+        e: [{f: 100, d: 3}]
+      });
     });
 
     it('should return a deep copy', () => {
-      let json = {a: 1, b: [{c:2}], d: {e: 'str'}};
+      let json = {a: 1, b: [{c: 2}], d: {e: 'str'}};
       let model = Model1.fromJson(json);
       let output = model.$toDatabaseJson();
 
@@ -806,7 +815,6 @@ describe('Model', () => {
       expect(model.$toDatabaseJson()).to.eql({a: 1});
       expect(model).to.eql({a: 1, b: 2, c: 3});
     });
-
   });
 
   describe('$clone', () => {
@@ -832,7 +840,13 @@ describe('Model', () => {
 
       expect(clone).to.eql(model);
       expect(clone.$toJson()).to.eql(model.$toJson());
-      expect(clone.$toJson()).to.eql({a: 1, g: {h: 100}, r: [{h: 50}], b: {c: 2, d: 3}, e: [{f: 100, d: 3}]});
+      expect(clone.$toJson()).to.eql({
+        a: 1,
+        g: {h: 100},
+        r: [{h: 50}],
+        b: {c: 2, d: 3},
+        e: [{f: 100, d: 3}]
+      });
 
       expect(clone.g).to.not.equal(model.g);
       expect(clone.r[0]).to.not.equal(model.r[0]);
@@ -855,7 +869,9 @@ describe('Model', () => {
     });
 
     it('should convert a property name to column name', () => {
-      expect(Model1.propertyNameToColumnName('someProperty')).to.equal('some_property');
+      expect(Model1.propertyNameToColumnName('someProperty')).to.equal(
+        'some_property'
+      );
     });
   });
 
@@ -873,84 +889,93 @@ describe('Model', () => {
     });
 
     it('should convert a column name to property name', () => {
-      expect(Model1.columnNameToPropertyName('some_property')).to.equal('someProperty');
+      expect(Model1.columnNameToPropertyName('some_property')).to.equal(
+        'someProperty'
+      );
     });
   });
 
   describe('$pick', () => {
-
     it('should pick only the given properties to be visible in JSON representations', () => {
       let Model1 = createModelClass();
 
-      let model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      let model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$pick('a').toJSON()).to.eql({a:1});
-      expect(model.$pick('a').$toDatabaseJson()).to.eql({a:1});
+      expect(model.$pick('a').toJSON()).to.eql({a: 1});
+      expect(model.$pick('a').$toDatabaseJson()).to.eql({a: 1});
       expect(model.$pick('a').$e).to.eql('5');
 
-      model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$pick('a', 'c').toJSON()).to.eql({a:1, c:3});
-      expect(model.$pick('a', 'c').$toDatabaseJson()).to.eql({a:1, c:3});
+      expect(model.$pick('a', 'c').toJSON()).to.eql({a: 1, c: 3});
+      expect(model.$pick('a', 'c').$toDatabaseJson()).to.eql({a: 1, c: 3});
       expect(model.$pick('a', 'c').$e).to.eql('5');
 
-      model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$pick(['a', 'b']).toJSON()).to.eql({a:1, b:2});
-      expect(model.$pick(['a', 'b']).$toDatabaseJson()).to.eql({a:1, b:2});
+      expect(model.$pick(['a', 'b']).toJSON()).to.eql({a: 1, b: 2});
+      expect(model.$pick(['a', 'b']).$toDatabaseJson()).to.eql({a: 1, b: 2});
       expect(model.$pick(['a', 'b']).$e).to.eql('5');
 
-      model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$pick({a:true, b:false, d:true}).toJSON()).to.eql({a:1, d:'4'});
-      expect(model.$pick({a:true, b:false, d:true}).$toDatabaseJson()).to.eql({a:1, d:'4'});
-      expect(model.$pick({a:true, b:false, d:true}).$e).to.eql('5');
+      expect(model.$pick({a: true, b: false, d: true}).toJSON()).to.eql({
+        a: 1,
+        d: '4'
+      });
+      expect(
+        model.$pick({a: true, b: false, d: true}).$toDatabaseJson()
+      ).to.eql({a: 1, d: '4'});
+      expect(model.$pick({a: true, b: false, d: true}).$e).to.eql('5');
     });
-
   });
 
   describe('$omit', () => {
-
     it('should omit the given properties from the JSON representations', () => {
       let Model1 = createModelClass();
 
-      let model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      let model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$omit('a').toJSON()).to.eql({b:2, c:3, d:'4'});
-      expect(model.$omit('a').$toDatabaseJson()).to.eql({b:2, c:3, d:'4'});
+      expect(model.$omit('a').toJSON()).to.eql({b: 2, c: 3, d: '4'});
+      expect(model.$omit('a').$toDatabaseJson()).to.eql({b: 2, c: 3, d: '4'});
       expect(model.$omit('$e').$e).to.eql('5');
 
-      model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$omit('b', 'd').toJSON()).to.eql({a:1, c:3});
-      expect(model.$omit('b', 'd').$toDatabaseJson()).to.eql({a:1, c:3});
+      expect(model.$omit('b', 'd').toJSON()).to.eql({a: 1, c: 3});
+      expect(model.$omit('b', 'd').$toDatabaseJson()).to.eql({a: 1, c: 3});
       expect(model.$omit('b', 'd', '$e').$e).to.eql('5');
 
-      model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$omit(['c', 'd']).toJSON()).to.eql({a:1, b:2});
-      expect(model.$omit(['c', 'd']).$toDatabaseJson()).to.eql({a:1, b:2});
+      expect(model.$omit(['c', 'd']).toJSON()).to.eql({a: 1, b: 2});
+      expect(model.$omit(['c', 'd']).$toDatabaseJson()).to.eql({a: 1, b: 2});
       expect(model.$omit(['c', 'd', '$e']).$e).to.eql('5');
 
-      model = Model1.fromJson({a:1, b:2, c:3, d:'4'});
+      model = Model1.fromJson({a: 1, b: 2, c: 3, d: '4'});
       model.$e = '5';
 
-      expect(model.$omit({a:false, b:true, c:true}).toJSON()).to.eql({a:1, d:'4'});
-      expect(model.$omit({a:false, b:true, c:true}).$toDatabaseJson()).to.eql({a:1, d:'4'});
-      expect(model.$omit({a:false, b:true, c:true, $e: true}).$e).to.eql('5');
+      expect(model.$omit({a: false, b: true, c: true}).toJSON()).to.eql({
+        a: 1,
+        d: '4'
+      });
+      expect(
+        model.$omit({a: false, b: true, c: true}).$toDatabaseJson()
+      ).to.eql({a: 1, d: '4'});
+      expect(model.$omit({a: false, b: true, c: true, $e: true}).$e).to.eql(
+        '5'
+      );
     });
-
   });
 
   describe('virtualAttributes', () => {
-
     it('should include getters', () => {
       class Model1 extends Model {
         get foo() {
@@ -970,7 +995,7 @@ describe('Model', () => {
         a: 100,
         b: 10,
         foo: 110
-      })
+      });
     });
 
     it('should include methods', () => {
@@ -992,7 +1017,7 @@ describe('Model', () => {
         a: 100,
         b: 10,
         foo: 110
-      })
+      });
     });
 
     it('should not try to set readonly virtuals', () => {
@@ -1018,19 +1043,21 @@ describe('Model', () => {
         }
       }
 
-      expect(Model1.fromJson({
-        a: 10, 
-        b: 100,
-        bar: 1000,
-        foo: 200,
-        baz: 300 
-      }).toJSON()).to.eql({
+      expect(
+        Model1.fromJson({
+          a: 10,
+          b: 100,
+          bar: 1000,
+          foo: 200,
+          baz: 300
+        }).toJSON()
+      ).to.eql({
         a: 10,
         b: 100,
         c: 1000,
         foo: 110,
         bar: 1000,
-        baz: 20,
+        baz: 20
       });
     });
   });
@@ -1157,18 +1184,24 @@ describe('Model', () => {
           }
         },
         prop4: {
-          anyOf: [{
-            type: 'array'
-          }, {
-            type: 'string'
-          }]
+          anyOf: [
+            {
+              type: 'array'
+            },
+            {
+              type: 'string'
+            }
+          ]
         },
         prop5: {
-          oneOf: [{
-            type: 'object'
-          }, {
-            type: 'string'
-          }]
+          oneOf: [
+            {
+              type: 'object'
+            },
+            {
+              type: 'string'
+            }
+          ]
         }
       }
     };
@@ -1178,13 +1211,8 @@ describe('Model', () => {
       prop2: {
         subProp1: 1000
       },
-      prop3: [
-        {subProp2: true},
-        {subProp2: false}
-      ],
-      prop4: [
-        1, 2, 3
-      ],
+      prop3: [{subProp2: true}, {subProp2: false}],
+      prop4: [1, 2, 3],
       prop5: {
         subProp3: 'str'
       }
@@ -1239,10 +1267,7 @@ describe('Model', () => {
       prop2: {
         subProp1: 1000
       },
-      prop3: [
-        {subProp2: true},
-        {subProp2: false}
-      ]
+      prop3: [{subProp2: true}, {subProp2: false}]
     };
 
     let model = Model.fromJson(inputJson);
@@ -1296,7 +1321,11 @@ describe('Model', () => {
 
     let model = Model.fromJson({a: 1, b: 2, someRelation: {a: 3, b: 4}});
 
-    expect(model.$toJson(false)).to.eql({a: 1, b: 2, someRelation: {a: 3, b: 4}});
+    expect(model.$toJson(false)).to.eql({
+      a: 1,
+      b: 2,
+      someRelation: {a: 3, b: 4}
+    });
     expect(model.$toJson(true)).to.eql({a: 1, b: 2});
   });
 
@@ -1304,7 +1333,9 @@ describe('Model', () => {
     let Model = modelClass('Model');
     Model.knex(knex({client: 'pg'}));
 
-    let sql = Model.raw('SELECT * FROM "Model" where "id" = ?', [10]).toString();
+    let sql = Model.raw('SELECT * FROM "Model" where "id" = ?', [
+      10
+    ]).toString();
     expect(sql).to.eql('SELECT * FROM "Model" where "id" = 10');
   });
 
@@ -1365,7 +1396,9 @@ describe('Model', () => {
 
     expect(Model1.query()).to.be.a(MyQueryBuilder1);
     expect(Model1.fromJson({}).$query()).to.be.a(MyQueryBuilder1);
-    expect(Model1.fromJson({}).$relatedQuery('someRelation')).to.be.a(MyQueryBuilder2);
+    expect(Model1.fromJson({}).$relatedQuery('someRelation')).to.be.a(
+      MyQueryBuilder2
+    );
   });
 
   describe('traverse() and $traverse()', () => {
@@ -1401,17 +1434,11 @@ describe('Model', () => {
       model = Model1.fromJson({
         id: 1,
         model1Id: 2,
-        relation1: [
-          {id: 4, model1Id: 1},
-          {id: 5, model1Id: 1}
-        ],
+        relation1: [{id: 4, model1Id: 1}, {id: 5, model1Id: 1}],
         relation2: {
           id: 2,
           model1Id: 3,
-          relation1: [
-            {id: 6, model1Id: 2},
-            {id: 7, model1Id: 2}
-          ],
+          relation1: [{id: 6, model1Id: 2}, {id: 7, model1Id: 2}],
           relation2: {
             id: 3,
             model1Id: null,
@@ -1458,13 +1485,13 @@ describe('Model', () => {
 
     it('traverse([], traverser) should not throw', () => {
       expect(() => {
-        Model1.traverse([], function () {});
+        Model1.traverse([], function() {});
       }).to.not.throwException();
     });
 
     it('traverse(undefined, traverser) should not throw', () => {
       expect(() => {
-        Model1.traverse(undefined, function () {});
+        Model1.traverse(undefined, function() {});
       }).to.not.throwException();
     });
 
@@ -1569,28 +1596,29 @@ describe('Model', () => {
       let model1Ids = [];
       let model2Ids = [];
 
-      model.$traverse(Model1, model => {
-        model1Ids.push(model.id);
-      }).$traverse(Model2, model => {
-        model2Ids.push(model.id);
-      });
+      model
+        .$traverse(Model1, model => {
+          model1Ids.push(model.id);
+        })
+        .$traverse(Model2, model => {
+          model2Ids.push(model.id);
+        });
 
       expect(_.sortBy(model1Ids)).to.eql([1, 2, 3]);
       expect(_.sortBy(model2Ids)).to.eql(_.range(4, 26));
     });
-
   });
 
   it('$validate should run run hooks and strip relations', () => {
     let Model1 = modelClass('Model1');
 
-    Model1.prototype.$parseJson = function (json, opt) {
+    Model1.prototype.$parseJson = function(json, opt) {
       json = Model.prototype.$parseJson.apply(this, arguments);
       json.foo = parseInt(json.foo);
       return json;
     };
 
-    Model1.prototype.$formatJson = function (json, opt) {
+    Model1.prototype.$formatJson = function(json, opt) {
       json = Model.prototype.$formatJson.apply(this, arguments);
       json.foo = json.foo.toString();
       return json;
@@ -1635,7 +1663,7 @@ describe('Model', () => {
       static get tableName() {
         return tableName;
       }
-    }
+    };
   }
 
   function createModelClass(proto, staticStuff) {

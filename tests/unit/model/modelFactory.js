@@ -6,13 +6,13 @@ const KnexRaw = require('knex/lib/raw');
 const Knex = require('knex');
 
 const modelFactory = require('../../../lib/model/modelFactory');
-const ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;
+const ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder')
+  .ReferenceBuilder;
 const QueryBuilderBase = require('../../../').QueryBuilderBase;
 const Model = require('../../../').Model;
 const ref = require('../../../').ref;
 
 describe('modelFactory', () => {
-
   class Person extends Model {
     static get tableName() {
       return 'Person';
@@ -60,13 +60,16 @@ describe('modelFactory', () => {
           name: 'Person 2',
           test2: knex.raw(''),
 
-          pets: [{
-            name: 'Fluffy'
-          }, {
-            name: 'Puudel',
-            test3: knex('test'),
-            test4: ref('testRef')
-          }]
+          pets: [
+            {
+              name: 'Fluffy'
+            },
+            {
+              name: 'Puudel',
+              test3: knex('test'),
+              test4: ref('testRef')
+            }
+          ]
         }
       };
 
@@ -83,17 +86,22 @@ describe('modelFactory', () => {
         name: 'Person 1',
         parent: {
           name: 'Person 2',
-          pets: [
-            { name: 'Fluffy' },
-            { name: 'Puudel' }
-          ]
+          pets: [{name: 'Fluffy'}, {name: 'Puudel'}]
         }
       });
 
-      expect(queryProps.get(model).test1 instanceof QueryBuilderBase).to.equal(true);
-      expect(queryProps.get(model.parent).test2 instanceof KnexRaw).to.equal(true);
-      expect(queryProps.get(model.parent.pets[1]).test3 instanceof KnexQueryBuilder).to.equal(true);
-      expect(queryProps.get(model.parent.pets[1]).test4 instanceof ReferenceBuilder).to.equal(true);
+      expect(queryProps.get(model).test1 instanceof QueryBuilderBase).to.equal(
+        true
+      );
+      expect(queryProps.get(model.parent).test2 instanceof KnexRaw).to.equal(
+        true
+      );
+      expect(
+        queryProps.get(model.parent.pets[1]).test3 instanceof KnexQueryBuilder
+      ).to.equal(true);
+      expect(
+        queryProps.get(model.parent.pets[1]).test4 instanceof ReferenceBuilder
+      ).to.equal(true);
     });
   });
 
@@ -111,13 +119,16 @@ describe('modelFactory', () => {
           name: 'Person 2',
           test2: knex.raw(''),
 
-          pets: [{
-            name: 'Fluffy'
-          }, {
-            name: 'Puudel',
-            test3: knex('test'),
-            test4: ref('testRef')
-          }]
+          pets: [
+            {
+              name: 'Fluffy'
+            },
+            {
+              name: 'Puudel',
+              test3: knex('test'),
+              test4: ref('testRef')
+            }
+          ]
         }
       };
 
@@ -135,7 +146,5 @@ describe('modelFactory', () => {
       expect(result.name).to.equal('Person 2');
       expect(result.test2).to.be.a(KnexRaw);
     });
-
   });
-
 });

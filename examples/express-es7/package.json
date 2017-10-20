@@ -11,9 +11,7 @@
   },
 
   "babel": {
-    "presets": [
-      "stage-0"
-    ],
+    "presets": ["stage-0"],
     "plugins": [
       "check-es2015-constants",
       "transform-es2015-arrow-functions",
@@ -76,6 +74,6 @@
     "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "babel-plugin-transform-es2015-typeof-symbol": "^6.23.0",
     "babel-plugin-transform-es2015-unicode-regex": "^6.24.1",
-    "babel-plugin-transform-async-to-generator": "^6.24.1"    
+    "babel-plugin-transform-async-to-generator": "^6.24.1"
   }
 }

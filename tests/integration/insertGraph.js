@@ -8,22 +8,25 @@ const transaction = require('../../').transaction;
 const ValidationError = require('../../').ValidationError;
 const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 
-module.exports = (session) => {
+module.exports = session => {
   let Model1 = session.models.Model1;
   let Model2 = session.models.Model2;
 
   describe('Model insertGraph queries', () => {
     let population;
     let insertion;
-    let eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2.model2Relation2]';
+    let eagerExpr =
+      '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2.model2Relation2]';
 
     beforeEach(() => {
       population = {
         id: 1,
         model1Prop1: '20',
-        model1Relation3: [{
-          idCol: 1
-        }]
+        model1Relation3: [
+          {
+            idCol: 1
+          }
+        ]
       };
 
       insertion = {
@@ -33,53 +36,61 @@ module.exports = (session) => {
           model1Prop1: 'parent',
           model1Prop2: '#ref{grandChild.idCol}',
 
-          model1Relation3: [{
-            "#ref": 'child1'
-          }, {
-            "#id": 'grandChild',
-            model2Prop1: 'cibling2',
-            // These should go to the join table.
-            extra1: 'extraVal1',
-            extra2: 'extraVal2'
-          }, {
-            "#dbRef": 1,
-            extra1: 'foo'
-          }]
+          model1Relation3: [
+            {
+              '#ref': 'child1'
+            },
+            {
+              '#id': 'grandChild',
+              model2Prop1: 'cibling2',
+              // These should go to the join table.
+              extra1: 'extraVal1',
+              extra2: 'extraVal2'
+            },
+            {
+              '#dbRef': 1,
+              extra1: 'foo'
+            }
+          ]
         },
 
         model1Relation1Inverse: {
           model1Prop1: 'rootParent'
         },
 
-        model1Relation2: [{
-          "#id": 'child1',
-          model2Prop1: 'child1'
-        }, {
-          model2Prop1: 'child2',
+        model1Relation2: [
+          {
+            '#id': 'child1',
+            model2Prop1: 'child1'
+          },
+          {
+            model2Prop1: 'child2',
 
-          model2Relation2: {
-            model1Prop1: 'child3'
+            model2Relation2: {
+              model1Prop1: 'child3'
+            }
           }
-        }]
+        ]
       };
     });
 
     describe('.query().insertGraph()', () => {
-
       beforeEach(() => {
         return session.populate(population);
       });
 
       it('should insert a model with relations', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .insertGraph(insertion)
           .then(inserted => {
             return check(inserted, true).return(inserted);
           })
           .then(inserted => {
             expect(inserted).to.not.have.property('model1Prop2');
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+            return Model1.query()
+              .eager(eagerExpr)
+              .where('id', inserted.id)
+              .first();
           })
           .then(model => {
             return check(model);
@@ -87,15 +98,17 @@ module.exports = (session) => {
       });
 
       it('should have alias `insertWithRelated`', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .insertWithRelated(insertion)
           .then(inserted => {
             return check(inserted, true).return(inserted);
           })
           .then(inserted => {
             expect(inserted).to.not.have.property('model1Prop2');
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+            return Model1.query()
+              .eager(eagerExpr)
+              .where('id', inserted.id)
+              .first();
           })
           .then(model => {
             return check(model);
@@ -133,62 +146,76 @@ module.exports = (session) => {
         });
 
         it('should insert a model with relations', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .insertGraph(insertion)
             .then(inserted => {
               return check(inserted, true).return(inserted);
             })
             .then(inserted => {
               expect(inserted).to.not.have.property('model1Prop2');
-              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+              return Model1.query()
+                .eager(eagerExpr)
+                .where('id', inserted.id)
+                .first();
             })
             .then(model => {
               return check(model);
             });
         });
-
       });
 
       it('should accept raw sql and subqueries', () => {
-        return Model1
-          .query()
-          .insertGraph([{
-            model1Prop1: '10'
-          }, {
-            model1Prop1: '50'
-          }])
+        return Model1.query()
+          .insertGraph([
+            {
+              model1Prop1: '10'
+            },
+            {
+              model1Prop1: '50'
+            }
+          ])
           .then(() => {
-            return Model1
-              .query()
-              .insertGraph({
-                model1Prop1: Model1.raw("40 + 2"),
+            return Model1.query().insertGraph({
+              model1Prop1: Model1.raw('40 + 2'),
 
-                model1Relation2: [{
-                  "#id": 'child1',
+              model1Relation2: [
+                {
+                  '#id': 'child1',
                   idCol: 100,
                   model2Prop1: Model1.query().min('model1Prop1')
-                }, {
+                },
+                {
                   idCol: 101,
-                  model2Prop1: Model1.knex().from('Model1').max('model1Prop1')
-                }]
-              });
+                  model2Prop1: Model1.knex()
+                    .from('Model1')
+                    .max('model1Prop1')
+                }
+              ]
+            });
           })
           .then(inserted => {
-            inserted.model1Relation2 = _.sortBy(inserted.model1Relation2, 'idCol');
+            inserted.model1Relation2 = _.sortBy(
+              inserted.model1Relation2,
+              'idCol'
+            );
 
             expect(inserted.toJSON()).to.eql({
               id: 4,
               model1Relation2: [
-                { model1Id: 4, idCol: 100 },
-                { model1Id: 4, idCol: 101 }
+                {model1Id: 4, idCol: 100},
+                {model1Id: 4, idCol: 101}
               ]
             });
 
-            return Model1.query().eager('model1Relation2').where('id', inserted.id);
+            return Model1.query()
+              .eager('model1Relation2')
+              .where('id', inserted.id);
           })
           .then(inserted => {
-            inserted[0].model1Relation2 = _.sortBy(inserted[0].model1Relation2, 'idCol');
+            inserted[0].model1Relation2 = _.sortBy(
+              inserted[0].model1Relation2,
+              'idCol'
+            );
 
             expect(inserted[0]).to.eql({
               id: 4,
@@ -197,8 +224,20 @@ module.exports = (session) => {
               model1Prop2: null,
               $afterGetCalled: 1,
               model1Relation2: [
-                { idCol: 100, model1Id: 4, model2Prop1: '10', model2Prop2: null, $afterGetCalled: 1},
-                { idCol: 101, model1Id: 4, model2Prop1: '50', model2Prop2: null, $afterGetCalled: 1}
+                {
+                  idCol: 100,
+                  model1Id: 4,
+                  model2Prop1: '10',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                },
+                {
+                  idCol: 101,
+                  model1Id: 4,
+                  model2Prop1: '50',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                }
               ]
             });
           });
@@ -237,21 +276,25 @@ module.exports = (session) => {
           expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
 
           return Model1.query().insertGraph(insertion);
-        }).then(() => {
-          done(new Error('should not get here'));
-        }).catch(err => {
-          expect(err).to.be.a(ValidationError);
-          expect(err.data).to.have.property('model1Prop1');
+        })
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err).to.be.a(ValidationError);
+            expect(err.data).to.have.property('model1Prop1');
 
-          return Promise.all([
-            session.knex('Model1'),
-            session.knex('model_2')
-          ]);
-        }).spread((rows1, rows2) => {
-          expect(rows1).to.have.length(1);
-          expect(rows2).to.have.length(1);
-          done();
-        }).catch(done);
+            return Promise.all([
+              session.knex('Model1'),
+              session.knex('model_2')
+            ]);
+          })
+          .spread((rows1, rows2) => {
+            expect(rows1).to.have.length(1);
+            expect(rows2).to.have.length(1);
+            done();
+          })
+          .catch(done);
       });
 
       it('should validate models upon insertion: references in integer columns should be accepted', () => {
@@ -285,15 +328,17 @@ module.exports = (session) => {
           expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
           expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
 
-          return Model1
-            .query()
+          return Model1.query()
             .insertGraph(insertion)
             .then(inserted => {
               return check(inserted, true).return(inserted);
             })
             .then(inserted => {
               expect(inserted).to.not.have.property('model1Prop2');
-              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+              return Model1.query()
+                .eager(eagerExpr)
+                .where('id', inserted.id)
+                .first();
             })
             .then(model => {
               return check(model);
@@ -303,8 +348,7 @@ module.exports = (session) => {
 
       if (utils.isPostgres(session.knex)) {
         it('query building methods should be applied to the root models', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .insertGraph(insertion)
             .returning('*')
             .then(inserted => {
@@ -312,47 +356,47 @@ module.exports = (session) => {
             })
             .then(inserted => {
               expect(inserted).to.have.property('model1Prop2');
-              return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+              return Model1.query()
+                .eager(eagerExpr)
+                .where('id', inserted.id)
+                .first();
             })
             .then(model => {
               return check(model);
             });
         });
       }
-
     });
 
     describe('.query().insertGraphAndFetch()', () => {
-
       beforeEach(() => {
         return session.populate(population);
       });
 
       it('should insert a model with relations and fetch the inserted graph', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .insertGraphAndFetch(insertion)
           .then(inserted => {
             return check(inserted).return(inserted);
           })
           .then(inserted => {
-            return Model1.query().eager(eagerExpr).findById(inserted.id).then(fetched => {
-              expect(inserted.$toJson()).to.eql(fetched.$toJson());
-            });
+            return Model1.query()
+              .eager(eagerExpr)
+              .findById(inserted.id)
+              .then(fetched => {
+                expect(inserted.$toJson()).to.eql(fetched.$toJson());
+              });
           });
       });
-
     });
 
     describe('.query().insertGraph().allowRelated()', () => {
-
       beforeEach(() => {
         return session.populate(population);
       });
 
       it('should allow insert when the allowed relation expression is a superset', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .insertGraph(insertion)
           .allowInsert(eagerExpr)
           .then(inserted => {
@@ -361,8 +405,7 @@ module.exports = (session) => {
       });
 
       it('should not allow insert when the allowed relation expression is not a superset', done => {
-        Model1
-          .query()
+        Model1.query()
           .insertGraph(insertion)
           .allowInsert('[model1Relation1.model1Relation3, model1Relation2]')
           .then(() => {
@@ -374,35 +417,33 @@ module.exports = (session) => {
           })
           .catch(done);
       });
-
     });
 
     describe('.$query().insertGraph()', () => {
-
       beforeEach(() => {
         return session.populate(population);
       });
 
       it('should insert a model with relations', () => {
-        return Model1
-          .fromJson(insertion)
+        return Model1.fromJson(insertion)
           .$query()
           .insertGraph()
           .then(inserted => {
             return check(inserted, true).return(inserted);
           })
           .then(inserted => {
-            return Model1.query().eager(eagerExpr).where('id', inserted.id).first();
+            return Model1.query()
+              .eager(eagerExpr)
+              .where('id', inserted.id)
+              .first();
           })
           .then(model => {
             return check(model);
           });
       });
-
     });
 
     describe('.$relatedQuery().insertGraph()', () => {
-
       describe('has many relation', () => {
         let parent;
 
@@ -411,8 +452,7 @@ module.exports = (session) => {
         });
 
         beforeEach(() => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('id', 1)
             .first()
             .then(par => {
@@ -435,9 +475,7 @@ module.exports = (session) => {
               return check(inserted.model2Relation1[0], true);
             })
             .then(() => {
-              return parent
-                .$relatedQuery('model1Relation2')
-                .first();
+              return parent.$relatedQuery('model1Relation2').first();
             })
             .then(insertion => {
               expect(insertion.model2Prop1).to.equal('howdy');
@@ -450,7 +488,6 @@ module.exports = (session) => {
               return check(model);
             });
         });
-
       });
 
       describe('many to many relation', () => {
@@ -461,8 +498,7 @@ module.exports = (session) => {
         });
 
         beforeEach(() => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('id', 1)
             .first()
             .then(par => {
@@ -499,7 +535,6 @@ module.exports = (session) => {
             });
         });
       });
-
     });
 
     function check(model, shouldCheckHooks) {
@@ -510,7 +545,10 @@ module.exports = (session) => {
       expect(model.model1Relation1).to.have.property('model1Relation3');
       expect(model).to.have.property('model1Relation2');
 
-      model.model1Relation1.model1Relation3 = _.sortBy(model.model1Relation1.model1Relation3, 'model2Prop1');
+      model.model1Relation1.model1Relation3 = _.sortBy(
+        model.model1Relation1.model1Relation3,
+        'model2Prop1'
+      );
       model.model1Relation2 = _.sortBy(model.model1Relation2, 'model2Prop1');
 
       expect(model.model1Prop1).to.equal('root');
@@ -522,12 +560,20 @@ module.exports = (session) => {
       expect(model.model1Relation1Inverse.model1Prop1).to.equal('rootParent');
       shouldCheckHooks && checkHooks(model.model1Relation1Inverse);
 
-      expect(model.model1Relation1.model1Relation3[0].model2Prop1).to.equal('child1');
+      expect(model.model1Relation1.model1Relation3[0].model2Prop1).to.equal(
+        'child1'
+      );
       shouldCheckHooks && checkHooks(model.model1Relation1.model1Relation3[0]);
 
-      expect(model.model1Relation1.model1Relation3[1].model2Prop1).to.equal('cibling2');
-      expect(model.model1Relation1.model1Relation3[1].extra1).to.equal('extraVal1');
-      expect(model.model1Relation1.model1Relation3[1].extra2).to.equal('extraVal2');
+      expect(model.model1Relation1.model1Relation3[1].model2Prop1).to.equal(
+        'cibling2'
+      );
+      expect(model.model1Relation1.model1Relation3[1].extra1).to.equal(
+        'extraVal1'
+      );
+      expect(model.model1Relation1.model1Relation3[1].extra2).to.equal(
+        'extraVal2'
+      );
       expect(model.model1Relation1.model1Relation3[2].idCol).to.equal(1);
       expect(model.model1Relation1.model1Relation3[2].extra1).to.equal('foo');
       shouldCheckHooks && checkHooks(model.model1Relation1.model1Relation3[1]);
@@ -538,7 +584,9 @@ module.exports = (session) => {
       expect(model.model1Relation2[1].model2Prop1).to.equal('child2');
       shouldCheckHooks && checkHooks(model.model1Relation2[1]);
 
-      expect(model.model1Relation2[1].model2Relation2.model1Prop1).to.equal('child3');
+      expect(model.model1Relation2[1].model2Relation2.model1Prop1).to.equal(
+        'child3'
+      );
       shouldCheckHooks && checkHooks(model.model1Relation2[1].model2Relation2);
 
       return knex(Model2.tableName).then(rows => {
@@ -551,6 +599,5 @@ module.exports = (session) => {
       expect(model.$beforeInsertCalled).to.equal(1);
       expect(model.$afterInsertCalled).to.equal(1);
     }
-
   });
 };

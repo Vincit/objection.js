@@ -1,5 +1,3 @@
 'use strict';
 
-module.exports = class InvalidModel {
-
-};
+module.exports = class InvalidModel {};

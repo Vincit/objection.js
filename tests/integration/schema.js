@@ -4,11 +4,9 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const Model = require('../../').Model;
 
-module.exports = (session) => {
-
+module.exports = session => {
   if (session.isPostgres()) {
     describe('table names with postgres schema', () => {
-
       class Person extends Model {
         static get tableName() {
           return 'public.Person';
@@ -52,52 +50,60 @@ module.exports = (session) => {
       after(() => {
         return session.knex.schema
           .dropTableIfExists('Animal')
-          .dropTableIfExists('Person')
+          .dropTableIfExists('Person');
       });
 
       beforeEach(() => {
         const knex = session.knex;
 
-        return Promise.coroutine(function *() {
+        return Promise.coroutine(function*() {
           yield Animal.query(knex).delete();
           yield Person.query(knex).delete();
           yield Person.query(knex).insertGraph({
             id: 1,
             name: 'Arnold',
 
-            pets: [{
-              id: 1,
-              name: 'Fluffy'
-            }]
+            pets: [
+              {
+                id: 1,
+                name: 'Fluffy'
+              }
+            ]
           });
         })();
       });
 
       it('simple find query', () => {
         return Person.query(session.knex).then(people => {
-          expect(people).to.eql([{
-            id: 1,
-            name: 'Arnold'
-          }]);
+          expect(people).to.eql([
+            {
+              id: 1,
+              name: 'Arnold'
+            }
+          ]);
         });
       });
 
       it('join eager', () => {
-        return Person.query(session.knex).joinEager('pets').then(people => {
-          expect(people).to.eql([{
-            id: 1,
-            name: 'Arnold',
+        return Person.query(session.knex)
+          .joinEager('pets')
+          .then(people => {
+            expect(people).to.eql([
+              {
+                id: 1,
+                name: 'Arnold',
 
-            pets: [{
-              id: 1,
-              name: 'Fluffy',
-              ownerId: 1
-            }]
-          }]);
-        });
+                pets: [
+                  {
+                    id: 1,
+                    name: 'Fluffy',
+                    ownerId: 1
+                  }
+                ]
+              }
+            ]);
+          });
       });
-
     });
   }
-
 };
