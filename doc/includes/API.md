@@ -166,7 +166,7 @@ Model.query()
 ```
 
 Factory function that returns a [`ReferenceBuilder`](#referencebuilder) instance, that makes it easier to refer
-to tables, columns, json attributes etc. `ReferenceBuilder` can also used to type cast and alias the references.
+to tables, columns, json attributes etc. `ReferenceBuilder` can also be used to type cast and alias the references.
 
 See [`FieldExpression`](#fieldexpression) for more information about how to refer to json fields.
 
@@ -205,7 +205,7 @@ Person
 ```
 
 Factory function that returns a [`RawBuilder`](#rawbuilder) instance. `RawBuilder` is a
-wrapper for knex raw query that doens't depend on knex. Instances of `RawBuilder` are
+wrapper for knex raw query that doesn't depend on knex. Instances of `RawBuilder` are
 converted to knex raw instances lazily when the query is executed.
 
 
