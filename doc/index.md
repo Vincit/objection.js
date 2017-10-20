@@ -1384,7 +1384,7 @@ objection.transaction(Person, Animal, (Person, Animal) => {
   // created transaction. The Person and Animal outside this function
   // are not! Even if you do `require('./models/Person')` inside this
   // function and start a query using the required `Person` it will
-  // NOT take part in the tranaction. Only the actual objects passed
+  // NOT take part in the transaction. Only the actual objects passed
   // to this function are bound to the transaction.
 
   return Person
