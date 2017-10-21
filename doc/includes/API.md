@@ -3516,6 +3516,53 @@ Type|Description
 
 
 
+#### mergeAllowEager
+
+> The following queries are equivalent
+
+```js
+Person
+  .query()
+  .allowEager('[children.pets, movies]')
+```
+
+```js
+Person
+  .query()
+  .allowEager('children')
+  .mergeAllowEager('children.pets')
+  .mergeAllowEager('movies')
+```
+
+```js
+Person
+  .query()
+  .allowEager('children.pets')
+  .mergeAllowEager('movies')
+```
+
+```js
+Person
+  .query()
+  .mergeAllowEager('children.pets')
+  .mergeAllowEager('movies')
+```
+
+Just like [allowEager](#allowEager) but instead of replacing query builder's allowEager expression this method merges the given expression to the existing expression.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The allowed eager expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
 
 #### modifyEager
 

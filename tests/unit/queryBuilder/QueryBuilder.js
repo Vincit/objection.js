@@ -1162,7 +1162,7 @@ describe('QueryBuilder', () => {
       });
   });
 
-  describe('eager and allowEager' , () => {
+  describe('eager, allowEager, and mergeAllowEager' , () => {
 
     beforeEach(() => {
       const rel = {
@@ -1186,6 +1186,20 @@ describe('QueryBuilder', () => {
     it("allowEager('a').eager('a(f1)') should be ok", done => {
       QueryBuilder
         .forClass(TestModel)
+        .allowEager('a')
+        .eager('a(f1)', {f1: _.noop})
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(err => {
+          done(new Error('should not get here'));
+        });
+    });
+
+    it("eager('a(f1)').allowEager('a') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
         .eager('a(f1)', {f1: _.noop})
         .allowEager('a')
         .then(() => {
@@ -1193,7 +1207,6 @@ describe('QueryBuilder', () => {
           done();
         })
         .catch(err => {
-          console.log(err.stack);
           done(new Error('should not get here'));
         });
     });
@@ -1236,10 +1249,140 @@ describe('QueryBuilder', () => {
         })
     });
 
+    it("mergeAllowEager('a').eager('a(f1)') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .mergeAllowEager('a')
+        .eager('a(f1)', {f1: _.noop})
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(err => {
+          done(new Error('should not get here'));
+        });
+    });
+
+    it("allowEager('[a, b.c.[a, e]]').mergeAllowEager('b.c.[b, d]').eager('a') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a, b.c.[a, e]]')
+        .mergeAllowEager('b.c.[b, d]')
+        .eager('a')
+        .then(() => {
+          done();
+        });
+    });
+
+    it("allowEager('[a.[a, b], b.c.[a, e]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.b') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a.[a, b], b.c.[a, e]]')
+        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
+        .eager('a.b')
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(() => {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('a.c') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a.[a, b], b.[a, c]]')
+        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
+        .eager('a.c')
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(() => {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.a') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a.[a, b], b.[a, c]]')
+        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
+        .eager('b.a')
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(() => {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a.[a, b], b.[a, c]]')
+        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
+        .eager('b.c')
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(() => {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('[a.[a, b], b.[a, c]]').mergeAllowEager('[a.[c, d], b.c.[b, d]]').eager('b.c.b') should be ok", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a.[a, b], b.[a, c]]')
+        .mergeAllowEager('[a.[c, d], b.c.[b, d]]')
+        .eager('b.c.b')
+        .then(() => {
+          expect(executedQueries).to.have.length(1);
+          done();
+        })
+        .catch(() => {
+          done(new Error('should not get here'));
+        })
+    });
+
+    it("allowEager('a').allowEager('b').eager('a') should fail", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('a')
+        .allowEager('b')
+        .eager('a')
+        .then(() => {
+          done(new Error('should not get here'));
+        })
+        .catch(() => {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
+
     it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", done => {
       QueryBuilder
         .forClass(TestModel)
         .allowEager('[a, b.c.[d, e]]')
+        .eager('a.b')
+        .then(() => {
+          done(new Error('should not get here'));
+        })
+        .catch(() => {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
+
+    it("allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]').eager('a.b') should fail", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .allowEager('[a, b.c.[d, e]]')
+        .mergeAllowEager('a.[c, d]')
         .eager('a.b')
         .then(() => {
           done(new Error('should not get here'));
@@ -1264,11 +1407,41 @@ describe('QueryBuilder', () => {
         });
     });
 
+    it("eager('a.b').allowEager('[a, b.c.[d, e]]').mergeAllowEager('a.[c, d]') should fail", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .eager('a.b')
+        .allowEager('[a, b.c.[d, e]]')
+        .mergeAllowEager('a.[c, d]')
+        .then(() => {
+          done(new Error('should not get here'));
+        })
+        .catch(() => {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
+
     it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]') should fail", done => {
       QueryBuilder
         .forClass(TestModel)
         .eager('b.c.d.e')
         .allowEager('[a, b.c.[d, e]]')
+        .then(() => {
+          done(new Error('should not get here'));
+        })
+        .catch(() => {
+          expect(executedQueries).to.have.length(0);
+          done();
+        });
+    });
+
+    it("eager('b.c.d.e').allowEager('[a, b.c.[d, e]]').mergeAllowEager('b.c.a') should fail", done => {
+      QueryBuilder
+        .forClass(TestModel)
+        .eager('b.c.d.e')
+        .allowEager('[a, b.c.[d, e]]')
+        .mergeAllowEager('b.c.a')
         .then(() => {
           done(new Error('should not get here'));
         })
