@@ -267,7 +267,7 @@ Person.query().findByIds([[1, '10'], [2, '10']]);
 
 Argument|Type|Description
 --------|----|--------------------
-id|any&#124; Array.&lt;any&gt;|
+id|any&#124;any[]|A List of identifiers.
 
 ##### Return value
 
@@ -1005,7 +1005,7 @@ Deletes a model by id.
 
 Argument|Type|Description
 --------|----|--------------------
-id|any&#124;Array.&lt;any&gt;|
+id|any&#124;any[]|
 
 ##### Return value
 
@@ -2676,7 +2676,7 @@ Where any of given strings is found from json object key(s) or array items.
 Argument|Type|Description
 --------|----|--------------------
 fieldExpression|[`FieldExpression`](#fieldexpression)|
-keys|string&#124;Array.&lt;string&gt;|Strings that are looked from object or array
+keys|string&#124;string[]|Strings that are looked from object or array
 
 ##### Return value
 
@@ -2707,7 +2707,7 @@ Where all of given strings are found from json object key(s) or array items.
 Argument|Type|Description
 --------|----|--------------------
 fieldExpression|[`FieldExpression`](#fieldexpression)|
-keys|string&#124;Array.&lt;string&gt;|Strings that are looked from object or array
+keys|string&#124;string[]|Strings that are looked from object or array
 
 ##### Return value
 
@@ -4314,7 +4314,7 @@ instances and `id` and `name` properties of all `Animal` instances.
 Argument|Type|Description
 --------|----|--------------------
 modelClass|[`Model`](#model)|The optional model class filter
-properties|Array.&lt;string&gt;|The properties to pick
+properties|string[]|The properties to pick
 
 ##### Return value
 
@@ -4362,7 +4362,7 @@ and `species` properties of all `Animal` instances.
 Argument|Type|Description
 --------|----|--------------------
 modelClass|[`Model`](#model)|The optional model class filter
-properties|Array.&lt;string&gt;|The properties to omit
+properties|string[]|The properties to omit
 
 ##### Return value
 
@@ -4851,7 +4851,7 @@ Property|Type|Description
 from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
 to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
 modelClass|string&#124;ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
-extra|Array.&lt;string&gt;&#124;Object|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
+extra|string[]&#124;Object|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
 
 
 
@@ -6250,7 +6250,7 @@ If you want to use `delete` instead of undefining, you can override the
 
 Argument|Type|Description
 --------|----|-------------------
-keys|string&#124;Array.&lt;string&gt;&#124;Object.&lt;string, boolean&gt;|keys to omit
+keys|string&#124;string[]&#124;Object.&lt;string, boolean&gt;|keys to omit
 
 ##### Return value
 
@@ -6309,7 +6309,7 @@ If you want to use `delete` instead of undefining, you can override the
 
 Argument|Type|Description
 --------|----|-------------------
-keys|string&#124;Array.&lt;string&gt;&#124;Object.&lt;string, boolean&gt;|keys to pick
+keys|string&#124;string[]&#124;Object.&lt;string, boolean&gt;|keys to pick
 
 ##### Return value
 
@@ -7410,9 +7410,14 @@ aliases|Object.&lt;string, string&gt;|Aliases for relations in a join based eage
 
 Property|Type|Description
 --------|----|-----------
-relate|boolean|If true, relations are related instead of inserted. See the examples [here](#graph-upserts).
-unrelate|boolean|If true, relations are unrelated instead of deleted. See the examples [here](#graph-upserts).
-insertMissing|boolean|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. See the examples [here](#graph-upserts).
+relate|boolean&#124;string[]|If true, relations are related instead of inserted. Relate functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+unrelate|boolean&#124;string[]|If true, relations are unrelated instead of deleted. Unrelate functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+insertMissing|boolean&#124;string[]|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noInsert|boolean&#124;string[]|If true, no inserts are performed. Inserts can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noUpdate|boolean&#124;string[]|If true, no updates are performed. Updates can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noDelete|boolean&#124;string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noRelate|boolean&#124;string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noUnrelate|boolean&#124;string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
 
 
 

@@ -236,6 +236,125 @@ module.exports = (session) => {
       });
     });
 
+    it('should respect noDelete, noInsert and noUpdate flags', () => {
+      const upsert = {
+        // Nothing is done for the root since it only has an ids.
+        id: 2,
+        model1Id: 3,
+
+        // don't update because of `noUpdate`
+        model1Relation1: {
+          id: 3,
+          model1Prop1: 'updated belongsToOne'
+        },
+
+        // update idCol=1
+        // don't delete idCol=2 because of `noDelete`
+        // and insert one new
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: 'updated hasMany 1',
+
+          // update id=4
+          // delete id=5
+          // don't insert new row because `noInsert`
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: 'updated manyToMany 1'
+          }, {
+            // This is the new row.
+            model1Prop1: 'inserted manyToMany'
+          }]
+        }, {
+          // This is the new row.
+          model2Prop1: 'inserted hasMany',
+        }]
+      };
+
+      return transaction(session.knex, trx => {
+        const sql = [];
+
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert, {
+            noUpdate: ['model1Relation1'],
+            noDelete: ['model1Relation2'],
+            noInsert: ['model1Relation2.model2Relation1']
+          })
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(2)
+              .eager('[model1Relation1, model1Relation2.model2Relation1]')
+              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 3,
+              model1Prop1: "root 2",
+
+              model1Relation1: {
+                // Not updated.
+                id: 3,
+                model1Id: null,
+                model1Prop1: "belongsToOne",
+              },
+
+              model1Relation2: [{
+                idCol: 1,
+                model1Id: 2,
+                model2Prop1: "updated hasMany 1",
+
+                model2Relation1: [{
+                  id: 4,
+                  model1Id: null,
+                  model1Prop1: "updated manyToMany 1",
+                }]
+              }, {
+                // Not deleted.
+                idCol: 2,
+                model1Id: 2,
+                model2Prop1: 'hasMany 2',
+
+                model2Relation1: [{
+                  id: 6,
+                  model1Id: null,
+                  model1Prop1: 'manyToMany 3'
+                }, {
+                  id: 7,
+                  model1Id: null,
+                  model1Prop1: 'manyToMany 4'
+                }]
+              }, {
+                idCol: 3,
+                model1Id: 2,
+                model2Prop1: "inserted hasMany",
+                model2Relation1: []
+              }]
+            });
+
+            return Promise.all([
+              trx('Model1'),
+              trx('model_2')
+            ])
+            .spread((model1Rows, model2Rows) => {
+              // Row 5 should be deleted.
+              expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+              // Row 6 should NOT be deleted even thought its parent is.
+              expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+              // Row 7 should NOT be deleted  even thought its parent is.
+              expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
+              // Row 2 should NOT be deleted because of `noDelete`.
+              expect(model2Rows.find(it => it.id_col == 2)).to.be.an(Object);
+            });
+          });
+      });
+    });
+
     it('should update model if belongsToOne relation changes', () => {
       const upsert = {
         id: 1,
@@ -416,7 +535,140 @@ module.exports = (session) => {
       });
     });
 
-    it('should relate and unrelate some models if `unrelate` and `relate` arrays of relation paths', () => {
+    it('should respect noRelate and noUnrelate flags', () => {
+      const upsert = {
+        // the root gets updated because it has an id
+        id: 2,
+        model1Prop1: 'updated root 2',
+
+        // unrelate
+        model1Relation1: null,
+
+        // update idCol=1
+        // don't unrelate idCol=2 because of `noUnrelate`
+        // and insert one new
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: 'updated hasMany 1',
+
+          // update id=4
+          // unrelate id=5
+          // don't relate id=6 because of `noRelate`
+          // and insert one new
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: 'updated manyToMany 1'
+          }, {
+            // This is the new row.
+            model1Prop1: 'inserted manyToMany'
+          }, {
+            // This will get related because it has an id
+            // that doesn't currently exist in the relation.
+            id: 6
+          }]
+        }, {
+          // This is the new row.
+          model2Prop1: 'inserted hasMany',
+        }]
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert, {
+            unrelate: true,
+            relate: true,
+            noUnrelate: ['model1Relation2'],
+            noRelate: ['model1Relation2.model2Relation1']
+          })
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(2)
+              .eager('[model1Relation1, model1Relation2.model2Relation1]')
+              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: null,
+              model1Prop1: "updated root 2",
+
+              model1Relation1: null,
+
+              model1Relation2: [{
+                idCol: 1,
+                model1Id: 2,
+                model2Prop1: "updated hasMany 1",
+
+                model2Relation1: [{
+                  id: 4,
+                  model1Id: null,
+                  model1Prop1: "updated manyToMany 1",
+                }, {
+                  id: 8,
+                  model1Id: null,
+                  model1Prop1: "inserted manyToMany",
+                }]
+              }, {
+                idCol: 2,
+                model1Id: 2,
+                model2Prop1: 'hasMany 2',
+
+                model2Relation1: [{
+                  id: 6,
+                  model1Id: null,
+                  model1Prop1: 'manyToMany 3'
+                }, {
+                  id: 7,
+                  model1Id: null,
+                  model1Prop1: 'manyToMany 4'
+                }]
+              }, {
+                idCol: 3,
+                model1Id: 2,
+                model2Prop1: "inserted hasMany",
+                model2Relation1: []
+              }]
+            });
+
+            return Promise.all([
+              trx('Model1'),
+              trx('model_2')
+            ])
+            .spread((model1Rows, model2Rows) => {
+              // Row 3 should NOT be deleted.
+              expect(model1Rows.find(it => it.id == 3)).to.eql({
+                id: 3,
+                model1Id: null,
+                model1Prop1: 'belongsToOne',
+                model1Prop2: null
+              });
+
+              // Row 5 should NOT be deleted.
+              expect(model1Rows.find(it => it.id == 5)).to.eql({
+                id: 5,
+                model1Id: null,
+                model1Prop1: 'manyToMany 2',
+                model1Prop2: null
+              });
+
+              // Row 2 should NOT be deleted.
+              expect(model2Rows.find(it => it.id_col == 2)).to.eql({
+                id_col: 2,
+                model_1_id: 2,
+                model_2_prop_1: 'hasMany 2',
+                model_2_prop_2: null
+              });
+            });
+          });
+      });
+    });
+
+    it('should relate and unrelate some models if `unrelate` and `relate` are arrays of relation paths', () => {
       const upsert = {
         // the root gets updated because it has an id
         id: 2,
@@ -537,11 +789,11 @@ module.exports = (session) => {
       });
     });
 
-    it('should update with solely id and relational property(existing)', () => {
+    it('should update parent if a `BelongsToOne` relation changes (because the relation propery is in the parent)', () => {
       const upsert = {
         id: 1,
         // This is a BelongsToOneRelation
-        model1Relation1: { id: 3 },
+        model1Relation1: { id: 3 }
       };
 
       return transaction(session.knex, trx => {
@@ -569,12 +821,12 @@ module.exports = (session) => {
       });
     });
 
-    it('should update with solely id and relation property(new)', () => {
+    it('should update parent if a new `BelongsToOne` relation is inserted (because the relation propery is in the parent)', () => {
       const model1Prop1 = 'new';
       const upsert = {
         id: 1,
         // This is a BelongsToOneRelation
-        model1Relation1: { model1Prop1 },
+        model1Relation1: { model1Prop1 }
       };
 
       return transaction(session.knex, trx => {
@@ -595,7 +847,7 @@ module.exports = (session) => {
             expect(result).to.eql({
               id: 1,
               model1Relation1: {
-                model1Prop1,
+                model1Prop1
               }
             });
           });

@@ -1183,7 +1183,7 @@ Person
 
     // Notice that Wanderlust is missing from the list. It will get deleted.
     // It is also worth mentioning that the Wanderlust's `reviews` or any
-    // other relations are __not__ recursively deleted (unless you have
+    // other relations are NOT recursively deleted (unless you have
     // defined `ON DELETE CASCADE` or other hooks in the db).
     movies: [{
       id: 1,
@@ -1267,8 +1267,71 @@ Person
   }, options);
 ```
 
+> `relate` and `unrelate` (and all other options) can also be lists of relation expressions. In that
+> case the option is only applied for the listed relations.
+
+```js
+const options = {
+  // Only enable `unrelate` functionlity for these two paths.
+  unrelate: ['pets', 'movies.reviews'],
+  // Only enable `relate` functionlity for 'movies' relation.
+  relate: ['movies'],
+  // Disable deleting for movies.
+  noDelete: ['movies']
+};
+
+Person
+  .query()
+  .upsertGraph({
+    id: 1,
+
+    // This gets deleted since `unrelate` list doesn't have 'parent' in it
+    // and deleting is the default behaviour.
+    parent: null,
+
+    // Notice that Kat the Cat is not listed in `pets`. It will get unrelated.
+    pets: [{
+      // It turns out Doggo is a cat. Update it.
+      id: 1,
+      species: 'Cat'
+    }],
+
+    // Notice that Wanderlust is missing from the list. It will NOT get unrelated
+    // or deleted since `unrelate` list doesn't contain `movies` and `noDelete`
+    // list does.
+    movies: [{
+      id: 1,
+
+      // Upsert graphs can be arbitrarily deep. This modifies the
+      // reviews of "Horrible Bosses".
+      reviews: [{
+        // Update a review.
+        id: 1,
+        stars: 2,
+        text: 'Even more Meh'
+      }, {
+        // And insert another one.
+        stars: 5,
+        title: 'Loved it',
+        text: 'Best movie ever'
+      }]
+    }, {
+      // This is some existing movie that isn't currently related to Jennifer.
+      // It will get related.
+      id: 1253
+    }]
+  }, options);
+```
+
+> You can disable updates, inserts, deletes etc. for the whole `upsertGraph` operation or for
+> individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See
+> [`UpsertGraphOptions`](#upsertgraphoptions) docs for more info.
+
 Arbitrary relation graphs can be upserted (insert + update + delete) using the [`upsertGraph`](#upsertgraph) method. This is best explained using
 examples, so check them out ➔.
+
+By default `upsertGraph` method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not
+present. This functionality can be modified in many ways by providing [`UpsertGraphOptions`](#upsertgraphoptions) object as the second argument.
 
 The `upsertGraph` method works a little different than the other update and patch methods. When using `upsertGraph` any `where` or `having` methods
 are ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
