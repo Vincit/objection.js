@@ -969,7 +969,47 @@ module.exports = (session) => {
             model2Relation1: []
           }]
         });
-      });
+      })
+    });
+
+    it('should insert root model with an id instead of throwing an error if `insertMissing` option is true', () => {
+      let upsert = {
+        // This doesn't exist.
+        id: NONEXISTENT_ID,
+        model1Prop1: `updated root ${NONEXISTENT_ID}`,
+
+        model1Relation1: {
+          model1Prop1: 'inserted belongsToOne'
+        }
+      };
+
+      const upsertAndCompare = () => {
+        return transaction(session.knex, trx => {
+          return Model1.query(trx).upsertGraph(upsert, {insertMissing: true})
+        }).then(result => {
+          // Fetch the graph from the database.
+          return Model1
+            .query(session.knex)
+            .findById(NONEXISTENT_ID)
+            .eager('model1Relation1')
+        }).then(omitIrrelevantProps).then(result => {
+          expect(result).to.eql({
+            id: NONEXISTENT_ID,
+            model1Prop1: `updated root ${NONEXISTENT_ID}`,
+            model1Id: 8,
+            model1Relation1: {
+              id: 8,
+              model1Id: null,
+              model1Prop1: 'inserted belongsToOne',
+            }
+          });
+          // Change upsert to the result, for the 2nd upsertAndCompare()
+          upsert = result;
+        })
+      }
+
+      // Execute upsertAndCompare() twice, first to insert, then to update
+      return upsertAndCompare().then(() => upsertAndCompare())
     });
 
     it('should fail if given nonexistent id in root', done => {
@@ -986,9 +1026,9 @@ module.exports = (session) => {
       transaction(session.knex, trx => {
         return Model1.query(trx).upsertGraph(upsert)
       }).then(() => {
-        next(new Error('should not get here'));
+        done(new Error('should not get here'));
       }).catch(err => {
-        expect(err.message).to.equal('one or more of the root models (ids=[1000]) were not found');
+        expect(err.message).to.equal('root model (id=1000) does not exist. If you want to insert it with an id, use the insertMissing: true option');
         return session.knex('Model1').whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
       }).then(rows => {
         expect(rows).to.have.length(0);
@@ -1011,7 +1051,7 @@ module.exports = (session) => {
       transaction(session.knex, trx => {
         return Model1.query(trx).upsertGraph(upsert)
       }).then(() => {
-        next(new Error('should not get here'));
+        done(new Error('should not get here'));
       }).catch(err => {
         expect(err.message).to.equal('model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate: true option. If you want to insert it with an id, use the insertMissing: true option');
         return session.knex('Model1').whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
