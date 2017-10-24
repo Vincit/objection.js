@@ -38,6 +38,7 @@ Shortcuts:
  * [API reference](http://vincit.github.io/objection.js/#api-reference)
  * [Changelog](http://vincit.github.io/objection.js/#changelog)
  * [Contribution guide](http://vincit.github.io/objection.js/#contribution-guide)
+ * [Plugins](http://vincit.github.io/objection.js/#plugins)
 
 Blog posts and tutorials:
 
