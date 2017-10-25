@@ -1272,9 +1272,9 @@ Person
 
 ```js
 const options = {
-  // Only enable `unrelate` functionlity for these two paths.
+  // Only enable `unrelate` functionality for these two paths.
   unrelate: ['pets', 'movies.reviews'],
-  // Only enable `relate` functionlity for 'movies' relation.
+  // Only enable `relate` functionality for 'movies' relation.
   relate: ['movies'],
   // Disable deleting for movies.
   noDelete: ['movies']
@@ -1398,7 +1398,7 @@ console.log('Jennifer and Scrappy were successfully inserted');
 
 > Note that you can pass either a normal knex instance or a transaction to `query`, `$relatedQuery` etc.
 > allowing you to build helper functions and services that can be used with or without a transaction.
-> When a transation is not wanted, just pass in the normal knex instance:
+> When a transaction is not wanted, just pass in the normal knex instance:
 
 ```js
 // `db` can be either a transaction or a knex instance or even
