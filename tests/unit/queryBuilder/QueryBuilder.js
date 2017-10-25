@@ -132,6 +132,12 @@ describe('QueryBuilder', () => {
     return promise;
   });
 
+  it('should return a promise from .reduce method', () => {
+    let promise = QueryBuilder.forClass(TestModel).reduce(_.identity);
+    expect(promise).to.be.a(Promise);
+    return promise;
+  });
+
   it('should return a promise from .return method', () => {
     let promise = QueryBuilder.forClass(TestModel).return({});
     expect(promise).to.be.a(Promise);
