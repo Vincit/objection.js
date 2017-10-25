@@ -3876,6 +3876,32 @@ Type|Description
 
 
 
+#### reduce
+
+```js
+const promise = queryBuilder.reduce(reducer, initialValue);
+```
+
+Executes the query and calls `reduce(reducer, initialValue)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+reducer|function|undefined|Reducer function
+initialValue|any|first element of the reduced collection|First arg for the
+reducer function
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Promise`](http://bluebirdjs.com/docs/getting-started.html)|Promise the will be resolved with the result of the query.
+
+
+
+
+
 #### catch
 
 ```js
