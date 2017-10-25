@@ -417,6 +417,40 @@ module.exports = (session) => {
       });
     });
 
+    it('should upsert a model with relations and fetch the upserted graph', () => {
+      const upsert = {
+        id: 2,
+        model1Id: 3,
+        model1Relation1: {
+          id: 3,
+          model1Prop1: 'updated belongsToOne'
+        },
+        model1Relation2: [{
+          idCol: 1,
+          model2Prop1: 'updated hasMany 1',
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: 'updated manyToMany 1'
+          }, {
+            model1Prop1: 'inserted manyToMany'
+          }]
+        }, {
+          model2Prop1: 'inserted hasMany',
+        }]
+      };
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraphAndFetch(upsert)
+      }).then(upserted => {
+        return Model1.query(session.knex)
+          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .findById(upserted.id).then(fetched => {
+            expect(upserted.$toJson()).to.eql(fetched.$toJson());
+          });
+      });
+    });
+
     it('should insert new, update existing relate unrelated and unrelate missing if `unrelate` and `relate` options are true', () => {
       const upsert = {
         // the root gets updated because it has an id

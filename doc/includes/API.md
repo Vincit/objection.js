@@ -778,6 +778,14 @@ Type|Description
 
 
 
+#### upsertGraphAndFetch
+
+Exactly like [upsertGraph](#upsertgraph) but also fetches the graph from the db after the upsert operation.
+
+
+
+
+
 #### patch
 
 ```js
