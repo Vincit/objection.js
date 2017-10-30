@@ -2153,6 +2153,33 @@ Type|Description
 
 See [knex documentation](http://knexjs.org/#Builder-modify)
 
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+fn|function&#124;string|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the call is redirected to [`applyFilter`](#applyfilter) instead.
+*arguments| |The optional arguments passed to the modify function
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### applyFilter
+
+Applies named filters to the query builder.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+filter|string|The name of the filter, as found in [`namedFilters`](#namedfilters).
+*arguments| |When providing multiple arguments, all provided named filters will be applied.
+
 ##### Return value
 
 Type|Description
@@ -5086,7 +5113,7 @@ Person
   .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
-Named filters that can be used in any eager query.
+Named filters that can be used in any eager query and by the [`applyFilter`](#applyfilter) method.
 
 
 

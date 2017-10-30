@@ -103,6 +103,27 @@ describe('QueryBuilder', () => {
     expect(bCalled).to.equal(true);
   });
 
+  it('applyFilter() accept a list of strings and call the corresponding named filters', () => {
+    let builder = QueryBuilder.forClass(TestModel);
+    let aCalled = false;
+    let bCalled = false;
+
+    TestModel.namedFilters = {
+      a(qb) {
+        aCalled = qb === builder;
+      },
+
+      b(qb) {
+        bCalled = qb === builder;
+      }
+    };
+
+    builder.applyFilter('a', 'b');
+
+    expect(aCalled).to.equal(true);
+    expect(bCalled).to.equal(true);
+  });
+
   it('should call the callback passed to .then after execution', done => {
     mockKnexQueryResults = [[{a: 1}, {a: 2}]];
     // Make sure the callback is called by not returning a promise from the test.
