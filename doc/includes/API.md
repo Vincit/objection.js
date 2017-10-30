@@ -433,121 +433,17 @@ Type|Description
 #### insertGraph
 
 ```js
-const builder = queryBuilder.insertGraph(graph);
+const builder = queryBuilder.insertGraph(graph, options);
 ```
 
-> You can insert any asyclic graph of models like this:
-
-```js
-Person
-  .query()
-  .insertGraph({
-    firstName: 'Sylvester',
-    lastName: 'Stallone',
-
-    children: [{
-      firstName: 'Sage',
-      lastName: 'Stallone',
-
-      pets: [{
-        name: 'Fluffy',
-        species: 'dog'
-      }]
-    }]
-  });
-```
-
-> The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create
-> relationships between them as defined in the `relationMappings` of the models.
-
-> If you need to refer to the same model in multiple places you can use the
-> special properties `#id` and `#ref` like this:
-
-```js
-Person
-  .query()
-  .insertGraph([{
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
-
-    movies: [{
-      "#id": 'Silver Linings Playbook'
-      name: 'Silver Linings Playbook',
-      duration: 122
-    }]
-  }, {
-    firstName: 'Bradley',
-    lastName: 'Cooper',
-
-    movies: [{
-      "#ref": 'Silver Linings Playbook'
-    }]
-  }]);
-```
-
-> The query above will insert only one movie (the 'Silver Linings Playbook') but
-> both 'Jennifer' and 'Bradley' will have the movie related to them through the
-> many-to-many relation `movies`.
-
-> If you need to refer to a model already in the database from a many-to-many relation
-> you can use the special property `#dbRef` like this:
-
-```js
-Person
-  .query()
-  .insertGraph([{
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
-
-    movies: [{
-      "#id": 'Silver Linings Playbook'
-      name: 'Silver Linings Playbook',
-      duration: 122
-    }]
-  }, {
-    firstName: 'Bradley',
-    lastName: 'Cooper',
-
-    movies: [{
-      "#dbRef": 1536
-    }, {
-      "#dbRef": 6527
-    }]
-  }]);
-```
-
-> You can refer to the properties of other models in the graph using expressions
-> of format `#ref{<id>.<property>}` for example:
-
-```js
-Person
-  .query()
-  .insertGraph([{
-    "#id": 'jenniLaw',
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
-
-    pets: [{
-      name: "I am the dog of #ref{jenniLaw.firstName} #ref{jenniLaw.lastName}",
-      species: 'dog'
-    }]
-  }]);
-```
-
-> The query above will insert a pet named `I am the dog of Jennifer Lawrence` for Jennifer.
-
-Insert models with relations. This method is best explained with examples ➔
-
-See the [`allowInsert`](#allowinsert) method if you need to limit which relations can be inserted using
-this method to avoid security issues.
-
-By the way, if you are using Postgres the inserts are done in batches for maximum performance.
+See the [section about graph inserts](#graph-inserts).
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
 graph|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Objects to insert
+graph|[`InsertGraphOptions`](#insertgraphoptions)|Optional options.
 
 ##### Return value
 
@@ -7453,7 +7349,11 @@ noDelete|boolean&#124;string[]|If true, no deletes are performed. Deletes can be
 noRelate|boolean&#124;string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
 noUnrelate|boolean&#124;string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
 
+## InsertGraphOptions
 
+Property|Type|Description
+--------|----|-----------
+relate|boolean&#124;string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-inserts).
 
 ## Relation
 

@@ -13,9 +13,14 @@ module.exports = (session) => {
   let Model2 = session.models.Model2;
 
   describe('Model insertGraph queries', () => {
+    const eagerExpr = `[
+      model1Relation1.model1Relation3,
+      model1Relation1Inverse,
+      model1Relation2.model2Relation2
+    ]`;
+
     let population;
     let insertion;
-    let eagerExpr = '[model1Relation1.model1Relation3, model1Relation1Inverse, model1Relation2.model2Relation2]';
 
     beforeEach(() => {
       population = {
@@ -299,6 +304,133 @@ module.exports = (session) => {
               return check(model);
             });
         });
+      });
+
+      it('relate: true option should cause models with id to be related instead of inserted', () => {
+        return Model2
+          .query()
+          .insertGraph({
+            model2Prop1: 'foo',
+
+            model2Relation1: [{
+              id: population.id
+            }]
+          }, {
+            relate: true
+          })
+          .then(model => {
+            return Model2
+              .query()
+              .findById(model.idCol)
+              .eager('model2Relation1');
+          })
+          .then(model => {
+            delete model.idCol;
+
+            expect(model).to.eql({
+              model1Id: null,
+              model2Prop1: 'foo',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+
+              model2Relation1: [{
+                id: population.id,
+                model1Id: null,
+                model1Prop1: population.model1Prop1,
+                model1Prop2: null,
+                aliasedExtra: null,
+                $afterGetCalled: 1
+              }]
+            });
+          });
+      });
+
+      it(`relate: ['relation.path'] option should cause models with id to be related instead of inserted`, () => {
+        return Model1
+          .query()
+          .insert({model1Prop1: 'howdy', id: 500})
+          .then(() => {
+            return Model1
+              .query()
+              .insertGraph({
+                model1Prop1: 'hello',
+
+                model1Relation1: {
+                  // This should get related.
+                  id: 500
+                },
+
+                model1Relation2: [{
+                  model2Prop1: 'world',
+
+                  model2Relation1: [{
+                    // This should get related.
+                    id: population.id
+                  }]
+                }],
+
+                model1Relation3: [{
+                  // This should get inserted.
+                  idCol: 1000
+                }]
+              }, {
+                relate: [
+                  'model1Relation1',
+                  'model1Relation2.model2Relation1'
+                ]
+              });
+          })
+          .then(model => {
+            return Model1
+              .query()
+              .findById(model.id)
+              .eager('[model1Relation1, model1Relation2.model2Relation1, model1Relation3]');
+          })
+          .then(model => {
+            delete model.id;
+            delete model.model1Relation2[0].idCol;
+            delete model.model1Relation2[0].model1Id;
+
+            expect(model).to.eql({
+              model1Id: 500,
+              model1Prop1: 'hello',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+
+              model1Relation1: {
+                id: 500,
+                model1Prop1: 'howdy',
+                model1Id: null,
+                model1Prop2: null,
+                $afterGetCalled: 1,
+              },
+
+              model1Relation2:[{
+                model2Prop1: 'world',
+                model2Prop2: null,
+                $afterGetCalled: 1,
+
+                model2Relation1: [{
+                  id: population.id,
+                  model1Id: null,
+                  model1Prop1: population.model1Prop1,
+                  model1Prop2: null,
+                  aliasedExtra: null,
+                  $afterGetCalled: 1
+                }]
+              }],
+
+              model1Relation3: [{
+                idCol: 1000,
+                model1Id: null,
+                model2Prop1: null,
+                model2Prop2: null,
+                extra1: null,
+                extra2: null,
+                $afterGetCalled: 1
+              }]
+            })
+          });
       });
 
       if (utils.isPostgres(session.knex)) {

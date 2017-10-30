@@ -791,9 +791,7 @@ See the [API documentation](#relate) of `relate` method.
 
 See the [API documentation](#unrelate) of `unrelate` method.
 
-# Eager queries
-
-## Eager loading
+# Eager loading
 
 > Fetch the `pets` relation for all results of a query:
 
@@ -1003,7 +1001,7 @@ eager tree. You can select which algorithm to use per query using [`eagerAlgorit
 per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. All algorithms
 have their strengths and weaknesses, which are discussed in detail [here](#eager).
 
-## Graph inserts
+# Graph inserts
 
 ```js
 Person
@@ -1079,6 +1077,65 @@ Person
 > The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used
 > within a string, the references are replaced with the referred values inside the string. If the reference string
 > contains nothing but the reference, the referred value is copied to it's place preserving its type.
+
+> Existing rows can be related to newly inserted rows by using the `relate` option. `relate` can be `true` in which case
+> all models in the graph that have an identifier get related. `relate` can also be an array of relation paths like
+> `['children', 'children.movies.actors']` in which case only objects in those paths get related even if they have an idetifier.
+
+```js
+Person
+  .query()
+  .insertGraph([{
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    movies: [{
+      id: 2636
+    }]
+  }, {
+    relate: true
+  }]);
+```
+
+> The query above would create a new person `Jennifer Lawrence` and add an existing movie (id = 2636) to its
+> `movies` relation. The nex query would do the same:
+
+```js
+Person
+  .query()
+  .insertGraph([{
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    movies: [{
+      id: 2636
+    }]
+  }, {
+    relate: [
+      'movies'
+    ]
+  }]);
+```
+
+> If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef`
+
+```js
+Person
+  .query()
+  .insertGraph([{
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    movies: [{
+      "#dbRef": 2636
+    }, {
+      // This will be inserted with an id.
+      id: 100,
+      name: 'New movie'
+    }]
+  }
+  }]);
+```
 
 Arbitrary relation graphs can be inserted using the [`insertGraph`](#insertgraph) method. This is best explained using
 examples, so check them out ➔.

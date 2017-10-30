@@ -8,6 +8,7 @@
  * [`lit`](http://vincit.github.io/objection.js/#lit) helper function [#275](https://github.com/Vincit/objection.js/issues/275)
  * Fixes for [`upsertGraph`](http://vincit.github.io/objection.js/#upsertgraph) when using composite keys. [#517](https://github.com/Vincit/objection.js/issues/517)
  * Added `noDelete`, `noUpdate`, `noInsert`, `noRelate` and `noUnrelate` options for `upsertGraph`. See [UpsertGraphOptions docs](#upsertgraphoptions) for more info.
+ * `insertGraph` now accepts an options object just like `upsertGraph`. `relate` option can be used instead of `#dbRef`. [#586](https://github.com/Vincit/objection.js/issues/586)
 
 ### Breaking changes
 
