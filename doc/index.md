@@ -1098,7 +1098,7 @@ Person
 ```
 
 > The query above would create a new person `Jennifer Lawrence` and add an existing movie (id = 2636) to its
-> `movies` relation. The nex query would do the same:
+> `movies` relation. The next query would do the same:
 
 ```js
 Person

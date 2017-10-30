@@ -393,7 +393,7 @@ through [`YourModel.knexQuery()`](#knexquery).
 
 Argument|Type|Description
 --------|----|--------------------
-modelsOrObjects|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Objects to insert
+modelsOrObjects|Object&#124;[`Model`](#model)&#124;Object[]&#124;[`Model`](#model)[];|Objects to insert
 
 ##### Return value
 
@@ -419,7 +419,7 @@ to get the same result without an additional query. See [this recipe](#postgresq
 
 Argument|Type|Description
 --------|----|--------------------
-modelsOrObjects|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Objects to insert
+modelsOrObjects|Object&#124;[`Model`](#model)&#124;Object[]&#124;[`Model`](#model)[];|Objects to insert
 
 ##### Return value
 
@@ -442,7 +442,7 @@ See the [section about graph inserts](#graph-inserts).
 
 Argument|Type|Description
 --------|----|--------------------
-graph|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Objects to insert
+graph|Object&#124;[`Model`](#model)&#124;Object[]&#124;[`Model`](#model)[];|Objects to insert
 graph|[`InsertGraphOptions`](#insertgraphoptions)|Optional options.
 
 ##### Return value
@@ -661,7 +661,7 @@ See the [section about graph upserts](#graph-upserts)
 
 Argument|Type|Description
 --------|----|--------------------
-graph|Object&#124;[`Model`](#model)&#124;Array.&lt;Object&gt;&#124;Array.&lt;[`Model`](#model)&gt;|Graph to upsert.
+graph|Object&#124;[`Model`](#model)&#124;Object[]&#124;[`Model`](#model)[];|Graph to upsert.
 options|[`UpsertGraphOptions`](#upsertgraphoptions)|Optional options.
 
 ##### Return value
@@ -5688,7 +5688,7 @@ In the second example the traverser function is only called for `Person` instanc
 Argument|Type|Description
 --------|----|-------------------
 filterConstructor|function|If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.
-models|[`Model`](#model)&#124;Array.&lt;[`Model`](#model)&gt;|The model(s) whose relation trees to traverse.
+models|[`Model`](#model)&#124;[`Model`](#model)[]|The model(s) whose relation trees to traverse.
 traverser|function([`Model`](#model), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
 
 
