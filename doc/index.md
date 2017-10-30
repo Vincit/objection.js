@@ -1019,6 +1019,11 @@ Person
         species: 'dog'
       }]
     }]
+  }).then(graph => {
+    // The return value of `insertGraoph` is the input graph converted into model instances.
+    // Inserted objects have ids added to them related rows have foreign keys set, but
+    // no other columns get fetched from the database. You can use `insertGraphAndFetch`
+    // for that.
   });
 ```
 
@@ -1264,6 +1269,10 @@ Person
         text: 'Would see again'
       }]
     }]
+  }).then(graph => {
+    // The return value of `upsertGraph` is the input graph converted into model instances.
+    // Inserted objects have ids added to them related rows have foreign keys set but no other
+    // columns get fetched from the database. You can use `upsertGraphAndFetch` for that.
   });
 ```
 
@@ -1324,7 +1333,7 @@ Person
   }, options);
 ```
 
-> `relate` and `unrelate` (and all other options) can also be lists of relation expressions. In that
+> `relate` and `unrelate` (and all other [options](#upsertgraphoptions)) can also be lists of relation paths. In that
 > case the option is only applied for the listed relations.
 
 ```js

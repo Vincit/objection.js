@@ -868,6 +868,9 @@ Person
 
 Creates a delete query.
 
+The return value of the query will be the number of deleted rows. if you're using Postgres
+and want to get the deleted rows, *take a look at [this recipe](#postgresql-quot-returning-quot-tricks)*.
+
 ##### Return value
 
 Type|Description
@@ -905,6 +908,9 @@ Person
 
 Deletes a model by id.
 
+The return value of the query will be the number of deleted rows. if you're using Postgres
+and want to get the deleted rows, *take a look at [this recipe](#postgresql-quot-returning-quot-tricks)*.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -934,7 +940,7 @@ Person
   .then(person => {
     return person.$relatedQuery('movies').relate(50);
   })
-  .then(() => {
+  .then(numRelatedRows => {
     console.log('movie 50 is now related to person 123 through `movies` relation');
   });
 ```
@@ -945,8 +951,8 @@ Person
 person
   .$relatedQuery('movies')
   .relate([50, 60, 70])
-  .then(() => {
-
+  .then(numRelatedRows => {
+    console.log(`${numRelatedRows} rows were related`);
   });
 ```
 
@@ -956,8 +962,8 @@ person
 person
   .$relatedQuery('movies')
   .relate({foo: 50, bar: 20, baz: 10})
-  .then(() => {
-
+  .then(numRelatedRows => {
+    console.log(`${numRelatedRows} rows were related`);
   });
 ```
 
@@ -972,8 +978,8 @@ someMovie
     id: 50,
     someExtra: "I'll be written to the join table"
   })
-  .then(() => {
-
+  .then(numRelatedRows => {
+    console.log(`${numRelatedRows} rows were related`);
   });
 ```
 
@@ -1013,7 +1019,7 @@ Person
   .then(person => {
     return person.$relatedQuery('movies').unrelate().where('id', 50);
   })
-  .then(() => {
+  .then(numUnrelatedRows => {
     console.log('movie 50 is no longer related to person 123 through `movies` relation');
   });
 ```
