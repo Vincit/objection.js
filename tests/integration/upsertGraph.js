@@ -493,6 +493,8 @@ module.exports = (session) => {
           .query(trx)
           .upsertGraph(upsert, {unrelate: true, relate: true})
           .then(result => {
+            expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(undefined);
+
             // Fetch the graph from the database.
             return Model1
               .query(trx)
@@ -564,6 +566,89 @@ module.exports = (session) => {
                 model_2_prop_1: 'hasMany 2',
                 model_2_prop_2: null
               });
+            });
+          });
+      });
+    });
+
+    it('should also update if relate model has other properties than id', () => {
+      const upsert = {
+        id: 2,
+
+        // unrelate idCol=2
+        // and insert one new
+        model1Relation2: [{
+          idCol: 1,
+
+          // update id=4
+          // unrelate id=5
+          // relate id=6
+          // and insert one new
+          model2Relation1: [{
+            id: 4,
+            model1Prop1: 'updated manyToMany 1'
+          }, {
+            // This is the new row.
+            model1Prop1: 'inserted manyToMany'
+          }, {
+            // This will get related because it has an id
+            // that doesn't currently exist in the relation.
+            // This should also get updated.
+            id: 6,
+            model1Prop1: 'related and updated manyToMany'
+          }]
+        }, {
+          // This is the new row.
+          model2Prop1: 'inserted hasMany',
+        }]
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1
+          .query(trx)
+          .upsertGraph(upsert, {unrelate: true, relate: true})
+          .then(result => {
+            expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(1);
+
+            // Fetch the graph from the database.
+            return Model1
+              .query(trx)
+              .findById(2)
+              .eager('[model1Relation2.model2Relation1]')
+              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'))
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 3,
+              model1Prop1: "root 2",
+
+              model1Relation2: [{
+                idCol: 1,
+                model1Id: 2,
+                model2Prop1: "hasMany 1",
+
+                model2Relation1: [{
+                  id: 4,
+                  model1Id: null,
+                  model1Prop1: "updated manyToMany 1",
+                }, {
+                  id: 6,
+                  model1Id: null,
+                  model1Prop1: "related and updated manyToMany",
+                }, {
+                  id: 8,
+                  model1Id: null,
+                  model1Prop1: "inserted manyToMany",
+                }]
+              }, {
+                idCol: 3,
+                model1Id: 2,
+                model2Prop1: "inserted hasMany",
+                model2Relation1: []
+              }]
             });
           });
       });
