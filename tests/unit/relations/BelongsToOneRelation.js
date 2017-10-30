@@ -49,6 +49,12 @@ describe('BelongsToOneRelation', () => {
       static get tableName() {
         return 'RelatedModel';
       }
+
+      static get namedFilters() {
+        return {
+          namedFilter: builder => builder.where('filteredProperty', true)
+        }
+      }
     };
 
     OwnerModel.knex(mockKnex);
@@ -244,6 +250,31 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal('select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "name" = \'Jennifer\'');
+      });
+    });
+
+    it('should support named filters', () => {
+      createModifiedRelation('namedFilter');
+
+      let owner = OwnerModel.fromJson({id: 666, relatedId: 1});
+      let expectedResult = [{id: 1, a: 10, rid: 1}];
+      mockKnexQueryResults = [expectedResult];
+
+      let builder = QueryBuilder
+        .forClass(RelatedModel)
+        .findOperationFactory(builder => {
+          return relation.find(builder, [owner]);
+        });
+
+      return builder.then(result => {
+        expect(result).to.eql(expectedResult[0]);
+        expect(owner.nameOfOurRelation).to.eql(expectedResult[0]);
+        expect(result).to.be.a(RelatedModel);
+
+        expect(executedQueries).to.have.length(1);
+        expect(executedQueries[0]).to.equal(builder.toString());
+        expect(executedQueries[0]).to.equal(builder.toSql());
+        expect(executedQueries[0]).to.eql('select "RelatedModel".* from "RelatedModel" where "RelatedModel"."rid" in (1) and "filteredProperty" = true');
       });
     });
 
