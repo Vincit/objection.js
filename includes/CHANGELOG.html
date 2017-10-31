@@ -30,12 +30,24 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
-<h2 id="0-8-9">0.8.9</h2>
+<h2 id="0-9-0">0.9.0</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
 
 <ul>
-<li>Fix <a href="https://github.com/Vincit/objection.js/issues/502">#502</a></li>
+<li>Relations can now be defined using keys inside JSON columns. See the examples <a href="http://vincit.github.io/objection.js/#relationmappings">here</a>.</li>
+<li><a href="http://vincit.github.io/objection.js/#lit"><code class="prettyprint">lit</code></a> helper function <a href="https://github.com/Vincit/objection.js/issues/275">#275</a></li>
+<li>Fixes for <a href="http://vincit.github.io/objection.js/#upsertgraph"><code class="prettyprint">upsertGraph</code></a> when using composite keys. <a href="https://github.com/Vincit/objection.js/issues/517">#517</a></li>
+<li>Added <code class="prettyprint">noDelete</code>, <code class="prettyprint">noUpdate</code>, <code class="prettyprint">noInsert</code>, <code class="prettyprint">noRelate</code> and <code class="prettyprint">noUnrelate</code> options for <code class="prettyprint">upsertGraph</code>. See <a href="#upsertgraphoptions">UpsertGraphOptions docs</a> for more info.</li>
+<li><code class="prettyprint">insertGraph</code> now accepts an options object just like <code class="prettyprint">upsertGraph</code>. <code class="prettyprint">relate</code> option can be used instead of <code class="prettyprint">#dbRef</code>. <a href="https://github.com/Vincit/objection.js/issues/586">#586</a></li>
+</ul>
+
+<h3 id="breaking-changes">Breaking changes</h3>
+
+<ul>
+<li><p>Instance update/patch with <code class="prettyprint">returning</code> now return a single object instead of an array. <a href="https://github.com/Vincit/objection.js/issues/423">#423</a></p></li>
+<li><p>Because of the support for JSON relations <a href="http://vincit.github.io/objection.js/#relation">the <code class="prettyprint">Relation</code> class</a>
+has changed a bit.</p></li>
 </ul>
 
 <h2 id="0-8-8">0.8.8</h2>
