@@ -5,39 +5,43 @@ const expect = require('expect.js');
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 
-module.exports = (session) => {
+module.exports = session => {
   const Model1 = session.models.Model1;
   const Model2 = session.models.Model2;
 
   describe('Model delete queries', () => {
-
     describe('.query().delete()', () => {
-
       beforeEach(() => {
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1',
-          model1Relation2: [{
-            idCol: 1,
-            model2Prop1: 'text 1',
-            model2Prop2: 2
-          }, {
-            idCol: 2,
-            model2Prop1: 'text 2',
-            model2Prop2: 1
-          }]
-        }, {
-          id: 2,
-          model1Prop1: 'hello 2'
-        }, {
-          id: 3,
-          model1Prop1: 'hello 3'
-        }]);
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1',
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Prop1: 'text 1',
+                model2Prop2: 2
+              },
+              {
+                idCol: 2,
+                model2Prop1: 'text 2',
+                model2Prop2: 1
+              }
+            ]
+          },
+          {
+            id: 2,
+            model1Prop1: 'hello 2'
+          },
+          {
+            id: 3,
+            model1Prop1: 'hello 3'
+          }
+        ]);
       });
 
       it('should delete a model (1)', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .delete()
           .where('id', '=', 2)
           .then(numDeleted => {
@@ -52,8 +56,7 @@ module.exports = (session) => {
       });
 
       it('should delete a model (2)', () => {
-        return Model2
-          .query()
+        return Model2.query()
           .del()
           .where('model_2_prop_2', 1)
           .then(numDeleted => {
@@ -67,8 +70,7 @@ module.exports = (session) => {
       });
 
       it('should delete multiple', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .delete()
           .where('model1Prop1', '<', 'hello 3')
           .then(numDeleted => {
@@ -85,8 +87,7 @@ module.exports = (session) => {
         it('should delete and return multiple', () => {
           let deleted1;
 
-          return Model1
-            .query()
+          return Model1.query()
             .delete()
             .where('model1Prop1', '<', 'hello 3')
             .returning('*')
@@ -106,15 +107,17 @@ module.exports = (session) => {
     });
 
     describe('.$query().delete()', () => {
-
       beforeEach(() => {
-        return session.populate([{
-          id: 1,
-          model1Prop1: 'hello 1'
-        }, {
-          id: 2,
-          model1Prop1: 'hello 2'
-        }]);
+        return session.populate([
+          {
+            id: 1,
+            model1Prop1: 'hello 1'
+          },
+          {
+            id: 2,
+            model1Prop1: 'hello 2'
+          }
+        ]);
       });
 
       it('should delete a model', () => {
@@ -138,18 +141,22 @@ module.exports = (session) => {
       it('should should call $beforeDelete and $afterDelete hooks', () => {
         let model = Model1.fromJson({id: 1});
 
-        model.$beforeDelete = function () {
+        model.$beforeDelete = function() {
           let self = this;
-          return Model1.query().findById(this.id).then(model => {
-            self.before = model;
-          });
+          return Model1.query()
+            .findById(this.id)
+            .then(model => {
+              self.before = model;
+            });
         };
 
-        model.$afterDelete = function () {
+        model.$afterDelete = function() {
           let self = this;
-          return Model1.query().findById(this.id).then(model => {
-            self.after = model || null;
-          });
+          return Model1.query()
+            .findById(this.id)
+            .then(model => {
+              self.after = model || null;
+            });
         };
 
         return model
@@ -165,40 +172,39 @@ module.exports = (session) => {
             expectPartEql(rows[0], {id: 2, model1Prop1: 'hello 2'});
           });
       });
-
     });
 
     describe('.$relatedQuery().delete()', () => {
-
       describe('belongs to one relation', () => {
         let parent1;
         let parent2;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation1: {
-              id: 2,
-              model1Prop1: 'hello 2'
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation1: {
+                id: 2,
+                model1Prop1: 'hello 2'
+              }
+            },
+            {
+              id: 3,
+              model1Prop1: 'hello 3',
+              model1Relation1: {
+                id: 4,
+                model1Prop1: 'hello 4'
+              }
             }
-          }, {
-            id: 3,
-            model1Prop1: 'hello 3',
-            model1Relation1: {
-              id: 4,
-              model1Prop1: 'hello 4'
-            }
-          }]);
+          ]);
         });
 
         beforeEach(() => {
-          return Model1
-            .query()
-            .then(parents => {
-              parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 3});
-            });
+          return Model1.query().then(parents => {
+            parent1 = _.find(parents, {id: 1});
+            parent2 = _.find(parents, {id: 3});
+          });
         });
 
         it('should delete a related object (1)', () => {
@@ -253,7 +259,6 @@ module.exports = (session) => {
               expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
             });
         });
-
       });
 
       describe('has many relation', () => {
@@ -261,48 +266,57 @@ module.exports = (session) => {
         let parent2;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
-              model2Prop2: 6
-            }, {
-              idCol: 2,
-              model2Prop1: 'text 2',
-              model2Prop2: 5
-            }, {
-              idCol: 3,
-              model2Prop1: 'text 3',
-              model2Prop2: 4
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 4,
-              model2Prop1: 'text 4',
-              model2Prop2: 3
-            }, {
-              idCol: 5,
-              model2Prop1: 'text 5',
-              model2Prop2: 2
-            }, {
-              idCol: 6,
-              model2Prop1: 'text 6',
-              model2Prop2: 1
-            }]
-          }]);
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Prop2: 6
+                },
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Prop2: 5
+                },
+                {
+                  idCol: 3,
+                  model2Prop1: 'text 3',
+                  model2Prop2: 4
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 4,
+                  model2Prop1: 'text 4',
+                  model2Prop2: 3
+                },
+                {
+                  idCol: 5,
+                  model2Prop1: 'text 5',
+                  model2Prop2: 2
+                },
+                {
+                  idCol: 6,
+                  model2Prop1: 'text 6',
+                  model2Prop2: 1
+                }
+              ]
+            }
+          ]);
         });
 
         beforeEach(() => {
-          return Model1
-            .query()
-            .then(parents => {
-              parent1 = _.find(parents, {id: 1});
-              parent2 = _.find(parents, {id: 2});
-            });
+          return Model1.query().then(parents => {
+            parent1 = _.find(parents, {id: 1});
+            parent2 = _.find(parents, {id: 2});
+          });
         });
 
         it('should delete all related objects', () => {
@@ -382,7 +396,6 @@ module.exports = (session) => {
               expectPartEql(rows[3], {id_col: 6, model_2_prop_1: 'text 6'});
             });
         });
-
       });
 
       describe('many to many relation', () => {
@@ -390,56 +403,69 @@ module.exports = (session) => {
         let parent2;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
-              model2Relation1: [{
-                id: 3,
-                model1Prop1: 'blaa 1',
-                model1Prop2: 6
-              }, {
-                id: 4,
-                model1Prop1: 'blaa 2',
-                model1Prop2: 5
-              }, {
-                id: 5,
-                model1Prop1: 'blaa 3',
-                model1Prop2: 4
-              }]
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 2,
-              model2Prop1: 'text 2',
-              model2Relation1: [{
-                id: 6,
-                model1Prop1: 'blaa 4',
-                model1Prop2: 3
-              }, {
-                id: 7,
-                model1Prop1: 'blaa 5',
-                model1Prop2: 2
-              }, {
-                id: 8,
-                model1Prop1: 'blaa 6',
-                model1Prop2: 1
-              }]
-            }]
-          }]);
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Relation1: [
+                    {
+                      id: 3,
+                      model1Prop1: 'blaa 1',
+                      model1Prop2: 6
+                    },
+                    {
+                      id: 4,
+                      model1Prop1: 'blaa 2',
+                      model1Prop2: 5
+                    },
+                    {
+                      id: 5,
+                      model1Prop1: 'blaa 3',
+                      model1Prop2: 4
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Relation1: [
+                    {
+                      id: 6,
+                      model1Prop1: 'blaa 4',
+                      model1Prop2: 3
+                    },
+                    {
+                      id: 7,
+                      model1Prop1: 'blaa 5',
+                      model1Prop2: 2
+                    },
+                    {
+                      id: 8,
+                      model1Prop1: 'blaa 6',
+                      model1Prop2: 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]);
         });
 
         beforeEach(() => {
-          return Model2
-            .query()
-            .then(parents => {
-              parent1 = _.find(parents, {idCol: 1});
-              parent2 = _.find(parents, {idCol: 2});
-            });
+          return Model2.query().then(parents => {
+            parent1 = _.find(parents, {idCol: 1});
+            parent2 = _.find(parents, {idCol: 2});
+          });
         });
 
         it('should delete all related objects', () => {
@@ -556,39 +582,44 @@ module.exports = (session) => {
         let parent;
 
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
-              model2Relation2: {
-                id: 3,
-                model1Prop1: 'blaa 1',
-                model1Prop2: 1
-              }
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 2,
-              model2Prop1: 'text 2',
-              model2Relation2: {
-                id: 4,
-                model1Prop1: 'blaa 2',
-                model1Prop2: 2
-              }
-            }]
-          }]);
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Relation2: {
+                    id: 3,
+                    model1Prop1: 'blaa 1',
+                    model1Prop2: 1
+                  }
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Relation2: {
+                    id: 4,
+                    model1Prop1: 'blaa 2',
+                    model1Prop2: 2
+                  }
+                }
+              ]
+            }
+          ]);
         });
 
         beforeEach(() => {
-          return Model2
-            .query()
-            .then(parents => {
-              parent = _.find(parents, {idCol: 2});
-            });
+          return Model2.query().then(parents => {
+            parent = _.find(parents, {idCol: 2});
+          });
         });
 
         it('should delete the related object', () => {
@@ -627,10 +658,7 @@ module.exports = (session) => {
               });
           });
         }
-
       });
-
     });
-
   });
 };

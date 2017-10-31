@@ -3,14 +3,12 @@
 // Objection.js plugins are class mixins. Read this excellent article for detailed description:
 // http://justinfagnani.com/2015/12/21/real-mixins-with-javascript-classes/
 //
-// A plugin should be a function that takes a model class as an argument. A plugin then needs to 
+// A plugin should be a function that takes a model class as an argument. A plugin then needs to
 // extends that model and return it. A plugin should never modify the model directly!
-module.exports = (Model) => {
-
+module.exports = Model => {
   // If your plugin extends the QueryBuilder, you need to extend `Model.QueryBuilder`
   // since it may have already been extended by other plugins.
   class SessionQueryBuilder extends Model.QueryBuilder {
-
     // A custom method that stores a session object to the query context. In this example
     // plugin a session represents the logged-in user as in passport.js session.
     session(session) {
@@ -29,15 +27,14 @@ module.exports = (Model) => {
   // IMPORTANT: Don't give a name for the returned class! This way the returned
   // class inherits the super class's name (starting from node 8).
   return class extends Model {
-
     // Make our model use the extended QueryBuilder.
     static get QueryBuilder() {
       return SessionQueryBuilder;
     }
 
     $beforeUpdate(opt, context) {
-      // If you exetend existing methods like this one, always remember to call the 
-      // super implementation. Check the documentation to see if the function can be 
+      // If you exetend existing methods like this one, always remember to call the
+      // super implementation. Check the documentation to see if the function can be
       // async and prepare for that also.
       const maybePromise = super.$beforeUpdate(opt, context);
 
@@ -50,8 +47,8 @@ module.exports = (Model) => {
     }
 
     $beforeInsert(context) {
-      // If you exetend existing methods like this one, always remember to call the 
-      // super implementation. Check the documentation to see if the function can be 
+      // If you exetend existing methods like this one, always remember to call the
+      // super implementation. Check the documentation to see if the function can be
       // async and prepare for that also.
       const maybePromise = super.$beforeInsert(context);
 

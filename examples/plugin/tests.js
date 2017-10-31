@@ -54,8 +54,7 @@ describe('example plugin tests', () => {
       }
     }
 
-    return Person
-      .query(knex)
+    return Person.query(knex)
       .session(session)
       .insert({name: 'Jennifer'})
       .then(jennifer => {
@@ -71,8 +70,7 @@ describe('example plugin tests', () => {
       }
     }
 
-    return Person
-      .query(knex)
+    return Person.query(knex)
       .session({userId: 'foo'})
       .insert({name: 'Jennifer'})
       .then(jennifer => {

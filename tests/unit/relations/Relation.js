@@ -5,7 +5,7 @@ const knex = require('knex');
 const expect = require('expect.js');
 const objection = require('../../../');
 
-const Model = objection.Model
+const Model = objection.Model;
 const Relation = objection.Relation;
 
 describe('Relation', () => {
@@ -136,7 +136,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one.');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one.'
+      );
     });
   });
 
@@ -153,7 +155,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.match(/OwnerModel\.relationMappings\.testRelation: modelClass path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./);
+      expect(err.message).to.match(
+        /OwnerModel\.relationMappings\.testRelation: modelClass path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
+      );
     });
   });
 
@@ -170,7 +174,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass is not defined');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: modelClass is not defined'
+      );
     });
   });
 
@@ -187,7 +193,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: modelClass: blaa is an invalid file path to a model class');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: modelClass: blaa is an invalid file path to a model class'
+      );
     });
   });
 
@@ -204,7 +212,11 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(/^OwnerModel\.relationMappings\.testRelation: modelClass: (.+)\/InvalidModel is an invalid file path to a model class$/.test(err.message)).to.equal(true);
+      expect(
+        /^OwnerModel\.relationMappings\.testRelation: modelClass: (.+)\/InvalidModel is an invalid file path to a model class$/.test(
+          err.message
+        )
+      ).to.equal(true);
     });
   });
 
@@ -220,7 +232,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: relation is not defined');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: relation is not defined'
+      );
     });
   });
 
@@ -229,7 +243,7 @@ describe('Relation', () => {
 
     expect(() => {
       relation.setMapping({
-        relation: function () {},
+        relation: function() {},
         modelClass: RelatedModel,
         join: {
           from: 'OwnerModel.id',
@@ -237,7 +251,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: relation is not a subclass of Relation');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: relation is not a subclass of Relation'
+      );
     });
   });
 
@@ -254,7 +270,7 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('Relation: Relation\'s owner is not a subclass of Model');
+      expect(err.message).to.equal("Relation: Relation's owner is not a subclass of Model");
     });
   });
 
@@ -271,7 +287,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join.to must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].'
+      );
     });
   });
 
@@ -288,7 +306,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.'
+      );
     });
   });
 
@@ -305,7 +325,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join.from must have format TableName.columnName. For example "SomeTable.id" or in case of composite key ["SomeTable.a", "SomeTable.b"].'
+      );
     });
   });
 
@@ -322,7 +344,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.'
+      );
     });
   });
 
@@ -335,8 +359,10 @@ describe('Relation', () => {
         modelClass: RelatedModel
       });
     }).to.throwException(err => {
-        expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
-      });
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
+      );
+    });
   });
 
   it('should fail if join.from is missing', () => {
@@ -351,7 +377,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
+      );
     });
   });
 
@@ -367,7 +395,9 @@ describe('Relation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal('OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}');
+      expect(err.message).to.equal(
+        'OwnerModel.relationMappings.testRelation: join must be an object that maps the columns of the related models together. For example: {from: "SomeTable.id", to: "SomeOtherTable.someModelId"}'
+      );
     });
   });
 
@@ -465,5 +495,5 @@ describe('Relation', () => {
     expect(relation.ownerProp.props).to.eql(['id']);
     expect(relation.relatedProp.cols).to.eql(['owner_id']);
     expect(relation.relatedProp.props).to.eql(['owner_id']);
-  })
+  });
 });

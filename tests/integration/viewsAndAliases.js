@@ -8,10 +8,10 @@ const mockKnexFactory = require('../../testUtils/mockKnex');
 
 // This is another one of those features that need a separate test suite
 // because they are so pervasive.
-module.exports = (session) => {
+module.exports = session => {
   const queries = [];
 
-  const knex = mockKnexFactory(session.knex, function (mock, oldImpl, args) {
+  const knex = mockKnexFactory(session.knex, function(mock, oldImpl, args) {
     queries.push(this.toString());
     return oldImpl.apply(this, args);
   });
@@ -24,68 +24,80 @@ module.exports = (session) => {
     let fullEagerResult;
 
     beforeEach(() => {
-      return session.populate([{
-        id: 1,
-        model1Prop1: 'hello 1',
-
-        model1Relation1: {
-          id: 2,
-          model1Prop1: 'hello 2',
+      return session.populate([
+        {
+          id: 1,
+          model1Prop1: 'hello 1',
 
           model1Relation1: {
-            id: 3,
-            model1Prop1: 'hello 3',
+            id: 2,
+            model1Prop1: 'hello 2',
 
             model1Relation1: {
-              id: 4,
-              model1Prop1: 'hello 4',
+              id: 3,
+              model1Prop1: 'hello 3',
 
-              model1Relation2: [{
-                idCol: 4,
-                model2Prop1: 'hejsan 4'
-              }]
+              model1Relation1: {
+                id: 4,
+                model1Prop1: 'hello 4',
+
+                model1Relation2: [
+                  {
+                    idCol: 4,
+                    model2Prop1: 'hejsan 4'
+                  }
+                ]
+              }
             }
-          }
-        },
+          },
 
-        model1Relation2: [{
-          idCol: 1,
-          model2Prop1: 'hejsan 1',
+          model1Relation2: [
+            {
+              idCol: 1,
+              model2Prop1: 'hejsan 1',
 
-          model2Relation2: {
-            id: 8,
-            model1Prop1: 'hello 8',
+              model2Relation2: {
+                id: 8,
+                model1Prop1: 'hello 8',
 
-            model1Relation1: {
-              id: 9,
-              model1Prop1: 'hello 9'
-            }
-          }
-        }, {
-          idCol: 2,
-          model2Prop1: 'hejsan 2',
-
-          model2Relation1: [{
-            id: 5,
-            model1Prop1: 'hello 5',
-            aliasedExtra: 'extra 5'
-          }, {
-            id: 6,
-            model1Prop1: 'hello 6',
-            aliasedExtra: 'extra 6',
-
-            model1Relation1: {
-              id: 7,
-              model1Prop1: 'hello 7'
+                model1Relation1: {
+                  id: 9,
+                  model1Prop1: 'hello 9'
+                }
+              }
             },
+            {
+              idCol: 2,
+              model2Prop1: 'hejsan 2',
 
-            model1Relation2: [{
-              idCol: 3,
-              model2Prop1: 'hejsan 3'
-            }]
-          }]
-        }]
-      }]);
+              model2Relation1: [
+                {
+                  id: 5,
+                  model1Prop1: 'hello 5',
+                  aliasedExtra: 'extra 5'
+                },
+                {
+                  id: 6,
+                  model1Prop1: 'hello 6',
+                  aliasedExtra: 'extra 6',
+
+                  model1Relation1: {
+                    id: 7,
+                    model1Prop1: 'hello 7'
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: 3,
+                      model2Prop1: 'hejsan 3'
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]);
     });
 
     beforeEach(() => {
@@ -100,92 +112,100 @@ module.exports = (session) => {
       ]`;
 
       // The result we should get for `fullEager`.
-      fullEagerResult = [{
-        id: 1,
-        model1Id: 2,
-        model1Prop1: 'hello 1',
-        model1Prop2: null,
-        $afterGetCalled: 1,
-
-        model1Relation1: {
-          id: 2,
-          model1Id: 3,
-          model1Prop1: 'hello 2',
+      fullEagerResult = [
+        {
+          id: 1,
+          model1Id: 2,
+          model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1
-        },
-
-        model1Relation2: [{
-          idCol: 1,
-          model1Id: 1,
-          model2Prop1: 'hejsan 1',
-          model2Prop2: null,
-          $afterGetCalled: 1,
-          model2Relation1: []
-        }, {
-          idCol: 2,
-          model1Id: 1,
-          model2Prop1: 'hejsan 2',
-          model2Prop2: null,
           $afterGetCalled: 1,
 
-          model2Relation1: [{
-            id: 5,
-            model1Id: null,
-            model1Prop1: 'hello 5',
+          model1Relation1: {
+            id: 2,
+            model1Id: 3,
+            model1Prop1: 'hello 2',
             model1Prop2: null,
-            aliasedExtra: 'extra 5',
-            model1Relation1: null,
-            model1Relation2: [],
             $afterGetCalled: 1
-          }, {
-            id: 6,
-            model1Id: 7,
-            model1Prop1: 'hello 6',
-            model1Prop2: null,
-            aliasedExtra: 'extra 6',
-            $afterGetCalled: 1,
+          },
 
-            model1Relation1: {
-              id: 7,
-              model1Id: null,
-              model1Prop1: 'hello 7',
-              model1Prop2: null,
-              $afterGetCalled: 1
-            },
-
-            model1Relation2: [{
-              idCol: 3,
-              model1Id: 6,
-              model2Prop1: 'hejsan 3',
+          model1Relation2: [
+            {
+              idCol: 1,
+              model1Id: 1,
+              model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1
-            }]
-          }]
-        }]
-      }];
+              $afterGetCalled: 1,
+              model2Relation1: []
+            },
+            {
+              idCol: 2,
+              model1Id: 1,
+              model2Prop1: 'hejsan 2',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+
+              model2Relation1: [
+                {
+                  id: 5,
+                  model1Id: null,
+                  model1Prop1: 'hello 5',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 5',
+                  model1Relation1: null,
+                  model1Relation2: [],
+                  $afterGetCalled: 1
+                },
+                {
+                  id: 6,
+                  model1Id: 7,
+                  model1Prop1: 'hello 6',
+                  model1Prop2: null,
+                  aliasedExtra: 'extra 6',
+                  $afterGetCalled: 1,
+
+                  model1Relation1: {
+                    id: 7,
+                    model1Id: null,
+                    model1Prop1: 'hello 7',
+                    model1Prop2: null,
+                    $afterGetCalled: 1
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: 3,
+                      model1Id: 6,
+                      model2Prop1: 'hejsan 3',
+                      model2Prop2: null,
+                      $afterGetCalled: 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ];
     });
 
     before(() => {
       // This makes sure the columnInfo cache is populated.
-      return Model1
-        .query()
+      return Model1.query()
         .findById(1)
         .eager('[model1Relation1, model1Relation2]')
         .eagerAlgorithm(Model1.JoinEagerAlgorithm);
     });
 
     describe('aliases', () => {
-
       it('should use alias in joinRelation', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .findById(1)
           .table('Model1 as someAlias')
           .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
           .then(models => {
             if (utils.isPostgres(session.knex)) {
-              expect(queries[0].replace(/\s/g, '')).to.equal(`
+              expect(queries[0].replace(/\s/g, '')).to.equal(
+                `
                 select "someAlias".* 
                 from "Model1" as "someAlias" 
                 inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "someAlias"."model1Id" 
@@ -193,14 +213,14 @@ module.exports = (session) => {
                 inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someAlias"."id" 
                 inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col" 
                 where "someAlias"."id" = 1
-              `.replace(/\s/g, ''));
+              `.replace(/\s/g, '')
+              );
             }
           });
       });
 
       it('should use alias for eager queries (WhereInEagerOperation)', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .findById(1)
           .table('Model1 as someAlias')
           .eager(fullEager)
@@ -224,12 +244,11 @@ module.exports = (session) => {
             }
 
             expect(model).to.eql(fullEagerResult[0]);
-          }); 
+          });
       });
 
       it('should use alias for eager queries (WhereInEagerOperation) (alias method)', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .findById(1)
           .alias('someAlias')
           .eager(fullEager)
@@ -253,12 +272,11 @@ module.exports = (session) => {
             }
 
             expect(model).to.eql(fullEagerResult[0]);
-          }); 
+          });
       });
 
       it('should use alias for eager queries (JoinEagerAlgorithm)', () => {
-        return Model1
-          .query()
+        return Model1.query()
           .findById(1)
           .table('Model1 as someAlias')
           .eager(fullEager)
@@ -267,7 +285,8 @@ module.exports = (session) => {
           .then(model => {
             if (utils.isPostgres(session.knex)) {
               expect(queries.length).to.equal(1);
-              expect(queries[0].replace(/\s/g, '')).to.equal(`
+              expect(queries[0].replace(/\s/g, '')).to.equal(
+                `
                 select 
                   "someAlias"."id" as "id", 
                   "someAlias"."model1Id" as "model1Id", 
@@ -310,18 +329,17 @@ module.exports = (session) => {
                   "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
                 where 
                   "someAlias"."id" = 1 
-              `.replace(/\s/g, ''));
+              `.replace(/\s/g, '')
+              );
             }
 
             expect(model).to.eql(fullEagerResult[0]);
-          }); 
+          });
       });
-
     });
 
     if (utils.isPostgres(session.knex)) {
       describe('views', () => {
-
         before(() => {
           return session.knex.schema.raw(`
             create view "someView" as (select * from "Model1")
@@ -336,8 +354,7 @@ module.exports = (session) => {
 
         before(() => {
           // This makes sure the columnInfo cache is populated.
-          return Model1
-            .query()
+          return Model1.query()
             .findById(1)
             .table('someView')
             .eager('[model1Relation1, model1Relation2]')
@@ -345,14 +362,14 @@ module.exports = (session) => {
         });
 
         it('swapping table into a view for a joinRelation query should work', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .findById(1)
             .table('someView')
             .joinRelation('[model1Relation1, model1Relation2, model1Relation3]')
             .then(models => {
               if (utils.isPostgres(session.knex)) {
-                expect(queries[0].replace(/\s/g, '')).to.equal(`
+                expect(queries[0].replace(/\s/g, '')).to.equal(
+                  `
                   select "someView".* 
                   from "someView"
                   inner join "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
@@ -360,14 +377,14 @@ module.exports = (session) => {
                   inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someView"."id" 
                   inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col" 
                   where "someView"."id" = 1
-                `.replace(/\s/g, ''));
+                `.replace(/\s/g, '')
+                );
               }
             });
         });
 
         it('swapping table into a view for an eager query should work (WhereInEagerOperation)', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('someView.id', 1)
             .table('someView')
             .eager(fullEager)
@@ -389,12 +406,11 @@ module.exports = (session) => {
               });
 
               expect(model).to.eql(fullEagerResult);
-            }); 
+            });
         });
 
         it('swapping table into a view for an eager query should work (JoinEagerAlgorithm)', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('someView.id', 1)
             .table('someView')
             .eager(fullEager)
@@ -402,7 +418,8 @@ module.exports = (session) => {
             .then(sortEager)
             .then(model => {
               expect(queries.length).to.equal(1);
-              expect(queries[0].replace(/\s/g, '')).to.equal((`
+              expect(queries[0].replace(/\s/g, '')).to.equal(
+                `
                 select 
                   "someView"."id" as "id", 
                   "someView"."model1Id" as "model1Id", 
@@ -445,16 +462,15 @@ module.exports = (session) => {
                   "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
                 where 
                   "someView"."id" = 1
-                `).replace(/\s/g, '')
+                `.replace(/\s/g, '')
               );
 
               expect(model).to.eql(fullEagerResult);
-            }); 
+            });
         });
 
         it('swapping table into a view for an eager query with filters should work (JoinEagerAlgorithm)', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('someView.id', 1)
             .table('someView')
             .eager(fullEager)
@@ -464,7 +480,8 @@ module.exports = (session) => {
             .then(sortEager)
             .then(model => {
               expect(queries.length).to.equal(1);
-              expect(queries[0].replace(/\s/g, '')).to.equal((`
+              expect(queries[0].replace(/\s/g, '')).to.equal(
+                `
                 select 
                   "someView"."id" as "id", 
                   "someView"."model1Id" as "model1Id", 
@@ -500,16 +517,13 @@ module.exports = (session) => {
                   "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
                 where 
                   "someView"."id" = 1
-                `).replace(/\s/g, '')
+                `.replace(/\s/g, '')
               );
-            }); 
+            });
         });
-
       });
     }
-
   });
-
 };
 
 function sortEager(models) {
@@ -525,7 +539,10 @@ function sortEager(models) {
     }
 
     if (model.model1Relation2[1].model2Relation1) {
-      model.model1Relation2[1].model2Relation1 = _.sortBy(model.model1Relation2[1].model2Relation1 , 'id');
+      model.model1Relation2[1].model2Relation1 = _.sortBy(
+        model.model1Relation2[1].model2Relation1,
+        'id'
+      );
     }
   });
 

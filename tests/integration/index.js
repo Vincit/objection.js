@@ -5,47 +5,48 @@ const path = require('path');
 const TestSession = require('./../../testUtils/TestSession');
 
 describe('integration tests', () => {
-
-  const testDatabaseConfigs = [{
-    client: 'sqlite3',
-    useNullAsDefault: true,
-    connection: {
-      filename: path.join(os.tmpdir(), 'objection_test.db')
-    }
-  }, {
-    client: 'mysql',
-    connection: {
-      host: '127.0.0.1',
-      user: 'objection',
-      database: 'objection_test'
+  const testDatabaseConfigs = [
+    {
+      client: 'sqlite3',
+      useNullAsDefault: true,
+      connection: {
+        filename: path.join(os.tmpdir(), 'objection_test.db')
+      }
     },
-    pool: {
-      min: 2,
-      max: 50,
-      afterCreate: (conn, cb) => {
-        conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, (err) => {
-          cb(err, conn);
-        });
+    {
+      client: 'mysql',
+      connection: {
+        host: '127.0.0.1',
+        user: 'objection',
+        database: 'objection_test'
+      },
+      pool: {
+        min: 2,
+        max: 50,
+        afterCreate: (conn, cb) => {
+          conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, err => {
+            cb(err, conn);
+          });
+        }
+      }
+    },
+    {
+      client: 'postgres',
+      connection: {
+        host: '127.0.0.1',
+        user: 'objection',
+        database: 'objection_test'
       }
     }
-  }, {
-    client: 'postgres',
-    connection: {
-      host: '127.0.0.1',
-      user: 'objection',
-      database: 'objection_test'
-    }
-  }];
+  ];
 
   testDatabaseConfigs.forEach(knexConfig => {
-
     const session = new TestSession({
       knexConfig: knexConfig
     });
 
     describe(knexConfig.client, () => {
-
-      before(() =>  {
+      before(() => {
         return session.createDb();
       });
 
@@ -77,5 +78,4 @@ describe('integration tests', () => {
       }
     });
   });
-
 });

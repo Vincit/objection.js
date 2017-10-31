@@ -7,7 +7,6 @@ const compose = require('../../lib/utils/mixin').compose;
 const mixin = require('../../lib/utils/mixin').mixin;
 
 describe('utils', () => {
-
   describe('isSubclassOf', () => {
     function A() {}
     function B() {}
@@ -26,30 +25,30 @@ describe('utils', () => {
       expect(utils.isSubclassOf(A, C)).to.equal(false);
     });
 
-    it ('should return false if one of the inputs is not a constructor', () => {
-      expect(utils.isSubclassOf(function () {}, {})).to.equal(false);
-      expect(utils.isSubclassOf({}, function () {})).to.equal(false);
+    it('should return false if one of the inputs is not a constructor', () => {
+      expect(utils.isSubclassOf(function() {}, {})).to.equal(false);
+      expect(utils.isSubclassOf({}, function() {})).to.equal(false);
     });
-
   });
 
   describe('mixin', () => {
-
     it('should mixin rest of the arguments to the first argument', () => {
       class X {}
 
-      const m1 = C => class extends C {
-        f() {
-          return 1;
-        }
-      };
+      const m1 = C =>
+        class extends C {
+          f() {
+            return 1;
+          }
+        };
 
-      const m2 = C => class extends C {
-        f() {
-          return super.f() + 1;
-        }
-      };
-      
+      const m2 = C =>
+        class extends C {
+          f() {
+            return super.f() + 1;
+          }
+        };
+
       const Y = mixin(X, m1, m2);
       const y = new Y();
 
@@ -68,29 +67,29 @@ describe('utils', () => {
         expect(Z.name).to.equal('X');
       }
     });
-
   });
 
   describe('compose', () => {
-
     it('should compose multiple functions', () => {
       class X {}
 
-      const m1 = C => class extends C {
-        f() {
-          return 1;
-        }
-      };
+      const m1 = C =>
+        class extends C {
+          f() {
+            return 1;
+          }
+        };
 
-      const m2 = C => class extends C {
-        f() {
-          return super.f() + 1;
-        }
-      };
+      const m2 = C =>
+        class extends C {
+          f() {
+            return super.f() + 1;
+          }
+        };
 
       const m3 = compose(m1, m2);
       const m4 = compose([m1, m2]);
-      
+
       const Y = m3(X);
       const y = new Y();
 
@@ -109,7 +108,5 @@ describe('utils', () => {
         expect(Z.name).to.equal('X');
       }
     });
-
   });
-
 });

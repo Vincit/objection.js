@@ -3,8 +3,7 @@
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
-module.exports = (session) => {
-
+module.exports = session => {
   describe('Default values not set with .insertGraph() in 0.7.2 #325', () => {
     let TestModel;
 
@@ -34,7 +33,7 @@ module.exports = (session) => {
             properties: {
               id: {type: 'integer'},
               value1: {type: 'string', default: 'foo'},
-              value2: {type: 'string', default: 'bar'},
+              value2: {type: 'string', default: 'bar'}
             }
           };
         }
@@ -48,8 +47,7 @@ module.exports = (session) => {
     });
 
     it('insert should set the defaults', () => {
-      return TestModel
-        .query()
+      return TestModel.query()
         .insert({value1: 'hello'})
         .then(model => {
           expect(model.value1).to.equal('hello');
@@ -63,8 +61,7 @@ module.exports = (session) => {
     });
 
     it('insertGraph should set the defaults', () => {
-      return TestModel
-        .query()
+      return TestModel.query()
         .insertGraph({value1: 'hello'})
         .then(model => {
           expect(model.value1).to.equal('hello');
@@ -76,7 +73,5 @@ module.exports = (session) => {
           expect(rows[0].value2).to.equal('bar');
         });
     });
-
   });
-
 };

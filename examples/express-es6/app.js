@@ -11,7 +11,7 @@ const registerApi = require('./api');
 const Model = require('objection').Model;
 
 // Adds yield support for express router.
-require('express-yields')
+require('express-yields');
 
 // Initialize knex.
 const knex = Knex(knexConfig.development);

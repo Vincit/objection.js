@@ -3,17 +3,14 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 
-module.exports = (session) => {
+module.exports = session => {
   let Model1 = session.models.Model1;
   let Model2 = session.models.Model2;
 
   describe('Model unrelate queries', () => {
-
     describe('.$query()', () => {
-
       it('should reject the query', done => {
-        Model1
-          .fromJson({id: 1})
+        Model1.fromJson({id: 1})
           .$query()
           .unrelate()
           .then(() => {
@@ -23,39 +20,36 @@ module.exports = (session) => {
             done();
           });
       });
-
     });
 
     describe('.$relatedQuery().unrelate()', () => {
-
       describe('belongs to one relation', () => {
-
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation1: {
-              id: 2,
-              model1Prop1: 'hello 2'
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation1: {
+                id: 2,
+                model1Prop1: 'hello 2'
+              }
+            },
+            {
+              id: 3,
+              model1Prop1: 'hello 3',
+              model1Relation1: {
+                id: 4,
+                model1Prop1: 'hello 4'
+              }
             }
-          }, {
-            id: 3,
-            model1Prop1: 'hello 3',
-            model1Relation1: {
-              id: 4,
-              model1Prop1: 'hello 4'
-            }
-          }]);
+          ]);
         });
 
         it('should unrelate', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .findById(1)
             .then(model => {
-              return model
-                .$relatedQuery('model1Relation1')
-                .unrelate();
+              return model.$relatedQuery('model1Relation1').unrelate();
             })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
@@ -70,60 +64,65 @@ module.exports = (session) => {
             });
         });
 
-        it('should fail if arguments are given', (done) => {
-          Model1
-            .query()
+        it('should fail if arguments are given', done => {
+          Model1.query()
             .findById(1)
             .then(model => {
-              return model
-                .$relatedQuery('model1Relation1')
-                .unrelate(1);
+              return model.$relatedQuery('model1Relation1').unrelate(1);
             })
             .then(numUpdated => {
               done(new Error('should not get here'));
             })
             .catch(err => {
-              expect(err.message).to.equal(`Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`);
+              expect(err.message).to.equal(
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+              );
               done();
             })
             .catch(done);
         });
-
       });
 
       describe('has many relation', () => {
-
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
-              model2Prop2: 6
-            }, {
-              idCol: 2,
-              model2Prop1: 'text 2',
-              model2Prop2: 5
-            }, {
-              idCol: 3,
-              model2Prop1: 'text 3',
-              model2Prop2: 4
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 4,
-              model2Prop1: 'text 4',
-              model2Prop2: 3
-            }]
-          }]);
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Prop2: 6
+                },
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Prop2: 5
+                },
+                {
+                  idCol: 3,
+                  model2Prop1: 'text 3',
+                  model2Prop2: 4
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 4,
+                  model2Prop1: 'text 4',
+                  model2Prop2: 3
+                }
+              ]
+            }
+          ]);
         });
 
         it('should unrelate', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('id', 1)
             .first()
             .then(model => {
@@ -146,8 +145,7 @@ module.exports = (session) => {
         });
 
         it('should unrelate multiple', () => {
-          return Model1
-            .query()
+          return Model1.query()
             .where('id', 1)
             .first()
             .then(model => {
@@ -169,68 +167,77 @@ module.exports = (session) => {
             });
         });
 
-        it('should fail if arguments are given', (done) => {
-          Model1
-            .query()
+        it('should fail if arguments are given', done => {
+          Model1.query()
             .findById(1)
             .then(model => {
-              return model
-                .$relatedQuery('model1Relation2')
-                .unrelate([1, 2])
+              return model.$relatedQuery('model1Relation2').unrelate([1, 2]);
             })
             .then(numUpdated => {
               done(new Error('should not get here'));
             })
             .catch(err => {
-              expect(err.message).to.equal(`Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`);
+              expect(err.message).to.equal(
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+              );
               done();
             })
             .catch(done);
         });
-
       });
 
       describe('many to many relation', () => {
-
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
-              model2Relation1: [{
-                id: 3,
-                model1Prop1: 'blaa 1',
-                model1Prop2: 6
-              }, {
-                id: 4,
-                model1Prop1: 'blaa 2',
-                model1Prop2: 5
-              }, {
-                id: 5,
-                model1Prop1: 'blaa 3',
-                model1Prop2: 4
-              }]
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 2,
-              model2Prop1: 'text 2',
-              model2Relation1: [{
-                id: 6,
-                model1Prop1: 'blaa 4',
-                model1Prop2: 3
-              }]
-            }]
-          }]);
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Relation1: [
+                    {
+                      id: 3,
+                      model1Prop1: 'blaa 1',
+                      model1Prop2: 6
+                    },
+                    {
+                      id: 4,
+                      model1Prop1: 'blaa 2',
+                      model1Prop2: 5
+                    },
+                    {
+                      id: 5,
+                      model1Prop1: 'blaa 3',
+                      model1Prop2: 4
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Relation1: [
+                    {
+                      id: 6,
+                      model1Prop1: 'blaa 4',
+                      model1Prop2: 3
+                    }
+                  ]
+                }
+              ]
+            }
+          ]);
         });
 
         it('should unrelate', () => {
-          return Model2
-            .query()
+          return Model2.query()
             .where('id_col', 1)
             .first()
             .then(model => {
@@ -253,8 +260,7 @@ module.exports = (session) => {
         });
 
         it('should unrelate multiple', () => {
-          return Model2
-            .query()
+          return Model2.query()
             .findById(1)
             .then(model => {
               return model
@@ -275,74 +281,77 @@ module.exports = (session) => {
             });
         });
 
-        it('should fail if arguments are given', (done) => {
-          Model2
-            .query()
+        it('should fail if arguments are given', done => {
+          Model2.query()
             .findById(1)
             .then(model => {
-              return model
-                .$relatedQuery('model2Relation1')
-                .unrelate([1, 2])
+              return model.$relatedQuery('model2Relation1').unrelate([1, 2]);
             })
             .then(numUpdated => {
               done(new Error('should not get here'));
             })
             .catch(err => {
-              expect(err.message).to.equal(`Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`);
+              expect(err.message).to.equal(
+                `Don't pass arguments to unrelate(). You should use it like this: unrelate().where('foo', 'bar').andWhere(...)`
+              );
               done();
             })
             .catch(done);
         });
-
       });
 
       describe('has one through relation', () => {
-
         beforeEach(() => {
-          return session.populate([{
-            id: 1,
-            model1Prop1: 'hello 1',
-            model1Relation2: [{
-              idCol: 1,
-              model2Prop1: 'text 1',
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
 
-              model2Relation2: {
-                id: 5,
-                model1Prop1: 'blaa 3',
-                model1Prop2: 4
-              }
-            }]
-          }, {
-            id: 2,
-            model1Prop1: 'hello 2',
-            model1Relation2: [{
-              idCol: 2,
-              model2Prop1: 'text 2',
+                  model2Relation2: {
+                    id: 5,
+                    model1Prop1: 'blaa 3',
+                    model1Prop2: 4
+                  }
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
 
-              model2Relation2: {
-                id: 6,
-                model1Prop1: 'blaa 4',
-                model1Prop2: 5
-              },
+                  model2Relation2: {
+                    id: 6,
+                    model1Prop1: 'blaa 4',
+                    model1Prop2: 5
+                  },
 
-              model2Relation1: [{
-                id: 7,
-                model1Prop1: 'blaa 5',
-                model1Prop2: 4
-              }]
-            }]
-          }]);
+                  model2Relation1: [
+                    {
+                      id: 7,
+                      model1Prop1: 'blaa 5',
+                      model1Prop2: 4
+                    }
+                  ]
+                }
+              ]
+            }
+          ]);
         });
 
         it('should unrelate', () => {
-          return Model2
-            .query()
+          return Model2.query()
             .where('id_col', 2)
             .first()
             .then(model => {
-              return model
-                .$relatedQuery('model2Relation2')
-                .unrelate();
+              return model.$relatedQuery('model2Relation2').unrelate();
             })
             .then(numDeleted => {
               expect(numDeleted).to.equal(1);
@@ -353,10 +362,7 @@ module.exports = (session) => {
               expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
             });
         });
-
       });
-
     });
-
   });
 };

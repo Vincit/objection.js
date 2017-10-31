@@ -3,8 +3,7 @@
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
-module.exports = (session) => {
-
+module.exports = session => {
   describe('generated id', () => {
     let TestModel;
 
@@ -40,14 +39,15 @@ module.exports = (session) => {
     });
 
     it('should return the generated id when inserted', () => {
-      return TestModel.query().insert({value: 'hello'}).then(ret => {
-        expect(ret.idCol).to.equal('someRandomId');
-        return session.knex(TestModel.tableName);
-      }).then(rows => {
-        expect(rows[0]).to.eql({value: 'hello', idCol: 'someRandomId'});
-      });
+      return TestModel.query()
+        .insert({value: 'hello'})
+        .then(ret => {
+          expect(ret.idCol).to.equal('someRandomId');
+          return session.knex(TestModel.tableName);
+        })
+        .then(rows => {
+          expect(rows[0]).to.eql({value: 'hello', idCol: 'someRandomId'});
+        });
     });
-
   });
-
 };

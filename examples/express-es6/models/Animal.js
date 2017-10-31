@@ -22,7 +22,7 @@ class Animal extends Model {
         name: {type: 'string', minLength: 1, maxLength: 255},
         species: {type: 'string', minLength: 1, maxLength: 255}
       }
-    }
+    };
   }
 
   // This object defines the relations to other models.

@@ -4,8 +4,7 @@ const expect = require('expect.js');
 const Model = require('../../../').Model;
 const AjvValidator = require('../../../').AjvValidator;
 
-module.exports = (session) => {
-
+module.exports = session => {
   describe('leverage ajv cache and serialize function #411', () => {
     let ajvValidator;
 
@@ -14,14 +13,14 @@ module.exports = (session) => {
         return {
           type: 'object',
           properties: {
-            foo: { type: 'string' }
+            foo: {type: 'string'}
           }
         };
       }
 
       static createValidator() {
         ajvValidator = new AjvValidator({
-          onCreateAjv: (ajv) => {},
+          onCreateAjv: ajv => {},
           options: {
             allErrors: true,
             validateSchema: false,
@@ -46,5 +45,4 @@ module.exports = (session) => {
       expect(ajvValidator.cache).to.have.property('blaa blaa');
     });
   });
-
 };

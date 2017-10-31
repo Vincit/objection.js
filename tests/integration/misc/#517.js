@@ -3,8 +3,7 @@
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
-module.exports = (session) => {
-
+module.exports = session => {
   describe('upsertGraph with compound key in relation #517', () => {
     let knex = session.knex;
     let Users;
@@ -26,9 +25,7 @@ module.exports = (session) => {
     });
 
     after(() => {
-      return knex.schema
-        .dropTableIfExists('Preferences')
-        .dropTableIfExists('Users');
+      return knex.schema.dropTableIfExists('Preferences').dropTableIfExists('Users');
     });
 
     before(() => {
@@ -59,7 +56,7 @@ module.exports = (session) => {
         static get idColumn() {
           return ['userId', 'category'];
         }
-      }
+      };
 
       Users.knex(knex);
       Preferences.knex(knex);
@@ -68,44 +65,48 @@ module.exports = (session) => {
     before(() => {
       return Users.query().insert({
         id: 1
-      })
+      });
     });
 
     it('test', () => {
-      const preferences = [{
-        category: 'sms',
-        setting: 'off'
-      }, {
-        category: 'sound',
-        setting: 'off'
-      }];
+      const preferences = [
+        {
+          category: 'sms',
+          setting: 'off'
+        },
+        {
+          category: 'sound',
+          setting: 'off'
+        }
+      ];
 
-      return Users
-        .query()
+      return Users.query()
         .upsertGraph({id: 1, preferences})
         .then(() => {
-          return Users
-            .query()
+          return Users.query()
             .eager('preferences')
-            .modifyEager('preferences', qb => qb.orderBy('category'))
+            .modifyEager('preferences', qb => qb.orderBy('category'));
         })
         .then(users => {
-          expect(users).to.eql([{
-            id: 1,
+          expect(users).to.eql([
+            {
+              id: 1,
 
-            preferences: [{
-              category: 'sms',
-              setting: 'off',
-              userId: 1
-            }, {
-              category: 'sound',
-              setting: 'off',
-              userId: 1
-            }]
-          }])
+              preferences: [
+                {
+                  category: 'sms',
+                  setting: 'off',
+                  userId: 1
+                },
+                {
+                  category: 'sound',
+                  setting: 'off',
+                  userId: 1
+                }
+              ]
+            }
+          ]);
         });
     });
-
   });
-
 };

@@ -5,14 +5,16 @@
   "main": "lib/objection.js",
   "license": "MIT",
   "scripts": {
-    "test": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
-    "test-travis": "istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests && npm run test-typings",
-    "test-bail": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
+    "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
+    "test-travis": "npm run eslint && istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests && npm run test-typings",
+    "test-fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
     "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining",
     "test-typings": "tsc",
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
-    "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt --trace_inlining"
+    "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt --trace_inlining",
+    "prettier": "prettier --write 'examples/**/*.js' 'lib/**/*.js' 'tests/**/*.js'",
+    "eslint": "eslint --format codeframe 'examples/**/*.js' 'lib/**/*.js' 'tests/**/*.js'"
   },
   "publishConfig": {
     "tag": "next"
@@ -60,7 +62,10 @@
   "devDependencies": {
     "@types/knex": "^0.0.61",
     "@types/node": "^8.0.33",
+    "babel-eslint": "^8.0.1",
     "coveralls": "^2.13.1",
+    "eslint": "^4.10.0",
+    "eslint-plugin-prettier": "^2.3.1",
     "expect.js": "^0.3.1",
     "fs-extra": "3.0.1",
     "glob": "^7.1.1",
@@ -69,7 +74,8 @@
     "mocha": "^3.4.1",
     "mysql": "^2.13.0",
     "pg": "^6.2.2",
-    "sqlite3": "^3.1.8",
+    "prettier": "^1.7.4",
+    "sqlite3": "3.1.8",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3"
   }
