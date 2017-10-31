@@ -3116,6 +3116,37 @@ Type|Description
 
 
 
+
+<h4 id="eageroptions-method">eagerOptions</h4>
+
+```js
+const builder = queryBuilder.eagerOptions(options);
+```
+
+```js
+Person
+  .query()
+  .eagerOptions({joinOperation: 'innerJoin'})
+  .eager('[pets, children]')
+```
+
+Sets [options](#eageroptions) for the eager query.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+options|[`EagerOptions`](#eageroptions)|Options to set.s
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### eager
 
 ```js
@@ -7358,6 +7389,7 @@ old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`
 
 
 
+
 ## EagerOptions
 
 Property|Type|Description
@@ -7365,6 +7397,7 @@ Property|Type|Description
 minimize|boolean|If true the aliases of the joined tables and columns in a join based eager loading are minimized. This is sometimes needed because of identifier length limitations of some database engines. objection throws an exception when a query exceeds the length limit. You need to use this only in those cases.
 separator|string|Separator between relations in nested join based eager query. Defaults to `:`. Dot (`.`) cannot be used at the moment because of the way knex parses the identifiers.
 aliases|Object.&lt;string, string&gt;|Aliases for relations in a join based eager query. Defaults to an empty object.
+joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoin', ...]` or any other knex join method name. Defaults to `leftJoin`.
 
 
 
