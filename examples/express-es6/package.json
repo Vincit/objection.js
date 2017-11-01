@@ -4,19 +4,21 @@
   "description": "Objection.js express ES6 example",
   "main": "app.js",
   "scripts": {
-    "start": "node app"
+    "migrate": "knex migrate:latest",
+    "start": "npm run migrate && node app"
   },
   "author": "Sami Koskimäki",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.3.5",
-    "body-parser": "^1.15.1",
-    "express": "^4.13.4",
-    "express-yields": "^1.0.2",
-    "knex": "^0.12.0",
-    "lodash": "^4.12.0",
-    "morgan": "^1.7.0",
-    "objection": "^0.8.0",
-    "sqlite3": "^3.1.3"
+    "axios": "^0.17.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "express-yields": "1.0.0",
+    "knex": "^0.13.0",
+    "lodash": "^4.17.4",
+    "morgan": "^1.9.0",
+    "objection": "^0.9.0",
+    "sqlite3": "^3.1.13"
   }
 }
