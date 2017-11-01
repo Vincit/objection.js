@@ -24,17 +24,18 @@
   "author": "Sami Koskimäki",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.17.2",
-    "express": "^4.15.3",
-    "express-promise-router": "^1.1.1",
+    "axios": "^0.17.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "express-promise-router": "^2.0.0",
     "knex": "^0.13.0",
     "lodash": "^4.17.4",
-    "morgan": "^1.8.2",
-    "objection": "^0.8.0",
-    "sqlite3": "^3.1.8"
+    "morgan": "^1.9.0",
+    "objection": "^0.9.0",
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.1",
+    "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-1": "^6.24.1"
   }

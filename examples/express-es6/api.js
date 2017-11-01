@@ -10,12 +10,20 @@ module.exports = app => {
   // all you want to do is insert a single person, `insertGraph` and `allowInsert`
   // can be replaced by `insert(req.body)`.
   app.post('/persons', function*(req, res) {
-    const person = yield Person.query()
-      // For security reasons, limit the relations that can be inserted.
-      .allowInsert('[pets, children.[pets, movies], movies, parent]')
-      .insertGraph(req.body);
+    const graph = req.body;
 
-    res.send(person);
+    // It's a good idea to wrap `insertGraph` call in a transaction since it
+    // may create multiple queries.
+    const insertedGraph = yield transaction(Person.knex(), trx => {
+      return (
+        Person.query(trx)
+          // For security reasons, limit the relations that can be inserted.
+          .allowInsert('[pets, children.[pets, movies], movies, parent]')
+          .insertGraph(graph)
+      );
+    });
+
+    res.send(insertedGraph);
   });
 
   // Patch a single Person.
@@ -38,10 +46,16 @@ module.exports = app => {
     // to determine which models need to be updated and which inserted.
     graph.id = parseInt(req.params.id, 10);
 
-    const upsertedGraph = yield Person.query()
-      // For security reasons, limit the relations that can be upserted.
-      .allowUpsert('[pets, children.[pets, movies], movies, parent]')
-      .upsertGraph(graph);
+    // It's a good idea to wrap `upsertGraph` call in a transaction since it
+    // may create multiple queries.
+    const upsertedGraph = yield transaction(Person.knex(), trx => {
+      return (
+        Person.query(trx)
+          // For security reasons, limit the relations that can be upserted.
+          .allowUpsert('[pets, children.[pets, movies], movies, parent]')
+          .upsertGraph(graph)
+      );
+    });
 
     res.send(upsertedGraph);
   });
