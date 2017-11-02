@@ -1239,7 +1239,7 @@ module.exports = session => {
         .catch(done);
     });
 
-    it('should fail if given nonexistent id in a relation (without relate=true option)', done => {
+    it('should fail if given nonexistent id in a relation (without relate: true option)', done => {
       const upsert = {
         id: 2,
         model1Prop1: 'updated root 2',
@@ -1551,6 +1551,7 @@ module.exports = session => {
 
       after(() => {
         delete Model1.$$jsonSchema;
+        delete Model1.$$validator;
       });
 
       it('should validate (also tests transactions)', () => {
@@ -1771,6 +1772,108 @@ module.exports = session => {
                     expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
                     // Row 2 should be deleted.
                     expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
+                  });
+                });
+            });
+          });
+      });
+    });
+
+    describe('upserts with update: true option', () => {
+      before(() => {
+        Model1.$$jsonSchema = {
+          type: 'object',
+          required: ['model1Prop1', 'model1Prop2'],
+
+          properties: {
+            model1Prop1: {type: 'string'},
+            model1Prop2: {type: 'integer'}
+          }
+        };
+      });
+
+      after(() => {
+        delete Model1.$$jsonSchema;
+        delete Model1.$$validator;
+      });
+
+      it('should fail to do an incomplete upsert', () => {
+        const fails = [
+          {
+            id: 2,
+            model1Prop1: 'updated root 2',
+            // This fails because of missing property.
+            // model1Prop2: 10,
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'updated belongsToOne',
+              model1Prop2: 100
+            }
+          },
+          {
+            id: 2,
+            model1Prop1: 'updated root 2',
+            model1Prop2: 10,
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'updated belongsToOne'
+              // This fails because of missing property.
+              // model2Prop2: 100
+            }
+          }
+        ];
+
+        const success = [
+          {
+            id: 2,
+            model1Prop1: 'updated root 2',
+            model1Prop2: 10,
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'updated belongsToOne',
+              model1Prop2: 100
+            }
+          }
+        ];
+
+        return Promise.map(fails, fail => {
+          return transaction(session.knex, trx =>
+            Model1.query(trx).upsertGraph(fail, {update: true})
+          ).reflect();
+        })
+          .then(results => {
+            // Check that all transactions have failed because of a validation error.
+            results.forEach(res => {
+              expect(res.isRejected()).to.equal(true);
+              expect(res.reason().data.model1Prop2[0].message).to.equal(
+                "should have required property 'model1Prop2'"
+              );
+            });
+          })
+          .then(() => {
+            return transaction(session.knex, trx => {
+              return Model1.query(trx)
+                .upsertGraph(success, {update: true})
+                .then(result => {
+                  // Fetch the graph from the database.
+                  return Model1.query(trx)
+                    .findById(2)
+                    .eager('model1Relation1');
+                })
+                .then(omitIrrelevantProps)
+                .then(omitIds)
+                .then(result => {
+                  expect(result).to.eql({
+                    model1Id: 3,
+                    model1Prop1: 'updated root 2',
+
+                    model1Relation1: {
+                      model1Id: null,
+                      model1Prop1: 'updated belongsToOne'
+                    }
                   });
                 });
             });
