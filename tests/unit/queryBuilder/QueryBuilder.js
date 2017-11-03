@@ -1683,6 +1683,138 @@ describe('QueryBuilder', () => {
         .catch(done);
     });
   });
+
+  describe('context', () => {
+    it('context() should replace context', () => {
+      const builder = TestModel.query();
+
+      builder.context({a: 1});
+      builder.context({b: 2});
+
+      expect(builder.context()).to.eql({
+        b: 2
+      });
+
+      expect(builder.context().transaction === mockKnex).to.equal(true);
+    });
+
+    it('`mergeContext` should merge context', () => {
+      const builder = TestModel.query();
+      const origContext = {a: 1};
+
+      builder.context(origContext);
+      builder.mergeContext({b: 2});
+
+      expect(builder.context()).to.eql({
+        a: 1,
+        b: 2
+      });
+
+      expect(origContext).to.eql({
+        a: 1
+      });
+
+      expect(builder.context().transaction === mockKnex).to.equal(true);
+    });
+
+    it('`mergeContext` can be called without `context` having been called', () => {
+      const builder = TestModel.query();
+      const origContext = {a: 1};
+
+      builder.mergeContext(origContext);
+      builder.mergeContext({b: 2});
+
+      expect(builder.context()).to.eql({
+        a: 1,
+        b: 2
+      });
+
+      expect(origContext).to.eql({
+        a: 1
+      });
+
+      expect(builder.context().transaction === mockKnex).to.equal(true);
+    });
+
+    it('cloning a query builder should clone the context also', () => {
+      const builder = TestModel.query();
+      const origContext = {a: 1};
+
+      builder.context(origContext);
+
+      const builder2 = builder.clone();
+      builder2.mergeContext({b: 2});
+
+      expect(builder.context()).to.eql({
+        a: 1
+      });
+
+      expect(builder2.context()).to.eql({
+        a: 1,
+        b: 2
+      });
+
+      expect(origContext).to.eql({
+        a: 1
+      });
+
+      expect(builder.context().transaction === mockKnex).to.equal(true);
+      expect(builder2.context().transaction === mockKnex).to.equal(true);
+    });
+
+    it('calling `childQueryOf` should copy a reference of the context', () => {
+      const builder = TestModel.query();
+      const origContext = {a: 1};
+
+      builder.context(origContext);
+
+      const builder2 = TestModel.query().childQueryOf(builder);
+      builder2.mergeContext({b: 2});
+
+      expect(builder.context()).to.eql({
+        a: 1,
+        b: 2
+      });
+
+      expect(builder2.context()).to.eql({
+        a: 1,
+        b: 2
+      });
+
+      expect(origContext).to.eql({
+        a: 1
+      });
+
+      expect(builder.context().transaction === mockKnex).to.equal(true);
+      expect(builder2.context().transaction === mockKnex).to.equal(true);
+    });
+
+    it('calling `childQueryOf(builder, true)` should copy the context', () => {
+      const builder = TestModel.query();
+      const origContext = {a: 1};
+
+      builder.context(origContext);
+
+      const builder2 = TestModel.query().childQueryOf(builder, true);
+      builder2.mergeContext({b: 2});
+
+      expect(builder.context()).to.eql({
+        a: 1
+      });
+
+      expect(builder2.context()).to.eql({
+        a: 1,
+        b: 2
+      });
+
+      expect(origContext).to.eql({
+        a: 1
+      });
+
+      expect(builder.context().transaction === mockKnex).to.equal(true);
+      expect(builder2.context().transaction === mockKnex).to.equal(true);
+    });
+  });
 });
 
 function createFindOperation(builder, whereObj) {
