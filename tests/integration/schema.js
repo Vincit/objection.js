@@ -102,6 +102,28 @@ module.exports = session => {
             ]);
           });
       });
+
+      it('columnInfo', () => {
+        return Person.query(session.knex)
+          .columnInfo()
+          .then(info => {
+            expect(info instanceof Model).to.equal(false);
+            expect(info).to.eql({
+              id: {
+                type: 'integer',
+                maxLength: null,
+                nullable: false,
+                defaultValue: `nextval('"Person_id_seq"'::regclass)`
+              },
+              name: {
+                type: 'character varying',
+                maxLength: 255,
+                nullable: true,
+                defaultValue: null
+              }
+            });
+          });
+      });
     });
   }
 };
