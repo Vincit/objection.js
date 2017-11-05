@@ -90,7 +90,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -111,7 +111,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -133,7 +133,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -155,7 +155,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -176,7 +176,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -197,7 +197,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -219,7 +219,7 @@ module.exports = session => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
@@ -243,7 +243,7 @@ module.exports = session => {
         expect(queryContext).to.eql(_.assign({}, context, merge1, merge2));
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
-        expect(queryContext.hasOwnProperty('transaction')).to.equal(false);
+        expect(Object.keys(queryContext).indexOf('transaction')).to.equal(-1);
         called = true;
       };
 
