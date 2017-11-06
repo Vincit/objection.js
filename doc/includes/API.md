@@ -3104,16 +3104,17 @@ query
    } else {
      return Promise.reject(error);
    }
- });
+ })
+ .where('age', > 30);
 ```
 
-Registers an error handler.
+Registers an error handler. Just like `catch` but doesn't execute the query.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-runAfter|function(Error, [`QueryBuilder`](#querybuilder))|The function to be executed on error.
+onError|function(Error, [`QueryBuilder`](#querybuilder))|The function to be executed on error.
 
 ##### Return value
 
