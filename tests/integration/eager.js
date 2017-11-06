@@ -1273,13 +1273,18 @@ module.exports = session => {
           .catch(done);
       });
 
-      it('should fail if given missing relation', () => {
-        expect(() => {
-          Model1.query()
-            .where('id', 1)
-            .eager('invalidRelation')
-            .then(() => {});
-        }).to.throwException();
+      it('should fail if given missing relation', done => {
+        Model1.query()
+          .where('id', 1)
+          .eager('invalidRelation')
+          .then(() => {
+            throw new Error('should not get here');
+          })
+          .catch(err => {
+            expect(err.data).to.have.property('eager');
+            done();
+          })
+          .catch(done);
       });
     });
 

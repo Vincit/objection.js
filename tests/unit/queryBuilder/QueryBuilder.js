@@ -439,8 +439,17 @@ describe('QueryBuilder', () => {
         expect(this).to.equal(builder);
         text += 'd';
       })
+      .runAfter(() => {
+        throw new Error('abort');
+      })
+      .onError(function(err, builder) {
+        expect(builder).to.be.a(QueryBuilder);
+        expect(this).to.equal(builder);
+        expect(err.message).to.equal('abort');
+        text += 'e';
+      })
       .then(() => {
-        expect(text).to.equal('abcd');
+        expect(text).to.equal('abcde');
         done();
       })
       .catch(err => {
