@@ -3085,6 +3085,46 @@ Type|Description
 
 
 
+#### onError
+
+```js
+const builder = queryBuilder.onError(onError);
+```
+
+```js
+const query = Person.query();
+
+query
+ .onError((error, queryBuilder) => {
+   // Handle `SomeError` but let other errors go through.
+   if (error instanceof SomeError) {
+     // This will cause the query to be resolved with an object
+     // instead of throwing an error.
+     return {error: 'some error occurred'};
+   } else {
+     return Promise.reject(error);
+   }
+ });
+```
+
+Registers an error handler.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+runAfter|function(Error, [`QueryBuilder`](#querybuilder))|The function to be executed on error.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+
 #### eagerAlgorithm
 
 ```js
