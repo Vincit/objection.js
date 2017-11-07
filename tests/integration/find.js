@@ -6,6 +6,7 @@ const ref = require('../../').ref;
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
+const Model = require('../../').Model;
 const QueryBuilderOperation = require('../../').QueryBuilderOperation;
 
 module.exports = session => {
@@ -959,6 +960,47 @@ module.exports = session => {
             models = _.sortBy(models, ['id', 'id_col']);
             expect(_.map(models, 'id')).to.eql([1, 1, 7]);
             expect(_.map(models, 'id_col')).to.eql([1, 2, 3]);
+          });
+      });
+
+      it('should join eager expression a.b.c, select c.* and cast result to c', () => {
+        return Model1.query()
+          .joinRelation('model1Relation2.model2Relation1.model1Relation1')
+          .select([
+            'model1Relation2:model2Relation1:model1Relation1.id as id_col',
+            'model1Relation2:model2Relation1.id as model_1_id'
+          ])
+          .castTo(Model2)
+          .then(models => {
+            expect(models[0]).to.be.a(Model2);
+            expect(models).to.eql([
+              {
+                idCol: 8,
+                model1Id: 7,
+                $afterGetCalled: 1
+              }
+            ]);
+          });
+      });
+
+      it('should join eager expression a.b.c, select columns with aliases and cast result to Model', () => {
+        return Model1.query()
+          .joinRelation('model1Relation2.model2Relation1.model1Relation1')
+          .select([
+            'model1Relation2:model2Relation1:model1Relation1.id as someId',
+            'model1Relation2:model2Relation1.id as someOtherId'
+          ])
+          .castTo(Model)
+          .then(models => {
+            expect(models[0]).to.be.a(Model);
+            expect(models[0]).to.not.be.a(Model1);
+
+            expect(models).to.eql([
+              {
+                someId: 8,
+                someOtherId: 7
+              }
+            ]);
           });
       });
     });

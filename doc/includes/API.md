@@ -3694,6 +3694,58 @@ Just like [`allowInsert`](#allowinsert) but this one works with [`upsertGraph`](
 
 
 
+
+#### castTo
+
+```js
+const builder = queryBuilder.castTo(ModelClass);
+```
+
+> The following example creates a query through `Person`, joins a bunch of relations, selects
+> only the related `Animal`'s columns and returns the results as `Animal` instances instead
+> of `Person` instances.
+
+```js
+Person
+  .query()
+  .joinRelation('children.children.pets')
+  .select('children:children:pets.*')
+  .castTo(Animal);
+```
+
+> If your result rows represent no actual model, you can use `objection.Model`
+
+```js
+const { Model } = require('objection');
+
+Person
+  .query()
+  .joinRelation('children.pets')
+  .select([
+    'children:pets.id as animalId',
+    'children.firstName as childFirstName'
+  ])
+  .castTo(Model);
+```
+
+Sets the model class of the result rows.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`ModelClass`](#model)|The model class of the result rows.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+
 #### modelClass
 
 ```js

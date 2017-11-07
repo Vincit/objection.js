@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+### What's new
+
+  * [`castTo`](http://vincit.github.io/objection.js/#castto) method for setting the model class of query result rows.
+
 ## 0.9.0
 
 ### What's new
