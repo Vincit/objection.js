@@ -5,6 +5,8 @@ const expect = require('expect.js');
 const utils = require('../../lib/utils/classUtils');
 const compose = require('../../lib/utils/mixin').compose;
 const mixin = require('../../lib/utils/mixin').mixin;
+const snakeCase = require('../../lib/utils/knexSnakeCaseMappers').snakeCase;
+const camelCase = require('../../lib/utils/knexSnakeCaseMappers').camelCase;
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
@@ -108,5 +110,22 @@ describe('utils', () => {
         expect(Z.name).to.equal('X');
       }
     });
+  });
+
+  describe('snakeCase and camelCase', () => {
+    test('*', '*');
+    test('foo', 'foo');
+    test('foo1bar2', 'foo1bar2');
+    test('Foo', 'Foo');
+    test('fooBar', 'foo_bar');
+    test('märkäLänttiÄäliö', 'märkä_läntti_ääliö');
+    test('fooBar:spamBaz:troloLolo', 'foo_bar:spam_baz:trolo_lolo');
+
+    function test(camel, snake) {
+      it(`${camel} --> ${snake}`, () => {
+        expect(snakeCase(camel)).to.equal(snake);
+        expect(camelCase(snakeCase(camel))).to.equal(camel);
+      });
+    }
   });
 });

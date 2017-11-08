@@ -167,7 +167,7 @@ module.exports = session => {
                   'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
 
                   'update "Model1" set "id" = 3, "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
-                  'update "model_2" set "id_col" = 1, "model_1_id" = 2, "model_2_prop_1" = \'updated hasMany 1\' where "model_2"."id_col" = 1 and "model_2"."model_1_id" in (2)',
+                  'update "model_2" set "id_col" = 1, "model_2_prop_1" = \'updated hasMany 1\', "model_1_id" = 2 where "model_2"."id_col" = 1 and "model_2"."model_1_id" in (2)',
                   'update "Model1" set "id" = 4, "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
                 ]);
               }
@@ -241,19 +241,18 @@ module.exports = session => {
                 ]
               });
 
-              return Promise.all([
-                trx('Model1'),
-                trx('model_2')
-              ]).spread((model1Rows, model2Rows) => {
-                // Row 5 should be deleted.
-                expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
-                // Row 6 should NOT be deleted even thought its parent is.
-                expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
-                // Row 7 should NOT be deleted  even thought its parent is.
-                expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
-                // Row 2 should be deleted.
-                expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
-              });
+              return Promise.all([trx('Model1'), trx('model_2')]).spread(
+                (model1Rows, model2Rows) => {
+                  // Row 5 should be deleted.
+                  expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+                  // Row 6 should NOT be deleted even thought its parent is.
+                  expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+                  // Row 7 should NOT be deleted  even thought its parent is.
+                  expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
+                  // Row 2 should be deleted.
+                  expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
+                }
+              );
             })
         );
       });
@@ -1395,34 +1394,33 @@ module.exports = session => {
             ]
           });
 
-          return Promise.all([
-            session.knex('Model1'),
-            session.knex('model_2')
-          ]).spread((model1Rows, model2Rows) => {
-            // Row 3 should NOT be deleted.
-            expect(model1Rows.find(it => it.id == 3)).to.eql({
-              id: 3,
-              model1Id: null,
-              model1Prop1: 'belongsToOne',
-              model1Prop2: null
-            });
+          return Promise.all([session.knex('Model1'), session.knex('model_2')]).spread(
+            (model1Rows, model2Rows) => {
+              // Row 3 should NOT be deleted.
+              expect(model1Rows.find(it => it.id == 3)).to.eql({
+                id: 3,
+                model1Id: null,
+                model1Prop1: 'belongsToOne',
+                model1Prop2: null
+              });
 
-            // Row 5 should NOT be deleted.
-            expect(model1Rows.find(it => it.id == 5)).to.eql({
-              id: 5,
-              model1Id: null,
-              model1Prop1: 'manyToMany 2',
-              model1Prop2: null
-            });
+              // Row 5 should NOT be deleted.
+              expect(model1Rows.find(it => it.id == 5)).to.eql({
+                id: 5,
+                model1Id: null,
+                model1Prop1: 'manyToMany 2',
+                model1Prop2: null
+              });
 
-            // Row 2 should NOT be deleted.
-            expect(model2Rows.find(it => it.id_col == 2)).to.eql({
-              id_col: 2,
-              model_1_id: null,
-              model_2_prop_1: 'hasMany 2',
-              model_2_prop_2: null
-            });
-          });
+              // Row 2 should NOT be deleted.
+              expect(model2Rows.find(it => it.id_col == 2)).to.eql({
+                id_col: 2,
+                model_1_id: null,
+                model_2_prop_1: 'hasMany 2',
+                model_2_prop_2: null
+              });
+            }
+          );
         });
     });
 
@@ -1760,19 +1758,18 @@ module.exports = session => {
                     ]
                   });
 
-                  return Promise.all([
-                    trx('Model1'),
-                    trx('model_2')
-                  ]).spread((model1Rows, model2Rows) => {
-                    // Row 5 should be deleted.
-                    expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
-                    // Row 6 should NOT be deleted even thought its parent is.
-                    expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
-                    // Row 7 should NOT be deleted  even thought its parent is.
-                    expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
-                    // Row 2 should be deleted.
-                    expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
-                  });
+                  return Promise.all([trx('Model1'), trx('model_2')]).spread(
+                    (model1Rows, model2Rows) => {
+                      // Row 5 should be deleted.
+                      expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+                      // Row 6 should NOT be deleted even thought its parent is.
+                      expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+                      // Row 7 should NOT be deleted  even thought its parent is.
+                      expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
+                      // Row 2 should be deleted.
+                      expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
+                    }
+                  );
                 });
             });
           });

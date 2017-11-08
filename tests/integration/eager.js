@@ -2388,16 +2388,11 @@ module.exports = session => {
         });
 
         function traverser(model) {
-          [
-            'extra1',
-            'extra2',
-            'aliasedExtra',
-            'model1Id',
-            'model1Prop2',
-            'model2Prop2'
-          ].forEach(key => {
-            delete model[key];
-          });
+          ['extra1', 'extra2', 'aliasedExtra', 'model1Id', 'model1Prop2', 'model2Prop2'].forEach(
+            key => {
+              delete model[key];
+            }
+          );
 
           ['model1Relation2', 'model1Relation3'].map(rel => {
             if (model[rel]) {
@@ -2428,8 +2423,7 @@ module.exports = session => {
 
     if (!opt.disableWhereIn) {
       testFn(testName + ' (QueryBuilder.eager)', () => {
-        return opt.Model
-          .query()
+        return opt.Model.query()
           .where(idCol, opt.id)
           .eager(expr, opt.filters)
           .then(sortRelations(opt.disableSort))
@@ -2437,8 +2431,7 @@ module.exports = session => {
       });
 
       testFn(testName + ' (Model.loadRelated)', () => {
-        return opt.Model
-          .query()
+        return opt.Model.query()
           .where(idCol, opt.id)
           .then(models => {
             return opt.Model.loadRelated(models, expr, opt.filters);
@@ -2448,8 +2441,7 @@ module.exports = session => {
       });
 
       testFn(testName + ' (Model.$loadRelated)', () => {
-        return opt.Model
-          .query()
+        return opt.Model.query()
           .where(idCol, opt.id)
           .then(models => {
             return models[0].$loadRelated(expr, opt.filters);
@@ -2461,8 +2453,7 @@ module.exports = session => {
       });
 
       testFn(testName + ' (NaiveEagerAlgorithm)', () => {
-        return opt.Model
-          .query()
+        return opt.Model.query()
           .where(idCol, opt.id)
           .eagerAlgorithm(Model1.NaiveEagerAlgorithm)
           .eager(expr, opt.filters)
@@ -2473,8 +2464,7 @@ module.exports = session => {
 
     if (!opt.disableJoin) {
       testFn(testName + ' (JoinEagerAlgorithm)', () => {
-        return opt.Model
-          .query()
+        return opt.Model.query()
           .where(idCol, opt.id)
           .eagerAlgorithm(Model1.JoinEagerAlgorithm, opt.eagerOptions)
           .eager(expr, opt.filters)

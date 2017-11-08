@@ -30,8 +30,7 @@ module.exports = session => {
     });
 
     it('belongs to one relation', () => {
-      return session.models.Model1
-        .query()
+      return session.models.Model1.query()
         .whereIn('id', [1, 3])
         .eager('model1Relation1')
         .then(models => {
@@ -69,8 +68,7 @@ module.exports = session => {
     });
 
     it('has one relation', () => {
-      return session.models.Model1
-        .query()
+      return session.models.Model1.query()
         .whereIn('id', [2, 4])
         .eager('model1Relation1Inverse')
         .then(models => {

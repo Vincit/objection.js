@@ -23,8 +23,7 @@ module.exports = session => {
     });
 
     it('count of HasManyRelation', () => {
-      return session.models.Model1
-        .query()
+      return session.models.Model1.query()
         .select('Model1.*')
         .count('model1Relation2.id_col as relCount')
         .joinRelation('model1Relation2')

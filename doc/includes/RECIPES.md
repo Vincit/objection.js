@@ -25,11 +25,11 @@ Person
   });
 ```
 
-To mix raw SQL with queries, use the [`raw`](#raw) function from the main module 
+To mix raw SQL with queries, use the [`raw`](#raw) function from the main module
 or the `raw` method of any [`Model`](#model) subclass. The only difference between
 these two is that the `raw` function from the main module doesn't depend on knex
 where as `Model.raw()` will throw if the model doesn't have a knex instance installed.
-Both of these functions work just like the [knex's raw method](http://knexjs.org/#Raw). 
+Both of these functions work just like the [knex's raw method](http://knexjs.org/#Raw).
 And of course you can just use `knex.raw()`.
 
 There are also some helper methods such as [`whereRaw`](#whereraw) in the [`QueryBuilder`](#querybuilder).
@@ -195,54 +195,46 @@ If you don't want to use the built-in json schema validation, you can just ignor
 It is completely optional. If you want to use some other validation library you need to implement a custom [`Validator`](#validator)
 (see the example).
 
-## Map column names to different property names
-
-> snake_case/camelCase conversion:
+## snake_case to camelCase conversion
 
 ```js
-// It's a good idea to memoize the conversion functions.
-const snakeCase = _.memoize(_.snakeCase);
-const camelCase = _.memoize(_.camelCase);
+const Knex = require('knex');
+const { knexSnakeCaseMappers } = require('objection');
 
-class Person extends Model {
-  // This is called when an object is serialized to database format.
-  $formatDatabaseJson(json) {
-    json = super.$formatDatabaseJson(json);
+const knex = Knex({
+  client: 'postgres',
 
-    return _.mapKeys(json, (value, key) => {
-      return snakeCase(key);
-    });
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
   }
 
-  // This is called when an object is read from database.
-  $parseDatabaseJson(json) {
-    json = _.mapKeys(json, (value, key) => {
-      return camelCase(key);
-    });
-
-    return super.$parseDatabaseJson(json);
-  }
-}
+  // Merge `postProcessResponse` and `wrapIdentifier` mappers.
+  ...knexSnakeCaseMappers()
+});
 ```
 
-> Note that even though column names are mapped when fetching / storing data, one still has to use
-> db column names when writing queries:
+> For older nodes:
 
 ```js
-await Person.query().insert({ firstName: 'Jennifer' });
-let jen = await Person.query().where('first_name', 'Jennifer');
-expect(jen.firstName).to.equal('Jennifer');
+const Knex = require('knex');
+const knexSnakeCaseMappers = require('objection').knexSnakeCaseMappers;
+
+const knex = Knex(Object.assign({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+}, knexSnakeCaseMappers()));
 ```
 
-Sometimes you may want to use for example snake_cased column names in database tables
-and camelCased property names in code. You can use the functions
-
-- [`$parseDatabaseJson`](#_s_parsedatabasejson)
-- [`$formatDatabaseJson`](#_s_formatdatabasejson)
-- [`$parseJson`](#_s_parsejson)
-- [`$formatJson`](#_s_formatjson)
-
-to convert data between database and "external" representations.
+To use snake_case names in database and camelCase properties in code, you can use the `knexSnakeCaseMappers`
+function and merge it into your knex configuration. `knexSnakeCaseMappers` returns an object that has two functions
+`postProcessResponse` and `wrapIdentifier` that take care of the mapping on knex level.
 
 ## Paging
 
@@ -566,9 +558,9 @@ app.get('/people', (req, res) => {
 ```
 
 Another option is to add the knex instance to the request using a middleware and not bind models at all (not even using `Model.knex()`).
-The knex instance can be passed to [`query`](#query), [`$query`](#_s_query), and [`$relatedQuery`](#_s_relatedquery) methods 
+The knex instance can be passed to [`query`](#query), [`$query`](#_s_query), and [`$relatedQuery`](#_s_relatedquery) methods
 as the last argument. This pattern forces you to design your services and helper methods in a way that you always need to pass
-in a knex instance. A great thing about this is that you can pass a transaction object instead. (the knex/objection transaction 
+in a knex instance. A great thing about this is that you can pass a transaction object instead. (the knex/objection transaction
 object is a query builder just like the normal knex instance). This gives you a fine grained control over your transactions.
 
 ## SQL clause precedence and parentheses
@@ -971,7 +963,7 @@ UserGroupPermission
   )
   .joinRelation("[user, permission]")
   .where("group_id", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
-/* 
+/*
 {
   first_name: ... ,
   last_name: ... ,
@@ -988,7 +980,7 @@ UserGroupPermission
   .query()
   .eager("[user, permission]")
   .where("group_id", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
-/* 
+/*
 {
   user: {
     first_name: ... ,

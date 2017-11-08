@@ -6,6 +6,7 @@
 
   * [`castTo`](http://vincit.github.io/objection.js/#castto) method for setting the model class of query result rows.
   * [`onError`](http://vincit.github.io/objection.js/#onerror) `QueryBuilder` method.
+  * [`knexSnakeCaseMappers`](http://vincit.github.io/objection.js/#objection-knexsnakecasemappers) for snake_case to camelCase conversions.
 
 ## 0.9.0
 

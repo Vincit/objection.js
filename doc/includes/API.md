@@ -90,6 +90,47 @@ const { Promise } = require('objection');
 
 [Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used internally by objection.
 
+<h4 id="objection-knexsnakecasemappers">Promise</h4>
+
+```js
+const { knexSnakeCaseMappers } = require('objection');
+const Knex = require('knex');
+
+const knex = Knex({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+
+  // Merge `postProcessResponse` and `wrapIdentifier` mappers.
+  ...knexSnakeCaseMappers()
+});
+```
+
+> For older nodes:
+
+```js
+const Knex = require('knex');
+const knexSnakeCaseMappers = require('objection').knexSnakeCaseMappers;
+
+const knex = Knex(Object.assign({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+}, knexSnakeCaseMappers()));
+```
+
+To use snake_case names in database and camelCase properties in code, you can use the `knexSnakeCaseMappers`
+function and merge it into your knex configuration. `knexSnakeCaseMappers` returns an object that has two functions
+`postProcessResponse` and `wrapIdentifier` that take care of the mapping on knex level.
+
 
 
 

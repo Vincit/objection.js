@@ -71,8 +71,9 @@ describe('integration tests', () => {
       require('./crossDb')(session);
       require('./viewsAndAliases')(session);
       require('./schema')(session);
+      require('./knexSnakeCase')(session);
 
-      if (knexConfig.client === 'postgres') {
+      if (session.isPostgres()) {
         require('./jsonQueries')(session);
         require('./jsonRelations')(session);
       }
