@@ -104,9 +104,9 @@ module.exports = session => {
       queries.splice(0, queries.length);
 
       fullEager = `[
-        model1Relation1, 
+        model1Relation1,
         model1Relation2.model2Relation1.[
-          model1Relation1, 
+          model1Relation1,
           model1Relation2
         ]
       ]`;
@@ -206,15 +206,34 @@ module.exports = session => {
             if (utils.isPostgres(session.knex)) {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
-                select "someAlias".* 
-                from "Model1" as "someAlias" 
-                inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "someAlias"."model1Id" 
-                inner join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someAlias"."id" 
-                inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someAlias"."id" 
-                inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col" 
+                select "someAlias".*
+                from "Model1" as "someAlias"
+                inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "someAlias"."model1Id"
+                inner join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someAlias"."id"
+                inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someAlias"."id"
+                inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
                 where "someAlias"."id" = 1
               `.replace(/\s/g, '')
               );
+            }
+          });
+      });
+
+      it('should use alias with an instance query', () => {
+        return Model1.query()
+          .findById(1)
+          .then(model => {
+            queries.splice(0, queries.length);
+            return model
+              .$query()
+              .alias('foo')
+              .joinRelation('model1Relation1.model1Relation1');
+          })
+          .then(model => {
+            if (session.isPostgres()) {
+              expect(queries).to.eql([
+                'select "foo".* from "Model1" as "foo" inner join "Model1" as "model1Relation1" on "model1Relation1"."id" = "foo"."model1Id" inner join "Model1" as "model1Relation1:model1Relation1" on "model1Relation1:model1Relation1"."id" = "model1Relation1"."model1Id" where "foo"."id" = 1'
+              ]);
             }
           });
       });
@@ -287,48 +306,48 @@ module.exports = session => {
               expect(queries.length).to.equal(1);
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
-                select 
-                  "someAlias"."id" as "id", 
-                  "someAlias"."model1Id" as "model1Id", 
-                  "someAlias"."model1Prop1" as "model1Prop1", 
-                  "someAlias"."model1Prop2" as "model1Prop2", 
-                  "model1Relation1"."id" as "model1Relation1:id", 
-                  "model1Relation1"."model1Id" as "model1Relation1:model1Id", 
-                  "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1", 
-                  "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2", 
-                  "model1Relation2"."id_col" as "model1Relation2:id_col", 
-                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id", 
-                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1", 
-                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2", 
-                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id", 
-                  "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id", 
-                  "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1", 
-                  "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2", 
-                  "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra", 
-                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2", 
-                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
-                from 
-                  "Model1" as "someAlias" 
-                left join 
-                  "Model1" as "model1Relation1" on "model1Relation1"."id" = "someAlias"."model1Id" 
-                left join 
-                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someAlias"."id" 
-                left join 
-                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col" 
-                left join 
-                  "Model1" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id" 
-                left join 
-                  "Model1" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id" 
-                left join 
-                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
-                where 
-                  "someAlias"."id" = 1 
+                select
+                  "someAlias"."id" as "id",
+                  "someAlias"."model1Id" as "model1Id",
+                  "someAlias"."model1Prop1" as "model1Prop1",
+                  "someAlias"."model1Prop2" as "model1Prop2",
+                  "model1Relation1"."id" as "model1Relation1:id",
+                  "model1Relation1"."model1Id" as "model1Relation1:model1Id",
+                  "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
+                  "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2",
+                  "model1Relation2"."id_col" as "model1Relation2:id_col",
+                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id",
+                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1",
+                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2",
+                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",
+                  "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id",
+                  "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1",
+                  "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra",
+                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2"
+                from
+                  "Model1" as "someAlias"
+                left join
+                  "Model1" as "model1Relation1" on "model1Relation1"."id" = "someAlias"."model1Id"
+                left join
+                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someAlias"."id"
+                left join
+                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
+                left join
+                  "Model1" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
+                left join
+                  "Model1" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id"
+                left join
+                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id"
+                where
+                  "someAlias"."id" = 1
               `.replace(/\s/g, '')
               );
             }
@@ -370,12 +389,12 @@ module.exports = session => {
               if (utils.isPostgres(session.knex)) {
                 expect(queries[0].replace(/\s/g, '')).to.equal(
                   `
-                  select "someView".* 
+                  select "someView".*
                   from "someView"
-                  inner join "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
-                  inner join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id" 
-                  inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someView"."id" 
-                  inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col" 
+                  inner join "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
+                  inner join "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id"
+                  inner join "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "someView"."id"
+                  inner join "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
                   where "someView"."id" = 1
                 `.replace(/\s/g, '')
                 );
@@ -420,47 +439,47 @@ module.exports = session => {
               expect(queries.length).to.equal(1);
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
-                select 
-                  "someView"."id" as "id", 
-                  "someView"."model1Id" as "model1Id", 
-                  "someView"."model1Prop1" as "model1Prop1", 
-                  "someView"."model1Prop2" as "model1Prop2", 
-                  "model1Relation1"."id" as "model1Relation1:id", 
-                  "model1Relation1"."model1Id" as "model1Relation1:model1Id", 
-                  "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1", 
-                  "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2", 
-                  "model1Relation2"."id_col" as "model1Relation2:id_col", 
-                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id", 
-                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1", 
-                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2", 
-                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id", 
-                  "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id", 
-                  "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1", 
-                  "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2", 
-                  "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra", 
-                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2", 
-                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
-                from 
+                select
+                  "someView"."id" as "id",
+                  "someView"."model1Id" as "model1Id",
+                  "someView"."model1Prop1" as "model1Prop1",
+                  "someView"."model1Prop2" as "model1Prop2",
+                  "model1Relation1"."id" as "model1Relation1:id",
+                  "model1Relation1"."model1Id" as "model1Relation1:model1Id",
+                  "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
+                  "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2",
+                  "model1Relation2"."id_col" as "model1Relation2:id_col",
+                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id",
+                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1",
+                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2",
+                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",
+                  "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id",
+                  "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1",
+                  "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra",
+                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2"
+                from
                   "someView"
-                left join 
-                  "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
-                left join 
-                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id" 
-                left join 
-                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col" 
-                left join 
-                  "someView" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id" 
-                left join 
-                  "someView" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id" 
-                left join 
-                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
-                where 
+                left join
+                  "someView" as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
+                left join
+                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id"
+                left join
+                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
+                left join
+                  "someView" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
+                left join
+                  "someView" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id"
+                left join
+                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id"
+                where
                   "someView"."id" = 1
                 `.replace(/\s/g, '')
               );
@@ -482,40 +501,40 @@ module.exports = session => {
               expect(queries.length).to.equal(1);
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
-                select 
-                  "someView"."id" as "id", 
-                  "someView"."model1Id" as "model1Id", 
-                  "someView"."model1Prop1" as "model1Prop1", 
-                  "someView"."model1Prop2" as "model1Prop2", 
-                  "model1Relation1"."id" as "model1Relation1:id", 
-                  "model1Relation2"."id_col" as "model1Relation2:id_col", 
-                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id", 
-                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1", 
-                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2", 
-                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",  
-                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1", 
-                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2", 
-                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1", 
-                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2" 
-                from 
+                select
+                  "someView"."id" as "id",
+                  "someView"."model1Id" as "model1Id",
+                  "someView"."model1Prop1" as "model1Prop1",
+                  "someView"."model1Prop2" as "model1Prop2",
+                  "model1Relation1"."id" as "model1Relation1:id",
+                  "model1Relation2"."id_col" as "model1Relation2:id_col",
+                  "model1Relation2"."model_1_id" as "model1Relation2:model_1_id",
+                  "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1",
+                  "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2",
+                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",
+                  "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1",
+                  "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_1_id" as "model1Relation2:model2Relation1:model1Relation2:model_1_id",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_1" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_1",
+                  "model1Relation2:model2Relation1:model1Relation2"."model_2_prop_2" as "model1Relation2:model2Relation1:model1Relation2:model_2_prop_2"
+                from
                   "someView"
-                left join 
-                  (select "id", "model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id" 
-                left join 
-                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id" 
-                left join 
-                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col" 
-                left join 
-                  (select "id", "model1Id" from "someView") as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id" 
-                left join 
-                  "someView" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id" 
-                left join 
-                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id" 
-                where 
+                left join
+                  (select "id", "model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
+                left join
+                  "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "someView"."id"
+                left join
+                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
+                left join
+                  (select "id", "model1Id" from "someView") as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
+                left join
+                  "someView" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id"
+                left join
+                  "model_2" as "model1Relation2:model2Relation1:model1Relation2" on "model1Relation2:model2Relation1:model1Relation2"."model_1_id" = "model1Relation2:model2Relation1"."id"
+                where
                   "someView"."id" = 1
                 `.replace(/\s/g, '')
               );
