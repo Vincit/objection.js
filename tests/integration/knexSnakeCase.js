@@ -95,93 +95,129 @@ module.exports = session => {
       knex = Knex(config);
     });
 
-    beforeEach(() => {
-      return Person.query(knex).insertGraph({
-        firstName: 'Seppo',
+    describe('schema', () => {
+      const table = 'snakeCaseTestTable';
 
-        parent: {
-          firstName: 'Teppo'
-        },
+      before(() => {
+        return knex.schema.dropTableIfExists(table);
+      });
 
-        pets: [
-          {
-            animalName: 'Hurtta'
-          },
-          {
-            animalName: 'Katti'
-          }
-        ],
+      afterEach(() => {
+        return knex.schema.dropTableIfExists(table);
+      });
 
-        movies: [
-          {
-            movieName: 'Salkkarit the movie'
-          },
-          {
-            movieName: 'Salkkarit 2, the low quality continues'
-          }
-        ]
+      it('createTable', () => {
+        return knex.schema.createTable(table, table => {
+          table.increments('id');
+        });
+      });
+
+      it('dropTable', () => {
+        return knex.schema
+          .createTable(table, table => {
+            table.increments('id');
+          })
+          .dropTableIfExists(table);
+      });
+
+      it('dropTable', () => {
+        return knex.schema
+          .createTable(table, table => {
+            table.increments('id');
+          })
+          .hasTable(table);
       });
     });
 
-    it('eager', () => {
-      return Promise.map(
-        [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm],
-        eagerAlgo => {
-          return Person.query(knex)
-            .eager('[parent, pets, movies]')
-            .eagerAlgorithm(eagerAlgo)
-            .orderBy('firstName')
-            .traverse(model => {
-              delete model.id;
-              delete model.ownerId;
-              delete model.parentId;
+    describe('queries', () => {
+      beforeEach(() => {
+        return Person.query(knex).insertGraph({
+          firstName: 'Seppo',
 
-              if (model.movies) {
-                model.movies = sortBy(model.movies, 'movieName');
-              }
+          parent: {
+            firstName: 'Teppo'
+          },
 
-              if (model.pets) {
-                model.pets = sortBy(model.pets, 'animalName');
-              }
-            })
-            .then(people => {
-              expect(people).to.eql([
-                {
-                  firstName: 'Seppo',
+          pets: [
+            {
+              animalName: 'Hurtta'
+            },
+            {
+              animalName: 'Katti'
+            }
+          ],
 
-                  parent: {
-                    firstName: 'Teppo'
-                  },
+          movies: [
+            {
+              movieName: 'Salkkarit the movie'
+            },
+            {
+              movieName: 'Salkkarit 2, the low quality continues'
+            }
+          ]
+        });
+      });
 
-                  pets: [
-                    {
-                      animalName: 'Hurtta'
-                    },
-                    {
-                      animalName: 'Katti'
-                    }
-                  ],
+      it('eager', () => {
+        return Promise.map(
+          [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm],
+          eagerAlgo => {
+            return Person.query(knex)
+              .eager('[parent, pets, movies]')
+              .eagerAlgorithm(eagerAlgo)
+              .orderBy('firstName')
+              .traverse(model => {
+                delete model.id;
+                delete model.ownerId;
+                delete model.parentId;
 
-                  movies: [
-                    {
-                      movieName: 'Salkkarit 2, the low quality continues'
-                    },
-                    {
-                      movieName: 'Salkkarit the movie'
-                    }
-                  ]
-                },
-                {
-                  firstName: 'Teppo',
-                  parent: null,
-                  pets: [],
-                  movies: []
+                if (model.movies) {
+                  model.movies = sortBy(model.movies, 'movieName');
                 }
-              ]);
-            });
-        },
-        {concurrency: 1}
-      );
+
+                if (model.pets) {
+                  model.pets = sortBy(model.pets, 'animalName');
+                }
+              })
+              .then(people => {
+                expect(people).to.eql([
+                  {
+                    firstName: 'Seppo',
+
+                    parent: {
+                      firstName: 'Teppo'
+                    },
+
+                    pets: [
+                      {
+                        animalName: 'Hurtta'
+                      },
+                      {
+                        animalName: 'Katti'
+                      }
+                    ],
+
+                    movies: [
+                      {
+                        movieName: 'Salkkarit 2, the low quality continues'
+                      },
+                      {
+                        movieName: 'Salkkarit the movie'
+                      }
+                    ]
+                  },
+                  {
+                    firstName: 'Teppo',
+                    parent: null,
+                    pets: [],
+                    movies: []
+                  }
+                ]);
+              });
+          },
+          {concurrency: 1}
+        );
+      });
     });
 
     after(() => {
