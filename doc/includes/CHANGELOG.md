@@ -5,6 +5,7 @@
 ### What's new
 
   * [`castTo`](http://vincit.github.io/objection.js/#castto) method for setting the model class of query result rows.
+  * [`onError`](http://vincit.github.io/objection.js/#onerror) `QueryBuilder` method.
 
 ## 0.9.0
 
