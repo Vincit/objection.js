@@ -120,6 +120,7 @@ describe('utils', () => {
     test('fooBar', 'foo_bar');
     test('märkäLänttiÄäliö', 'märkä_läntti_ääliö');
     test('fooBar:spamBaz:troloLolo', 'foo_bar:spam_baz:trolo_lolo');
+    test('fooBar.spamBaz.troloLolo', 'foo_bar.spam_baz.trolo_lolo');
 
     function test(camel, snake) {
       it(`${camel} --> ${snake}`, () => {

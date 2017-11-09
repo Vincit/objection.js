@@ -106,10 +106,31 @@ module.exports = session => {
         return knex.schema.dropTableIfExists(table);
       });
 
+      after(() => {
+        return knex.schema.dropTableIfExists(table);
+      });
+
       it('createTable', () => {
-        return knex.schema.createTable(table, table => {
-          table.increments('id');
-        });
+        return knex.schema
+          .createTable(table, table => {
+            table.increments('id');
+            table.string('firstName');
+          })
+          .then(() => {
+            return knex(table).insert({id: 1, firstName: 'fooBar'});
+          })
+          .then(() => {
+            return knex(table);
+          })
+          .then(rows => {
+            expect(rows).to.eql([{id: 1, firstName: 'fooBar'}]);
+
+            // Query with a knex without case mapping.
+            return session.knex('snake_case_test_table');
+          })
+          .then(rows => {
+            expect(rows).to.eql([{id: 1, first_name: 'fooBar'}]);
+          });
       });
 
       it('dropTable', () => {
@@ -120,12 +141,21 @@ module.exports = session => {
           .dropTableIfExists(table);
       });
 
-      it('dropTable', () => {
+      it('hasTable (true)', () => {
         return knex.schema
           .createTable(table, table => {
             table.increments('id');
           })
-          .hasTable(table);
+          .hasTable(table)
+          .then(hasTable => {
+            expect(!!hasTable).to.equal(true);
+          });
+      });
+
+      it('hasTable (false)', () => {
+        return knex.schema.hasTable(table).then(hasTable => {
+          expect(hasTable).to.equal(false);
+        });
       });
     });
 
