@@ -508,6 +508,50 @@ module.exports = session => {
               });
           });
       });
+
+      it('relate: true option should cause models with id to be related instead of inserted', () => {
+        return Model2.query()
+          .insertGraphAndFetch(
+            {
+              model2Prop1: 'foo',
+
+              model2Relation1: [
+                {
+                  id: population.id
+                }
+              ]
+            },
+            {
+              relate: true
+            }
+          )
+          .then(model => {
+            return Model2.query()
+              .findById(model.idCol)
+              .eager('model2Relation1');
+          })
+          .then(model => {
+            delete model.idCol;
+
+            expect(model).to.eql({
+              model1Id: null,
+              model2Prop1: 'foo',
+              model2Prop2: null,
+              $afterGetCalled: 1,
+
+              model2Relation1: [
+                {
+                  id: population.id,
+                  model1Id: null,
+                  model1Prop1: population.model1Prop1,
+                  model1Prop2: null,
+                  aliasedExtra: null,
+                  $afterGetCalled: 1
+                }
+              ]
+            });
+          });
+      });
     });
 
     describe('.query().insertGraph().allowRelated()', () => {
