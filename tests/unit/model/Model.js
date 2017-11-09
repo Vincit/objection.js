@@ -474,6 +474,36 @@ describe('Model', () => {
       }).to.throwException();
     });
 
+    it('should be capable to return multiple validation errors per property', () => {
+      Model1.jsonSchema = {
+        required: ['a'],
+        properties: {
+          a: {
+            type: 'string',
+            minLength: 5,
+            pattern: '^\\d+$'
+          }
+        }
+      };
+
+      expect(() => {
+        Model1.fromJson({a: 'four'});
+      }).to.throwException(exp => {
+        expect(exp).to.be.a(ValidationError);
+        expect(exp.data).to.have.property('a');
+        expect(exp.data['a']).to.be.a(Array);
+        expect(exp.data['a']).to.have.length(2);
+        expect(exp.data['a'][0]).to.have.property('message');
+        expect(exp.data['a'][0]).to.have.property('keyword');
+        expect(exp.data['a'][0]).to.have.property('params');
+        expect(exp.data['a'][0].keyword).to.equal('pattern');
+        expect(exp.data['a'][1]).to.have.property('message');
+        expect(exp.data['a'][1]).to.have.property('keyword');
+        expect(exp.data['a'][1]).to.have.property('params');
+        expect(exp.data['a'][1].keyword).to.equal('minLength');
+      });
+    });
+
     it('should parse relations into Model instances and remove them from database representation', () => {
       let Model2 = modelClass('Model2');
 
