@@ -652,6 +652,59 @@ module.exports = session => {
               expect(_.map(models, 'model2Prop1').sort()).to.eql(['hejsan 2', 'hejsan 3']);
             });
         });
+
+        it('from', () => {
+          return Model1.query()
+            .upsertGraph({
+              id: 2,
+              model1Relation2: [
+                {
+                  model2Prop1: 'lol'
+                }
+              ]
+            })
+            .then(() => {
+              return (
+                Model1.query()
+                  .select('m2.*')
+                  .from({
+                    m1: 'Model1',
+                    m2: 'model_2'
+                  })
+                  // This tests that correct alias is used
+                  // for Model1 under the hood.
+                  .findByIds(1)
+                  .where('m1.id', ref('m2.model_1_id'))
+                  .orderBy('m2.id_col')
+                  .castTo(Model2)
+              );
+            })
+            .then(models => {
+              expect(models).to.eql([
+                {
+                  idCol: 1,
+                  model1Id: 1,
+                  model2Prop1: 'hejsan 1',
+                  model2Prop2: 30,
+                  $afterGetCalled: 1
+                },
+                {
+                  idCol: 2,
+                  model1Id: 1,
+                  model2Prop1: 'hejsan 2',
+                  model2Prop2: 20,
+                  $afterGetCalled: 1
+                },
+                {
+                  idCol: 3,
+                  model1Id: 1,
+                  model2Prop1: 'hejsan 3',
+                  model2Prop2: 10,
+                  $afterGetCalled: 1
+                }
+              ]);
+            });
+        });
       });
     });
 
