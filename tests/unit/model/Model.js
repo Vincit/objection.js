@@ -1244,31 +1244,42 @@ describe('Model', () => {
   });
 
   it('should convert objects to json based on jsonAttributes array', () => {
-    let Model = modelClass('Model');
+    class TestModel extends Model {
+      static get tableName() {
+        return tableName;
+      }
 
-    Model.jsonSchema = {
-      type: 'object',
-      properties: {
-        prop1: {type: 'string'},
-        prop2: {
+      static get jsonSchema() {
+        return {
           type: 'object',
+
           properties: {
-            subProp1: {type: 'number'}
-          }
-        },
-        prop3: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              subProp2: {type: 'boolean'}
+            prop1: {type: 'string'},
+            prop2: {
+              type: 'object',
+              properties: {
+                subProp1: {type: 'number'}
+              }
+            },
+
+            // This will not be converted because it is not listed in `jsonAttributes`.
+            prop3: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  subProp2: {type: 'boolean'}
+                }
+              }
             }
           }
-        }
+        };
       }
-    };
 
-    Model.jsonAttributes = ['prop2'];
+      static get jsonAttributes() {
+        return ['prop2'];
+      }
+    }
 
     let inputJson = {
       prop1: 'text',
@@ -1278,7 +1289,7 @@ describe('Model', () => {
       prop3: [{subProp2: true}, {subProp2: false}]
     };
 
-    let model = Model.fromJson(inputJson);
+    let model = TestModel.fromJson(inputJson);
 
     expect(model).to.eql(inputJson);
 
@@ -1288,7 +1299,7 @@ describe('Model', () => {
     expect(dbJson.prop2).to.equal('{"subProp1":1000}');
     expect(dbJson.prop3).to.eql(inputJson.prop3);
 
-    let model2 = Model.fromDatabaseJson(dbJson);
+    let model2 = TestModel.fromDatabaseJson(dbJson);
 
     expect(model2).to.eql(inputJson);
   });
