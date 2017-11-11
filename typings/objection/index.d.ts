@@ -437,10 +437,14 @@ declare namespace Objection {
     throwIfNotFound(): this;
   }
 
+  export interface Executable<T> extends Promise<T> {
+    execute(): Promise<T>;
+  }
+
   /**
    * QueryBuilder with one expected result
    */
-  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> {
+  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Executable<T> {
     runAfter(fn: (result: T, builder: this) => any): this;
   }
 
@@ -450,7 +454,7 @@ declare namespace Objection {
   export interface QueryBuilderUpdate<T>
     extends QueryBuilderBase<T>,
       ThrowIfNotFound,
-      Promise<number> {
+      Executable<number> {
     returning(columns: string | string[]): QueryBuilder<T>;
     runAfter(fn: (result: number, builder: this) => any): this;
   }
@@ -461,7 +465,7 @@ declare namespace Objection {
   export interface QueryBuilderDelete<T>
     extends QueryBuilderBase<T>,
       ThrowIfNotFound,
-      Promise<number> {
+      Executable<number> {
     returning(columns: string | string[]): QueryBuilder<T>;
     runAfter(fn: (result: number, builder: this) => any): this;
   }
@@ -472,7 +476,7 @@ declare namespace Objection {
   export interface QueryBuilderInsert<T>
     extends QueryBuilderBase<T>,
       ThrowIfNotFound,
-      Promise<T[]> {
+      Executable<T[]> {
     returning(columns: string | string[]): this;
     runAfter(fn: (result: T[], builder: this) => any): this;
   }
@@ -483,7 +487,7 @@ declare namespace Objection {
   export interface QueryBuilderInsertSingle<T>
     extends QueryBuilderBase<T>,
       ThrowIfNotFound,
-      Promise<T> {
+      Executable<T> {
     returning(columns: string | string[]): this;
     runAfter(fn: (result: T, builder: this) => any): this;
   }
@@ -492,7 +496,7 @@ declare namespace Objection {
    * QueryBuilder with zero or one expected result
    * (Using the Scala `Option` terminology)
    */
-  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Promise<T | undefined> {
+  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Executable<T | undefined> {
     throwIfNotFound(): QueryBuilderSingle<T>;
     runAfter(fn: (result: T | undefined, builder: this) => any): this;
   }
@@ -500,7 +504,7 @@ declare namespace Objection {
   /**
    * QueryBuilder with zero or more expected results
    */
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> {
+  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Executable<T[]> {
     runAfter(fn: (result: T[], builder: this) => any): this;
   }
 
@@ -510,7 +514,7 @@ declare namespace Objection {
   export interface QueryBuilderPage<T>
     extends QueryBuilderBase<T>,
       ThrowIfNotFound,
-      Promise<Page<T>> {}
+      Executable<Page<T>> {}
 
   interface Insert<T> {
     (modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
@@ -696,7 +700,6 @@ declare namespace Objection {
 
     // We get `then` and `catch` by extending Promise
 
-    execute(): Promise<T>;
     map<V, Result>(mapper: BluebirdMapper<V, Result>): Promise<Result[]>;
     return<V>(returnValue: V): Promise<V>;
     bind(context: any): Promise<T>;
