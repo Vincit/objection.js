@@ -17,11 +17,10 @@ Please list related issues and discussion by using the following syntax:
 ### Checklist
 
 <!--
-- Please mark your choice with an "x" (i.e. [x], see
-https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
+- Please mark your choice with an "x" (i.e. [x], see https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments)
 - PR's without test coverage will be closed.
 -->
 
 - [ ] New tests added or existing tests modified to cover all changes
-- [ ] Code conforms with the ESLint and Prettier rules (`yarn eslint` passes
-      and `yarn prettier` has been applied)
+- [ ] Code conforms with the ESLint and Prettier rules (`npm eslint` passes
+      and `npm prettier` has been applied)
