@@ -47,7 +47,7 @@ describe('QueryBuilder', () => {
     TestModel.knex(mockKnex);
   });
 
-  it('should throw if model doesn\'t have a `tableName`', done => {
+  it("should throw if model doesn't have a `tableName`", done => {
     class TestModel extends Model {
       // no tableName
     }

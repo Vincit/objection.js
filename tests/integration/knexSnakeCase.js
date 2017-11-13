@@ -5,7 +5,7 @@ const Model = require('../../').Model;
 const sortBy = require('lodash/sortBy');
 const Promise = require('bluebird');
 const knexSnakeCaseMappers = require('../../').knexSnakeCaseMappers;
-const expect = require('expect.js');
+const expect = require('chai').expect;
 
 module.exports = session => {
   describe('knexSnakeCaseMappers', () => {
@@ -188,6 +188,30 @@ module.exports = session => {
         });
       });
 
+      afterEach(() => {
+        return ['animal', 'personMovie', 'movie', 'person'].reduce((promise, table) => {
+          return promise.then(() => knex(table).delete());
+        }, Promise.resolve());
+      });
+
+      it('$relatedQuery', () => {
+        return Person.query(knex)
+          .findOne({firstName: 'Seppo'})
+          .then(model => {
+            return model.$relatedQuery('pets', knex).orderBy('animalName');
+          })
+          .then(pets => {
+            expect(pets).to.containSubset([
+              {
+                animalName: 'Hurtta'
+              },
+              {
+                animalName: 'Katti'
+              }
+            ]);
+          });
+      });
+
       it('eager', () => {
         return Promise.map(
           [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm],
@@ -196,21 +220,9 @@ module.exports = session => {
               .eager('[parent, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
               .orderBy('firstName')
-              .traverse(model => {
-                delete model.id;
-                delete model.ownerId;
-                delete model.parentId;
-
-                if (model.movies) {
-                  model.movies = sortBy(model.movies, 'movieName');
-                }
-
-                if (model.pets) {
-                  model.pets = sortBy(model.pets, 'animalName');
-                }
-              })
               .then(people => {
-                expect(people).to.eql([
+                expect(people.length).to.equal(2);
+                expect(people).to.containSubset([
                   {
                     firstName: 'Seppo',
 

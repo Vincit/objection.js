@@ -490,10 +490,10 @@ module.exports = session => {
       {
         filters: {
           selectProps: builder => {
-            builder.select('id_col', 'model_1_id', 'model_2_prop_1');
+            builder.select('id_col', 'model1_id', 'model2_prop1');
           },
           orderByDesc: builder => {
-            builder.orderBy('model_2_prop_1', 'desc');
+            builder.orderBy('model2_prop1', 'desc');
           }
         },
         disableJoin: true,
@@ -963,7 +963,7 @@ module.exports = session => {
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
         .internalOptions({keepImplicitJoinProps: true})
         .modifyEager('model1Relation1', qb => qb.select('Model1.id'))
-        .modifyEager('model1Relation2', qb => qb.select('model_2.id_col').orderBy('model_2.id_col'))
+        .modifyEager('model1Relation2', qb => qb.select('model2.id_col').orderBy('model2.id_col'))
         .modifyEager('model1Relation2.model2Relation1', qb =>
           qb.select('Model1.id').orderBy('Model1.id')
         )
@@ -1376,7 +1376,7 @@ module.exports = session => {
               })
               .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
               .filterEager('model1Relation2', builder => {
-                builder.where('model_2_prop_1', 'hejsan 2');
+                builder.where('model2_prop1', 'hejsan 2');
               })
               .then(models => {
                 expect(models[0].model1Relation2).to.have.length(1);
@@ -1398,7 +1398,7 @@ module.exports = session => {
               .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
               .eagerAlgorithm(eagerAlgo)
               .filterEager('model1Relation2', builder => {
-                builder.select('model_2_prop_1');
+                builder.select('model2_prop1');
               })
               .filterEager('model1Relation2.model2Relation1', builder => {
                 builder.distinct('model1Prop1');
@@ -1407,7 +1407,7 @@ module.exports = session => {
                 builder.select('model1Prop1');
               })
               .filterEager('model1Relation2.model2Relation1.model1Relation2', builder => {
-                builder.select('model_2_prop_1');
+                builder.select('model2_prop1');
               })
               .then(models => {
                 models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'model2Prop1');
@@ -1474,7 +1474,7 @@ module.exports = session => {
           .column('Model1.model1Prop1')
           .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
           .filterEager('model1Relation2', builder => {
-            builder.select('model_2_prop_1', 'id_col as x1', 'model_1_id as x2');
+            builder.select('model2_prop1', 'id_col as x1', 'model1_id as x2');
           })
           .filterEager('model1Relation2.model2Relation1', builder => {
             builder.select('model1Prop1', 'Model1.id as y1', 'Model1.model1Id as y2');
@@ -1483,7 +1483,7 @@ module.exports = session => {
             builder.select('model1Prop1', 'Model1.id as y1', 'Model1.model1Id as y2');
           })
           .filterEager('model1Relation2.model2Relation1.model1Relation2', builder => {
-            builder.select('model_2_prop_1', 'id_col as x1', 'model_1_id as x2');
+            builder.select('model2_prop1', 'id_col as x1', 'model1_id as x2');
           })
           .then(models => {
             models[0].model1Relation2 = _.sortBy(models[0].model1Relation2, 'model2Prop1');
@@ -1561,7 +1561,7 @@ module.exports = session => {
           })
           .eager('model1Relation2.model2Relation1.[model1Relation1, model1Relation2]')
           .modifyEager('model1Relation2', builder => {
-            builder.where('model_2_prop_1', 'hejsan 2');
+            builder.where('model2_prop1', 'hejsan 2');
           })
           .modifyEager('model1Relation2.model2Relation1', builder => {
             builder.select('model1Prop1');
@@ -2119,7 +2119,7 @@ module.exports = session => {
             ]`,
                 {
                   f1: builder => builder.select('Model1.id'),
-                  f2: builder => builder.select('model_2.id_col')
+                  f2: builder => builder.select('model2.id_col')
                 }
               )
               .first()
@@ -2193,7 +2193,7 @@ module.exports = session => {
           ]`,
             {
               f1: builder => builder.select('Model1.id'),
-              f2: builder => builder.select('model_2.id_col')
+              f2: builder => builder.select('model2.id_col')
             }
           )
           .where('b:d.id', 6)
@@ -2305,9 +2305,9 @@ module.exports = session => {
                 "model1Relation1Inverse"."model1Prop1" as "model1Relation1Inverse:model1Prop1",
                 "model1Relation1Inverse"."model1Prop2" as "model1Relation1Inverse:model1Prop2",
                 "model1Relation2"."id_col" as "model1Relation2:id_col",
-                "model1Relation2"."model_1_id" as "model1Relation2:model_1_id",
-                "model1Relation2"."model_2_prop_1" as "model1Relation2:model_2_prop_1",
-                "model1Relation2"."model_2_prop_2" as "model1Relation2:model_2_prop_2",
+                "model1Relation2"."model1_id" as "model1Relation2:model1_id",
+                "model1Relation2"."model2_prop1" as "model1Relation2:model2_prop1",
+                "model1Relation2"."model2_prop2" as "model1Relation2:model2_prop2",
                 "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",
                 "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id",
                 "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1",
@@ -2318,9 +2318,9 @@ module.exports = session => {
                 "model1Relation2:model2Relation2"."model1Prop1" as "model1Relation2:model2Relation2:model1Prop1",
                 "model1Relation2:model2Relation2"."model1Prop2" as "model1Relation2:model2Relation2:model1Prop2",
                 "model1Relation3"."id_col" as "model1Relation3:id_col",
-                "model1Relation3"."model_1_id" as "model1Relation3:model_1_id",
-                "model1Relation3"."model_2_prop_1" as "model1Relation3:model_2_prop_1",
-                "model1Relation3"."model_2_prop_2" as "model1Relation3:model_2_prop_2",
+                "model1Relation3"."model1_id" as "model1Relation3:model1_id",
+                "model1Relation3"."model2_prop1" as "model1Relation3:model2_prop1",
+                "model1Relation3"."model2_prop2" as "model1Relation3:model2_prop2",
                 "model1Relation3_join"."extra1" as "model1Relation3:extra1",
                 "model1Relation3_join"."extra2" as "model1Relation3:extra2"
               from
@@ -2330,7 +2330,7 @@ module.exports = session => {
               left join
                 "Model1" as "model1Relation1Inverse" on "model1Relation1Inverse"."model1Id" = "Model1"."id"
               left join
-                "model_2" as "model1Relation2" on "model1Relation2"."model_1_id" = "Model1"."id"
+                "model2" as "model1Relation2" on "model1Relation2"."model1_id" = "Model1"."id"
               left join
                 "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
               left join
@@ -2342,7 +2342,7 @@ module.exports = session => {
               left join
                 "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "Model1"."id"
               left join
-                "model_2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
+                "model2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
             `.replace(/\s/g, '')
             );
           });

@@ -137,10 +137,10 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(4);
-              expect(rows[0].model_1_id).to.equal(1);
-              expect(rows[1].model_1_id).to.equal(null);
-              expect(rows[2].model_1_id).to.equal(1);
-              expect(rows[3].model_1_id).to.equal(2);
+              expect(rows[0].model1_id).to.equal(1);
+              expect(rows[1].model1_id).to.equal(null);
+              expect(rows[2].model1_id).to.equal(1);
+              expect(rows[3].model1_id).to.equal(2);
             });
         });
 
@@ -160,10 +160,10 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(4);
-              expect(rows[0].model_1_id).to.equal(1);
-              expect(rows[1].model_1_id).to.equal(null);
-              expect(rows[2].model_1_id).to.equal(null);
-              expect(rows[3].model_1_id).to.equal(2);
+              expect(rows[0].model1_id).to.equal(1);
+              expect(rows[1].model1_id).to.equal(null);
+              expect(rows[2].model1_id).to.equal(null);
+              expect(rows[3].model1_id).to.equal(2);
             });
         });
 

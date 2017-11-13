@@ -6,6 +6,10 @@ const Promise = require('bluebird');
 const Model = require('../').Model;
 const knexUtils = require('../lib/utils/knexUtils');
 const transaction = require('../').transaction;
+const snakeCaseMappers = require('../').snakeCaseMappers;
+
+const chai = require('chai');
+chai.use(require('chai-subset'));
 
 class TestSession {
 
@@ -33,9 +37,6 @@ class TestSession {
   }
 
   createModels() {
-    const snakeCase = _.memoize(_.snakeCase);
-    const camelCase = _.memoize(_.camelCase);
-
     class Model1 extends Model {
       static get tableName() {
         return 'Model1';
@@ -74,7 +75,7 @@ class TestSession {
             modelClass: Model2,
             join: {
               from: 'Model1.id',
-              to: 'model_2.model_1_id'
+              to: 'model2.model1_id'
             }
           },
 
@@ -88,7 +89,7 @@ class TestSession {
                 to: 'Model1Model2.model2Id',
                 extra: ['extra1', 'extra2']
               },
-              to: 'model_2.id_col'
+              to: 'model2.id_col'
             }
           }
         };
@@ -97,21 +98,15 @@ class TestSession {
 
     class Model2 extends Model {
       static get tableName() {
-        return 'model_2';
+        return 'model2';
       }
 
       static get idColumn() {
         return 'id_col';
       }
 
-      $formatDatabaseJson(json) {
-        json = super.$formatDatabaseJson(json);
-        return _.mapKeys(json, (val, key) => snakeCase(key));
-      }
-
-      $parseDatabaseJson(json) {
-        json = _.mapKeys(json, (val, key) => camelCase(key));
-        return super.$parseDatabaseJson(json);
+      static get columnNameMappers() {
+        return snakeCaseMappers();
       }
 
       static get relationMappings() {
@@ -120,7 +115,7 @@ class TestSession {
             relation: Model.ManyToManyRelation,
             modelClass: Model1,
             join: {
-              from: 'model_2.id_col',
+              from: 'model2.id_col',
               through: {
                 from: 'Model1Model2.model2Id',
                 to: 'Model1Model2.model1Id',
@@ -134,7 +129,7 @@ class TestSession {
             relation: Model.HasOneThroughRelation,
             modelClass: Model1,
             join: {
-              from: 'model_2.id_col',
+              from: 'model2.id_col',
               through: {
                 from: 'Model1Model2One.model2Id',
                 to: 'Model1Model2One.model1Id'
@@ -173,7 +168,7 @@ class TestSession {
       .then(() => knex.schema.dropTableIfExists('Model1Model2'))
       .then(() => knex.schema.dropTableIfExists('Model1Model2One'))
       .then(() => knex.schema.dropTableIfExists('Model1'))
-      .then(() => knex.schema.dropTableIfExists('model_2'))
+      .then(() => knex.schema.dropTableIfExists('model2'))
       .then(() => {
         return knex.schema
           .createTable('Model1', table => {
@@ -182,11 +177,11 @@ class TestSession {
             table.string('model1Prop1');
             table.integer('model1Prop2');
           })
-          .createTable('model_2', table => {
+          .createTable('model2', table => {
             table.increments('id_col').primary();
-            table.integer('model_1_id').index();
-            table.string('model_2_prop_1');
-            table.integer('model_2_prop_2');
+            table.integer('model1_id').index();
+            table.string('model2_prop1');
+            table.integer('model2_prop2');
           })
           .createTable('Model1Model2', table => {
             table.increments('id').primary();
@@ -194,11 +189,11 @@ class TestSession {
             table.string('extra2');
             table.string('extra3');
             table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model2').onDelete('CASCADE').index();
           })
           .createTable('Model1Model2One', table => {
             table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model_2').onDelete('CASCADE').index();
+            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model2').onDelete('CASCADE').index();
           });
       })
       .catch(() => {
@@ -217,10 +212,10 @@ class TestSession {
         .delete()
         .then(() => trx('Model1Model2One').delete())
         .then(() => trx('Model1').delete())
-        .then(() => trx('model_2').delete())
+        .then(() => trx('model2').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
-          return Promise.resolve(['Model1', 'model_2', 'Model1Model2']).map(table => {
+          return Promise.resolve(['Model1', 'model2', 'Model1Model2']).map(table => {
             const idCol = (_.find(this.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
 
             return trx(table).max(idCol).then(res => {

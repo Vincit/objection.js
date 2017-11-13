@@ -170,7 +170,7 @@ module.exports = session => {
       it('should accept subqueries and raw expressions', () => {
         return Model1.query()
           .insert({
-            model1Prop1: Model2.query().max('model_2_prop_1'),
+            model1Prop1: Model2.query().max('model2_prop1'),
             model1Prop2: Model1.raw('5 + 8')
           })
           .then(inserted => {
@@ -731,12 +731,12 @@ module.exports = session => {
               expect(inserted.model2Prop1).to.equal('test');
               expect(inserted.model1Id).to.equal(parent1.id);
               expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
-              return session.knex('model_2');
+              return session.knex('model2');
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id_col: inserted.idCol}).model_1_id).to.equal(parent1.id);
-              expect(_.find(rows, {id_col: inserted.idCol}).model_2_prop_1).to.equal('test');
+              expect(_.find(rows, {id_col: inserted.idCol}).model1_id).to.equal(parent1.id);
+              expect(_.find(rows, {id_col: inserted.idCol}).model2_prop1).to.equal('test');
             });
         });
 
@@ -761,12 +761,12 @@ module.exports = session => {
               expect(inserted.model2Prop1).to.equal('test');
               expect(inserted.model1Id).to.equal(parent1.id);
               expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
-              return session.knex('model_2');
+              return session.knex('model2');
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id_col: inserted.idCol}).model_1_id).to.equal(parent1.id);
-              expect(_.find(rows, {id_col: inserted.idCol}).model_2_prop_1).to.equal('test');
+              expect(_.find(rows, {id_col: inserted.idCol}).model1_id).to.equal(parent1.id);
+              expect(_.find(rows, {id_col: inserted.idCol}).model2_prop1).to.equal('test');
             });
         });
 
@@ -799,14 +799,14 @@ module.exports = session => {
                 expect(inserted[0].model1Id).to.equal(parent1.id);
                 expect(inserted[1].model1Id).to.equal(parent1.id);
                 expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
-                return session.knex('model_2');
+                return session.knex('model2');
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model_1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model_2_prop_1).to.equal('test 1');
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model_1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model_2_prop_1).to.equal('test 2');
+                expect(_.find(rows, {id_col: inserted[0].idCol}).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, {id_col: inserted[0].idCol}).model2_prop1).to.equal('test 1');
+                expect(_.find(rows, {id_col: inserted[1].idCol}).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, {id_col: inserted[1].idCol}).model2_prop1).to.equal('test 2');
               });
           });
 
@@ -839,14 +839,14 @@ module.exports = session => {
                 expect(inserted[0].model1Id).to.equal(parent1.id);
                 expect(inserted[1].model1Id).to.equal(parent1.id);
                 expect(parent1.model1Relation2).to.eql(_.flatten([originalRelated, inserted]));
-                return session.knex('model_2');
+                return session.knex('model2');
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model_1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model_2_prop_1).to.equal('test 1');
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model_1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model_2_prop_1).to.equal('test 2');
+                expect(_.find(rows, {id_col: inserted[0].idCol}).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, {id_col: inserted[0].idCol}).model2_prop1).to.equal('test 1');
+                expect(_.find(rows, {id_col: inserted[1].idCol}).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, {id_col: inserted[1].idCol}).model2_prop1).to.equal('test 2');
               });
           });
         }

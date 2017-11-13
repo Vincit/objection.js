@@ -267,7 +267,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err.data).to.have.property('model1Prop1');
 
-            return Promise.all([session.knex('Model1'), session.knex('model_2')]);
+            return Promise.all([session.knex('Model1'), session.knex('model2')]);
           })
           .spread((rows1, rows2) => {
             expect(rows1).to.have.length(1);
@@ -743,7 +743,7 @@ module.exports = session => {
 
       return knex(Model2.tableName).then(rows => {
         // Check that the reference model was only inserted once.
-        expect(_.filter(rows, {model_2_prop_1: 'child1'})).to.have.length(1);
+        expect(_.filter(rows, {model2_prop1: 'child1'})).to.have.length(1);
       });
     }
 

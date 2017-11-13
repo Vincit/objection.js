@@ -361,7 +361,7 @@ module.exports = session => {
                     // actually comes from the database.
                     builder.returning([
                       'id_col',
-                      Model1.raw('"model_2_prop_1" || \' computed2\' as computed')
+                      Model1.raw('"model2_prop1" || \' computed2\' as computed')
                     ]);
                   }
                 }
@@ -404,7 +404,7 @@ module.exports = session => {
               expect(mockKnex.executedQueries).to.eql([
                 'insert into "public"."Model1" ("model1Prop1") values (\'new 2\'), (\'new 4\') returning "id", "model1Prop1" || \' computed1\' as computed',
                 'insert into "public"."Model1" ("model1Id", "model1Prop1") values (5, \'new 1\') returning "id", "model1Prop1" || \' computed1\' as computed',
-                'insert into "public"."model_2" ("model_1_id", "model_2_prop_1") values (5, \'new 3\') returning "id_col", "model_2_prop_1" || \' computed2\' as computed',
+                'insert into "public"."model2" ("model1_id", "model2_prop1") values (5, \'new 3\') returning "id_col", "model2_prop1" || \' computed2\' as computed',
                 'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (6, 3) returning "model1Id"'
               ]);
 
@@ -464,8 +464,8 @@ module.exports = session => {
                   );
                 } else {
                   builder.select(
-                    'model_2.*',
-                    Model1.raw('"model_2_prop_1" || \' computed2\' as computed')
+                    'model2.*',
+                    Model1.raw('"model2_prop1" || \' computed2\' as computed')
                   );
                 }
               },
@@ -491,7 +491,7 @@ module.exports = session => {
                 'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "id" = 1',
                 'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (2)',
                 'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (3)',
-                'select "model_2".*, "model_2_prop_1" || \' computed2\' as computed from "public"."model_2" where "model_2"."model_1_id" in (2) order by "id_col" asc',
+                'select "model2".*, "model2_prop1" || \' computed2\' as computed from "public"."model2" where "model2"."model1_id" in (2) order by "id_col" asc',
                 'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2)'
               ]);
 
@@ -577,7 +577,7 @@ module.exports = session => {
           .then(() => {
             expect(queries).to.eql(mockKnex.executedQueries);
             expect(queries).to.eql([
-              'select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'
+              'select (select avg("model2Prop1") from "someSchema"."model2") as "avg" from "public"."Model1"'
             ]);
           });
       });
@@ -605,7 +605,7 @@ module.exports = session => {
           .then(() => {
             expect(queries).to.eql(mockKnex.executedQueries);
             expect(queries).to.eql([
-              'select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'
+              'select (select avg("model2Prop1") from "someSchema"."model2") as "avg" from "public"."Model1"'
             ]);
           });
       });
@@ -620,7 +620,7 @@ module.exports = session => {
           .select(builder => {
             builder
               .avg('model2Prop1')
-              .from('model_2')
+              .from('model2')
               .withSchema('someSchema')
               .as('avg');
           })
@@ -634,7 +634,7 @@ module.exports = session => {
           .then(() => {
             expect(queries).to.eql(mockKnex.executedQueries);
             expect(queries).to.eql([
-              'select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'
+              'select (select avg("model2Prop1") from "someSchema"."model2") as "avg" from "public"."Model1"'
             ]);
           });
       });
@@ -648,7 +648,7 @@ module.exports = session => {
           .select(builder => {
             builder
               .avg('model2Prop1')
-              .from('model_2')
+              .from('model2')
               .withSchema('someSchema')
               .as('avg');
           })
@@ -663,7 +663,7 @@ module.exports = session => {
           .then(() => {
             expect(queries).to.eql(mockKnex.executedQueries);
             expect(queries).to.eql([
-              'select (select avg("model2Prop1") from "someSchema"."model_2") as "avg" from "public"."Model1"'
+              'select (select avg("model2Prop1") from "someSchema"."model2") as "avg" from "public"."Model1"'
             ]);
           });
       });
@@ -704,7 +704,7 @@ module.exports = session => {
                     } else if (builder.modelClass() === Model2) {
                       builder.returning([
                         'id_col',
-                        Model1.raw('"model_2_prop_1" || \' computed2\' as computed')
+                        Model1.raw('"model2_prop1" || \' computed2\' as computed')
                       ]);
                     }
                   },
@@ -837,13 +837,13 @@ module.exports = session => {
                 .then(() => {
                   expect(mockKnex.executedQueries).to.eql(queries);
                   expect(mockKnex.executedQueries).to.eql([
-                    'update "public"."model_2" set "model_1_id" = 2 where "model_2"."id_col" in (3) returning *'
+                    'update "public"."model2" set "model1_id" = 2 where "model2"."id_col" in (3) returning *'
                   ]);
 
-                  return session.knex('model_2').where('id_col', newModel.idCol);
+                  return session.knex('model2').where('id_col', newModel.idCol);
                 })
                 .then(rows => {
-                  expect(rows[0].model_1_id).to.eql(2);
+                  expect(rows[0].model1_id).to.eql(2);
                 })
             );
           });
@@ -870,14 +870,14 @@ module.exports = session => {
                 .then(() => {
                   expect(mockKnex.executedQueries).to.eql(queries);
                   expect(mockKnex.executedQueries).to.eql([
-                    'update "public"."model_2" set "model_1_id" = NULL where "model_2"."model_1_id" = 2 returning *'
+                    'update "public"."model2" set "model1_id" = NULL where "model2"."model1_id" = 2 returning *'
                   ]);
 
-                  return session.knex('model_2');
+                  return session.knex('model2');
                 })
                 .then(rows => {
                   _.each(rows, row => {
-                    expect(row.model_1_id).to.equal(null);
+                    expect(row.model1_id).to.equal(null);
                   });
                 })
             );

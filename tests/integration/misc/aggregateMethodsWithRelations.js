@@ -9,15 +9,11 @@ module.exports = session => {
       return session.populate([
         {
           model1Prop1: 'a',
-          model1Relation2: [
-            {model_2_prop_1: 'one'},
-            {model_2_prop_1: 'two'},
-            {model_2_prop_1: 'three'}
-          ]
+          model1Relation2: [{model2_prop1: 'one'}, {model2_prop1: 'two'}, {model2_prop1: 'three'}]
         },
         {
           model1Prop1: 'b',
-          model1Relation2: [{model_2_prop_1: 'four'}, {model_2_prop_1: 'five'}]
+          model1Relation2: [{model2_prop1: 'four'}, {model2_prop1: 'five'}]
         }
       ]);
     });

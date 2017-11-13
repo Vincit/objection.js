@@ -146,8 +146,8 @@ module.exports = session => {
 
                 if (builder.modelClass().tableName === 'Model1') {
                   builder.orderBy('Model1.id');
-                } else if (builder.modelClass().tableName === 'model_2') {
-                  builder.orderBy('model_2.id_col');
+                } else if (builder.modelClass().tableName === 'model2') {
+                  builder.orderBy('model2.id_col');
                 }
               }
             })
@@ -156,18 +156,18 @@ module.exports = session => {
                 expect(sql).to.eql([
                   'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc',
                   'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
-                  'select "model_2"."model_1_id", "model_2"."id_col" from "model_2" where "model_2"."model_1_id" in (2) order by "model_2"."id_col" asc',
+                  'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
                   'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
 
-                  'delete from "model_2" where "model_2"."id_col" in (2) and "model_2"."model_1_id" in (2)',
+                  'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
                   'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
 
                   'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
-                  'insert into "model_2" ("model_1_id", "model_2_prop_1") values (2, \'inserted hasMany\') returning "id_col"',
+                  'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
                   'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
 
                   'update "Model1" set "id" = 3, "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
-                  'update "model_2" set "id_col" = 1, "model_2_prop_1" = \'updated hasMany 1\', "model_1_id" = 2 where "model_2"."id_col" = 1 and "model_2"."model_1_id" in (2)',
+                  'update "model2" set "id_col" = 1, "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
                   'update "Model1" set "id" = 4, "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
                 ]);
               }
@@ -241,7 +241,7 @@ module.exports = session => {
                 ]
               });
 
-              return Promise.all([trx('Model1'), trx('model_2')]).spread(
+              return Promise.all([trx('Model1'), trx('model2')]).spread(
                 (model1Rows, model2Rows) => {
                   // Row 5 should be deleted.
                   expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
@@ -372,7 +372,7 @@ module.exports = session => {
               ]
             });
 
-            return Promise.all([trx('Model1'), trx('model_2')]).spread((model1Rows, model2Rows) => {
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
               // Row 5 should be deleted.
               expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
               // Row 6 should NOT be deleted even thought its parent is.
@@ -585,7 +585,7 @@ module.exports = session => {
               ]
             });
 
-            return Promise.all([trx('Model1'), trx('model_2')]).spread((model1Rows, model2Rows) => {
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
               // Row 3 should NOT be deleted.
               expect(model1Rows.find(it => it.id == 3)).to.eql({
                 id: 3,
@@ -605,9 +605,9 @@ module.exports = session => {
               // Row 2 should NOT be deleted.
               expect(model2Rows.find(it => it.id_col == 2)).to.eql({
                 id_col: 2,
-                model_1_id: null,
-                model_2_prop_1: 'hasMany 2',
-                model_2_prop_2: null
+                model1_id: null,
+                model2_prop1: 'hasMany 2',
+                model2_prop2: null
               });
             });
           });
@@ -824,7 +824,7 @@ module.exports = session => {
               ]
             });
 
-            return Promise.all([trx('Model1'), trx('model_2')]).spread((model1Rows, model2Rows) => {
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
               // Row 3 should NOT be deleted.
               expect(model1Rows.find(it => it.id == 3)).to.eql({
                 id: 3,
@@ -844,9 +844,9 @@ module.exports = session => {
               // Row 2 should NOT be deleted.
               expect(model2Rows.find(it => it.id_col == 2)).to.eql({
                 id_col: 2,
-                model_1_id: 2,
-                model_2_prop_1: 'hasMany 2',
-                model_2_prop_2: null
+                model1_id: 2,
+                model2_prop1: 'hasMany 2',
+                model2_prop2: null
               });
             });
           });
@@ -953,7 +953,7 @@ module.exports = session => {
               ]
             });
 
-            return Promise.all([trx('Model1'), trx('model_2')]).spread((model1Rows, model2Rows) => {
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
               // Row 3 should NOT be deleted.
               expect(model1Rows.find(it => it.id == 3)).to.eql({
                 id: 3,
@@ -1073,7 +1073,7 @@ module.exports = session => {
               }
             });
 
-            return Promise.all([trx('Model1'), trx('model_2')]).spread((model1Rows, model2Rows) => {
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
               // Row 3 should be deleted.
               expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
             });
@@ -1394,7 +1394,7 @@ module.exports = session => {
             ]
           });
 
-          return Promise.all([session.knex('Model1'), session.knex('model_2')]).spread(
+          return Promise.all([session.knex('Model1'), session.knex('model2')]).spread(
             (model1Rows, model2Rows) => {
               // Row 3 should NOT be deleted.
               expect(model1Rows.find(it => it.id == 3)).to.eql({
@@ -1415,9 +1415,9 @@ module.exports = session => {
               // Row 2 should NOT be deleted.
               expect(model2Rows.find(it => it.id_col == 2)).to.eql({
                 id_col: 2,
-                model_1_id: null,
-                model_2_prop_1: 'hasMany 2',
-                model_2_prop_2: null
+                model1_id: null,
+                model2_prop1: 'hasMany 2',
+                model2_prop2: null
               });
             }
           );
@@ -1520,7 +1520,7 @@ module.exports = session => {
               ]
             });
 
-            return Promise.all([trx('Model1'), trx('model_2')]).spread((model1Rows, model2Rows) => {
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
               // Row 5 should be deleted.
               expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
               // Row 6 should NOT be deleted even thought its parent is.
@@ -1758,7 +1758,7 @@ module.exports = session => {
                     ]
                   });
 
-                  return Promise.all([trx('Model1'), trx('model_2')]).spread(
+                  return Promise.all([trx('Model1'), trx('model2')]).spread(
                     (model1Rows, model2Rows) => {
                       // Row 5 should be deleted.
                       expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);

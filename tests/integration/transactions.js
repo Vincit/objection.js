@@ -88,11 +88,11 @@ module.exports = session => {
         .then(rows => {
           expect(rows).to.have.length(2);
           expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
-          return session.knex('model_2');
+          return session.knex('model2');
         })
         .then(rows => {
           expect(rows).to.have.length(1);
-          expect(rows[0].model_2_prop_1).to.equal('test 3');
+          expect(rows[0].model2_prop1).to.equal('test 3');
           done();
         })
         .catch(done);
@@ -122,7 +122,7 @@ module.exports = session => {
         .then(() => {
           return [
             session.knex('Model1').orderBy('model1Prop1'),
-            session.knex('model_2'),
+            session.knex('model2'),
             session.knex('Model1Model2')
           ];
         })
@@ -130,7 +130,7 @@ module.exports = session => {
           expect(rows1).to.have.length(3);
           expect(_.map(rows1, 'model1Prop1')).to.eql(['a', 'b', 'd']);
           expect(rows2).to.have.length(1);
-          expect(rows2[0].model_2_prop_1).to.equal('c');
+          expect(rows2[0].model2_prop1).to.equal('c');
           expect(rows3).to.have.length(1);
           done();
         })
@@ -162,7 +162,7 @@ module.exports = session => {
         .then(() => {
           return [
             session.knex('Model1').orderBy('model1Prop1'),
-            session.knex('model_2'),
+            session.knex('model2'),
             session.knex('Model1Model2')
           ];
         })
@@ -170,7 +170,7 @@ module.exports = session => {
           expect(rows1).to.have.length(3);
           expect(_.map(rows1, 'model1Prop1')).to.eql(['a', 'b', 'd']);
           expect(rows2).to.have.length(1);
-          expect(rows2[0].model_2_prop_1).to.equal('c');
+          expect(rows2[0].model2_prop1).to.equal('c');
           expect(rows3).to.have.length(1);
           done();
         })
@@ -197,7 +197,7 @@ module.exports = session => {
         })
         .then(rows => {
           expect(rows).to.have.length(0);
-          return session.knex('model_2');
+          return session.knex('model2');
         })
         .then(rows => {
           expect(rows).to.have.length(0);
@@ -223,7 +223,7 @@ module.exports = session => {
         })
         .then(rows => {
           expect(rows).to.have.length(0);
-          return session.knex('model_2');
+          return session.knex('model2');
         })
         .then(rows => {
           expect(rows).to.have.length(0);
@@ -260,7 +260,7 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model_2'), session.knex('Model1Model2')];
+          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
         })
         .spread((rows1, rows2, rows3) => {
           expect(rows1).to.have.length(0);
@@ -323,7 +323,7 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model_2'), session.knex('Model1Model2')];
+          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
         })
         .spread((rows1, rows2, rows3) => {
           expect(rows1).to.have.length(0);
@@ -385,7 +385,7 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model_2'), session.knex('Model1Model2')];
+          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
         })
         .spread((rows1, rows2, rows3) => {
           expect(rows1).to.have.length(0);
@@ -440,7 +440,7 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model_2'), session.knex('Model1Model2')];
+          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
         })
         .spread((rows1, rows2, rows3) => {
           expect(rows1).to.have.length(0);
@@ -480,7 +480,7 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model_2'), session.knex('Model1Model2')];
+          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
         })
         .spread((rows1, rows2, rows3) => {
           expect(rows1).to.have.length(0);
@@ -516,7 +516,7 @@ module.exports = session => {
         })
         .then(rows => {
           expect(rows).to.have.length(0);
-          return session.knex('model_2');
+          return session.knex('model2');
         })
         .then(rows => {
           expect(rows).to.have.length(0);
@@ -598,11 +598,11 @@ module.exports = session => {
           .then(rows => {
             expect(rows).to.have.length(2);
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
-            return session.knex('model_2');
+            return session.knex('model2');
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expect(rows[0].model_2_prop_1).to.equal('test 3');
+            expect(rows[0].model2_prop1).to.equal('test 3');
             done();
           })
           .catch(done);
@@ -637,11 +637,11 @@ module.exports = session => {
           .then(rows => {
             expect(rows).to.have.length(2);
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
-            return session.knex('model_2');
+            return session.knex('model2');
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expect(rows[0].model_2_prop_1).to.equal('test 3');
+            expect(rows[0].model2_prop1).to.equal('test 3');
             done();
           })
           .catch(done);
@@ -675,7 +675,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(0);
-            return session.knex('model_2');
+            return session.knex('model2');
           })
           .then(rows => {
             expect(rows).to.have.length(0);
@@ -723,7 +723,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(0);
-            return session.knex('model_2');
+            return session.knex('model2');
           })
           .then(rows => {
             expect(rows).to.have.length(0);
@@ -758,7 +758,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(0);
-            return session.knex('model_2');
+            return session.knex('model2');
           })
           .then(rows => {
             expect(rows).to.have.length(0);

@@ -58,14 +58,14 @@ module.exports = session => {
       it('should delete a model (2)', () => {
         return Model2.query()
           .del()
-          .where('model_2_prop_2', 1)
+          .where('model2_prop2', 1)
           .then(numDeleted => {
             expect(numDeleted).to.equal(1);
-            return session.knex('model_2').orderBy('id_col');
+            return session.knex('model2').orderBy('id_col');
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1', model_2_prop_2: 2});
+            expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1', model2_prop2: 2});
           });
       });
 
@@ -325,13 +325,13 @@ module.exports = session => {
             .delete()
             .then(numDeleted => {
               expect(numDeleted).to.equal(3);
-              return session.knex('model_2').orderBy('id_col');
+              return session.knex('model2').orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expectPartEql(rows[0], {id_col: 4, model_2_prop_1: 'text 4'});
-              expectPartEql(rows[1], {id_col: 5, model_2_prop_1: 'text 5'});
-              expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
+              expectPartEql(rows[0], {id_col: 4, model2_prop1: 'text 4'});
+              expectPartEql(rows[1], {id_col: 5, model2_prop1: 'text 5'});
+              expectPartEql(rows[2], {id_col: 6, model2_prop1: 'text 6'});
             });
         });
 
@@ -348,13 +348,13 @@ module.exports = session => {
                 child1 = _.find(deletedObjects, {idCol: 1});
                 expect(child1).to.be.a(Model2);
                 expectPartEql(child1, {idCol: 1, model2Prop1: 'text 1'});
-                return session.knex('model_2').orderBy('id_col');
+                return session.knex('model2').orderBy('id_col');
               })
               .then(rows => {
                 expect(rows).to.have.length(3);
-                expectPartEql(rows[0], {id_col: 4, model_2_prop_1: 'text 4'});
-                expectPartEql(rows[1], {id_col: 5, model_2_prop_1: 'text 5'});
-                expectPartEql(rows[2], {id_col: 6, model_2_prop_1: 'text 6'});
+                expectPartEql(rows[0], {id_col: 4, model2_prop1: 'text 4'});
+                expectPartEql(rows[1], {id_col: 5, model2_prop1: 'text 5'});
+                expectPartEql(rows[2], {id_col: 6, model2_prop1: 'text 6'});
               });
           });
         }
@@ -366,15 +366,15 @@ module.exports = session => {
             .where('id_col', 2)
             .then(numDeleted => {
               expect(numDeleted).to.equal(1);
-              return session.knex('model_2').orderBy('id_col');
+              return session.knex('model2').orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1'});
-              expectPartEql(rows[1], {id_col: 3, model_2_prop_1: 'text 3'});
-              expectPartEql(rows[2], {id_col: 4, model_2_prop_1: 'text 4'});
-              expectPartEql(rows[3], {id_col: 5, model_2_prop_1: 'text 5'});
-              expectPartEql(rows[4], {id_col: 6, model_2_prop_1: 'text 6'});
+              expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1'});
+              expectPartEql(rows[1], {id_col: 3, model2_prop1: 'text 3'});
+              expectPartEql(rows[2], {id_col: 4, model2_prop1: 'text 4'});
+              expectPartEql(rows[3], {id_col: 5, model2_prop1: 'text 5'});
+              expectPartEql(rows[4], {id_col: 6, model2_prop1: 'text 6'});
             });
         });
 
@@ -382,18 +382,18 @@ module.exports = session => {
           return parent1
             .$relatedQuery('model1Relation2')
             .delete()
-            .where('model_2_prop_2', '<', 6)
-            .where('model_2_prop_1', 'like', 'text %')
+            .where('model2_prop2', '<', 6)
+            .where('model2_prop1', 'like', 'text %')
             .then(numDeleted => {
               expect(numDeleted).to.equal(2);
-              return session.knex('model_2').orderBy('id_col');
+              return session.knex('model2').orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(4);
-              expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1'});
-              expectPartEql(rows[1], {id_col: 4, model_2_prop_1: 'text 4'});
-              expectPartEql(rows[2], {id_col: 5, model_2_prop_1: 'text 5'});
-              expectPartEql(rows[3], {id_col: 6, model_2_prop_1: 'text 6'});
+              expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1'});
+              expectPartEql(rows[1], {id_col: 4, model2_prop1: 'text 4'});
+              expectPartEql(rows[2], {id_col: 5, model2_prop1: 'text 5'});
+              expectPartEql(rows[3], {id_col: 6, model2_prop1: 'text 6'});
             });
         });
       });

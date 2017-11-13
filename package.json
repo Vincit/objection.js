@@ -63,6 +63,8 @@
     "@types/knex": "^0.0.61",
     "@types/node": "^8.0.33",
     "babel-eslint": "^8.0.1",
+    "chai": "^4.1.2",
+    "chai-subset": "^1.6.0",
     "coveralls": "^2.13.1",
     "eslint": "^4.10.0",
     "eslint-plugin-prettier": "^2.3.1",

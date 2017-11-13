@@ -80,12 +80,12 @@ module.exports = session => {
             expect(model.$beforeUpdateOptions).to.eql({patch: true});
             expect(model.$afterUpdateCalled).to.equal(1);
             expect(model.$afterUpdateOptions).to.eql({patch: true});
-            return session.knex('model_2').orderBy('id_col');
+            return session.knex('model2').orderBy('id_col');
           })
           .then(rows => {
             expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'updated text', model_2_prop_2: 2});
-            expectPartEql(rows[1], {id_col: 2, model_2_prop_1: 'text 2', model_2_prop_2: 1});
+            expectPartEql(rows[0], {id_col: 1, model2_prop1: 'updated text', model2_prop2: 2});
+            expectPartEql(rows[1], {id_col: 2, model2_prop1: 'text 2', model2_prop2: 1});
           });
       });
 
@@ -128,8 +128,8 @@ module.exports = session => {
       it('should accept subqueries and raw expressions (1)', () => {
         return Model1.query()
           .patch({
-            model1Prop1: Model2.raw('(select max(??) from ??)', ['model_2_prop_1', 'model_2']),
-            model1Prop2: Model2.query().sum('model_2_prop_2')
+            model1Prop1: Model2.raw('(select max(??) from ??)', ['model2_prop1', 'model2']),
+            model1Prop2: Model2.query().sum('model2_prop2')
           })
           .where('id', '=', 1)
           .then(numUpdated => {
@@ -148,7 +148,7 @@ module.exports = session => {
         return Model1.query()
           .patch({
             model1Prop1: 'Morten',
-            model1Prop2: Model2.knexQuery().sum('model_2_prop_2')
+            model1Prop2: Model2.knexQuery().sum('model2_prop2')
           })
           .where('id', '=', 1)
           .then(numUpdated => {
@@ -185,12 +185,12 @@ module.exports = session => {
           .where('id_col', '=', 2)
           .then(numUpdated => {
             expect(numUpdated).to.equal(1);
-            return session.knex('model_2').orderBy('id_col');
+            return session.knex('model2').orderBy('id_col');
           })
           .then(rows => {
             expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id_col: 1, model_2_prop_2: 2});
-            expectPartEql(rows[1], {id_col: 2, model_2_prop_2: 11});
+            expectPartEql(rows[0], {id_col: 1, model2_prop2: 2});
+            expectPartEql(rows[1], {id_col: 2, model2_prop2: 11});
           });
       });
 
@@ -200,12 +200,12 @@ module.exports = session => {
           .where('id_col', '=', 2)
           .then(numUpdated => {
             expect(numUpdated).to.equal(1);
-            return session.knex('model_2').orderBy('id_col');
+            return session.knex('model2').orderBy('id_col');
           })
           .then(rows => {
             expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id_col: 1, model_2_prop_2: 2});
-            expectPartEql(rows[1], {id_col: 2, model_2_prop_2: -9});
+            expectPartEql(rows[0], {id_col: 1, model2_prop2: 2});
+            expectPartEql(rows[1], {id_col: 2, model2_prop2: -9});
           });
       });
 
@@ -791,20 +791,20 @@ module.exports = session => {
               expect(model.$afterUpdateCalled).to.equal(1);
               expect(model.$afterUpdateOptions).to.eql({patch: true});
 
-              return session.knex('model_2').orderBy('id_col');
+              return session.knex('model2').orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1'});
+              expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1'});
               expectPartEql(rows[1], {
                 id_col: 2,
-                model_2_prop_1: 'updated text',
-                model_2_prop_2: 5
+                model2_prop1: 'updated text',
+                model2_prop2: 5
               });
-              expectPartEql(rows[2], {id_col: 3, model_2_prop_1: 'text 3'});
-              expectPartEql(rows[3], {id_col: 4, model_2_prop_1: 'text 4'});
-              expectPartEql(rows[4], {id_col: 5, model_2_prop_1: 'text 5'});
-              expectPartEql(rows[5], {id_col: 6, model_2_prop_1: 'text 6'});
+              expectPartEql(rows[2], {id_col: 3, model2_prop1: 'text 3'});
+              expectPartEql(rows[3], {id_col: 4, model2_prop1: 'text 4'});
+              expectPartEql(rows[4], {id_col: 5, model2_prop1: 'text 5'});
+              expectPartEql(rows[5], {id_col: 6, model2_prop1: 'text 6'});
             });
         });
 
@@ -812,28 +812,28 @@ module.exports = session => {
           return parent1
             .$relatedQuery('model1Relation2')
             .patch({model2Prop1: 'updated text'})
-            .where('model_2_prop_2', '<', 6)
-            .where('model_2_prop_1', 'like', 'text %')
+            .where('model2_prop2', '<', 6)
+            .where('model2_prop1', 'like', 'text %')
             .then(numUpdated => {
               expect(numUpdated).to.equal(2);
-              return session.knex('model_2').orderBy('id_col');
+              return session.knex('model2').orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              expectPartEql(rows[0], {id_col: 1, model_2_prop_1: 'text 1'});
+              expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1'});
               expectPartEql(rows[1], {
                 id_col: 2,
-                model_2_prop_1: 'updated text',
-                model_2_prop_2: 5
+                model2_prop1: 'updated text',
+                model2_prop2: 5
               });
               expectPartEql(rows[2], {
                 id_col: 3,
-                model_2_prop_1: 'updated text',
-                model_2_prop_2: 4
+                model2_prop1: 'updated text',
+                model2_prop2: 4
               });
-              expectPartEql(rows[3], {id_col: 4, model_2_prop_1: 'text 4'});
-              expectPartEql(rows[4], {id_col: 5, model_2_prop_1: 'text 5'});
-              expectPartEql(rows[5], {id_col: 6, model_2_prop_1: 'text 6'});
+              expectPartEql(rows[3], {id_col: 4, model2_prop1: 'text 4'});
+              expectPartEql(rows[4], {id_col: 5, model2_prop1: 'text 5'});
+              expectPartEql(rows[5], {id_col: 6, model2_prop1: 'text 6'});
             });
         });
       });
@@ -1004,7 +1004,7 @@ module.exports = session => {
                   expect(numUpdated).to.equal(1);
 
                   return [
-                    session.knex('model_2').orderBy('id_col'),
+                    session.knex('model2').orderBy('id_col'),
                     session
                       .knex('Model1Model2')
                       .select('model1Id', 'model2Id', 'extra1', 'extra2')
@@ -1015,14 +1015,14 @@ module.exports = session => {
                   expect(model2.length).to.equal(8);
                   expect(model1Model2.length).to.equal(12);
 
-                  expectPartEql(model2[0], {id_col: 1, model_2_prop_1: 'text 1'});
-                  expectPartEql(model2[1], {id_col: 2, model_2_prop_1: 'text 2'});
-                  expectPartEql(model2[2], {id_col: 3, model_2_prop_1: 'foo 1'});
-                  expectPartEql(model2[3], {id_col: 4, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[4], {id_col: 5, model_2_prop_1: 'foo 3'});
-                  expectPartEql(model2[5], {id_col: 6, model_2_prop_1: 'foo 4'});
-                  expectPartEql(model2[6], {id_col: 7, model_2_prop_1: 'foo 5'});
-                  expectPartEql(model2[7], {id_col: 8, model_2_prop_1: 'foo 6'});
+                  expectPartEql(model2[0], {id_col: 1, model2_prop1: 'text 1'});
+                  expectPartEql(model2[1], {id_col: 2, model2_prop1: 'text 2'});
+                  expectPartEql(model2[2], {id_col: 3, model2_prop1: 'foo 1'});
+                  expectPartEql(model2[3], {id_col: 4, model2_prop1: 'iam updated'});
+                  expectPartEql(model2[4], {id_col: 5, model2_prop1: 'foo 3'});
+                  expectPartEql(model2[5], {id_col: 6, model2_prop1: 'foo 4'});
+                  expectPartEql(model2[6], {id_col: 7, model2_prop1: 'foo 5'});
+                  expectPartEql(model2[7], {id_col: 8, model2_prop1: 'foo 6'});
 
                   expectPartEql(model1Model2[0], {
                     model1Id: 1,
@@ -1080,7 +1080,7 @@ module.exports = session => {
                   expect(numUpdated).to.equal(3);
 
                   return [
-                    session.knex('model_2').orderBy('id_col'),
+                    session.knex('model2').orderBy('id_col'),
                     session
                       .knex('Model1Model2')
                       .select('model1Id', 'model2Id', 'extra1', 'extra2')
@@ -1091,14 +1091,14 @@ module.exports = session => {
                   expect(model2.length).to.equal(8);
                   expect(model1Model2.length).to.equal(12);
 
-                  expectPartEql(model2[0], {id_col: 1, model_2_prop_1: 'text 1'});
-                  expectPartEql(model2[1], {id_col: 2, model_2_prop_1: 'text 2'});
-                  expectPartEql(model2[2], {id_col: 3, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[3], {id_col: 4, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[4], {id_col: 5, model_2_prop_1: 'iam updated'});
-                  expectPartEql(model2[5], {id_col: 6, model_2_prop_1: 'foo 4'});
-                  expectPartEql(model2[6], {id_col: 7, model_2_prop_1: 'foo 5'});
-                  expectPartEql(model2[7], {id_col: 8, model_2_prop_1: 'foo 6'});
+                  expectPartEql(model2[0], {id_col: 1, model2_prop1: 'text 1'});
+                  expectPartEql(model2[1], {id_col: 2, model2_prop1: 'text 2'});
+                  expectPartEql(model2[2], {id_col: 3, model2_prop1: 'iam updated'});
+                  expectPartEql(model2[3], {id_col: 4, model2_prop1: 'iam updated'});
+                  expectPartEql(model2[4], {id_col: 5, model2_prop1: 'iam updated'});
+                  expectPartEql(model2[5], {id_col: 6, model2_prop1: 'foo 4'});
+                  expectPartEql(model2[6], {id_col: 7, model2_prop1: 'foo 5'});
+                  expectPartEql(model2[7], {id_col: 8, model2_prop1: 'foo 6'});
 
                   expectPartEql(model1Model2[0], {
                     model1Id: 1,
