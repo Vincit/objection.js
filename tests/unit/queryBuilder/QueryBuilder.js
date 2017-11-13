@@ -47,6 +47,20 @@ describe('QueryBuilder', () => {
     TestModel.knex(mockKnex);
   });
 
+  it('should throw if model doesn\'t have a `tableName`', done => {
+    class TestModel extends Model {
+      // no tableName
+    }
+
+    TestModel.query(mockKnex)
+      .then(() => done(new Error('should not get here')))
+      .catch(err => {
+        expect(err.message).to.equal('Model TestModel must have a static property tableName');
+        done();
+      })
+      .catch(done);
+  });
+
   it('should have knex methods', () => {
     let ignore = [
       'and',
