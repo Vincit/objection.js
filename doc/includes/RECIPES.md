@@ -195,7 +195,7 @@ If you don't want to use the built-in json schema validation, you can just ignor
 It is completely optional. If you want to use some other validation library you need to implement a custom [`Validator`](#validator)
 (see the example).
 
-## snake case to camel case conversion
+## Snake case to camel case conversion
 
 > Conversion in knex:
 
@@ -246,7 +246,7 @@ When the conversion is done on knex level __everything__ is converted to came ca
 in `relationMappings` and queries. `knexSnakeCaseMappers` use knex's `postProcessResponse` and `wrapIdentifier` hooks.
 
 2. _Conversion in objection using [`snakeCaseMappers`](#objection-snakecasemappers)_.
-When the conversion is done on objection level only database columns in the returned rows (model instances) are convered
+When the conversion is done on objection level only database columns of the returned rows (model instances) are convered
 to camel case. You still need to use snake case in `relationMappings` and queries. Note that `insert`, `patch`, `update`
 and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come
 from the client that also uses camel case.
