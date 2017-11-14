@@ -195,7 +195,9 @@ If you don't want to use the built-in json schema validation, you can just ignor
 It is completely optional. If you want to use some other validation library you need to implement a custom [`Validator`](#validator)
 (see the example).
 
-## snake_case to camelCase conversion
+## snake case to camel case conversion
+
+> Conversion in knex:
 
 ```js
 const Knex = require('knex');
@@ -215,26 +217,39 @@ const knex = Knex({
 });
 ```
 
-> For older nodes:
+> Conversion in objection:
 
 ```js
-const Knex = require('knex');
-const knexSnakeCaseMappers = require('objection').knexSnakeCaseMappers;
+const { Model, snakeCaseMappers } = require('objection');
 
-const knex = Knex(Object.assign({
-  client: 'postgres',
-
-  connection: {
-    host: '127.0.0.1',
-    user: 'objection',
-    database: 'objection_test'
+class Person extends Model {
+  static get columnNameMappers() {
+    return snakeCaseMappers();
   }
-}, knexSnakeCaseMappers()));
+}
 ```
 
-To use snake_case names in database and camelCase properties in code, you can use the `knexSnakeCaseMappers`
-function and merge it into your knex configuration. `knexSnakeCaseMappers` returns an object that has two functions
-`postProcessResponse` and `wrapIdentifier` that take care of the mapping on knex level.
+> ESNext:
+
+```js
+import { Model, snakeCaseMappers } from 'objection';
+
+class Person extends Model {
+  static columnNameMappers = snakeCaseMappers();
+}
+```
+
+You may want to use snake_cased names in database and camelCased names in code. There are two ways to achieve this:
+
+1. _Conversion in knex using [`knexSnakeCaseMappers`](#objection-knexsnakecasemappers)_.
+When the conversion is done on knex level __everything__ is converted to came case including properties and identifiers
+in `relationMappings` and queries. `knexSnakeCaseMappers` use knex's `postProcessResponse` and `wrapIdentifier` hooks.
+
+2. _Conversion in objection using [`snakeCaseMappers`](#objection-snakecasemappers)_.
+When the conversion is done on objection level only database columns in the returned rows (model instances) are convered
+to camel case. You still need to use snake case in `relationMappings` and queries. Note that `insert`, `patch`, `update`
+and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come
+from the client that also uses camel case.
 
 ## Paging
 

@@ -90,7 +90,7 @@ const { Promise } = require('objection');
 
 [Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used internally by objection.
 
-<h4 id="objection-knexsnakecasemappers">Promise</h4>
+<h4 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h4>
 
 ```js
 const { knexSnakeCaseMappers } = require('objection');
@@ -127,12 +127,31 @@ const knex = Knex(Object.assign({
 }, knexSnakeCaseMappers()));
 ```
 
-To use snake_case names in database and camelCase properties in code, you can use the `knexSnakeCaseMappers`
-function and merge it into your knex configuration. `knexSnakeCaseMappers` returns an object that has two functions
-`postProcessResponse` and `wrapIdentifier` that take care of the mapping on knex level.
+Documented [here](#snake-case-to-camel-case-conversion).
 
+<h4 id="objection-snakecasemappers">snakeCaseMappers</h4>
 
+```js
+const { Model, snakeCaseMappers } = require('objection');
 
+class Person extends Model {
+  static get columnNameMappers() {
+    return snakeCaseMappers();
+  }
+}
+```
+
+> ESNext:
+
+```js
+import { Model, snakeCaseMappers } from 'objection';
+
+class Person extends Model {
+  static columnNameMappers = snakeCaseMappers();
+}
+```
+
+Documented [here](#snake-case-to-camel-case-conversion).
 
 
 ## QueryBuilder
@@ -5010,6 +5029,50 @@ as single database rows.
 
 If this property is left unset all properties declared as objects or arrays in the
 [`jsonSchema`](#jsonschema) are implicitly added to this list.
+
+
+
+
+#### columnNameMappers
+
+```js
+const { Model, snakeCaseMappers } = require('objection');
+
+class Person extends Model {
+  static get columnNameMappers() {
+    return snakeCaseMappers();
+  }
+}
+```
+
+> ESNext
+
+```js
+import { Model, snakeCaseMappers } from 'objection';
+
+class Person extends Model {
+  static columnNameMappers = snakeCaseMappers();
+}
+```
+
+> The mapper signature:
+
+```js
+class Person extends Model {
+  static columnNameMappers = {
+    parse(obj) {
+      // database --> code
+    },
+
+    format(obj) {
+      // code --> database
+    }
+  };
+}
+```
+
+The mappers to use to convert column names to property names in code.
+
 
 
 
