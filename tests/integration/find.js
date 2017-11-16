@@ -164,6 +164,32 @@ module.exports = session => {
             });
         });
 
+        it('.where() and object with toKnexRaw method', () => {
+          return Model2.query()
+            .where('model2_prop2', '>', {
+              toKnexRaw(knex) {
+                return knex.raw('?', 15);
+              }
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20, 30]);
+            });
+        });
+
+        it('.where() with object and object with toKnexRaw method', () => {
+          return Model2.query()
+            .where({
+              model2_prop2: {
+                toKnexRaw(knex) {
+                  return knex.raw('?', 20);
+                }
+              }
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
         it('.where() with an object and query builder', () => {
           return Model2.query()
             .where({
