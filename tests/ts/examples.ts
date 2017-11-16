@@ -2,7 +2,7 @@
 import * as knex from 'knex';
 import * as objection from '../../typings/objection';
 
-const { lit, raw, ref } = objection;
+const {lit, raw, ref} = objection;
 
 // This file exercises the Objection.js typings.
 
@@ -16,14 +16,9 @@ class Person extends objection.Model {
   examplePersonMethod = (arg: string) => 1;
 
   async petsWithId(petId: number): Promise<Animal[]> {
-    // Types can't look at strings and give strong types, so this must be a
-    // Model[] promise:
-    const pets: objection.Model[] = await this.$relatedQuery('pets').where(
-      'id',
-      petId
-    );
-    // that we can subsequently cast to Animal:
-    return pets as Animal[];
+    // Types can't look at strings and give strong types, so <Animal> needs
+    // to be provided to $relatedQuery
+    return await this.$relatedQuery<Animal>('pets').where('id', petId);
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -31,8 +26,9 @@ class Person extends objection.Model {
   }
 }
 
-const takesModel = (m: objection.Model) => 1;
-const takesModelClass = (m: objection.ModelClass<any>) => 1;
+function takesModelSubclass<M extends objection.Model>(m: M) {}
+function takesModel(m: objection.Model) {}
+function takesModelClass(m: objection.ModelClass<any>) {}
 
 const takesPerson = (person: Person) => {
   person.examplePersonMethod('');
@@ -56,7 +52,7 @@ const lastName = 'Lawrence';
 
 async () => {
   takesPeople(await Person.query().where('lastName', lastName));
-  takesPeople(await Person.query().where({ lastName }));
+  takesPeople(await Person.query().where({lastName}));
   takesMaybePerson(await Person.query().findById(123));
   takesMaybePerson(await Person.query().findById('uid'));
 };
@@ -80,14 +76,14 @@ async () => {
   );
   takesMaybePerson(
     await Person.query()
-      .where({ lastName })
+      .where({lastName})
       .first()
   );
 
   takesMaybePerson(await Person.query().findOne('raw SQL constraint'));
   takesMaybePerson(await Person.query().findOne('lastName', lastName));
   takesMaybePerson(await Person.query().findOne('lastName', '>', lastName));
-  takesMaybePerson(await Person.query().findOne({ lastName }));
+  takesMaybePerson(await Person.query().findOne({lastName}));
 };
 
 // instance methods:
@@ -138,14 +134,14 @@ const examplePerson = new BoundPerson();
 // and inherited methods from Model
 
 const personId = examplePerson.$id();
-const exampleJsonPerson: Person = examplePerson.$setJson({ id: 'hello' });
+const exampleJsonPerson: Person = examplePerson.$setJson({id: 'hello'});
 const exampleDatabaseJsonPerson: Person = examplePerson.$setDatabaseJson({
   id: 'hello'
 });
 const omitPersonFromKey: Person = examplePerson.$omit('lastName');
-const omitPersonFromObj: Person = examplePerson.$omit({ firstName: true });
+const omitPersonFromObj: Person = examplePerson.$omit({firstName: true});
 const pickPersonFromKey: Person = examplePerson.$pick('lastName');
-const pickPersonFromObj: Person = examplePerson.$pick({ firstName: true });
+const pickPersonFromObj: Person = examplePerson.$pick({firstName: true});
 const clonePerson: Person = examplePerson.$clone();
 
 // static methods from Model should return the subclass type
@@ -168,16 +164,11 @@ function whereSpecies(species: string): Promise<Animal[]> {
   return Animal.query().where('species', species);
 }
 
-const personPromise: Promise<Person> = objection.QueryBuilder
-  .forClass(Person)
-  .findById(1);
+const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).findById(1);
 
 // QueryBuilder.findById accepts single and array values:
 
-let qb: objection.QueryBuilder<Person> = BoundPerson.query().where(
-  'name',
-  'foo'
-);
+let qb: objection.QueryBuilder<Person> = BoundPerson.query().where('name', 'foo');
 
 // QueryBuilder.throwIfNotFound makes an option query return exactly one:
 
@@ -220,17 +211,14 @@ qb = qb.distinct('column1', 'column2', 'column3');
 qb = qb.join('tablename', 'column1', '=', 'column2');
 qb = qb.outerJoin('tablename', 'column1', '=', 'column2');
 qb = qb.joinRelation('table');
-qb = qb.joinRelation('table', { alias: false });
+qb = qb.joinRelation('table', {alias: false});
 qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 
 // signature-changing QueryBuilder methods:
 
-const rowInserted: Promise<Person> = qb.insert({ firstName: 'bob' });
-const rowsInserted: Promise<Person[]> = qb.insert([
-  { firstName: 'alice' },
-  { firstName: 'bob' }
-]);
+const rowInserted: Promise<Person> = qb.insert({firstName: 'bob'});
+const rowsInserted: Promise<Person[]> = qb.insert([{firstName: 'alice'}, {firstName: 'bob'}]);
 const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({});
 const rowsUpdated: Promise<number> = qb.update({});
 const rowsPatched: Promise<number> = qb.patch({});
@@ -245,34 +233,24 @@ const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([
 ]);
 
 const upsertModel1: Promise<Person> = Person.query().upsertGraph({});
-const upsertModel2: Promise<Person> = Person.query().upsertGraph(
-  {},
-  { relate: true }
-);
+const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, {relate: true});
 const upsertModels1: Promise<Person[]> = Person.query().upsertGraph([]);
 const upsertModels2: Promise<Person[]> = Person.query().upsertGraph([], {
   unrelate: true
 });
 
-const insertedGraphAndFetchOne: Promise<
-  Person
-> = Person.query().insertGraphAndFetch(new Person());
-const insertedGraphAndFetchSome: Promise<
-  Person[]
-> = Person.query().insertGraphAndFetch([new Person(), new Person()]);
-const insertedRelatedAndFetch: Promise<
-  Person
-> = Person.query().insertWithRelatedAndFetch(new Person());
+const insertedGraphAndFetchOne: Promise<Person> = Person.query().insertGraphAndFetch(new Person());
+const insertedGraphAndFetchSome: Promise<Person[]> = Person.query().insertGraphAndFetch([
+  new Person(),
+  new Person()
+]);
+const insertedRelatedAndFetch: Promise<Person> = Person.query().insertWithRelatedAndFetch(
+  new Person()
+);
 const updatedModel: Promise<Person> = Person.query().updateAndFetch({});
-const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(
-  123,
-  {}
-);
+const updatedModelById: Promise<Person> = Person.query().updateAndFetchById(123, {});
 const patchedModel: Promise<Person> = Person.query().patchAndFetch({});
-const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(
-  123,
-  {}
-);
+const patchedModelById: Promise<Person> = Person.query().patchAndFetchById(123, {});
 
 const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
@@ -320,10 +298,10 @@ const modelFromQuery: typeof objection.Model = qb.modelClass();
 const sql: string = qb.toSql();
 
 qb = qb.whereJsonEquals('Person.jsonColumnName:details.names[1]', {
-  details: { names: ['First', 'Second', 'Last'] }
+  details: {names: ['First', 'Second', 'Last']}
 });
 qb = qb.whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
-qb = qb.whereJsonEquals('additionalData:myDogs[0]', { name: 'peter' });
+qb = qb.whereJsonEquals('additionalData:myDogs[0]', {name: 'peter'});
 qb = qb.whereJsonNotEquals('jsonObject:a', 'jsonObject:b');
 qb = qb.whereJsonField('column:field', 'IS', null);
 
@@ -358,16 +336,11 @@ objection.transaction(Movie, Person, async (TxMovie, TxPerson) => {
   const n: number = new TxPerson().examplePersonMethod('hello');
 });
 
-objection.transaction(
-  Movie,
-  Person,
-  Animal,
-  async (TxMovie, TxPerson, TxAnimal) => {
-    const t: string = new TxMovie().title;
-    const n: number = new TxPerson().examplePersonMethod('hello');
-    const s: string = new TxAnimal().species;
-  }
-);
+objection.transaction(Movie, Person, Animal, async (TxMovie, TxPerson, TxAnimal) => {
+  const t: string = new TxMovie().title;
+  const n: number = new TxPerson().examplePersonMethod('hello');
+  const s: string = new TxAnimal().species;
+});
 
 objection.transaction(
   Movie,
@@ -410,12 +383,12 @@ const p: Promise<string> = qb.then(() => 'done');
 
 // Verify that we can insert a partial model and relate a partial movie
 Person.query()
-  .insertAndFetch({ firstName: 'Jim' })
+  .insertAndFetch({firstName: 'Jim'})
   .then((ea: Person) => {
     console.log(`Inserted ${p}`);
     ea
       .$loadRelated('movies')
-      .relate<Movie>({ title: 'Total Recall' })
+      .relate<Movie>({title: 'Total Recall'})
       .then((pWithMovie: Person) => {
         console.log(`Related ${pWithMovie}`);
       });
@@ -423,24 +396,24 @@ Person.query()
 
 // Verify we can call `.insert` with a Partial<Person>:
 
-Person.query().insert({ firstName: 'Chuck' });
+Person.query().insert({firstName: 'Chuck'});
 
 // Verify we can call `.insert` via $relatedQuery
 // (albeit with a cast to Movie):
 
 const relatedQueryResult: Promise<Movie> = new Person()
   .$relatedQuery<Movie>('movies')
-  .insert({ title: 'Total Recall' });
+  .insert({title: 'Total Recall'});
 
 // Verify if is possible transaction class can be shared across models
 objection.transaction(Person.knex(), async trx => {
-  await Person.query(trx).insert({ firstName: 'Name' });
-  await Movie.query(trx).insert({ title: 'Total Recall' });
+  await Person.query(trx).insert({firstName: 'Name'});
+  await Movie.query(trx).insert({title: 'Total Recall'});
 });
 
 objection.transaction<Person>(Person.knex(), async trx => {
-  const person = await Person.query(trx).insert({ firstName: 'Name' });
-  await Movie.query(trx).insert({ title: 'Total Recall' });
+  const person = await Person.query(trx).insert({firstName: 'Name'});
+  await Movie.query(trx).insert({title: 'Total Recall'});
   await person.$loadRelated('movies', {}, trx);
 
   return person;
@@ -466,10 +439,7 @@ Person.query().where(builder => {
 
 Person.query()
   .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
-  .where(
-    raw(`?? || ' ' || ??`, 'firstName', 'lastName'),
-    'Arnold Schwarzenegger'
-  )
+  .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
   .orderBy(raw('random()'));
 
 // ReferenceBuilder:
@@ -485,20 +455,11 @@ Person.query()
       .castInt()
       .as('age')
   ])
-  .join(
-    'OtherModel',
-    ref('Model.jsonColumn:details.name').castText(),
-    '=',
-    ref('OtherModel.name')
-  )
+  .join('OtherModel', ref('Model.jsonColumn:details.name').castText(), '=', ref('OtherModel.name'))
   .where('age', '>', ref('OtherModel.ageLimit'));
 
 // LiteralBuilder:
-Person.query().where(
-  ref('Model.jsonColumn:details'),
-  '=',
-  lit({ name: 'Jennifer', age: 29 })
-);
+Person.query().where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}));
 Person.query().where('age', '>', lit(10));
 Person.query().where('firstName', lit('Jennifer').castText());
 
@@ -510,10 +471,8 @@ const peep123: Promise<Person | undefined> = BoundPerson.query(k).findById(123);
 new Person().$query(k).execute();
 new Person().$relatedQuery('pets', k).execute();
 
-takesPerson(Person.fromJson({ firstName: 'jennifer', lastName: 'Lawrence' }));
-takesPerson(
-  Person.fromDatabaseJson({ firstName: 'jennifer', lastName: 'Lawrence' })
-);
+takesPerson(Person.fromJson({firstName: 'jennifer', lastName: 'Lawrence'}));
+takesPerson(Person.fromDatabaseJson({firstName: 'jennifer', lastName: 'Lawrence'}));
 
 // plugin tests for mixin and compose:
 
@@ -523,25 +482,29 @@ const plugin2 = ({} as any) as objection.Plugin;
 () => {
   const BaseModel = objection.mixin(objection.Model, [plugin1, plugin2]);
   takesModelClass(BaseModel);
+  takesModelSubclass(new BaseModel());
   takesModel(new BaseModel());
 };
 
 () => {
   const BaseModel = objection.mixin(objection.Model, plugin1, plugin2);
   takesModelClass(BaseModel);
+  takesModelSubclass(new BaseModel());
   takesModel(new BaseModel());
 };
 
 () => {
   const PersonModel = objection.mixin(Person, plugin1, plugin2);
   takesModelClass(PersonModel);
-  takesModel(new PersonModel());
+  takesPersonClass(PersonModel);
+  takesModelSubclass(new PersonModel());
 };
 
 () => {
   const plugin = objection.compose([plugin1, plugin2]);
   const BaseModel = objection.mixin(objection.Model, plugin);
   takesModelClass(BaseModel);
+  takesModelSubclass(new BaseModel());
   takesModel(new BaseModel());
 };
 
@@ -549,6 +512,7 @@ const plugin2 = ({} as any) as objection.Plugin;
   const plugin = objection.compose(plugin1, plugin2);
   const BaseModel = objection.mixin(objection.Model, plugin);
   takesModelClass(BaseModel);
+  takesModelSubclass(new BaseModel());
   takesModel(new BaseModel());
 };
 
@@ -559,12 +523,13 @@ const plugin2 = ({} as any) as objection.Plugin;
     readonly myModelMethod = true;
   }
   takesModelClass(MyModel);
-  takesModel(new MyModel());
+  takesModelSubclass(new MyModel());
 };
 
 // Example with subclass of Model:
 () => {
   class MyPerson extends objection.mixin(Person, plugin1) {}
   takesModelClass(MyPerson);
-  takesModel(new MyPerson());
+  takesPersonClass(MyPerson);
+  takesModelSubclass(new MyPerson());
 };
