@@ -18,6 +18,10 @@ declare namespace Objection {
     [key: string]: Value;
   }
 
+  export interface AnyObject {
+    [key: string]: any
+  }
+
   export interface LiteralBuilder {
     (value: Value | LiteralObject): Literal;
   }
@@ -224,6 +228,7 @@ declare namespace Objection {
   interface Filters<T> {
     [filterName: string]: (queryBuilder: QueryBuilder<T>) => void;
   }
+
   interface Properties {
     [propertyName: string]: boolean;
   }
@@ -328,8 +333,8 @@ declare namespace Objection {
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
-    static fromJson<T>(this: Constructor<T>, json: object, opt?: ModelOptions): T;
-    static fromDatabaseJson<T>(this: Constructor<T>, row: object): T;
+    static fromJson<T>(this: Constructor<T>, json: AnyObject, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: Constructor<T>, row: AnyObject): T;
 
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
@@ -351,21 +356,21 @@ declare namespace Objection {
     $id(): any;
     $id(id: any): void;
 
-    $beforeValidate(jsonSchema: JsonSchema, json: object, opt: ModelOptions): JsonSchema;
+    $beforeValidate(jsonSchema: JsonSchema, json: AnyObject, opt: ModelOptions): JsonSchema;
     $validate(): void; // may throw ValidationError if validation fails
-    $afterValidate(json: object, opt: ModelOptions): void; // may throw ValidationError if validation fails
+    $afterValidate(json: AnyObject, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $toDatabaseJson(): object;
     $toJson(): object;
     toJSON(): object;
-    $parseDatabaseJson(json: object): object;
-    $formatDatabaseJson(json: object): object;
-    $parseJson(json: object, opt?: ModelOptions): object;
-    $formatJson(json: object): object;
-    $setJson(json: object, opt?: ModelOptions): this;
-    $setDatabaseJson(json: object): this;
+    $parseDatabaseJson(json: AnyObject): AnyObject;
+    $formatDatabaseJson(json: AnyObject): AnyObject;
+    $parseJson(json: AnyObject, opt?: ModelOptions): AnyObject;
+    $formatJson(json: AnyObject): AnyObject;
+    $setJson(json: AnyObject, opt?: ModelOptions): this;
+    $setDatabaseJson(json: AnyObject): this;
 
-    $set(obj: object): this;
+    $set(obj: AnyObject): this;
     $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
     $clone(): this;
