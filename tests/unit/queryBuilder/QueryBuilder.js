@@ -288,11 +288,13 @@ describe('QueryBuilder', () => {
     });
 
     it('should fail with invalid operator', () => {
-      expect(() => {
+      expect(
         QueryBuilder.forClass(TestModel)
           .whereRef('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
-          .toString();
-      }).to.throwException();
+          .toString()
+      ).to.equal(
+        'This query cannot be built synchronously. Consider using debug() method instead.'
+      );
     });
 
     it('orWhereRef should create a where clause using column references instead of values', () => {
@@ -319,11 +321,13 @@ describe('QueryBuilder', () => {
     });
 
     it('should fail with invalid operator', () => {
-      expect(() => {
+      expect(
         QueryBuilder.forClass(TestModel)
           .whereComposite('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
-          .toString();
-      }).to.throwException();
+          .toString()
+      ).to.equal(
+        'This query cannot be built synchronously. Consider using debug() method instead.'
+      );
     });
 
     it('operator should default to `=`', () => {
