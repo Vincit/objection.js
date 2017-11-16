@@ -64,8 +64,8 @@ declare namespace Objection {
     // than an identity function type. <M extends typeof Model> retains the
     // model subclass type in the return value, without requiring the user
     // to type the Mixin call.
-    <M extends typeof Model>(modelClass: M, ...plugins: Plugin[]): M;
-    <M extends typeof Model>(modelClass: M, plugins: Plugin[]): M;
+    <MC extends ModelClass<any>>(modelClass: MC, ...plugins: Plugin[]): MC;
+    <MC extends ModelClass<any>>(modelClass: MC, plugins: Plugin[]): MC;
   }
 
   export interface Page<T> {
