@@ -24,6 +24,16 @@ class Person extends objection.Model {
   async $beforeInsert(queryContext: objection.QueryContext) {
     console.log(queryContext.someCustomValue);
   }
+
+  $formatDatabaseJson(json: objection.AnyObject) {
+    json.bar = json.foo;
+    return json;
+  }
+
+  $parseDatabaseJson(json: objection.AnyObject) {
+    json.foo = json.bar;
+    return json;
+  }
 }
 
 function takesModelSubclass<M extends objection.Model>(m: M) {}
@@ -134,7 +144,8 @@ const examplePerson = new BoundPerson();
 // and inherited methods from Model
 
 const personId = examplePerson.$id();
-const exampleJsonPerson: Person = examplePerson.$setJson({id: 'hello'});
+const exampleJsonPerson1: Person = examplePerson.$setJson({id: 'hello'});
+const exampleJsonPerson2: Person = examplePerson.$set({id: 'hello'});
 const exampleDatabaseJsonPerson: Person = examplePerson.$setDatabaseJson({
   id: 'hello'
 });
