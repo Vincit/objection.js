@@ -10,6 +10,7 @@
     "member-access": [false],
     "member-ordering": [false],
     "no-console": false,
+    "no-empty": false,
     "no-namespace": [false],
     "no-unused-expression": [false],
     "object-literal-sort-keys": [

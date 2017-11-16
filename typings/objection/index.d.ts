@@ -15,7 +15,7 @@ declare namespace Objection {
   const mixin: Mixin;
 
   interface LiteralObject {
-    [key: string]: Value
+    [key: string]: Value;
   }
 
   export interface LiteralBuilder {
@@ -47,7 +47,7 @@ declare namespace Objection {
   // "{ new(): T }"
   // is from https://www.typescriptlang.org/docs/handbook/generics.html#using-class-types-in-generics
   export interface Constructor<M> {
-    new(...args: any[]): M;
+    new (...args: any[]): M;
   }
 
   export interface Plugin {
@@ -64,8 +64,8 @@ declare namespace Objection {
     // than an identity function type. <M extends typeof Model> retains the
     // model subclass type in the return value, without requiring the user
     // to type the Mixin call.
-    <M extends typeof Model>(modelClass: M, ...plugins: Plugin[]): M;
-    <M extends typeof Model>(modelClass: M, plugins: Plugin[]): M;
+    <MC extends ModelClass<any>>(modelClass: MC, ...plugins: Plugin[]): MC;
+    <MC extends ModelClass<any>>(modelClass: MC, plugins: Plugin[]): MC;
   }
 
   export interface Page<T> {
@@ -85,7 +85,9 @@ declare namespace Objection {
     message: string;
   }
 
-  export interface RelationMappings { [relationName: string]: RelationMapping; }
+  export interface RelationMappings {
+    [relationName: string]: RelationMapping;
+  }
 
   interface Relation {
     // TODO should this be something other than a tagging interface?
@@ -106,7 +108,7 @@ declare namespace Objection {
 
   export interface RelationMapping {
     relation: Relation;
-    modelClass: typeof Model | string;
+    modelClass: ModelClass<any> | string;
     join: RelationJoin;
     modify?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
     filter?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
@@ -147,7 +149,9 @@ declare namespace Objection {
     (queryBuilder: QueryBuilder<T>): void;
   }
 
-  interface FilterExpression<T> { [namedFilter: string]: FilterFunction<T>; }
+  interface FilterExpression<T> {
+    [namedFilter: string]: FilterFunction<T>;
+  }
 
   interface RelationExpressionMethod {
     <T>(relationExpression: RelationExpression): QueryBuilder<T>;
@@ -169,7 +173,9 @@ declare namespace Objection {
 
   type IdOrIds = Id | Ids;
 
-  interface RelationOptions { alias: boolean | string; }
+  interface RelationOptions {
+    alias: boolean | string;
+  }
 
   interface JoinRelation {
     <T>(relationName: string, opt?: RelationOptions): QueryBuilder<T>;
@@ -178,7 +184,10 @@ declare namespace Objection {
   type JsonObjectOrFieldExpression = object | object[] | FieldExpression;
 
   interface WhereJson<T> {
-    (fieldExpression: FieldExpression, jsonObjectOrFieldExpression: JsonObjectOrFieldExpression): QueryBuilder<T>;
+    (
+      fieldExpression: FieldExpression,
+      jsonObjectOrFieldExpression: JsonObjectOrFieldExpression
+    ): QueryBuilder<T>;
   }
 
   interface WhereFieldExpression<T> {
@@ -186,10 +195,7 @@ declare namespace Objection {
   }
 
   interface WhereJsonExpression<T> {
-    (
-      fieldExpression: FieldExpression,
-      keys: string | string[]
-    ): QueryBuilder<T>;
+    (fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder<T>;
   }
 
   interface WhereJsonField<T> {
@@ -215,8 +221,12 @@ declare namespace Objection {
     (err: any, result?: any): void;
   }
 
-  interface Filters<T> { [filterName: string]: (queryBuilder: QueryBuilder<T>) => void; }
-  interface Properties { [propertyName: string]: boolean; }
+  interface Filters<T> {
+    [filterName: string]: (queryBuilder: QueryBuilder<T>) => void;
+  }
+  interface Properties {
+    [propertyName: string]: boolean;
+  }
 
   /**
    * ModelClass is a TypeScript hack to support referencing a Model
@@ -252,7 +262,7 @@ declare namespace Objection {
     query(trxOrKnex?: Transaction | knex): QueryBuilder<M>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
-    knexQuery(): knex.QueryBuilder
+    knexQuery(): knex.QueryBuilder;
 
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
@@ -269,7 +279,11 @@ declare namespace Objection {
       trxOrKnex?: Transaction | knex
     ): Promise<M[]>;
 
-    traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
+    traverse(
+      filterConstructor: typeof Model,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): void;
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
   }
 
@@ -327,7 +341,11 @@ declare namespace Objection {
       trxOrKnex?: Transaction | knex
     ): Promise<T[]>;
 
-    static traverse(filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
+    static traverse(
+      filterConstructor: typeof Model,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
 
     $id(): any;
@@ -362,9 +380,16 @@ declare namespace Objection {
      * indicate the type (and if it returned Model directly, Partial<Model>
      * guards are worthless)
      */
-    $relatedQuery<M extends Model>(relationName: string, trxOrKnex?: Transaction | knex): QueryBuilder<M>;
+    $relatedQuery<M extends Model>(
+      relationName: string,
+      trxOrKnex?: Transaction | knex
+    ): QueryBuilder<M>;
 
-    $loadRelated<T>(expression: RelationExpression, filters?: Filters<T>, trxOrKnex?: Transaction | knex): QueryBuilderSingle<this>;
+    $loadRelated<T>(
+      expression: RelationExpression,
+      filters?: Filters<T>,
+      trxOrKnex?: Transaction | knex
+    ): QueryBuilderSingle<this>;
 
     $traverse(traverser: TraverserFunction): void;
     $traverse(filterConstructor: this, traverser: TraverserFunction): void;
@@ -392,33 +417,45 @@ declare namespace Objection {
   /**
    * QueryBuilder with one expected result
    */
-  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> { }
+  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> {}
 
   /**
    * Query builder for update operations
    */
-  export interface QueryBuilderUpdate<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<number> {
+  export interface QueryBuilderUpdate<T>
+    extends QueryBuilderBase<T>,
+      ThrowIfNotFound,
+      Promise<number> {
     returning(columns: string | string[]): QueryBuilder<T>;
   }
 
   /**
    * Query builder for delete operations
    */
-  export interface QueryBuilderDelete<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<number> {
+  export interface QueryBuilderDelete<T>
+    extends QueryBuilderBase<T>,
+      ThrowIfNotFound,
+      Promise<number> {
     returning(columns: string | string[]): QueryBuilder<T>;
   }
 
   /**
    * Query builder for batch insert operations
    */
-  export interface QueryBuilderInsert<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> {
+  export interface QueryBuilderInsert<T>
+    extends QueryBuilderBase<T>,
+      ThrowIfNotFound,
+      Promise<T[]> {
     returning(columns: string | string[]): this;
   }
 
   /**
    * Query builder for single insert operations
    */
-  export interface QueryBuilderInsertSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> {
+  export interface QueryBuilderInsertSingle<T>
+    extends QueryBuilderBase<T>,
+      ThrowIfNotFound,
+      Promise<T> {
     returning(columns: string | string[]): this;
   }
 
@@ -433,14 +470,15 @@ declare namespace Objection {
   /**
    * QueryBuilder with zero or more expected results
    */
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> { 
-  }
+  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> {}
 
   /**
    * QueryBuilder with a page result.
    */
-  export interface QueryBuilderPage<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<Page<T>> { 
-  }
+  export interface QueryBuilderPage<T>
+    extends QueryBuilderBase<T>,
+      ThrowIfNotFound,
+      Promise<Page<T>> {}
 
   interface Insert<T> {
     (modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
@@ -664,14 +702,21 @@ declare namespace Objection {
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
-      callback: (boundModel1Class: MC1, boundModel2Class: MC2, boundModel3Class: MC3, trx?: Transaction) => Promise<V>
+      callback: (
+        boundModel1Class: MC1,
+        boundModel2Class: MC2,
+        boundModel3Class: MC3,
+        trx?: Transaction
+      ) => Promise<V>
     ): Promise<V>;
 
-    <MC1 extends ModelClass<any>,
+    <
+      MC1 extends ModelClass<any>,
       MC2 extends ModelClass<any>,
       MC3 extends ModelClass<any>,
       MC4 extends ModelClass<any>,
-      V>(
+      V
+    >(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
@@ -685,12 +730,14 @@ declare namespace Objection {
       ) => Promise<V>
     ): Promise<V>;
 
-    <MC1 extends ModelClass<any>,
+    <
+      MC1 extends ModelClass<any>,
       MC2 extends ModelClass<any>,
       MC3 extends ModelClass<any>,
       MC4 extends ModelClass<any>,
       MC5 extends ModelClass<any>,
-      V>(
+      V
+    >(
       modelClass1: MC1,
       modelClass2: MC2,
       modelClass3: MC3,
@@ -719,7 +766,19 @@ declare namespace Objection {
   // to change the signatures to return Objection's typed QueryBuilder wrapper:
   //
 
-  type Value = string | number | boolean | Date | string[] | number[] | boolean[] | Date[] | null | Buffer | Raw | Literal;
+  type Value =
+    | string
+    | number
+    | boolean
+    | Date
+    | string[]
+    | number[]
+    | boolean[]
+    | Date[]
+    | null
+    | Buffer
+    | Raw
+    | Literal;
   type ColumnRef = string | Raw | Reference | QueryBuilder<any>;
   type TableName = string | Raw | Reference | QueryBuilder<any>;
 
@@ -801,20 +860,20 @@ declare namespace Objection {
     orHavingRaw: WhereRaw<T>;
     havingIn: WhereIn<T>;
     orHavingIn: WhereIn<T>;
-    havingNotIn: WhereIn<T>
-    orHavingNotIn: WhereIn<T>
-    havingNull: WhereNull<T>
-    orHavingNull: WhereNull<T>
-    havingNotNull: WhereNull<T>
-    orHavingNotNull: WhereNull<T>
-    havingExists: WhereExists<T>
-    orHavingExists: WhereExists<T>
-    havingNotExists: WhereExists<T>
-    orHavingNotExists: WhereExists<T>
-    havingBetween: WhereBetween<T>
-    orHavingBetween: WhereBetween<T>
-    havingNotBetween: WhereBetween<T>
-    orHavingNotBetween: WhereBetween<T>
+    havingNotIn: WhereIn<T>;
+    orHavingNotIn: WhereIn<T>;
+    havingNull: WhereNull<T>;
+    orHavingNull: WhereNull<T>;
+    havingNotNull: WhereNull<T>;
+    orHavingNotNull: WhereNull<T>;
+    havingExists: WhereExists<T>;
+    orHavingExists: WhereExists<T>;
+    havingNotExists: WhereExists<T>;
+    orHavingNotExists: WhereExists<T>;
+    havingBetween: WhereBetween<T>;
+    orHavingBetween: WhereBetween<T>;
+    havingNotBetween: WhereBetween<T>;
+    orHavingNotBetween: WhereBetween<T>;
 
     // Clear
     clearSelect(): this;
@@ -864,11 +923,19 @@ declare namespace Objection {
 
   interface Join<T> {
     (raw: Raw): QueryBuilder<T>;
-    (tableName: TableName, clause: (this: knex.JoinClause, join: knex.JoinClause) => void): QueryBuilder<T>;
-    (tableName: TableName, columns: { [key: string]: string | number | Raw | Reference }): QueryBuilder<T>;
+    (
+      tableName: TableName,
+      clause: (this: knex.JoinClause, join: knex.JoinClause) => void
+    ): QueryBuilder<T>;
+    (
+      tableName: TableName,
+      columns: {[key: string]: string | number | Raw | Reference}
+    ): QueryBuilder<T>;
     (tableName: TableName, raw: Raw): QueryBuilder<T>;
     (tableName: TableName, column1: ColumnRef, column2: ColumnRef): QueryBuilder<T>;
-    (tableName: TableName, column1: ColumnRef, operator: string, column2: ColumnRef): QueryBuilder<T>;
+    (tableName: TableName, column1: ColumnRef, operator: string, column2: ColumnRef): QueryBuilder<
+      T
+    >;
   }
 
   interface JoinRaw<T> {
@@ -878,7 +945,8 @@ declare namespace Objection {
   interface With<T> extends WithRaw<T>, WithWrapped<T> {}
 
   interface WithRaw<T> {
-    (alias: string, raw: Raw): QueryBuilder<T>;join: knex.JoinClause,
+    (alias: string, raw: Raw): QueryBuilder<T>;
+    join: knex.JoinClause;
     (alias: string, sql: string, bindings?: any): QueryBuilder<T>;
   }
 
@@ -890,8 +958,15 @@ declare namespace Objection {
     (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
     (object: object): QueryBuilder<T>;
     (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
-    (column: ColumnRef, operator: string, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
-    (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+    (
+      column: ColumnRef,
+      operator: string,
+      value: Value | Reference | QueryBuilder<any>
+    ): QueryBuilder<T>;
+    (
+      column: ColumnRef,
+      callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void
+    ): QueryBuilder<T>;
   }
 
   interface FindOne<T> {
@@ -901,8 +976,15 @@ declare namespace Objection {
     (sql: string, ...bindings: any[]): QueryBuilderOption<T>;
     (sql: string, bindings: any): QueryBuilderOption<T>;
     (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilderOption<T>;
-    (column: ColumnRef, operator: string, value: Value | Reference | QueryBuilder<any>): QueryBuilderOption<T>;
-    (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilderOption<T>;
+    (
+      column: ColumnRef,
+      operator: string,
+      value: Value | Reference | QueryBuilder<any>
+    ): QueryBuilderOption<T>;
+    (
+      column: ColumnRef,
+      callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void
+    ): QueryBuilderOption<T>;
   }
 
   interface WhereRaw<T> extends RawMethod<T> {
@@ -919,7 +1001,10 @@ declare namespace Objection {
 
   interface WhereIn<T> {
     (column: ColumnRef, values: Value[]): QueryBuilder<T>;
-    (column: ColumnRef, callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+    (
+      column: ColumnRef,
+      callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void
+    ): QueryBuilder<T>;
     (column: ColumnRef, query: QueryBuilder<any>): QueryBuilder<T>;
   }
 
@@ -1069,17 +1154,17 @@ declare namespace Objection {
      * Holds simple JSON Schema definitions for
      * referencing from elsewhere.
      */
-    definitions?: { [key: string]: JsonSchema };
+    definitions?: {[key: string]: JsonSchema};
     /**
      * The keys that can exist on the object with the
      * json schema that should validate their value
      */
-    properties?: { [property: string]: JsonSchema };
+    properties?: {[property: string]: JsonSchema};
     /**
      * The key of this object is a regex for which
      * properties the schema applies to
      */
-    patternProperties?: { [pattern: string]: JsonSchema };
+    patternProperties?: {[pattern: string]: JsonSchema};
     /**
      * If the key is present as a property then the
      * string of properties must also be present.
@@ -1087,7 +1172,7 @@ declare namespace Objection {
      * also be valid for the object if the key is
      * present.
      */
-    dependencies?: { [key: string]: JsonSchema | string[] };
+    dependencies?: {[key: string]: JsonSchema | string[]};
 
     /////////////////////////////////////////////////
     // Generic

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": false,
+    "alwaysStrict": true,
     "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
@@ -10,6 +11,7 @@
     "noImplicitThis": true,
     "noImplicitUseStrict": false,
     "strict": true,
+    "strictFunctionTypes": true,
     "strictNullChecks": true,
     "target": "es6"
   },
