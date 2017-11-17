@@ -14,6 +14,9 @@ declare namespace Objection {
   const compose: Compose;
   const mixin: Mixin;
 
+  const snakeCaseMappers: () => ColumnNameMappers;
+  const knexSnakeCaseMappers: () => KnexMappers;
+
   interface LiteralObject {
     [key: string]: Value;
   }
@@ -70,6 +73,16 @@ declare namespace Objection {
     // to type the Mixin call.
     <MC extends ModelClass<any>>(modelClass: MC, ...plugins: Plugin[]): MC;
     <MC extends ModelClass<any>>(modelClass: MC, plugins: Plugin[]): MC;
+  }
+
+  export interface ColumnNameMappers {
+    parse(json: AnyObject): AnyObject;
+    format(json: AnyObject): AnyObject
+  }
+
+  export interface KnexMappers {
+    wrapIdentifier(identifier: string, origWrap: (identifier: string) => string): string;
+    postProcessResponse(response: any): any;
   }
 
   export interface Page<T> {
@@ -254,6 +267,7 @@ declare namespace Objection {
     defaultEagerAlgorithm?: EagerAlgorithm;
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
+    columnNameMappers: ColumnNameMappers;
 
     raw: knex.RawBuilder;
     fn: knex.FunctionHelper;
@@ -311,6 +325,7 @@ declare namespace Objection {
     static defaultEagerOptions?: EagerOptions;
     static QueryBuilder: typeof QueryBuilder;
     static RelatedQueryBuilder: typeof QueryBuilder;
+    static columnNameMappers: ColumnNameMappers;
 
     static raw: knex.RawBuilder;
     static fn: knex.FunctionHelper;

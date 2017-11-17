@@ -13,6 +13,9 @@ const {lit, raw, ref} = objection;
 class Person extends objection.Model {
   firstName: string;
   lastName: string;
+
+  static columnNameMappers = objection.snakeCaseMappers();
+
   examplePersonMethod = (arg: string) => 1;
 
   async petsWithId(petId: number): Promise<Animal[]> {
