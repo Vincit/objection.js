@@ -147,6 +147,10 @@ declare namespace Objection {
     insertMissing?: boolean;
   }
 
+  export interface InsertGraphOptions {
+    relate?: boolean;
+  }
+
   export interface QueryContext {
     transaction: Transaction;
     [key: string]: any;
@@ -505,14 +509,20 @@ declare namespace Objection {
     (): this;
   }
 
+  interface InsertGraph<T> {
+    (modelsOrObjects?: Partial<T>[], options?: InsertGraphOptions): QueryBuilderInsert<T>;
+    (modelOrObject?: Partial<T>, options?: InsertGraphOptions): QueryBuilderInsertSingle<T>;
+    (): this;
+  }
+
   interface Upsert<T> {
     (modelsOrObjects?: Partial<T>[], options?: UpsertOptions): QueryBuilder<T>;
     (modelOrObject?: Partial<T>, options?: UpsertOptions): QueryBuilderSingle<T>;
   }
 
   interface InsertGraphAndFetch<T> {
-    (modelsOrObjects?: Partial<T>): QueryBuilderInsertSingle<T>;
-    (modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
+    (modelsOrObjects?: Partial<T>, options?: InsertGraphOptions): QueryBuilderInsertSingle<T>;
+    (modelsOrObjects?: Partial<T>[], options?: InsertGraphOptions): QueryBuilderInsert<T>;
   }
 
   interface QueryBuilderBase<T> extends QueryInterface<T> {
@@ -528,13 +538,13 @@ declare namespace Objection {
     insertAndFetch(modelOrObject: Partial<T>): QueryBuilderInsertSingle<T>;
     insertAndFetch(modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
 
-    insertGraph: Insert<T>;
+    insertGraph: InsertGraph<T>;
     insertGraphAndFetch: InsertGraphAndFetch<T>;
 
     /**
      * insertWithRelated is an alias for insertGraph.
      */
-    insertWithRelated: Insert<T>;
+    insertWithRelated: InsertGraph<T>;
     insertWithRelatedAndFetch: InsertGraphAndFetch<T>;
 
     /**

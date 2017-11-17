@@ -234,6 +234,8 @@ qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 const rowInserted: Promise<Person> = qb.insert({firstName: 'bob'});
 const rowsInserted: Promise<Person[]> = qb.insert([{firstName: 'alice'}, {firstName: 'bob'}]);
 const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({});
+const rowsInsertGraph1: Promise<Person> = qb.insertGraph({});
+const rowsInsertGraph2: Promise<Person> = qb.insertGraph({}, {relate: true});
 const rowsUpdated: Promise<number> = qb.update({});
 const rowsPatched: Promise<number> = qb.patch({});
 const rowsDeleted: Promise<number> = qb.delete();
@@ -241,10 +243,16 @@ const rowsDeletedById: Promise<number> = qb.deleteById(123);
 const rowsDeletedByIds: Promise<number> = qb.deleteById([123, 456]);
 
 const insertedModel: Promise<Person> = Person.query().insertAndFetch({});
-const insertedModels: Promise<Person[]> = Person.query().insertGraphAndFetch([
+const insertedModels1: Promise<Person[]> = Person.query().insertGraphAndFetch([
   new Person(),
   new Person()
 ]);
+const insertedModels2: Promise<Person[]> = Person.query().insertGraphAndFetch([
+  new Person(),
+  new Person()
+], {
+  relate: true
+});
 
 const upsertModel1: Promise<Person> = Person.query().upsertGraph({});
 const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, {relate: true});
