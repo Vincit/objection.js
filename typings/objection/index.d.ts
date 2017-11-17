@@ -627,9 +627,10 @@ declare namespace Objection {
     isExecutable(): boolean;
     isFindQuery(): boolean;
 
-    runBefore(fn: (builder: this) => void): this;
+    runBefore(fn: (result: any, builder: this) => any): this;
     onBuild(fn: (builder: this) => void): this;
-    runAfter(fn: (builder: this) => void): this;
+    runAfter(fn: (result: any, builder: this) => any): this;
+    onError(fn: (error: Error, builder: this) => any): this;
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
 
