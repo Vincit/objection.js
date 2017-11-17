@@ -324,7 +324,6 @@ declare namespace Objection {
     static defaultEagerAlgorithm?: EagerAlgorithm;
     static defaultEagerOptions?: EagerOptions;
     static QueryBuilder: typeof QueryBuilder;
-    static RelatedQueryBuilder: typeof QueryBuilder;
     static columnNameMappers: ColumnNameMappers;
 
     static raw: knex.RawBuilder;
