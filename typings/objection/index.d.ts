@@ -21,7 +21,7 @@ declare namespace Objection {
     [key: string]: Value;
   }
 
-  export interface AnyObject {
+  export interface Pojo {
     [key: string]: any;
   }
 
@@ -76,8 +76,8 @@ declare namespace Objection {
   }
 
   export interface ColumnNameMappers {
-    parse(json: AnyObject): AnyObject;
-    format(json: AnyObject): AnyObject
+    parse(json: Pojo): Pojo;
+    format(json: Pojo): Pojo
   }
 
   export interface KnexMappers {
@@ -351,8 +351,8 @@ declare namespace Objection {
     static bindTransaction<T>(this: T, transaction: Transaction): T;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
-    static fromJson<T>(this: Constructor<T>, json: AnyObject, opt?: ModelOptions): T;
-    static fromDatabaseJson<T>(this: Constructor<T>, row: AnyObject): T;
+    static fromJson<T>(this: Constructor<T>, json: Pojo, opt?: ModelOptions): T;
+    static fromDatabaseJson<T>(this: Constructor<T>, row: Pojo): T;
 
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
@@ -374,21 +374,21 @@ declare namespace Objection {
     $id(): any;
     $id(id: any): void;
 
-    $beforeValidate(jsonSchema: JsonSchema, json: AnyObject, opt: ModelOptions): JsonSchema;
+    $beforeValidate(jsonSchema: JsonSchema, json: Pojo, opt: ModelOptions): JsonSchema;
     $validate(): void; // may throw ValidationError if validation fails
-    $afterValidate(json: AnyObject, opt: ModelOptions): void; // may throw ValidationError if validation fails
+    $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $toDatabaseJson(): object;
     $toJson(): object;
     toJSON(): object;
-    $parseDatabaseJson(json: AnyObject): AnyObject;
-    $formatDatabaseJson(json: AnyObject): AnyObject;
-    $parseJson(json: AnyObject, opt?: ModelOptions): AnyObject;
-    $formatJson(json: AnyObject): AnyObject;
-    $setJson(json: AnyObject, opt?: ModelOptions): this;
-    $setDatabaseJson(json: AnyObject): this;
+    $parseDatabaseJson(json: Pojo): Pojo;
+    $formatDatabaseJson(json: Pojo): Pojo;
+    $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
+    $formatJson(json: Pojo): Pojo;
+    $setJson(json: Pojo, opt?: ModelOptions): this;
+    $setDatabaseJson(json: Pojo): this;
 
-    $set(obj: AnyObject): this;
+    $set(obj: Pojo): this;
     $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
     $clone(): this;

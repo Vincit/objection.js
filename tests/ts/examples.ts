@@ -28,12 +28,14 @@ class Person extends objection.Model {
     console.log(queryContext.someCustomValue);
   }
 
-  $formatDatabaseJson(json: objection.AnyObject) {
+  $formatDatabaseJson(json: objection.Pojo) {
+    // Test that any property can be accessed and set.
     json.bar = json.foo;
     return json;
   }
 
-  $parseDatabaseJson(json: objection.AnyObject) {
+  $parseDatabaseJson(json: objection.Pojo) {
+    // Test that any property can be accessed and set.
     json.foo = json.bar;
     return json;
   }
