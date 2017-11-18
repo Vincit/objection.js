@@ -705,6 +705,10 @@ declare namespace Objection {
     pluck(propertyName: string): this;
     first(): QueryBuilderOption<T>;
 
+    alias(alias: string): this;
+    tableRefFor(modelClass: ModelClass<any>): string;
+    tableNameFor(modelClass: ModelClass<any>): string;
+
     traverse(modelClass: typeof Model, traverser: TraverserFunction): this;
 
     pick(modelClass: typeof Model, properties: string[]): this;
