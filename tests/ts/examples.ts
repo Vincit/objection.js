@@ -128,6 +128,17 @@ class Movie extends objection.Model {
 
 class Animal extends objection.Model {
   species: string;
+
+  // Tests the ColumnNameMappers interface.
+  static columnNameMappers = {
+    parse(json: objection.Pojo) {
+      return json;
+    },
+
+    format(json: objection.Pojo) {
+      return json;
+    }
+  }
 }
 
 class Comment extends objection.Model {
