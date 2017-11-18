@@ -243,6 +243,10 @@ qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 qb = qb.alias('someAlias');
 
+// query builder hooks
+qb = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => {});
+qb = qb.runAfter(async (result: Person[], builder: objection.QueryBuilder<Person>) => {});
+
 // signature-changing QueryBuilder methods:
 
 const rowInserted: Promise<Person> = qb.insert({firstName: 'bob'});
