@@ -241,6 +241,7 @@ qb = qb.joinRelation('table');
 qb = qb.joinRelation('table', {alias: false});
 qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
+qb = qb.alias('someAlias');
 
 // signature-changing QueryBuilder methods:
 
@@ -331,6 +332,8 @@ const rowsInsertReturning: Promise<Person[]> = Person.query()
 const modelFromQuery: typeof objection.Model = qb.modelClass();
 
 const sql: string = qb.toSql();
+const tableName: string = qb.tableNameFor(Person);
+const tableRef: string = qb.tableRefFor(Person);
 
 qb = qb.whereJsonEquals('Person.jsonColumnName:details.names[1]', {
   details: {names: ['First', 'Second', 'Last']}
