@@ -5,21 +5,18 @@
  * API defined in api.js.
  */
 
-const Promise = require('bluebird');
 const axios = require('axios');
 
 const req = axios.create({
   baseURL: 'http://localhost:8641/'
 });
 
-// We use generator function + yield instead of async/await because
-// this example project supports node versions down to 4.0.
-Promise.coroutine(function*() {
+(async () => {
   ////////////////////////////////////////////////
   // Insert some people
   ////////////////////////////////////////////////
 
-  let sylvester = yield req.post('persons', {
+  let sylvester = await req.post('persons', {
     firstName: 'Sylvester',
     lastName: 'Stallone',
     age: 68
@@ -27,7 +24,7 @@ Promise.coroutine(function*() {
 
   console.log('inserted', sylvester.data);
 
-  let ben = yield req.post('persons', {
+  let ben = await req.post('persons', {
     firstName: 'Ben',
     lastName: 'Affleck',
     age: 40
@@ -39,7 +36,7 @@ Promise.coroutine(function*() {
   // Insert a person with relations
   ////////////////////////////////////////////////
 
-  let matt = yield req.post('persons', {
+  let matt = await req.post('persons', {
     firstName: 'Matt',
     lastName: 'Damon',
     age: 43,
@@ -78,7 +75,7 @@ Promise.coroutine(function*() {
   ////////////////////////////////////////////////
 
   // Patch Matt Damon's father's age.
-  let kent = yield req.patch(`persons/${matt.data.parent.id}`, {
+  let kent = await req.patch(`persons/${matt.data.parent.id}`, {
     age: 71
   });
 
@@ -95,7 +92,7 @@ Promise.coroutine(function*() {
   //    - `Kat` gets deleted since it is not in the sent graph
   //    - `Doggo`'s name gest updated
   //    - `Kitty` gets inserted since it didn't previously exist.
-  kent = yield req.patch(`persons/${matt.data.id}/upsert`, {
+  kent = await req.patch(`persons/${matt.data.id}/upsert`, {
     id: matt.data.id,
 
     pets: [
@@ -117,7 +114,7 @@ Promise.coroutine(function*() {
   ////////////////////////////////////////////////
 
   // Add Ben Affleck to Good Will Hunting.
-  let actor = yield req.post(`movies/${matt.data.movies[1].id}/actors`, {
+  let actor = await req.post(`movies/${matt.data.movies[1].id}/actors`, {
     id: ben.data.id
   });
 
@@ -127,7 +124,7 @@ Promise.coroutine(function*() {
   // Add a pet for a person
   ////////////////////////////////////////////////
 
-  let theHound = yield req.post(`persons/${ben.data.id}/pets`, {
+  let theHound = await req.post(`persons/${ben.data.id}/pets`, {
     name: 'The Hound',
     species: 'dog'
   });
@@ -138,7 +135,7 @@ Promise.coroutine(function*() {
   // Fetch Persons
   ////////////////////////////////////////////////
 
-  let people = yield req.get('persons', {
+  let people = await req.get('persons', {
     params: {
       minAge: 41,
       eager: `[

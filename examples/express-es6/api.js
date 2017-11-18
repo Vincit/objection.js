@@ -1,20 +1,20 @@
 'use strict';
 
-const transaction = require('objection').transaction;
+const {transaction} = require('objection');
 const Person = require('./models/Person');
 const Movie = require('./models/Movie');
 
-module.exports = app => {
+module.exports = router => {
   // Create a new Person. Because we use `insertGraph` you can pass relations
   // with the person and they also get inserted and related to the person. If
   // all you want to do is insert a single person, `insertGraph` and `allowInsert`
   // can be replaced by `insert(req.body)`.
-  app.post('/persons', function*(req, res) {
+  router.post('/persons', async (req, res) => {
     const graph = req.body;
 
     // It's a good idea to wrap `insertGraph` call in a transaction since it
     // may create multiple queries.
-    const insertedGraph = yield transaction(Person.knex(), trx => {
+    const insertedGraph = await transaction(Person.knex(), trx => {
       return (
         Person.query(trx)
           // For security reasons, limit the relations that can be inserted.
@@ -27,14 +27,14 @@ module.exports = app => {
   });
 
   // Patch a single Person.
-  app.patch('/persons/:id', function*(req, res) {
-    const person = yield Person.query().patchAndFetchById(req.params.id, req.body);
+  router.patch('/persons/:id', async (req, res) => {
+    const person = await Person.query().patchAndFetchById(req.params.id, req.body);
 
     res.send(person);
   });
 
   // Patch a person and upsert its relations.
-  app.patch('/persons/:id/upsert', function*(req, res) {
+  router.patch('/persons/:id/upsert', async (req, res) => {
     const graph = req.body;
 
     // Make sure only one person was sent.
@@ -48,7 +48,7 @@ module.exports = app => {
 
     // It's a good idea to wrap `upsertGraph` call in a transaction since it
     // may create multiple queries.
-    const upsertedGraph = yield transaction(Person.knex(), trx => {
+    const upsertedGraph = await transaction(Person.knex(), trx => {
       return (
         Person.query(trx)
           // For security reasons, limit the relations that can be upserted.
@@ -63,11 +63,11 @@ module.exports = app => {
   // Get multiple Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
-  app.get('/persons', function*(req, res) {
+  router.get('/persons', async (req, res) => {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
-    const persons = yield Person.query()
+    const persons = await Person.query()
       .skipUndefined()
       // For security reasons, limit the relations that can be fetched.
       .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
@@ -83,42 +83,42 @@ module.exports = app => {
   });
 
   // Delete a person.
-  app.delete('/persons/:id', function*(req, res) {
-    yield Person.query().deleteById(req.params.id);
+  router.delete('/persons/:id', async (req, res) => {
+    await Person.query().deleteById(req.params.id);
 
     res.send({});
   });
 
   // Add a child for a Person.
-  app.post('/persons/:id/children', function*(req, res) {
-    const person = yield Person.query().findById(req.params.id);
+  router.post('/persons/:id/children', async (req, res) => {
+    const person = await Person.query().findById(req.params.id);
 
     if (!person) {
       throw createStatusCodeError(404);
     }
 
-    const child = yield person.$relatedQuery('children').insert(req.body);
+    const child = await person.$relatedQuery('children').insert(req.body);
 
     res.send(child);
   });
 
   // Add a pet for a Person.
-  app.post('/persons/:id/pets', function*(req, res) {
-    const person = yield Person.query().findById(req.params.id);
+  router.post('/persons/:id/pets', async (req, res) => {
+    const person = await Person.query().findById(req.params.id);
 
     if (!person) {
       throw createStatusCodeError(404);
     }
 
-    const pet = yield person.$relatedQuery('pets').insert(req.body);
+    const pet = await person.$relatedQuery('pets').insert(req.body);
 
     res.send(pet);
   });
 
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
-  app.get('/persons/:id/pets', function*(req, res) {
-    const person = yield Person.query().findById(req.params.id);
+  router.get('/persons/:id/pets', async (req, res) => {
+    const person = await Person.query().findById(req.params.id);
 
     if (!person) {
       throw createStatusCodeError(404);
@@ -127,7 +127,7 @@ module.exports = app => {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
-    const pets = yield person
+    const pets = await person
       .$relatedQuery('pets')
       .skipUndefined()
       .where('name', 'like', req.query.name)
@@ -137,44 +137,44 @@ module.exports = app => {
   });
 
   // Add a movie for a Person.
-  app.post('/persons/:id/movies', function*(req, res) {
+  router.post('/persons/:id/movies', async (req, res) => {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    const movie = yield transaction(Person.knex(), function*(trx) {
-      const person = yield Person.query(trx).findById(req.params.id);
+    const movie = await transaction(Person.knex(), async trx => {
+      const person = await Person.query(trx).findById(req.params.id);
 
       if (!person) {
         throw createStatusCodeError(404);
       }
 
-      return yield person.$relatedQuery('movies', trx).insert(req.body);
+      return await person.$relatedQuery('movies', trx).insert(req.body);
     });
 
     res.send(movie);
   });
 
   // Add existing Person as an actor to a movie.
-  app.post('/movies/:id/actors', function*(req, res) {
-    const movie = yield Movie.query().findById(req.params.id);
+  router.post('/movies/:id/actors', async (req, res) => {
+    const movie = await Movie.query().findById(req.params.id);
 
     if (!movie) {
       throw createStatusCodeError(404);
     }
 
-    yield movie.$relatedQuery('actors').relate(req.body.id);
+    await movie.$relatedQuery('actors').relate(req.body.id);
 
     res.send(req.body);
   });
 
   // Get Movie's actors.
-  app.get('/movies/:id/actors', function*(req, res) {
-    const movie = yield Movie.query().findById(req.params.id);
+  router.get('/movies/:id/actors', async (req, res) => {
+    const movie = await Movie.query().findById(req.params.id);
 
     if (!movie) {
       throw createStatusCodeError(404);
     }
 
-    const actors = yield movie.$relatedQuery('actors');
+    const actors = await movie.$relatedQuery('actors');
     res.send(actors);
   });
 };

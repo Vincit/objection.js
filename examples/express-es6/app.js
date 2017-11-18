@@ -6,12 +6,10 @@ const morgan = require('morgan');
 const express = require('express');
 const Promise = require('bluebird');
 const bodyParser = require('body-parser');
+const promiseRouter = require('express-promise-router');
 const knexConfig = require('./knexfile');
 const registerApi = require('./api');
-const Model = require('objection').Model;
-
-// Adds yield support for express router.
-require('express-yields');
+const {Model} = require('objection');
 
 // Initialize knex.
 const knex = Knex(knexConfig.development);
@@ -21,13 +19,15 @@ const knex = Knex(knexConfig.development);
 // the Model.bindKnex method.
 Model.knex(knex);
 
+const router = promiseRouter();
 const app = express()
   .use(bodyParser.json())
   .use(morgan('dev'))
+  .use(router)
   .set('json spaces', 2);
 
 // Register our REST API.
-registerApi(app);
+registerApi(router);
 
 // Error handling. The `ValidationError` instances thrown by objection.js have a `statusCode`
 // property that is sent as the status code of the response.

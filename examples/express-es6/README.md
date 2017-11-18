@@ -1,6 +1,6 @@
 # ES6 example project
 
-This is an example project that targets node 4.0.0 and up. The project
+This is an example project that targets node 8.0.0 and up. The project
 is a simple express server with a REST API that demonstrates the basic
 functionalities of objection like models, relations, eager loading,
 graph inserts, graph upserts etc.
@@ -20,8 +20,3 @@ to start playing with the REST API.
 ```sh
 node client.js
 ```
-
-This example uses an ES6 version supported by node 4.0. Therefore we use
-generator functions and `yield` instead of `async/await`. For modern node
-versions you can simply replace `function*() {}` by `async () => {}` and
-`yield` by `await`.
