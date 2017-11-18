@@ -440,7 +440,9 @@ declare namespace Objection {
   /**
    * QueryBuilder with one expected result
    */
-  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> {}
+  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T> {
+    runAfter(fn: (result: T, builder: this) => any): this;
+  }
 
   /**
    * Query builder for update operations
@@ -450,6 +452,7 @@ declare namespace Objection {
       ThrowIfNotFound,
       Promise<number> {
     returning(columns: string | string[]): QueryBuilder<T>;
+    runAfter(fn: (result: number, builder: this) => any): this;
   }
 
   /**
@@ -460,6 +463,7 @@ declare namespace Objection {
       ThrowIfNotFound,
       Promise<number> {
     returning(columns: string | string[]): QueryBuilder<T>;
+    runAfter(fn: (result: number, builder: this) => any): this;
   }
 
   /**
@@ -470,6 +474,7 @@ declare namespace Objection {
       ThrowIfNotFound,
       Promise<T[]> {
     returning(columns: string | string[]): this;
+    runAfter(fn: (result: T[], builder: this) => any): this;
   }
 
   /**
@@ -480,6 +485,7 @@ declare namespace Objection {
       ThrowIfNotFound,
       Promise<T> {
     returning(columns: string | string[]): this;
+    runAfter(fn: (result: T, builder: this) => any): this;
   }
 
   /**
@@ -488,12 +494,15 @@ declare namespace Objection {
    */
   export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Promise<T | undefined> {
     throwIfNotFound(): QueryBuilderSingle<T>;
+    runAfter(fn: (result: T | undefined, builder: this) => any): this;
   }
 
   /**
    * QueryBuilder with zero or more expected results
    */
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> {}
+  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Promise<T[]> {
+    runAfter(fn: (result: T[], builder: this) => any): this;
+  }
 
   /**
    * QueryBuilder with a page result.
@@ -653,7 +662,6 @@ declare namespace Objection {
 
     runBefore(fn: (result: any, builder: this) => any): this;
     onBuild(fn: (builder: this) => void): this;
-    runAfter(fn: (result: any, builder: this) => any): this;
     onError(fn: (error: Error, builder: this) => any): this;
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
