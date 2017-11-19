@@ -84,6 +84,61 @@ documented elsewhere in the API docs.</p>
 </code></pre>
 <p><a href="http://bluebirdjs.com/docs/getting-started.html">Bluebird promise library</a> used internally by objection.</p>
 
+<h4 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexSnakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">({</span>
+  <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
+
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">host</span><span class="p">:</span> <span class="s1">'127.0.0.1'</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="s1">'objection'</span><span class="p">,</span>
+    <span class="na">database</span><span class="p">:</span> <span class="s1">'objection_test'</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Merge `postProcessResponse` and `wrapIdentifier` mappers.</span>
+  <span class="p">...</span><span class="nx">knexSnakeCaseMappers</span><span class="p">()</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>For older nodes:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">knexSnakeCaseMappers</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">knexSnakeCaseMappers</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({</span>
+  <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
+
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">host</span><span class="p">:</span> <span class="s1">'127.0.0.1'</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="s1">'objection'</span><span class="p">,</span>
+    <span class="na">database</span><span class="p">:</span> <span class="s1">'objection_test'</span>
+  <span class="p">}</span>
+<span class="p">},</span> <span class="nx">knexSnakeCaseMappers</span><span class="p">()));</span>
+</code></pre>
+<p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>.</p>
+
+<h4 id="objection-snakecasemappers">snakeCaseMappers</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">columnNameMappers</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">columnNameMappers</span> <span class="o">=</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre>
+<p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>.</p>
+
 <h2 id="querybuilder">QueryBuilder</h2>
 
 <p>Query builder for Models.</p>
@@ -3729,6 +3784,55 @@ registered using the <a href="#then"><code class="prettyprint">then</code></a> m
 </tr>
 </tbody></table>
 
+<h4 id="onerror">onError</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">onError</span><span class="p">(</span><span class="nx">onError</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">query</span>
+ <span class="p">.</span><span class="nx">onError</span><span class="p">((</span><span class="nx">error</span><span class="p">,</span> <span class="nx">queryBuilder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+   <span class="c1">// Handle `SomeError` but let other errors go through.</span>
+   <span class="k">if</span> <span class="p">(</span><span class="nx">error</span> <span class="k">instanceof</span> <span class="nx">SomeError</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">// This will cause the query to be resolved with an object</span>
+     <span class="c1">// instead of throwing an error.</span>
+     <span class="k">return</span> <span class="p">{</span><span class="na">error</span><span class="p">:</span> <span class="s1">'some error occurred'</span><span class="p">};</span>
+   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+     <span class="k">return</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+   <span class="p">}</span>
+ <span class="p">})</span>
+ <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">);</span>
+</code></pre>
+<p>Registers an error handler. Just like <code class="prettyprint">catch</code> but doesn&rsquo;t execute the query.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>onError</td>
+<td>function(Error, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>The function to be executed on error.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
 <h4 id="eageralgorithm">eagerAlgorithm</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">eagerAlgorithm</span><span class="p">(</span><span class="nx">algo</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
@@ -4360,6 +4464,64 @@ section about <a href="#eager-queries">eager queries</a> for more information on
 <h4 id="allowupsert">allowUpsert</h4>
 
 <p>Just like <a href="#allowinsert"><code class="prettyprint">allowInsert</code></a> but this one works with <a href="#upsertgraph"><code class="prettyprint">upsertGraph</code></a>.</p>
+
+<h4 id="castto">castTo</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">castTo</span><span class="p">(</span><span class="nx">ModelClass</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>The following example creates a query through <code class="prettyprint">Person</code>, joins a bunch of relations, selects
+only the related <code class="prettyprint">Animal</code>&rsquo;s columns and returns the results as <code class="prettyprint">Animal</code> instances instead
+of <code class="prettyprint">Person</code> instances.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'children.children.pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'children:children:pets.*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">castTo</span><span class="p">(</span><span class="nx">Animal</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>If your result rows represent no actual model, you can use <code class="prettyprint">objection.Model</code></p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'children.pets'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
+    <span class="s1">'children:pets.id as animalId'</span><span class="p">,</span>
+    <span class="s1">'children.firstName as childFirstName'</span>
+  <span class="p">])</span>
+  <span class="p">.</span><span class="nx">castTo</span><span class="p">(</span><span class="nx">Model</span><span class="p">);</span>
+</code></pre>
+<p>Sets the model class of the result rows.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#model"><code class="prettyprint">ModelClass</code></a></td>
+<td>The model class of the result rows.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
 
 <h4 id="modelclass">modelClass</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">modelClass</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">modelClass</span><span class="p">();</span>
@@ -5818,6 +5980,41 @@ as single database rows.</p>
 
 <p>If this property is left unset all properties declared as objects or arrays in the
 <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> are implicitly added to this list.</p>
+
+<h4 id="columnnamemappers">columnNameMappers</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">columnNameMappers</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">columnNameMappers</span> <span class="o">=</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>The mapper signature:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">columnNameMappers</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">parse</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// database --&gt; code</span>
+    <span class="p">},</span>
+
+    <span class="nx">format</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// code --&gt; database</span>
+    <span class="p">}</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</code></pre>
+<p>The mappers to use to convert column names to property names in code.</p>
 
 <h4 id="virtualattributes">virtualAttributes</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -8605,6 +8802,11 @@ string to identify the validation rule which didn&rsquo;t pass and a <code class
 <td>insertMissing</td>
 <td>boolean&#124;string[]</td>
 <td>If true, models that have identifiers <em>and</em> are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples <a href="#graph-upserts">here</a>.</td>
+</tr>
+<tr>
+<td>update</td>
+<td>boolean&#124;string[]</td>
+<td>If true, update operations are performaed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples <a href="#graph-upserts">here</a>.</td>
 </tr>
 <tr>
 <td>noInsert</td>
