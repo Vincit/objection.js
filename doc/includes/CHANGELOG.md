@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2
+
+### What's new
+
+  * Fix regression: `from` fails with a subquery.
+
 ## 0.9.1
 
 ### What's new

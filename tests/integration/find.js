@@ -397,6 +397,70 @@ module.exports = session => {
             });
         });
 
+        it('from (objection subquery)', () => {
+          return Model1.query()
+            .select('sub.*')
+            .from(
+              Model1.query()
+                .where('id', 2)
+                .as('sub')
+            )
+            .then(res => {
+              expect(res.length).to.equal(1);
+              expect(res[0].id).to.equal(2);
+            });
+        });
+
+        it('from (knex subquery)', () => {
+          return Model1.query()
+            .select('sub.*')
+            .from(
+              session
+                .knex('Model1')
+                .where('id', 2)
+                .as('sub')
+            )
+            .then(res => {
+              expect(res.length).to.equal(1);
+              expect(res[0].id).to.equal(2);
+            });
+        });
+
+        it('from (knex raw subquery)', () => {
+          return Model1.query()
+            .select('sub.*')
+            .from(session.knex.raw('(select * from ?? where ?? = 2) as sub', ['Model1', 'id']))
+            .then(res => {
+              expect(res.length).to.equal(1);
+              expect(res[0].id).to.equal(2);
+            });
+        });
+
+        it('from (objection raw subquery)', () => {
+          return Model1.query()
+            .select('sub.*')
+            .from(raw('(select * from ?? where ?? = 2) as sub', ['Model1', 'id']))
+            .then(res => {
+              expect(res.length).to.equal(1);
+              expect(res[0].id).to.equal(2);
+            });
+        });
+
+        it('from (function subquery)', () => {
+          return Model1.query()
+            .select('sub.*')
+            .from(builder =>
+              builder
+                .from('Model1')
+                .where('id', 2)
+                .as('sub')
+            )
+            .then(res => {
+              expect(res.length).to.equal(1);
+              expect(res[0].id).to.equal(2);
+            });
+        });
+
         if (session.isPostgres()) {
           it('smoke test for various methods', () => {
             // This test doesn't actually test that the methods work. Knex has tests

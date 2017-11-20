@@ -1841,6 +1841,26 @@ describe('QueryBuilder', () => {
       expect(builder.context().transaction === mockKnex).to.equal(true);
       expect(builder2.context().transaction === mockKnex).to.equal(true);
     });
+
+    it('values saved to context in hooks should be available later', () => {
+      let foo = null;
+
+      TestModel = class extends TestModel {
+        $beforeUpdate(opt, ctx) {
+          ctx.foo = 100;
+        }
+
+        $afterUpdate(opt, ctx) {
+          foo = ctx.foo;
+        }
+      };
+
+      return TestModel.query()
+        .patch({a: 1})
+        .then(() => {
+          expect(foo).to.equal(100);
+        });
+    });
   });
 });
 
