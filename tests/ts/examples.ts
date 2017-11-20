@@ -331,6 +331,29 @@ const rowsInsertReturning: Promise<Person[]> = Person.query()
   .insert([{}])
   .returning('*');
 
+// Executing a query builder should be equivalent to treating it
+// as a promise directly, regardless of query builder return type:
+
+const maybePersonQb = Person.query().findById(1);
+let maybePersonPromise: Promise<Person | undefined> = maybePersonQb;
+maybePersonPromise = maybePersonQb.execute();
+
+const peopleQb = Person.query();
+let peoplePromise: Promise<Person[]> = peopleQb;
+peoplePromise = peopleQb.execute();
+
+const insertQb = Person.query().insert({});
+let insertPromise: Promise<Person> = insertQb;
+insertPromise = insertQb.execute();
+
+const deleteQb = Person.query().delete();
+let deletePromise: Promise<number> = deleteQb;
+deletePromise = deleteQb.execute();
+
+const pageQb = Person.query().page(1, 10);
+let pagePromise: Promise<objection.Page<Person>> = pageQb;
+pagePromise = pageQb.execute();
+
 // non-wrapped methods:
 
 const modelFromQuery: typeof objection.Model = qb.modelClass();
