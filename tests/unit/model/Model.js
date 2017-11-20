@@ -1130,6 +1130,42 @@ describe('Model', () => {
     expect(json.prop4).to.eql({also: 'this'});
   });
 
+  it('if pickJsonSchemaProperties = true and jsonSchema is given, should omit relations even if defined in jsonSchema', () => {
+    let Model = modelClass('Model');
+
+    Model.pickJsonSchemaProperties = true;
+
+    Model.relationMappings = {
+      someRelation: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Model,
+        join: {
+          from: 'Model.id',
+          to: 'Model.model1Id'
+        }
+      }
+    };
+
+    Model.jsonSchema = {
+      type: 'object',
+      properties: {
+        someRelation: {type: 'object'}
+      }
+    };
+
+    let model = Model.fromJson({
+      someRelation: {
+        value: 'should be removed'
+      }
+    });
+
+    let json = model.$toDatabaseJson();
+    expect(json.someRelation).to.equal(undefined);
+    expect(model.someRelation).to.eql({value: 'should be removed'});
+    json = model.$toJson();
+    expect(json.someRelation).to.eql({value: 'should be removed'});
+  });
+
   it('if pickJsonSchemaProperties = false, should select all properties even if jsonSchema is defined', () => {
     // pickJsonSchemaProperties = false is the default.
     let Model = modelClass('Model');
