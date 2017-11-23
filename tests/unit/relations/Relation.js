@@ -307,7 +307,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.'
+        "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct"
       );
     });
   });
@@ -345,7 +345,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table.'
+        "OwnerModel.relationMappings.testRelation: join: either `from` or `to` must point to the owner model table and the other one to the related table. It might be that specified table 'SomeOtherModel' is not correct"
       );
     });
   });
