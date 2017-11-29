@@ -1020,8 +1020,8 @@ Person
       }]
     }]
   }).then(graph => {
-    // The return value of `insertGraoph` is the input graph converted into model instances.
-    // Inserted objects have ids added to them related rows have foreign keys set, but
+    // The return value of `insertGraph` is the input graph converted into model instances.
+    // Inserted objects have ids added to them and related rows have foreign keys set, but
     // no other columns get fetched from the database. You can use `insertGraphAndFetch`
     // for that.
   });
