@@ -79,6 +79,38 @@ module.exports = session => {
       });
     });
 
+    it("basic where's", () => {
+      const query = Model1.query()
+        .orWhereNot('id', '>', 10)
+        .whereIn('id', [1, 8, 11]);
+
+      return query.knex(session.knex).then(models => {
+        expect(models[0].model1Prop1).to.equal('hello 1');
+      });
+    });
+
+    it('findById', () => {
+      const query = Model1.query().findById(1);
+
+      return query.knex(session.knex).then(model => {
+        expect(model.model1Prop1).to.equal('hello 1');
+      });
+    });
+
+    it('findById composite', () => {
+      class TestModel extends Model1 {
+        static get idColumn() {
+          return ['id', 'model1Prop1'];
+        }
+      }
+
+      const query = TestModel.query().findById([1, 'hello 1']);
+
+      return query.knex(session.knex).then(model => {
+        expect(model.model1Prop1).to.equal('hello 1');
+      });
+    });
+
     it('eager', () => {
       return Promise.all([
         Model1.query(session.knex)
@@ -86,12 +118,20 @@ module.exports = session => {
           .eager(
             '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
           ),
+
         Model1.query(session.knex)
           .findById(1)
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .eager(
+          .joinEager(
+            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+          ),
+
+        // Give connection after building the query.
+        Model1.query()
+          .findById(1)
+          .joinEager(
             '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
           )
+          .knex(session.knex)
       ]).then(results => {
         results.forEach(models => {
           expect(sortRelations(models)).to.eql({
@@ -166,6 +206,35 @@ module.exports = session => {
               }
             ]
           });
+        });
+      });
+    });
+
+    describe('subqueries', () => {
+      it('basic', () => {
+        const query = Model1.query().whereIn(
+          'id',
+          Model1.query()
+            .select('id')
+            .where('id', 5)
+        );
+
+        return query.knex(session.knex).then(models => {
+          expect(models[0].model1Prop1).to.equal('hello 5');
+        });
+      });
+
+      it('joinRelation in subquery', () => {
+        const query = Model1.query().whereIn(
+          'id',
+          Model1.query()
+            .select('Model1.id')
+            .joinRelation('model1Relation1')
+            .where('model1Relation1.id', 4)
+        );
+
+        return query.knex(session.knex).then(models => {
+          expect(models[0].id).to.equal(3);
         });
       });
     });

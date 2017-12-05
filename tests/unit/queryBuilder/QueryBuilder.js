@@ -1137,7 +1137,9 @@ describe('QueryBuilder', () => {
 
   it('undefined values as query builder method arguments should raise an exception', () => {
     expect(() => {
-      QueryBuilder.forClass(TestModel).where('id', undefined);
+      QueryBuilder.forClass(TestModel)
+        .where('id', undefined)
+        .build();
     }).to.throwException(err => {
       expect(err.message).to.equal(
         "undefined passed as argument #1 for 'where' operation. Call skipUndefined() method to ignore the undefined values."
@@ -1145,7 +1147,9 @@ describe('QueryBuilder', () => {
     });
 
     expect(() => {
-      QueryBuilder.forClass(TestModel).orWhere('id', '<', undefined);
+      QueryBuilder.forClass(TestModel)
+        .orWhere('id', '<', undefined)
+        .build();
     }).to.throwException(err => {
       expect(err.message).to.equal(
         "undefined passed as argument #2 for 'orWhere' operation. Call skipUndefined() method to ignore the undefined values."
@@ -1153,19 +1157,23 @@ describe('QueryBuilder', () => {
     });
 
     expect(() => {
-      QueryBuilder.forClass(TestModel).orWhere('id', undefined, 10);
+      QueryBuilder.forClass(TestModel)
+        .orWhere('id', undefined, 10)
+        .build();
     }).to.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .delete()
-        .whereIn('id', undefined);
+        .whereIn('id', undefined)
+        .build();
     }).to.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .delete()
-        .whereIn('id', [1, undefined, 3]);
+        .whereIn('id', [1, undefined, 3])
+        .build();
     }).to.throwException(err => {
       expect(err.message).to.equal(
         "undefined passed as an item in argument #1 for 'whereIn' operation. Call skipUndefined() method to ignore the undefined values."
@@ -1177,39 +1185,45 @@ describe('QueryBuilder', () => {
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .skipUndefined()
-        .where('id', undefined);
+        .where('id', undefined)
+        .build();
     }).to.not.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .skipUndefined()
-        .orWhere('id', '<', undefined);
+        .orWhere('id', '<', undefined)
+        .build();
     }).to.not.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .skipUndefined()
-        .orWhere('id', undefined, 10);
+        .orWhere('id', undefined, 10)
+        .build();
     }).to.not.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .skipUndefined()
-        .deleteById(undefined);
+        .deleteById(undefined)
+        .build();
     }).to.not.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .skipUndefined()
         .delete()
-        .whereIn('id', undefined);
+        .whereIn('id', undefined)
+        .build();
     }).to.not.throwException();
 
     expect(() => {
       QueryBuilder.forClass(TestModel)
         .skipUndefined()
         .delete()
-        .whereIn('id', [1, undefined, 3]);
+        .whereIn('id', [1, undefined, 3])
+        .build();
     }).to.not.throwException();
   });
 
