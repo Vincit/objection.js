@@ -1554,22 +1554,40 @@ module.exports = session => {
       });
 
       describe('.whereJsonField(fieldExpr, operator, value)', () => {
-        it('should throw error if operator is not valid', () => {
-          expect(() => {
-            BoundModel.query().whereJsonField('jsonObject:numberField', ';', {});
-          }).to.throwException();
+        it('should throw error if operator is not valid', done => {
+          BoundModel.query()
+            .whereJsonField('jsonObject:numberField', ';', {})
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should throw error if value is object', () => {
-          expect(() => {
-            BoundModel.query().whereJsonField('jsonObject:numberField', '>', {});
-          }).to.throwException();
+        it('should throw error if value is object', done => {
+          BoundModel.query()
+            .whereJsonField('jsonObject:numberField', '>', {})
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should throw error if value is array', () => {
-          expect(() => {
-            BoundModel.query().whereJsonField('jsonObject:nullField', '=', []);
-          }).to.throwException();
+        it('should throw error if value is array', done => {
+          BoundModel.query()
+            .whereJsonField('jsonObject:nullField', '=', [])
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
         it('should be able to find numbers with >', () => {
