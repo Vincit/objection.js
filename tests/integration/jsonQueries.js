@@ -1447,22 +1447,40 @@ module.exports = session => {
       });
 
       describe('.whereJsonHasAny(fieldExpr, keys) and .whereJsonHasAll(fieldExpr, keys)', () => {
-        it('should throw error if null in input array', () => {
-          expect(() => {
-            BoundModel.query().whereJsonHasAny('jsonObject', [null]);
-          }).to.throwException();
+        it('should throw error if null in input array', done => {
+          BoundModel.query()
+            .whereJsonHasAny('jsonObject', [null])
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should throw error if number in input array', () => {
-          expect(() => {
-            BoundModel.query().whereJsonHasAny('jsonObject', 1);
-          }).to.throwException();
+        it('should throw error if number in input array', done => {
+          BoundModel.query()
+            .whereJsonHasAny('jsonObject', 1)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should throw error if boolean in input array', () => {
-          expect(() => {
-            BoundModel.query().whereJsonHasAny('jsonObject', false);
-          }).to.throwException();
+        it('should throw error if boolean in input array', done => {
+          BoundModel.query()
+            .whereJsonHasAny('jsonObject', false)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
         it('should find results for a', () => {
