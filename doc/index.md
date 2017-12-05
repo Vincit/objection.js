@@ -408,6 +408,7 @@ Models are created by inheriting from the [`Model`](#model) base class.
 
 ```js
 class Animal extends Model {
+  static tableName = 'animal';
   static relationMappings = {
     owner: {
       relation: Model.BelongsToOneRelation,
@@ -425,6 +426,7 @@ class Animal extends Model {
 
 ```js
 class Person extends Model {
+  static tableName = 'person';
   static relationMappings = {
     animals: {
       relation: Model.HasManyRelation,
@@ -442,6 +444,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
+  static tableName = 'person';
   static relationMappings = {
     animal: {
       relation: Model.HasOneRelation,
@@ -459,6 +462,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
+  static tableName = 'Person';
   static relationMappings = {
     movies: {
       relation: Model.ManyToManyRelation,
@@ -481,6 +485,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
+  static tableName = 'Person';
   static relationMappings = {
     movie: {
       relation: Model.HasOneThroughRelation,
@@ -500,7 +505,7 @@ class Person extends Model {
 ```
 
 We already went through how to create relations in the [models](#models) section but here's a list of all the
-available relation types in a nicely searchable place. See the [this](#relationmapping) API doc section for full
+available relation types in a nicely searchable place. See [this](#relationmapping) API doc section for full
 documentation of the relation mapping parameters.
 
 Vocabulary for the relation descriptions:
