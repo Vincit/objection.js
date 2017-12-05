@@ -480,36 +480,67 @@ module.exports = session => {
       });
 
       describe('function whereJsonbRefOnLeftJsonbValOrRefOnRight(builder, fieldExpr, operator, <array|object|string>)', () => {
-        it('should fail if right hand is null', () => {
-          expect(() => {
-            BoundModel.query().whereJsonEquals('jsonArray', null);
-          }).to.throwException();
+        it('should fail if right hand is null', done => {
+          BoundModel.query()
+            .whereJsonEquals('jsonArray', null)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should fail if right hand is number', () => {
-          expect(() => {
-            BoundModel.query().whereJsonEquals('jsonArray', 1);
-          }).to.throwException();
+        it('should fail if right hand is number', done => {
+          BoundModel.query()
+            .whereJsonEquals('jsonArray', 1)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should fail if right hand is not valid json', () => {
+        it('should fail if right hand is not valid json', done => {
           let selfreference = {};
           selfreference.me = selfreference;
-          expect(() => {
-            BoundModel.query().whereJsonEquals('jsonObject', selfreference);
-          }).to.throwException();
+
+          BoundModel.query()
+            .whereJsonEquals('jsonObject', selfreference)
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should fail if right hand is not parseable expression', () => {
-          expect(() => {
-            BoundModel.query().whereJsonEquals('jsonObject', 'jsonArray:');
-          }).to.throwException();
+        it('should fail if right hand is not parseable expression', done => {
+          BoundModel.query()
+            .whereJsonEquals('jsonObject', 'jsonArray:')
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
 
-        it('should fail if left hand is not parseable expression', () => {
-          expect(() => {
-            BoundModel.query().whereJsonEquals('jsonObject:', 'jsonArray');
-          }).to.throwException();
+        it('should fail if left hand is not parseable expression', done => {
+          BoundModel.query()
+            .whereJsonEquals('jsonObject:', 'jsonArray')
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              done();
+            })
+            .catch(done);
         });
       });
 
