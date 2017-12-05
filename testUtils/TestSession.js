@@ -142,11 +142,11 @@ class TestSession {
     }
 
     [
-      ['$beforeInsert', 5],
-      ['$afterInsert', 1],
+      ['$beforeInsert', 1],
+      ['$afterInsert', 0],
       ['$beforeDelete', 1],
       ['$afterDelete', 1],
-      ['$beforeUpdate', 5, (self, args) => self.$beforeUpdateOptions = _.cloneDeep(args[0])],
+      ['$beforeUpdate', 1, (self, args) => self.$beforeUpdateOptions = _.cloneDeep(args[0])],
       ['$afterUpdate', 1, (self, args) => self.$afterUpdateOptions = _.cloneDeep(args[0])],
       ['$afterGet', 1]
     ].forEach(hook => {
