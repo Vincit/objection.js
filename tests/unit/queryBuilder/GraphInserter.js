@@ -1455,19 +1455,12 @@ describe('GraphInserter', () => {
 
     return inserter
       .execute(tableInsertion => {
-        let ret = _.clone(tableInsertion.models);
-
-        _.each(tableInsertion.models, (model, idx) => {
-          if (_.isArray(opt.models)) {
-            expect(opt.models.indexOf(model) !== -1).to.equal(tableInsertion.isInputModel[idx]);
-          } else {
-            expect(model === opt.models).to.equal(tableInsertion.isInputModel[idx]);
-          }
-        });
+        let models = tableInsertion.items.map(it => it.model);
+        let ret = _.clone(models);
 
         insertions.push({
-          tableName: tableInsertion.modelClass.tableName,
-          models: _.map(tableInsertion.models, model => {
+          tableName: tableInsertion.modelClass.getTableName(),
+          models: _.map(models, model => {
             if (model instanceof Model) {
               return model.$toJson(true);
             } else {
