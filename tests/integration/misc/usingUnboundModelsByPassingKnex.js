@@ -79,7 +79,7 @@ module.exports = session => {
       });
     });
 
-    it("basic where's", () => {
+    it('basic wheres', () => {
       const query = Model1.query()
         .orWhereNot('id', '>', 10)
         .whereIn('id', [1, 8, 11]);
