@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3
+
+  * Add beforeInsert hook for relations. [#649](https://github.com/Vincit/objection.js/issues/649) [#19](https://github.com/Vincit/objection.js/issues/19)
+
 ## 0.9.2
 
 ### What's new

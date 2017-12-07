@@ -415,6 +415,9 @@ class Issue extends Model {
         relation: Model.HasManyRelation,
         modelClass: Comment,
         filter: {commentableType: 'Issue'},
+        beforeInsert(model) {
+          model.commentableType = 'Issue';
+        },
         join: {
           from: 'Issue.id',
           to: 'Comment.commentableId'
@@ -431,6 +434,9 @@ class PullRequest extends Model {
         relation: Model.HasManyRelation,
         modelClass: Comment,
         filter: {commentableType: 'PullRequest'},
+        beforeInsert(model) {
+          model.commentableType = 'PullRequest';
+        },
         join: {
           from: 'PullRequest.id',
           to: 'Comment.commentableId'
@@ -442,21 +448,12 @@ class PullRequest extends Model {
 ```
 
 > The `{commentableType: 'Type'}` filter adds a `WHERE "commentableType" = 'Type'` clause to the relation fetch
-> query. It doesn't automatically set the type when you insert a new comment. You have to set the `commentableType`
-> manually:
+> query. The `beforeInsert` hook takes care of setting the type on insert.
 
-```js
-someIssue
-  .$relatedQuery('comments')
-  .insert({text: 'blaa', commentableType: 'Issue'})
-  .then(...)
-```
 
-Creating polymorphic associations isn't as easy as it could be at the moment, but it can be done using
-custom filters for relations. Let's assume we have tables `Comment`, `Issue` and `PullRequest`. Both
-`Issue` and `PullRequest` can have a list of comments. `Comment` has a column `commentableId` to hold
-the foreign key and `commentableType` to hold the related model type. Check out the first example for
-how to create relations for this setup ➔
+Let's assume we have tables `Comment`, `Issue` and `PullRequest`. Both `Issue` and `PullRequest` can have a list of comments.
+`Comment` has a column `commentableId` to hold the foreign key and `commentableType` to hold the related model type. Check out
+the first example for how to create relations for this setup ➔
 
 This kind of associations don't have referential integrity and should be avoided if possible. Instead, consider
 using the _exclusive arc table_ pattern discussed [here](https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442).

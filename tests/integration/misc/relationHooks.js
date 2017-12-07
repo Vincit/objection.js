@@ -288,6 +288,103 @@ module.exports = session => {
                 });
             });
         });
+
+        it('upsertGraph', () => {
+          return Model1.query()
+            .insertGraph({
+              model1Prop1: 'parent',
+
+              model1Relation1: null,
+
+              model1Relation2: [
+                {
+                  model2Prop1: 'child2'
+                }
+              ],
+
+              model1Relation3: [
+                {
+                  model2Prop1: 'child5'
+                }
+              ]
+            })
+            .then(model => {
+              return Model1.query()
+                .mergeContext({
+                  belongsToOneValue: 1,
+                  hasManyValue: 2,
+                  manyToManyValue: 3,
+                  manyToManyJoinValue: 4
+                })
+                .upsertGraph({
+                  id: model.id,
+                  model1Prop1: 'parent',
+
+                  model1Relation1: {
+                    model1Prop1: 'child1'
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: model.model1Relation2[0].idCol,
+                      model2Prop1: 'child2'
+                    },
+                    {
+                      model2Prop1: 'child3'
+                    }
+                  ],
+
+                  model1Relation3: [
+                    {
+                      model2Prop1: 'child4'
+                    },
+                    {
+                      idCol: model.model1Relation3[0].idCol,
+                      model2Prop1: 'child5'
+                    }
+                  ]
+                });
+            })
+            .then(() => {
+              return Model1.query()
+                .findOne({model1Prop1: 'parent'})
+                .eager('[model1Relation1, model1Relation2, model1Relation3]')
+                .then(model => {
+                  expect(model).to.containSubset({
+                    model1Prop1: 'parent',
+
+                    model1Relation1: {
+                      model1Prop1: 'child1',
+                      model1Prop2: 1
+                    },
+
+                    model1Relation2: [
+                      {
+                        model2Prop1: 'child2',
+                        model2Prop2: null
+                      },
+                      {
+                        model2Prop1: 'child3',
+                        model2Prop2: 2
+                      }
+                    ],
+
+                    model1Relation3: [
+                      {
+                        model2Prop1: 'child4',
+                        model2Prop2: 3,
+                        extra2: '4'
+                      },
+                      {
+                        model2Prop1: 'child5',
+                        model2Prop2: null,
+                        extra2: null
+                      }
+                    ]
+                  });
+                });
+            });
+        });
       });
     });
   });

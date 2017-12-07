@@ -4982,6 +4982,7 @@ modelClass|[`Model`](#model)&#124;string|Constructor of the related model class,
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
 modify|function([`QueryBuilder`](#querybuilder))|Optional modifier for the relation query. This is called each time the relation is fetched.
 filter|function([`QueryBuilder`](#querybuilder))|Alias for modify.
+beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted model instance.  This function can be async.
 
 ##### RelationJoin
 
@@ -4999,6 +5000,7 @@ from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined
 to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
 modelClass|string&#124;ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
 extra|string[]&#124;Object|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
+beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
 
 
 
