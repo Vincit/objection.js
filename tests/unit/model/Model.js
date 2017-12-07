@@ -293,6 +293,70 @@ describe('Model', () => {
       }).not.to.throwException();
     });
 
+    it('should skip requirement validation if options.patch == true (oneOf)', () => {
+      Model1.jsonSchema = {
+        oneOf: [{
+          required: ['a']
+        }, {
+          required: ['b']
+        }],
+
+        properties: {
+          a: {type: 'string'},
+          b: {type: 'number'},
+          c: {type: 'string'}
+        }
+      };
+
+      expect(() => {
+        Model1.fromJson({c: 'str'});
+      }).to.throwException();
+
+      expect(() => {
+        Model1.fromJson({a: 'str'});
+      }).to.not.throwException();
+
+      expect(() => {
+        Model1.fromJson({b: 1});
+      }).to.not.throwException();
+
+      expect(() => {
+        Model1.fromJson({c: 'str'}, {patch: true});
+      }).to.not.throwException(err => console.log(err));
+    });
+
+    it('should skip requirement validation if options.patch == true (anyOf)', () => {
+      Model1.jsonSchema = {
+        anyOf: [{
+          required: ['a']
+        }, {
+          required: ['b']
+        }],
+
+        properties: {
+          a: {type: 'string'},
+          b: {type: 'number'},
+          c: {type: 'string'}
+        }
+      };
+
+      expect(() => {
+        Model1.fromJson({c: 'str'});
+      }).to.throwException();
+
+      expect(() => {
+        Model1.fromJson({a: 'str'});
+      }).to.not.throwException();
+
+      expect(() => {
+        Model1.fromJson({b: 1});
+      }).to.not.throwException();
+
+      expect(() => {
+        Model1.fromJson({c: 'str'}, {patch: true});
+      }).to.not.throwException(err => console.log(err));
+    });
+
     it('should skip validation if options.skipValidation == true', () => {
       Model1.jsonSchema = {
         required: ['a'],
@@ -1659,7 +1723,7 @@ describe('Model', () => {
     });
   });
 
-  it('$validate should run run hooks and strip relations', () => {
+  it('$validate should run hooks and strip relations', () => {
     let Model1 = modelClass('Model1');
 
     Model1.prototype.$parseJson = function(json, opt) {
