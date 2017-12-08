@@ -295,11 +295,14 @@ describe('Model', () => {
 
     it('should skip requirement validation if options.patch == true (oneOf)', () => {
       Model1.jsonSchema = {
-        oneOf: [{
-          required: ['a']
-        }, {
-          required: ['b']
-        }],
+        oneOf: [
+          {
+            required: ['a']
+          },
+          {
+            required: ['b']
+          }
+        ],
 
         properties: {
           a: {type: 'string'},
@@ -327,11 +330,14 @@ describe('Model', () => {
 
     it('should skip requirement validation if options.patch == true (anyOf)', () => {
       Model1.jsonSchema = {
-        anyOf: [{
-          required: ['a']
-        }, {
-          required: ['b']
-        }],
+        anyOf: [
+          {
+            required: ['a']
+          },
+          {
+            required: ['b']
+          }
+        ],
 
         properties: {
           a: {type: 'string'},
