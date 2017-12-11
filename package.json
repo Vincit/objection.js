@@ -13,8 +13,8 @@
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
     "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt --trace_inlining",
-    "prettier": "prettier --write 'examples/**/*.js' 'lib/**/*.js' 'tests/**/*.js'",
-    "eslint": "eslint --format codeframe 'examples/**/*.js' 'lib/**/*.js' 'tests/**/*.js'"
+    "prettier": "prettier --write \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
+    "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\""
   },
   "publishConfig": {
     "tag": "next"
@@ -76,7 +76,7 @@
     "mocha": "^3.4.1",
     "mysql": "^2.13.0",
     "pg": "^6.2.2",
-    "prettier": "^1.7.4",
+    "prettier": "^1.9.1",
     "sqlite3": "3.1.8",
     "tslint": "^5.8.0",
     "typescript": "^2.6.1"
