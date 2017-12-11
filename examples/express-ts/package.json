@@ -1,6 +1,6 @@
 {
   "name": "objection-example-express-ts",
-  "version": "0.7.0",
+  "version": "0.0.1-example",
   "description": "Objection.js express TypeScript example",
   "main": "app.js",
   "scripts": {
@@ -18,22 +18,22 @@
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "express-promise-router": "^2.0.0",
-    "knex": "^0.13.0",
+    "knex": "^0.14.2",
     "lodash": "^4.17.4",
     "morgan": "^1.9.0",
-    "objection": "../..",
+    "objection": "^0.9.2",
     "sqlite3": "^3.1.13"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.16.5",
-    "@types/express": "^4.0.37",
-    "@types/knex": "^0.0.62",
-    "@types/lodash": "^4.14.77",
-    "@types/morgan": "^1.7.33",
+    "@types/body-parser": "^1.16.8",
+    "@types/express": "^4.0.39",
+    "@types/knex": "^0.0.67",
+    "@types/lodash": "^4.14.88",
+    "@types/morgan": "^1.7.35",
     "@types/sqlite3": "^3.1.1",
     "rimraf": "^2.6.2",
-    "tslint": "^5.7.0",
-    "tslint-config-standard": "^6.0.1",
-    "typescript": "^2.5.3"
+    "tslint": "^5.8.0",
+    "tslint-config-standard": "^7.0.0",
+    "typescript": "^2.6.2"
   }
 }
