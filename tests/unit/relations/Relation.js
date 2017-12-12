@@ -513,6 +513,6 @@ describe('Relation', () => {
     expect(relation.ownerProp.cols).to.eql(['id']);
     expect(relation.ownerProp.props).to.eql(['id']);
     expect(relation.relatedProp.cols).to.eql(['owner_id']);
-    expect(relation.relatedProp.props).to.eql(['ownerId']);
+    expect(relation.relatedProp.props).to.eql(['owner_id']);
   });
 });
