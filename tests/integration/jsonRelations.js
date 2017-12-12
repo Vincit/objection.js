@@ -36,7 +36,7 @@ module.exports = session => {
 
           movies: {
             relation: Model.ManyToManyRelation,
-            modelClass: Movie,
+            modelClass: () => Movie,
             join: {
               from: 'Person.id',
               through: {
@@ -59,7 +59,8 @@ module.exports = session => {
         return {
           peopleWhoseFavoriteIAm: {
             relation: Model.HasManyRelation,
-            modelClass: Person,
+            // thunk-reference to a modelClass:
+            modelClass: () => Person,
             join: {
               from: 'Animal.id',
               to: ref('Person.json:stuff.favoritePetId').castInt()
@@ -68,6 +69,7 @@ module.exports = session => {
 
           favoritePerson: {
             relation: Model.BelongsToOneRelation,
+            // direct reference to a modelClass:
             modelClass: Person,
             join: {
               from: ref('Animal.json:favoritePersonName').castText(),

@@ -22,8 +22,17 @@ describe('Relation', () => {
     RelatedModelNamedExport = require(__dirname + '/files/RelatedModelNamedExport').RelatedModel;
   });
 
+  function assertValidRelations(relation) {
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerProp.cols).to.eql(['id']);
+    expect(relation.ownerProp.props).to.eql(['id']);
+    expect(relation.relatedProp.cols).to.eql(['ownerId']);
+    expect(relation.relatedProp.props).to.eql(['ownerId']);
+  }
+
   it('should accept a Model subclass as modelClass', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -34,12 +43,22 @@ describe('Relation', () => {
       }
     });
 
-    expect(relation.ownerModelClass).to.equal(OwnerModel);
-    expect(relation.relatedModelClass).to.equal(RelatedModel);
-    expect(relation.ownerProp.cols).to.eql(['id']);
-    expect(relation.ownerProp.props).to.eql(['id']);
-    expect(relation.relatedProp.cols).to.eql(['ownerId']);
-    expect(relation.relatedProp.props).to.eql(['ownerId']);
+    assertValidRelations(relation);
+  });
+
+  it('should accept a Model subclass thunk as modelClass', () => {
+    let relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: () => require(__dirname + '/files/RelatedModel'),
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    assertValidRelations(relation);
   });
 
   it('should accept a path to a Model subclass as modelClass', () => {
@@ -108,7 +127,7 @@ describe('Relation', () => {
 
     relation.setMapping({
       relation: Relation,
-      modelClass: RelatedModel,
+      modelClass: () => RelatedModel,
       join: {
         from: ['OwnerModel.name', 'OwnerModel.dateOfBirth'],
         to: ['RelatedModel.ownerName', 'RelatedModel.ownerDateOfBirth']
@@ -137,7 +156,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one.'
+        'OwnerModel.relationMappings.testRelation: modelClass must be either a subclass of Model, a thunk to a subclass of Model, or a file path to a module that exports one.'
       );
     });
   });
@@ -156,7 +175,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.match(
-        /OwnerModel\.relationMappings\.testRelation: modelClass path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
+        /OwnerModel\.relationMappings\.testRelation: modelClass path .+[\\\/]tests[\\\/]unit[\\\/]relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
       );
     });
   });
@@ -494,6 +513,6 @@ describe('Relation', () => {
     expect(relation.ownerProp.cols).to.eql(['id']);
     expect(relation.ownerProp.props).to.eql(['id']);
     expect(relation.relatedProp.cols).to.eql(['owner_id']);
-    expect(relation.relatedProp.props).to.eql(['owner_id']);
+    expect(relation.relatedProp.props).to.eql(['ownerId']);
   });
 });
