@@ -1121,6 +1121,54 @@ module.exports = session => {
           });
       });
 
+      it('should be able to change the separator', () => {
+        return Model1.query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .where('Model1.id', 1)
+          .where('model1Relation2.id_col', 2)
+          .where('model1Relation2->model2Relation1.id', 6)
+          .joinEager('[model1Relation1, model1Relation2.model2Relation1]')
+          .eagerOptions({separator: '->'})
+          .then(models => {
+            expect(models).to.eql([
+              {
+                id: 1,
+                model1Prop1: 'hello 1',
+                $afterGetCalled: 1,
+
+                model1Relation1: {
+                  id: 2,
+                  model1Id: 3,
+                  model1Prop1: 'hello 2',
+                  model1Prop2: null,
+                  $afterGetCalled: 1
+                },
+
+                model1Relation2: [
+                  {
+                    idCol: 2,
+                    model1Id: 1,
+                    model2Prop1: 'hejsan 2',
+                    model2Prop2: null,
+                    $afterGetCalled: 1,
+
+                    model2Relation1: [
+                      {
+                        id: 6,
+                        model1Id: 7,
+                        model1Prop1: 'hello 6',
+                        model1Prop2: null,
+                        aliasedExtra: 'extra 6',
+                        $afterGetCalled: 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]);
+          });
+      });
+
       it('should be able to refer to joined relations with syntax Table:rel1:rel2.col', () => {
         return Model1.query()
           .where('Model1.id', 1)
