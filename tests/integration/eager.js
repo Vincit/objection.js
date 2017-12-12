@@ -1058,6 +1058,69 @@ module.exports = session => {
           });
       });
 
+      it('should be able to change the join type', () => {
+        return Model1.query()
+          .select('Model1.id', 'Model1.model1Prop1')
+          .joinEager('model1Relation2')
+          .eagerOptions({joinOperation: 'innerJoin'})
+          .orderBy(['Model1.id', 'model1Relation2.id_col'])
+          .then(models => {
+            // With innerJoin we should only get `Model1` instances that have one
+            // or more `model2Relation2` relations.
+            expect(models).to.eql([
+              {
+                id: 1,
+                model1Prop1: 'hello 1',
+                $afterGetCalled: 1,
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model1Id: 1,
+                    model2Prop1: 'hejsan 1',
+                    model2Prop2: null,
+                    $afterGetCalled: 1
+                  },
+                  {
+                    idCol: 2,
+                    model1Id: 1,
+                    model2Prop1: 'hejsan 2',
+                    model2Prop2: null,
+                    $afterGetCalled: 1
+                  }
+                ]
+              },
+              {
+                id: 4,
+                model1Prop1: 'hello 4',
+                $afterGetCalled: 1,
+                model1Relation2: [
+                  {
+                    idCol: 4,
+                    model1Id: 4,
+                    model2Prop1: 'hejsan 4',
+                    model2Prop2: null,
+                    $afterGetCalled: 1
+                  }
+                ]
+              },
+              {
+                id: 6,
+                model1Prop1: 'hello 6',
+                $afterGetCalled: 1,
+                model1Relation2: [
+                  {
+                    idCol: 3,
+                    model1Id: 6,
+                    model2Prop1: 'hejsan 3',
+                    model2Prop2: null,
+                    $afterGetCalled: 1
+                  }
+                ]
+              }
+            ]);
+          });
+      });
+
       it('should be able to refer to joined relations with syntax Table:rel1:rel2.col', () => {
         return Model1.query()
           .where('Model1.id', 1)
