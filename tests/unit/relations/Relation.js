@@ -47,7 +47,7 @@ describe('Relation', () => {
   });
 
   it('should accept a Model subclass thunk as modelClass', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -62,7 +62,7 @@ describe('Relation', () => {
   });
 
   it('should accept a path to a Model subclass as modelClass', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -83,7 +83,7 @@ describe('Relation', () => {
 
   it('should accept a relative path to a Model subclass as modelClass (resolved using Model.modelPaths)', () => {
     OwnerModel.modelPaths = [__dirname + '/files/'];
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -103,7 +103,7 @@ describe('Relation', () => {
   });
 
   it('should accept a module with named exports', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -123,7 +123,7 @@ describe('Relation', () => {
   });
 
   it('should accept a composite key as an array of columns', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -143,7 +143,7 @@ describe('Relation', () => {
   });
 
   it('should fail if modelClass is not a subclass of Model', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -162,7 +162,7 @@ describe('Relation', () => {
   });
 
   it('should fail if modelClass resolves to a module that exports multiple model classes', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -181,7 +181,7 @@ describe('Relation', () => {
   });
 
   it('should fail if modelClass is missing', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -200,7 +200,7 @@ describe('Relation', () => {
   });
 
   it('should fail if modelClass is an invalid file path', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -219,7 +219,7 @@ describe('Relation', () => {
   });
 
   it('should fail if modelClass is a file path that points to a non-model', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -240,7 +240,7 @@ describe('Relation', () => {
   });
 
   it('should fail if relation is not defined', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -258,7 +258,7 @@ describe('Relation', () => {
   });
 
   it('should fail if relation is not a Relation subclass', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -277,7 +277,7 @@ describe('Relation', () => {
   });
 
   it('should fail if OwnerModelClass is not a subclass of Model', () => {
-    let relation = new Relation('testRelation', {});
+    const relation = new Relation('testRelation', {});
 
     expect(() => {
       relation.setMapping({
@@ -294,7 +294,7 @@ describe('Relation', () => {
   });
 
   it('join.to should have format ModelName.columnName', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -313,7 +313,7 @@ describe('Relation', () => {
   });
 
   it('join.to should point to either of the related model classes', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -332,7 +332,7 @@ describe('Relation', () => {
   });
 
   it('join.from should have format ModelName.columnName', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -351,7 +351,7 @@ describe('Relation', () => {
   });
 
   it('join.from should point to either of the related model classes', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -370,7 +370,7 @@ describe('Relation', () => {
   });
 
   it('should fail if join object is missing', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -385,7 +385,7 @@ describe('Relation', () => {
   });
 
   it('should fail if join.from is missing', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -403,7 +403,7 @@ describe('Relation', () => {
   });
 
   it('should fail if join.to is missing', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     expect(() => {
       relation.setMapping({
@@ -421,7 +421,7 @@ describe('Relation', () => {
   });
 
   it('the values of `join.to` and `join.from` can be swapped', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     relation.setMapping({
       relation: Relation,
@@ -441,7 +441,7 @@ describe('Relation', () => {
   });
 
   it('relatedCol and ownerCol should be in database format', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     Object.defineProperty(OwnerModel, 'tableName', {
       get() {
@@ -485,7 +485,7 @@ describe('Relation', () => {
   });
 
   it('should allow relations on tables under a schema', () => {
-    let relation = new Relation('testRelation', OwnerModel);
+    const relation = new Relation('testRelation', OwnerModel);
 
     Object.defineProperty(OwnerModel, 'tableName', {
       get() {
