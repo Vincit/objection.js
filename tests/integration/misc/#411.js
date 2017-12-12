@@ -42,7 +42,7 @@ module.exports = session => {
 
     it('test', () => {
       const model = Person.fromJson({foo: 'bar'});
-      expect(ajvValidator.cache).to.have.property('blaa blaa');
+      expect(ajvValidator.cache.has('blaa blaa')).to.equal(true);
     });
   });
 };
