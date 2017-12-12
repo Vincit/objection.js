@@ -113,7 +113,7 @@ class Movie extends objection.Model {
   static relationMappings = {
     actors: {
       relation: objection.Model.ManyToManyRelation,
-      modelClass: Person,
+      modelClass: () => Person,
       join: {
         from: ['Movie.id1', 'Model.id2'],
         through: {

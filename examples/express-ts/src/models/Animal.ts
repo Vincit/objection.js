@@ -1,6 +1,5 @@
 import { Model } from 'objection';
 import Person from './Person';
-import { join } from 'path';
 
 export default class Animal extends Model {
   readonly id: number;
@@ -33,7 +32,7 @@ export default class Animal extends Model {
       // The related model. This can be either a Model subclass constructor or an
       // absolute file path to a module that exports one. We use the file path version
       // here to prevent require loops.
-      modelClass: join(__dirname, 'Person'),
+      modelClass: () => Person,
       join: {
         from: 'Animal.ownerId',
         to: 'Person.id'

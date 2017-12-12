@@ -1179,9 +1179,8 @@ object.pick@^1.2.0:
   dependencies:
     isobject "^3.0.1"
 
-objection@^0.9.2:
+objection@../..:
   version "0.9.2"
-  resolved "https://registry.yarnpkg.com/objection/-/objection-0.9.2.tgz#ea2abbccbfc887605dfe48748b31e46cb4b317a0"
   dependencies:
     ajv "^5.1.1"
     bluebird "^3.5.0"
