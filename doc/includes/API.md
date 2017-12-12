@@ -440,10 +440,11 @@ the Promise is rejected with a [`ValidationError`](#validationerror).
 NOTE: The return value of the insert query _only_ contains the properties given to the insert
 method plus the identifier. This is because we don't make an additional fetch query after
 the insert. Using postgres you can chain [`returning('*')`](#returning) to the query to get all
-properties - see [this recipe](#postgresql-quot-returning-quot-tricks) for some examples. On other databases you
-can use the [`insertAndFetch`](#insertandfetch) method.
+properties - see [this recipe](#postgresql-quot-returning-quot-tricks) for some examples. If you use
+`returning(['only', 'some', 'props'])` note that the result object will still contain the input properies
+__plus__ the properties listed in `returning`. On other databases you can use the [`insertAndFetch`](#insertandfetch) method.
 
-The batch insert only works on Postgres because Postgres is the only database engine
+Batch inserts only work on Postgres because Postgres is the only database engine
 that returns the identifiers of _all_ inserted rows. knex supports batch inserts on
 other databases also, but you only get the id of the first (or last) inserted object
 as a result. If you need batch insert on other databases you can use knex directly
@@ -4134,6 +4135,7 @@ Type|Description
 
 
 
+
 #### resultSize
 
 ```js
@@ -4197,7 +4199,7 @@ The problem with this is that if the result set is empty, we don't get the total
 
 Argument|Type|Description
 --------|----|-------------------
-page|number|The index of the page to return
+page|number|The index of the page to return. The index of the first page is 0.
 pageSize|number|The page size
 
 ##### Return value

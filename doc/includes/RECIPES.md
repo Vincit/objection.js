@@ -70,13 +70,21 @@ json fields.
 
 Json queries currently only work with postgres.
 
-## Change id column
+## Custom id column
 
 ```js
 class Person extends Model {
   static get idColumn() {
     return 'person_id';
   }
+}
+```
+
+> ESNext:
+
+```js
+class Person extends Model {
+  static idColumn = 'person_id';
 }
 ```
 
@@ -143,12 +151,14 @@ class MyCustomValidator extends Validator {
     const json = args.json;
 
     // `ModelOptions` object. If your custom validator sets default
-    // values, you need to check the `opt.patch` boolean. If it is true
-    // we are validating a patch object, the defaults should not be set.
+    // values or has the concept of required properties, you need to
+    // check the `opt.patch` boolean. If it is true we are validating
+    // a patch object (an object with a subset of model's properties).
     const opt = args.options;
 
     // A context object shared between the validation methods. A new
-    // object is created for each validation operation.
+    // object is created for each validation operation. You can store
+    // whatever you need in this object.
     const ctx = args.ctx;
 
     // Do your validation here and throw any exception if the
