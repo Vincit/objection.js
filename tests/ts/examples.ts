@@ -109,8 +109,12 @@ async () => {
 
 class Movie extends objection.Model {
   title: string;
-
-  static relationMappings = {
+  /**
+   * This static field instructs Objection how to hydrate and persist
+   * relations. By making relationMappings a thunk, we avoid require loops
+   * caused by other class references.
+   */
+  static relationMappings = () => ({
     actors: {
       relation: objection.Model.ManyToManyRelation,
       modelClass: Person,
@@ -123,7 +127,7 @@ class Movie extends objection.Model {
         to: [ref('Person.id1'), 'Person.id2']
       }
     }
-  };
+  });
 }
 
 class Animal extends objection.Model {
@@ -138,7 +142,7 @@ class Animal extends objection.Model {
     format(json: objection.Pojo) {
       return json;
     }
-  }
+  };
 }
 
 class Comment extends objection.Model {
@@ -265,12 +269,12 @@ const insertedModels1: Promise<Person[]> = Person.query().insertGraphAndFetch([
   new Person(),
   new Person()
 ]);
-const insertedModels2: Promise<Person[]> = Person.query().insertGraphAndFetch([
-  new Person(),
-  new Person()
-], {
-  relate: true
-});
+const insertedModels2: Promise<Person[]> = Person.query().insertGraphAndFetch(
+  [new Person(), new Person()],
+  {
+    relate: true
+  }
+);
 
 const upsertModel1: Promise<Person> = Person.query().upsertGraph({});
 const upsertModel2: Promise<Person> = Person.query().upsertGraph({}, {relate: true});

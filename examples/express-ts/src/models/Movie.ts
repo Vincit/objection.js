@@ -1,6 +1,6 @@
-import { Model } from 'objection';
+import {Model} from 'objection';
 import Person from './Person';
-import { join } from 'path';
+import {join} from 'path';
 
 export default class Movie extends Model {
   readonly id: number;
@@ -18,12 +18,13 @@ export default class Movie extends Model {
     required: ['name'],
 
     properties: {
-      id: { type: 'integer' },
-      name: { type: 'string', minLength: 1, maxLength: 255 }
+      id: {type: 'integer'},
+      name: {type: 'string', minLength: 1, maxLength: 255}
     }
   };
 
-  static relationMappings = {
+  // This relationMappings is a thunk, which prevents require loops:
+  static relationMappings = () => ({
     actors: {
       relation: Model.ManyToManyRelation,
       // The related model. This can be either a Model subclass constructor or an
@@ -40,5 +41,5 @@ export default class Movie extends Model {
         to: 'Person.id'
       }
     }
-  };
+  });
 }

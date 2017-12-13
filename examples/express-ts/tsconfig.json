@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": false,
     "allowUnreachableCode": false,
     "alwaysStrict": true,
     "module": "commonjs",

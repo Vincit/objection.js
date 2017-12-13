@@ -4,7 +4,7 @@ import * as morgan from 'morgan';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import registerApi from './api';
-import { Model } from 'objection';
+import {Model} from 'objection';
 
 const knexConfig = require('../knexfile');
 const promiseRouter = require('express-promise-router');
@@ -32,7 +32,7 @@ registerApi(router);
 
 // Error handling. The `ValidationError` instances thrown by objection.js have a `statusCode`
 // property that is sent as the status code of the response.
-app.use((err: any, req: express.Request, res: express.Response,next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (err) {
     res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});
   } else {
@@ -40,6 +40,6 @@ app.use((err: any, req: express.Request, res: express.Response,next: express.Nex
   }
 });
 
-const server = app.listen(8641, function () {
+const server = app.listen(8641, function() {
   console.log('Example app listening at port %s', server.address().port);
 });
