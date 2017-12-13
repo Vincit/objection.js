@@ -1,5 +1,5 @@
-import { Model, RelationMappings } from 'objection';
-import { join } from 'path';
+import {Model, RelationMappings} from 'objection';
+import {join} from 'path';
 
 export interface Address {
   street: string;
@@ -28,18 +28,18 @@ export default class Person extends Model {
     required: ['firstName', 'lastName'],
 
     properties: {
-      id: { type: 'integer' },
-      parentId: { type: ['integer', 'null'] },
-      firstName: { type: 'string', minLength: 1, maxLength: 255 },
-      lastName: { type: 'string', minLength: 1, maxLength: 255 },
-      age: { type: 'number' },
+      id: {type: 'integer'},
+      parentId: {type: ['integer', 'null']},
+      firstName: {type: 'string', minLength: 1, maxLength: 255},
+      lastName: {type: 'string', minLength: 1, maxLength: 255},
+      age: {type: 'number'},
 
       address: {
         type: 'object',
         properties: {
-          street: { type: 'string' },
-          city: { type: 'string' },
-          zipCode: { type: 'string' }
+          street: {type: 'string'},
+          city: {type: 'string'},
+          zipCode: {type: 'string'}
         }
       }
     }
@@ -48,7 +48,10 @@ export default class Person extends Model {
   // Where to look for models classes.
   static modelPaths = [__dirname];
 
-  // This object defines the relations to other models.
+  // This object defines the relations to other models. The modelClass strings
+  // will be joined to `modelPaths` to find the class definition, to avoid
+  // require loops. The other solution to avoid require loops is to make
+  // relationMappings a thunk. See Movie.ts for an example.
   static relationMappings: RelationMappings = {
     pets: {
       relation: Model.HasManyRelation,

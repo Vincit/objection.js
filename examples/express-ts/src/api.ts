@@ -4,13 +4,11 @@ import * as express from 'express';
 import Person from './models/Person';
 import Movie from './models/Movie';
 
-export default function (router: express.Router) {
-
+export default function(router: express.Router) {
   // Create a new Person. You can pass relations with the person
   // and they also get inserted.
   router.post('/persons', async (req, res) => {
-    const person = await Person
-      .query()
+    const person = await Person.query()
       .allowInsert('[pets, children.[pets, movies], movies, parent]')
       .insertGraph(req.body);
 
@@ -19,9 +17,7 @@ export default function (router: express.Router) {
 
   // Patch a Person.
   router.patch('/persons/:id', async (req, res) => {
-    const person = await Person
-      .query()
-      .patchAndFetchById(req.params.id, req.body);
+    const person = await Person.query().patchAndFetchById(req.params.id, req.body);
 
     res.send(person);
   });
@@ -33,8 +29,7 @@ export default function (router: express.Router) {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
-    const persons = await Person
-      .query()
+    const persons = await Person.query()
       .allowEager('[pets, children.[pets, movies], movies]')
       .eager(req.query.eager)
       .skipUndefined()
@@ -47,8 +42,7 @@ export default function (router: express.Router) {
 
   // Delete a person.
   router.delete('/persons/:id', async (req, res) => {
-    await Person
-      .query()
+    await Person.query()
       .delete()
       .where('id', req.params.id);
 
@@ -57,16 +51,12 @@ export default function (router: express.Router) {
 
   // Add a child for a Person.
   router.post('/persons/:id/children', async (req, res) => {
-    const person = await Person
-      .query()
-      .findById(req.params.id);
+    const person = await Person.query().findById(req.params.id);
 
     if (!person) {
       throwNotFound();
     } else {
-      const child = await person
-        .$relatedQuery('children')
-        .insert(req.body);
+      const child = await person.$relatedQuery('children').insert(req.body);
 
       res.send(child);
     }
@@ -74,16 +64,12 @@ export default function (router: express.Router) {
 
   // Add a pet for a Person.
   router.post('/persons/:id/pets', async (req, res) => {
-    const person = await Person
-      .query()
-      .findById(req.params.id);
+    const person = await Person.query().findById(req.params.id);
 
     if (!person) {
       throwNotFound();
     } else {
-      const pet = await person
-        .$relatedQuery('pets')
-        .insert(req.body);
+      const pet = await person.$relatedQuery('pets').insert(req.body);
 
       res.send(pet);
     }
@@ -92,9 +78,7 @@ export default function (router: express.Router) {
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
   router.get('/persons/:id/pets', async (req, res) => {
-    const person = await Person
-      .query()
-      .findById(req.params.id);
+    const person = await Person.query().findById(req.params.id);
 
     if (!person) {
       throwNotFound();
@@ -116,17 +100,13 @@ export default function (router: express.Router) {
   router.post('/persons/:id/movies', async (req, res) => {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
-    const movie = await objection.transaction(Person, async (Person) => {
-      const person = await Person
-        .query()
-        .findById(req.params.id);
+    const movie = await objection.transaction(Person, async Person => {
+      const person = await Person.query().findById(req.params.id);
 
       if (!person) {
         return throwNotFound();
       } else {
-        return person
-          .$relatedQuery('movies')
-          .insert(req.body);
+        return person.$relatedQuery('movies').insert(req.body);
       }
     });
 
@@ -135,16 +115,12 @@ export default function (router: express.Router) {
 
   // Add existing Person as an actor to a movie.
   router.post('/movies/:id/actors', async (req, res) => {
-    const movie = await Movie
-      .query()
-      .findById(req.params.id);
+    const movie = await Movie.query().findById(req.params.id);
 
     if (!movie) {
       throwNotFound();
     } else {
-      await movie
-        .$relatedQuery('actors')
-        .relate(req.body.id);
+      await movie.$relatedQuery('actors').relate(req.body.id);
 
       res.send(req.body);
     }
@@ -152,9 +128,7 @@ export default function (router: express.Router) {
 
   // Get Movie's actors.
   router.get('/movies/:id/actors', async (req, res) => {
-    const movie = await Movie
-      .query()
-      .findById(req.params.id);
+    const movie = await Movie.query().findById(req.params.id);
 
     if (!movie) {
       throwNotFound();
@@ -163,7 +137,7 @@ export default function (router: express.Router) {
       res.send(actors);
     }
   });
-};
+}
 
 function throwNotFound() {
   const err: any = new Error();

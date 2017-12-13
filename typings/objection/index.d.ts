@@ -77,7 +77,7 @@ declare namespace Objection {
 
   export interface ColumnNameMappers {
     parse(json: Pojo): Pojo;
-    format(json: Pojo): Pojo
+    format(json: Pojo): Pojo;
   }
 
   export interface KnexMappers {
@@ -260,7 +260,7 @@ declare namespace Objection {
     jsonSchema: JsonSchema;
     idColumn: string | string[];
     modelPaths: string[];
-    relationMappings: RelationMappings;
+    relationMappings: RelationMappings | (() => RelationMappings);
     jsonAttributes: string[];
     virtualAttributes: string[];
     uidProp: string;
@@ -317,7 +317,7 @@ declare namespace Objection {
     static jsonSchema: JsonSchema;
     static idColumn: string | string[];
     static modelPaths: string[];
-    static relationMappings: RelationMappings;
+    static relationMappings: RelationMappings | (() => RelationMappings);
     static jsonAttributes: string[];
     static virtualAttributes: string[];
     static uidProp: string;
@@ -444,7 +444,10 @@ declare namespace Objection {
   /**
    * QueryBuilder with one expected result
    */
-  export interface QueryBuilderSingle<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Executable<T> {
+  export interface QueryBuilderSingle<T>
+    extends QueryBuilderBase<T>,
+      ThrowIfNotFound,
+      Executable<T> {
     runAfter(fn: (result: T, builder: this) => any): this;
   }
 
