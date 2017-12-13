@@ -125,7 +125,7 @@ declare namespace Objection {
 
   export interface RelationMapping {
     relation: Relation;
-    modelClass: ModelClass<any> | string;
+    modelClass: ModelClass<any> | string | (() => ModelClass<any>);
     join: RelationJoin;
     modify?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
     filter?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;

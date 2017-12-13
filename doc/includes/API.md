@@ -4907,7 +4907,7 @@ class Person extends Model {
   static relationMappings = {
     pets: {
       relation: Model.HasManyRelation,
-      modelClass: Animal,
+      modelClass: () => Animal,
       join: {
         from: 'Person.id',
         // Any of the `to` and `from` fields can also be
@@ -4921,7 +4921,7 @@ class Person extends Model {
 
     father: {
       relation: Model.BelongsToOneRelation,
-      modelClass: Person,
+      modelClass: () => Person,
       join: {
         from: 'Person.fatherId',
         to: 'Person.id'
@@ -4930,7 +4930,7 @@ class Person extends Model {
 
     movies: {
       relation: Model.ManyToManyRelation,
-      modelClass: Movie,
+      modelClass: () => Movie,
       join: {
         from: 'Person.id',
         through: {
@@ -4968,10 +4968,16 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 The `modelClass` passed to the relation mappings is the class of the related model. It can be one of the following:
 
 1. A model class constructor
-2. An absolute path to a module that exports a model class
-3. A path relative to one of the paths in [`modelPaths`](#modelpaths) array.
+1. A thunk (a function with no arguments) that returns a model class constructor
+1. An absolute path to a module that exports a model class
+1. A path relative to one of the paths in [`modelPaths`](#modelpaths) array.
 
-The file path versions are handy for avoiding require loops.
+The thunk and file path versions avoid require loops.
+
+Thunks are recommended if you are packing up your server-side code, as the
+model files won't be `require`able at runtime unless you add `exclude`
+patterns (and even then, it's not as efficient as simply providing the class
+reference).
 
 See [`RelationMapping`](#relationmapping)
 
