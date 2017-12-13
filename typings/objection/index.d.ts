@@ -578,6 +578,7 @@ declare namespace Objection {
     patchAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
 
     upsertGraph: Upsert<T>;
+    upsertGraphAndFetch: Upsert<T>;
 
     /**
      * @return a Promise of the number of deleted rows
