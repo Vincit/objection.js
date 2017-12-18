@@ -97,7 +97,7 @@ declare namespace Objection {
   }
 
   export type ValidatorArgs = {
-    ctx: object, // TBD: always {}; perhaps should be QueryContext (class QueryBuilderUserContext)?
+    ctx: object,
     model: Model,
     json: Pojo,
     options: ModelOptions
