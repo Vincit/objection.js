@@ -382,7 +382,7 @@ declare namespace Objection {
     static knexQuery(): knex.QueryBuilder;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
-    static createValidator(): AjvValidator;
+    static createValidator(): Validator;
     static createValidationError(errorHash: ErrorHash): ValidationError;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
