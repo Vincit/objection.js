@@ -318,7 +318,7 @@ declare namespace Objection {
 
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
-    createValidator(): AjvValidator;
+    createValidator(): Validator;
     createValidationError(errorHash: ErrorHash): ValidationError;
 
     fromJson(json: object, opt?: ModelOptions): M;
