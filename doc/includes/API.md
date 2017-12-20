@@ -6775,7 +6775,7 @@ jennifer
   });
 ```
 
-Loads related models using a [`RelationExpression`](#relationexpression).
+Loads related models using a [`RelationExpression`](#relationexpression) and assigns them to the target model instances.
 
 ##### Arguments
 

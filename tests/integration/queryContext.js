@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
+const chai = require('chai');
 const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const knexMocker = require('../../testUtils/mockKnex');
 
@@ -400,13 +401,18 @@ module.exports = session => {
               }
             })
             .then(model => {
-              expect(mockKnex.executedQueries).to.eql(queries);
-              expect(mockKnex.executedQueries).to.eql([
-                'insert into "public"."Model1" ("model1Prop1") values (\'new 2\'), (\'new 4\') returning "id", "model1Prop1" || \' computed1\' as computed',
-                'insert into "public"."Model1" ("model1Id", "model1Prop1") values (5, \'new 1\') returning "id", "model1Prop1" || \' computed1\' as computed',
-                'insert into "public"."model2" ("model1_id", "model2_prop1") values (5, \'new 3\') returning "id_col", "model2_prop1" || \' computed2\' as computed',
-                'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (6, 3) returning "model1Id"'
-              ]);
+              expect(mockKnex.executedQueries.length).to.equal(4);
+              expect(mockKnex.executedQueries.length).to.equal(queries.length);
+
+              chai.expect(mockKnex.executedQueries).to.containSubset(queries);
+              chai
+                .expect(mockKnex.executedQueries)
+                .to.containSubset([
+                  'insert into "public"."Model1" ("model1Prop1") values (\'new 2\'), (\'new 4\') returning "id", "model1Prop1" || \' computed1\' as computed',
+                  'insert into "public"."Model1" ("model1Id", "model1Prop1") values (5, \'new 1\') returning "id", "model1Prop1" || \' computed1\' as computed',
+                  'insert into "public"."model2" ("model1_id", "model2_prop1") values (5, \'new 3\') returning "id_col", "model2_prop1" || \' computed2\' as computed',
+                  'insert into "public"."Model1Model2" ("model1Id", "model2Id") values (6, 3) returning "model1Id"'
+                ]);
 
               expect(model.$toJson()).to.eql({
                 id: 7,
