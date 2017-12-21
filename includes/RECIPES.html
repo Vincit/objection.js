@@ -90,11 +90,18 @@ json fields.</p>
 
 <p>Json queries currently only work with postgres.</p>
 
-<h2 id="change-id-column">Change id column</h2>
+<h2 id="custom-id-column">Custom id column</h2>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="s1">'person_id'</span><span class="p">;</span>
   <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'person_id'</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
 <p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.
@@ -158,12 +165,14 @@ implementing a custom <a href="#validator"><code class="prettyprint">Validator</
     <span class="kr">const</span> <span class="nx">json</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">json</span><span class="p">;</span>
 
     <span class="c1">// `ModelOptions` object. If your custom validator sets default</span>
-    <span class="c1">// values, you need to check the `opt.patch` boolean. If it is true</span>
-    <span class="c1">// we are validating a patch object, the defaults should not be set.</span>
+    <span class="c1">// values or has the concept of required properties, you need to</span>
+    <span class="c1">// check the `opt.patch` boolean. If it is true we are validating</span>
+    <span class="c1">// a patch object (an object with a subset of model's properties).</span>
     <span class="kr">const</span> <span class="nx">opt</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">options</span><span class="p">;</span>
 
     <span class="c1">// A context object shared between the validation methods. A new</span>
-    <span class="c1">// object is created for each validation operation.</span>
+    <span class="c1">// object is created for each validation operation. You can store</span>
+    <span class="c1">// whatever you need in this object.</span>
     <span class="kr">const</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">ctx</span><span class="p">;</span>
 
     <span class="c1">// Do your validation here and throw any exception if the</span>
@@ -413,6 +422,9 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
         <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">},</span>
+        <span class="nx">beforeInsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">model</span><span class="p">.</span><span class="nx">commentableType</span> <span class="o">=</span> <span class="s1">'Issue'</span><span class="p">;</span>
+        <span class="p">},</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Issue.id'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
@@ -429,6 +441,9 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
         <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'PullRequest'</span><span class="p">},</span>
+        <span class="nx">beforeInsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">model</span><span class="p">.</span><span class="nx">commentableType</span> <span class="o">=</span> <span class="s1">'PullRequest'</span><span class="p">;</span>
+        <span class="p">},</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'PullRequest.id'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
@@ -440,19 +455,12 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 </code></pre>
 <blockquote>
 <p>The <code class="prettyprint">{commentableType: &#39;Type&#39;}</code> filter adds a <code class="prettyprint">WHERE &quot;commentableType&quot; = &#39;Type&#39;</code> clause to the relation fetch
-query. It doesn&rsquo;t automatically set the type when you insert a new comment. You have to set the <code class="prettyprint">commentableType</code>
-manually:</p>
+query. The <code class="prettyprint">beforeInsert</code> hook takes care of setting the type on insert.</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">someIssue</span>
-  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">text</span><span class="p">:</span> <span class="s1">'blaa'</span><span class="p">,</span> <span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(...)</span>
-</code></pre>
-<p>Creating polymorphic associations isn&rsquo;t as easy as it could be at the moment, but it can be done using
-custom filters for relations. Let&rsquo;s assume we have tables <code class="prettyprint">Comment</code>, <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code>. Both
-<code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code> can have a list of comments. <code class="prettyprint">Comment</code> has a column <code class="prettyprint">commentableId</code> to hold
-the foreign key and <code class="prettyprint">commentableType</code> to hold the related model type. Check out the first example for
-how to create relations for this setup ➔</p>
+
+<p>Let&rsquo;s assume we have tables <code class="prettyprint">Comment</code>, <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code>. Both <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code> can have a list of comments.
+<code class="prettyprint">Comment</code> has a column <code class="prettyprint">commentableId</code> to hold the foreign key and <code class="prettyprint">commentableType</code> to hold the related model type. Check out
+the first example for how to create relations for this setup ➔</p>
 
 <p>This kind of associations don&rsquo;t have referential integrity and should be avoided if possible. Instead, consider
 using the <em>exclusive arc table</em> pattern discussed <a href="https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442">here</a>.</p>

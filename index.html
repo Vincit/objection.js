@@ -428,6 +428,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 <p><code class="prettyprint">BelongsToOneRelation</code>: Use this relation when the source model has the foreign key</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'animal'</span><span class="p">;</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">owner</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
@@ -444,6 +445,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 <p><code class="prettyprint">HasManyRelation</code>: Use this relation when the related model has the foreign key</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'person'</span><span class="p">;</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">animals</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
@@ -460,6 +462,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 <p><code class="prettyprint">HasOneRelation</code>: Just like <code class="prettyprint">HasManyRelation</code> but for one related row</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'person'</span><span class="p">;</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">animal</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasOneRelation</span><span class="p">,</span>
@@ -476,6 +479,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 <p><code class="prettyprint">ManyToManyRelation</code>: Use this relation when the model is related to a list of other models through a join table</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
@@ -497,6 +501,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 <p><code class="prettyprint">HasOneThroughRelation</code>: Use this relation when the model is related to a single model through a join table</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">movie</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasOneThroughRelation</span><span class="p">,</span>
@@ -515,7 +520,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES5 tra
 <span class="p">}</span>
 </code></pre>
 <p>We already went through how to create relations in the <a href="#models">models</a> section but here&rsquo;s a list of all the
-available relation types in a nicely searchable place. See the <a href="#relationmapping">this</a> API doc section for full
+available relation types in a nicely searchable place. See <a href="#relationmapping">this</a> API doc section for full
 documentation of the relation mapping parameters.</p>
 
 <p>Vocabulary for the relation descriptions:</p>
@@ -701,7 +706,13 @@ just like the <a href="#query"><code class="prettyprint">query</code></a> method
 </code></pre>
 <p>Simply call <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery(&#39;pets&#39;)</code></a> for a model <em>instance</em> to fetch a relation for it. The relation name is
 given as the only argument. The return value is a <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> so you once again have all the query methods
-at your disposal. In many cases it&rsquo;s more convenient to use <a href="#eager-loading"><code class="prettyprint">eager loading</code></a> to fetch relations.</p>
+at your disposal. In many cases it&rsquo;s more convenient to use <a href="#eager-loading"><code class="prettyprint">eager loading</code></a> to fetch relations. <code class="prettyprint">$relatedQuery</code>
+is better when you only need one relation and you need to filter the query extensively.</p>
+
+<p>By default the fetched related models are assigned to the parent model to a property by the same name as the relation. For example
+in our <code class="prettyprint">person.$relatedQuery(&#39;pets&#39;)</code> example query, the return value would be assigned to <code class="prettyprint">person.pets</code>. This behaviour
+can be modified using <a href="#relatedfindquerymutates"><code class="prettyprint">relatedFindQueryMutates</code></a>. Also check out <a href="#_s_setrelated"><code class="prettyprint">$setRelated</code></a> and
+<a href="#_s_appendrelated"><code class="prettyprint">$appendRelated</code></a> helpers.</p>
 
 <h3 id="insert-queries">Insert queries</h3>
 
@@ -733,9 +744,15 @@ the join table in the following example:</p>
 </code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"Movie"</span> <span class="p">(</span><span class="nv">"name"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'The room'</span><span class="p">)</span>
 <span class="k">insert</span> <span class="k">into</span> <span class="nv">"Person_Movie"</span> <span class="p">(</span><span class="nv">"movieId"</span><span class="p">,</span> <span class="nv">"personId"</span><span class="p">,</span> <span class="nv">"awesomeness"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9001</span><span class="p">)</span>
 </code></pre>
-<p>Chain the <a href="#insert"><code class="prettyprint">insert</code></a> method to the <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery(&#39;pets&#39;)</code></a> call to insert a related object for a model
-<em>instance</em>. The query inserts the new object to the related table and updates the needed tables to create the relation.
-In case of many-to-many relation a row is inserted to the join table etc.</p>
+<p>Chain the <a href="#insert"><code class="prettyprint">insert</code></a> method to the <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery</code></a> call to insert a related object for a model
+<em>instance</em>. The query inserts a new object to the related table and updates the needed tables to create the relation.
+In case of many-to-many relation a row is inserted to the join table etc. Also check out <a href="#graph-inserts"><code class="prettyprint">insertGraph</code></a>
+method for an alternative way to insert related models.</p>
+
+<p>By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example
+in our <code class="prettyprint">person.$relatedQuery(&#39;pets&#39;).insert(obj)</code> example query, the return value would be appended to <code class="prettyprint">person.pets</code>. This behaviour
+can be modified using <a href="#relatedinsertquerymutates"><code class="prettyprint">relatedInsertQueryMutates</code></a>. Also check out the <a href="#_s_setrelated"><code class="prettyprint">$setRelated</code></a> and
+<a href="#_s_appendrelated"><code class="prettyprint">$appendRelated</code></a> helpers.</p>
 
 <h3 id="update-queries">Update queries</h3>
 
@@ -974,8 +991,8 @@ have their strengths and weaknesses, which are discussed in detail <a href="#eag
       <span class="p">}]</span>
     <span class="p">}]</span>
   <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">graph</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="c1">// The return value of `insertGraoph` is the input graph converted into model instances.</span>
-    <span class="c1">// Inserted objects have ids added to them related rows have foreign keys set, but</span>
+    <span class="c1">// The return value of `insertGraph` is the input graph converted into model instances.</span>
+    <span class="c1">// Inserted objects have ids added to them and related rows have foreign keys set, but</span>
     <span class="c1">// no other columns get fetched from the database. You can use `insertGraphAndFetch`</span>
     <span class="c1">// for that.</span>
   <span class="p">});</span>
@@ -1884,11 +1901,18 @@ json fields.</p>
 
 <p>Json queries currently only work with postgres.</p>
 
-<h2 id="change-id-column">Change id column</h2>
+<h2 id="custom-id-column">Custom id column</h2>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="s1">'person_id'</span><span class="p">;</span>
   <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'person_id'</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
 <p>Name of the identifier column can be changed by setting the static <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property of a model class.
@@ -1952,12 +1976,14 @@ implementing a custom <a href="#validator"><code class="prettyprint">Validator</
     <span class="kr">const</span> <span class="nx">json</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">json</span><span class="p">;</span>
 
     <span class="c1">// `ModelOptions` object. If your custom validator sets default</span>
-    <span class="c1">// values, you need to check the `opt.patch` boolean. If it is true</span>
-    <span class="c1">// we are validating a patch object, the defaults should not be set.</span>
+    <span class="c1">// values or has the concept of required properties, you need to</span>
+    <span class="c1">// check the `opt.patch` boolean. If it is true we are validating</span>
+    <span class="c1">// a patch object (an object with a subset of model's properties).</span>
     <span class="kr">const</span> <span class="nx">opt</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">options</span><span class="p">;</span>
 
     <span class="c1">// A context object shared between the validation methods. A new</span>
-    <span class="c1">// object is created for each validation operation.</span>
+    <span class="c1">// object is created for each validation operation. You can store</span>
+    <span class="c1">// whatever you need in this object.</span>
     <span class="kr">const</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">args</span><span class="p">.</span><span class="nx">ctx</span><span class="p">;</span>
 
     <span class="c1">// Do your validation here and throw any exception if the</span>
@@ -2207,6 +2233,9 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
         <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">},</span>
+        <span class="nx">beforeInsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">model</span><span class="p">.</span><span class="nx">commentableType</span> <span class="o">=</span> <span class="s1">'Issue'</span><span class="p">;</span>
+        <span class="p">},</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'Issue.id'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
@@ -2223,6 +2252,9 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Comment</span><span class="p">,</span>
         <span class="na">filter</span><span class="p">:</span> <span class="p">{</span><span class="na">commentableType</span><span class="p">:</span> <span class="s1">'PullRequest'</span><span class="p">},</span>
+        <span class="nx">beforeInsert</span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">model</span><span class="p">.</span><span class="nx">commentableType</span> <span class="o">=</span> <span class="s1">'PullRequest'</span><span class="p">;</span>
+        <span class="p">},</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="s1">'PullRequest.id'</span><span class="p">,</span>
           <span class="na">to</span><span class="p">:</span> <span class="s1">'Comment.commentableId'</span>
@@ -2234,19 +2266,12 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 </code></pre>
 <blockquote>
 <p>The <code class="prettyprint">{commentableType: &#39;Type&#39;}</code> filter adds a <code class="prettyprint">WHERE &quot;commentableType&quot; = &#39;Type&#39;</code> clause to the relation fetch
-query. It doesn&rsquo;t automatically set the type when you insert a new comment. You have to set the <code class="prettyprint">commentableType</code>
-manually:</p>
+query. The <code class="prettyprint">beforeInsert</code> hook takes care of setting the type on insert.</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">someIssue</span>
-  <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">text</span><span class="p">:</span> <span class="s1">'blaa'</span><span class="p">,</span> <span class="na">commentableType</span><span class="p">:</span> <span class="s1">'Issue'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(...)</span>
-</code></pre>
-<p>Creating polymorphic associations isn&rsquo;t as easy as it could be at the moment, but it can be done using
-custom filters for relations. Let&rsquo;s assume we have tables <code class="prettyprint">Comment</code>, <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code>. Both
-<code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code> can have a list of comments. <code class="prettyprint">Comment</code> has a column <code class="prettyprint">commentableId</code> to hold
-the foreign key and <code class="prettyprint">commentableType</code> to hold the related model type. Check out the first example for
-how to create relations for this setup ➔</p>
+
+<p>Let&rsquo;s assume we have tables <code class="prettyprint">Comment</code>, <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code>. Both <code class="prettyprint">Issue</code> and <code class="prettyprint">PullRequest</code> can have a list of comments.
+<code class="prettyprint">Comment</code> has a column <code class="prettyprint">commentableId</code> to hold the foreign key and <code class="prettyprint">commentableType</code> to hold the related model type. Check out
+the first example for how to create relations for this setup ➔</p>
 
 <p>This kind of associations don&rsquo;t have referential integrity and should be avoided if possible. Instead, consider
 using the <em>exclusive arc table</em> pattern discussed <a href="https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442">here</a>.</p>
@@ -3153,10 +3178,11 @@ the Promise is rejected with a <a href="#validationerror"><code class="prettypri
 <p>NOTE: The return value of the insert query <em>only</em> contains the properties given to the insert
 method plus the identifier. This is because we don&rsquo;t make an additional fetch query after
 the insert. Using postgres you can chain <a href="#returning"><code class="prettyprint">returning(&#39;*&#39;)</code></a> to the query to get all
-properties - see <a href="#postgresql-quot-returning-quot-tricks">this recipe</a> for some examples. On other databases you
-can use the <a href="#insertandfetch"><code class="prettyprint">insertAndFetch</code></a> method.</p>
+properties - see <a href="#postgresql-quot-returning-quot-tricks">this recipe</a> for some examples. If you use
+<code class="prettyprint">returning([&#39;only&#39;, &#39;some&#39;, &#39;props&#39;])</code> note that the result object will still contain the input properies
+<strong>plus</strong> the properties listed in <code class="prettyprint">returning</code>. On other databases you can use the <a href="#insertandfetch"><code class="prettyprint">insertAndFetch</code></a> method.</p>
 
-<p>The batch insert only works on Postgres because Postgres is the only database engine
+<p>Batch inserts only work on Postgres because Postgres is the only database engine
 that returns the identifiers of <em>all</em> inserted rows. knex supports batch inserts on
 other databases also, but you only get the id of the first (or last) inserted object
 as a result. If you need batch insert on other databases you can use knex directly
@@ -7792,7 +7818,7 @@ The problem with this is that if the result set is empty, we don&rsquo;t get the
 <tr>
 <td>page</td>
 <td>number</td>
-<td>The index of the page to return</td>
+<td>The index of the page to return. The index of the first page is 0.</td>
 </tr>
 <tr>
 <td>pageSize</td>
@@ -8638,6 +8664,11 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 <td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
 <td>Alias for modify.</td>
 </tr>
+<tr>
+<td>beforeInsert</td>
+<td>function(<a href="#model"><code class="prettyprint">Model</code></a>, <a href="#context"><code class="prettyprint">QueryContext</code></a>)</td>
+<td>Optional insert hook that is called for each inserted model instance.  This function can be async.</td>
+</tr>
 </tbody></table>
 
 <h5 id="relationjoin">RelationJoin</h5>
@@ -8694,6 +8725,11 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 <td>extra</td>
 <td>string[]&#124;Object</td>
 <td>Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object <code class="prettyprint">{propertyName: &#39;columnName&#39;, otherPropertyName: &#39;otherColumnName&#39;} instead of array</code></td>
+</tr>
+<tr>
+<td>beforeInsert</td>
+<td>function(<a href="#model"><code class="prettyprint">Model</code></a>, <a href="#context"><code class="prettyprint">QueryContext</code></a>)</td>
+<td>Optional insert hook that is called for each inserted join table model instance. This function can be async.</td>
 </tr>
 </tbody></table>
 
@@ -8755,6 +8791,26 @@ as single database rows.</p>
 <span class="p">}</span>
 </code></pre>
 <p>The mappers to use to convert column names to property names in code.</p>
+
+<h4 id="relatedfindquerymutates">relatedFindQueryMutates</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relatedFindQueryMutates</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>If this config is set to false, calling <code class="prettyprint">foo.$relatedQuery(&#39;bar&#39;)</code> doesn&rsquo;t assign the fetched related models to <code class="prettyprint">foo.bar</code>.
+The default is true.</p>
+
+<h4 id="relatedinsertquerymutates">relatedInsertQueryMutates</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relatedInsertQueryMutates</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>If this config is set to false, calling <code class="prettyprint">foo.$relatedQuery(&#39;bar&#39;).insert(obj)</code> doesn&rsquo;t append the inserted related model to <code class="prettyprint">foo.bar</code>.
+The default is true.</p>
 
 <h4 id="virtualattributes">virtualAttributes</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -10193,6 +10249,97 @@ This simply sets each value in the object to this object.</p>
 </tr>
 </tbody></table>
 
+<h4 id="setrelated">$setRelated</h4>
+<pre class="highlight javascript"><code><span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$setRelated</span><span class="p">(</span><span class="nx">relation</span><span class="p">,</span> <span class="nx">relatedModels</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$setRelated</span><span class="p">(</span><span class="s1">'parent'</span><span class="p">,</span> <span class="nx">parent</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">parent</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$setRelated</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">children</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</code></pre>
+<p>Sets related models to a corresponding property in the object.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relation</td>
+<td>string&#124;<a href="#relation"><code class="prettyprint">Relation</code></a></td>
+<td>Relation name or a relation instance to set.</td>
+</tr>
+<tr>
+<td>relatedModels</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;<a href="#model"><code class="prettyprint">Model[]</code></a></td>
+<td>Models to set.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#model"><code class="prettyprint">Model</code></a></td>
+<td><code class="prettyprint">this</code> for chaining</td>
+</tr>
+</tbody></table>
+
+<h4 id="appendrelated">$appendRelated</h4>
+<pre class="highlight javascript"><code><span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="nx">relation</span><span class="p">,</span> <span class="nx">relatedModels</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="s1">'parent'</span><span class="p">,</span> <span class="nx">parent</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">parent</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">child1</span><span class="p">);</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">child2</span><span class="p">);</span>
+
+<span class="nx">child1</span> <span class="o">=</span> <span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+<span class="nx">child2</span> <span class="o">=</span> <span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">2</span><span class="p">];</span>
+</code></pre>
+<p>Appends related models to a corresponding property in the object.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relation</td>
+<td>string&#124;<a href="#relation"><code class="prettyprint">Relation</code></a></td>
+<td>Relation name or a relation instance to set.</td>
+</tr>
+<tr>
+<td>relatedModels</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;<a href="#model"><code class="prettyprint">Model[]</code></a></td>
+<td>Models to append.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#model"><code class="prettyprint">Model</code></a></td>
+<td><code class="prettyprint">this</code> for chaining</td>
+</tr>
+</tbody></table>
+
 <h4 id="omit">$omit</h4>
 <pre class="highlight javascript"><code><span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$omit</span><span class="p">(</span><span class="nx">keys</span><span class="p">);</span>
 </code></pre>
@@ -10595,7 +10742,7 @@ to the relations:</p>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
   <span class="p">});</span>
 </code></pre>
-<p>Loads related models using a <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a>.</p>
+<p>Loads related models using a <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a> and assigns them to the target model instances.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -11860,6 +12007,14 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="0-9-3">0.9.3</h2>
+
+<ul>
+<li>Add beforeInsert hook for relations. <a href="https://github.com/Vincit/objection.js/issues/649">#649</a> <a href="https://github.com/Vincit/objection.js/issues/19">#19</a></li>
+<li>Add <a href="#relatedfindquerymutates"><code class="prettyprint">relatedFindQueryMutates</code></a> and <a href="#relatedinsertquerymutates"><code class="prettyprint">relatedInsertQueryMutates</code></a> configs as well as <a href="#_s_setrelated"><code class="prettyprint">$setRelated</code></a> and <a href="#_s_appendrelated"><code class="prettyprint">$appendRelated</code></a> helpers. <a href="https://github.com/Vincit/objection.js/issues/599">#599</a></li>
+<li>Fixed <a href="https://github.com/Vincit/objection.js/issues/648">#648</a></li>
+</ul>
 
 <h2 id="0-9-2">0.9.2</h2>
 

@@ -413,10 +413,11 @@ the Promise is rejected with a <a href="#validationerror"><code class="prettypri
 <p>NOTE: The return value of the insert query <em>only</em> contains the properties given to the insert
 method plus the identifier. This is because we don&rsquo;t make an additional fetch query after
 the insert. Using postgres you can chain <a href="#returning"><code class="prettyprint">returning(&#39;*&#39;)</code></a> to the query to get all
-properties - see <a href="#postgresql-quot-returning-quot-tricks">this recipe</a> for some examples. On other databases you
-can use the <a href="#insertandfetch"><code class="prettyprint">insertAndFetch</code></a> method.</p>
+properties - see <a href="#postgresql-quot-returning-quot-tricks">this recipe</a> for some examples. If you use
+<code class="prettyprint">returning([&#39;only&#39;, &#39;some&#39;, &#39;props&#39;])</code> note that the result object will still contain the input properies
+<strong>plus</strong> the properties listed in <code class="prettyprint">returning</code>. On other databases you can use the <a href="#insertandfetch"><code class="prettyprint">insertAndFetch</code></a> method.</p>
 
-<p>The batch insert only works on Postgres because Postgres is the only database engine
+<p>Batch inserts only work on Postgres because Postgres is the only database engine
 that returns the identifiers of <em>all</em> inserted rows. knex supports batch inserts on
 other databases also, but you only get the id of the first (or last) inserted object
 as a result. If you need batch insert on other databases you can use knex directly
@@ -5052,7 +5053,7 @@ The problem with this is that if the result set is empty, we don&rsquo;t get the
 <tr>
 <td>page</td>
 <td>number</td>
-<td>The index of the page to return</td>
+<td>The index of the page to return. The index of the first page is 0.</td>
 </tr>
 <tr>
 <td>pageSize</td>
@@ -5898,6 +5899,11 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 <td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
 <td>Alias for modify.</td>
 </tr>
+<tr>
+<td>beforeInsert</td>
+<td>function(<a href="#model"><code class="prettyprint">Model</code></a>, <a href="#context"><code class="prettyprint">QueryContext</code></a>)</td>
+<td>Optional insert hook that is called for each inserted model instance.  This function can be async.</td>
+</tr>
 </tbody></table>
 
 <h5 id="relationjoin">RelationJoin</h5>
@@ -5954,6 +5960,11 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 <td>extra</td>
 <td>string[]&#124;Object</td>
 <td>Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object <code class="prettyprint">{propertyName: &#39;columnName&#39;, otherPropertyName: &#39;otherColumnName&#39;} instead of array</code></td>
+</tr>
+<tr>
+<td>beforeInsert</td>
+<td>function(<a href="#model"><code class="prettyprint">Model</code></a>, <a href="#context"><code class="prettyprint">QueryContext</code></a>)</td>
+<td>Optional insert hook that is called for each inserted join table model instance. This function can be async.</td>
 </tr>
 </tbody></table>
 
@@ -6015,6 +6026,26 @@ as single database rows.</p>
 <span class="p">}</span>
 </code></pre>
 <p>The mappers to use to convert column names to property names in code.</p>
+
+<h4 id="relatedfindquerymutates">relatedFindQueryMutates</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relatedFindQueryMutates</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>If this config is set to false, calling <code class="prettyprint">foo.$relatedQuery(&#39;bar&#39;)</code> doesn&rsquo;t assign the fetched related models to <code class="prettyprint">foo.bar</code>.
+The default is true.</p>
+
+<h4 id="relatedinsertquerymutates">relatedInsertQueryMutates</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relatedInsertQueryMutates</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>If this config is set to false, calling <code class="prettyprint">foo.$relatedQuery(&#39;bar&#39;).insert(obj)</code> doesn&rsquo;t append the inserted related model to <code class="prettyprint">foo.bar</code>.
+The default is true.</p>
 
 <h4 id="virtualattributes">virtualAttributes</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -7453,6 +7484,97 @@ This simply sets each value in the object to this object.</p>
 </tr>
 </tbody></table>
 
+<h4 id="setrelated">$setRelated</h4>
+<pre class="highlight javascript"><code><span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$setRelated</span><span class="p">(</span><span class="nx">relation</span><span class="p">,</span> <span class="nx">relatedModels</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$setRelated</span><span class="p">(</span><span class="s1">'parent'</span><span class="p">,</span> <span class="nx">parent</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">parent</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$setRelated</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">children</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</code></pre>
+<p>Sets related models to a corresponding property in the object.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relation</td>
+<td>string&#124;<a href="#relation"><code class="prettyprint">Relation</code></a></td>
+<td>Relation name or a relation instance to set.</td>
+</tr>
+<tr>
+<td>relatedModels</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;<a href="#model"><code class="prettyprint">Model[]</code></a></td>
+<td>Models to set.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#model"><code class="prettyprint">Model</code></a></td>
+<td><code class="prettyprint">this</code> for chaining</td>
+</tr>
+</tbody></table>
+
+<h4 id="appendrelated">$appendRelated</h4>
+<pre class="highlight javascript"><code><span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="nx">relation</span><span class="p">,</span> <span class="nx">relatedModels</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="s1">'parent'</span><span class="p">,</span> <span class="nx">parent</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">parent</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">person</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">child1</span><span class="p">);</span>
+<span class="nx">person</span><span class="p">.</span><span class="nx">$appendRelated</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">child2</span><span class="p">);</span>
+
+<span class="nx">child1</span> <span class="o">=</span> <span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">];</span>
+<span class="nx">child2</span> <span class="o">=</span> <span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">2</span><span class="p">];</span>
+</code></pre>
+<p>Appends related models to a corresponding property in the object.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relation</td>
+<td>string&#124;<a href="#relation"><code class="prettyprint">Relation</code></a></td>
+<td>Relation name or a relation instance to set.</td>
+</tr>
+<tr>
+<td>relatedModels</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;<a href="#model"><code class="prettyprint">Model[]</code></a></td>
+<td>Models to append.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#model"><code class="prettyprint">Model</code></a></td>
+<td><code class="prettyprint">this</code> for chaining</td>
+</tr>
+</tbody></table>
+
 <h4 id="omit">$omit</h4>
 <pre class="highlight javascript"><code><span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$omit</span><span class="p">(</span><span class="nx">keys</span><span class="p">);</span>
 </code></pre>
@@ -7855,7 +7977,7 @@ to the relations:</p>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
   <span class="p">});</span>
 </code></pre>
-<p>Loads related models using a <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a>.</p>
+<p>Loads related models using a <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a> and assigns them to the target model instances.</p>
 
 <h5 id="arguments">Arguments</h5>
 
