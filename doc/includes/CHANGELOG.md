@@ -3,6 +3,7 @@
 ## 0.9.3
 
   * Add beforeInsert hook for relations. [#649](https://github.com/Vincit/objection.js/issues/649) [#19](https://github.com/Vincit/objection.js/issues/19)
+  * Add [`relatedFindQueryMutates`](#relatedfindquerymutates) and [`relatedInsertQueryMutates`](#relatedinsertquerymutates) configs as well as [`$setRelated`](#_s_setrelated) and [`$appendRelated`](#_s_appendrelated) helpers. [#599](https://github.com/Vincit/objection.js/issues/599)
   * Fixed [#648](https://github.com/Vincit/objection.js/issues/648)
 
 ## 0.9.2

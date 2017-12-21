@@ -5080,6 +5080,38 @@ The mappers to use to convert column names to property names in code.
 
 
 
+#### relatedFindQueryMutates
+
+```js
+class Person extends Model {
+  static get relatedFindQueryMutates() {
+    return false;
+  }
+}
+```
+
+If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assign the fetched related models to `foo.bar`.
+The default is true.
+
+
+
+
+#### relatedInsertQueryMutates
+
+```js
+class Person extends Model {
+  static get relatedInsertQueryMutates() {
+    return false;
+  }
+}
+```
+
+If this config is set to false, calling `foo.$relatedQuery('bar').insert(obj)` doesn't append the inserted related model to `foo.bar`.
+The default is true.
+
+
+
+
 #### virtualAttributes
 
 ```js
@@ -6387,6 +6419,77 @@ This simply sets each value in the object to this object.
 Argument|Type|Description
 --------|----|-------------------
 obj|Object|
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $setRelated
+
+```js
+modelInstance.$setRelated(relation, relatedModels);
+```
+
+```js
+person.$setRelated('parent', parent);
+console.log(person.parent);
+```
+
+```js
+person.$setRelated('children', children);
+console.log(person.children[0]);
+```
+
+Sets related models to a corresponding property in the object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+relation|string&#124;[`Relation`](#relation)|Relation name or a relation instance to set.
+relatedModels|[`Model`](#model)&#124;[`Model[]`](#model)|Models to set.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $appendRelated
+
+```js
+modelInstance.$appendRelated(relation, relatedModels);
+```
+
+```js
+person.$appendRelated('parent', parent);
+console.log(person.parent);
+```
+
+```js
+person.$appendRelated('children', child1);
+person.$appendRelated('children', child2);
+
+child1 = person.children[person.children.length - 1];
+child2 = person.children[person.children.length - 2];
+```
+
+Appends related models to a corresponding property in the object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+relation|string&#124;[`Relation`](#relation)|Relation name or a relation instance to set.
+relatedModels|[`Model`](#model)&#124;[`Model[]`](#model)|Models to append.
 
 ##### Return value
 

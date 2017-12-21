@@ -735,7 +735,13 @@ order by "name" asc
 
 Simply call [`$relatedQuery('pets')`](#_s_relatedquery) for a model _instance_ to fetch a relation for it. The relation name is
 given as the only argument. The return value is a [`QueryBuilder`](#querybuilder) so you once again have all the query methods
-at your disposal. In many cases it's more convenient to use [`eager loading`](#eager-loading) to fetch relations.
+at your disposal. In many cases it's more convenient to use [`eager loading`](#eager-loading) to fetch relations. `$relatedQuery`
+is better when you only need one relation and you need to filter the query extensively.
+
+By default the fetched related models are assigned to the parent model to a property by the same name as the relation. For example
+in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour
+can be modified using [`relatedFindQueryMutates`](#relatedfindquerymutates). Also check out [`$setRelated`](#_s_setrelated) and
+[`$appendRelated`](#_s_appendrelated) helpers.
 
 ### Insert queries
 
@@ -775,9 +781,15 @@ insert into "Movie" ("name") values ('The room')
 insert into "Person_Movie" ("movieId", "personId", "awesomeness") values (14, 25, 9001)
 ```
 
-Chain the [`insert`](#insert) method to the [`$relatedQuery('pets')`](#_s_relatedquery) call to insert a related object for a model
-_instance_. The query inserts the new object to the related table and updates the needed tables to create the relation.
-In case of many-to-many relation a row is inserted to the join table etc.
+Chain the [`insert`](#insert) method to the [`$relatedQuery`](#_s_relatedquery) call to insert a related object for a model
+_instance_. The query inserts a new object to the related table and updates the needed tables to create the relation.
+In case of many-to-many relation a row is inserted to the join table etc. Also check out [`insertGraph`](#graph-inserts)
+method for an alternative way to insert related models.
+
+By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example
+in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour
+can be modified using [`relatedInsertQueryMutates`](#relatedinsertquerymutates). Also check out the [`$setRelated`](#_s_setrelated) and
+[`$appendRelated`](#_s_appendrelated) helpers.
 
 
 ### Update queries
