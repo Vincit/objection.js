@@ -5760,6 +5760,18 @@ class BaseModel extends Model {
 }
 ```
 
+> Sharing the same validator between model classes is also possible:
+
+```js
+const validator = new MyCustomValidator();
+
+class BaseModel extends Model {
+  static createValidator() {
+    return validator;
+  }
+}
+```
+
 > The default implementation:
 
 ```js
@@ -5794,6 +5806,10 @@ validator. The custom validator doesn't need to be based on the
 If you want to use the default json schema based [`AjvValidator`](#ajvvalidator) but
 want to modify it, you can use the `objection.AjvValidator` constructor. See
 the default implementation example.
+
+If you want to share the same validator instance between multiple models, that's
+completely fine too. Simply implement `createValidator` so that it always returns
+the same object instead of creating a new one.
 
 ##### Return value
 
