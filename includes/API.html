@@ -6648,6 +6648,17 @@ a multi-tenant system. See the <a href="#multi-tenancy">multi tenancy recipe</a>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
+<p>Sharing the same validator between model classes is also possible:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyCustomValidator</span><span class="p">();</span>
+
+<span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createValidator</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">validator</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
 <p>The default implementation:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">AjvValidator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">AjvValidator</span><span class="p">;</span>
@@ -6680,6 +6691,10 @@ validator. The custom validator doesn&rsquo;t need to be based on the
 <p>If you want to use the default json schema based <a href="#ajvvalidator"><code class="prettyprint">AjvValidator</code></a> but
 want to modify it, you can use the <code class="prettyprint">objection.AjvValidator</code> constructor. See
 the default implementation example.</p>
+
+<p>If you want to share the same validator instance between multiple models, that&rsquo;s
+completely fine too. Simply implement <code class="prettyprint">createValidator</code> so that it always returns
+the same object instead of creating a new one.</p>
 
 <h5 id="return-value">Return value</h5>
 
