@@ -559,6 +559,7 @@ declare namespace Objection {
 
     findById(id: Id): QueryBuilderOption<T>;
     findById(idOrIds: IdOrIds): this;
+    findByIds(ids: Id[] | Id[][]): this;
     /** findOne is shorthand for .where(...whereArgs).first() */
     findOne: FindOne<T>;
 

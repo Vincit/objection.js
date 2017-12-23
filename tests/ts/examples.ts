@@ -197,6 +197,12 @@ function byId(id: number): Promise<Person | undefined> {
   return Person.query().findById(id);
 }
 
+// Person[] typing for findByIds():
+
+function byIds(ids: number[] | number[][]): Promise<Person[]> {
+  return Person.query().findByIds(ids);
+}
+
 // Person[] typing for where():
 
 function whereSpecies(species: string): Promise<Animal[]> {
