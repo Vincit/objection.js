@@ -5191,6 +5191,9 @@ class Person extends Model {
 
 Name of the property used to store a temporary non-db identifier for the model.
 
+NOTE: You cannot use any of the model's properties as `uidProp`. For example if your
+model has a property `id`, you cannot set `uidProp = 'id'`.
+
 Defaults to '#id'.
 
 
@@ -5216,6 +5219,9 @@ class Person extends Model {
 
 Name of the property used to store a reference to a [`uidProp`](#uidprop)
 
+NOTE: You cannot use any of the model's properties as `uidRefProp`. For example if your
+model has a property `ref`, you cannot set `uidRefProp = 'ref'`.
+
 Defaults to '#ref'.
 
 
@@ -5240,6 +5246,9 @@ class Person extends Model {
 ```
 
 Name of the property used to point to an existing database row from an `insertGraph` graph.
+
+NOTE: You cannot use any of the model's properties as `dbRefProp`. For example if your
+model has a property `id`, you cannot set `dbRefProp = 'id'`.
 
 Defaults to '#dbRef'.
 
@@ -5327,7 +5336,11 @@ Defaults to `Model.WhereInEagerAlgorithm`.
 ```js
 class Person extends Model {
   static get defaultEagerOptions() {
-    return {minimize: true};
+    return {
+      minimize: true,
+      separator: '->',
+      aliases: {}
+    };
   }
 }
 ```
@@ -5336,14 +5349,18 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  static defaultEagerOptions = {minimize: true};
+  static defaultEagerOptions = {
+    minimize: true,
+    separator: '->',
+    aliases: {}
+  };
 }
 ```
 
 Sets the default options for eager loading algorithm. See the possible
 fields [here](#eageroptions).
 
-Defaults to `null`.
+Defaults to `{minimize: false, separator: ':', aliases: {}}`.
 
 
 
