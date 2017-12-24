@@ -405,7 +405,7 @@ declare namespace Objection {
     $id(): any;
     $id(id: any): void;
 
-    $beforeValidate(jsonSchema: JsonSchema, json: Pojo, opt: ModelOptions): void;
+    $beforeValidate(jsonSchema: JsonSchema, json: Pojo, opt: ModelOptions): JsonSchema;
     $validate(json: Pojo, opt: ModelOptions): Pojo; // may throw ValidationError if validation fails
     $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
