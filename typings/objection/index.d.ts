@@ -96,13 +96,15 @@ declare namespace Objection {
     skipValidation?: boolean;
   }
 
+  export interface ValidatorContext extends Pojo { }
+
   export type ValidatorArgs = {
-    ctx: object,
+    ctx: ValidatorContext,
     model: Model,
     json: Pojo,
     options: ModelOptions
   }
-
+  
   export class Validator {
     beforeValidate(args: ValidatorArgs): void;
     validate(args: ValidatorArgs): Pojo;
