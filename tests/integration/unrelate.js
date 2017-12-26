@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 
@@ -10,7 +8,7 @@ module.exports = session => {
   describe('Model unrelate queries', () => {
     describe('.$query()', () => {
       it('should reject the query', done => {
-        Model1.fromJson({id: 1})
+        Model1.fromJson({ id: 1 })
           .$query()
           .unrelate()
           .then(() => {
@@ -252,10 +250,10 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 4})).to.have.length(0);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 4 })).to.have.length(0);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 5 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
             });
         });
 
@@ -274,10 +272,10 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(2);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 4})).to.have.length(0);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(0);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 4 })).to.have.length(0);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 5 })).to.have.length(0);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
             });
         });
 
@@ -359,7 +357,7 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 5 })).to.have.length(1);
             });
         });
       });

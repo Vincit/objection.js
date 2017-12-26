@@ -1,6 +1,7 @@
-import {Model} from 'objection';
-import {join} from 'path';
+
+import { Model } from 'objection';
 import Person from './Person';
+import { join } from 'path';
 
 export default class Movie extends Model {
   readonly id: number;
@@ -20,8 +21,8 @@ export default class Movie extends Model {
     required: ['name'],
 
     properties: {
-      id: {type: 'integer'},
-      name: {type: 'string', minLength: 1, maxLength: 255}
+      id: { type: 'integer' },
+      name: { type: 'string', minLength: 1, maxLength: 255 }
     }
   };
 

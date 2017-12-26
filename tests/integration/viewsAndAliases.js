@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');

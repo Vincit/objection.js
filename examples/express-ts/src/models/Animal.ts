@@ -1,6 +1,7 @@
-import {Model} from 'objection';
-import {join} from 'path';
+
+import { Model } from 'objection';
 import Person from './Person';
+import { join } from 'path';
 
 export default class Animal extends Model {
   readonly id: number;
@@ -22,10 +23,10 @@ export default class Animal extends Model {
     required: ['name'],
 
     properties: {
-      id: {type: 'integer'},
-      ownerId: {type: ['integer', 'null']},
-      name: {type: 'string', minLength: 1, maxLength: 255},
-      species: {type: 'string', minLength: 1, maxLength: 255}
+      id: { type: 'integer' },
+      ownerId: { type: ['integer', 'null'] },
+      name: { type: 'string', minLength: 1, maxLength: 255 },
+      species: { type: 'string', minLength: 1, maxLength: 255 }
     }
   };
 

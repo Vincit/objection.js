@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js'),
   ValidationError = require('../../../').ValidationError,
   RelationExpression = require('../../../').RelationExpression;
@@ -409,7 +407,7 @@ describe('RelationExpression', () => {
       testParse(
         `a as aa.[
         b as bb,
-        c as cc  
+        c as cc
       ]`,
         {
           name: null,

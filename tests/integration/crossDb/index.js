@@ -1,5 +1,3 @@
-'use strict';
-
 const knexUtils = require('../../../lib/utils/knexUtils');
 
 module.exports = session => {

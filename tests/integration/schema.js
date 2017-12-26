@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const Model = require('../../').Model;

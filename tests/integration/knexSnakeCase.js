@@ -1,5 +1,3 @@
-'use strict';
-
 const Knex = require('knex');
 const Model = require('../../').Model;
 const sortBy = require('lodash/sortBy');
@@ -117,19 +115,19 @@ module.exports = session => {
             table.string('firstName');
           })
           .then(() => {
-            return knex(table).insert({id: 1, firstName: 'fooBar'});
+            return knex(table).insert({ id: 1, firstName: 'fooBar' });
           })
           .then(() => {
             return knex(table);
           })
           .then(rows => {
-            expect(rows).to.eql([{id: 1, firstName: 'fooBar'}]);
+            expect(rows).to.eql([{ id: 1, firstName: 'fooBar' }]);
 
             // Query with a knex without case mapping.
             return session.knex('snake_case_test_table');
           })
           .then(rows => {
-            expect(rows).to.eql([{id: 1, first_name: 'fooBar'}]);
+            expect(rows).to.eql([{ id: 1, first_name: 'fooBar' }]);
           });
       });
 
@@ -196,7 +194,7 @@ module.exports = session => {
 
       it('$relatedQuery', () => {
         return Person.query(knex)
-          .findOne({firstName: 'Seppo'})
+          .findOne({ firstName: 'Seppo' })
           .then(model => {
             return model.$relatedQuery('pets', knex).orderBy('animalName');
           })
@@ -257,7 +255,7 @@ module.exports = session => {
                 ]);
               });
           },
-          {concurrency: 1}
+          { concurrency: 1 }
         );
       });
     });

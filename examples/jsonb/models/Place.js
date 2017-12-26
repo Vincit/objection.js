@@ -22,9 +22,9 @@ Place.jsonSchema = {
   required: ['name'],
 
   properties: {
-    id: {type: 'integer'},
-    name: {type: 'string'},
-    details: {type: 'object'}
+    id: { type: 'integer' },
+    name: { type: 'string' },
+    details: { type: 'object' }
   }
 };
 

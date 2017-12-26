@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
@@ -129,10 +127,10 @@ module.exports = session => {
             type: 'object',
             additionalProperties: false,
             properties: {
-              id: {type: 'number'},
-              model1Prop1: {type: 'string'},
-              model1Prop2: {type: 'number'},
-              model1Id: {type: 'number'}
+              id: { type: 'number' },
+              model1Prop1: { type: 'string' },
+              model1Prop2: { type: 'number' },
+              model1Id: { type: 'number' }
             }
           };
 
@@ -202,7 +200,7 @@ module.exports = session => {
 
             expect(inserted.toJSON()).to.eql({
               id: 4,
-              model1Relation2: [{model1Id: 4, idCol: 100}, {model1Id: 4, idCol: 101}]
+              model1Relation2: [{ model1Id: 4, idCol: 100 }, { model1Id: 4, idCol: 101 }]
             });
 
             return Model1.query()
@@ -247,20 +245,20 @@ module.exports = session => {
           Model1.jsonSchema = {
             type: 'object',
             properties: {
-              id: {type: 'integer'},
-              model1Id: {type: 'integer'},
-              model1Prop1: {type: 'string'},
-              model1Prop2: {type: 'integer'}
+              id: { type: 'integer' },
+              model1Id: { type: 'integer' },
+              model1Prop1: { type: 'string' },
+              model1Prop2: { type: 'integer' }
             }
           };
 
           Model2.jsonSchema = {
             type: 'object',
             properties: {
-              idCol: {type: 'integer'},
-              model1Id: {type: 'integer'},
-              model2Prop1: {type: 'string'},
-              model2Prop2: {type: 'integer'}
+              idCol: { type: 'integer' },
+              model1Id: { type: 'integer' },
+              model2Prop1: { type: 'string' },
+              model2Prop2: { type: 'integer' }
             }
           };
 
@@ -296,20 +294,20 @@ module.exports = session => {
           Model1.jsonSchema = {
             type: 'object',
             properties: {
-              id: {type: 'integer'},
-              model1Id: {type: 'integer'},
-              model1Prop1: {type: 'string'},
-              model1Prop2: {type: 'integer'}
+              id: { type: 'integer' },
+              model1Id: { type: 'integer' },
+              model1Prop1: { type: 'string' },
+              model1Prop2: { type: 'integer' }
             }
           };
 
           Model2.jsonSchema = {
             type: 'object',
             properties: {
-              idCol: {type: 'integer'},
-              model1Id: {type: 'integer'},
-              model2Prop1: {type: 'string'},
-              model2Prop2: {type: 'integer'}
+              idCol: { type: 'integer' },
+              model1Id: { type: 'integer' },
+              model2Prop1: { type: 'string' },
+              model2Prop2: { type: 'integer' }
             }
           };
 
@@ -410,7 +408,7 @@ module.exports = session => {
 
       it(`relate: ['relation.path'] option should cause models with id to be related instead of inserted`, () => {
         return Model1.query()
-          .insert({model1Prop1: 'howdy', id: 500})
+          .insert({ model1Prop1: 'howdy', id: 500 })
           .then(() => {
             return Model1.query().insertGraph(
               {
@@ -726,11 +724,11 @@ module.exports = session => {
               return parent.$relatedQuery('model1Relation3');
             })
             .then(models => {
-              let insertion = _.find(models, {model2Prop1: 'howdy'});
+              let insertion = _.find(models, { model2Prop1: 'howdy' });
               return insertion.$relatedQuery('model2Relation1').eager(eagerExpr);
             })
             .then(models => {
-              let model = _.find(models, {model1Prop1: 'root'});
+              let model = _.find(models, { model1Prop1: 'root' });
               return check(model);
             });
         });
@@ -781,7 +779,7 @@ module.exports = session => {
 
       return knex(Model2.tableName).then(rows => {
         // Check that the reference model was only inserted once.
-        expect(_.filter(rows, {model2_prop1: 'child1'})).to.have.length(1);
+        expect(_.filter(rows, { model2_prop1: 'child1' })).to.have.length(1);
       });
     }
 

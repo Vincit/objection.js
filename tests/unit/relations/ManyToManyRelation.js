@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const Knex = require('knex');
 const expect = require('expect.js');
@@ -25,7 +23,7 @@ describe('ManyToManyRelation', () => {
   let compositeKeyRelation;
 
   beforeEach(() => {
-    let knex = Knex({client: 'pg'});
+    let knex = Knex({ client: 'pg' });
 
     mockKnex = knexMocker(knex, function(mock, oldImpl, args) {
       executedQueries.push(this.toString());
@@ -375,8 +373,8 @@ describe('ManyToManyRelation', () => {
 
   describe('find', () => {
     it('should generate a find query', () => {
-      let owner = OwnerModel.fromJson({oid: 666});
-      let expectedResult = [{a: 1, objectiontmpjoin0: 666}, {a: 2, objectiontmpjoin0: 666}];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -411,10 +409,10 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should generate a find query (composite key)', () => {
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let expectedResult = [
-        {a: 1, objectiontmpjoin0: 11, objectiontmpjoin1: 22},
-        {a: 2, objectiontmpjoin0: 11, objectiontmpjoin1: 22}
+        { a: 1, objectiontmpjoin0: 11, objectiontmpjoin1: 22 },
+        { a: 2, objectiontmpjoin0: 11, objectiontmpjoin1: 22 }
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -450,13 +448,13 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should find for multiple owners', () => {
-      let owners = [OwnerModel.fromJson({oid: 666}), OwnerModel.fromJson({oid: 667})];
+      let owners = [OwnerModel.fromJson({ oid: 666 }), OwnerModel.fromJson({ oid: 667 })];
 
       let expectedResult = [
-        {a: 1, objectiontmpjoin0: 666},
-        {a: 2, objectiontmpjoin0: 666},
-        {a: 3, objectiontmpjoin0: 667},
-        {a: 4, objectiontmpjoin0: 667}
+        { a: 1, objectiontmpjoin0: 666 },
+        { a: 2, objectiontmpjoin0: 666 },
+        { a: 3, objectiontmpjoin0: 667 },
+        { a: 4, objectiontmpjoin0: 667 }
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -471,8 +469,8 @@ describe('ManyToManyRelation', () => {
       return builder.then(result => {
         expect(result).to.have.length(4);
         expect(result).to.eql(expectedResult);
-        expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
-        expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
+        expect(owners[0].nameOfOurRelation).to.eql([{ a: 1 }, { a: 2 }]);
+        expect(owners[1].nameOfOurRelation).to.eql([{ a: 3 }, { a: 4 }]);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
         expect(result[2]).to.be.a(RelatedModel);
@@ -496,15 +494,15 @@ describe('ManyToManyRelation', () => {
 
     it('should find for multiple owners (composite key)', () => {
       let owners = [
-        OwnerModel.fromJson({aid: 11, bid: 22}),
-        OwnerModel.fromJson({aid: 11, bid: 33})
+        OwnerModel.fromJson({ aid: 11, bid: 22 }),
+        OwnerModel.fromJson({ aid: 11, bid: 33 })
       ];
 
       let expectedResult = [
-        {a: 1, objectiontmpjoin0: 11, objectiontmpjoin1: 22},
-        {a: 2, objectiontmpjoin0: 11, objectiontmpjoin1: 22},
-        {a: 3, objectiontmpjoin0: 11, objectiontmpjoin1: 33},
-        {a: 4, objectiontmpjoin0: 11, objectiontmpjoin1: 33}
+        { a: 1, objectiontmpjoin0: 11, objectiontmpjoin1: 22 },
+        { a: 2, objectiontmpjoin0: 11, objectiontmpjoin1: 22 },
+        { a: 3, objectiontmpjoin0: 11, objectiontmpjoin1: 33 },
+        { a: 4, objectiontmpjoin0: 11, objectiontmpjoin1: 33 }
       ];
 
       mockKnexQueryResults = [expectedResult];
@@ -519,8 +517,8 @@ describe('ManyToManyRelation', () => {
       return builder.then(result => {
         expect(result).to.have.length(4);
         expect(result).to.eql(expectedResult);
-        expect(owners[0].nameOfOurRelation).to.eql([{a: 1}, {a: 2}]);
-        expect(owners[1].nameOfOurRelation).to.eql([{a: 3}, {a: 4}]);
+        expect(owners[0].nameOfOurRelation).to.eql([{ a: 1 }, { a: 2 }]);
+        expect(owners[1].nameOfOurRelation).to.eql([{ a: 3 }, { a: 4 }]);
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
         expect(result[2]).to.be.a(RelatedModel);
@@ -543,8 +541,8 @@ describe('ManyToManyRelation', () => {
     });
 
     it('explicit selects should override the RelatedModel.*', () => {
-      let owner = OwnerModel.fromJson({oid: 666});
-      let expectedResult = [{a: 1, objectiontmpjoin0: 666}, {a: 2, objectiontmpjoin0: 666}];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -581,10 +579,10 @@ describe('ManyToManyRelation', () => {
 
     // TODO expectedResult array is changed in-place and the items in it are replaced with model instances. SHOULD FIX THAT!
     it('should apply the modifier', () => {
-      createModifiedRelation({someColumn: 100});
+      createModifiedRelation({ someColumn: 100 });
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let expectedResult = [{a: 1, objectiontmpjoin0: 666}, {a: 2, objectiontmpjoin0: 666}];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -623,8 +621,8 @@ describe('ManyToManyRelation', () => {
     it('should support named filters', () => {
       createModifiedRelation('namedFilter');
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let expectedResult = [{a: 1, objectiontmpjoin0: 666}, {a: 2, objectiontmpjoin0: 666}];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -664,13 +662,13 @@ describe('ManyToManyRelation', () => {
     it('should generate an insert query', () => {
       mockKnexQueryResults = [[1, 2]];
 
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
       let related = [
-        RelatedModel.fromJson({a: 'str1', rid: 3}),
-        RelatedModel.fromJson({a: 'str2', rid: 4})
+        RelatedModel.fromJson({ a: 'str1', rid: 3 }),
+        RelatedModel.fromJson({ a: 'str2', rid: 4 })
       ];
 
-      owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0', id: 3})];
+      owner.nameOfOurRelation = [RelatedModel.fromJson({ a: 'str0', id: 3 })];
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -693,12 +691,12 @@ describe('ManyToManyRelation', () => {
         );
 
         expect(_.sortBy(owner.nameOfOurRelation, 'id')).to.eql([
-          {a: 'str1', id: 1, rid: 3},
-          {a: 'str2', id: 2, rid: 4},
-          {a: 'str0', id: 3}
+          { a: 'str1', id: 1, rid: 3 },
+          { a: 'str2', id: 2, rid: 4 },
+          { a: 'str0', id: 3 }
         ]);
 
-        expect(result).to.eql([{a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
+        expect(result).to.eql([{ a: 'str1', id: 1, rid: 3 }, { a: 'str2', id: 2, rid: 4 }]);
 
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -706,15 +704,15 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should generate an insert query (composite key)', () => {
-      mockKnexQueryResults = [[{id: 1, cid: 33, did: 44}, {id: 2, cid: 33, did: 55}]];
+      mockKnexQueryResults = [[{ id: 1, cid: 33, did: 44 }, { id: 2, cid: 33, did: 55 }]];
 
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let related = [
-        RelatedModel.fromJson({a: 'str1', cid: 33, did: 44}),
-        RelatedModel.fromJson({a: 'str2', cid: 33, did: 55})
+        RelatedModel.fromJson({ a: 'str1', cid: 33, did: 44 }),
+        RelatedModel.fromJson({ a: 'str2', cid: 33, did: 55 })
       ];
 
-      owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0', id: 3})];
+      owner.nameOfOurRelation = [RelatedModel.fromJson({ a: 'str0', id: 3 })];
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -737,14 +735,14 @@ describe('ManyToManyRelation', () => {
         );
 
         expect(_.sortBy(owner.nameOfOurRelation, 'id')).to.eql([
-          {a: 'str1', id: 1, cid: 33, did: 44},
-          {a: 'str2', id: 2, cid: 33, did: 55},
-          {a: 'str0', id: 3}
+          { a: 'str1', id: 1, cid: 33, did: 44 },
+          { a: 'str2', id: 2, cid: 33, did: 55 },
+          { a: 'str0', id: 3 }
         ]);
 
         expect(result).to.eql([
-          {a: 'str1', id: 1, cid: 33, did: 44},
-          {a: 'str2', id: 2, cid: 33, did: 55}
+          { a: 'str1', id: 1, cid: 33, did: 44 },
+          { a: 'str2', id: 2, cid: 33, did: 55 }
         ]);
 
         expect(result[0]).to.be.a(RelatedModel);
@@ -755,8 +753,8 @@ describe('ManyToManyRelation', () => {
     it('should accept json object array', () => {
       mockKnexQueryResults = [[1, 2]];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let related = [{a: 'str1', rid: 3}, {a: 'str2', rid: 4}];
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let related = [{ a: 'str1', rid: 3 }, { a: 'str2', rid: 4 }];
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -779,11 +777,11 @@ describe('ManyToManyRelation', () => {
         );
 
         expect(owner.nameOfOurRelation).to.eql([
-          {a: 'str1', id: 1, rid: 3},
-          {a: 'str2', id: 2, rid: 4}
+          { a: 'str1', id: 1, rid: 3 },
+          { a: 'str2', id: 2, rid: 4 }
         ]);
 
-        expect(result).to.eql([{a: 'str1', id: 1, rid: 3}, {a: 'str2', id: 2, rid: 4}]);
+        expect(result).to.eql([{ a: 'str1', id: 1, rid: 3 }, { a: 'str2', id: 2, rid: 4 }]);
 
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -793,8 +791,8 @@ describe('ManyToManyRelation', () => {
     it('should accept single model', () => {
       mockKnexQueryResults = [[1]];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let related = RelatedModel.fromJson({a: 'str1', rid: 2});
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let related = RelatedModel.fromJson({ a: 'str1', rid: 2 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -816,7 +814,7 @@ describe('ManyToManyRelation', () => {
           'insert into "JoinModel" ("ownerId", "relatedId") values (666, 2) returning "relatedId"'
         );
 
-        expect(result).to.eql({a: 'str1', id: 1, rid: 2});
+        expect(result).to.eql({ a: 'str1', id: 1, rid: 2 });
         expect(result).to.be.a(RelatedModel);
       });
     });
@@ -824,8 +822,8 @@ describe('ManyToManyRelation', () => {
     it('should accept single json object', () => {
       mockKnexQueryResults = [[1]];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let related = {a: 'str1', rid: 2};
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let related = { a: 'str1', rid: 2 };
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -847,7 +845,7 @@ describe('ManyToManyRelation', () => {
           'insert into "JoinModel" ("ownerId", "relatedId") values (666, 2) returning "relatedId"'
         );
 
-        expect(result).to.eql({a: 'str1', id: 1, rid: 2});
+        expect(result).to.eql({ a: 'str1', id: 1, rid: 2 });
         expect(result).to.be.a(RelatedModel);
       });
     });
@@ -855,7 +853,7 @@ describe('ManyToManyRelation', () => {
     it('should insert extra properties to join table', () => {
       mockKnexQueryResults = [[1, 2]];
 
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
       let related = RelatedModel.fromJson({
         a: 'str2',
         rid: 4,
@@ -863,7 +861,7 @@ describe('ManyToManyRelation', () => {
         extra2: 'extraVal2'
       });
 
-      owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0', id: 3})];
+      owner.nameOfOurRelation = [RelatedModel.fromJson({ a: 'str0', id: 3 })];
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -886,8 +884,8 @@ describe('ManyToManyRelation', () => {
         );
 
         expect(_.sortBy(_.invokeMap(owner.nameOfOurRelation, 'toJSON'), 'id')).to.eql([
-          {a: 'str2', id: 1, rid: 4, extra1: 'extraVal1', extra2: 'extraVal2'},
-          {a: 'str0', id: 3}
+          { a: 'str2', id: 1, rid: 4, extra1: 'extraVal1', extra2: 'extraVal2' },
+          { a: 'str0', id: 3 }
         ]);
 
         expect(result).to.be.a(RelatedModel);
@@ -904,10 +902,10 @@ describe('ManyToManyRelation', () => {
     it('should insert extra properties to join table (not all)', () => {
       mockKnexQueryResults = [[1, 2]];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let related = RelatedModel.fromJson({a: 'str2', rid: 4, extra2: 'extraVal2'});
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let related = RelatedModel.fromJson({ a: 'str2', rid: 4, extra2: 'extraVal2' });
 
-      owner.nameOfOurRelation = [RelatedModel.fromJson({a: 'str0', id: 3})];
+      owner.nameOfOurRelation = [RelatedModel.fromJson({ a: 'str0', id: 3 })];
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -930,12 +928,12 @@ describe('ManyToManyRelation', () => {
         );
 
         expect(_.sortBy(_.invokeMap(owner.nameOfOurRelation, 'toJSON'), 'id')).to.eql([
-          {a: 'str2', id: 1, rid: 4, extra2: 'extraVal2'},
-          {a: 'str0', id: 3}
+          { a: 'str2', id: 1, rid: 4, extra2: 'extraVal2' },
+          { a: 'str0', id: 3 }
         ]);
 
         expect(result).to.be.a(RelatedModel);
-        expect(result.toJSON()).to.eql({a: 'str2', id: 1, rid: 4, extra2: 'extraVal2'});
+        expect(result.toJSON()).to.eql({ a: 'str2', id: 1, rid: 4, extra2: 'extraVal2' });
       });
     });
   });
@@ -944,8 +942,8 @@ describe('ManyToManyRelation', () => {
     it('should generate an update query', () => {
       mockKnexQueryResults = [42];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let update = RelatedModel.fromJson({a: 'str1'});
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let update = RelatedModel.fromJson({ a: 'str1' });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
@@ -976,8 +974,8 @@ describe('ManyToManyRelation', () => {
     it('should generate an update query (composite key)', () => {
       mockKnexQueryResults = [42];
 
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
-      let update = RelatedModel.fromJson({a: 'str1'});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
+      let update = RelatedModel.fromJson({ a: 'str1' });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
@@ -1009,8 +1007,8 @@ describe('ManyToManyRelation', () => {
     it('should accept json object', () => {
       mockKnexQueryResults = [42];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let update = {a: 'str1'};
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let update = { a: 'str1' };
 
       return QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
@@ -1037,9 +1035,9 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should apply the modifier', () => {
-      createModifiedRelation({someColumn: 100});
-      let owner = OwnerModel.fromJson({oid: 666});
-      let update = RelatedModel.fromJson({a: 'str1'});
+      createModifiedRelation({ someColumn: 100 });
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let update = RelatedModel.fromJson({ a: 'str1' });
 
       return QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
@@ -1070,8 +1068,8 @@ describe('ManyToManyRelation', () => {
     it('should generate a patch query', () => {
       mockKnexQueryResults = [42];
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let patch = RelatedModel.fromJson({a: 'str1'});
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let patch = RelatedModel.fromJson({ a: 'str1' });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
@@ -1105,14 +1103,14 @@ describe('ManyToManyRelation', () => {
         type: 'object',
         required: ['b'],
         properties: {
-          id: {type: 'number'},
-          a: {type: 'string'},
-          b: {type: 'string'}
+          id: { type: 'number' },
+          a: { type: 'string' },
+          b: { type: 'string' }
         }
       };
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let patch = {a: 'str1'};
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let patch = { a: 'str1' };
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
@@ -1137,7 +1135,7 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should work with increment', () => {
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
@@ -1158,7 +1156,7 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should work with decrement', () => {
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
@@ -1179,10 +1177,10 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should apply the modifier', () => {
-      createModifiedRelation({someColumn: 100});
+      createModifiedRelation({ someColumn: 100 });
 
-      let owner = OwnerModel.fromJson({oid: 666});
-      let patch = RelatedModel.fromJson({a: 'str1'});
+      let owner = OwnerModel.fromJson({ oid: 666 });
+      let patch = RelatedModel.fromJson({ a: 'str1' });
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
@@ -1209,7 +1207,7 @@ describe('ManyToManyRelation', () => {
 
   describe('delete', () => {
     it('should generate a delete query', () => {
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
@@ -1238,7 +1236,7 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should generate a delete query (composite key)', () => {
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
@@ -1267,8 +1265,8 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should apply the modifier', () => {
-      createModifiedRelation({someColumn: 100});
-      let owner = OwnerModel.fromJson({oid: 666});
+      createModifiedRelation({ someColumn: 100 });
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
@@ -1297,7 +1295,7 @@ describe('ManyToManyRelation', () => {
   describe('relate', () => {
     it('should generate a relate query', () => {
       mockKnexQueryResults = [[5]];
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
@@ -1307,7 +1305,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({ownerId: 666, relatedId: 10});
+        expect(result).to.eql({ ownerId: 666, relatedId: 10 });
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1321,7 +1319,7 @@ describe('ManyToManyRelation', () => {
 
     it('should generate a relate query (array value)', () => {
       mockKnexQueryResults = [[5, 6, 7]];
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
@@ -1332,9 +1330,9 @@ describe('ManyToManyRelation', () => {
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([
-          {ownerId: 666, relatedId: 10},
-          {ownerId: 666, relatedId: 20},
-          {ownerId: 666, relatedId: 30}
+          { ownerId: 666, relatedId: 10 },
+          { ownerId: 666, relatedId: 20 },
+          { ownerId: 666, relatedId: 30 }
         ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -1349,20 +1347,20 @@ describe('ManyToManyRelation', () => {
 
     it('should generate a relate query (object value)', () => {
       mockKnexQueryResults = [[5, 6, 7]];
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
           return relation.relate(builder, owner);
         })
-        .relate([{rid: 10}, {rid: 20}, {rid: 30}]);
+        .relate([{ rid: 10 }, { rid: 20 }, { rid: 30 }]);
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([
-          {ownerId: 666, relatedId: 10},
-          {ownerId: 666, relatedId: 20},
-          {ownerId: 666, relatedId: 30}
+          { ownerId: 666, relatedId: 10 },
+          { ownerId: 666, relatedId: 20 },
+          { ownerId: 666, relatedId: 30 }
         ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -1378,13 +1376,13 @@ describe('ManyToManyRelation', () => {
     it('should generate a relate query (composite key)', () => {
       mockKnexQueryResults = [
         [
-          {relatedCId: 33, relatedDId: 44},
-          {relatedCId: 33, relatedDId: 55},
-          {relatedCId: 66, relatedDId: 77}
+          { relatedCId: 33, relatedDId: 44 },
+          { relatedCId: 33, relatedDId: 55 },
+          { relatedCId: 66, relatedDId: 77 }
         ]
       ];
 
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
           return compositeKeyRelation.relate(builder, owner);
@@ -1394,9 +1392,9 @@ describe('ManyToManyRelation', () => {
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([
-          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44},
-          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55},
-          {ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77}
+          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44 },
+          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55 },
+          { ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77 }
         ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -1412,25 +1410,25 @@ describe('ManyToManyRelation', () => {
     it('should generate a relate query (composite key with object value)', () => {
       mockKnexQueryResults = [
         [
-          {relatedCId: 33, relatedDId: 44},
-          {relatedCId: 33, relatedDId: 55},
-          {relatedCId: 66, relatedDId: 77}
+          { relatedCId: 33, relatedDId: 44 },
+          { relatedCId: 33, relatedDId: 55 },
+          { relatedCId: 66, relatedDId: 77 }
         ]
       ];
 
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
           return compositeKeyRelation.relate(builder, owner);
         })
-        .relate([{cid: 33, did: 44}, {cid: 33, did: 55}, {cid: 66, did: 77}]);
+        .relate([{ cid: 33, did: 44 }, { cid: 33, did: 55 }, { cid: 66, did: 77 }]);
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql([
-          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44},
-          {ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55},
-          {ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77}
+          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44 },
+          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55 },
+          { ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77 }
         ]);
 
         expect(executedQueries[0]).to.equal(builder.toString());
@@ -1445,7 +1443,7 @@ describe('ManyToManyRelation', () => {
 
     it('should accept one id', () => {
       mockKnexQueryResults = [[5]];
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       return QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
@@ -1454,7 +1452,7 @@ describe('ManyToManyRelation', () => {
         .relate(11)
         .then(result => {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({ownerId: 666, relatedId: 11});
+          expect(result).to.eql({ ownerId: 666, relatedId: 11 });
           expect(executedQueries[0]).to.eql(
             'insert into "JoinModel" ("ownerId", "relatedId") values (666, 11) returning "relatedId"'
           );
@@ -1463,17 +1461,17 @@ describe('ManyToManyRelation', () => {
 
     it('should also insert extra properties', () => {
       mockKnexQueryResults = [[5]];
-      let owner = OwnerModel.fromJson({oid: 666});
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
           return relation.relate(builder, owner);
         })
-        .relate({rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar'});
+        .relate({ rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar' });
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({ownerId: 666, relatedId: 10, extra2: 'foo'});
+        expect(result).to.eql({ ownerId: 666, relatedId: 10, extra2: 'foo' });
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1489,8 +1487,8 @@ describe('ManyToManyRelation', () => {
   describe('unrelate', () => {
     it('should generate a unrelate query', () => {
       mockKnexQueryResults = [123];
-      createModifiedRelation({someColumn: 100});
-      let owner = OwnerModel.fromJson({oid: 666});
+      createModifiedRelation({ someColumn: 100 });
+      let owner = OwnerModel.fromJson({ oid: 666 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {
@@ -1519,7 +1517,7 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should generate a unrelate query (composite key)', () => {
-      let owner = OwnerModel.fromJson({aid: 11, bid: 22});
+      let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {

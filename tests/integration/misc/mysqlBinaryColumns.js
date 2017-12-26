@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 const utils = require('../../../lib/utils/knexUtils');
@@ -51,7 +49,7 @@ module.exports = session => {
 
       it('#insert should insert a buffer', () => {
         return TestModel.query()
-          .insert({binary: buffer()})
+          .insert({ binary: buffer() })
           .then(ret => {
             expect(bufferEquals(buffer(), ret.binary)).to.equal(true);
             return session.knex(TestModel.tableName);

@@ -58,7 +58,7 @@ describe('example plugin tests', () => {
 
     return Person.query(knex)
       .session(session)
-      .insert({name: 'Jennifer'})
+      .insert({ name: 'Jennifer' })
       .then(jennifer => {
         expect(jennifer.createdBy).to.equal(session.userId);
         expect(jennifer.createdAt).to.match(ISO_DATE_REGEX);
@@ -75,13 +75,13 @@ describe('example plugin tests', () => {
     }
 
     return Person.query(knex)
-      .session({userId: 'foo'})
-      .insert({name: 'Jennifer'})
+      .session({ userId: 'foo' })
+      .insert({ name: 'Jennifer' })
       .then(jennifer => {
         return jennifer
           .$query(knex)
-          .session({userId: 'bar'})
-          .patchAndFetch({name: 'Jonnifer'});
+          .session({ userId: 'bar' })
+          .patchAndFetch({ name: 'Jonnifer' });
       })
       .then(jonnifer => {
         expect(jonnifer.createdBy).to.equal('foo');
@@ -104,13 +104,13 @@ describe('example plugin tests', () => {
     }
 
     return Person.query(knex)
-      .session({userId: 'foo'})
-      .insert({name: 'Jennifer'})
+      .session({ userId: 'foo' })
+      .insert({ name: 'Jennifer' })
       .then(jennifer => {
         return jennifer
           .$query(knex)
-          .session({userId: 'bar'})
-          .patchAndFetch({name: 'Jonnifer'});
+          .session({ userId: 'bar' })
+          .patchAndFetch({ name: 'Jonnifer' });
       })
       .then(jonnifer => {
         expect(jonnifer.createdBy).to.equal(null);

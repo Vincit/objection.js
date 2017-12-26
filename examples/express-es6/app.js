@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 const promiseRouter = require('express-promise-router');
 const knexConfig = require('./knexfile');
 const registerApi = require('./api');
-const {Model} = require('objection');
+const { Model } = require('objection');
 
 // Initialize knex.
 const knex = Knex(knexConfig.development);

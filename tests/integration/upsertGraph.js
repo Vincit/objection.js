@@ -1,5 +1,3 @@
-'use strict';
-
 const raw = require('../../').raw;
 const expect = require('expect.js');
 const chai = require('chai');
@@ -396,12 +394,12 @@ module.exports = session => {
         id: 1,
         // This causes the parent model's model1Id to change
         // which in turn should cause the parent to get updated.
-        model1Relation1: {id: 3}
+        model1Relation1: { id: 3 }
       };
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {relate: true})
+          .upsertGraph(upsert, { relate: true })
           .then(result => {
             expect(result.$beforeUpdateCalled).to.equal(1);
             expect(result.$afterUpdateCalled).to.equal(1);
@@ -535,7 +533,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {unrelate: true, relate: true})
+          .upsertGraph(upsert, { unrelate: true, relate: true })
           .then(result => {
             expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(
               undefined
@@ -638,7 +636,7 @@ module.exports = session => {
       };
 
       return BoundModel1.query()
-        .upsertGraph(upsert, {relate: true})
+        .upsertGraph(upsert, { relate: true })
         .then(result => {
           return BoundModel1.query()
             .findById(1)
@@ -707,7 +705,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {unrelate: true, relate: true})
+          .upsertGraph(upsert, { unrelate: true, relate: true })
           .then(result => {
             expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(1);
 
@@ -1033,12 +1031,12 @@ module.exports = session => {
       const upsert = {
         id: 1,
         // This is a BelongsToOneRelation
-        model1Relation1: {id: 3}
+        model1Relation1: { id: 3 }
       };
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {relate: true, unrelate: true})
+          .upsertGraph(upsert, { relate: true, unrelate: true })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1064,12 +1062,12 @@ module.exports = session => {
       const upsert = {
         id: 1,
         // This is a BelongsToOneRelation
-        model1Relation1: {model1Prop1}
+        model1Relation1: { model1Prop1 }
       };
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {relate: true, unrelate: true})
+          .upsertGraph(upsert, { relate: true, unrelate: true })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1169,7 +1167,7 @@ module.exports = session => {
       };
 
       return transaction(session.knex, trx => {
-        return Model1.query(trx).upsertGraph(upsert, {insertMissing: true});
+        return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
       })
         .then(result => {
           // Fetch the graph from the database.
@@ -1229,7 +1227,7 @@ module.exports = session => {
 
       const upsertAndCompare = () => {
         return transaction(session.knex, trx => {
-          return Model1.query(trx).upsertGraph(upsert, {insertMissing: true});
+          return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
         })
           .then(result => {
             // Fetch the graph from the database.
@@ -1371,14 +1369,14 @@ module.exports = session => {
 
       // This should fail.
       return Model1.query(session.knex)
-        .upsertGraph(upsert, {unrelate: true, relate: true})
+        .upsertGraph(upsert, { unrelate: true, relate: true })
         .allowUpsert('[model1Relation1, model1Relation2]')
         .catch(err => {
           errors.push(err);
 
           // This should also fail.
           return Model1.query(session.knex)
-            .upsertGraph(upsert, {unrelate: true, relate: true})
+            .upsertGraph(upsert, { unrelate: true, relate: true })
             .allowUpsert('[model1Relation2.model2Relation1]');
         })
         .catch(err => {
@@ -1386,7 +1384,7 @@ module.exports = session => {
 
           // This should succeed.
           return Model1.query(session.knex)
-            .upsertGraph(upsert, {unrelate: true, relate: true})
+            .upsertGraph(upsert, { unrelate: true, relate: true })
             .allowUpsert('[model1Relation1, model1Relation2.model2Relation1]');
         })
         .then(result => {
@@ -1593,8 +1591,8 @@ module.exports = session => {
           required: ['model1Prop1', 'model1Prop2'],
 
           properties: {
-            model1Prop1: {type: ['string', 'null']},
-            model1Prop2: {type: ['integer', 'null']}
+            model1Prop1: { type: ['string', 'null'] },
+            model1Prop2: { type: ['integer', 'null'] }
           }
         };
       });
@@ -1835,8 +1833,8 @@ module.exports = session => {
           required: ['model1Prop1', 'model1Prop2'],
 
           properties: {
-            model1Prop1: {type: 'string'},
-            model1Prop2: {type: 'integer'}
+            model1Prop1: { type: 'string' },
+            model1Prop2: { type: 'integer' }
           }
         };
       });
@@ -1890,7 +1888,7 @@ module.exports = session => {
 
         return Promise.map(fails, fail => {
           return transaction(session.knex, trx =>
-            Model1.query(trx).upsertGraph(fail, {update: true})
+            Model1.query(trx).upsertGraph(fail, { update: true })
           ).reflect();
         })
           .then(results => {
@@ -1905,7 +1903,7 @@ module.exports = session => {
           .then(() => {
             return transaction(session.knex, trx => {
               return Model1.query(trx)
-                .upsertGraph(success, {update: true})
+                .upsertGraph(success, { update: true })
                 .then(result => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)

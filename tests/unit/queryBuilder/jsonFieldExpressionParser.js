@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash'),
   expect = require('expect.js'),
   parser = require('../../../lib/queryBuilder/parsers/jsonFieldExpressionParser.js');
@@ -107,12 +105,12 @@ describe('jsonFieldExpressionParser', () => {
   describe("field expression parser's general options", () => {
     it('should fail if wrong start rule in parser options', () => {
       expect(() => {
-        parser.parse('col', {startRule: 'undefined is not a function'});
+        parser.parse('col', { startRule: 'undefined is not a function' });
       }).to.throwException();
     });
 
     it('should be able to give start rule as parameter', () => {
-      let result = parser.parse('col', {startRule: 'start'});
+      let result = parser.parse('col', { startRule: 'start' });
       expect(result.columnName).to.be('col');
     });
   });

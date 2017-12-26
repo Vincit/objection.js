@@ -152,7 +152,7 @@ const req = axios.create({
     }
   });
 
-  console.dir(people.data, {depth: null});
+  console.dir(people.data, { depth: null });
 })().catch(err => {
   console.error(err.response.data);
 });

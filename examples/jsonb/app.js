@@ -87,7 +87,7 @@ db
   })
   .then(function(data) {
     // Start doing the queries...
-    console.log('Inserted data:', util.inspect(data, {colors: true, depth: null}));
+    console.log('Inserted data:', util.inspect(data, { colors: true, depth: null }));
 
     function testQuery(label, opts) {
       // Kids, don't try this at home!
@@ -109,11 +109,11 @@ db
       [
         testQuery(
           "db.Place.query().whereJsonIsObject('JustTable.imaColumn:the.same.sql.generated')",
-          {justDumpSql: true}
+          { justDumpSql: true }
         ),
         testQuery(
           "db.Place.query().whereJsonIsObject('JustTable.imaColumn:[the][same][sql][generated]')",
-          {justDumpSql: true}
+          { justDumpSql: true }
         ),
         testQuery("db.Hero.query().select('name').whereJsonHasAny('details', ['title', 'race'])"),
         testQuery("db.Hero.query().select('name').whereJsonHasAll('details', ['title', 'race'])"),

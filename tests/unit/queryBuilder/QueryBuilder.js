@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash'),
   Knex = require('knex'),
   expect = require('expect.js'),
@@ -21,7 +19,7 @@ describe('QueryBuilder', () => {
   let TestModel = null;
 
   before(() => {
-    let knex = Knex({client: 'pg'});
+    let knex = Knex({ client: 'pg' });
 
     mockKnex = knexMocker(knex, function(mock, oldImpl, args) {
       executedQueries.push(this.toString());
@@ -159,7 +157,7 @@ describe('QueryBuilder', () => {
   });
 
   it('should call the callback passed to .then after execution', done => {
-    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
+    mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
     // Make sure the callback is called by not returning a promise from the test.
     // Instead call the `done` function so that the test times out if the callback
     // is not called.
@@ -208,7 +206,7 @@ describe('QueryBuilder', () => {
   });
 
   it('should pass node-style values to the asCallback method', done => {
-    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
+    mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
     QueryBuilder.forClass(TestModel).asCallback((err, models) => {
       expect(models).to.eql(mockKnexQueryResults[0]);
       done();
@@ -216,7 +214,7 @@ describe('QueryBuilder', () => {
   });
 
   it('should pass node-style values to the nodeify method', done => {
-    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
+    mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
     QueryBuilder.forClass(TestModel).nodeify((err, models) => {
       expect(models).to.eql(mockKnexQueryResults[0]);
       done();
@@ -244,7 +242,7 @@ describe('QueryBuilder', () => {
       .join('AnotherTable', 'AnotherTable.modelId', 'Model.id')
       .where('id', 10)
       .where('height', '>', 180)
-      .where({name: 'test'})
+      .where({ name: 'test' })
       .orWhere(function(builder) {
         // The builder passed to these functions should be a QueryBuilderBase instead of
         // knex query builder.
@@ -414,7 +412,7 @@ describe('QueryBuilder', () => {
   });
 
   it('should convert array query result into Model instances', () => {
-    mockKnexQueryResults = [[{a: 1}, {a: 2}]];
+    mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
 
     return QueryBuilder.forClass(TestModel).then(result => {
       expect(result).to.have.length(2);
@@ -425,7 +423,7 @@ describe('QueryBuilder', () => {
   });
 
   it('should convert an object query result into a Model instance', () => {
-    mockKnexQueryResults = [{a: 1}];
+    mockKnexQueryResults = [{ a: 1 }];
 
     return QueryBuilder.forClass(TestModel).then(result => {
       expect(result).to.be.a(TestModel);
@@ -549,7 +547,7 @@ describe('QueryBuilder', () => {
     return QueryBuilder.forClass(TestModel)
       .findOperationFactory(function(builder) {
         expect(builder).to.equal(this);
-        return createFindOperation(builder, {a: 1});
+        return createFindOperation(builder, { a: 1 });
       })
       .then(() => {
         expect(executedQueries).to.have.length(1);
@@ -560,9 +558,9 @@ describe('QueryBuilder', () => {
   it('should not call custom find implementation defined by findOperationFactory if insert is called', () => {
     return QueryBuilder.forClass(TestModel)
       .findOperationFactory(builder => {
-        return createFindOperation(builder, {a: 1});
+        return createFindOperation(builder, { a: 1 });
       })
-      .insert({a: 1})
+      .insert({ a: 1 })
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal('insert into "Model" ("a") values (1) returning "id"');
@@ -572,9 +570,9 @@ describe('QueryBuilder', () => {
   it('should not call custom find implementation defined by findOperationFactory if update is called', () => {
     return QueryBuilder.forClass(TestModel)
       .findOperationFactory(builder => {
-        return createFindOperation(builder, {a: 1});
+        return createFindOperation(builder, { a: 1 });
       })
-      .update({a: 1})
+      .update({ a: 1 })
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal('update "Model" set "a" = 1');
@@ -584,7 +582,7 @@ describe('QueryBuilder', () => {
   it('should not call custom find implementation defined by findOperationFactory if delete is called', () => {
     return QueryBuilder.forClass(TestModel)
       .findOperationFactory(builder => {
-        return createFindOperation(builder, {a: 1});
+        return createFindOperation(builder, { a: 1 });
       })
       .delete()
       .then(() => {
@@ -596,9 +594,9 @@ describe('QueryBuilder', () => {
   it('should call custom insert implementation defined by insertOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
       .insertOperationFactory(builder => {
-        return createInsertOperation(builder, {b: 2});
+        return createInsertOperation(builder, { b: 2 });
       })
-      .insert({a: 1})
+      .insert({ a: 1 })
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (1, 2)');
@@ -608,9 +606,9 @@ describe('QueryBuilder', () => {
   it('should call custom update implementation defined by updateOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
       .updateOperationFactory(builder => {
-        return createUpdateOperation(builder, {b: 2});
+        return createUpdateOperation(builder, { b: 2 });
       })
-      .update({a: 1})
+      .update({ a: 1 })
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2');
@@ -620,9 +618,9 @@ describe('QueryBuilder', () => {
   it('should call custom patch implementation defined by patchOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
       .patchOperationFactory(builder => {
-        return createUpdateOperation(builder, {b: 2});
+        return createUpdateOperation(builder, { b: 2 });
       })
-      .patch({a: 1})
+      .patch({ a: 1 })
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal('update "Model" set "a" = 1, "b" = 2');
@@ -632,7 +630,7 @@ describe('QueryBuilder', () => {
   it('should call custom delete implementation defined by deleteOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
       .deleteOperationFactory(builder => {
-        return createDeleteOperation(builder, {id: 100});
+        return createDeleteOperation(builder, { id: 100 });
       })
       .delete()
       .then(() => {
@@ -644,9 +642,9 @@ describe('QueryBuilder', () => {
   it('should call custom relate implementation defined by relateOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
       .relateOperationFactory(builder => {
-        return createInsertOperation(builder, {b: 2});
+        return createInsertOperation(builder, { b: 2 });
       })
-      .relate({a: 1})
+      .relate({ a: 1 })
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(executedQueries[0]).to.equal('insert into "Model" ("a", "b") values (1, 2)');
@@ -656,7 +654,7 @@ describe('QueryBuilder', () => {
   it('should call custom unrelate implementation defined by unrelateOperationFactory', () => {
     return QueryBuilder.forClass(TestModel)
       .unrelateOperationFactory(builder => {
-        return createDeleteOperation(builder, {id: 100});
+        return createDeleteOperation(builder, { id: 100 });
       })
       .unrelate()
       .then(() => {
@@ -668,10 +666,10 @@ describe('QueryBuilder', () => {
   it('should be able to execute same query multiple times', () => {
     let query = QueryBuilder.forClass(TestModel)
       .updateOperationFactory(builder => {
-        return createUpdateOperation(builder, {b: 2});
+        return createUpdateOperation(builder, { b: 2 });
       })
       .where('test', '<', 100)
-      .update({a: 1});
+      .update({ a: 1 });
 
     query
       .then(() => {
@@ -705,7 +703,7 @@ describe('QueryBuilder', () => {
   });
 
   it('resultSize should create and execute a query that returns the size of the query', done => {
-    mockKnexQueryResults = [[{count: 123}]];
+    mockKnexQueryResults = [[{ count: 123 }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
@@ -723,7 +721,7 @@ describe('QueryBuilder', () => {
   });
 
   it('range should return a range and the total count', done => {
-    mockKnexQueryResults = [[{count: 123}], [{a: 1}]];
+    mockKnexQueryResults = [[{ count: 123 }], [{ a: 1 }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
@@ -735,14 +733,14 @@ describe('QueryBuilder', () => {
           'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 101 offset 100'
         ]);
         expect(res.total).to.equal(123);
-        expect(res.results).to.eql([{a: 1}]);
+        expect(res.results).to.eql([{ a: 1 }]);
         done();
       })
       .catch(done);
   });
 
   it('page should return a page and the total count', done => {
-    mockKnexQueryResults = [[{count: 123}], [{a: 1}]];
+    mockKnexQueryResults = [[{ count: 123 }], [{ a: 1 }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
@@ -754,7 +752,7 @@ describe('QueryBuilder', () => {
           'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000'
         ]);
         expect(res.total).to.equal(123);
-        expect(res.results).to.eql([{a: 1}]);
+        expect(res.results).to.eql([{ a: 1 }]);
         done();
       })
       .catch(done);
@@ -812,7 +810,7 @@ describe('QueryBuilder', () => {
       throw new Error('$afterGet should not be called');
     };
 
-    let model = TestModel.fromJson({a: 10, b: 'test'});
+    let model = TestModel.fromJson({ a: 10, b: 'test' });
     QueryBuilder.forClass(TestModel)
       .update(model)
       .then(() => {
@@ -837,7 +835,7 @@ describe('QueryBuilder', () => {
       throw new Error('$afterGet should not be called');
     };
 
-    let model = TestModel.fromJson({a: 10, b: 'test'});
+    let model = TestModel.fromJson({ a: 10, b: 'test' });
     QueryBuilder.forClass(TestModel)
       .update(model)
       .then(() => {
@@ -859,7 +857,7 @@ describe('QueryBuilder', () => {
       throw new Error('$afterGet should not be called');
     };
 
-    let model = TestModel.fromJson({a: 10, b: 'test'});
+    let model = TestModel.fromJson({ a: 10, b: 'test' });
     QueryBuilder.forClass(TestModel)
       .patch(model)
       .then(() => {
@@ -884,7 +882,7 @@ describe('QueryBuilder', () => {
       throw new Error('$afterGet should not be called');
     };
 
-    let model = TestModel.fromJson({a: 10, b: 'test'});
+    let model = TestModel.fromJson({ a: 10, b: 'test' });
     QueryBuilder.forClass(TestModel)
       .patch(model)
       .then(() => {
@@ -907,7 +905,7 @@ describe('QueryBuilder', () => {
     };
 
     QueryBuilder.forClass(TestModel)
-      .insert(TestModel.fromJson({a: 10, b: 'test'}))
+      .insert(TestModel.fromJson({ a: 10, b: 'test' }))
       .then(model => {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal(
@@ -931,7 +929,7 @@ describe('QueryBuilder', () => {
     };
 
     QueryBuilder.forClass(TestModel)
-      .insert({a: 10, b: 'test'})
+      .insert({ a: 10, b: 'test' })
       .then(model => {
         expect(model.c).to.equal('beforeInsert');
         expect(executedQueries[0]).to.equal(
@@ -959,7 +957,7 @@ describe('QueryBuilder', () => {
     };
 
     QueryBuilder.forClass(TestModel)
-      .context({x: 10})
+      .context({ x: 10 })
       .then(models => {
         expect(models[0]).to.be.a(TestModel);
         expect(models[1]).to.be.a(TestModel);
@@ -998,7 +996,7 @@ describe('QueryBuilder', () => {
     };
 
     QueryBuilder.forClass(TestModel)
-      .context({x: 10})
+      .context({ x: 10 })
       .then(models => {
         expect(models[0]).to.be.a(TestModel);
         expect(models[1]).to.be.a(TestModel);
@@ -1037,7 +1035,7 @@ describe('QueryBuilder', () => {
     };
 
     QueryBuilder.forClass(TestModel)
-      .context({x: 10})
+      .context({ x: 10 })
       .runAfter((result, builder) => {
         builder.context().x = 666;
         return result;
@@ -1124,7 +1122,7 @@ describe('QueryBuilder', () => {
     M2.knex(mockKnex);
 
     M2.query()
-      .joinRelation('m1', {alias: 'm'})
+      .joinRelation('m1', { alias: 'm' })
       .join('M1', 'M1.id', 'M2.m1Id')
       .then(() => {
         expect(executedQueries[0]).to.equal(
@@ -1287,7 +1285,7 @@ describe('QueryBuilder', () => {
     it("allowEager('a').eager('a(f1)') should be ok", done => {
       QueryBuilder.forClass(TestModel)
         .allowEager('a')
-        .eager('a(f1)', {f1: _.noop})
+        .eager('a(f1)', { f1: _.noop })
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1299,7 +1297,7 @@ describe('QueryBuilder', () => {
 
     it("eager('a(f1)').allowEager('a') should be ok", done => {
       QueryBuilder.forClass(TestModel)
-        .eager('a(f1)', {f1: _.noop})
+        .eager('a(f1)', { f1: _.noop })
         .allowEager('a')
         .then(() => {
           expect(executedQueries).to.have.length(1);
@@ -1348,7 +1346,7 @@ describe('QueryBuilder', () => {
     it("mergeAllowEager('a').eager('a(f1)') should be ok", done => {
       QueryBuilder.forClass(TestModel)
         .mergeAllowEager('a')
-        .eager('a(f1)', {f1: _.noop})
+        .eager('a(f1)', { f1: _.noop })
         .then(() => {
           expect(executedQueries).to.have.length(1);
           done();
@@ -1599,9 +1597,9 @@ describe('QueryBuilder', () => {
       M3.knex(mockKnex);
 
       mockKnexQueryResults = [
-        [{id: 1, m1Id: 2, m3Id: 3}],
-        [{id: 1, m1Id: 2, m3Id: 3}],
-        [{id: 1, m1Id: 2, m3Id: 3}]
+        [{ id: 1, m1Id: 2, m3Id: 3 }],
+        [{ id: 1, m1Id: 2, m3Id: 3 }],
+        [{ id: 1, m1Id: 2, m3Id: 3 }]
       ];
 
       let filter1Check = false;
@@ -1657,17 +1655,17 @@ describe('QueryBuilder', () => {
       M1.knex(mockKnex);
 
       mockKnexQueryResults = [
-        [{id: 1}, {id: 2}],
-        [{id: 3, m1Id: 1}, {id: 4, m1Id: 1}, {id: 5, m1Id: 2}, {id: 6, m1Id: 2}],
+        [{ id: 1 }, { id: 2 }],
+        [{ id: 3, m1Id: 1 }, { id: 4, m1Id: 1 }, { id: 5, m1Id: 2 }, { id: 6, m1Id: 2 }],
         [
-          {id: 7, m1Id: 3},
-          {id: 8, m1Id: 3},
-          {id: 9, m1Id: 4},
-          {id: 10, m1Id: 4},
-          {id: 11, m1Id: 5},
-          {id: 12, m1Id: 5},
-          {id: 13, m1Id: 6},
-          {id: 14, m1Id: 6}
+          { id: 7, m1Id: 3 },
+          { id: 8, m1Id: 3 },
+          { id: 9, m1Id: 4 },
+          { id: 10, m1Id: 4 },
+          { id: 11, m1Id: 5 },
+          { id: 12, m1Id: 5 },
+          { id: 13, m1Id: 6 },
+          { id: 14, m1Id: 6 }
         ]
       ];
 
@@ -1689,13 +1687,13 @@ describe('QueryBuilder', () => {
                   id: 3,
                   m1Id: 1,
                   ids: [7, 8],
-                  someRel: [{id: 7, m1Id: 3, ids: []}, {id: 8, m1Id: 3, ids: []}]
+                  someRel: [{ id: 7, m1Id: 3, ids: [] }, { id: 8, m1Id: 3, ids: [] }]
                 },
                 {
                   id: 4,
                   m1Id: 1,
                   ids: [9, 10],
-                  someRel: [{id: 9, m1Id: 4, ids: []}, {id: 10, m1Id: 4, ids: []}]
+                  someRel: [{ id: 9, m1Id: 4, ids: [] }, { id: 10, m1Id: 4, ids: [] }]
                 }
               ]
             },
@@ -1707,13 +1705,13 @@ describe('QueryBuilder', () => {
                   id: 5,
                   m1Id: 2,
                   ids: [11, 12],
-                  someRel: [{id: 11, m1Id: 5, ids: []}, {id: 12, m1Id: 5, ids: []}]
+                  someRel: [{ id: 11, m1Id: 5, ids: [] }, { id: 12, m1Id: 5, ids: [] }]
                 },
                 {
                   id: 6,
                   m1Id: 2,
                   ids: [13, 14],
-                  someRel: [{id: 13, m1Id: 6, ids: []}, {id: 14, m1Id: 6, ids: []}]
+                  someRel: [{ id: 13, m1Id: 6, ids: [] }, { id: 14, m1Id: 6, ids: [] }]
                 }
               ]
             }
@@ -1729,8 +1727,8 @@ describe('QueryBuilder', () => {
     it('context() should replace context', () => {
       const builder = TestModel.query();
 
-      builder.context({a: 1});
-      builder.context({b: 2});
+      builder.context({ a: 1 });
+      builder.context({ b: 2 });
 
       expect(builder.context()).to.eql({
         b: 2
@@ -1741,10 +1739,10 @@ describe('QueryBuilder', () => {
 
     it('`mergeContext` should merge context', () => {
       const builder = TestModel.query();
-      const origContext = {a: 1};
+      const origContext = { a: 1 };
 
       builder.context(origContext);
-      builder.mergeContext({b: 2});
+      builder.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -1760,10 +1758,10 @@ describe('QueryBuilder', () => {
 
     it('`mergeContext` can be called without `context` having been called', () => {
       const builder = TestModel.query();
-      const origContext = {a: 1};
+      const origContext = { a: 1 };
 
       builder.mergeContext(origContext);
-      builder.mergeContext({b: 2});
+      builder.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -1779,12 +1777,12 @@ describe('QueryBuilder', () => {
 
     it('cloning a query builder should clone the context also', () => {
       const builder = TestModel.query();
-      const origContext = {a: 1};
+      const origContext = { a: 1 };
 
       builder.context(origContext);
 
       const builder2 = builder.clone();
-      builder2.mergeContext({b: 2});
+      builder2.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1
@@ -1805,12 +1803,12 @@ describe('QueryBuilder', () => {
 
     it('calling `childQueryOf` should copy a reference of the context', () => {
       const builder = TestModel.query();
-      const origContext = {a: 1};
+      const origContext = { a: 1 };
 
       builder.context(origContext);
 
       const builder2 = TestModel.query().childQueryOf(builder);
-      builder2.mergeContext({b: 2});
+      builder2.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1,
@@ -1832,12 +1830,12 @@ describe('QueryBuilder', () => {
 
     it('calling `childQueryOf(builder, true)` should copy the context', () => {
       const builder = TestModel.query();
-      const origContext = {a: 1};
+      const origContext = { a: 1 };
 
       builder.context(origContext);
 
       const builder2 = TestModel.query().childQueryOf(builder, true);
-      builder2.mergeContext({b: 2});
+      builder2.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
         a: 1
@@ -1870,7 +1868,7 @@ describe('QueryBuilder', () => {
       };
 
       return TestModel.query()
-        .patch({a: 1})
+        .patch({ a: 1 })
         .then(() => {
           expect(foo).to.equal(100);
         });

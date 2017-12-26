@@ -1,5 +1,3 @@
-'use strict';
-
 const ref = require('../../').ref;
 const find = require('lodash/find');
 const Model = require('../../').Model;
@@ -172,7 +170,7 @@ module.exports = session => {
     describe('eager', () => {
       it('eager', () => {
         return Person.query()
-          .findOne({'Person.name': 'Arnold'})
+          .findOne({ 'Person.name': 'Arnold' })
           .select('Person.name')
           .eager(
             `[
@@ -216,7 +214,7 @@ module.exports = session => {
 
       it('joinEager', () => {
         return Person.query()
-          .findOne({'Person.name': 'Arnold'})
+          .findOne({ 'Person.name': 'Arnold' })
           .select('Person.name')
           .joinEager(
             `[
@@ -263,11 +261,11 @@ module.exports = session => {
       describe('belongs to one relation', () => {
         it('insert', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
-            .then(it => it.$relatedQuery('favoritePet').insert({name: 'Doggo'}))
+            .findOne({ name: 'Arnold' })
+            .then(it => it.$relatedQuery('favoritePet').insert({ name: 'Doggo' }))
             .then(() =>
               Person.query()
-                .findOne({name: 'Arnold'})
+                .findOne({ name: 'Arnold' })
                 .eager('favoritePet')
             )
             .then(person => {
@@ -277,7 +275,7 @@ module.exports = session => {
 
         it('find', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
+            .findOne({ name: 'Arnold' })
             .then(it => it.$relatedQuery('favoritePet').select('name'))
             .then(pet => {
               expect(pet).to.eql({
@@ -288,8 +286,8 @@ module.exports = session => {
 
         it('patch', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
-            .then(it => it.$relatedQuery('favoritePet').patch({json: {updated: true}}))
+            .findOne({ name: 'Arnold' })
+            .then(it => it.$relatedQuery('favoritePet').patch({ json: { updated: true } }))
             .then(() =>
               Animal.query()
                 .select('json', 'name')
@@ -313,7 +311,7 @@ module.exports = session => {
 
         it('relate', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
+            .findOne({ name: 'Arnold' })
             .then(it => it.$relatedQuery('favoritePet').relate(123))
             .then(() =>
               Person.query()
@@ -321,8 +319,8 @@ module.exports = session => {
                 .orderBy('name')
             )
             .then(people => {
-              const brad = find(people, {name: 'Brad'});
-              const ardnold = find(people, {name: 'Arnold'});
+              const brad = find(people, { name: 'Brad' });
+              const ardnold = find(people, { name: 'Arnold' });
 
               expect(ardnold.json.stuff.favoritePetId).to.equal(123);
               expect(brad.json.stuff.favoritePetId).to.equal(brad.favoritePet.id);
@@ -331,7 +329,7 @@ module.exports = session => {
 
         it('unrelate', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
+            .findOne({ name: 'Arnold' })
             .then(it => it.$relatedQuery('favoritePet').unrelate())
             .then(() =>
               Person.query()
@@ -339,8 +337,8 @@ module.exports = session => {
                 .orderBy('name')
             )
             .then(people => {
-              const brad = find(people, {name: 'Brad'});
-              const ardnold = find(people, {name: 'Arnold'});
+              const brad = find(people, { name: 'Brad' });
+              const ardnold = find(people, { name: 'Arnold' });
 
               expect(ardnold.json.stuff.favoritePetId).to.equal(null);
               expect(brad.json.stuff.favoritePetId).to.equal(brad.favoritePet.id);
@@ -351,11 +349,11 @@ module.exports = session => {
       describe('has many relation', () => {
         it('insert', () => {
           return Animal.query()
-            .findOne({name: 'Fluffy'})
-            .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').insert({name: 'Jorge'}))
+            .findOne({ name: 'Fluffy' })
+            .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').insert({ name: 'Jorge' }))
             .then(() =>
               Animal.query()
-                .findOne({name: 'Fluffy'})
+                .findOne({ name: 'Fluffy' })
                 .eager('peopleWhoseFavoriteIAm(name)')
                 .select('name')
             )
@@ -378,7 +376,7 @@ module.exports = session => {
 
         it('find', () => {
           return Animal.query()
-            .findOne({name: 'Fluffy'})
+            .findOne({ name: 'Fluffy' })
             .then(it => it.$relatedQuery('peopleWhoseFavoriteIAm').select('name'))
             .then(pet => {
               expect(pet).to.eql([
@@ -391,9 +389,9 @@ module.exports = session => {
 
         it('patch', () => {
           return Animal.query()
-            .findOne({name: 'Fluffy'})
+            .findOne({ name: 'Fluffy' })
             .then(it =>
-              it.$relatedQuery('peopleWhoseFavoriteIAm').patch({name: 'Arnold the second'})
+              it.$relatedQuery('peopleWhoseFavoriteIAm').patch({ name: 'Arnold the second' })
             )
             .then(() =>
               Person.query()
@@ -414,12 +412,12 @@ module.exports = session => {
 
         it('relate', () => {
           return Animal.query()
-            .findOne({name: 'Fluffy'})
-            .then(it => [it, Person.query().findOne({name: 'Brad'})])
+            .findOne({ name: 'Fluffy' })
+            .then(it => [it, Person.query().findOne({ name: 'Brad' })])
             .spread((fluffy, brad) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
             .then(() =>
               Animal.query()
-                .findOne({name: 'Fluffy'})
+                .findOne({ name: 'Fluffy' })
                 .eager('peopleWhoseFavoriteIAm(name)')
             )
             .then(sortRelations)
@@ -437,8 +435,8 @@ module.exports = session => {
 
         it('unrelate', () => {
           return Animal.query()
-            .findOne({name: 'Fluffy'})
-            .then(it => [it, Person.query().findOne({name: 'Brad'})])
+            .findOne({ name: 'Fluffy' })
+            .then(it => [it, Person.query().findOne({ name: 'Brad' })])
             .spread((fluffy, brad) =>
               fluffy
                 .$relatedQuery('peopleWhoseFavoriteIAm')
@@ -453,7 +451,7 @@ module.exports = session => {
             )
             .then(() =>
               Animal.query()
-                .findOne({name: 'Fluffy'})
+                .findOne({ name: 'Fluffy' })
                 .eager('peopleWhoseFavoriteIAm(name)')
             )
             .then(sortRelations)
@@ -465,7 +463,7 @@ module.exports = session => {
               ]);
 
               return Person.query()
-                .findOne({name: 'Arnold'})
+                .findOne({ name: 'Arnold' })
                 .select('json');
             })
             .then(arnold => {
@@ -477,11 +475,11 @@ module.exports = session => {
       describe('many to many relation', () => {
         it('insert', () => {
           return Person.query()
-            .findOne({name: 'Brad'})
-            .then(it => it.$relatedQuery('movies').insert({name: 'Seven years in Tibet'}))
+            .findOne({ name: 'Brad' })
+            .then(it => it.$relatedQuery('movies').insert({ name: 'Seven years in Tibet' }))
             .then(() =>
               Person.query()
-                .findOne({name: 'Brad'})
+                .findOne({ name: 'Brad' })
                 .eager('movies(name)')
                 .select('name')
             )
@@ -504,7 +502,7 @@ module.exports = session => {
 
         it('find', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
+            .findOne({ name: 'Arnold' })
             .then(it =>
               it
                 .$relatedQuery('movies')
@@ -525,8 +523,8 @@ module.exports = session => {
 
         it('patch', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
-            .then(it => it.$relatedQuery('movies').patch({name: 'Some terminator'}))
+            .findOne({ name: 'Arnold' })
+            .then(it => it.$relatedQuery('movies').patch({ name: 'Some terminator' }))
             .then(() =>
               Movie.query()
                 .select('name')
@@ -549,13 +547,13 @@ module.exports = session => {
 
         it('relate', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
-            .then(it => [it, Movie.query().findOne({name: 'Inglorious bastards'})])
+            .findOne({ name: 'Arnold' })
+            .then(it => [it, Movie.query().findOne({ name: 'Inglorious bastards' })])
             .spread((arnold, bastards) => arnold.$relatedQuery('movies').relate(bastards.id))
             .then(() =>
               Person.query()
                 .select('name')
-                .findOne({name: 'Arnold'})
+                .findOne({ name: 'Arnold' })
                 .eager('movies(name)')
             )
             .then(sortRelations)
@@ -576,8 +574,8 @@ module.exports = session => {
 
         it('unrelate', () => {
           return Person.query()
-            .findOne({name: 'Arnold'})
-            .then(it => [it, Movie.query().findOne({name: 'Inglorious bastards'})])
+            .findOne({ name: 'Arnold' })
+            .then(it => [it, Movie.query().findOne({ name: 'Inglorious bastards' })])
             .spread((arnold, bastards) =>
               arnold
                 .$relatedQuery('movies')
@@ -593,7 +591,7 @@ module.exports = session => {
             .then(() =>
               Person.query()
                 .select('name')
-                .findOne({name: 'Arnold'})
+                .findOne({ name: 'Arnold' })
                 .eager('movies(name)')
             )
             .then(sortRelations)

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const Knex = require('knex');
 const Model = require('../../../').Model;
@@ -95,12 +93,12 @@ module.exports = session => {
 
     it('should be able to insert to another database', () => {
       return T1.query()
-        .insert({id: 1, foo: 1})
+        .insert({ id: 1, foo: 1 })
         .then(() => {
           return db2Knex('t1');
         })
         .then(rows => {
-          expect(rows).to.eql([{id: 1, foo: 1}]);
+          expect(rows).to.eql([{ id: 1, foo: 1 }]);
         });
     });
 
@@ -120,24 +118,24 @@ module.exports = session => {
           return Promise.all([db2Knex('t1'), db2Knex('t2')]);
         })
         .then(res => {
-          expect(res).to.eql([[{id: 1, foo: 1}], [{id: 1, bar: 2, t1_id: 1}]]);
+          expect(res).to.eql([[{ id: 1, foo: 1 }], [{ id: 1, bar: 2, t1_id: 1 }]]);
         });
     });
 
     it('select should work with a normal query', () => {
       return T1.query()
-        .insert({id: 1, foo: 1})
+        .insert({ id: 1, foo: 1 })
         .then(() => {
           return T1.query().select('objection_test_2.t1.*');
         })
         .then(models => {
-          expect(models).to.eql([{id: 1, foo: 1}]);
+          expect(models).to.eql([{ id: 1, foo: 1 }]);
         })
         .then(() => {
           return T1.query().select('objection_test_2.t1.id');
         })
         .then(models => {
-          expect(models).to.eql([{id: 1}]);
+          expect(models).to.eql([{ id: 1 }]);
         });
     });
 

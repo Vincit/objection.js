@@ -1,5 +1,3 @@
-'use strict';
-
 const Model = require('../../../../').Model;
 
 class JoinModel extends Model {

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
@@ -216,7 +214,7 @@ module.exports = session => {
           }
         ]);
       },
-      {disableJoin: true}
+      { disableJoin: true }
     );
 
     test('model1Relation1.^2', models => {
@@ -317,7 +315,7 @@ module.exports = session => {
           }
         },
         disableWhereIn: true,
-        eagerOptions: {minimize: true}
+        eagerOptions: { minimize: true }
       }
     );
 
@@ -952,7 +950,7 @@ module.exports = session => {
               ]);
             });
         },
-        {concurrency: 1}
+        { concurrency: 1 }
       );
     });
 
@@ -961,7 +959,7 @@ module.exports = session => {
         .select('id')
         .findById(1)
         .eager('[model1Relation1, model1Relation2.model2Relation1]')
-        .internalOptions({keepImplicitJoinProps: true})
+        .internalOptions({ keepImplicitJoinProps: true })
         .modifyEager('model1Relation1', qb => qb.select('Model1.id'))
         .modifyEager('model1Relation2', qb => qb.select('model2.id_col').orderBy('model2.id_col'))
         .modifyEager('model1Relation2.model2Relation1', qb =>
@@ -1062,7 +1060,7 @@ module.exports = session => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
           .joinEager('model1Relation2')
-          .eagerOptions({joinOperation: 'innerJoin'})
+          .eagerOptions({ joinOperation: 'innerJoin' })
           .orderBy(['Model1.id', 'model1Relation2.id_col'])
           .then(models => {
             // With innerJoin we should only get `Model1` instances that have one
@@ -1128,7 +1126,7 @@ module.exports = session => {
           .where('model1Relation2.id_col', 2)
           .where('model1Relation2->model2Relation1.id', 6)
           .joinEager('[model1Relation1, model1Relation2.model2Relation1]')
-          .eagerOptions({separator: '->'})
+          .eagerOptions({ separator: '->' })
           .then(models => {
             expect(models).to.eql([
               {
@@ -1309,11 +1307,11 @@ module.exports = session => {
           .where('Model1.id', 1)
           .eager('[model1Relation1.model1Relation1.model1Relation1.model1Relation1]')
           .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .eagerOptions({minimize: false})
+          .eagerOptions({ minimize: false })
           .runBefore((result, builder) => {
             // Call in runBefore to test the EeagerOperation.clone method.
             // This doesn't need to be called in a runBefore.
-            builder.eagerOptions({minimize: true});
+            builder.eagerOptions({ minimize: true });
           })
           .then(models => {
             expect(models).to.eql([
@@ -2042,27 +2040,27 @@ module.exports = session => {
                 expect(models).to.eql([
                   {
                     model1Prop1: 'hello 8',
-                    model1Relation1: {model1Prop1: 'hello 9', $afterGetCalled: 1},
+                    model1Relation1: { model1Prop1: 'hello 9', $afterGetCalled: 1 },
                     $afterGetCalled: 1
                   },
                   {
                     model1Prop1: 'hello 6',
-                    model1Relation1: {model1Prop1: 'hello 7', $afterGetCalled: 1},
+                    model1Relation1: { model1Prop1: 'hello 7', $afterGetCalled: 1 },
                     $afterGetCalled: 1
                   },
                   {
                     model1Prop1: 'hello 3',
-                    model1Relation1: {model1Prop1: 'hello 4', $afterGetCalled: 1},
+                    model1Relation1: { model1Prop1: 'hello 4', $afterGetCalled: 1 },
                     $afterGetCalled: 1
                   },
                   {
                     model1Prop1: 'hello 2',
-                    model1Relation1: {model1Prop1: 'hello 3', $afterGetCalled: 1},
+                    model1Relation1: { model1Prop1: 'hello 3', $afterGetCalled: 1 },
                     $afterGetCalled: 1
                   },
                   {
                     model1Prop1: 'hello 1',
-                    model1Relation1: {model1Prop1: 'hello 2', $afterGetCalled: 1},
+                    model1Relation1: { model1Prop1: 'hello 2', $afterGetCalled: 1 },
                     $afterGetCalled: 1
                   }
                 ]);
@@ -2286,7 +2284,7 @@ module.exports = session => {
                 });
               });
           },
-          {concurrency: 1}
+          { concurrency: 1 }
         );
       });
 
@@ -2366,7 +2364,7 @@ module.exports = session => {
                   f1: builder => builder.select('id')
                 }
               )
-              .findOne({'m1.id': 1})
+              .findOne({ 'm1.id': 1 })
               .then(model => {
                 expect(model).to.eql({
                   id: 1,
@@ -2379,7 +2377,7 @@ module.exports = session => {
                 });
               });
           },
-          {concurrency: 1}
+          { concurrency: 1 }
         );
       });
     });
@@ -2546,7 +2544,7 @@ module.exports = session => {
                   expect(got).to.eql(expected);
                 });
             },
-            {concurrency: 1}
+            { concurrency: 1 }
           );
         });
 

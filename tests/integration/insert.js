@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
@@ -36,7 +34,7 @@ module.exports = session => {
       });
 
       it('should insert new model', () => {
-        let model = Model1.fromJson({model1Prop1: 'hello 3'});
+        let model = Model1.fromJson({ model1Prop1: 'hello 3' });
 
         return Model1.query()
           .insert(model)
@@ -60,13 +58,13 @@ module.exports = session => {
           type: 'object',
           additionalProperties: false,
           properties: {
-            model1Prop1: {type: 'string'},
-            model2Prop2: {type: 'number'}
+            model1Prop1: { type: 'string' },
+            model2Prop2: { type: 'number' }
           }
         };
 
         return Mod.query()
-          .insert({model1Prop1: 'hello 3'})
+          .insert({ model1Prop1: 'hello 3' })
           .then(inserted => {
             expect(inserted).to.be.a(Mod);
             expect(inserted.$beforeInsertCalled).to.equal(1);
@@ -103,7 +101,7 @@ module.exports = session => {
       });
 
       it('should insert new model with identifier', () => {
-        let model = Model1.fromJson({id: 1000, model1Prop1: 'hello 3'});
+        let model = Model1.fromJson({ id: 1000, model1Prop1: 'hello 3' });
 
         return Model1.query()
           .insert(model)
@@ -116,7 +114,7 @@ module.exports = session => {
             return session.knex(Model1.tableName);
           })
           .then(rows => {
-            expect(_.filter(rows, {id: 1000, model1Prop1: 'hello 3'})).to.have.length(1);
+            expect(_.filter(rows, { id: 1000, model1Prop1: 'hello 3' })).to.have.length(1);
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
       });
@@ -124,8 +122,8 @@ module.exports = session => {
       if (session.isPostgres()) {
         it('should accept an array', () => {
           let models = [
-            Model1.fromJson({model1Prop1: 'hello 3'}),
-            Model1.fromJson({model1Prop1: 'hello 4'})
+            Model1.fromJson({ model1Prop1: 'hello 3' }),
+            Model1.fromJson({ model1Prop1: 'hello 4' })
           ];
 
           return Model1.query()
@@ -155,7 +153,7 @@ module.exports = session => {
 
       it('should accept json', () => {
         return Model1.query()
-          .insert({model1Prop1: 'hello 3'})
+          .insert({ model1Prop1: 'hello 3' })
           .then(inserted => {
             expect(inserted).to.be.a(Model1);
             expect(inserted.id).to.eql(3);
@@ -180,14 +178,14 @@ module.exports = session => {
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'test 2']);
-            expect(_.find(rows, {id: 3, model1Prop1: 'test 2'}).model1Prop2).to.equal(13);
+            expect(_.find(rows, { id: 3, model1Prop1: 'test 2' }).model1Prop2).to.equal(13);
           });
       });
 
       if (session.isPostgres()) {
         it('should accept a json array', () => {
           return Model1.query()
-            .insert([{model1Prop1: 'hello 3'}, {model1Prop1: 'hello 4'}])
+            .insert([{ model1Prop1: 'hello 3' }, { model1Prop1: 'hello 4' }])
             .then(inserted => {
               expect(inserted[0]).to.be.a(Model1);
               expect(inserted[1]).to.be.a(Model1);
@@ -208,7 +206,7 @@ module.exports = session => {
 
         it('returning("*") should return all columns', () => {
           return Model1.query()
-            .insert({model1Prop1: 'hello 3'})
+            .insert({ model1Prop1: 'hello 3' })
             .returning('*')
             .then(inserted => {
               expect(inserted).to.be.a(Model1);
@@ -228,11 +226,11 @@ module.exports = session => {
 
         it('returning("someColumn") should only return that `someColumn`', () => {
           return Model1.query()
-            .insert({model1Prop1: Model1.raw("'hello' || ' 3'")})
+            .insert({ model1Prop1: Model1.raw("'hello' || ' 3'") })
             .returning('model1Prop1')
             .then(inserted => {
               expect(inserted).to.be.a(Model1);
-              expect(inserted.$toJson()).to.eql({model1Prop1: 'hello 3'});
+              expect(inserted.$toJson()).to.eql({ model1Prop1: 'hello 3' });
               return session.knex(Model1.tableName);
             })
             .then(rows => {
@@ -246,14 +244,14 @@ module.exports = session => {
         let ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           properties: {
-            id: {type: ['number', 'null']},
-            model1Prop1: {type: 'string'},
-            model1Prop2: {type: 'number'}
+            id: { type: ['number', 'null'] },
+            model1Prop1: { type: 'string' },
+            model1Prop2: { type: 'number' }
           }
         });
 
         ModelWithSchema.query()
-          .insert({model1Prop1: 666})
+          .insert({ model1Prop1: 666 })
           .then(x => {
             done(new Error('should not get here'));
           })
@@ -280,9 +278,9 @@ module.exports = session => {
         let ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           properties: {
-            id: {type: ['number', 'null']},
-            model1Prop1: {type: 'string'},
-            model1Prop2: {type: 'number'}
+            id: { type: ['number', 'null'] },
+            model1Prop1: { type: 'string' },
+            model1Prop2: { type: 'number' }
           }
         });
 
@@ -291,7 +289,7 @@ module.exports = session => {
         };
 
         ModelWithSchema.query()
-          .insert({model1Prop1: 666})
+          .insert({ model1Prop1: 666 })
           .then(x => {
             done(new Error('should not get here'));
           })
@@ -330,7 +328,7 @@ module.exports = session => {
         };
 
         return Mod.query()
-          .insert({model1Prop1: 123, model1Relation1: 666})
+          .insert({ model1Prop1: 123, model1Relation1: 666 })
           .then(inserted => {
             expect(inserted.model1Prop1).to.equal(666);
           });
@@ -362,7 +360,7 @@ module.exports = session => {
       });
 
       it('should insert and fetch new model', () => {
-        let model = Model1.fromJson({model1Prop1: 'hello 3'});
+        let model = Model1.fromJson({ model1Prop1: 'hello 3' });
 
         return Model1.query()
           .insertAndFetch(model)
@@ -386,8 +384,8 @@ module.exports = session => {
 
       if (session.isPostgres()) {
         it('should insert and fetch an array of new models', () => {
-          let model1 = Model1.fromJson({model1Prop1: 'hello 3'});
-          let model2 = Model1.fromJson({model1Prop1: 'hello 4', model1Prop2: 10});
+          let model1 = Model1.fromJson({ model1Prop1: 'hello 3' });
+          let model2 = Model1.fromJson({ model1Prop1: 'hello 4', model1Prop2: 10 });
 
           return Model1.query()
             .insertAndFetch([model1, model2])
@@ -445,7 +443,7 @@ module.exports = session => {
       });
 
       it('should insert new model', () => {
-        return Model1.fromJson({model1Prop1: 'hello 3'})
+        return Model1.fromJson({ model1Prop1: 'hello 3' })
           .$query()
           .insert()
           .then(inserted => {
@@ -505,8 +503,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 2});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 2 });
           });
         });
 
@@ -522,7 +520,7 @@ module.exports = session => {
 
               return parent1
                 .$relatedQuery('model1Relation1')
-                .insert(Model1.fromJson({model1Prop1: 'test'}));
+                .insert(Model1.fromJson({ model1Prop1: 'test' }));
             })
             .then($inserted => {
               inserted = $inserted;
@@ -536,8 +534,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id: parent1.id}).model1Id).to.equal(3);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: parent1.id }).model1Id).to.equal(3);
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
             });
         });
 
@@ -545,7 +543,7 @@ module.exports = session => {
           let inserted = null;
           return parent1
             .$relatedQuery('model1Relation1')
-            .insert({model1Prop1: 'inserted'})
+            .insert({ model1Prop1: 'inserted' })
             .then($inserted => {
               inserted = $inserted;
               expect(inserted.$beforeInsertCalled).to.equal(1);
@@ -558,8 +556,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id: parent1.id}).model1Id).to.equal(3);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('inserted');
+              expect(_.find(rows, { id: parent1.id }).model1Id).to.equal(3);
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('inserted');
             });
         });
 
@@ -567,9 +565,9 @@ module.exports = session => {
           let inserted = null;
           return parent1
             .$relatedQuery('model1Relation1')
-            .insert({model1Prop1: 'inserted'})
+            .insert({ model1Prop1: 'inserted' })
             .then(() => {
-              return parent1.$relatedQuery('model1Relation1').insert({model1Prop1: 'inserted 2'});
+              return parent1.$relatedQuery('model1Relation1').insert({ model1Prop1: 'inserted 2' });
             })
             .then($inserted => {
               inserted = $inserted;
@@ -581,8 +579,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(4);
-              expect(_.find(rows, {id: parent1.id}).model1Id).to.equal(4);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('inserted 2');
+              expect(_.find(rows, { id: parent1.id }).model1Id).to.equal(4);
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('inserted 2');
             });
         });
       });
@@ -606,8 +604,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 2});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 2 });
           });
         });
 
@@ -622,7 +620,7 @@ module.exports = session => {
 
               return parent1
                 .$relatedQuery('model1Relation1Inverse')
-                .insert(Model1.fromJson({model1Prop1: 'test'}));
+                .insert(Model1.fromJson({ model1Prop1: 'test' }));
             })
             .then($inserted => {
               inserted = $inserted;
@@ -636,8 +634,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id: inserted.id}).model1Id).to.equal(parent1.id);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: inserted.id }).model1Id).to.equal(parent1.id);
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
             });
         });
 
@@ -650,7 +648,9 @@ module.exports = session => {
             .then(model => {
               expect(model).to.eql(undefined);
 
-              return parent1.$relatedQuery('model1Relation1Inverse').insert({model1Prop1: 'test'});
+              return parent1
+                .$relatedQuery('model1Relation1Inverse')
+                .insert({ model1Prop1: 'test' });
             })
             .then($inserted => {
               inserted = $inserted;
@@ -664,8 +664,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id: inserted.id}).model1Id).to.equal(parent1.id);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: inserted.id }).model1Id).to.equal(parent1.id);
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
             });
         });
       });
@@ -703,8 +703,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 2});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 2 });
           });
         });
 
@@ -720,7 +720,7 @@ module.exports = session => {
 
               return parent1
                 .$relatedQuery('model1Relation2')
-                .insert(Model2.fromJson({model2Prop1: 'test'}));
+                .insert(Model2.fromJson({ model2Prop1: 'test' }));
             })
             .then($inserted => {
               inserted = $inserted;
@@ -735,8 +735,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id_col: inserted.idCol}).model1_id).to.equal(parent1.id);
-              expect(_.find(rows, {id_col: inserted.idCol}).model2_prop1).to.equal('test');
+              expect(_.find(rows, { id_col: inserted.idCol }).model1_id).to.equal(parent1.id);
+              expect(_.find(rows, { id_col: inserted.idCol }).model2_prop1).to.equal('test');
             });
         });
 
@@ -750,7 +750,7 @@ module.exports = session => {
               originalRelated = models;
               expect(models).to.have.length(1);
 
-              return parent1.$relatedQuery('model1Relation2').insert({model2Prop1: 'test'});
+              return parent1.$relatedQuery('model1Relation2').insert({ model2Prop1: 'test' });
             })
             .then($inserted => {
               inserted = $inserted;
@@ -765,8 +765,8 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expect(_.find(rows, {id_col: inserted.idCol}).model1_id).to.equal(parent1.id);
-              expect(_.find(rows, {id_col: inserted.idCol}).model2_prop1).to.equal('test');
+              expect(_.find(rows, { id_col: inserted.idCol }).model1_id).to.equal(parent1.id);
+              expect(_.find(rows, { id_col: inserted.idCol }).model2_prop1).to.equal('test');
             });
         });
 
@@ -784,8 +784,8 @@ module.exports = session => {
                 return parent1
                   .$relatedQuery('model1Relation2')
                   .insert([
-                    Model2.fromJson({model2Prop1: 'test 1'}),
-                    Model2.fromJson({model2Prop1: 'test 2'})
+                    Model2.fromJson({ model2Prop1: 'test 1' }),
+                    Model2.fromJson({ model2Prop1: 'test 2' })
                   ]);
               })
               .then($inserted => {
@@ -803,10 +803,10 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model2_prop1).to.equal('test 1');
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model2_prop1).to.equal('test 2');
+                expect(_.find(rows, { id_col: inserted[0].idCol }).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, { id_col: inserted[0].idCol }).model2_prop1).to.equal('test 1');
+                expect(_.find(rows, { id_col: inserted[1].idCol }).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, { id_col: inserted[1].idCol }).model2_prop1).to.equal('test 2');
               });
           });
 
@@ -822,7 +822,7 @@ module.exports = session => {
 
                 return parent1
                   .$relatedQuery('model1Relation2')
-                  .insert([{model2Prop1: 'test 1'}, {model2Prop1: 'test 2'}]);
+                  .insert([{ model2Prop1: 'test 1' }, { model2Prop1: 'test 2' }]);
               })
               .then($inserted => {
                 inserted = $inserted;
@@ -843,10 +843,10 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[0].idCol}).model2_prop1).to.equal('test 1');
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model1_id).to.equal(parent1.id);
-                expect(_.find(rows, {id_col: inserted[1].idCol}).model2_prop1).to.equal('test 2');
+                expect(_.find(rows, { id_col: inserted[0].idCol }).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, { id_col: inserted[0].idCol }).model2_prop1).to.equal('test 1');
+                expect(_.find(rows, { id_col: inserted[1].idCol }).model1_id).to.equal(parent1.id);
+                expect(_.find(rows, { id_col: inserted[1].idCol }).model2_prop1).to.equal('test 2');
               });
           });
         }
@@ -897,8 +897,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model2.query().then(parents => {
-            parent1 = _.find(parents, {idCol: 1});
-            parent2 = _.find(parents, {idCol: 2});
+            parent1 = _.find(parents, { idCol: 1 });
+            parent2 = _.find(parents, { idCol: 2 });
           });
         });
 
@@ -913,7 +913,7 @@ module.exports = session => {
               expect(models).to.have.length(1);
               return parent1
                 .$relatedQuery('model2Relation1')
-                .insert(Model1.fromJson({model1Prop1: 'test'}));
+                .insert(Model1.fromJson({ model1Prop1: 'test' }));
             })
             .then($inserted => {
               inserted = $inserted;
@@ -927,13 +927,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
               return session.knex('Model1Model2');
             })
             .then(rows => {
               expect(rows).to.have.length(3);
               expect(
-                _.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol})
+                _.filter(rows, { model1Id: inserted.id, model2Id: parent1.idCol })
               ).to.have.length(1);
             });
         });
@@ -948,7 +948,7 @@ module.exports = session => {
               originalRelated = models;
               expect(models).to.have.length(1);
 
-              return parent1.$relatedQuery('model2Relation1').insert({model1Prop1: 'test'});
+              return parent1.$relatedQuery('model2Relation1').insert({ model1Prop1: 'test' });
             })
             .then($inserted => {
               inserted = $inserted;
@@ -962,13 +962,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
               return session.knex('Model1Model2');
             })
             .then(rows => {
               expect(rows).to.have.length(3);
               expect(
-                _.filter(rows, {model1Id: inserted.id, model2Id: parent1.idCol})
+                _.filter(rows, { model1Id: inserted.id, model2Id: parent1.idCol })
               ).to.have.length(1);
             });
         });
@@ -987,8 +987,8 @@ module.exports = session => {
                 return parent1
                   .$relatedQuery('model2Relation1')
                   .insert([
-                    Model1.fromJson({model1Prop1: 'test 1'}),
-                    Model1.fromJson({model1Prop1: 'test 2'})
+                    Model1.fromJson({ model1Prop1: 'test 1' }),
+                    Model1.fromJson({ model1Prop1: 'test 2' })
                   ]);
               })
               .then($inserted => {
@@ -1004,17 +1004,17 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(6);
-                expect(_.find(rows, {id: inserted[0].id}).model1Prop1).to.equal('test 1');
-                expect(_.find(rows, {id: inserted[1].id}).model1Prop1).to.equal('test 2');
+                expect(_.find(rows, { id: inserted[0].id }).model1Prop1).to.equal('test 1');
+                expect(_.find(rows, { id: inserted[1].id }).model1Prop1).to.equal('test 2');
                 return session.knex('Model1Model2');
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
                 expect(
-                  _.filter(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})
+                  _.filter(rows, { model1Id: inserted[0].id, model2Id: parent1.idCol })
                 ).to.have.length(1);
                 expect(
-                  _.filter(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})
+                  _.filter(rows, { model1Id: inserted[1].id, model2Id: parent1.idCol })
                 ).to.have.length(1);
               });
           });
@@ -1031,7 +1031,7 @@ module.exports = session => {
 
                 return parent1
                   .$relatedQuery('model2Relation1')
-                  .insert([{model1Prop1: 'test 1'}, {model1Prop1: 'test 2'}]);
+                  .insert([{ model1Prop1: 'test 1' }, { model1Prop1: 'test 2' }]);
               })
               .then($inserted => {
                 inserted = $inserted;
@@ -1050,17 +1050,17 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(6);
-                expect(_.find(rows, {id: inserted[0].id}).model1Prop1).to.equal('test 1');
-                expect(_.find(rows, {id: inserted[1].id}).model1Prop1).to.equal('test 2');
+                expect(_.find(rows, { id: inserted[0].id }).model1Prop1).to.equal('test 1');
+                expect(_.find(rows, { id: inserted[1].id }).model1Prop1).to.equal('test 2');
                 return session.knex('Model1Model2');
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
                 expect(
-                  _.filter(rows, {model1Id: inserted[0].id, model2Id: parent1.idCol})
+                  _.filter(rows, { model1Id: inserted[0].id, model2Id: parent1.idCol })
                 ).to.have.length(1);
                 expect(
-                  _.filter(rows, {model1Id: inserted[1].id, model2Id: parent1.idCol})
+                  _.filter(rows, { model1Id: inserted[1].id, model2Id: parent1.idCol })
                 ).to.have.length(1);
               });
           });
@@ -1077,7 +1077,7 @@ module.exports = session => {
               expect(models).to.have.length(1);
               return parent1
                 .$relatedQuery('model2Relation1')
-                .insert(Model1.fromJson({model1Prop1: 'test', aliasedExtra: 'foo'}));
+                .insert(Model1.fromJson({ model1Prop1: 'test', aliasedExtra: 'foo' }));
             })
             .then($inserted => {
               inserted = $inserted;
@@ -1089,7 +1089,7 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
               return session.knex('Model1Model2');
             })
             .then(rows => {
@@ -1149,7 +1149,7 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model2.query().then(parents => {
-            parent = _.find(parents, {idCol: 2});
+            parent = _.find(parents, { idCol: 2 });
           });
         });
 
@@ -1161,7 +1161,7 @@ module.exports = session => {
             .then(models => {
               expect(models).to.equal(undefined);
 
-              return parent.$relatedQuery('model2Relation2').insert({model1Prop1: 'test'});
+              return parent.$relatedQuery('model2Relation2').insert({ model1Prop1: 'test' });
             })
             .then($inserted => {
               inserted = $inserted;
@@ -1176,13 +1176,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.find(rows, {id: inserted.id}).model1Prop1).to.equal('test');
+              expect(_.find(rows, { id: inserted.id }).model1Prop1).to.equal('test');
               return session.knex('Model1Model2One');
             })
             .then(rows => {
               expect(rows).to.have.length(1);
               expect(
-                _.filter(rows, {model1Id: inserted.id, model2Id: parent.idCol})
+                _.filter(rows, { model1Id: inserted.id, model2Id: parent.idCol })
               ).to.have.length(1);
             });
         });

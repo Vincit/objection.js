@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 
 describe('main module', () => {

@@ -19,10 +19,10 @@ Hero.jsonSchema = {
   required: ['name'],
 
   properties: {
-    id: {type: 'integer'},
-    name: {type: 'string'},
-    details: {type: ['object', 'array', 'null']},
-    homeId: {type: 'integer'}
+    id: { type: 'integer' },
+    name: { type: 'string' },
+    details: { type: ['object', 'array', 'null'] },
+    homeId: { type: 'integer' }
   }
 };
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
@@ -50,8 +48,8 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(2);
-            expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-            expectPartEql(rows[1], {id: 3, model1Prop1: 'hello 3'});
+            expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+            expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
           });
       });
 
@@ -65,7 +63,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1', model2_prop2: 2});
+            expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1', model2_prop2: 2 });
           });
       });
 
@@ -79,7 +77,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expectPartEql(rows[0], {id: 3, model1Prop1: 'hello 3'});
+            expectPartEql(rows[0], { id: 3, model1Prop1: 'hello 3' });
           });
       });
 
@@ -93,14 +91,14 @@ module.exports = session => {
             .returning('*')
             .then(deletedObjects => {
               expect(deletedObjects).to.have.length(2);
-              deleted1 = _.find(deletedObjects, {id: 1});
+              deleted1 = _.find(deletedObjects, { id: 1 });
               expect(deleted1).to.be.a(Model1);
-              expectPartEql(deleted1, {id: 1, model1Prop1: 'hello 1'});
+              expectPartEql(deleted1, { id: 1, model1Prop1: 'hello 1' });
               return session.knex('Model1').orderBy('id');
             })
             .then(rows => {
               expect(rows).to.have.length(1);
-              expectPartEql(rows[0], {id: 3, model1Prop1: 'hello 3'});
+              expectPartEql(rows[0], { id: 3, model1Prop1: 'hello 3' });
             });
         });
       }
@@ -121,7 +119,7 @@ module.exports = session => {
       });
 
       it('should delete a model', () => {
-        let model = Model1.fromJson({id: 1});
+        let model = Model1.fromJson({ id: 1 });
 
         return model
           .$query()
@@ -134,7 +132,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expectPartEql(rows[0], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[0], { id: 2, model1Prop1: 'hello 2' });
           });
       });
 
@@ -184,7 +182,7 @@ module.exports = session => {
       }
 
       it('should should call $beforeDelete and $afterDelete hooks', () => {
-        let model = Model1.fromJson({id: 1});
+        let model = Model1.fromJson({ id: 1 });
 
         model.$beforeDelete = function() {
           let self = this;
@@ -214,7 +212,7 @@ module.exports = session => {
           })
           .then(rows => {
             expect(rows).to.have.length(1);
-            expectPartEql(rows[0], {id: 2, model1Prop1: 'hello 2'});
+            expectPartEql(rows[0], { id: 2, model1Prop1: 'hello 2' });
           });
       });
     });
@@ -247,8 +245,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 3});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 3 });
           });
         });
 
@@ -262,9 +260,9 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 3, model1Prop1: 'hello 3'});
-              expectPartEql(rows[2], {id: 4, model1Prop1: 'hello 4'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
+              expectPartEql(rows[2], { id: 4, model1Prop1: 'hello 4' });
             });
         });
 
@@ -277,14 +275,14 @@ module.exports = session => {
               .returning('*')
               .then(deletedObject => {
                 expect(deletedObject).to.be.a(Model1);
-                expectPartEql(deletedObject, {id: 2, model1Prop1: 'hello 2'});
+                expectPartEql(deletedObject, { id: 2, model1Prop1: 'hello 2' });
                 return session.knex('Model1').orderBy('id');
               })
               .then(rows => {
                 expect(rows).to.have.length(3);
-                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-                expectPartEql(rows[1], {id: 3, model1Prop1: 'hello 3'});
-                expectPartEql(rows[2], {id: 4, model1Prop1: 'hello 4'});
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
+                expectPartEql(rows[2], { id: 4, model1Prop1: 'hello 4' });
               });
           });
         }
@@ -299,9 +297,9 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-              expectPartEql(rows[2], {id: 3, model1Prop1: 'hello 3'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'hello 3' });
             });
         });
       });
@@ -359,8 +357,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 2});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 2 });
           });
         });
 
@@ -374,9 +372,9 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expectPartEql(rows[0], {id_col: 4, model2_prop1: 'text 4'});
-              expectPartEql(rows[1], {id_col: 5, model2_prop1: 'text 5'});
-              expectPartEql(rows[2], {id_col: 6, model2_prop1: 'text 6'});
+              expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
+              expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
+              expectPartEql(rows[2], { id_col: 6, model2_prop1: 'text 6' });
             });
         });
 
@@ -390,16 +388,16 @@ module.exports = session => {
               .returning('*')
               .then(deletedObjects => {
                 expect(deletedObjects).to.have.length(3);
-                child1 = _.find(deletedObjects, {idCol: 1});
+                child1 = _.find(deletedObjects, { idCol: 1 });
                 expect(child1).to.be.a(Model2);
-                expectPartEql(child1, {idCol: 1, model2Prop1: 'text 1'});
+                expectPartEql(child1, { idCol: 1, model2Prop1: 'text 1' });
                 return session.knex('model2').orderBy('id_col');
               })
               .then(rows => {
                 expect(rows).to.have.length(3);
-                expectPartEql(rows[0], {id_col: 4, model2_prop1: 'text 4'});
-                expectPartEql(rows[1], {id_col: 5, model2_prop1: 'text 5'});
-                expectPartEql(rows[2], {id_col: 6, model2_prop1: 'text 6'});
+                expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
+                expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
+                expectPartEql(rows[2], { id_col: 6, model2_prop1: 'text 6' });
               });
           });
         }
@@ -415,11 +413,11 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1'});
-              expectPartEql(rows[1], {id_col: 3, model2_prop1: 'text 3'});
-              expectPartEql(rows[2], {id_col: 4, model2_prop1: 'text 4'});
-              expectPartEql(rows[3], {id_col: 5, model2_prop1: 'text 5'});
-              expectPartEql(rows[4], {id_col: 6, model2_prop1: 'text 6'});
+              expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
+              expectPartEql(rows[1], { id_col: 3, model2_prop1: 'text 3' });
+              expectPartEql(rows[2], { id_col: 4, model2_prop1: 'text 4' });
+              expectPartEql(rows[3], { id_col: 5, model2_prop1: 'text 5' });
+              expectPartEql(rows[4], { id_col: 6, model2_prop1: 'text 6' });
             });
         });
 
@@ -435,10 +433,10 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(4);
-              expectPartEql(rows[0], {id_col: 1, model2_prop1: 'text 1'});
-              expectPartEql(rows[1], {id_col: 4, model2_prop1: 'text 4'});
-              expectPartEql(rows[2], {id_col: 5, model2_prop1: 'text 5'});
-              expectPartEql(rows[3], {id_col: 6, model2_prop1: 'text 6'});
+              expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
+              expectPartEql(rows[1], { id_col: 4, model2_prop1: 'text 4' });
+              expectPartEql(rows[2], { id_col: 5, model2_prop1: 'text 5' });
+              expectPartEql(rows[3], { id_col: 6, model2_prop1: 'text 6' });
             });
         });
       });
@@ -508,8 +506,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model2.query().then(parents => {
-            parent1 = _.find(parents, {idCol: 1});
-            parent2 = _.find(parents, {idCol: 2});
+            parent1 = _.find(parents, { idCol: 1 });
+            parent2 = _.find(parents, { idCol: 2 });
           });
         });
 
@@ -523,11 +521,11 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-              expectPartEql(rows[2], {id: 6, model1Prop1: 'blaa 4'});
-              expectPartEql(rows[3], {id: 7, model1Prop1: 'blaa 5'});
-              expectPartEql(rows[4], {id: 8, model1Prop1: 'blaa 6'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[3], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[4], { id: 8, model1Prop1: 'blaa 6' });
             });
         });
 
@@ -542,13 +540,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(7);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-              expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
-              expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
-              expectPartEql(rows[4], {id: 6, model1Prop1: 'blaa 4'});
-              expectPartEql(rows[5], {id: 7, model1Prop1: 'blaa 5'});
-              expectPartEql(rows[6], {id: 8, model1Prop1: 'blaa 6'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
             });
         });
 
@@ -564,12 +562,12 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-              expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
-              expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
-              expectPartEql(rows[4], {id: 5, model1Prop1: 'blaa 3'});
-              expectPartEql(rows[5], {id: 7, model1Prop1: 'blaa 5'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 5, model1Prop1: 'blaa 3' });
+              expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
             });
         });
 
@@ -585,19 +583,19 @@ module.exports = session => {
               .returning('*')
               .then(deletedObjects => {
                 expect(deletedObjects).to.have.length(2);
-                child1 = _.find(deletedObjects, {id: 6});
+                child1 = _.find(deletedObjects, { id: 6 });
                 expect(child1).to.be.a(Model1);
-                expectPartEql(child1, {id: 6, model1Prop1: 'blaa 4'});
+                expectPartEql(child1, { id: 6, model1Prop1: 'blaa 4' });
                 return session.knex('Model1').orderBy('Model1.id');
               })
               .then(rows => {
                 expect(rows).to.have.length(6);
-                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-                expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-                expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
-                expectPartEql(rows[3], {id: 4, model1Prop1: 'blaa 2'});
-                expectPartEql(rows[4], {id: 5, model1Prop1: 'blaa 3'});
-                expectPartEql(rows[5], {id: 7, model1Prop1: 'blaa 5'});
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+                expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+                expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+                expectPartEql(rows[4], { id: 5, model1Prop1: 'blaa 3' });
+                expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
               });
           });
         }
@@ -613,12 +611,12 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-              expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
-              expectPartEql(rows[3], {id: 6, model1Prop1: 'blaa 4'});
-              expectPartEql(rows[4], {id: 7, model1Prop1: 'blaa 5'});
-              expectPartEql(rows[5], {id: 8, model1Prop1: 'blaa 6'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[4], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[5], { id: 8, model1Prop1: 'blaa 6' });
             });
         });
       });
@@ -663,7 +661,7 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model2.query().then(parents => {
-            parent = _.find(parents, {idCol: 2});
+            parent = _.find(parents, { idCol: 2 });
           });
         });
 
@@ -677,9 +675,9 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-              expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-              expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
             });
         });
 
@@ -692,14 +690,14 @@ module.exports = session => {
               .returning('*')
               .then(deletedObject => {
                 expect(deletedObject).to.be.a(Model1);
-                expectPartEql(deletedObject, {id: 4, model1Prop1: 'blaa 2'});
+                expectPartEql(deletedObject, { id: 4, model1Prop1: 'blaa 2' });
                 return session.knex('Model1').orderBy('Model1.id');
               })
               .then(rows => {
                 expect(rows).to.have.length(3);
-                expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
-                expectPartEql(rows[1], {id: 2, model1Prop1: 'hello 2'});
-                expectPartEql(rows[2], {id: 3, model1Prop1: 'blaa 1'});
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+                expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
               });
           });
         }
