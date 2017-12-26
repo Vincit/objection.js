@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
@@ -9,11 +7,15 @@ module.exports = session => {
       return session.populate([
         {
           model1Prop1: 'a',
-          model1Relation2: [{model2_prop1: 'one'}, {model2_prop1: 'two'}, {model2_prop1: 'three'}]
+          model1Relation2: [
+            { model2_prop1: 'one' },
+            { model2_prop1: 'two' },
+            { model2_prop1: 'three' }
+          ]
         },
         {
           model1Prop1: 'b',
-          model1Relation2: [{model2_prop1: 'four'}, {model2_prop1: 'five'}]
+          model1Relation2: [{ model2_prop1: 'four' }, { model2_prop1: 'five' }]
         }
       ]);
     });

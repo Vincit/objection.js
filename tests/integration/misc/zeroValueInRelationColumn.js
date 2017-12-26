@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
@@ -61,10 +59,10 @@ module.exports = session => {
 
     before(() => {
       return Promise.all([
-        Table1.query().insert({id: 1, value: 0}),
-        Table1.query().insert({id: 2, value: 1}),
-        Table2.query().insert({id: 1, value: 0}),
-        Table2.query().insert({id: 2, value: 1})
+        Table1.query().insert({ id: 1, value: 0 }),
+        Table1.query().insert({ id: 2, value: 1 }),
+        Table2.query().insert({ id: 1, value: 0 }),
+        Table2.query().insert({ id: 2, value: 1 })
       ]);
     });
 
@@ -75,7 +73,7 @@ module.exports = session => {
           return model.$relatedQuery('relation');
         })
         .then(models => {
-          expect(models).to.eql([{id: 1, value: 0}]);
+          expect(models).to.eql([{ id: 1, value: 0 }]);
         });
     });
   });

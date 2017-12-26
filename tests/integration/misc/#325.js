@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
@@ -31,9 +29,9 @@ module.exports = session => {
           return {
             type: 'object',
             properties: {
-              id: {type: 'integer'},
-              value1: {type: 'string', default: 'foo'},
-              value2: {type: 'string', default: 'bar'}
+              id: { type: 'integer' },
+              value1: { type: 'string', default: 'foo' },
+              value2: { type: 'string', default: 'bar' }
             }
           };
         }
@@ -48,7 +46,7 @@ module.exports = session => {
 
     it('insert should set the defaults', () => {
       return TestModel.query()
-        .insert({value1: 'hello'})
+        .insert({ value1: 'hello' })
         .then(model => {
           expect(model.value1).to.equal('hello');
           expect(model.value2).to.equal('bar');
@@ -62,7 +60,7 @@ module.exports = session => {
 
     it('insertGraph should set the defaults', () => {
       return TestModel.query()
-        .insertGraph({value1: 'hello'})
+        .insertGraph({ value1: 'hello' })
         .then(model => {
           expect(model.value1).to.equal('hello');
           expect(model.value2).to.equal('bar');

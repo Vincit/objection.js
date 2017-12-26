@@ -6654,7 +6654,7 @@ Type|Description
 #### $clone
 
 ```js
-const clone = modelInstance.$clone;
+const clone = modelInstance.$clone();
 ```
 
 Returns a deep copy of this model.

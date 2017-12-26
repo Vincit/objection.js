@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('chai').expect;
 const Model = require('../../../').Model;
 const snakeCaseMappers = require('../../../').snakeCaseMappers;
@@ -93,7 +91,7 @@ module.exports = session => {
                 through: {
                   from: 'Model1Model2.model2Id',
                   to: 'Model1Model2.model1Id',
-                  extra: {aliasedExtra: 'extra3'}
+                  extra: { aliasedExtra: 'extra3' }
                 },
                 to: 'Model1.id'
               }
@@ -133,7 +131,7 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query()
-            .findOne({model1Prop1: 'root'})
+            .findOne({ model1Prop1: 'root' })
             .then(model => {
               root = model;
             });
@@ -142,12 +140,12 @@ module.exports = session => {
         it('belongs to one relation', () => {
           return root
             .$relatedQuery('model1Relation1')
-            .insert({model1Prop1: 'new'})
-            .mergeContext({belongsToOneValue: 42})
+            .insert({ model1Prop1: 'new' })
+            .mergeContext({ belongsToOneValue: 42 })
             .then(model => {
               return session
                 .knex(Model1.tableName)
-                .where({model1Prop1: 'new'})
+                .where({ model1Prop1: 'new' })
                 .first();
             })
             .then(row => {
@@ -158,12 +156,12 @@ module.exports = session => {
         it('has many relation', () => {
           return root
             .$relatedQuery('model1Relation2')
-            .insert({model2Prop1: 'new'})
-            .mergeContext({hasManyValue: 100})
+            .insert({ model2Prop1: 'new' })
+            .mergeContext({ hasManyValue: 100 })
             .then(model => {
               return session
                 .knex(Model2.tableName)
-                .where({model2_prop1: 'new'})
+                .where({ model2_prop1: 'new' })
                 .first();
             })
             .then(row => {
@@ -174,7 +172,7 @@ module.exports = session => {
         it('many to many relation (insert)', () => {
           return root
             .$relatedQuery('model1Relation3')
-            .insert({model2Prop1: 'new'})
+            .insert({ model2Prop1: 'new' })
             .mergeContext({
               manyToManyValue: 7,
               manyToManyJoinValue: 'Hello'
@@ -182,7 +180,7 @@ module.exports = session => {
             .then(model => {
               return session
                 .knex(Model2.tableName)
-                .where({model2_prop1: 'new'})
+                .where({ model2_prop1: 'new' })
                 .first();
             })
             .then(row => {
@@ -197,7 +195,7 @@ module.exports = session => {
 
         it('many to many relation (relate)', () => {
           return Model2.query()
-            .insert({model2Prop1: 'rel'})
+            .insert({ model2Prop1: 'rel' })
             .then(model => {
               return root
                 .$relatedQuery('model1Relation3')
@@ -250,7 +248,7 @@ module.exports = session => {
             })
             .then(() => {
               return Model1.query()
-                .findOne({model1Prop1: 'parent'})
+                .findOne({ model1Prop1: 'parent' })
                 .eager('[model1Relation1, model1Relation2, model1Relation3]')
                 .then(model => {
                   expect(model).to.containSubset({
@@ -347,7 +345,7 @@ module.exports = session => {
             })
             .then(() => {
               return Model1.query()
-                .findOne({model1Prop1: 'parent'})
+                .findOne({ model1Prop1: 'parent' })
                 .eager('[model1Relation1, model1Relation2, model1Relation3]')
                 .then(model => {
                   expect(model).to.containSubset({

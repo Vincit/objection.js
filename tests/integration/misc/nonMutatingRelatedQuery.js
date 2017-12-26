@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('chai').expect;
 const Model = require('../../../').Model;
@@ -63,7 +61,7 @@ module.exports = session => {
     describe('find', () => {
       it('belongs to one', () => {
         return ModelOne.query()
-          .findOne({model1Prop1: 'root'})
+          .findOne({ model1Prop1: 'root' })
           .then(model => {
             return model.$relatedQuery('model1Relation1').return(model);
           })
@@ -79,7 +77,7 @@ module.exports = session => {
 
       it('has many', () => {
         return ModelOne.query()
-          .findOne({model1Prop1: 'root'})
+          .findOne({ model1Prop1: 'root' })
           .then(model => {
             return model.$relatedQuery('model1Relation2').return(model);
           })
@@ -95,7 +93,7 @@ module.exports = session => {
 
       it('many to many', () => {
         return ModelOne.query()
-          .findOne({model1Prop1: 'root'})
+          .findOne({ model1Prop1: 'root' })
           .then(model => {
             return model.$relatedQuery('model1Relation3').return(model);
           })
@@ -113,11 +111,11 @@ module.exports = session => {
     describe('insert', () => {
       it('belongs to one', () => {
         return ModelOne.query()
-          .findOne({model1Prop1: 'root'})
+          .findOne({ model1Prop1: 'root' })
           .then(model => {
             return model
               .$relatedQuery('model1Relation1')
-              .insert({id: 10, model1Prop1: 'new'})
+              .insert({ id: 10, model1Prop1: 'new' })
               .return(model);
           })
           .then(model => {
@@ -132,11 +130,11 @@ module.exports = session => {
 
       it('has many', () => {
         return ModelOne.query()
-          .findOne({model1Prop1: 'root'})
+          .findOne({ model1Prop1: 'root' })
           .then(model => {
             return model
               .$relatedQuery('model1Relation2')
-              .insert({model2Prop1: 'new'})
+              .insert({ model2Prop1: 'new' })
               .return(model);
           })
           .then(model => {
@@ -151,11 +149,11 @@ module.exports = session => {
 
       it('many to many', () => {
         return ModelOne.query()
-          .findOne({model1Prop1: 'root'})
+          .findOne({ model1Prop1: 'root' })
           .then(model => {
             return model
               .$relatedQuery('model1Relation3')
-              .insert({model2Prop1: 'new'})
+              .insert({ model2Prop1: 'new' })
               .return(model);
           })
           .then(model => {

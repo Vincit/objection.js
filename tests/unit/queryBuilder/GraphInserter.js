@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash'),
   Knex = require('knex'),
   expect = require('expect.js'),
@@ -19,7 +17,7 @@ describe('GraphInserter', () => {
   let Movie = null;
 
   before(() => {
-    let knex = Knex({client: 'pg'});
+    let knex = Knex({ client: 'pg' });
 
     mockKnex = knexMocker(knex, function(mock, oldImpl, args) {
       executedQueries.push(this.toString());
@@ -582,7 +580,7 @@ describe('GraphInserter', () => {
         models: models,
         // children.pets is missing.
         allowedRelations: '[parent, children, pets, movies.actors]',
-        expectErrorWithData: {allowedRelations: 'trying to insert an unallowed relation'}
+        expectErrorWithData: { allowedRelations: 'trying to insert an unallowed relation' }
       });
     });
 
@@ -592,7 +590,7 @@ describe('GraphInserter', () => {
         models: models,
         // movies.actors missing.
         allowedRelations: '[parent, children.pets, pets, movies]',
-        expectErrorWithData: {allowedRelations: 'trying to insert an unallowed relation'}
+        expectErrorWithData: { allowedRelations: 'trying to insert an unallowed relation' }
       });
     });
 
@@ -602,7 +600,7 @@ describe('GraphInserter', () => {
         models: models,
         // parent missing.
         allowedRelations: '[children.pets, pets, movies.actors]',
-        expectErrorWithData: {allowedRelations: 'trying to insert an unallowed relation'}
+        expectErrorWithData: { allowedRelations: 'trying to insert an unallowed relation' }
       });
     });
   });
@@ -962,7 +960,7 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
       });
 
       test({
@@ -978,7 +976,7 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
       });
 
       test({
@@ -1004,7 +1002,7 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
       });
 
       test({
@@ -1023,7 +1021,7 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
       });
 
       test({
@@ -1036,7 +1034,7 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: {cyclic: 'the object graph contains cyclic references'}
+        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
       });
     });
 
@@ -1202,7 +1200,7 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: {ref: 'could not resolve reference "child"'}
+        expectErrorWithData: { ref: 'could not resolve reference "child"' }
       });
     });
   });

@@ -1,4 +1,4 @@
-import {transaction} from 'objection';
+import { transaction } from 'objection';
 import Person from './models/Person';
 import Movie from './models/Movie';
 

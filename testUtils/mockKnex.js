@@ -1,7 +1,5 @@
-'use strict';
-
-var _ = require('lodash');
-var knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
+const _ = require('lodash');
+const knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
 
 /**
  * @param {function} knex

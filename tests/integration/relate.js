@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 
@@ -10,7 +8,7 @@ module.exports = session => {
   describe('Model relate queries', () => {
     describe('.$query()', () => {
       it('should reject the query because relate makes no sense in this context', done => {
-        Model1.fromJson({id: 1})
+        Model1.fromJson({ id: 1 })
           .$query()
           .relate(1)
           .then(() => {
@@ -47,9 +45,9 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(models => {
-            model1 = _.find(models, {id: 1});
-            model2 = _.find(models, {id: 2});
-            model3 = _.find(models, {id: 3});
+            model1 = _.find(models, { id: 1 });
+            model2 = _.find(models, { id: 2 });
+            model3 = _.find(models, { id: 3 });
           });
         });
 
@@ -88,7 +86,7 @@ module.exports = session => {
         it('should relate (object value)', () => {
           return model1
             .$relatedQuery('model1Relation1')
-            .relate({id: model2.id})
+            .relate({ id: model2.id })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
               return session.knex(Model1.tableName).orderBy('id');
@@ -120,7 +118,7 @@ module.exports = session => {
         it('should fail with invalid object value)', done => {
           model1
             .$relatedQuery('model1Relation1')
-            .relate({wrongId: model2.id})
+            .relate({ wrongId: model2.id })
             .then(() => {
               done(new Error('should not get here'));
             })
@@ -221,7 +219,7 @@ module.exports = session => {
             .where('id', 1)
             .first()
             .then(model => {
-              return model.$relatedQuery('model1Relation2').relate({idCol: 2});
+              return model.$relatedQuery('model1Relation2').relate({ idCol: 2 });
             })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
@@ -240,7 +238,7 @@ module.exports = session => {
             .where('id', 1)
             .first()
             .then(model => {
-              return model.$relatedQuery('model1Relation2').relate([{idCol: 2}, {idCol: 3}]);
+              return model.$relatedQuery('model1Relation2').relate([{ idCol: 2 }, { idCol: 3 }]);
             })
             .then(numUpdated => {
               expect(numUpdated).to.equal(2);
@@ -313,16 +311,16 @@ module.exports = session => {
               return model.$relatedQuery('model2Relation1').relate(5);
             })
             .then(res => {
-              expect(res).to.eql({model2Id: 1, model1Id: 5});
+              expect(res).to.eql({ model2Id: 1, model1Id: 5 });
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 5 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 4 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 5 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
             });
         });
 
@@ -335,17 +333,17 @@ module.exports = session => {
                 return model.$relatedQuery('model2Relation1').relate([5, 6]);
               })
               .then(res => {
-                expect(res).to.eql([{model2Id: 1, model1Id: 5}, {model2Id: 1, model1Id: 6}]);
+                expect(res).to.eql([{ model2Id: 1, model1Id: 5 }, { model2Id: 1, model1Id: 6 }]);
                 return session.knex('Model1Model2').orderBy('id');
               })
               .then(rows => {
                 expect(rows).to.have.length(6);
-                expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-                expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-                expect(_.filter(rows, {model2Id: 1, model1Id: 6})).to.have.length(1);
-                expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-                expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-                expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+                expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
+                expect(_.filter(rows, { model2Id: 1, model1Id: 5 })).to.have.length(1);
+                expect(_.filter(rows, { model2Id: 1, model1Id: 6 })).to.have.length(1);
+                expect(_.filter(rows, { model2Id: 2, model1Id: 4 })).to.have.length(1);
+                expect(_.filter(rows, { model2Id: 2, model1Id: 5 })).to.have.length(1);
+                expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
               });
           });
         }
@@ -355,19 +353,19 @@ module.exports = session => {
             .where('id_col', 1)
             .first()
             .then(model => {
-              return model.$relatedQuery('model2Relation1').relate({id: 5});
+              return model.$relatedQuery('model2Relation1').relate({ id: 5 });
             })
             .then(res => {
-              expect(res).to.eql({model2Id: 1, model1Id: 5});
+              expect(res).to.eql({ model2Id: 1, model1Id: 5 });
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 5})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 5 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 4 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 5 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
             });
         });
 
@@ -376,21 +374,23 @@ module.exports = session => {
             .where('id_col', 1)
             .first()
             .then(model => {
-              return model.$relatedQuery('model2Relation1').relate({id: 5, aliasedExtra: 'foobar'});
+              return model
+                .$relatedQuery('model2Relation1')
+                .relate({ id: 5, aliasedExtra: 'foobar' });
             })
             .then(res => {
-              expect(res).to.eql({model2Id: 1, model1Id: 5, extra3: 'foobar'});
+              expect(res).to.eql({ model2Id: 1, model1Id: 5, extra3: 'foobar' });
               return session.knex('Model1Model2').orderBy('id');
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 3})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 5, extra3: 'foobar'})).to.have.length(
+              expect(_.filter(rows, { model2Id: 1, model1Id: 3 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 5, extra3: 'foobar' })).to.have.length(
                 1
               );
-              expect(_.filter(rows, {model2Id: 2, model1Id: 4})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 5})).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 2, model1Id: 6})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 4 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 5 })).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 2, model1Id: 6 })).to.have.length(1);
             });
         });
       });
@@ -424,12 +424,12 @@ module.exports = session => {
               return model.$relatedQuery('model2Relation2').relate(2);
             })
             .then(res => {
-              expect(res).to.eql({model2Id: 1, model1Id: 2});
+              expect(res).to.eql({ model2Id: 1, model1Id: 2 });
               return session.knex('Model1Model2One');
             })
             .then(rows => {
               expect(rows).to.have.length(1);
-              expect(_.filter(rows, {model2Id: 1, model1Id: 2})).to.have.length(1);
+              expect(_.filter(rows, { model2Id: 1, model1Id: 2 })).to.have.length(1);
             });
         });
       });

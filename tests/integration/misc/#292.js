@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const Model = require('../../../').Model;
@@ -115,17 +113,17 @@ module.exports = session => {
         })
         .then(() => {
           return Promise.all([
-            session.knex('a').insert({id: 1}),
-            session.knex('d').insert({id: 1}),
-            session.knex('d').insert({id: 2})
+            session.knex('a').insert({ id: 1 }),
+            session.knex('d').insert({ id: 1 }),
+            session.knex('d').insert({ id: 2 })
           ])
             .then(() => {
-              return session.knex('b').insert({id: 1, aId: 1});
+              return session.knex('b').insert({ id: 1, aId: 1 });
             })
             .then(() => {
               return Promise.all([
-                session.knex('b_d').insert({bId: 1, dId: 1}),
-                session.knex('b_d').insert({bId: 1, dId: 2})
+                session.knex('b_d').insert({ bId: 1, dId: 1 }),
+                session.knex('b_d').insert({ bId: 1, dId: 2 })
               ]);
             });
         });

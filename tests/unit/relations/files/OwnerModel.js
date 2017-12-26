@@ -1,5 +1,3 @@
-'use strict';
-
 const Model = require('../../../../').Model;
 
 class OwnerModel extends Model {
