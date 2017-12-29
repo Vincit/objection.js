@@ -138,6 +138,51 @@ module.exports = session => {
           });
       });
 
+      if (isPostgres(session.knex)) {
+        it('should work with returning', () => {
+          let model = Model1.fromJson({id: 1});
+
+          return model
+            .$query()
+            .delete()
+            .returning('model1Prop1', 'model1Prop2')
+            .then(deleted => {
+              const expected = {model1Prop1: 'hello 1', model1Prop2: null};
+              expect(deleted).to.be.a(Model1);
+              expect(deleted).to.eql(expected);
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(1);
+              expectPartEql(rows[0], {id: 2, model1Prop1: 'hello 2'});
+            });
+        });
+
+        it('should work with returning *', () => {
+          let model = Model1.fromJson({id: 2});
+
+          return model
+            .$query()
+            .delete()
+            .returning('*')
+            .then(deleted => {
+              const expected = {
+                id: 2,
+                model1Id: null,
+                model1Prop1: 'hello 2',
+                model1Prop2: null
+              };
+              expect(deleted).to.be.a(Model1);
+              expect(deleted).to.eql(expected);
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(1);
+              expectPartEql(rows[0], {id: 1, model1Prop1: 'hello 1'});
+            });
+        });
+      }
+
       it('should should call $beforeDelete and $afterDelete hooks', () => {
         let model = Model1.fromJson({id: 1});
 
