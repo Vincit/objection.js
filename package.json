@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "0.9.2",
+  "version": "0.9.4",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -8,11 +8,11 @@
     "test": "npm run eslint && mocha --slow 10 --timeout 15000 --reporter spec --recursive tests",
     "test-travis": "npm run eslint && istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests && npm run test-typings",
     "test-fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
-    "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt --trace_inlining",
+    "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt",
     "test-typings": "tsc",
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
-    "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt --trace_inlining",
+    "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt",
     "prettier": "prettier --write \"{examples,lib,tests,typings}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\""
   },
@@ -77,7 +77,7 @@
     "mysql": "^2.13.0",
     "pg": "^6.2.2",
     "prettier": "^1.9.1",
-    "sqlite3": "3.1.8",
+    "sqlite3": "3.1.13",
     "typescript": "^2.6.2"
   }
 }

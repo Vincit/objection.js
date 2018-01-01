@@ -5080,6 +5080,38 @@ The mappers to use to convert column names to property names in code.
 
 
 
+#### relatedFindQueryMutates
+
+```js
+class Person extends Model {
+  static get relatedFindQueryMutates() {
+    return false;
+  }
+}
+```
+
+If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assign the fetched related models to `foo.bar`.
+The default is true.
+
+
+
+
+#### relatedInsertQueryMutates
+
+```js
+class Person extends Model {
+  static get relatedInsertQueryMutates() {
+    return false;
+  }
+}
+```
+
+If this config is set to false, calling `foo.$relatedQuery('bar').insert(obj)` doesn't append the inserted related model to `foo.bar`.
+The default is true.
+
+
+
+
 #### virtualAttributes
 
 ```js
@@ -5159,6 +5191,9 @@ class Person extends Model {
 
 Name of the property used to store a temporary non-db identifier for the model.
 
+NOTE: You cannot use any of the model's properties as `uidProp`. For example if your
+model has a property `id`, you cannot set `uidProp = 'id'`.
+
 Defaults to '#id'.
 
 
@@ -5184,6 +5219,9 @@ class Person extends Model {
 
 Name of the property used to store a reference to a [`uidProp`](#uidprop)
 
+NOTE: You cannot use any of the model's properties as `uidRefProp`. For example if your
+model has a property `ref`, you cannot set `uidRefProp = 'ref'`.
+
 Defaults to '#ref'.
 
 
@@ -5208,6 +5246,9 @@ class Person extends Model {
 ```
 
 Name of the property used to point to an existing database row from an `insertGraph` graph.
+
+NOTE: You cannot use any of the model's properties as `dbRefProp`. For example if your
+model has a property `id`, you cannot set `dbRefProp = 'id'`.
 
 Defaults to '#dbRef'.
 
@@ -5295,7 +5336,11 @@ Defaults to `Model.WhereInEagerAlgorithm`.
 ```js
 class Person extends Model {
   static get defaultEagerOptions() {
-    return {minimize: true};
+    return {
+      minimize: true,
+      separator: '->',
+      aliases: {}
+    };
   }
 }
 ```
@@ -5304,14 +5349,18 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  static defaultEagerOptions = {minimize: true};
+  static defaultEagerOptions = {
+    minimize: true,
+    separator: '->',
+    aliases: {}
+  };
 }
 ```
 
 Sets the default options for eager loading algorithm. See the possible
 fields [here](#eageroptions).
 
-Defaults to `null`.
+Defaults to `{minimize: false, separator: ':', aliases: {}}`.
 
 
 
@@ -5728,6 +5777,18 @@ class BaseModel extends Model {
 }
 ```
 
+> Sharing the same validator between model classes is also possible:
+
+```js
+const validator = new MyCustomValidator();
+
+class BaseModel extends Model {
+  static createValidator() {
+    return validator;
+  }
+}
+```
+
 > The default implementation:
 
 ```js
@@ -5762,6 +5823,10 @@ validator. The custom validator doesn't need to be based on the
 If you want to use the default json schema based [`AjvValidator`](#ajvvalidator) but
 want to modify it, you can use the `objection.AjvValidator` constructor. See
 the default implementation example.
+
+If you want to share the same validator instance between multiple models, that's
+completely fine too. Simply implement `createValidator` so that it always returns
+the same object instead of creating a new one.
 
 ##### Return value
 
@@ -6397,6 +6462,77 @@ Type|Description
 
 
 
+#### $setRelated
+
+```js
+modelInstance.$setRelated(relation, relatedModels);
+```
+
+```js
+person.$setRelated('parent', parent);
+console.log(person.parent);
+```
+
+```js
+person.$setRelated('children', children);
+console.log(person.children[0]);
+```
+
+Sets related models to a corresponding property in the object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+relation|string&#124;[`Relation`](#relation)|Relation name or a relation instance to set.
+relatedModels|[`Model`](#model)&#124;[`Model[]`](#model)|Models to set.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
+#### $appendRelated
+
+```js
+modelInstance.$appendRelated(relation, relatedModels);
+```
+
+```js
+person.$appendRelated('parent', parent);
+console.log(person.parent);
+```
+
+```js
+person.$appendRelated('children', child1);
+person.$appendRelated('children', child2);
+
+child1 = person.children[person.children.length - 1];
+child2 = person.children[person.children.length - 2];
+```
+
+Appends related models to a corresponding property in the object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+relation|string&#124;[`Relation`](#relation)|Relation name or a relation instance to set.
+relatedModels|[`Model`](#model)&#124;[`Model[]`](#model)|Models to append.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`Model`](#model)|`this` for chaining
+
+
+
+
 #### $omit
 
 ```js
@@ -6775,7 +6911,7 @@ jennifer
   });
 ```
 
-Loads related models using a [`RelationExpression`](#relationexpression).
+Loads related models using a [`RelationExpression`](#relationexpression) and assigns them to the target model instances.
 
 ##### Arguments
 

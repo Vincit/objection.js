@@ -219,8 +219,20 @@ module.exports = session => {
               model1Prop2: null,
               $afterGetCalled: 1,
               model1Relation2: [
-                {idCol: 100, model1Id: 4, model2Prop1: '10', model2Prop2: null, $afterGetCalled: 1},
-                {idCol: 101, model1Id: 4, model2Prop1: '50', model2Prop2: null, $afterGetCalled: 1}
+                {
+                  idCol: 100,
+                  model1Id: 4,
+                  model2Prop1: '10',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                },
+                {
+                  idCol: 101,
+                  model1Id: 4,
+                  model2Prop1: '50',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                }
               ]
             });
           });
@@ -368,6 +380,32 @@ module.exports = session => {
               ]
             });
           });
+      });
+
+      it('trying to relate a HasManyRelation should throw', done => {
+        Model1.query()
+          .insertGraph(
+            {
+              model1Prop1: 'foo',
+
+              model1Relation2: [
+                {
+                  idCol: population.model1Relation3[0].idCol
+                }
+              ]
+            },
+            {
+              relate: true
+            }
+          )
+          .then(model => done(new Error('should not get here')))
+          .catch(err => {
+            expect(err.message).to.equal(
+              'You cannot relate HasManyRelation or HasOneRelation using insertGraph, because those require update operations. Consider using upsertGraph instead.'
+            );
+            done();
+          })
+          .catch(done);
       });
 
       it(`relate: ['relation.path'] option should cause models with id to be related instead of inserted`, () => {

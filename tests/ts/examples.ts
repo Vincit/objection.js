@@ -174,6 +174,14 @@ const omitPersonFromObj: Person = examplePerson.$omit({firstName: true});
 const pickPersonFromKey: Person = examplePerson.$pick('lastName');
 const pickPersonFromObj: Person = examplePerson.$pick({firstName: true});
 const clonePerson: Person = examplePerson.$clone();
+const setRelatedPerson: Person = examplePerson.$setRelated(
+  'parent',
+  Person.fromJson({firstName: 'parent'})
+);
+const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
+  Animal.fromJson({firstName: 'pet 1'}),
+  Animal.fromJson({firstName: 'pet 2'})
+]);
 
 // static methods from Model should return the subclass type
 
@@ -187,6 +195,12 @@ class Actor {
 
 function byId(id: number): Promise<Person | undefined> {
   return Person.query().findById(id);
+}
+
+// Person[] typing for findByIds():
+
+function byIds(ids: number[] | number[][]): Promise<Person[]> {
+  return Person.query().findByIds(ids);
 }
 
 // Person[] typing for where():

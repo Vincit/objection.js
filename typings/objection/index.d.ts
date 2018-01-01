@@ -272,6 +272,8 @@ declare namespace Objection {
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
     columnNameMappers: ColumnNameMappers;
+    relatedFindQueryMutates: boolean;
+    relatedInsertQueryMutates: boolean;
 
     raw: knex.RawBuilder;
     fn: knex.FunctionHelper;
@@ -329,6 +331,8 @@ declare namespace Objection {
     static defaultEagerOptions?: EagerOptions;
     static QueryBuilder: typeof QueryBuilder;
     static columnNameMappers: ColumnNameMappers;
+    static relatedFindQueryMutates: boolean;
+    static relatedInsertQueryMutates: boolean;
 
     static raw: knex.RawBuilder;
     static fn: knex.FunctionHelper;
@@ -387,6 +391,14 @@ declare namespace Objection {
     $formatJson(json: Pojo): Pojo;
     $setJson(json: Pojo, opt?: ModelOptions): this;
     $setDatabaseJson(json: Pojo): this;
+    $setRelated<M extends Model>(
+      relation: String | Relation,
+      related: M | M[] | null | undefined
+    ): this;
+    $appendRelated<M extends Model>(
+      relation: String | Relation,
+      related: M | M[] | null | undefined
+    ): this;
 
     $set(obj: Pojo): this;
     $omit(keys: string | string[] | Properties): this;
@@ -547,6 +559,7 @@ declare namespace Objection {
 
     findById(id: Id): QueryBuilderOption<T>;
     findById(idOrIds: IdOrIds): this;
+    findByIds(ids: Id[] | Id[][]): this;
     /** findOne is shorthand for .where(...whereArgs).first() */
     findOne: FindOne<T>;
 

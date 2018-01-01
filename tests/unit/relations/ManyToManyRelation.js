@@ -692,7 +692,7 @@ describe('ManyToManyRelation', () => {
           'insert into "JoinModel" ("ownerId", "relatedId") values (666, 3), (666, 4) returning "relatedId"'
         );
 
-        expect(owner.nameOfOurRelation).to.eql([
+        expect(_.sortBy(owner.nameOfOurRelation, 'id')).to.eql([
           {a: 'str1', id: 1, rid: 3},
           {a: 'str2', id: 2, rid: 4},
           {a: 'str0', id: 3}
@@ -736,7 +736,7 @@ describe('ManyToManyRelation', () => {
           'insert into "JoinModel" ("ownerAId", "ownerBId", "relatedCId", "relatedDId") values (11, 22, 33, 44), (11, 22, 33, 55) returning "relatedCId", "relatedDId"'
         );
 
-        expect(owner.nameOfOurRelation).to.eql([
+        expect(_.sortBy(owner.nameOfOurRelation, 'id')).to.eql([
           {a: 'str1', id: 1, cid: 33, did: 44},
           {a: 'str2', id: 2, cid: 33, did: 55},
           {a: 'str0', id: 3}
@@ -885,7 +885,7 @@ describe('ManyToManyRelation', () => {
           'insert into "JoinModel" ("extra1", "extra2", "ownerId", "relatedId") values (\'extraVal1\', \'extraVal2\', 666, 4) returning "relatedId"'
         );
 
-        expect(_.invokeMap(owner.nameOfOurRelation, 'toJSON')).to.eql([
+        expect(_.sortBy(_.invokeMap(owner.nameOfOurRelation, 'toJSON'), 'id')).to.eql([
           {a: 'str2', id: 1, rid: 4, extra1: 'extraVal1', extra2: 'extraVal2'},
           {a: 'str0', id: 3}
         ]);
@@ -929,7 +929,7 @@ describe('ManyToManyRelation', () => {
           'insert into "JoinModel" ("extra2", "ownerId", "relatedId") values (\'extraVal2\', 666, 4) returning "relatedId"'
         );
 
-        expect(_.invokeMap(owner.nameOfOurRelation, 'toJSON')).to.eql([
+        expect(_.sortBy(_.invokeMap(owner.nameOfOurRelation, 'toJSON'), 'id')).to.eql([
           {a: 'str2', id: 1, rid: 4, extra2: 'extraVal2'},
           {a: 'str0', id: 3}
         ]);

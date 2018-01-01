@@ -263,17 +263,29 @@ class TestSession {
 
 TestSession.staticInitCalled = false;
 TestSession.unhandledRejectionHandlers = [];
+TestSession.hookCounter = 0;
 
-// Creates an asynchronous hook that waits for `delay` milliseconds
-// and then increments a `${name}Called` property.
+// Creates a hook that waits for `delay` milliseconds and then
+// increments a `${name}Called` property. The hook is asynchonous
+// every other time it is called so that the synchronous path is
+// also tested.
 function createHook(name, delay, extraAction) {
+  const hook = (model, args) => {
+    // Increment the property so that it can be checked in the tests.
+    inc(model, `${name}Called`);
+
+    // Optionally run the extraAction function.
+    (extraAction || _.noop)(model, args);
+  };
+
   return function () {
     const args = arguments;
 
-    return Promise.delay(delay).then(() => {
-      inc(this, `${name}Called`);
-      (extraAction || _.noop)(this, args);
-    });
+    if (TestSession.hookCounter++ % 2 === 0) {
+      return hook(this, args);
+    } else {
+      return Promise.delay(delay).then(() => hook(this, args));
+    }
   };
 }
 

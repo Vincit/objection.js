@@ -868,21 +868,6 @@ describe('Model', () => {
       expect(calls).to.equal(1);
     });
 
-    it('should call $toDatabaseJson for properties of class Model', () => {
-      let Model2 = createModelClass();
-
-      Model2.prototype.$formatDatabaseJson = jsn => {
-        jsn.d = 3;
-        return jsn;
-      };
-
-      let model = Model1.fromJson({a: 1});
-      model.b = Model2.fromJson({c: 2});
-      model.e = [Model2.fromJson({f: 100})];
-
-      expect(model.$toDatabaseJson()).to.eql({a: 1, b: {c: 2, d: 3}, e: [{f: 100, d: 3}]});
-    });
-
     it('should return a deep copy', () => {
       let json = {a: 1, b: [{c: 2}], d: {e: 'str'}};
       let model = Model1.fromJson(json);
