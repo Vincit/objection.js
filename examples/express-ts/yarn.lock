@@ -17,6 +17,12 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.1.0.tgz#93b1be91f63c184450385272c47b6496fd028e02"
 
+"@types/express-promise-router@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/express-promise-router/-/express-promise-router-2.0.0.tgz#d8393324309b3d184e5531fdb4a314490b9e1550"
+  dependencies:
+    "@types/express" "*"
+
 "@types/express-serve-static-core@*":
   version "4.0.57"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.0.57.tgz#3cd8ab4b11d5ecd70393bada7fc1c480491537dd"
@@ -1121,7 +1127,7 @@ object.pick@^1.2.0:
     isobject "^3.0.1"
 
 objection@../..:
-  version "0.9.2"
+  version "0.9.4"
   dependencies:
     ajv "^5.1.1"
     bluebird "^3.5.0"
