@@ -29,7 +29,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/express@*", "@types/express@^4.0.39":
+"@types/express@*":
   version "4.0.39"
   resolved "https://registry.yarnpkg.com/@types/express/-/express-4.0.39.tgz#1441f21d52b33be8d4fa8a865c15a6a91cd0fa09"
   dependencies:
@@ -37,17 +37,25 @@
     "@types/express-serve-static-core" "*"
     "@types/serve-static" "*"
 
-"@types/knex@^0.0.67":
-  version "0.0.67"
-  resolved "https://registry.yarnpkg.com/@types/knex/-/knex-0.0.67.tgz#c7703153bc3e7b00fda6c9cfb42d7f29f7a33693"
+"@types/express@^4.11.0":
+  version "4.11.0"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.11.0.tgz#234d65280af917cb290634b7a8d6bcac24aecbad"
+  dependencies:
+    "@types/body-parser" "*"
+    "@types/express-serve-static-core" "*"
+    "@types/serve-static" "*"
+
+"@types/knex@^0.0.68":
+  version "0.0.68"
+  resolved "https://registry.yarnpkg.com/@types/knex/-/knex-0.0.68.tgz#7faa21a9534cc0362f9d684d332a26d9378afbfb"
   dependencies:
     "@types/bluebird" "*"
     "@types/events" "*"
     "@types/node" "*"
 
-"@types/lodash@^4.14.88":
-  version "4.14.88"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.88.tgz#97eaf2dc668f33ed8e511a5b627035f4ea20b0f5"
+"@types/lodash@^4.14.91":
+  version "4.14.91"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.91.tgz#794611b28056d16b5436059c6d800b39d573cd3a"
 
 "@types/mime@*":
   version "2.0.0"
@@ -1126,8 +1134,9 @@ object.pick@^1.2.0:
   dependencies:
     isobject "^3.0.1"
 
-objection@../..:
+objection@^0.9.4:
   version "0.9.4"
+  resolved "https://registry.yarnpkg.com/objection/-/objection-0.9.4.tgz#708314fd2bb5bb3d5eb83c5badd5d9a1106ecb59"
   dependencies:
     ajv "^5.1.1"
     bluebird "^3.5.0"
