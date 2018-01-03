@@ -96,13 +96,15 @@ declare namespace Objection {
     skipValidation?: boolean;
   }
 
-  export interface ValidatorContext extends Pojo { }
+  export interface ValidatorContext {
+    [key: string]: any;
+  }
 
-  export type ValidatorArgs = {
-    ctx: ValidatorContext,
-    model: Model,
-    json: Pojo,
-    options: ModelOptions
+  export interface ValidatorArgs {
+    ctx: ValidatorContext;
+    model: Model;
+    json: Pojo;
+    options: ModelOptions;
   }
   
   export class Validator {
@@ -111,10 +113,10 @@ declare namespace Objection {
     afterValidate(args: ValidatorArgs): void;
   }
 
-  export type AjvConfig = {
+  export interface AjvConfig {
     onCreateAjv(ajv: ajv.Ajv): void;
     options?: ajv.Options;
-  };
+  }
 
   export class AjvValidator extends Validator {
     constructor(config: AjvConfig);
