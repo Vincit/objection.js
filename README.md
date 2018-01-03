@@ -42,6 +42,5 @@ Shortcuts:
 
 Blog posts and tutorials:
 
- * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/) (objection.js was originally called moron.js)
  * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
  * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)

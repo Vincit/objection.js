@@ -1738,10 +1738,11 @@ create a pull request or an issue to get it added to this list.
 
 ## 3rd party plugins
 
-  * [objection-soft-delete](https://github.com/griffinpp/objection-soft-delete) - Soft delete functionality with minimal configuration
-  * [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for you models
+  * [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for your models
+  * [objection-db-errors](https://github.com/Vincit/objection-db-errors) - better database errors for your queries
   * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
   * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
+  * [objection-soft-delete](https://github.com/griffinpp/objection-soft-delete) - Soft delete functionality with minimal configuration
   * [objection-unique](https://github.com/seegno/objection-unique) - Unique validation for your models
   * [objection-visibility](https://github.com/oscaroox/objection-visibility) - whitelist/blacklist your model properties
 
