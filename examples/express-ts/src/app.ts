@@ -1,14 +1,12 @@
-import * as _ from 'lodash';
+import registerApi from './api';
+import * as bodyParser from 'body-parser';
+import * as express from 'express';
+import * as promiseRouter from 'express-promise-router';
 import * as Knex from 'knex';
 import * as morgan from 'morgan';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
-import registerApi from './api';
 import {Model} from 'objection';
 
 const knexConfig = require('../knexfile');
-const promiseRouter = require('express-promise-router');
-
 // Initialize knex.
 export const knex = Knex(knexConfig.development);
 
@@ -20,8 +18,8 @@ knex.migrate.latest();
 // the Model.bindKnex method.
 Model.knex(knex);
 
-const router: express.Router = promiseRouter();
-const app: express.Application = express()
+const router = promiseRouter();
+const app = express()
   .use(bodyParser.json())
   .use(morgan('dev'))
   .use(router)
