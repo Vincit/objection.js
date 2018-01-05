@@ -7743,21 +7743,21 @@ joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoi
 
 Property|Type|Description
 --------|----|-----------
-relate|boolean&#124;string[]|If true, relations are related instead of inserted. Relate functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-unrelate|boolean&#124;string[]|If true, relations are unrelated instead of deleted. Unrelate functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-insertMissing|boolean&#124;string[]|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-update|boolean&#124;string[]|If true, update operations are performaed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-noInsert|boolean&#124;string[]|If true, no inserts are performed. Inserts can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-noUpdate|boolean&#124;string[]|If true, no updates are performed. Updates can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-noDelete|boolean&#124;string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-noRelate|boolean&#124;string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
-noUnrelate|boolean&#124;string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+relate|boolean&#124;string[]|If true, relations are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+unrelate|boolean&#124;string[]|If true, relations are unrelated instead of deleted. Unrelate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+insertMissing|boolean&#124;string[]|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+update|boolean&#124;string[]|If true, update operations are performaed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noInsert|boolean&#124;string[]|If true, no inserts are performed. Inserts can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noUpdate|boolean&#124;string[]|If true, no updates are performed. Updates can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noDelete|boolean&#124;string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noRelate|boolean&#124;string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
+noUnrelate|boolean&#124;string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-upserts).
 
 ## InsertGraphOptions
 
 Property|Type|Description
 --------|----|-----------
-relate|boolean&#124;string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations is the graph by providing a list of relation expressions. See the examples [here](#graph-inserts).
+relate|boolean&#124;string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-inserts).
 
 ## Relation
 
