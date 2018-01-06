@@ -1,6 +1,6 @@
 import {transaction} from 'objection';
-import Person from './Person'; // built from examples/build/models/Person
-import Movie from './Movie'; // build from examples/build/models/Movie
+import Person from './models/Person';
+import Movie from './models/Movie';
 
 export default router => {
   // Create a new Person. Because we use `insertGraph` you can pass relations

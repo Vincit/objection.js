@@ -6,9 +6,6 @@ functionalities of objection like models, relations, eager loading,
 graph inserts, graph upserts etc. The code is modern ecmascript
 and it is transpiled to ES6 using babel.
 
-This example shares model classes with the express-es7 example and
-depends on those classes being in ../express-es7/src/models/.
-
 # Install and run
 
 ```sh

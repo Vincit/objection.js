@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "migrate": "knex migrate:latest",
-    "build": "babel src ../express-es7/src/models -d build",
+    "build": "babel src -d build",
     "start": "npm run build && npm run migrate && node build/app"
   },
   "babel": {
