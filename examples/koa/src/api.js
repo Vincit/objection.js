@@ -7,7 +7,7 @@ export default router => {
   // with the person and they also get inserted and related to the person. If
   // all you want to do is insert a single person, `insertGraph` and `allowInsert`
   // can be replaced by `insert(req.body)`.
-  router.post('/persons', async (ctx) => {
+  router.post('/persons', async ctx => {
     const graph = ctx.request.body;
 
     // It's a good idea to wrap `insertGraph` call in a transaction since it
@@ -25,14 +25,14 @@ export default router => {
   });
 
   // Patch a Person.
-  router.patch('/persons/:id', async (ctx) => {
+  router.patch('/persons/:id', async ctx => {
     const person = await Person.query().patchAndFetchById(ctx.params.id, ctx.request.body);
 
     ctx.body = person;
   });
 
   // Patch a person and upsert its relations.
-  router.patch('/persons/:id/upsert', async (ctx) => {
+  router.patch('/persons/:id/upsert', async ctx => {
     const graph = ctx.request.body;
 
     // Make sure only one person was sent.
@@ -61,7 +61,7 @@ export default router => {
   // Get multiple Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
-  router.get('/persons', async (ctx) => {
+  router.get('/persons', async ctx => {
     // We don't need to check for the existence of the query parameters because
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
@@ -81,14 +81,14 @@ export default router => {
   });
 
   // Delete a person.
-  router.delete('/persons/:id', async (ctx) => {
+  router.delete('/persons/:id', async ctx => {
     await Person.query().deleteById(ctx.params.id);
 
     ctx.body = {};
   });
 
   // Add a child for a Person.
-  router.post('/persons/:id/children', async (ctx) => {
+  router.post('/persons/:id/children', async ctx => {
     const person = await Person.query().findById(ctx.params.id);
 
     if (!person) {
@@ -101,7 +101,7 @@ export default router => {
   });
 
   // Add a pet for a Person.
-  router.post('/persons/:id/pets', async (ctx) => {
+  router.post('/persons/:id/pets', async ctx => {
     const person = await Person.query().findById(ctx.params.id);
 
     if (!person) {
@@ -115,7 +115,7 @@ export default router => {
 
   // Get a Person's pets. The result can be filtered using query parameters
   // `name` and `species`.
-  router.get('/persons/:id/pets', async (ctx) => {
+  router.get('/persons/:id/pets', async ctx => {
     const person = await Person.query().findById(ctx.params.id);
 
     if (!person) {
@@ -135,7 +135,7 @@ export default router => {
   });
 
   // Add a movie for a Person.
-  router.post('/persons/:id/movies', async (ctx) => {
+  router.post('/persons/:id/movies', async ctx => {
     // Inserting a movie for a person creates two queries: the movie insert query
     // and the join table row insert query. It is wise to use a transaction here.
     const movie = await transaction(Person.knex(), async function(trx) {
@@ -152,7 +152,7 @@ export default router => {
   });
 
   // Add existing Person as an actor to a movie.
-  router.post('/movies/:id/actors', async (ctx) => {
+  router.post('/movies/:id/actors', async ctx => {
     const movie = await Movie.query().findById(ctx.params.id);
 
     if (!movie) {
@@ -165,7 +165,7 @@ export default router => {
   });
 
   // Get Movie's actors.
-  router.get('/movies/:id/actors', async (ctx) => {
+  router.get('/movies/:id/actors', async ctx => {
     const movie = await Movie.query().findById(ctx.params.id);
 
     if (!movie) {
