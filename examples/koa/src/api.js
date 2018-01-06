@@ -128,8 +128,8 @@ export default router => {
     const pets = await person
       .$relatedQuery('pets')
       .skipUndefined()
-      .where('name', 'like', ctx.request.body.name)
-      .where('species', ctx.request.body.species);
+      .where('name', 'like', ctx.query.name)
+      .where('species', ctx.query.species);
 
     ctx.body = pets;
   });
