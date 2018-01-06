@@ -24,13 +24,11 @@ async function errorHandler(ctx, next) {
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
     if (err instanceof ValidationError) {
-      ctx.body = { message: 'Invalid request parameter(s)', data: err.data };
-    }
-    else if (ctx.status === 500) {
+      ctx.body = {message: 'Invalid request parameter(s)', data: err.data};
+    } else if (ctx.status === 500) {
       ctx.app.emit('error', err, ctx);
-    }
-    else {
-      ctx.body = { message: err.message || 'An error occurred' };
+    } else {
+      ctx.body = {message: err.message || 'An error occurred'};
     }
   }
 }
@@ -38,7 +36,7 @@ async function errorHandler(ctx, next) {
 const router = new Router();
 
 const app = new Koa()
-  .use(json({ pretty: true }))
+  .use(json({pretty: true}))
   .use(errorHandler)
   .use(logger('dev'))
   .use(bodyparser())
