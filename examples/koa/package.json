@@ -1,0 +1,44 @@
+{
+  "name": "objection-example-koa",
+  "version": "0.1.0",
+  "description": "Objection.js koa example",
+  "main": "app.js",
+  "scripts": {
+    "migrate": "knex migrate:latest",
+    "build": "babel src ../express-es7/src/models -d build",
+    "start": "npm run build && npm run migrate && node build/app"
+  },
+  "babel": {
+    "presets": [
+      [
+        "env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ],
+      "stage-1"
+    ]
+  },
+  "author": "Sami Koskimäki",
+  "contributors": [
+    "Joseph T. Lapp <https://github.com/jtlapp>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.17.0",
+    "knex": "^0.13.0",
+    "koa": "^2.4.1",
+    "koa-bodyparser": "^4.2.0",
+    "koa-morgan": "^1.0.1",
+    "koa-router": "^7.3.0",
+    "objection": "^0.9.0",
+    "sqlite3": "^3.1.13"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-1": "^6.24.1"
+  }
+}
