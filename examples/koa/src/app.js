@@ -1,11 +1,12 @@
 import Knex from 'knex';
 import Koa from 'koa';
+import json from 'koa-json';
 import logger from 'koa-morgan';
 import bodyparser from 'koa-bodyparser';
 import Router from 'koa-router';
 import knexConfig from '../knexfile';
 import registerApi from './api';
-import {Model} from 'objection';
+import {Model, ValidationError} from 'objection';
 
 // Initialize knex.
 const knex = Knex(knexConfig.development);
@@ -22,14 +23,22 @@ async function errorHandler(ctx, next) {
     await next();
   } catch (err) {
     ctx.status = err.statusCode || err.status || 500;
-    ctx.body = err.data || err.message || {};
-    ctx.app.emit('error', err, ctx);
+    if (err instanceof ValidationError) {
+      ctx.body = { message: 'Invalid request parameter(s)', data: err.data };
+    }
+    else if (ctx.status === 500) {
+      ctx.app.emit('error', err, ctx);
+    }
+    else {
+      ctx.body = { message: err.message || 'An error occurred' };
+    }
   }
 }
 
 const router = new Router();
 
 const app = new Koa()
+  .use(json({ pretty: true }))
   .use(errorHandler)
   .use(logger('dev'))
   .use(bodyparser())
