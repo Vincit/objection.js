@@ -7797,7 +7797,7 @@ Note that this executes a query (not the one we are building) and returns a Prom
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
   <span class="p">});</span>
 </code></pre>
-<p>Two queries queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
+<p>Two queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
 
 <p>Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and <code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size,
 but according to my tests and <a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the
@@ -7868,7 +7868,7 @@ The problem with this is that if the result set is empty, we don&rsquo;t get the
 </code></pre>
 <p>Only returns the given range of results.</p>
 
-<p>Two queries queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
+<p>Two queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
 
 <p>Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and <code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size,
 but according to my tests and <a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the
