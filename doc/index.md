@@ -100,8 +100,7 @@ npm start
 // run the following command to install:
 // npm install objection knex sqlite3
 
-const objection = require('objection');
-const Model = objection.Model;
+const { Model } = require('objection');
 const Knex = require('knex');
 
 // Initialize knex connection.
@@ -116,13 +115,6 @@ const knex = Knex({
 // Give the connection to objection.
 Model.knex(knex);
 
-// Create database schema. You should use knex migration files to do this. We
-// create it here for simplicity.
-const schemaPromise = knex.schema.createTableIfNotExists('Person', table => {
-  table.increments('id').primary();
-  table.string('firstName');
-});
-
 // Person model.
 class Person extends Model {
   static get tableName() {
@@ -130,22 +122,28 @@ class Person extends Model {
   }
 }
 
-schemaPromise.then(() => {
+async function main() {
+  // Create database schema. You should use knex migration files to do this. We
+  // create it here for simplicity.
+  await knex.schema.createTableIfNotExists('Person', table => {
+    table.increments('id').primary();
+    table.string('firstName');
+  });
 
   // Create a person.
-  return Person.query().insert({firstName: 'Sylvester'});
-
-}).then(person => {
+  const person = await Person.query().insert({firstName: 'Sylvester'});
 
   console.log('created:', person.firstName, 'id:', person.id);
-  // Fetch all people named Sylvester.
-  return Person.query().where('firstName', 'Sylvester');
 
-}).then(sylvesters => {
+  // Fetch all people named Sylvester and sort them by id.
+  const sylvesters = await Person.query()
+    .where('firstName', 'Sylvester')
+    .orderBy('id');
 
   console.log('sylvesters:', sylvesters);
+}
 
-});
+main().catch(console.error);
 ```
 
 To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the
@@ -531,19 +529,14 @@ that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has a
 > Fetch all people from the database:
 
 ```js
-Person
-  .query()
-  .then(people => {
-    console.log(people[0] instanceof Person); // --> true
-    console.log('there are', people.length, 'People in total');
-  })
-  .catch(err => {
-    console.log('oh noes');
-  });
+const people = await Person.query();
+
+console.log(people[0] instanceof Person); // --> true
+console.log('there are', people.length, 'People in total');
 ```
 
 ```sql
-select * from "Person"
+select "Person".* from "Person"
 ```
 
 > The return value of the [`query`](#query) method is an instance of [`QueryBuilder`](#querybuilder)
@@ -551,20 +544,19 @@ select * from "Person"
 > that uses some of them:
 
 ```js
-Person
+const middleAgedJennifers = await Person
   .query()
   .where('age', '>', 40)
   .andWhere('age', '<', 60)
   .andWhere('firstName', 'Jennifer')
   .orderBy('lastName')
-  .then(middleAgedJennifers => {
-    console.log('The last name of the first middle aged Jennifer is');
-    console.log(middleAgedJennifers[0].lastName);
-  });
+
+console.log('The last name of the first middle aged Jennifer is');
+console.log(middleAgedJennifers[0].lastName);
 ```
 
 ```sql
-select * from "Person"
+select "Person".* from "Person"
 where "age" > 40
 and "age" < 60
 and "firstName" = 'Jennifer'
@@ -575,13 +567,12 @@ order by "lastName" asc
 > relations like the [`joinRelation`](#joinrelation) method:
 
 ```js
-Person
+const people = await Person
   .query()
   .select('parent:parent.name as grandParentName')
-  .joinRelation('parent.parent')
-  .then(people => {
-    console.log(people[0].grandParentName)
-  });
+  .joinRelation('parent.parent');
+
+console.log(people[0].grandParentName)
 ```
 
 ```sql
@@ -594,16 +585,15 @@ inner join "Person" as "parent:parent" on "parent:parent"."id" = "parent"."paren
 > The next example shows how easy it is to build complex queries:
 
 ```js
-Person
+const people = await Person
   .query()
   .select('Person.*', 'Parent.firstName as parentFirstName')
   .join('Person as Parent', 'Person.parentId', 'Parent.id')
   .where('Person.age', '<', Person.query().avg('Person.age'))
-  .whereExists(Animal.query().select(1).whereRef('Person.id', 'Animal.ownerId'))
-  .orderBy('Person.lastName')
-  .then(people => {
-    console.log(people[0].parentFirstName);
-  });
+  .whereExists(Animal.query().select(1).where('Person.id', ref('Animal.ownerId')))
+  .orderBy('Person.lastName');
+
+console.log(people[0].parentFirstName);
 ```
 
 ```sql
@@ -622,17 +612,13 @@ into a [`Promise`](http://bluebirdjs.com/docs/getting-started.html).
 ### Insert queries
 
 ```js
-Person
+const jennifer = await Person
   .query()
   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-  .then(jennifer => {
-    console.log(jennifer instanceof Person); // --> true
-    console.log(jennifer.firstName); // --> 'Jennifer'
-    console.log(jennifer.fullName()); // --> 'Jennifer Lawrence'
-  })
-  .catch(err => {
-    console.log('oh noes');
-  });
+
+console.log(jennifer instanceof Person); // --> true
+console.log(jennifer.firstName); // --> 'Jennifer'
+console.log(jennifer.fullName()); // --> 'Jennifer Lawrence'
 ```
 
 ```sql
@@ -645,17 +631,12 @@ for inserting object graphs.
 ### Update queries
 
 ```js
-Person
-  .query()
+const numUpdated = await Person.query()
   .patch({lastName: 'Dinosaur'})
   .where('age', '>', 60)
-  .then(numUpdated => {
-    console.log('all people over 60 years old are now dinosaurs');
-    console.log(numUpdated, 'people were updated');
-  })
-  .catch(err => {
-    console.log(err.stack);
-  });
+
+console.log('all people over 60 years old are now dinosaurs');
+console.log(numUpdated, 'people were updated');
 ```
 
 ```sql
@@ -663,20 +644,16 @@ update "Person" set "lastName" = 'Dinosaur' where "age" > 60
 ```
 
 ```js
-Person
+const updatedPerson = await Person
   .query()
-  .patchAndFetchById(246, {lastName: 'Updated'})
-  .then(updated => {
-    console.log(updated.lastName); // --> Updated.
-  })
-  .catch(err => {
-    console.log(err.stack);
-  });
+  .patchAndFetchById(246, {lastName: 'Updated'});
+
+console.log(updatedPerson.lastName); // --> Updated.
 ```
 
 ```sql
 update "Person" set "lastName" = 'Updated' where "id" = 246
-select * from "Person" where "id" = 246
+select "Person".* from "Person" where "id" = 246
 ```
 
 Update queries are created by chaining the [`update`](#update) or [`patch`](#patch) method to the query. The [`patch`](#patch) and [`update`](#update)
@@ -687,16 +664,12 @@ simply chain `.returning('*')` or take a look at [this recipe](#postgresql-quot-
 ### Delete queries
 
 ```js
-Person
+const numDeleted = await Person
   .query()
   .delete()
-  .where(Person.raw('lower("firstName")'), 'like', '%ennif%')
-  .then(numDeleted => {
-    console.log(numDeleted, 'people were deleted');
-  })
-  .catch(err => {
-    console.log(err.stack);
-  });
+  .where(raw('lower("firstName")'), 'like', '%ennif%');
+
+console.log(numDeleted, 'people were deleted');
 ```
 
 ```sql
@@ -716,18 +689,17 @@ just like the [`query`](#query) method.
 
 ```js
 // `person` is an instance of `Person` model.
-person
+const pets = await person
   .$relatedQuery('pets')
   .where('species', 'dog')
-  .orderBy('name')
-  .then(pets => {
-    console.log(person.pets === pets); // --> true
-    console.log(pets[0] instanceof Animal); // --> true
-  });
+  .orderBy('name');
+
+console.log(person.pets === pets); // --> true
+console.log(pets[0] instanceof Animal); // --> true
 ```
 
 ```sql
-select * from "Animal"
+select "Animal".* from "Animal"
 where "species" = 'dog'
 and "Animal"."ownerId" = 1
 order by "name" asc
@@ -749,12 +721,11 @@ can be modified using [`relatedFindQueryMutates`](#relatedfindquerymutates). Als
 
 ```js
 // `person` is an instance of `Person` model.
-person
+const fluffy = await person
   .$relatedQuery('pets')
-  .insert({name: 'Fluffy'})
-  .then(fluffy => {
-    console.log(person.pets.indexOf(fluffy) !== -1); // --> true
-  });
+  .insert({name: 'Fluffy'});
+
+console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 ```
 
 ```sql
@@ -768,12 +739,11 @@ insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
 
 ```js
 // `person` is an instance of `Person` model.
-person
+const movie = await person
   .$relatedQuery('movies')
-  .insert({name: 'The room', awesomeness: 9001})
-  .then(movie => {
-    console.log('best movie ever was added');
-  });
+  .insert({name: 'The room', awesomeness: 9001});
+
+console.log('best movie ever was added');
 ```
 
 ```sql
@@ -813,75 +783,71 @@ See the [API documentation](#unrelate) of `unrelate` method.
 > Fetch the `pets` relation for all results of a query:
 
 ```js
-Person
+const people = await Person
   .query()
-  .eager('pets')
-  .then(people => {
-    // Each person has the `.pets` property populated with Animal objects related
-    // through `pets` relation.
-    console.log(people[0].pets[0].name);
-    console.log(people[0].pets[0] instanceof Animal); // --> true
-  });
+  .eager('pets');
+
+// Each person has the `.pets` property populated with Animal objects related
+// through `pets` relation.
+console.log(people[0].pets[0].name);
+console.log(people[0].pets[0] instanceof Animal); // --> true
 ```
 
 > Fetch multiple relations on multiple levels:
 
 ```js
-Person
+const people = await Person
   .query()
-  .eager('[pets, children.[pets, children]]')
-  .then(people => {
-    // Each person has the `.pets` property populated with Animal objects related
-    // through `pets` relation. The `.children` property contains the Person's
-    // children. Each child also has the `pets` and `children` relations eagerly
-    // fetched.
-    console.log(people[0].pets[0].name);
-    console.log(people[1].children[2].pets[1].name);
-    console.log(people[1].children[2].children[0].name);
-  });
+  .eager('[pets, children.[pets, children]]');
+
+// Each person has the `.pets` property populated with Animal objects related
+// through `pets` relation. The `.children` property contains the Person's
+// children. Each child also has the `pets` and `children` relations eagerly
+// fetched.
+console.log(people[0].pets[0].name);
+console.log(people[1].children[2].pets[1].name);
+console.log(people[1].children[2].children[0].name);
 ```
 
 > Fetch one relation recursively:
 
 ```js
-Person
+const people = await Person
   .query()
-  .eager('[pets, children.^]')
-  .then(people => {
-    // The children relation is from Person to Person. If we want to fetch the whole
-    // descendant tree of a person we can just say "fetch this relation recursively"
-    // using the `.^` notation.
-    console.log(people[0].children[0].children[0].children[0].children[0].firstName);
-  });
+  .eager('[pets, children.^]');
+
+// The children relation is from Person to Person. If we want to fetch the whole
+// descendant tree of a person we can just say "fetch this relation recursively"
+// using the `.^` notation.
+console.log(people[0].children[0].children[0].children[0].children[0].firstName);
 ```
 
 > Limit recursion to 3 levels:
 
 ```js
-Person
+const people = await Person
   .query()
-  .eager('[pets, children.^3]')
-  .then(people => {
-    console.log(people[0].children[0].children[0].children[0].firstName);
-  });
+  .eager('[pets, children.^3]');
+
+console.log(people[0].children[0].children[0].children[0].firstName);
 ```
 
 > Relations can be filtered using the [`modifyEager`](#modifyeager) method:
 
 ```js
-Person
+const people = await Person
   .query()
   .eager('[children.[pets, movies], movies]')
   .modifyEager('children.pets', builder => {
     // Only select pets older than 10 years old for children.
     builder.where('age', '>', 10);
-  })
+  });
 ```
 
 > Relations can also be filtered using named filters like this:
 
 ```js
-Person
+const people = await Person
   .query()
   .eager('[pets(orderByName, onlyDogs), children(orderByAge).[pets, children]]', {
     orderByName: (builder) => {
@@ -893,11 +859,10 @@ Person
     onlyDogs: (builder) => {
       builder.where('species', 'dog');
     }
-  })
-  .then(people => {
-    console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id);
   });
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
 ```
 
 > Reusable named filters can be defined for models using [`namedFilters`](#namedfilters)
@@ -932,19 +897,18 @@ class Animal extends Model {
 
 // somewhereElse.js
 
-Person
+const people = await Person
   .query()
-  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]')
-  .then(people => {
-    console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id);
-  });
+  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]');
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
 ```
 
 > Relations can be aliased using `as` keyword:
 
 ```js
-Person
+const people = await Person
   .query()
   .eager(`[
     children(orderByAge) as kids .[
@@ -955,30 +919,29 @@ Person
         actors
       ]
     ]
-  ]`)
-  .then(people => {
-    console.log(people[0].kids[0].dogs[0].name);
-    console.log(people[0].kids[0].movies[0].id);
-  });
+  ]`);
+
+console.log(people[0].kids[0].dogs[0].name);
+console.log(people[0].kids[0].movies[0].id);
 ```
 
 > Example usage for [`allowEager`](#alloweager) in an express route:
 
 ```js
-expressApp.get('/people', (req, res, next) => {
-  Person
+expressApp.get('/people', async (req, res, next) => {
+  const people = await Person
     .query()
     .allowEager('[pets, children.pets]')
-    .eager(req.query.eager)
-    .then(people => res.send(people))
-    .catch(next);
+    .eager(req.query.eager);
+
+  res.send(people);
 });
 ```
 
 > Eager loading algorithm can be changed using the [`eagerAlgorithm`](#eageralgorithm) method:
 
 ```js
-Person
+const people = await Person
   .query()
   .eagerAlgorithm(Model.JoinEagerAlgorithm)
   .eager('[pets, children.pets]');
@@ -1021,7 +984,11 @@ have their strengths and weaknesses, which are discussed in detail [here](#eager
 # Graph inserts
 
 ```js
-Person
+// The return value of `insertGraph` is the input graph converted into model instances.
+// Inserted objects have ids added to them and related rows have foreign keys set, but
+// no other columns get fetched from the database. You can use `insertGraphAndFetch`
+// for that.
+const graph = await Person
   .query()
   .insertGraph({
     firstName: 'Sylvester',
@@ -1036,11 +1003,6 @@ Person
         species: 'dog'
       }]
     }]
-  }).then(graph => {
-    // The return value of `insertGraph` is the input graph converted into model instances.
-    // Inserted objects have ids added to them and related rows have foreign keys set, but
-    // no other columns get fetched from the database. You can use `insertGraphAndFetch`
-    // for that.
   });
 ```
 
@@ -1052,7 +1014,7 @@ Person
 > If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
 
 ```js
-Person
+await Person
   .query()
   .insertGraph([{
     firstName: 'Jennifer',
@@ -1082,7 +1044,7 @@ Person
 > as long as the reference doesn't create a circular dependency. For example:
 
 ```js
-Person
+await Person
   .query()
   .insertGraph([{
     "#id": 'jenniLaw',
@@ -1105,7 +1067,7 @@ Person
 > `['children', 'children.movies.actors']` in which case only objects in those paths get related even if they have an idetifier.
 
 ```js
-Person
+await Person
   .query()
   .insertGraph([{
     firstName: 'Jennifer',
@@ -1123,7 +1085,7 @@ Person
 > `movies` relation. The next query would do the same:
 
 ```js
-Person
+await Person
   .query()
   .insertGraph([{
     firstName: 'Jennifer',
@@ -1142,7 +1104,7 @@ Person
 > If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef`
 
 ```js
-Person
+await Person
   .query()
   .insertGraph([{
     firstName: 'Jennifer',
@@ -1232,7 +1194,10 @@ You can read more about graph inserts from [this blog post](https://www.vincit.f
 > all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
 
 ```js
-Person
+// The return value of `upsertGraph` is the input graph converted into model instances.
+// Inserted objects have ids added to them related rows have foreign keys set but no other
+// columns get fetched from the database. You can use `upsertGraphAndFetch` for that.
+const graph = await Person
   .query()
   .upsertGraph({
     // This updates the `Jennifer Aniston` person since the id property is present.
@@ -1286,10 +1251,6 @@ Person
         text: 'Would see again'
       }]
     }]
-  }).then(graph => {
-    // The return value of `upsertGraph` is the input graph converted into model instances.
-    // Inserted objects have ids added to them related rows have foreign keys set but no other
-    // columns get fetched from the database. You can use `upsertGraphAndFetch` for that.
   });
 ```
 
@@ -1303,7 +1264,7 @@ const options = {
   unrelate: true
 };
 
-Person
+await Person
   .query()
   .upsertGraph({
     // This updates the `Jennifer Aniston` person since the id property is present.
@@ -1363,7 +1324,7 @@ const options = {
   noDelete: ['movies']
 };
 
-Person
+await Person
   .query()
   .upsertGraph({
     id: 1,
@@ -1439,44 +1400,54 @@ There are two ways to work with transactions in objection:
 ## Passing around a transaction object
 
 ```js
-const knex = Person.knex();
-
-objection.transaction(knex, trx => {
-  return Person
-    .query(trx)
-    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-    .then(jennifer => {
-      return jennifer
-        .$relatedQuery('pets', trx)
-        .insert({name: 'Scrappy'});
-    });
-}).then(scrappy => {
-  console.log('Jennifer and Scrappy were successfully inserted');
-}).catch(err => {
-  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-});
-```
-
-> ESNext
-
-```js
+const { transaction } = require('objection');
+// You can access `knex` instance anywhere you want.
+// One way is to get it through any model.
 const knex = Person.knex();
 
 try {
-  const scrappy = await objection.transaction(knex, async (trx) => {
+  const scrappy = await transaction(knex, async (trx) => {
     const jennifer = await Person
       .query(trx)
-      .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+      .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
 
-    return jennifer
+    const scrappy = await jennifer
       .$relatedQuery('pets', trx)
       .insert({name: 'Scrappy'});
+
+    return scrappy;
   });
 } catch (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
 }
+```
 
-console.log('Jennifer and Scrappy were successfully inserted');
+> Alternatively `transaction.start` can be used.
+
+```js
+const { transaction } = require('objection');
+// You can access `knex` instance anywhere you want.
+// One way is to get it through any model.
+const knex = Person.knex();
+
+let trx;
+try {
+  trx = await transaction.start(knex);
+
+  const jennifer = await Person
+    .query(trx)
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+  const scrappy = await jennifer
+    .$relatedQuery('pets', trx)
+    .insert({name: 'Scrappy'});
+
+  await trx.commit();
+} catch (err) {
+  await trx.rollback();
+
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+}
 ```
 
 > Note that you can pass either a normal knex instance or a transaction to `query`, `$relatedQuery` etc.
@@ -1487,16 +1458,28 @@ console.log('Jennifer and Scrappy were successfully inserted');
 // `db` can be either a transaction or a knex instance or even
 // `null` or `undefined` if you have globally set the knex
 // instance using `Model.knex(knex)`.
-function insertPersonAndPet(person, pet, db) {
-  return Person
+async function insertPersonAndPet(person, pet, db) {
+  const person = await Person
     .query(db)
-    .insert(person)
-    .then(person => {
-      return person
-        .$relatedQuery('pets', db)
-        .insert(pet);
-    });
+    .insert(person);
+
+  return person
+    .$relatedQuery('pets', db)
+    .insert(pet);
 }
+
+// All following 3 ways to call insertPersonAndPet work:
+
+// 1.
+const trx = await transaction.start(Person.knex());
+await insertPersonAndPet(person, pet, trx);
+await trx.commit();
+
+// 2.
+await insertPersonAndPet(person, pet, trx);
+
+// 3.
+await insertPersonAndPet(person, pet);
 ```
 
 A transaction is started by calling `objection.transaction` method. You need to pass a knex instance as the first argument.
@@ -1512,6 +1495,8 @@ as their last argument.
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise
 is rejected or an error is thrown inside the callback the transaction is rolled back.
 
+Another way to start a trasnsaction is the `transaction.start` function. See the examples.
+
 Transactions in javascript are a bit of a PITA if you are used to threaded frameworks and languages like java. In those
 a single chain of operations (for example a single request) is handled in a dedicated thread. Transactions are usually
 started for the whole thread and every database operation you perform after the start automatically takes part in the
@@ -1525,106 +1510,103 @@ a transaction object to each operation explicitly.
 ## Binding models to a transaction
 
 ```js
-objection.transaction(Person, Animal, (Person, Animal) => {
-  // Person and Animal inside this function are bound to a newly
-  // created transaction. The Person and Animal outside this function
-  // are not! Even if you do `require('./models/Person')` inside this
-  // function and start a query using the required `Person` it will
-  // NOT take part in the transaction. Only the actual objects passed
-  // to this function are bound to the transaction.
+const { transaction } = require('objection');
 
-  return Person
-    .query()
-    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-    .then(() => {
-      return Animal
-        .query()
-        .insert({name: 'Scrappy'});
-    });
+try {
+  const scrappy = await transaction(Person, Animal, async (Person, Animal) => {
+    // Person and Animal inside this function are bound to a newly
+    // created transaction. The Person and Animal outside this function
+    // are not! Even if you do `require('./models/Person')` inside this
+    // function and start a query using the required `Person` it will
+    // NOT take part in the transaction. Only the actual objects passed
+    // to this function are bound to the transaction.
 
-}).then(scrappy => {
-  console.log('Jennifer and Scrappy were successfully inserted');
-}).catch(err => {
+    await Person
+      .query()
+      .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+    return Animal
+      .query()
+      .insert({name: 'Scrappy'});
+  });
+} catch (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-});
+}
 ```
 
 > You only need to give the [`transaction`](#transaction) function the model classes you use explicitly. All the
 > related model classes are implicitly bound to the same transaction:
 
 ```js
-objection.transaction(Person, Person => {
+const { transaction } = require('objection');
 
-  return Person
-    .query()
-    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-    .then(jennifer => {
-      // This creates a query using the `Animal` model class but we
-      // don't need to give `Animal` as one of the arguments to the
-      // transaction function because `jennifer` is an instance of
-      // the `Person` that is bound to a transaction.
-      return jennifer
-        .$relatedQuery('pets')
-        .insert({name: 'Scrappy'});
-    });
+try {
+  const scrappy = await transaction(Person, async (Person) => {
+    const jennifer = await Person
+      .query()
+      .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
 
-}).then(scrappy => {
-  console.log('Jennifer and Scrappy were successfully inserted');
-}).catch(err => {
+    // This creates a query using the `Animal` model class but we
+    // don't need to give `Animal` as one of the arguments to the
+    // transaction function because `jennifer` is an instance of
+    // the `Person` that is bound to a transaction.
+    return jennifer
+      .$relatedQuery('pets')
+      .insert({name: 'Scrappy'});
+  });
+} catch (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-});
+}
 ```
 
 > The only way you can mess up with the transactions is if you _explicitly_ start a query using a model class
 > that is not bound to the transaction:
 
 ```js
+const { transaction } = require('objection');
 const Person = require('./models/Person');
 const Animal = require('./models/Animal');
 
-objection.transaction(Person, BoundPerson => {
-
+await transaction(Person, async (BoundPerson) => {
   // This will be executed inside the transaction.
-  return BoundPerson
+  const jennifer = await BoundPerson
     .query()
-    .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-    .then(jennifer => {
-      // OH NO! This query is executed outside the transaction
-      // since the `Animal` class is not bound to the transaction.
-      return Animal
-        .query()
-        .insert({name: 'Scrappy'});
-    })
-    .then(() => {
-      // OH NO! This query is executed outside the transaction
-      // since the `Person` class is not bound to the transaction.
-      // BoundPerson !== Person.
-      return Person
-        .query()
-        .insert({firstName: 'Bradley'});
-    });
+    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
 
+  // OH NO! This query is executed outside the transaction
+  // since the `Animal` class is not bound to the transaction.
+  await Animal
+    .query()
+    .insert({name: 'Scrappy'});
+
+  // OH NO! This query is executed outside the transaction
+  // since the `Person` class is not bound to the transaction.
+  // BoundPerson !== Person.
+  await Person
+    .query()
+    .insert({firstName: 'Bradley'});
 });
 ```
 
 > The transaction object is always passed as the last argument to the callback:
 
 ```js
-objection.transaction(Person, (Person, trx) => {
+const { transaction } = require('objection');
+
+await transaction(Person, async (Person, trx) => {
   // `trx` is the knex transaction object.
   // It can be passed to `transacting`, `query` etc.
   // methods, or used as a knex query builder.
 
-  var q1 = trx('Person').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
-  var q2 = Animal.query(trx).insert({name: 'Scrappy'});
-  var q3 = Animal.query().transacting(trx).insert({name: 'Fluffy'});
+  const jennifer = await trx('Person').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+  const scrappy = await Animal.query(trx).insert({name: 'Scrappy'});
+  const fluffy = await Animal.query().transacting(trx).insert({name: 'Fluffy'});
 
-  return Promise.all([q1, q2, q3]);
-
-}).spread((jennifer, scrappy, fluffy) => {
-  console.log('Jennifer, Scrappy and Fluffy were successfully inserted');
-}).catch(err => {
-  console.log('Something went wrong. Jennifer, Scrappy and Fluffy were not inserted');
+  return {
+    jennifer,
+    scrappy,
+    fluffy
+  };
 });
 ```
 
@@ -1650,7 +1632,7 @@ models from which the copies were taken.
 > The `address` property of the Person model is defined as an object in the [Person.jsonSchema](#models):
 
 ```js
-Person
+const jennifer = await Person
   .query()
   .insert({
     firstName: 'Jennifer',
@@ -1661,17 +1643,14 @@ Person
       zipCode: '123456',
       city: 'Tampere'
     }
-  })
-  .then(jennifer => {
-    console.log(jennifer.address.city); // --> Tampere
-    return Person.query().where('id', jennifer.id);
-  })
-  .then(jenniferFromDb => {
-    console.log(jenniferFromDb.address.city); // --> Tampere
-  })
-  .catch(err => {
-    console.log('oh noes');
   });
+
+const jenniferFromDb = await Person
+  .query()
+  .findById(jennifer.id);
+
+console.log(jennifer.address.city); // --> Tampere
+console.log(jenniferFromDb.address.city); // --> Tampere
 ```
 
 Objection.js makes it easy to store non-flat documents as table rows. All properties of a model that are marked as
@@ -1679,6 +1658,8 @@ objects or arrays in the model's [`jsonSchema`](#jsonschema) are automatically c
 back to objects when read from the database. The database columns for the object properties can be normal
 text columns. Postgresql has the `json` and `jsonb` data types that can be used instead for better performance
 and possibility to [write queries](http://www.postgresql.org/docs/9.4/static/functions-json.html) to the documents.
+If you don't want to use `jsonSchema` you can mark properties as objects using the [`jsonAttributes`](#jsonattributes)
+Model property.
 
 # Validation
 
@@ -1686,29 +1667,35 @@ and possibility to [write queries](http://www.postgresql.org/docs/9.4/static/fun
 
 ```js
 Person.fromJson({firstName: 'jennifer', lastName: 'Lawrence'});
-Person.query().insert({firstName: 'jennifer', lastName: 'Lawrence'});
-Person.query().update({firstName: 'jennifer', lastName: 'Lawrence'}).where('id', 10);
+await Person.query().insert({firstName: 'jennifer', lastName: 'Lawrence'});
+await Person.query().update({firstName: 'jennifer', lastName: 'Lawrence'}).where('id', 10);
 // Patch operation ignores the `required` property of the schema and only validates the
 // given properties. This allows a subset of model's properties to be updated.
-Person.query().patch({age: 24}).where('age', '<', 24);
+await Person.query().patch({age: 24}).where('age', '<', 24);
 ```
 
 > Validation errors provide detailed error message:
 
 ```js
-Person.query().insert({firstName: 'jennifer'}).catch(err => {
+try {
+  await Person.query().insert({firstName: 'jennifer'});
+} catch (err) {
   console.log(err instanceof objection.ValidationError); // --> true
   console.log(err.data); // --> {lastName: [{message: 'required property missing', ...}]}
-});
+}
 ```
 
 > Error parameters returned by [`ValidationError`](#validationerror) could be used to provide custom error messages:
 
 ```js
-Person.query().insert({firstName: 'jennifer'}).catch(err => {
-  let lastNameErrors = err.data['lastName'];
+try {
+  await Person.query().insert({firstName: 'jennifer'});
+} catch (err) {
+  let lastNameErrors = err.data.lastName;
+
   for (let i = 0; i < lastNameErrors.length; ++i) {
     let lastNameError = lastNameErrors[i];
+
     if (lastNameError.keyword === "required") {
       console.log('This field is required!');
     } else if (lastNameError.keyword === "minLength") {
@@ -1717,7 +1704,7 @@ Person.query().insert({firstName: 'jennifer'}).catch(err => {
       console.log(lastNameError.message); // Fallback to default error message
     }
   }
-});
+}
 ```
 
 [JSON schema](http://json-schema.org/) validation can be enabled by setting the [`jsonSchema`](#jsonschema) property
@@ -1912,6 +1899,7 @@ mysql -u root -e "CREATE DATABASE objection_test"
 
 ### Develop
 
-Code and tests need to be written in ES2015 subset supported by node 4.0.0. The best way to make sure of this is
+Code and tests need to be written in ES2015 subset supported by node 6.0.0. The best way to make sure of this is
 to develop with the correct node version. [nvm](https://github.com/creationix/nvm) is a great tool for swapping
-between node versions.
+between node versions. `prettier` is used to format the code. Remember to run `npm run prettier` before committing
+code.
