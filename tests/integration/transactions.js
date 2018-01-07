@@ -606,6 +606,45 @@ module.exports = session => {
           .catch(done);
       });
 
+      it(
+        'commit should work with yield (and thus async/await)',
+        Promise.coroutine(function*() {
+          const trx = yield transaction.start(Model1.knex());
+
+          yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
+          yield Model1.query(trx).insert({ model1Prop1: 'test 2' });
+          yield Model2.query(trx).insert({ model2Prop1: 'test 3' });
+          yield trx.commit();
+
+          const model1Rows = yield session.knex('Model1');
+          const model2Rows = yield session.knex('model2');
+
+          expect(model1Rows).to.have.length(2);
+          expect(_.map(model1Rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+
+          expect(model2Rows).to.have.length(1);
+          expect(model2Rows[0].model2_prop1).to.equal('test 3');
+        })
+      );
+
+      it(
+        'rollback should work with yield (and thus async/await)',
+        Promise.coroutine(function*() {
+          const trx = yield transaction.start(Model1.knex());
+
+          yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
+          yield Model1.query(trx).insert({ model1Prop1: 'test 2' });
+          yield Model2.query(trx).insert({ model2Prop1: 'test 3' });
+          yield trx.rollback();
+
+          const model1Rows = yield session.knex('Model1');
+          const model2Rows = yield session.knex('model2');
+
+          expect(model1Rows).to.have.length(0);
+          expect(model2Rows).to.have.length(0);
+        })
+      );
+
       it('should work when a knex connection is passed instead of a model', done => {
         let trx;
         transaction
