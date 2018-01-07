@@ -1007,6 +1007,17 @@ module.exports = session => {
         });
     });
 
+    it('range', () => {
+      return Model1.query()
+        .where('id', 1)
+        .eager('[model1Relation1, model1Relation2]')
+        .range(0, 0)
+        .then(res => {
+          expect(res.results[0].model1Relation1.id).to.equal(2);
+          expect(res.results[0].model1Relation2).to.have.length(2);
+        });
+    });
+
     describe('JoinEagerAlgorithm', () => {
       it('select should work', () => {
         return Model1.query()
