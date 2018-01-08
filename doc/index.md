@@ -391,20 +391,23 @@ class Person extends Model {
 ```
 
 Models are created by inheriting from the [`Model`](#model) class. A `Model` subclass reprents a database table
-and instances of that class represent table rows. A `Model` class can define [relationships](#relations) (relations, associations)
+and instances of that class represent table rows. A `Model` class can define [relationships](#relations) (aka. relations, associations)
 to other models using the static [`relationMappings`](#relationmappings) property.
 
 In objection, all configuration is done through `Model` classes and there is no global configuration or state. This allows you
 to create isolated components and for example to use multiple different databases with different configurations in one
 app. Most of the time you want the same configuration for all models and a good pattern is to create a `BaseModel`
-superclass and inherit all your models from that. You can then add all shared configuration to `BaseModel`.
+superclass and inherit all your models from that. You can then add all shared configuration to `BaseModel`. See the
+[Reference --> Model --> Static properties](#tablename) section for all available configuration options.
 
-Each model must have an identifier column. The identifier can be set using the [`idColumn`](#idcolumn) property.
-`idColumn` defaults to `"id"`. If your table's identifier is something else, you need to set [`idColumn`](#idcolumn)
-for your models. Composite id can be set by giving an array of column names. Composite keys are first class citizens
-in objection.
+Models can optionally define a [`jsonSchema`](#jsonschema) object that is used for input validation. Every time
+a `Model` instance is created, it is validated against the `jsonSchema`. Note that `Model` instances are implicitly
+created whenever you call `insert(obj)`, `insertGraph(obj)`, `patch(obj)` or any other method that takes model properties
+(no validation is done when reading from the database).
 
-See the [Reference --> Model --> Static properties](#tablename) section for all available configuration options.
+Each model must have an identifier column. The identifier column name can be set using the [`idColumn`](#idcolumn) property.
+`idColumn` defaults to `"id"`. If your table's identifier is something else, you need to set [`idColumn`](#idcolumn).
+Composite id can be set by giving an array of column names. Composite keys are first class citizens in objection.
 
 # Relations
 
@@ -508,14 +511,117 @@ class Person extends Model {
 }
 ```
 
-We already went through how to create relations in the [models](#models) section but here's a list of all the
-available relation types in a nicely searchable place. See [this](#relationmapping) API doc section for full
-documentation of the relation mapping parameters.
+> Solutions to require loops
+
+```js
+class Person extends Model {
+  static get tableName() {
+    return 'person';
+  }
+
+  static get relationMappings() {
+    // Solution 1:
+    //
+    // relationMappings getter is accessed lazily when you execute your first query
+    // that needs it. Therefore if you `require` your models inside the getter, you
+    // don't end up with a require loop. Note that only one end of the relation needs
+    // to be required like this, not both. `relationMappings` can also be a method or
+    // a thunk if you prefer those instead of getters.
+    const Animal = require('./Animal');
+
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'person.id',
+          to: 'animal.ownerId'
+        }
+      },
+
+      movies: {
+        relation: Model.ManyToManyRelation,
+        // Solution 2:
+        //
+        // Absolute file path to a module that exports the model class. This is similar
+        // to solution 1, but objection calls `require` under the hood. The downside here
+        // is that you need to give an absolute file path because of the way `require` works.
+        modelClass: `${__dirname}/Movie`,
+        join: {
+          from: 'Person.id',
+          through: {
+            // Person_Movie is the join table.
+            from: 'Person_Movie.personId',
+            to: 'Person_Movie.movieId'
+          },
+          to: 'Movie.id'
+        }
+      },
+
+      movies: {
+        relation: Model.ManyToManyRelation,
+        // Solution 3:
+        //
+        // Use only a module name and define a `modelPaths` property for your model (or a superclass
+        // of your model). Search for `modelPaths` from the docs for more info.
+        modelClass: 'Movie',
+        join: {
+          from: 'Person.id',
+          through: {
+            from: 'Person_Movie.personId',
+            to: 'Person_Movie.movieId'
+          },
+          to: 'Movie.id'
+        }
+      }
+    };
+  }
+}
+```
+
+We already went through how to create relationships (aka. relations, associations) in the [models](#models) section's examples
+but here's a list of all the available relation types in a nicely searchable place. See [this](#relationmapping) API doc
+section for full documentation of the relation mapping parameters.
+
+Relationships are a very basic concept in relational databases and if you aren't familiar with it, you should spend some
+time googling it first. Basically there are three ways to create a relationship between two tables `A` and `B`:
+
+1. `A` table has a column that holds the `B` table's id. This relationship is called a `BelongsToOneRelation` in objection.
+   We can say that `A` belongs to one `B`.
+
+2. `B` table has a column that holds the `A` table's id. This relationship is called a `HasManyRelation` in objection.
+   We can say that `A` has many `B`'s.
+
+3. `C` table has columns for both `A` and `B` tables' identifiers. This relationship is called `ManyToManyRelation` in objection.
+   Each row in `C` joins one `A` with one `B`. Therefore an `A` row can be related to multiple `B` rows and a `B` row can be related to
+   multiple `A` rows.
+
+While relations are usually created between the primary key of one table and a foreign key reference of another table, objection
+has no such limitations. You can create relationship using any two columns (or any sets of columns). You can even create relation
+using values nested deep inside json columns.
+
+If you have used other ORM's you may notice that objection's `relationMappings` are really verbose. There are couple of reasons for that:
+
+1. For a new user, this style underlines what is happening, and which columns and tables are involved.
+
+2. You only need defined relations once. Writing a couple of lines more for clarity shouldn't impact your productivity.
 
 Vocabulary for the relation descriptions:
 
  * source model: The model for which you are writing the `relationMapping` for.
  * related model: The model at the other end of the relation.
+
+**Require loops**
+
+Require loops (circular dependencies, circular requires) are a very common problem when defining relations. Whenever a module `A`
+`requires` or `imports` module `B` that immediately (synchronously) `requires` or `imports` module `A`, you create a require loop
+that node.js or objection cannot solve automatically. A require loop usually leads to the other imported value to be an empty object
+which causes all kinds of problems. Objection attempts to detect these situations and mention the words `require loop` in the
+thrown error. Objection offers multiple solutions to this problem. See the circular dependency solutions examples in this section.
+In addition to objection's solutions, you can always organize your code so that such loops are not created.
+
+
+
 
 # Query examples
 

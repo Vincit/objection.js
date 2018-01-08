@@ -229,7 +229,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join.through.modelClass is not a subclass of Model or a file path to a module that exports one.'
+        'OwnerModel.relationMappings.testRelation: join.through.modelClass is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
       );
     });
   });
