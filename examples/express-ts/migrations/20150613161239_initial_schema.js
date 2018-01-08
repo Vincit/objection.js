@@ -1,6 +1,6 @@
-exports.up = function(knex) {
+exports.up = knex => {
   return knex.schema
-    .createTable('Person', function(table) {
+    .createTable('Person', table => {
       table.increments('id').primary();
       table
         .integer('parentId')
@@ -14,11 +14,11 @@ exports.up = function(knex) {
       table.bigInteger('createdAt').notNullable();
       table.bigInteger('updatedAt').notNullable();
     })
-    .createTable('Movie', function(table) {
+    .createTable('Movie', table => {
       table.increments('id').primary();
       table.string('name');
     })
-    .createTable('Animal', function(table) {
+    .createTable('Animal', table => {
       table.increments('id').primary();
       table
         .integer('ownerId')
@@ -28,7 +28,7 @@ exports.up = function(knex) {
       table.string('name');
       table.string('species');
     })
-    .createTable('Person_Movie', function(table) {
+    .createTable('Person_Movie', table => {
       table.increments('id').primary();
       table
         .integer('personId')
@@ -45,7 +45,7 @@ exports.up = function(knex) {
     });
 };
 
-exports.down = function(knex) {
+exports.down = knex => {
   return knex.schema
     .dropTableIfExists('Person_Movie')
     .dropTableIfExists('Animal')
