@@ -4777,6 +4777,30 @@ class Person extends Model {
 }
 ```
 
+> Using a shared `BaseModel` superclass:
+
+```js
+const { Model } = require('objection');
+
+// models/BaseModel.js
+class BaseModel extends Model {
+  static get modelPaths() {
+    return [__dirname];
+  }
+}
+
+module.exports = {
+  BaseModel
+};
+
+// models/Person.js
+const { BaseModel } = require('./BaseModel');
+
+class Person extends BaseModel {
+  ...
+}
+```
+
 > ESNext:
 
 ```js
@@ -4792,6 +4816,10 @@ A model class can be defined for a relation in [`relationMappings`](#relationmap
 1. A model class constructor
 2. An absolute path to a module that exports a model class
 3. A path relative to one of the paths in `modelPaths` array.
+
+You probably don't want to define `modelPaths` property for each model. Once again we
+recommend that you create a `BaseModel` super class for all your models and define
+shared configuration such as this there.
 
 
 
