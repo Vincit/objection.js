@@ -4185,7 +4185,7 @@ Person
   });
 ```
 
-Two queries queries are performed by this method: the actual query and a query to get the `total` count.
+Two queries are performed by this method: the actual query and a query to get the `total` count.
 
 Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size,
 but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the
@@ -4245,7 +4245,7 @@ Person
 
 Only returns the given range of results.
 
-Two queries queries are performed by this method: the actual query and a query to get the `total` count.
+Two queries are performed by this method: the actual query and a query to get the `total` count.
 
 Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size,
 but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the
