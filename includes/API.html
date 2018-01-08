@@ -5672,6 +5672,29 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <span class="p">}</span>
 </code></pre>
 <blockquote>
+<p>Using a shared <code class="prettyprint">BaseModel</code> superclass:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="c1">// models/BaseModel.js</span>
+<span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modelPaths</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nx">__dirname</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">BaseModel</span>
+<span class="p">};</span>
+
+<span class="c1">// models/Person.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">BaseModel</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./BaseModel'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">BaseModel</span> <span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
 <p>ESNext:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -5687,6 +5710,10 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <li>An absolute path to a module that exports a model class</li>
 <li>A path relative to one of the paths in <code class="prettyprint">modelPaths</code> array.</li>
 </ol>
+
+<p>You probably don&rsquo;t want to define <code class="prettyprint">modelPaths</code> property for each model. Once again we
+recommend that you create a <code class="prettyprint">BaseModel</code> super class for all your models and define
+shared configuration such as this there.</p>
 
 <h4 id="relationmappings">relationMappings</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>

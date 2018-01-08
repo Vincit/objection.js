@@ -406,20 +406,23 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
 <span class="p">}</span>
 </code></pre>
 <p>Models are created by inheriting from the <a href="#model"><code class="prettyprint">Model</code></a> class. A <code class="prettyprint">Model</code> subclass reprents a database table
-and instances of that class represent table rows. A <code class="prettyprint">Model</code> class can define <a href="#relations">relationships</a> (relations, associations)
+and instances of that class represent table rows. A <code class="prettyprint">Model</code> class can define <a href="#relations">relationships</a> (aka. relations, associations)
 to other models using the static <a href="#relationmappings"><code class="prettyprint">relationMappings</code></a> property.</p>
 
 <p>In objection, all configuration is done through <code class="prettyprint">Model</code> classes and there is no global configuration or state. This allows you
 to create isolated components and for example to use multiple different databases with different configurations in one
 app. Most of the time you want the same configuration for all models and a good pattern is to create a <code class="prettyprint">BaseModel</code>
-superclass and inherit all your models from that. You can then add all shared configuration to <code class="prettyprint">BaseModel</code>.</p>
+superclass and inherit all your models from that. You can then add all shared configuration to <code class="prettyprint">BaseModel</code>. See the
+<a href="#tablename">Reference &ndash;&gt; Model &ndash;&gt; Static properties</a> section for all available configuration options.</p>
 
-<p>Each model must have an identifier column. The identifier can be set using the <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property.
-<code class="prettyprint">idColumn</code> defaults to <code class="prettyprint">&quot;id&quot;</code>. If your table&rsquo;s identifier is something else, you need to set <a href="#idcolumn"><code class="prettyprint">idColumn</code></a>
-for your models. Composite id can be set by giving an array of column names. Composite keys are first class citizens
-in objection.</p>
+<p>Models can optionally define a <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> object that is used for input validation. Every time
+a <code class="prettyprint">Model</code> instance is created, it is validated against the <code class="prettyprint">jsonSchema</code>. Note that <code class="prettyprint">Model</code> instances are implicitly
+created whenever you call <code class="prettyprint">insert(obj)</code>, <code class="prettyprint">insertGraph(obj)</code>, <code class="prettyprint">patch(obj)</code> or any other method that takes model properties
+(no validation is done when reading from the database).</p>
 
-<p>See the <a href="#tablename">Reference &ndash;&gt; Model &ndash;&gt; Static properties</a> section for all available configuration options.</p>
+<p>Each model must have an identifier column. The identifier column name can be set using the <a href="#idcolumn"><code class="prettyprint">idColumn</code></a> property.
+<code class="prettyprint">idColumn</code> defaults to <code class="prettyprint">&quot;id&quot;</code>. If your table&rsquo;s identifier is something else, you need to set <a href="#idcolumn"><code class="prettyprint">idColumn</code></a>.
+Composite id can be set by giving an array of column names. Composite keys are first class citizens in objection.</p>
 
 <h1 id="relations">Relations</h1>
 
@@ -518,9 +521,100 @@ in objection.</p>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-<p>We already went through how to create relations in the <a href="#models">models</a> section but here&rsquo;s a list of all the
-available relation types in a nicely searchable place. See <a href="#relationmapping">this</a> API doc section for full
-documentation of the relation mapping parameters.</p>
+<blockquote>
+<p>Solutions to require loops</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'person'</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Solution 1:</span>
+    <span class="c1">//</span>
+    <span class="c1">// relationMappings getter is accessed lazily when you execute your first query</span>
+    <span class="c1">// that needs it. Therefore if you `require` your models inside the getter, you</span>
+    <span class="c1">// don't end up with a require loop. Note that only one end of the relation needs</span>
+    <span class="c1">// to be required like this, not both. `relationMappings` can also be a method or</span>
+    <span class="c1">// a thunk if you prefer those instead of getters.</span>
+    <span class="kr">const</span> <span class="nx">Animal</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./Animal'</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'person.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'animal.ownerId'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="c1">// Solution 2:</span>
+        <span class="c1">//</span>
+        <span class="c1">// Absolute file path to a module that exports the model class. This is similar</span>
+        <span class="c1">// to solution 1, but objection calls `require` under the hood. The downside here</span>
+        <span class="c1">// is that you need to give an absolute file path because of the way `require` works.</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">__dirname</span><span class="p">}</span><span class="s2">/Movie`</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1">// Person_Movie is the join table.</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+
+      <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
+        <span class="c1">// Solution 3:</span>
+        <span class="c1">//</span>
+        <span class="c1">// Use only a module name and define a `modelPaths` property for your model (or a superclass</span>
+        <span class="c1">// of your model). Search for `modelPaths` from the docs for more info.</span>
+        <span class="na">modelClass</span><span class="p">:</span> <span class="s1">'Movie'</span><span class="p">,</span>
+        <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="p">},</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>We already went through how to create relationships (aka. relations, associations) in the <a href="#models">models</a> section&rsquo;s examples
+but here&rsquo;s a list of all the available relation types in a nicely searchable place. See <a href="#relationmapping">this</a> API doc
+section for full documentation of the relation mapping parameters.</p>
+
+<p>Relationships are a very basic concept in relational databases and if you aren&rsquo;t familiar with it, you should spend some
+time googling it first. Basically there are three ways to create a relationship between two tables <code class="prettyprint">A</code> and <code class="prettyprint">B</code>:</p>
+
+<ol>
+<li><p><code class="prettyprint">A</code> table has a column that holds the <code class="prettyprint">B</code> table&rsquo;s id. This relationship is called a <code class="prettyprint">BelongsToOneRelation</code> in objection.
+We can say that <code class="prettyprint">A</code> belongs to one <code class="prettyprint">B</code>.</p></li>
+<li><p><code class="prettyprint">B</code> table has a column that holds the <code class="prettyprint">A</code> table&rsquo;s id. This relationship is called a <code class="prettyprint">HasManyRelation</code> in objection.
+We can say that <code class="prettyprint">A</code> has many <code class="prettyprint">B</code>&rsquo;s.</p></li>
+<li><p><code class="prettyprint">C</code> table has columns for both <code class="prettyprint">A</code> and <code class="prettyprint">B</code> tables&rsquo; identifiers. This relationship is called <code class="prettyprint">ManyToManyRelation</code> in objection.
+Each row in <code class="prettyprint">C</code> joins one <code class="prettyprint">A</code> with one <code class="prettyprint">B</code>. Therefore an <code class="prettyprint">A</code> row can be related to multiple <code class="prettyprint">B</code> rows and a <code class="prettyprint">B</code> row can be related to
+multiple <code class="prettyprint">A</code> rows.</p></li>
+</ol>
+
+<p>While relations are usually created between the primary key of one table and a foreign key reference of another table, objection
+has no such limitations. You can create relationship using any two columns (or any sets of columns). You can even create relation
+using values nested deep inside json columns.</p>
+
+<p>If you have used other ORM&rsquo;s you may notice that objection&rsquo;s <code class="prettyprint">relationMappings</code> are really verbose. There are couple of reasons for that:</p>
+
+<ol>
+<li><p>For a new user, this style underlines what is happening, and which columns and tables are involved.</p></li>
+<li><p>You only need defined relations once. Writing a couple of lines more for clarity shouldn&rsquo;t impact your productivity.</p></li>
+</ol>
 
 <p>Vocabulary for the relation descriptions:</p>
 
@@ -528,6 +622,15 @@ documentation of the relation mapping parameters.</p>
 <li>source model: The model for which you are writing the <code class="prettyprint">relationMapping</code> for.</li>
 <li>related model: The model at the other end of the relation.</li>
 </ul>
+
+<p><strong>Require loops</strong></p>
+
+<p>Require loops (circular dependencies, circular requires) are a very common problem when defining relations. Whenever a module <code class="prettyprint">A</code>
+<code class="prettyprint">requires</code> or <code class="prettyprint">imports</code> module <code class="prettyprint">B</code> that immediately (synchronously) <code class="prettyprint">requires</code> or <code class="prettyprint">imports</code> module <code class="prettyprint">A</code>, you create a require loop
+that node.js or objection cannot solve automatically. A require loop usually leads to the other imported value to be an empty object
+which causes all kinds of problems. Objection attempts to detect these situations and mention the words <code class="prettyprint">require loop</code> in the
+thrown error. Objection offers multiple solutions to this problem. See the circular dependency solutions examples in this section.
+In addition to objection&rsquo;s solutions, you can always organize your code so that such loops are not created.</p>
 
 <h1 id="query-examples">Query examples</h1>
 
@@ -8427,6 +8530,29 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <span class="p">}</span>
 </code></pre>
 <blockquote>
+<p>Using a shared <code class="prettyprint">BaseModel</code> superclass:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="c1">// models/BaseModel.js</span>
+<span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modelPaths</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nx">__dirname</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">BaseModel</span>
+<span class="p">};</span>
+
+<span class="c1">// models/Person.js</span>
+<span class="kr">const</span> <span class="p">{</span> <span class="nx">BaseModel</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./BaseModel'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">BaseModel</span> <span class="p">{</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
 <p>ESNext:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -8442,6 +8568,10 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <li>An absolute path to a module that exports a model class</li>
 <li>A path relative to one of the paths in <code class="prettyprint">modelPaths</code> array.</li>
 </ol>
+
+<p>You probably don&rsquo;t want to define <code class="prettyprint">modelPaths</code> property for each model. Once again we
+recommend that you create a <code class="prettyprint">BaseModel</code> super class for all your models and define
+shared configuration such as this there.</p>
 
 <h4 id="relationmappings">relationMappings</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
