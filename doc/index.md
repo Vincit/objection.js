@@ -22,6 +22,7 @@ Objection.js is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping
 that aims to stay out of your way and make it as easy as possible to use the full power of SQL and the underlying
 database engine while keeping magic to a minimum.
 
+
 Objection.js is built on an SQL query builder called [knex](http://knexjs.org). All databases supported by knex
 are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thoroughly tested](https://travis-ci.org/Vincit/objection.js).
 
@@ -38,7 +39,7 @@ What objection.js gives you:
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
- * **Automatic database schema creation and migration.**
+ * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
     but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
@@ -49,12 +50,6 @@ Objection.js uses Promises and coding practices that make it ready for the futur
 in the codebase. You can use things like [async/await](http://jakearchibald.com/2014/es7-async-functions/)
 using node ">=7.6.0" or alternatively with a transpiler such as [Babel](https://babeljs.io/). Check out our [ES2015](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
-
-Blog posts and tutorials:
-
- * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/) (objection.js was originally called moron.js)
- * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
- * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
 
 # Installation
 
@@ -103,7 +98,7 @@ npm start
 const { Model } = require('objection');
 const Knex = require('knex');
 
-// Initialize knex connection.
+// Initialize knex.
 const knex = Knex({
   client: 'sqlite3',
   useNullAsDefault: true,
@@ -112,7 +107,7 @@ const knex = Knex({
   }
 });
 
-// Give the connection to objection.
+// Give the knex object to objection.
 Model.knex(knex);
 
 // Person model.
@@ -147,31 +142,26 @@ main().catch(console.error);
 ```
 
 To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the
-connection to objection.js using [`Model.knex(knex)`](#knex). Doing this installs the knex connection globally for all models.
-If you need to use multiple databases check out our [multi-tenancy recipe](#multi-tenancy).
+created object to objection.js using [`Model.knex(knex)`](#knex). Doing this installs the knex connection globally
+for all models (even the ones that have not been created yet). If you need to use multiple databases check out our
+[multi-tenancy recipe](#multi-tenancy).
 
 The next step is to create some migrations and models and start using objection.js. The best way to get started is to
 check out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6). The `express`
-example project is a simple express server. The `example-requests.sh` file contains a bunch of curl commands for you to
+example project is a simple express server. The `client.js` file contains a bunch of http requests for you to
 start playing with the REST API.
 
 We also have an [ESNext version of the example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7)
-that uses [Babel](https://babeljs.io/) for ESNext --> ES5 transpiling and a [typescript version](https://github.com/Vincit/objection.js/tree/master/examples/express-ts).
+that uses [Babel](https://babeljs.io/) for ESNext --> ES2015 transpiling and a [typescript version](https://github.com/Vincit/objection.js/tree/master/examples/express-ts).
 
 Also check out our [API reference](#api-reference) and [recipe book](#recipe-book).
-
-Blog posts and tutorials:
-
- * [Introduction](https://www.vincit.fi/en/blog/introducing-moron-js-a-new-orm-for-node-js/) (objection.js was originally called moron.js)
- * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
- * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
 
 # Models
 
 > A working model with minimal amount of code:
 
 ```js
-const Model = require('objection').Model;
+const { Model } = require('objection');
 
 class MinimalModel extends Model {
   static get tableName() {
@@ -195,6 +185,8 @@ export default class MinimalModel extends Model {
 > Model with custom methods, json schema validation and relations. This model is used in the examples:
 
 ```js
+const { Model } = require('objection');
+
 class Person extends Model {
 
   // Table name is the only required property.
@@ -208,8 +200,8 @@ class Person extends Model {
 
   // Optional JSON schema. This is not the database schema!
   // Nothing is generated based on this. This is only used
-  // for validation. Whenever a model instance is created
-  // it is checked against this schema.
+  // for input validation. Whenever a model instance is created
+  // either explicitly or implicitly it is checked against this schema.
   // http://json-schema.org/.
   static get jsonSchema () {
     return {
@@ -313,8 +305,8 @@ class Person extends Model {
 
   // Optional JSON schema. This is not the database schema!
   // Nothing is generated based on this. This is only used
-  // for validation. Whenever a model instance is created
-  // it is checked against this schema.
+  // for input validation. Whenever a model instance is created
+  // either explicitly or implicitly it is checked against this schema.
   // http://json-schema.org/.
   static jsonSchema = {
     type: 'object',
@@ -398,7 +390,21 @@ class Person extends Model {
 }
 ```
 
-Models are created by inheriting from the [`Model`](#model) base class.
+Models are created by inheriting from the [`Model`](#model) class. A `Model` subclass reprents a database table
+and instances of that class represent table rows. A `Model` class can define [relationships](#relations) (relations, associations)
+to other models using the static [`relationMappings`](#relationmappings) property.
+
+In objection, all configuration is done through `Model` classes and there is no global configuration or state. This allows you
+to create isolated components and for example to use multiple different databases with different configurations in one
+app. Most of the time you want the same configuration for all models and a good pattern is to create a `BaseModel`
+superclass and inherit all your models from that. You can then add all shared configuration to `BaseModel`.
+
+Each model must have an identifier column. The identifier can be set using the [`idColumn`](#idcolumn) property.
+`idColumn` defaults to `"id"`. If your table's identifier is something else, you need to set [`idColumn`](#idcolumn)
+for your models. Composite id can be set by giving an array of column names. Composite keys are first class citizens
+in objection.
+
+See the [Reference --> Model --> Static properties](#tablename) section for all available configuration options.
 
 # Relations
 

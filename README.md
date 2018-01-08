@@ -22,7 +22,7 @@ What objection.js gives you:
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
- * **Automatic database schema creation and migration.**
+ * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
     but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
@@ -39,8 +39,3 @@ Shortcuts:
  * [Changelog](http://vincit.github.io/objection.js/#changelog)
  * [Contribution guide](http://vincit.github.io/objection.js/#contribution-guide)
  * [Plugins](http://vincit.github.io/objection.js/#plugins)
-
-Blog posts and tutorials:
-
- * [Eager loading](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)
- * [Postgres JSON queries](https://www.vincit.fi/en/blog/by-the-power-of-json-queries/)
