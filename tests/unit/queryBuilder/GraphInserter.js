@@ -1460,7 +1460,7 @@ describe('GraphInserter', () => {
           tableName: tableInsertion.modelClass.getTableName(),
           models: _.map(models, model => {
             if (model instanceof Model) {
-              return model.$toJson(true);
+              return model.$toJson({ shallow: true });
             } else {
               return _.clone(model);
             }
