@@ -1,21 +1,24 @@
 import {Model, RelationMappings} from 'objection';
 import {join} from 'path';
+import * as Interfaces from './interfaces';
 
-export interface Address {
-  street: string;
-  city: string;
-  zipCode: string;
-}
+export {Address} from './interfaces';
 
-export default class Person extends Model {
+export default class Person extends Model implements Interfaces.Person {
   readonly id: number;
-  parent: Person;
+  parentId: number|null;
   firstName: string;
   lastName: string;
   age: number;
-  address: Address;
+  address: Interfaces.Address;
   createdAt: Date;
   updatedAt: Date;
+
+  // Optional eager relations.
+  parent?: Interfaces.Person;
+  children?: Interfaces.Person[];
+  pets?: Interfaces.Animal[];
+  movies?: Interfaces.Movie[];
 
   // Table name is the only required property.
   static tableName = 'Person';
