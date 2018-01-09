@@ -106,7 +106,7 @@ declare namespace Objection {
     json: Pojo;
     options: ModelOptions;
   }
-  
+
   export class Validator {
     beforeValidate(args: ValidatorArgs): void;
     validate(args: ValidatorArgs): Pojo;
@@ -128,7 +128,7 @@ declare namespace Objection {
     data: any;
     message: string;
   }
-  
+
   export interface ErrorHash {
     [columnName: string]: ValidationError[];
   }
