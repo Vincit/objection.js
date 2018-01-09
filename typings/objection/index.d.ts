@@ -4,6 +4,7 @@
 
 /// <reference types="node" />
 import * as knex from 'knex';
+import * as ajv from 'ajv';
 
 export = Objection;
 
@@ -95,11 +96,41 @@ declare namespace Objection {
     skipValidation?: boolean;
   }
 
+  export interface ValidatorContext {
+    [key: string]: any;
+  }
+
+  export interface ValidatorArgs {
+    ctx: ValidatorContext;
+    model: Model;
+    json: Pojo;
+    options: ModelOptions;
+  }
+  
+  export class Validator {
+    beforeValidate(args: ValidatorArgs): void;
+    validate(args: ValidatorArgs): Pojo;
+    afterValidate(args: ValidatorArgs): void;
+  }
+
+  export interface AjvConfig {
+    onCreateAjv(ajv: ajv.Ajv): void;
+    options?: ajv.Options;
+  }
+
+  export class AjvValidator extends Validator {
+    constructor(config: AjvConfig);
+  }
+
   export class ValidationError extends Error {
     constructor(errors: any);
     statusCode: number;
     data: any;
     message: string;
+  }
+  
+  export interface ErrorHash {
+    [columnName: string]: ValidationError[];
   }
 
   export interface RelationMappings {
@@ -291,6 +322,8 @@ declare namespace Objection {
 
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
+    createValidator(): Validator;
+    createValidationError(errorHash: ErrorHash): ValidationError;
 
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
@@ -353,6 +386,8 @@ declare namespace Objection {
     static knexQuery(): knex.QueryBuilder;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
+    static createValidator(): Validator;
+    static createValidationError(errorHash: ErrorHash): ValidationError;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
     static fromJson<T>(this: Constructor<T>, json: Pojo, opt?: ModelOptions): T;
@@ -379,7 +414,7 @@ declare namespace Objection {
     $id(id: any): void;
 
     $beforeValidate(jsonSchema: JsonSchema, json: Pojo, opt: ModelOptions): JsonSchema;
-    $validate(): void; // may throw ValidationError if validation fails
+    $validate(json: Pojo, opt: ModelOptions): Pojo; // may throw ValidationError if validation fails
     $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $toDatabaseJson(): object;
