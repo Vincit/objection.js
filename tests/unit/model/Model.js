@@ -930,6 +930,26 @@ describe('Model', () => {
       expect(clone.b).to.not.equal(model.b);
       expect(clone.e[0]).to.not.equal(model.e[0]);
     });
+
+    it('should shallow clone', () => {
+      let Model = modelClass('Model');
+
+      Model.relationMappings = {
+        someRelation: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Model,
+          join: {
+            from: 'Model.id',
+            to: 'Model.model1Id'
+          }
+        }
+      };
+
+      let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+
+      expect(model.$clone()).to.eql({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+      expect(model.$clone({ shallow: true })).to.eql({ a: 1, b: 2 });
+    });
   });
 
   describe('propertyNameToColumnName', () => {
@@ -1422,7 +1442,7 @@ describe('Model', () => {
     expect(model).to.eql({ a: 1, b: 2 });
   });
 
-  it('$toJson should return result without relations if true is given as argument', () => {
+  it('$toJson should return result without relations if {shallow: true} is given as argument', () => {
     let Model = modelClass('Model');
 
     Model.relationMappings = {
@@ -1438,8 +1458,28 @@ describe('Model', () => {
 
     let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
 
-    expect(model.$toJson(false)).to.eql({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
-    expect(model.$toJson(true)).to.eql({ a: 1, b: 2 });
+    expect(model.$toJson()).to.eql({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+    expect(model.$toJson({ shallow: true })).to.eql({ a: 1, b: 2 });
+  });
+
+  it('toJSON should return result without relations if {shallow: true} is given as argument', () => {
+    let Model = modelClass('Model');
+
+    Model.relationMappings = {
+      someRelation: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Model,
+        join: {
+          from: 'Model.id',
+          to: 'Model.model1Id'
+        }
+      }
+    };
+
+    let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+
+    expect(model.toJSON()).to.eql({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+    expect(model.toJSON({ shallow: true })).to.eql({ a: 1, b: 2 });
   });
 
   it('raw method should be a shortcut to knex().raw', () => {

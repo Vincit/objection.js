@@ -6175,6 +6175,7 @@ Exports this model as a database JSON object.
 
 This method is called internally to convert a model into a database row.
 
+
 ##### Return value
 
 Type|Description
@@ -6187,10 +6188,20 @@ Object|Database row.
 #### $toJson
 
 ```js
-const jsonObj = modelInstance.$toJson();
+const jsonObj = modelInstance.$toJson(opt);
+```
+
+```js
+const shallowObj = modelInstance.$toJson({shallow: true});
 ```
 
 Exports this model as a JSON object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+opt|[`CloneOptions`](#cloneoptions)|Optional options
 
 ##### Return value
 
@@ -6204,10 +6215,20 @@ Object|Model as a JSON object.
 #### toJSON
 
 ```js
-const jsonObj = modelInstance.toJSON();
+const jsonObj = modelInstance.toJSON(opt);
+```
+
+```js
+const shallowObj = modelInstance.toJSON({shallow: true});
 ```
 
 Exports this model as a JSON object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+opt|[`CloneOptions`](#cloneoptions)|Optional options
 
 ##### Return value
 
@@ -6688,13 +6709,24 @@ Type|Description
 #### $clone
 
 ```js
-const clone = modelInstance.$clone();
+const clone = modelInstance.$clone(options);
 ```
 
-Returns a deep copy of this model.
+```js
+const shallowClone = modelInstance.$clone({shallow: true});
+```
+
+Returns a (deep) copy of this model.
 
 If this object has instances of [`Model`](#model) as properties (or arrays of them)
-they are cloned using their `$clone()` method.
+they are cloned using their `$clone()` method. A shallow copy without relations
+can be created by passing the `shallow: true` option.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+opt|[`CloneOptions`](#cloneoptions)|Optional options
 
 ##### Return value
 
@@ -7740,6 +7772,16 @@ Property|Type|Description
 patch|boolean|If true the json is treated as a patch and the `required` field of the json schema is ignored in the validation. This allows us to create models with a subset of required properties for patch operations.
 skipValidation|boolean|If true the json schema validation is skipped
 old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`.
+
+
+
+
+
+## CloneOptions
+
+Property|Type|Description
+--------|----|-----------
+shallow|boolean|If true, relations are ignored
 
 
 

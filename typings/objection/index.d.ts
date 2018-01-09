@@ -95,6 +95,10 @@ declare namespace Objection {
     skipValidation?: boolean;
   }
 
+  export interface CloneOptions {
+    shallow?: boolean;
+  }
+
   export class ValidationError extends Error {
     constructor(errors: any);
     statusCode: number;
@@ -385,8 +389,8 @@ declare namespace Objection {
     $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $toDatabaseJson(): object;
-    $toJson(): object;
-    toJSON(): object;
+    $toJson(opt?: CloneOptions): object;
+    toJSON(opt?: CloneOptions): object;
     $parseDatabaseJson(json: Pojo): Pojo;
     $formatDatabaseJson(json: Pojo): Pojo;
     $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
@@ -405,7 +409,7 @@ declare namespace Objection {
     $set(obj: Pojo): this;
     $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
-    $clone(): this;
+    $clone(opt?: CloneOptions): this;
 
     /**
      * AKA `reload` in ActiveRecord parlance
