@@ -1441,6 +1441,7 @@ describe('GraphInserter', () => {
 
     if (opt.expectErrorWithData) {
       expect(createInserter).to.throwException(err => {
+        expect(err.type).to.equal('GenericInputValidation');
         expect(err.data).to.eql(opt.expectErrorWithData);
       });
       return;

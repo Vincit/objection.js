@@ -1305,6 +1305,8 @@ module.exports = session => {
             done(new Error('should not get here'));
           })
           .catch(err => {
+            expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('GenericInputValidation');
             expect(err.data.eager).to.equal(
               'identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.'
             );
@@ -1371,11 +1373,13 @@ module.exports = session => {
             done(new Error('should not get here'));
           })
           .catch(err => {
+            expect(err.type).to.equal('GenericInputValidation');
             expect(err.data.eager).to.equal(
               'recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm'
             );
             done();
-          });
+          })
+          .catch(done);
       });
 
       it('should fail if given missing filter', done => {
@@ -1387,6 +1391,7 @@ module.exports = session => {
           })
           .catch(error => {
             expect(error).to.be.a(ValidationError);
+            expect(error.type).to.equal('GenericInputValidation');
             expect(error.data).to.have.property('eager');
             done();
           })
@@ -1401,6 +1406,22 @@ module.exports = session => {
             throw new Error('should not get here');
           })
           .catch(err => {
+            expect(err.type).to.equal('GenericInputValidation');
+            expect(err.data).to.have.property('eager');
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should fail if given invalid relation expression', done => {
+        Model1.query()
+          .where('id', 1)
+          .eager('invalidRelation')
+          .then(() => {
+            throw new Error('should not get here');
+          })
+          .catch(err => {
+            expect(err.type).to.equal('GenericInputValidation');
             expect(err.data).to.have.property('eager');
             done();
           })

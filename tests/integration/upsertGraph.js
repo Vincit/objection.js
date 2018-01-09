@@ -1545,6 +1545,7 @@ module.exports = session => {
 
           errors.forEach(error => {
             expect(error).to.be.a(ValidationError);
+            expect(error.type).to.equal('GenericInputValidation');
             expect(error.data.allowedRelations).to.equal('trying to upsert an unallowed relation');
           });
 

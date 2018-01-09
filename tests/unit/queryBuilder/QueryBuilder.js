@@ -1444,10 +1444,17 @@ describe('QueryBuilder', () => {
         .then(() => {
           done(new Error('should not get here'));
         })
-        .catch(() => {
+        .catch(err => {
+          expect(err).to.be.a(objection.ValidationError);
+          expect(err.type).to.equal('GenericInputValidation');
+          expect(err.data).to.eql({
+            allowedRelations: 'eager expression not allowed',
+            eager: 'eager expression not allowed'
+          });
           expect(executedQueries).to.have.length(0);
           done();
-        });
+        })
+        .catch(done);
     });
 
     it("allowEager('[a, b.c.[d, e]]').eager('a.b') should fail", done => {

@@ -158,6 +158,7 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('PropertyValidation');
             return session.knex(Model1.tableName);
           })
           .then(rows => {
@@ -196,9 +197,9 @@ module.exports = session => {
 
       it('should use `Model.createValidationError` to create the error', done => {
         class MyError extends Error {
-          constructor(errors) {
+          constructor({ data }) {
             super('MyError');
-            this.errors = errors;
+            this.errors = data;
           }
         }
 
@@ -211,8 +212,8 @@ module.exports = session => {
           }
         });
 
-        ModelWithSchema.createValidationError = errors => {
-          return new MyError(errors);
+        ModelWithSchema.createValidationError = props => {
+          return new MyError(props);
         };
 
         ModelWithSchema.query()

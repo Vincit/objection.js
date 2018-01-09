@@ -5917,8 +5917,8 @@ Type|Description
 
 ```js
 class BaseModel extends Model {
-  static createValidationError(errorHash) {
-    return new MyCustomValidationError(errorHash);
+  static createValidationError({type, message, data}) {
+    return new MyCustomValidationError({type, message, data});
   }
 }
 ```
@@ -5927,8 +5927,8 @@ class BaseModel extends Model {
 
 ```js
 class Model {
-  static createValidationError(errorHash) {
-    return new this.ValidationError(errorHash);
+  static createValidationError({type, message, data}) {
+    return new this.ValidationError({type, message, data});
   }
 }
 ```
@@ -7685,7 +7685,7 @@ method of [`Model`](#model) like in the example to modify the validator.
 ```js
 const ValidationError = require('objection').ValidationError;
 
-throw new ValidationError(data);
+throw new ValidationError({type, message, data});
 ```
 
 > Or
@@ -7693,10 +7693,10 @@ throw new ValidationError(data);
 ```js
 const ValidationError = require('objection').Model.ValidationError;
 
-throw new ValidationError(data);
+throw new ValidationError({type, message, data});
 ```
 
-> The `data` object should follow this pattern:
+> If `type` is `"PropertyValidation"` then `data` object should follow this pattern:
 
 ```js
 {
@@ -7728,6 +7728,8 @@ throw new ValidationError(data);
 > For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword`
 > string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
 
+> If `type` is anything else but `"PropertyValidation"`, `data` can be any object that describes the error.
+
 Error of this class is thrown by default if a model validation fails.
 
 You can replace this error by overriding [`Model.createValidationError()`](#createvalidationerror) method.
@@ -7735,7 +7737,8 @@ You can replace this error by overriding [`Model.createValidationError()`](#crea
 Property|Type|Description
 --------|----|-----------
 statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
-data|Object|Dictionary of errors.
+type|string|Either `"PropertyValidation"` or `"GenericInputValidation"`. The type is `"PropertyValidation"` if the error is thrown by the `Validator`. `"GenericInputValidation"` is used for other validation errors like invalid or unallowed relation expressions.
+data|object|Dictionary of errors.
 
 
 
