@@ -796,6 +796,94 @@ module.exports = session => {
       });
     });
 
+    describe('relatedQuery()', () => {
+      before(() => {
+        return session.populate([
+          {
+            id: 1,
+
+            model1Relation2: [
+              {
+                idCol: 1
+              },
+              {
+                idCol: 2
+              }
+            ],
+
+            model1Relation3: [
+              {
+                idCol: 4
+              }
+            ]
+          },
+          {
+            id: 2,
+
+            model1Relation2: [
+              {
+                idCol: 3
+              }
+            ],
+
+            model1Relation3: [
+              {
+                idCol: 5
+              },
+              {
+                idCol: 6
+              }
+            ]
+          }
+        ]);
+      });
+
+      it('should work in select', () => {
+        return Model1.query()
+          .select([
+            'id',
+
+            Model1.relatedQuery('model1Relation2')
+              .count()
+              .as('rel2Count'),
+
+            Model1.relatedQuery('model1Relation3')
+              .count()
+              .as('rel3Count')
+          ])
+          .orderBy('id')
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
+              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 }
+            ]);
+          });
+      });
+
+      it('should work with alias', () => {
+        return Model1.query()
+          .alias('m')
+          .select([
+            'm.id',
+
+            Model1.relatedQuery('model1Relation2')
+              .count()
+              .as('rel2Count'),
+
+            Model1.relatedQuery('model1Relation3')
+              .count()
+              .as('rel3Count')
+          ])
+          .orderBy('id')
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
+              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 }
+            ]);
+          });
+      });
+    });
+
     describe('joinRelation()', () => {
       before(() => {
         return session.populate([
@@ -1137,6 +1225,26 @@ module.exports = session => {
                 someId: 8,
                 someOtherId: 7
               }
+            ]);
+          });
+      });
+
+      it('should count related models', () => {
+        return Model1.query()
+          .leftJoinRelation('model1Relation2')
+          .select('Model1.id', 'Model1.model1Prop1')
+          .count('Model1.id as relCount')
+          .groupBy('Model1.id', 'Model1.model1Prop1')
+          .findByIds([1, 2])
+          .orderBy('id')
+          .map(it => {
+            it.relCount = parseInt(it.relCount);
+            return it;
+          })
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, model1Prop1: 'hello 1', relCount: 2, $afterGetCalled: 1 },
+              { id: 2, model1Prop1: 'hello 2', relCount: 1, $afterGetCalled: 1 }
             ]);
           });
       });

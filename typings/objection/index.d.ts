@@ -285,6 +285,7 @@ declare namespace Objection {
     HasOneThroughRelation: Relation;
 
     query(trxOrKnex?: Transaction | knex): QueryBuilder<M>;
+    relatedQuery<R extends Model>(relationName: string): QueryBuilder<R>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
     knexQuery(): knex.QueryBuilder;
@@ -348,6 +349,7 @@ declare namespace Objection {
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
     static query<T>(this: Constructor<T>, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
+    static relatedQuery<M extends Model>(relationName: string): QueryBuilder<M>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery(): knex.QueryBuilder;
