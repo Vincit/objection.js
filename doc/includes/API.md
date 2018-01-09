@@ -5557,6 +5557,60 @@ Type|Description
 
 
 
+#### relatedQuery
+
+```js
+const queryBuilder = Person.relatedQuery(relationName);
+```
+
+> Select count of a relation and the maximum value of another one:
+
+```js
+const people = await Person
+  .query()
+  .select([
+    'Person.*',
+
+    Person.relatedQuery('pets')
+      .count()
+      .where('species', 'dog')
+      .as('dogCount'),
+
+    Person.relatedQuery('movies')
+      .max('createdAt')
+      .as('mostRecentMovieDate')
+  ]);
+
+console.log(people[0].id);
+console.log(people[0].dogCount)
+console.log(people[0].mostRecentMovieDate);
+```
+
+> Find models that have at least one item in a relation:
+
+```js
+const peopleThatHavePets = await Person
+  .query()
+  .whereExists(Person.relatedQuery('pets'));
+```
+
+Creates a subquery to a relation.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation to create subquery for.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|The created query builder
+
+
+
+
 #### knex
 
 > Get:

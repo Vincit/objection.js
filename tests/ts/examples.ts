@@ -528,6 +528,18 @@ const whereSubQuery = Movie.query().select('name');
 Person.query().whereIn('firstName', whereSubQuery);
 Person.query().where('foo', whereSubQuery);
 Person.query().whereExists(whereSubQuery);
+Person.query().whereExists(Person.relatedQuery('pets'));
+Person.query().select([
+  Person.relatedQuery('pets')
+    .count()
+    .as('petCount')
+]);
+Person.query().select(
+  'id',
+  Person.relatedQuery('pets')
+    .count()
+    .as('petCount')
+);
 Person.query().where(builder => {
   builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
