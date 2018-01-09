@@ -6,7 +6,7 @@ export {Address} from './interfaces';
 
 export default class Person extends Model implements Interfaces.Person {
   readonly id: number;
-  parentId: number|null;
+  parentId: number | null;
   firstName: string;
   lastName: string;
   age: number;

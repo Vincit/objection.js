@@ -4,7 +4,7 @@ import * as Interfaces from './interfaces';
 
 export default class Animal extends Model implements Interfaces.Animal {
   readonly id: number;
-  ownerId: number|null;
+  ownerId: number | null;
   name: string;
   species: string;
 

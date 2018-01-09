@@ -2,7 +2,7 @@ import {Model} from 'objection';
 
 export interface Person extends Model {
   readonly id: number;
-  parentId: number|null;
+  parentId: number | null;
   firstName: string;
   lastName: string;
   age: number;
@@ -25,7 +25,7 @@ export interface Address {
 
 export interface Animal extends Model {
   readonly id: number;
-  ownerId: number|null;
+  ownerId: number | null;
   name: string;
   species: string;
 
