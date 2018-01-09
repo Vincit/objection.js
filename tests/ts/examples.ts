@@ -13,15 +13,22 @@ const {lit, raw, ref} = objection;
 class Person extends objection.Model {
   firstName: string;
   lastName: string;
+  mom: Person;
+  comments: Comment[]
 
   static columnNameMappers = objection.snakeCaseMappers();
 
   examplePersonMethod = (arg: string) => 1;
 
-  async petsWithId(petId: number): Promise<Animal[]> {
-    // Types can't look at strings and give strong types, so <Animal> needs
-    // to be provided to $relatedQuery
-    return await this.$relatedQuery<Animal>('pets').where('id', petId);
+  // $relatedQuery can either take a cast, if you don't want to add the field
+  // to your model:
+  petsWithId(petId: number): Promise<Animal[]> {
+    return this.$relatedQuery<Animal>('pets').where('id', petId);
+  }
+
+  // Or, if you add the field, this.$relatedQuery just works:
+  fetchMom(): Promise<Person> {
+    return this.$relatedQuery('mom')
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -109,6 +116,8 @@ async () => {
 
 class Movie extends objection.Model {
   title: string;
+  actors: Person[];
+
   /**
    * This static field instructs Objection how to hydrate and persist
    * relations. By making relationMappings a thunk, we avoid require loops
@@ -128,6 +137,11 @@ class Movie extends objection.Model {
       }
     }
   });
+}
+
+async () => {
+  // Another example of strongly-typed $relatedQuery without a cast:
+  takesPeople(await new Movie().$relatedQuery("actors"));
 }
 
 class Animal extends objection.Model {
