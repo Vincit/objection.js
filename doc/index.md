@@ -115,30 +115,59 @@ class Person extends Model {
   static get tableName() {
     return 'Person';
   }
+
+  static get relationMappings() {
+    return {
+      children: {
+        relation: Model.HasManyRelation,
+        modelClass: Person,
+        join: {
+          from: 'Person.id',
+          to: 'Person.parentId'
+        }
+      }
+    };
+  }
 }
 
-async function main() {
+async function createSchema() {
   // Create database schema. You should use knex migration files to do this. We
   // create it here for simplicity.
   await knex.schema.createTableIfNotExists('Person', table => {
     table.increments('id').primary();
+    table.integer('parentId').references('Person.id');
     table.string('firstName');
   });
+}
 
-  // Create a person.
-  const person = await Person.query().insert({firstName: 'Sylvester'});
+async function main() {
+  // Create some people.
+  const sylvester = await Person.query().insertGraph({
+    firstName: 'Sylvester',
 
-  console.log('created:', person.firstName, 'id:', person.id);
+    children: [
+      {
+        firstName: 'Sage'
+      },
+      {
+        firstName: 'Sophia'
+      }
+    ]
+  });
+
+  console.log('created:', sylvester);
 
   // Fetch all people named Sylvester and sort them by id.
+  // Load `children` relation eagerly.
   const sylvesters = await Person.query()
     .where('firstName', 'Sylvester')
+    .eager('children')
     .orderBy('id');
 
   console.log('sylvesters:', sylvesters);
 }
 
-main().catch(console.error);
+createSchema().then(() => main()).catch(console.error);
 ```
 
 To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the
