@@ -225,6 +225,7 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('PropertyValidation');
             return session.knex(Model1.tableName);
           })
           .then(rows => {

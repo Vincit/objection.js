@@ -613,6 +613,8 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err instanceof ValidationError).to.equal(true);
+            expect(err.type).to.equal('GenericInputValidation');
+            expect(err.data).to.eql({ allowedRelations: 'trying to insert an unallowed relation' });
             done();
           })
           .catch(done);
