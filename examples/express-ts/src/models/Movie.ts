@@ -1,13 +1,13 @@
 import {Model} from 'objection';
 import {join} from 'path';
-import * as Interfaces from './interfaces';
+import Person from './Person';
 
-export default class Movie extends Model implements Interfaces.Movie {
+export default class Movie extends Model {
   readonly id: number;
   name: string;
 
   // Optional eager relations.
-  actors?: Interfaces.Person[];
+  actors?: Person[];
 
   // Table name is the only required property.
   static tableName = 'Movie';

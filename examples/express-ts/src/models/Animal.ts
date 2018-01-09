@@ -1,15 +1,15 @@
 import {Model} from 'objection';
 import {join} from 'path';
-import * as Interfaces from './interfaces';
+import Person from './Person';
 
-export default class Animal extends Model implements Interfaces.Animal {
+export default class Animal extends Model {
   readonly id: number;
   ownerId: number | null;
   name: string;
   species: string;
 
   // Optional eager relations.
-  owner?: Interfaces.Person;
+  owner?: Person;
 
   // Table name is the only required property.
   static tableName = 'Animal';
