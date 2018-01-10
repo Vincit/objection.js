@@ -7696,7 +7696,7 @@ const ValidationError = require('objection').Model.ValidationError;
 throw new ValidationError({type, message, data});
 ```
 
-> If `type` is `"PropertyValidation"` then `data` object should follow this pattern:
+> If `type` is `"ModelValidation"` then `data` object should follow this pattern:
 
 ```js
 {

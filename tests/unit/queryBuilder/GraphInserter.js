@@ -580,7 +580,10 @@ describe('GraphInserter', () => {
         models: models,
         // children.pets is missing.
         allowedRelations: '[parent, children, pets, movies.actors]',
-        expectErrorWithData: { allowedRelations: 'trying to insert an unallowed relation' }
+        expectError: {
+          type: 'UnallowedRelation',
+          message: 'trying to insert an unallowed relation'
+        }
       });
     });
 
@@ -590,7 +593,10 @@ describe('GraphInserter', () => {
         models: models,
         // movies.actors missing.
         allowedRelations: '[parent, children.pets, pets, movies]',
-        expectErrorWithData: { allowedRelations: 'trying to insert an unallowed relation' }
+        expectError: {
+          type: 'UnallowedRelation',
+          message: 'trying to insert an unallowed relation'
+        }
       });
     });
 
@@ -600,7 +606,10 @@ describe('GraphInserter', () => {
         models: models,
         // parent missing.
         allowedRelations: '[children.pets, pets, movies.actors]',
-        expectErrorWithData: { allowedRelations: 'trying to insert an unallowed relation' }
+        expectError: {
+          type: 'UnallowedRelation',
+          message: 'trying to insert an unallowed relation'
+        }
       });
     });
   });
@@ -960,7 +969,10 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
+        expectError: {
+          type: 'InvalidGraph',
+          message: 'the object graph contains cyclic references'
+        }
       });
 
       test({
@@ -976,7 +988,10 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
+        expectError: {
+          type: 'InvalidGraph',
+          message: 'the object graph contains cyclic references'
+        }
       });
 
       test({
@@ -1002,7 +1017,10 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
+        expectError: {
+          type: 'InvalidGraph',
+          message: 'the object graph contains cyclic references'
+        }
       });
 
       test({
@@ -1021,7 +1039,10 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
+        expectError: {
+          type: 'InvalidGraph',
+          message: 'the object graph contains cyclic references'
+        }
       });
 
       test({
@@ -1034,7 +1055,10 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: { cyclic: 'the object graph contains cyclic references' }
+        expectError: {
+          type: 'InvalidGraph',
+          message: 'the object graph contains cyclic references'
+        }
       });
     });
 
@@ -1200,7 +1224,10 @@ describe('GraphInserter', () => {
           }
         ],
         modelClass: Person,
-        expectErrorWithData: { ref: 'could not resolve reference "child"' }
+        expectError: {
+          message: 'could not resolve reference "child"',
+          type: 'InvalidGraph'
+        }
       });
     });
   });
@@ -1406,8 +1433,9 @@ describe('GraphInserter', () => {
       test({
         models: models,
         modelClass: Person,
-        expectErrorWithData: {
-          ref: 'could not resolve reference "#ref{doesNotExist.id}"'
+        expectError: {
+          type: 'InvalidGraph',
+          message: 'could not resolve reference "#ref{doesNotExist.id}"'
         }
       });
     });
@@ -1439,10 +1467,10 @@ describe('GraphInserter', () => {
 
     let inserter;
 
-    if (opt.expectErrorWithData) {
+    if (opt.expectError) {
       expect(createInserter).to.throwException(err => {
-        expect(err.type).to.equal('GenericInputValidation');
-        expect(err.data).to.eql(opt.expectErrorWithData);
+        expect(err.type).to.equal(opt.expectError.type);
+        expect(err.message).to.eql(opt.expectError.message);
       });
       return;
     } else {

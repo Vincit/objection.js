@@ -158,7 +158,18 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err).to.be.a(ValidationError);
-            expect(err.type).to.equal('PropertyValidation');
+            expect(err.type).to.equal('ModelValidation');
+            expect(err.data).to.eql({
+              model1Prop1: [
+                {
+                  message: 'should be string',
+                  keyword: 'type',
+                  params: {
+                    type: 'string'
+                  }
+                }
+              ]
+            });
             return session.knex(Model1.tableName);
           })
           .then(rows => {
