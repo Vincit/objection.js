@@ -1007,7 +1007,7 @@ module.exports = session => {
         });
     });
 
-    it('range', () => {
+    it('range should work', () => {
       return Model1.query()
         .where('id', 1)
         .eager('[model1Relation1, model1Relation2]')
@@ -1306,8 +1306,8 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err).to.be.a(ValidationError);
-            expect(err.type).to.equal('GenericInputValidation');
-            expect(err.data.eager).to.equal(
+            expect(err.type).to.equal('RelationExpression');
+            expect(err.message).to.equal(
               'identifier model1Relation1:model1Relation1:model1Relation1:model1Relation1:id is over 63 characters long and would be truncated by the database engine.'
             );
             done();
@@ -1373,8 +1373,8 @@ module.exports = session => {
             done(new Error('should not get here'));
           })
           .catch(err => {
-            expect(err.type).to.equal('GenericInputValidation');
-            expect(err.data.eager).to.equal(
+            expect(err.type).to.equal('RelationExpression');
+            expect(err.message).to.equal(
               'recursion depth of eager expression model1Relation1.^ too big for JoinEagerAlgorithm'
             );
             done();
@@ -1389,10 +1389,12 @@ module.exports = session => {
           .then(() => {
             done(new Error('should not get here'));
           })
-          .catch(error => {
-            expect(error).to.be.a(ValidationError);
-            expect(error.type).to.equal('GenericInputValidation');
-            expect(error.data).to.have.property('eager');
+          .catch(err => {
+            expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('RelationExpression');
+            expect(err.message).to.equal(
+              'could not find filter "missingFilter" for relation "model1Relation2"'
+            );
             done();
           })
           .catch(done);
@@ -1406,8 +1408,11 @@ module.exports = session => {
             throw new Error('should not get here');
           })
           .catch(err => {
-            expect(err.type).to.equal('GenericInputValidation');
-            expect(err.data).to.have.property('eager');
+            expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('RelationExpression');
+            expect(err.message).to.equal(
+              'unknown relation "invalidRelation" in an eager expression'
+            );
             done();
           })
           .catch(done);
@@ -1421,8 +1426,11 @@ module.exports = session => {
             throw new Error('should not get here');
           })
           .catch(err => {
-            expect(err.type).to.equal('GenericInputValidation');
-            expect(err.data).to.have.property('eager');
+            expect(err).to.be.a(ValidationError);
+            expect(err.type).to.equal('RelationExpression');
+            expect(err.message).to.equal(
+              'unknown relation "invalidRelation" in an eager expression'
+            );
             done();
           })
           .catch(done);
@@ -2490,7 +2498,7 @@ module.exports = session => {
       });
     }
 
-    if (isPostgres(session.knex))
+    if (session.isPostgres())
       describe.skip('big data', () => {
         let graph = null;
 

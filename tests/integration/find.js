@@ -154,6 +154,50 @@ module.exports = session => {
             });
         });
 
+        it('.join() with a subquery', () => {
+          return Model1.query()
+            .findByIds(1)
+            .join(
+              Model2.query()
+                // Test objection raw instance in subquery where while we're at it.
+                .where(raw('1 = 1'))
+                .as('alias'),
+              joinBuilder => {
+                joinBuilder.on('Model1.id', 'alias.model1_id');
+              }
+            )
+            .then(models => {
+              // Three items because Model1 (id = 1) has three related Model2 instances.
+              expect(models.length).to.equal(3);
+            });
+        });
+
+        it('.where() with an a raw instance', () => {
+          return Model2.query()
+            .where(raw('model2_prop2 = 20'))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('grouped .where() with an a raw instance', () => {
+          return Model2.query()
+            .where(builder => {
+              builder.where(raw('model2_prop2 = 20'));
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with an a knex.raw instance', () => {
+          return Model2.query()
+            .where(session.knex.raw('model2_prop2 = 20'))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
         it('.where() with an object', () => {
           return Model2.query()
             .where({ model2_prop2: 20 })
@@ -1246,6 +1290,18 @@ module.exports = session => {
               { id: 1, model1Prop1: 'hello 1', relCount: 2, $afterGetCalled: 1 },
               { id: 2, model1Prop1: 'hello 2', relCount: 1, $afterGetCalled: 1 }
             ]);
+          });
+      });
+
+      it('should work with namedFilters', () => {
+        return Model2.query()
+          .joinRelation('model2Relation1(idGreaterThan)')
+          .select('model2Relation1.id', 'model2.*')
+          .mergeContext({
+            filterArgs: [5]
+          })
+          .then(models => {
+            expect(models.map(it => it.id)).to.not.contain(5);
           });
       });
     });

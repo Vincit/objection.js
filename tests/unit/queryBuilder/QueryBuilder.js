@@ -1446,11 +1446,8 @@ describe('QueryBuilder', () => {
         })
         .catch(err => {
           expect(err).to.be.a(objection.ValidationError);
-          expect(err.type).to.equal('GenericInputValidation');
-          expect(err.data).to.eql({
-            allowedRelations: 'eager expression not allowed',
-            eager: 'eager expression not allowed'
-          });
+          expect(err.type).to.equal('UnallowedRelation');
+          expect(err.message).to.equal('eager expression not allowed');
           expect(executedQueries).to.have.length(0);
           done();
         })
