@@ -18,7 +18,7 @@ Person
 ```js
 Person
   .query()
-  .select(Person.raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
   .groupBy('parentId')
   .then(childAgeSums => {
     console.log(childAgeSums[0].childAgeSum);
@@ -678,6 +678,33 @@ Here's a list of methods that may help working with composite keys:
  * [`patchAndFetchById`](#patchandfetchbyid)
  * [`$id`](#_s_id)
  * [`$values`](#_s_values)
+
+## Getting count of relations
+
+Let's say you have a `Tweet` model and a `Like` model. `Tweet` has a `HasManyRelation` named `likers` to `Like` table.
+Now let's assume you'd like to fetch a list of `Tweet`s and get the number of likes for each of them without fetching
+the actual `Like` rows. This cannot be easily achieved using `eager` because of the way the queries are optimized
+(you can read more [here](#eager)). You can leverage SQL's subqueries and the [`relatedQuery`](#relatedquery) helper:
+
+```js
+const tweets = await Tweet
+  .query()
+  .select(
+    'Tweet.*',
+    Tweet.relatedQuery('likers').count().as('numberOfLikes')
+  );
+
+console.log(tweets[4].numberOfLikes);
+```
+
+The generated SQL is something like this:
+
+```sql
+select "Tweet".*, (select count(*) from "Like" where "Like"."tweetId" = "Tweet"."id") as "numberOfLikes" from "Tweet"
+```
+
+Naturally you can add as many subquery selects as you like. For example you could also get the count of retweets
+in the same query. [`relatedQuery`](#relatedquery) method works with all relations and not just `HasManyRelation`.
 
 ## Indexing PostgreSQL JSONB columns
 

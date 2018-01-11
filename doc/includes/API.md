@@ -154,6 +154,9 @@ class Person extends Model {
 Documented [here](#snake-case-to-camel-case-conversion).
 
 
+
+
+
 ## QueryBuilder
 
 Query builder for Models.
@@ -281,13 +284,13 @@ const builder = queryBuilder.findById(id);
 ```
 
 ```js
-await Person.query().findById(1);
+const person = await Person.query().findById(1);
 ```
 
 > Composite key:
 
 ```js
-await Person.query().findById([1, '10']);
+const person = await Person.query().findById([1, '10']);
 ```
 
 ##### Arguments
@@ -313,13 +316,13 @@ const builder = queryBuilder.findByIds([id1, id2]);
 ```
 
 ```js
-await Person.query().findByIds([1, 2]);
+const [person1, person2] = await Person.query().findByIds([1, 2]);
 ```
 
 > Composite key:
 
 ```js
-await Person.query().findByIds([[1, '10'], [2, '10']]);
+const [person1, person2] = await Person.query().findByIds([[1, '10'], [2, '10']]);
 ```
 
 ##### Arguments
@@ -345,15 +348,15 @@ const builder = queryBuilder.findOne(...whereArgs);
 ```
 
 ```js
-await Person.query().findOne({firstName: 'Jennifer', lastName: 'Lawrence'});
+const person = await Person.query().findOne({firstName: 'Jennifer', lastName: 'Lawrence'});
 ```
 
 ```js
-await Person.query().findOne('age', '>', 20);
+const person = await Person.query().findOne('age', '>', 20);
 ```
 
 ```js
-await Person.query().findOne(raw('random() < 0.5'));
+const person = await Person.query().findOne(raw('random() < 0.5'));
 ```
 
 Shorthand for `where(...whereArgs).first()`.
@@ -404,11 +407,13 @@ console.log(actors[1].firstName);
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
+const { raw } = require('objection');
+
 await Person
   .query()
   .insert({
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: raw("'Jenni' || 'fer'")
   });
 ```
 
@@ -549,10 +554,12 @@ console.log(numberOfAffectedRows);
 > You can also give raw expressions, subqueries and `ref()` as values like this:
 
 ```js
+const { raw, ref } = require('objection');
+
 await Person
   .query()
   .update({
-    firstName: Person.raw("'Jenni' || 'fer'"),
+    firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age'),
     oldLastName: ref('lastName') // same as knex.raw('??', ['lastName'])
@@ -614,10 +621,12 @@ console.log(updatedModel.firstName);
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
+const { raw } = require('objection');
+
 await Person
   .query()
   .updateAndFetchById(134, {
-    firstName: Person.raw("'Jenni' || 'fer'"),
+    firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age')
   });
@@ -667,10 +676,12 @@ console.log(updatedModel.firstName);
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
+const { raw } = require('objection');
+
 await person
   .$query()
   .updateAndFetch({
-    firstName: Person.raw("'Jenni' || 'fer'"),
+    firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age')
   });
@@ -814,11 +825,13 @@ console.log(updatedModel.firstName);
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
+const { raw } = require('objection');
+
 await Person
   .query()
   .patchAndFetchById(134, {
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: raw("'Jenni' || 'fer'")
   });
 ```
 
@@ -866,11 +879,13 @@ console.log(updatedModel.firstName);
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
+const { raw } = require('objection');
+
 await person
   .$query()
   .patchAndFetch({
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: raw("'Jenni' || 'fer'")
   });
 ```
 
@@ -5121,6 +5136,10 @@ const person = Person.fromJson({
   gender: 'female'
 });
 
+// Note that `toJSON` is always called automatically when an object is serialized
+// to a JSON string using JSON.stringify. You very rarely need to call `toJSON`
+// explicitly. koa, express and all other frameworks I'm aware of use JSON.stringify
+// to serialize objects to JSON.
 console.log(person.toJSON());
 // --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
 ```
@@ -5146,6 +5165,10 @@ const person = Person.fromJson({
   gender: 'female'
 });
 
+// Note that `toJSON` is always called automatically when an object is serialized
+// to a JSON string using JSON.stringify. You very rarely need to call `toJSON`
+// explicitly. koa, express and all other frameworks I'm aware of use JSON.stringify
+// to serialize objects to JSON.
 console.log(person.toJSON());
 // --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
 ```
@@ -7119,7 +7142,7 @@ class Person extends Model {
 }
 ```
 
-> Note that the the `opt.old` object is only populated for instance queries started with `$query`:
+> Note that the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
 somePerson
@@ -7194,7 +7217,7 @@ class Person extends Model {
 }
 ```
 
-> Note that the the `opt.old` object is only populated for instance queries started with `$query`:
+> Note that the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
 somePerson
@@ -7728,7 +7751,7 @@ throw new ValidationError({type, message, data});
 > For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword`
 > string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
 
-> If `type` is anything else but `"PropertyValidation"`, `data` can be any object that describes the error.
+> If `type` is anything else but `"ModelValidation"`, `data` can be any object that describes the error.
 
 Error of this class is thrown by default if a model validation fails.
 
@@ -7737,7 +7760,7 @@ You can replace this error by overriding [`Model.createValidationError()`](#crea
 Property|Type|Description
 --------|----|-----------
 statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
-type|string|Either `"PropertyValidation"` or `"GenericInputValidation"`. The type is `"PropertyValidation"` if the error is thrown by the `Validator`. `"GenericInputValidation"` is used for other validation errors like invalid or unallowed relation expressions.
+type|string|One of "ModelValidation", "RelationExpression", "UnallowedRelation" and "InvalidGraph"a
 data|object|Dictionary of errors.
 
 
