@@ -10,6 +10,8 @@ const { lit, raw, ref } = objection;
 
 // This "test" passes if the TypeScript compiler is satisfied.
 
+class CustomValidationError extends Error {}
+
 class Person extends objection.Model {
   firstName: string;
   lastName: string;
@@ -45,6 +47,13 @@ class Person extends objection.Model {
     // Test that any property can be accessed and set.
     json.foo = json.bar;
     return json;
+  }
+
+  static createValidationError(args: objection.CreateValidationErrorArgs) {
+    const { message, type, data } = args;
+    const errorItem: objection.ValidationErrorItem = data['someProp'];
+    const itemMessage: string = errorItem.message;
+    return new CustomValidationError('my custom error: ' + message + ' ' + itemMessage);
   }
 }
 

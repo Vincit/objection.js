@@ -126,15 +126,35 @@ declare namespace Objection {
     shallow?: boolean;
   }
 
+  export type ValidationErrorType =
+    | 'ModelValidation'
+    | 'RelationExpression'
+    | 'UnallowedRelation'
+    | 'InvalidGraph';
+
   export class ValidationError extends Error {
-    constructor(errors: any);
+    constructor(args: CreateValidationErrorArgs);
+
     statusCode: number;
-    data: any;
     message: string;
+    data?: ErrorHash | any;
+    type: ValidationErrorType;
+  }
+
+  export interface ValidationErrorItem {
+    message: string;
+    keyword: string;
+    params: Pojo;
   }
 
   export interface ErrorHash {
-    [columnName: string]: ValidationError[];
+    [columnName: string]: ValidationErrorItem[];
+  }
+
+  export interface CreateValidationErrorArgs {
+    message?: string;
+    data?: ErrorHash | any;
+    type: ValidationErrorType;
   }
 
   export interface RelationMappings {
@@ -328,7 +348,7 @@ declare namespace Objection {
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
     createValidator(): Validator;
-    createValidationError(errorHash: ErrorHash): ValidationError;
+    createValidationError(args: CreateValidationErrorArgs): Error;
 
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
@@ -393,7 +413,7 @@ declare namespace Objection {
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
     static createValidator(): Validator;
-    static createValidationError(errorHash: ErrorHash): ValidationError;
+    static createValidationError(args: CreateValidationErrorArgs): Error;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
     static fromJson<T>(this: Constructor<T>, json: Pojo, opt?: ModelOptions): T;
