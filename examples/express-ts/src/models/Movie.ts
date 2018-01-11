@@ -1,4 +1,3 @@
-
 import { Model } from 'objection';
 import Person from './Person';
 import { join } from 'path';

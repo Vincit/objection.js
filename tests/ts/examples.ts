@@ -14,7 +14,7 @@ class Person extends objection.Model {
   firstName: string;
   lastName: string;
   mom: Person;
-  comments: Comment[]
+  comments: Comment[];
 
   static columnNameMappers = objection.snakeCaseMappers();
 
@@ -28,7 +28,7 @@ class Person extends objection.Model {
 
   // Or, if you add the field, this.$relatedQuery just works:
   fetchMom(): Promise<Person> {
-    return this.$relatedQuery('mom')
+    return this.$relatedQuery('mom');
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -141,8 +141,8 @@ class Movie extends objection.Model {
 
 async () => {
   // Another example of strongly-typed $relatedQuery without a cast:
-  takesPeople(await new Movie().$relatedQuery("actors"));
-}
+  takesPeople(await new Movie().$relatedQuery('actors'));
+};
 
 class Animal extends objection.Model {
   species: string;

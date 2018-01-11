@@ -3,7 +3,6 @@ import { join } from 'path';
 import Animal from './Animal';
 import Movie from './Movie';
 
-
 export interface Address {
   street: string;
   city: string;
