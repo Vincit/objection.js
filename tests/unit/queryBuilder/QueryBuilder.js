@@ -83,7 +83,8 @@ describe('QueryBuilder', () => {
       'removeAllListeners',
       'listeners',
       'listenerCount',
-      'eventNames'
+      'eventNames',
+      'rawListeners'
     ];
 
     let builder = QueryBuilder.forClass(TestModel);
