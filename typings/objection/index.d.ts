@@ -106,7 +106,7 @@ declare namespace Objection {
     json: Pojo;
     options: ModelOptions;
   }
-  
+
   export class Validator {
     beforeValidate(args: ValidatorArgs): void;
     validate(args: ValidatorArgs): Pojo;
@@ -128,7 +128,7 @@ declare namespace Objection {
     data: any;
     message: string;
   }
-  
+
   export interface ErrorHash {
     [columnName: string]: ValidationError[];
   }
@@ -446,9 +446,20 @@ declare namespace Objection {
     $query(trxOrKnex?: Transaction | knex): QueryBuilderSingle<this>;
 
     /**
-     * Users need to explicitly type these calls, as the relationName doesn't
-     * indicate the type (and if it returned Model directly, Partial<Model>
-     * guards are worthless)
+     * If you add model relations as fields, $relatedQuery works
+     * automatically:
+     */
+    $relatedQuery<K extends keyof this>(
+      relationName: K,
+      trxOrKnex?: Transaction | knex
+    ): QueryBuilderSingle<this[K]>;
+
+    // PLEASE NOTE: `$relatedQuery<K extends keyof this>` MUST BE DEFINED
+    // BEFORE `$relatedQuery<M extends Model>`!
+
+    /**
+     * If you don't want to add the fields to your model, you can cast the
+     * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
      */
     $relatedQuery<M extends Model>(
       relationName: string,
@@ -456,7 +467,7 @@ declare namespace Objection {
     ): QueryBuilder<M>;
 
     $loadRelated<T>(
-      expression: RelationExpression,
+      expression: keyof this | RelationExpression,
       filters?: Filters<T>,
       trxOrKnex?: Transaction | knex
     ): QueryBuilderSingle<this>;

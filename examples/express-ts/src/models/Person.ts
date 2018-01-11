@@ -1,5 +1,7 @@
 import {Model, RelationMappings} from 'objection';
 import {join} from 'path';
+import Animal from './Animal';
+import Movie from './Movie';
 
 export interface Address {
   street: string;
@@ -9,13 +11,19 @@ export interface Address {
 
 export default class Person extends Model {
   readonly id: number;
-  parent: Person;
+  parentId: number | null;
   firstName: string;
   lastName: string;
   age: number;
   address: Address;
   createdAt: Date;
   updatedAt: Date;
+
+  // Optional eager relations.
+  parent?: Person;
+  children?: Person[];
+  pets?: Animal[];
+  movies?: Movie[];
 
   // Table name is the only required property.
   static tableName = 'Person';
