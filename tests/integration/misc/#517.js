@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
@@ -81,7 +79,7 @@ module.exports = session => {
       ];
 
       return Users.query()
-        .upsertGraph({id: 1, preferences})
+        .upsertGraph({ id: 1, preferences })
         .then(() => {
           return Users.query()
             .eager('preferences')

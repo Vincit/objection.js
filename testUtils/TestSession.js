@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
@@ -46,7 +44,8 @@ class TestSession {
         return {
           'select:id': (builder) => builder.select('id'),
           'select:model1Prop1': (builder) => builder.select('model1Prop1'),
-          'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1')
+          'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1'),
+          'idGreaterThan': (builder) => builder.where('id', '>', builder.context().filterArgs[0])
         };
       }
 

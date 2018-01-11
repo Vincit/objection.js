@@ -4,7 +4,7 @@ import * as express from 'express';
 import * as promiseRouter from 'express-promise-router';
 import * as Knex from 'knex';
 import * as morgan from 'morgan';
-import {Model} from 'objection';
+import { Model } from 'objection';
 
 const knexConfig = require('../knexfile');
 // Initialize knex.

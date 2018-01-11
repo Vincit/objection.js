@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const ref = require('../../../').ref;
 const ReferenceBuilder = require('../../../lib/queryBuilder/ReferenceBuilder').ReferenceBuilder;

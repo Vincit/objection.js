@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const knex = require('knex');
 const expect = require('expect.js');
@@ -137,7 +135,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one.'
+        'OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
       );
     });
   });

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const Promise = require('bluebird');
 
@@ -84,7 +82,7 @@ module.exports = session => {
 
     it('should get passed to the $afterGet method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$afterGet = queryContext => {
@@ -105,7 +103,7 @@ module.exports = session => {
 
     it('should get passed to the $beforeUpdate method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$beforeUpdate = function(opt, queryContext) {
@@ -118,7 +116,7 @@ module.exports = session => {
 
       return Model.query()
         .context(context)
-        .update({model1Prop1: 'updated'})
+        .update({ model1Prop1: 'updated' })
         .where('id', 1)
         .then(() => {
           expect(called).to.equal(true);
@@ -127,7 +125,7 @@ module.exports = session => {
 
     it('should get passed to the $afterUpdate method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$afterUpdate = function(opt, queryContext) {
@@ -140,7 +138,7 @@ module.exports = session => {
 
       return Model.query()
         .context(context)
-        .update({model1Prop1: 'updated'})
+        .update({ model1Prop1: 'updated' })
         .where('id', 1)
         .then(() => {
           expect(called).to.equal(true);
@@ -149,7 +147,7 @@ module.exports = session => {
 
     it('should get passed to the $beforeInsert method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$beforeInsert = queryContext => {
@@ -162,7 +160,7 @@ module.exports = session => {
 
       return Model.query()
         .context(context)
-        .insert({model1Prop1: 'new'})
+        .insert({ model1Prop1: 'new' })
         .then(() => {
           expect(called).to.equal(true);
         });
@@ -170,7 +168,7 @@ module.exports = session => {
 
     it('should get passed to the $afterInsert method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$afterInsert = queryContext => {
@@ -183,7 +181,7 @@ module.exports = session => {
 
       return Model.query()
         .context(context)
-        .insert({model1Prop1: 'new'})
+        .insert({ model1Prop1: 'new' })
         .then(() => {
           expect(called).to.equal(true);
         });
@@ -191,7 +189,7 @@ module.exports = session => {
 
     it('should get passed to the $beforeDelete method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$beforeDelete = queryContext => {
@@ -202,7 +200,7 @@ module.exports = session => {
         called = true;
       };
 
-      return Model.fromJson({id: 1})
+      return Model.fromJson({ id: 1 })
         .$query()
         .context(context)
         .delete()
@@ -213,7 +211,7 @@ module.exports = session => {
 
     it('should get passed to the $afterDelete method', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
+      let context = { a: 1, b: '2' };
       let called = false;
 
       Model.prototype.$afterDelete = queryContext => {
@@ -224,7 +222,7 @@ module.exports = session => {
         called = true;
       };
 
-      return Model.fromJson({id: 1})
+      return Model.fromJson({ id: 1 })
         .$query()
         .context(context)
         .delete()
@@ -235,9 +233,9 @@ module.exports = session => {
 
     it('mergeContex should merge values into the context', () => {
       let Model = inheritModel(Model1);
-      let context = {a: 1, b: '2'};
-      let merge1 = {c: [10, 11]};
-      let merge2 = {d: false};
+      let context = { a: 1, b: '2' };
+      let merge1 = { c: [10, 11] };
+      let merge2 = { d: false };
       let called = false;
 
       Model.prototype.$afterDelete = queryContext => {
@@ -248,7 +246,7 @@ module.exports = session => {
         called = true;
       };
 
-      return Model.fromJson({id: 1})
+      return Model.fromJson({ id: 1 })
         .$query()
         .context(context)
         .mergeContext(merge1)
@@ -268,7 +266,7 @@ module.exports = session => {
 
         return (
           Model1.query()
-            .insertAndFetch({model1Prop1: 'new'})
+            .insertAndFetch({ model1Prop1: 'new' })
             // withSchema uses the context to share the schema between all queries.
             .withSchema('public')
             .context({
@@ -303,7 +301,7 @@ module.exports = session => {
 
         return (
           Model1.query()
-            .updateAndFetchById(1, {model1Prop1: 'updated'})
+            .updateAndFetchById(1, { model1Prop1: 'updated' })
             // withSchema uses the context to share the schema between all queries.
             .withSchema('public')
             .context({
@@ -683,8 +681,8 @@ module.exports = session => {
             return Model1.query()
               .whereIn('id', [2, 4])
               .then(mod => {
-                model2 = _.find(mod, {id: 2});
-                model4 = _.find(mod, {id: 4});
+                model2 = _.find(mod, { id: 2 });
+                model4 = _.find(mod, { id: 4 });
                 mockKnex.reset();
               });
           });
@@ -695,7 +693,7 @@ module.exports = session => {
             return (
               model4
                 .$relatedQuery('model1Relation1')
-                .insert({model1Prop1: 'new'})
+                .insert({ model1Prop1: 'new' })
                 // withSchema uses the context to share the schema between all queries.
                 .withSchema('public')
                 .context({
@@ -813,7 +811,7 @@ module.exports = session => {
               .first()
               .then(mod => {
                 model = mod;
-                return Model2.query().insert({model2Prop1: 'new'});
+                return Model2.query().insert({ model2Prop1: 'new' });
               })
               .then(newMod => {
                 newModel = newMod;
@@ -909,7 +907,7 @@ module.exports = session => {
             return (
               model
                 .$relatedQuery('model2Relation1')
-                .insert({model1Prop1: 'new'})
+                .insert({ model1Prop1: 'new' })
                 // withSchema uses the context to share the schema between all queries.
                 .withSchema('public')
                 .context({
@@ -971,7 +969,7 @@ module.exports = session => {
                   return session.knex('Model1Model2');
                 })
                 .then(rows => {
-                  expect(_.filter(rows, {model1Id: 1, model2Id: 1}).length).to.equal(1);
+                  expect(_.filter(rows, { model1Id: 1, model2Id: 1 }).length).to.equal(1);
                 })
             );
           });

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const Model = require('../../../').Model;
@@ -343,7 +341,7 @@ module.exports = session => {
       });
 
       it('insert', () => {
-        return Model1.fromJson({model1Prop1: 'foo', id: 100})
+        return Model1.fromJson({ model1Prop1: 'foo', id: 100 })
           .$query(session.knex)
           .insert()
           .then(model => {
@@ -357,7 +355,7 @@ module.exports = session => {
       });
 
       it('insertAndFetch', () => {
-        return Model1.fromJson({model1Prop1: 'foo', id: 101})
+        return Model1.fromJson({ model1Prop1: 'foo', id: 101 })
           .$query(session.knex)
           .insertAndFetch()
           .then(model => {
@@ -379,10 +377,10 @@ module.exports = session => {
         .innerJoinRelation('model1Relation1')
         .then(models => {
           expect(_.sortBy(models, 'id')).to.eql([
-            {id: 1, relId: 2, $afterGetCalled: 1},
-            {id: 2, relId: 3, $afterGetCalled: 1},
-            {id: 3, relId: 4, $afterGetCalled: 1},
-            {id: 6, relId: 7, $afterGetCalled: 1}
+            { id: 1, relId: 2, $afterGetCalled: 1 },
+            { id: 2, relId: 3, $afterGetCalled: 1 },
+            { id: 3, relId: 4, $afterGetCalled: 1 },
+            { id: 6, relId: 7, $afterGetCalled: 1 }
           ]);
         });
     });
@@ -393,8 +391,8 @@ module.exports = session => {
         .innerJoinRelation('model1Relation3')
         .then(models => {
           expect(_.sortBy(models, 'id')).to.eql([
-            {id: 5, relId: 2, $afterGetCalled: 1},
-            {id: 6, relId: 2, $afterGetCalled: 1}
+            { id: 5, relId: 2, $afterGetCalled: 1 },
+            { id: 6, relId: 2, $afterGetCalled: 1 }
           ]);
         });
     });

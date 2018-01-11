@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
@@ -27,16 +25,16 @@ module.exports = session => {
 
     it('should resolve an empty transaction', done => {
       transaction(Model1, Model2, () => {
-        return {a: 1};
+        return { a: 1 };
       }).then(result => {
-        expect(result).to.eql({a: 1});
+        expect(result).to.eql({ a: 1 });
         done();
       });
     });
 
     it('should fail without models', done => {
       transaction(() => {
-        return {a: 1};
+        return { a: 1 };
       })
         .then(() => {
           done(new Error('should not get here'));
@@ -48,7 +46,7 @@ module.exports = session => {
 
     it('should fail if one of the model classes is not a subclass of Model', done => {
       transaction(Model1, function() {}, () => {
-        return {a: 1};
+        return { a: 1 };
       })
         .then(() => {
           done(new Error('should not get here'));
@@ -60,7 +58,7 @@ module.exports = session => {
 
     it('should fail if all ModelClasses are not bound to the same knex connection', done => {
       transaction(Model1, Model2.bindKnex({}), () => {
-        return {a: 1};
+        return { a: 1 };
       })
         .then(() => {
           done(new Error('should not get here'));
@@ -73,12 +71,12 @@ module.exports = session => {
     it('should commit transaction if no errors occur (1)', done => {
       transaction(Model1, Model2, (Model1, Model2) => {
         return Model1.query()
-          .insert({model1Prop1: 'test 1'})
+          .insert({ model1Prop1: 'test 1' })
           .then(() => {
-            return Model1.query().insert({model1Prop1: 'test 2'});
+            return Model1.query().insert({ model1Prop1: 'test 2' });
           })
           .then(() => {
-            return Model2.query().insert({model2Prop1: 'test 3'});
+            return Model2.query().insert({ model2Prop1: 'test 3' });
           });
       })
         .then(result => {
@@ -180,12 +178,12 @@ module.exports = session => {
     it('should rollback if an error occurs (1)', done => {
       transaction(Model1, Model2, (Model1, Model2) => {
         return Model1.query()
-          .insert({model1Prop1: 'test 1'})
+          .insert({ model1Prop1: 'test 1' })
           .then(() => {
-            return Model1.query().insert({model1Prop1: 'test 2'});
+            return Model1.query().insert({ model1Prop1: 'test 2' });
           })
           .then(() => {
-            return Model2.query().insert({model2Prop1: 'test 3'});
+            return Model2.query().insert({ model2Prop1: 'test 3' });
           })
           .then(() => {
             throw new Error('whoops');
@@ -209,9 +207,9 @@ module.exports = session => {
     it('should rollback if an error occurs (2)', done => {
       transaction(Model1, Model1 => {
         return Model1.query()
-          .insert({model1Prop1: 'test 1'})
+          .insert({ model1Prop1: 'test 1' })
           .then(model => {
-            return model.$relatedQuery('model1Relation2').insert({model2Prop2: 1000});
+            return model.$relatedQuery('model1Relation2').insert({ model2Prop2: 1000 });
           })
           .then(() => {
             throw new Error('whoops');
@@ -296,14 +294,14 @@ module.exports = session => {
             .then(models => {
               return models[0]
                 .$relatedQuery('model1Relation2', trx)
-                .insert({model2Prop1: 'e'})
+                .insert({ model2Prop1: 'e' })
                 .return(models);
             })
             .then(models => {
               return models[0]
                 .$relatedQuery('model1Relation2')
                 .transacting(trx)
-                .insert({model2Prop1: 'f'})
+                .insert({ model2Prop1: 'f' })
                 .return(models);
             })
             .then(models => {
@@ -358,14 +356,14 @@ module.exports = session => {
           .then(models => {
             return models[0]
               .$relatedQuery('model1Relation2', trx)
-              .insert({model2Prop1: 'e'})
+              .insert({ model2Prop1: 'e' })
               .return(models);
           })
           .then(models => {
             return models[0]
               .$relatedQuery('model1Relation2')
               .transacting(trx)
-              .insert({model2Prop1: 'f'})
+              .insert({ model2Prop1: 'f' })
               .return(models);
           })
           .then(models => {
@@ -420,14 +418,14 @@ module.exports = session => {
           .then(models => {
             return models[0]
               .$relatedQuery('model1Relation2', trx)
-              .insert({model2Prop1: 'e'})
+              .insert({ model2Prop1: 'e' })
               .return(models);
           })
           .then(models => {
             return models[0]
               .$relatedQuery('model1Relation2')
               .transacting(trx)
-              .insert({model2Prop1: 'f'})
+              .insert({ model2Prop1: 'f' })
               .return(models);
           })
           .then(models => {
@@ -495,7 +493,7 @@ module.exports = session => {
     it('should skip queries after rollback', done => {
       transaction(Model1, Model1 => {
         return Model1.query()
-          .insert({model1Prop1: '123'})
+          .insert({ model1Prop1: '123' })
           .then(() => {
             return Promise.all(
               _.map(_.range(2), i => {
@@ -503,7 +501,7 @@ module.exports = session => {
                   throw new Error();
                 }
                 return Model1.query()
-                  .insert({model1Prop1: i.toString()})
+                  .insert({ model1Prop1: i.toString() })
                   .then();
               })
             );
@@ -526,7 +524,7 @@ module.exports = session => {
     });
 
     it('bound model class should accept unbound model instances', done => {
-      let unboundModel = Model1.fromJson({model1Prop1: '123'});
+      let unboundModel = Model1.fromJson({ model1Prop1: '123' });
 
       transaction(Model1, Model1 => {
         return Model1.query().insert(unboundModel);
@@ -555,7 +553,7 @@ module.exports = session => {
 
     it('if knex instance is passed, should be equivalent to knex.transaction()', done => {
       transaction(Model1.knex(), trx => {
-        return trx('Model1').insert({model1Prop1: '1'});
+        return trx('Model1').insert({ model1Prop1: '1' });
       })
         .then(() => {
           return session.knex('Model1');
@@ -577,17 +575,17 @@ module.exports = session => {
             trx = trans;
             return Model1.bindKnex(trx)
               .query()
-              .insert({model1Prop1: 'test 1'});
+              .insert({ model1Prop1: 'test 1' });
           })
           .then(() => {
             return Model1.bindKnex(trx)
               .query()
-              .insert({model1Prop1: 'test 2'});
+              .insert({ model1Prop1: 'test 2' });
           })
           .then(() => {
             return Model2.bindKnex(trx)
               .query()
-              .insert({model2Prop1: 'test 3'});
+              .insert({ model2Prop1: 'test 3' });
           })
           .then(() => {
             return trx.commit();
@@ -608,6 +606,45 @@ module.exports = session => {
           .catch(done);
       });
 
+      it(
+        'commit should work with yield (and thus async/await)',
+        Promise.coroutine(function*() {
+          const trx = yield transaction.start(Model1.knex());
+
+          yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
+          yield Model1.query(trx).insert({ model1Prop1: 'test 2' });
+          yield Model2.query(trx).insert({ model2Prop1: 'test 3' });
+          yield trx.commit();
+
+          const model1Rows = yield session.knex('Model1');
+          const model2Rows = yield session.knex('model2');
+
+          expect(model1Rows).to.have.length(2);
+          expect(_.map(model1Rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+
+          expect(model2Rows).to.have.length(1);
+          expect(model2Rows[0].model2_prop1).to.equal('test 3');
+        })
+      );
+
+      it(
+        'rollback should work with yield (and thus async/await)',
+        Promise.coroutine(function*() {
+          const trx = yield transaction.start(Model1.knex());
+
+          yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
+          yield Model1.query(trx).insert({ model1Prop1: 'test 2' });
+          yield Model2.query(trx).insert({ model2Prop1: 'test 3' });
+          yield trx.rollback();
+
+          const model1Rows = yield session.knex('Model1');
+          const model2Rows = yield session.knex('model2');
+
+          expect(model1Rows).to.have.length(0);
+          expect(model2Rows).to.have.length(0);
+        })
+      );
+
       it('should work when a knex connection is passed instead of a model', done => {
         let trx;
         transaction
@@ -616,17 +653,17 @@ module.exports = session => {
             trx = trans;
             return Model1.bindTransaction(trx)
               .query()
-              .insert({model1Prop1: 'test 1'});
+              .insert({ model1Prop1: 'test 1' });
           })
           .then(() => {
             return Model1.bindTransaction(trx)
               .query()
-              .insert({model1Prop1: 'test 2'});
+              .insert({ model1Prop1: 'test 2' });
           })
           .then(() => {
             return Model2.bindTransaction(trx)
               .query()
-              .insert({model2Prop1: 'test 3'});
+              .insert({ model2Prop1: 'test 3' });
           })
           .then(() => {
             return trx.commit();
@@ -655,17 +692,17 @@ module.exports = session => {
             trx = trans;
             return Model1.bindTransaction(trx)
               .query()
-              .insert({model1Prop1: 'test 1'});
+              .insert({ model1Prop1: 'test 1' });
           })
           .then(() => {
             return Model1.bindTransaction(trx)
               .query()
-              .insert({model1Prop1: 'test 2'});
+              .insert({ model1Prop1: 'test 2' });
           })
           .then(() => {
             return Model2.bindTransaction(trx)
               .query()
-              .insert({model2Prop1: 'test 3'});
+              .insert({ model2Prop1: 'test 3' });
           })
           .then(() => {
             return trx.rollback();
@@ -703,17 +740,17 @@ module.exports = session => {
           .then(trx => {
             return Model1.bindTransaction(trx)
               .query()
-              .insert({model1Prop1: 'test 1'});
+              .insert({ model1Prop1: 'test 1' });
           })
           .then(model => {
             return Model1.bindTransaction(model.$transaction())
               .query()
-              .insert({model1Prop1: 'test 2'});
+              .insert({ model1Prop1: 'test 2' });
           })
           .then(model => {
             return Model2.bindTransaction(model.$transaction())
               .query()
-              .insert({model2Prop1: 'test 3'});
+              .insert({ model2Prop1: 'test 3' });
           })
           .then(model => {
             return model.$transaction().rollback();
@@ -738,17 +775,17 @@ module.exports = session => {
           .then(trx => {
             return Model1.bindTransaction(trx)
               .query()
-              .insert({model1Prop1: 'test 1'});
+              .insert({ model1Prop1: 'test 1' });
           })
           .then(model => {
             return Model1.bindTransaction(model.$knex())
               .query()
-              .insert({model1Prop1: 'test 2'});
+              .insert({ model1Prop1: 'test 2' });
           })
           .then(model => {
             return Model2.bindTransaction(model.$knex())
               .query()
-              .insert({model2Prop1: 'test 3'});
+              .insert({ model2Prop1: 'test 3' });
           })
           .then(model => {
             return model.$knex().rollback();

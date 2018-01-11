@@ -1,4 +1,4 @@
-import {Model} from 'objection';
+import { Model } from 'objection';
 import Animal from './Animal';
 import Movie from './Movie';
 
@@ -14,18 +14,18 @@ export default class Person extends Model {
     required: ['firstName', 'lastName'],
 
     properties: {
-      id: {type: 'integer'},
-      parentId: {type: ['integer', 'null']},
-      firstName: {type: 'string', minLength: 1, maxLength: 255},
-      lastName: {type: 'string', minLength: 1, maxLength: 255},
-      age: {type: 'number'},
+      id: { type: 'integer' },
+      parentId: { type: ['integer', 'null'] },
+      firstName: { type: 'string', minLength: 1, maxLength: 255 },
+      lastName: { type: 'string', minLength: 1, maxLength: 255 },
+      age: { type: 'number' },
 
       address: {
         type: 'object',
         properties: {
-          street: {type: 'string'},
-          city: {type: 'string'},
-          zipCode: {type: 'string'}
+          street: { type: 'string' },
+          city: { type: 'string' },
+          zipCode: { type: 'string' }
         }
       }
     }

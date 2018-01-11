@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 const utils = require('../../../lib/utils/knexUtils');
@@ -88,36 +86,36 @@ module.exports = session => {
       before(() => {
         return Page.query().insertGraph({
           page_id: 1,
-          object_data: {name: '1'},
+          object_data: { name: '1' },
 
           parents: [
             {
               page_id: 2,
-              object_data: {name: '1_1'},
+              object_data: { name: '1_1' },
 
               parents: [
                 {
                   page_id: 4,
-                  object_data: {name: '1_1_1'}
+                  object_data: { name: '1_1_1' }
                 },
                 {
                   page_id: 5,
-                  object_data: {name: '1_1_2'}
+                  object_data: { name: '1_1_2' }
                 }
               ]
             },
             {
               page_id: 3,
-              object_data: {name: '1_2'},
+              object_data: { name: '1_2' },
 
               parents: [
                 {
                   page_id: 6,
-                  object_data: {name: '1_2_1'}
+                  object_data: { name: '1_2_1' }
                 },
                 {
                   page_id: 7,
-                  object_data: {name: '1_2_2'}
+                  object_data: { name: '1_2_2' }
                 }
               ]
             }
@@ -189,10 +187,10 @@ module.exports = session => {
           .orderBy('parents:parents.page_id')
           .then(models => {
             expect(models).to.eql([
-              {id: 4, name: '1_1_1'},
-              {id: 5, name: '1_1_2'},
-              {id: 6, name: '1_2_1'},
-              {id: 7, name: '1_2_2'}
+              { id: 4, name: '1_1_1' },
+              { id: 5, name: '1_1_2' },
+              { id: 6, name: '1_2_1' },
+              { id: 7, name: '1_2_2' }
             ]);
           });
       });

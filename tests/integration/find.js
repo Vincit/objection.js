@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const raw = require('../../').raw;
 const ref = require('../../').ref;
@@ -156,9 +154,53 @@ module.exports = session => {
             });
         });
 
+        it('.join() with a subquery', () => {
+          return Model1.query()
+            .findByIds(1)
+            .join(
+              Model2.query()
+                // Test objection raw instance in subquery where while we're at it.
+                .where(raw('1 = 1'))
+                .as('alias'),
+              joinBuilder => {
+                joinBuilder.on('Model1.id', 'alias.model1_id');
+              }
+            )
+            .then(models => {
+              // Three items because Model1 (id = 1) has three related Model2 instances.
+              expect(models.length).to.equal(3);
+            });
+        });
+
+        it('.where() with an a raw instance', () => {
+          return Model2.query()
+            .where(raw('model2_prop2 = 20'))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('grouped .where() with an a raw instance', () => {
+          return Model2.query()
+            .where(builder => {
+              builder.where(raw('model2_prop2 = 20'));
+            })
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
+        it('.where() with an a knex.raw instance', () => {
+          return Model2.query()
+            .where(session.knex.raw('model2_prop2 = 20'))
+            .then(models => {
+              expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
+            });
+        });
+
         it('.where() with an object', () => {
           return Model2.query()
-            .where({model2_prop2: 20})
+            .where({ model2_prop2: 20 })
             .then(models => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
             });
@@ -328,7 +370,7 @@ module.exports = session => {
         });
 
         it('.where() with a model instance', () => {
-          const where = Model1.fromJson({model1Prop1: 'hello 1'});
+          const where = Model1.fromJson({ model1Prop1: 'hello 1' });
 
           return Model1.query()
             .where(where)
@@ -370,7 +412,7 @@ module.exports = session => {
         it('.distinct()', () => {
           return Model1.query()
             .distinct('Model1.id', 'Model1.model1Prop1')
-            .leftJoinRelation('model1Relation1', {alias: 'balls'})
+            .leftJoinRelation('model1Relation1', { alias: 'balls' })
             .where('Model1.model1Prop1', 'hello 1')
             .orderBy('Model1.model1Prop1')
             .page(0, 1)
@@ -468,8 +510,8 @@ module.exports = session => {
             return Model2.query()
               .with('wm1', builder =>
                 builder
-                  .insert({a: 1})
-                  .update({a: 2})
+                  .insert({ a: 1 })
+                  .update({ a: 2 })
                   .delete()
                   .del()
                   .table('model2')
@@ -613,14 +655,14 @@ module.exports = session => {
 
           TestModel.query()
             .where('model1Prop1', 'There is no value like me')
-            .mergeContext({foo: 'bar'})
+            .mergeContext({ foo: 'bar' })
             .throwIfNotFound()
             .then(() => {
               done(new Error('should not get here'));
             })
             .catch(err => {
               expect(err).to.be.a(CustomError);
-              expect(err.ctx).to.eql({foo: 'bar'});
+              expect(err.ctx).to.eql({ foo: 'bar' });
               done();
             })
             .catch(done);
@@ -670,7 +712,7 @@ module.exports = session => {
 
         it('raw in where', () => {
           return Model2.query()
-            .where('model2_prop2', raw(':value', {value: 20}))
+            .where('model2_prop2', raw(':value', { value: 20 }))
             .orderBy('id_col')
             .then(models => {
               expect(_.map(models, 'idCol')).to.eql([2]);
@@ -795,6 +837,94 @@ module.exports = session => {
               ]);
             });
         });
+      });
+    });
+
+    describe('relatedQuery()', () => {
+      before(() => {
+        return session.populate([
+          {
+            id: 1,
+
+            model1Relation2: [
+              {
+                idCol: 1
+              },
+              {
+                idCol: 2
+              }
+            ],
+
+            model1Relation3: [
+              {
+                idCol: 4
+              }
+            ]
+          },
+          {
+            id: 2,
+
+            model1Relation2: [
+              {
+                idCol: 3
+              }
+            ],
+
+            model1Relation3: [
+              {
+                idCol: 5
+              },
+              {
+                idCol: 6
+              }
+            ]
+          }
+        ]);
+      });
+
+      it('should work in select', () => {
+        return Model1.query()
+          .select([
+            'id',
+
+            Model1.relatedQuery('model1Relation2')
+              .count()
+              .as('rel2Count'),
+
+            Model1.relatedQuery('model1Relation3')
+              .count()
+              .as('rel3Count')
+          ])
+          .orderBy('id')
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
+              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 }
+            ]);
+          });
+      });
+
+      it('should work with alias', () => {
+        return Model1.query()
+          .alias('m')
+          .select([
+            'm.id',
+
+            Model1.relatedQuery('model1Relation2')
+              .count()
+              .as('rel2Count'),
+
+            Model1.relatedQuery('model1Relation3')
+              .count()
+              .as('rel3Count')
+          ])
+          .orderBy('id')
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
+              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 }
+            ]);
+          });
       });
     });
 
@@ -1069,7 +1199,7 @@ module.exports = session => {
       it('should disable alias with option alias = false', () => {
         return Model1.query()
           .select('model2.*', 'Model1.id')
-          .joinRelation('model1Relation2', {alias: false})
+          .joinRelation('model1Relation2', { alias: false })
           .where('model2.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -1081,7 +1211,7 @@ module.exports = session => {
       it('should use relation name as alias with option alias = true', () => {
         return Model1.query()
           .select('Model1.*', 'model1Relation2.id_col')
-          .joinRelation('model1Relation2', {alias: true})
+          .joinRelation('model1Relation2', { alias: true })
           .where('model1Relation2.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -1093,7 +1223,7 @@ module.exports = session => {
       it('should use custom alias with option alias = string', () => {
         return Model1.query()
           .select('Model1.*', 'fooBarBaz.id_col')
-          .joinRelation('model1Relation2', {alias: 'fooBarBaz'})
+          .joinRelation('model1Relation2', { alias: 'fooBarBaz' })
           .where('fooBarBaz.id_col', '<', 4)
           .then(models => {
             models = _.sortBy(models, ['id', 'id_col']);
@@ -1140,6 +1270,38 @@ module.exports = session => {
                 someOtherId: 7
               }
             ]);
+          });
+      });
+
+      it('should count related models', () => {
+        return Model1.query()
+          .leftJoinRelation('model1Relation2')
+          .select('Model1.id', 'Model1.model1Prop1')
+          .count('Model1.id as relCount')
+          .groupBy('Model1.id', 'Model1.model1Prop1')
+          .findByIds([1, 2])
+          .orderBy('id')
+          .map(it => {
+            it.relCount = parseInt(it.relCount);
+            return it;
+          })
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, model1Prop1: 'hello 1', relCount: 2, $afterGetCalled: 1 },
+              { id: 2, model1Prop1: 'hello 2', relCount: 1, $afterGetCalled: 1 }
+            ]);
+          });
+      });
+
+      it('should work with namedFilters', () => {
+        return Model2.query()
+          .joinRelation('model2Relation1(idGreaterThan)')
+          .select('model2Relation1.id', 'model2.*')
+          .mergeContext({
+            filterArgs: [5]
+          })
+          .then(models => {
+            expect(models.map(it => it.id)).to.not.contain(5);
           });
       });
     });
@@ -1217,8 +1379,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 3});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 3 });
           });
         });
 
@@ -1345,8 +1507,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model1.query().then(parents => {
-            parent1 = _.find(parents, {id: 1});
-            parent2 = _.find(parents, {id: 2});
+            parent1 = _.find(parents, { id: 1 });
+            parent2 = _.find(parents, { id: 2 });
           });
         });
 
@@ -1558,8 +1720,8 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model2.query().then(parents => {
-            parent1 = _.find(parents, {idCol: 1});
-            parent2 = _.find(parents, {idCol: 2});
+            parent1 = _.find(parents, { idCol: 1 });
+            parent2 = _.find(parents, { idCol: 2 });
           });
         });
 
@@ -1610,7 +1772,7 @@ module.exports = session => {
 
         it('should work in both directions', () => {
           return Model1.query()
-            .where({id: 6})
+            .where({ id: 6 })
             .first()
             .then(model => {
               return model.$relatedQuery('model1Relation3');
@@ -1762,7 +1924,7 @@ module.exports = session => {
 
         beforeEach(() => {
           return Model2.query().then(parents => {
-            parent = _.find(parents, {idCol: 1});
+            parent = _.find(parents, { idCol: 1 });
           });
         });
 

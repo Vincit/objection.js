@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 
@@ -32,14 +30,14 @@ module.exports = session => {
 
     it('should insert', () => {
       return TestModel.query()
-        .insert({length: 10})
+        .insert({ length: 10 })
         .then(model => {
-          expect(model).to.eql({id: 1, length: 10});
+          expect(model).to.eql({ id: 1, length: 10 });
           return session.knex(TestModel.tableName);
         })
         .then(rows => {
           expect(rows.length).to.equal(1);
-          expect(rows[0]).to.eql({id: 1, length: 10});
+          expect(rows[0]).to.eql({ id: 1, length: 10 });
         });
     });
   });

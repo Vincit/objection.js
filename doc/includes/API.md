@@ -154,6 +154,9 @@ class Person extends Model {
 Documented [here](#snake-case-to-camel-case-conversion).
 
 
+
+
+
 ## QueryBuilder
 
 Query builder for Models.
@@ -215,7 +218,7 @@ const ref = require('objection').ref;
 ```js
 import { ref } from 'objection';
 
-Model.query()
+await Model.query()
   .select([
     'id',
     ref('Model.jsonColumn:details.name').castText().as('name'),
@@ -238,7 +241,7 @@ See [`FieldExpression`](#fieldexpression) for more information about how to refe
 ```js
 import { lit, ref } from 'objection';
 
-Model
+await Model
   .query()
   .where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}))
 ```
@@ -254,14 +257,13 @@ helps build literals of different types.
 ```js
 const { raw } = require('objection');
 
-Person
+const childAgeSums = await Person
   .query()
   .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
   .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
-  .orderBy(raw('random()'))
-  .then(childAgeSums => {
-    console.log(childAgeSums[0].childAgeSum);
-  });
+  .orderBy(raw('random()'));
+
+console.log(childAgeSums[0].childAgeSum);
 ```
 
 Factory function that returns a [`RawBuilder`](#rawbuilder) instance. `RawBuilder` is a
@@ -282,13 +284,13 @@ const builder = queryBuilder.findById(id);
 ```
 
 ```js
-Person.query().findById(1);
+const person = await Person.query().findById(1);
 ```
 
 > Composite key:
 
 ```js
-Person.query().findById([1, '10']);
+const person = await Person.query().findById([1, '10']);
 ```
 
 ##### Arguments
@@ -314,13 +316,13 @@ const builder = queryBuilder.findByIds([id1, id2]);
 ```
 
 ```js
-Person.query().findByIds([1, 2]);
+const [person1, person2] = await Person.query().findByIds([1, 2]);
 ```
 
 > Composite key:
 
 ```js
-Person.query().findByIds([[1, '10'], [2, '10']]);
+const [person1, person2] = await Person.query().findByIds([[1, '10'], [2, '10']]);
 ```
 
 ##### Arguments
@@ -346,15 +348,15 @@ const builder = queryBuilder.findOne(...whereArgs);
 ```
 
 ```js
-Person.query().findOne({firstName: 'Jennifer', lastName: 'Lawrence'});
+const person = await Person.query().findOne({firstName: 'Jennifer', lastName: 'Lawrence'});
 ```
 
 ```js
-Person.query().findOne('age', '>', 20);
+const person = await Person.query().findOne('age', '>', 20);
 ```
 
 ```js
-Person.query().findOne(raw('random() < 0.5'));
+const person = await Person.query().findOne(raw('random() < 0.5'));
 ```
 
 Shorthand for `where(...whereArgs).first()`.
@@ -381,37 +383,37 @@ const builder = queryBuilder.insert(modelsOrObjects);
 ```
 
 ```js
-Person
+const jennifer = await Person
   .query()
-  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-  .then(jennifer => {
-    console.log(jennifer.id);
-  });
+  .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+console.log(jennifer.id);
 ```
 
 > Batch insert (Only works on Postgres):
 
 ```js
-someMovie
+const actors = await someMovie
   .$relatedQuery('actors')
   .insert([
     {firstName: 'Jennifer', lastName: 'Lawrence'},
     {firstName: 'Bradley', lastName: 'Cooper'}
-  ])
-  .then(actors => {
-    console.log(actors[0].firstName);
-    console.log(actors[1].firstName);
-  });
+  ]);
+
+console.log(actors[0].firstName);
+console.log(actors[1].firstName);
 ```
 
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
-Person
+const { raw } = require('objection');
+
+await Person
   .query()
   .insert({
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: raw("'Jenni' || 'fer'")
   });
 ```
 
@@ -420,16 +422,15 @@ Person
 > to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
 
 ```js
-someMovie
+const jennifer = await someMovie
   .$relatedQuery('actors')
   .insert({
     firstName: 'Jennifer',
     lastName: 'Lawrence',
     someExtra: "I'll be written to the join table"
-  })
-  .then(jennifer => {
-    console.log(jennifer.someExtra);
   });
+
+console.log(jennifer.someExtra);
 ```
 
 Creates an insert query.
@@ -542,22 +543,23 @@ const builder = queryBuilder.update(modelOrObject);
 ```
 
 ```js
-Person
+const numberOfAffectedRows = await Person
   .query()
   .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .where('id', 134)
-  .then(numberOfAffectedRows => {
-    console.log(numberOfAffectedRows);
-  });
+  .where('id', 134);
+
+console.log(numberOfAffectedRows);
 ```
 
 > You can also give raw expressions, subqueries and `ref()` as values like this:
 
 ```js
-Person
+const { raw, ref } = require('objection');
+
+await Person
   .query()
   .update({
-    firstName: Person.raw("'Jenni' || 'fer'"),
+    firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age'),
     oldLastName: ref('lastName') // same as knex.raw('??', ['lastName'])
@@ -567,7 +569,7 @@ Person
 > Updating single value inside json column and referring attributes inside json columns (only with postgres) etc.:
 
 ```js
-Person
+await Person
   .query()
   .update({
     lastName: ref('someJsonColumn:mother.lastName').castText(),
@@ -609,21 +611,22 @@ const builder = queryBuilder.updateAndFetchById(id, modelOrObject);
 ```
 
 ```js
-Person
+const updatedModel = await Person
   .query()
-  .updateAndFetchById(134, {firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .then(updatedModel => {
-    console.log(updatedModel.firstName);
-  });
+  .updateAndFetchById(134, {firstName: 'Jennifer', lastName: 'Lawrence', age: 24});
+
+console.log(updatedModel.firstName);
 ```
 
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
-Person
+const { raw } = require('objection');
+
+await Person
   .query()
   .updateAndFetchById(134, {
-    firstName: Person.raw("'Jenni' || 'fer'"),
+    firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age')
   });
@@ -663,21 +666,22 @@ const builder = queryBuilder.updateAndFetch(modelOrObject);
 ```
 
 ```js
-person
+const updatedModel = await person
   .$query()
-  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .then(updatedModel => {
-    console.log(updatedModel.firstName);
-  });
+  .updateAndFetch({firstName: 'Jennifer', lastName: 'Lawrence', age: 24});
+
+console.log(updatedModel.firstName);
 ```
 
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
-person
+const { raw } = require('objection');
+
+await person
   .$query()
   .updateAndFetch({
-    firstName: Person.raw("'Jenni' || 'fer'"),
+    firstName: raw("'Jenni' || 'fer'"),
     lastName: 'Lawrence',
     age: Person.query().avg('age')
   });
@@ -750,13 +754,12 @@ const builder = queryBuilder.patch(modelOrObject);
 ```
 
 ```js
-Person
+const numberOfAffectedRows = await Person
   .query()
   .patch({age: 24})
-  .where('id', 134)
-  .then(numberOfAffectedRows => {
-    console.log(numberOfAffectedRows);
-  });
+  .where('id', 134);
+
+console.log(numberOfAffectedRows);
 ```
 
 > You can also give raw expressions, subqueries and `ref()` as values and [`FieldExpressions`](#fieldexpression) as keys:
@@ -764,7 +767,7 @@ Person
 ```js
 const {ref, raw} = require('objection');
 
-Person
+await Person
   .query()
   .patch({
     age: Person.query().avg('age'),
@@ -812,22 +815,23 @@ const builder = queryBuilder.patchAndFetchById(id, modelOrObject);
 ```
 
 ```js
-Person
+const updatedModel = await Person
   .query()
-  .patchAndFetchById(134, {age: 24})
-  .then(updatedModel => {
-    console.log(updatedModel.firstName);
-  });
+  .patchAndFetchById(134, {age: 24});
+
+console.log(updatedModel.firstName);
 ```
 
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
-Person
+const { raw } = require('objection');
+
+await Person
   .query()
   .patchAndFetchById(134, {
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: raw("'Jenni' || 'fer'")
   });
 ```
 
@@ -865,22 +869,23 @@ const builder = queryBuilder.patchAndFetch(modelOrObject);
 ```
 
 ```js
-person
+const updatedModel = await person
   .$query()
-  .patchAndFetch({age: 24})
-  .then(updatedModel => {
-    console.log(updatedModel.firstName);
-  });
+  .patchAndFetch({age: 24});
+
+console.log(updatedModel.firstName);
 ```
 
 > You can also give raw expressions and subqueries as values like this:
 
 ```js
-person
+const { raw } = require('objection');
+
+await person
   .$query()
   .patchAndFetch({
     age: Person.query().avg('age'),
-    firstName: Person.raw("'Jenni' || 'fer'")
+    firstName: raw("'Jenni' || 'fer'")
   });
 ```
 
@@ -918,13 +923,12 @@ const builder = queryBuilder.delete();
 ```
 
 ```js
-Person
+const numberOfDeletedRows = await Person
   .query()
   .delete()
   .where('age', '>', 100)
-  .then(numberOfDeletedRows => {
-    console.log('removed', numberOfDeletedRows, 'people');
-  });
+
+console.log('removed', numberOfDeletedRows, 'people');
 ```
 
 Creates a delete query.
@@ -948,23 +952,21 @@ const builder = queryBuilder.deleteById(id);
 ```
 
 ```js
-Person
+const numberOfDeletedRows = await Person
   .query()
   .deleteById(1)
-  .then(numberOfDeletedRows => {
-    console.log('removed', numberOfDeletedRows, 'people');
-  });
+
+console.log('removed', numberOfDeletedRows, 'people');
 ```
 
 > Composite key:
 
 ```js
-Person
+const numberOfDeletedRows = await Person
   .query()
-  .deleteById([10, '20', 46])
-  .then(numberOfDeletedRows => {
-    console.log('removed', numberOfDeletedRows, 'people');
-  });
+  .deleteById([10, '20', 46]);
+
+console.log('removed', numberOfDeletedRows, 'people');
 ```
 
 Deletes a model by id.
@@ -994,38 +996,32 @@ const builder = queryBuilder.relate(ids);
 ```
 
 ```js
-Person
+const person = await Person
   .query()
-  .where('id', 123)
-  .first()
-  .then(person => {
-    return person.$relatedQuery('movies').relate(50);
-  })
-  .then(numRelatedRows => {
-    console.log('movie 50 is now related to person 123 through `movies` relation');
-  });
+  .findById(123);
+
+const numRelatedRows = await person.$relatedQuery('movies').relate(50);
+console.log('movie 50 is now related to person 123 through `movies` relation');
 ```
 
 > Relate multiple (only works with postgres)
 
 ```js
-person
+const numRelatedRows = await person
   .$relatedQuery('movies')
-  .relate([50, 60, 70])
-  .then(numRelatedRows => {
-    console.log(`${numRelatedRows} rows were related`);
-  });
+  .relate([50, 60, 70]);
+
+console.log(`${numRelatedRows} rows were related`);
 ```
 
 > Composite key
 
 ```js
-person
+const numRelatedRows = await person
   .$relatedQuery('movies')
-  .relate({foo: 50, bar: 20, baz: 10})
-  .then(numRelatedRows => {
-    console.log(`${numRelatedRows} rows were related`);
-  });
+  .relate({foo: 50, bar: 20, baz: 10});
+
+console.log(`${numRelatedRows} rows were related`);
 ```
 
 > Fields marked as `extras` for many-to-many relations in [`relationMappings`](#relationmappings) are automatically
@@ -1033,15 +1029,14 @@ person
 > `extra` array of the relation mapping contains the string `'someExtra'`.
 
 ```js
-someMovie
+const numRelatedRows = await someMovie
   .$relatedQuery('actors')
   .relate({
     id: 50,
     someExtra: "I'll be written to the join table"
-  })
-  .then(numRelatedRows => {
-    console.log(`${numRelatedRows} rows were related`);
   });
+
+console.log(`${numRelatedRows} rows were related`);
 ```
 
 Relates an existing model to another model.
@@ -1073,16 +1068,15 @@ const builder = queryBuilder.unrelate();
 ```
 
 ```js
-Person
+const person = await Person
   .query()
-  .where('id', 123)
-  .first()
-  .then(person => {
-    return person.$relatedQuery('movies').unrelate().where('id', 50);
-  })
-  .then(numUnrelatedRows => {
-    console.log('movie 50 is no longer related to person 123 through `movies` relation');
-  });
+  .findById(123)
+
+const numUnrelatedRows = await person.$relatedQuery('movies')
+  .unrelate()
+  .where('id', 50);
+
+console.log('movie 50 is no longer related to person 123 through `movies` relation');
 ```
 
 Removes a connection between two models.
@@ -1109,7 +1103,7 @@ const builder = queryBuilder.alias(alias);
 ```
 
 ```js
-Person
+await Person
   .query()
   .alias('p')
   .where('p.id', 1)
@@ -1469,7 +1463,7 @@ const builder = queryBuilder.joinRelation(relationExpression, opt);
 > Join one relation:
 
 ```js
-Person
+await Person
   .query()
   .joinRelation('pets')
   .where('pets.species', 'dog');
@@ -1478,7 +1472,7 @@ Person
 > Give an alias for a single relation:
 
 ```js
-Person
+await Person
   .query()
   .joinRelation('pets', {alias: 'p'})
   .where('p.species', 'dog');
@@ -1487,7 +1481,7 @@ Person
 > Join two relations:
 
 ```js
-Person
+await Person
   .query()
   .joinRelation('[pets, parent]')
   .where('pets.species', 'dog');
@@ -1499,7 +1493,7 @@ Person
 > knex parses table references.
 
 ```js
-Person
+await Person
   .query()
   .select('Person.id', 'parent:parent.name as grandParentName')
   .joinRelation('[pets, parent.[pets, parent]]')
@@ -1509,7 +1503,7 @@ Person
 > Give aliases for a bunch of relations:
 
 ```js
-Person
+await Person
   .query()
   .select('Person.id', 'pr:pr.name as grandParentName')
   .joinRelation('[pets, parent.[pets, parent]]', {
@@ -2266,7 +2260,7 @@ Type|Description
 #### whereRef
 
 ```js
-var builder = queryBuilder.whereRef(leftRef, operator, rightRef);
+const builder = queryBuilder.whereRef(leftRef, operator, rightRef);
 ```
 
 ```js
@@ -2287,7 +2281,7 @@ Type|Description
 #### orWhereRef
 
 ```js
-var builder = queryBuilder.orWhereRef(leftRef, operator, rightRef);
+const builder = queryBuilder.orWhereRef(leftRef, operator, rightRef);
 ```
 
 ```js
@@ -2308,7 +2302,7 @@ Type|Description
 #### whereComposite
 
 ```js
-var builder = queryBuilder.whereComposite(columns, operator, values);
+const builder = queryBuilder.whereComposite(columns, operator, values);
 ```
 
 ```js
@@ -2372,20 +2366,18 @@ const builder = queryBuilder.whereJsonEquals(fieldExpression, jsonObjectOrFieldE
 ```
 
 ```js
-Person
+const people = await Person
   .query()
-  .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome')
-  .then(people => {
-    // oh joy! these people have all their dogs at home!
-  });
+  .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
 
-Person
+// oh joy! these people have all their dogs at home!
+
+const people = await Person
   .query()
-  .whereJsonEquals('additionalData:myDogs[0]', { name: "peter"})
-  .then(people => {
-    // these people's first dog name is "peter" and the dog has no other
-    // attributes, but its name
-  });
+  .whereJsonEquals('additionalData:myDogs[0]', { name: "peter"});
+
+// these people's first dog name is "peter" and the dog has no other
+// attributes, but its name
 ```
 
 Where jsonb field reference equals jsonb object or other field reference.
@@ -2436,21 +2428,19 @@ var builder = queryBuilder.whereJsonSupersetOf(fieldExpression, jsonObjectOrFiel
 ```
 
 ```js
-Person
+const people = await Person
   .query()
-  .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome')
-  .then(people => {
-    // These people have all or some of their dogs at home. Person might have some
-    // additional dogs in their custody since myDogs is supreset of dogsAtHome.
-  });
+  .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome');
 
-Person
+// These people have all or some of their dogs at home. Person might have some
+// additional dogs in their custody since myDogs is supreset of dogsAtHome.
+
+const people = await Person
   .query()
-  .whereJsonSupersetOf('additionalData:myDogs[0]', { name: "peter"})
-  .then(people => {
-    // These people's first dog name is "peter", but the dog might have
-    // additional attributes as well.
-  });
+  .whereJsonSupersetOf('additionalData:myDogs[0]', { name: "peter"});
+
+// These people's first dog name is "peter", but the dog might have
+// additional attributes as well.
 ```
 
 > Object and array are always their own supersets.
@@ -2782,7 +2772,7 @@ const builder = queryBuilder.context(queryContext);
 > You can set the context like this:
 
 ```js
-Person
+await Person
   .query()
   .context({something: 'hello'});
 ```
@@ -2790,7 +2780,7 @@ Person
 > and access the context like this:
 
 ```js
-var context = builder.context();
+const context = builder.context();
 ```
 
 > You can set any data to the context object. You can also register QueryBuilder lifecycle methods
@@ -3026,18 +3016,18 @@ const builder = queryBuilder.runBefore(runBefore);
 const query = Person.query();
 
 query
- .runBefore(() => {
+ .runBefore(async () => {
    console.log('hello 1');
 
-   return Promise.delay(10).then(() => {
-     console.log('hello 2');
-   });
+   await Promise.delay(10);
+
+    console.log('hello 2');
  })
  .runBefore(() => {
    console.log('hello 3');
  });
 
-query.then();
+await query;
 // --> hello 1
 // --> hello 2
 // --> hello 3
@@ -3113,16 +3103,14 @@ const builder = queryBuilder.runAfter(runAfter);
 const query = Person.query();
 
 query
- .runAfter((models, queryBuilder) => {
+ .runAfter(async (models, queryBuilder) => {
    return models;
  })
- .runAfter((models, queryBuilder) => {
+ .runAfter(async (models, queryBuilder) => {
    models.push(Person.fromJson({firstName: 'Jennifer'}));
  });
 
-query.then(models => {
-  const jennifer = models[models.length - 1];
-});
+const models = await query;
 ```
 
 Registers a function to be called when the builder is executed.
@@ -3156,7 +3144,7 @@ const builder = queryBuilder.onError(onError);
 const query = Person.query();
 
 query
- .onError((error, queryBuilder) => {
+ .onError(async (error, queryBuilder) => {
    // Handle `SomeError` but let other errors go through.
    if (error instanceof SomeError) {
      // This will cause the query to be resolved with an object
@@ -3194,7 +3182,7 @@ const builder = queryBuilder.eagerAlgorithm(algo);
 ```
 
 ```js
-Person
+const people = await Person
   .query()
   .eagerAlgorithm(Person.JoinEagerAlgorithm)
   .eager('[pets, children]')
@@ -3226,7 +3214,7 @@ const builder = queryBuilder.eagerOptions(options);
 ```
 
 ```js
-Person
+const people = await Person
   .query()
   .eagerOptions({joinOperation: 'innerJoin'})
   .eager('[pets, children]')
@@ -3258,20 +3246,19 @@ const builder = queryBuilder.eager(relationExpression, filters);
 ```js
 // Fetch `children` relation for each result Person and `pets` and `movies`
 // relations for all the children.
-Person
+const people = await Person
   .query()
-  .eager('children.[pets, movies]')
-  .then(people => {
-    console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id);
-  });
+  .eager('children.[pets, movies]');
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
 ```
 
 > Relations can be filtered by giving named filter functions as arguments
 > to the relations:
 
 ```js
-Person
+const people = await Person
   .query()
   .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
     orderByAge: (builder) => {
@@ -3283,11 +3270,10 @@ Person
     onlyDogs: (builder) => {
       builder.where('species', 'dog');
     }
-  })
-  .then(people => {
-    console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id);
   });
+
+console.log(people[0].children[0].pets[0].name);
+cconsole.log(people[0].children[0].movies[0].id);
 ```
 
 > Reusable named filters can be defined for a model class using [`namedFilters`](#namedfilters)
@@ -3316,19 +3302,18 @@ class Animal extends Model {
   }
 }
 
-Person
+const people = await Person
   .query()
-  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]')
-  .then(people => {
-    console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id);
-  });
+  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]');
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
 ```
 
 > Filters can also be registered using the [`modifyEager`](#modifyeager) method:
 
 ```js
-Person
+const people = await Person
   .query()
   .eager('children.[pets, movies]')
   .modifyEager('children', builder => {
@@ -3342,17 +3327,16 @@ Person
   .modifyEager('children.movies]', builder => {
     // Only select 100 first movies for the children.
     builder.limit(100);
-  })
-  .then(people => {
-    console.log(people[0].children[0].pets[0].name);
-    console.log(people[0].children[0].movies[0].id);
   });
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
 ```
 
 > Relations can be given aliases using the `as` keyword:
 
 ```js
-Person
+const people = await Person
   .query()
   .eager(`[
     children(orderByAge) as kids .[
@@ -3363,24 +3347,22 @@ Person
         actors
       ]
     ]
-  ]`)
-  .then(people => {
-    console.log(people[0].kids[0].dogs[0].name);
-    console.log(people[0].kids[0].movies[0].id);
-  });
+  ]`);
+
+console.log(people[0].kids[0].dogs[0].name);
+console.log(people[0].kids[0].movies[0].id);
 ```
 
 > The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
 
 ```js
-Person
+const people = await Person
   .query()
   .where('id', 1)
-  .eager('children.children')
-  .then(people => {
-    console.log(people[0].children.length); // --> 10
-    console.log(people[0].children[9].children.length); // --> 10
-  });
+  .eager('children.children');
+
+console.log(people[0].children.length); // --> 10
+console.log(people[0].children[9].children.length); // --> 10
 ```
 
 > The person has 10 children and they all have 10 children. The query above will
@@ -3390,16 +3372,15 @@ Person
 > The loading algorithm can be changed using the [`eagerAlgorithm`](#eageralgorithm) method:
 
 ```js
-Person
+const people = await Person
   .query()
   .where('id', 1)
   .eagerAlgorithm(Person.JoinEagerAlgorithm)
   .eager('[movies, children.pets]')
   .where('movies.name', 'like', '%terminator%')
-  .where('children:pets.species', 'dog')
-  .then(people => {
-    console.log(people);
-  });
+  .where('children:pets.species', 'dog');
+
+console.log(people);
 ```
 
 
@@ -3708,7 +3689,7 @@ const builder = queryBuilder.allowInsert(relationExpression);
 ```
 
 ```js
-Person
+const insertedPerson = await Person
   .query()
   .allowInsert('[children.pets, movies]')
   .insertGraph({
@@ -3767,7 +3748,7 @@ const builder = queryBuilder.castTo(ModelClass);
 > of `Person` instances.
 
 ```js
-Person
+const animals = await Person
   .query()
   .joinRelation('children.children.pets')
   .select('children:children:pets.*')
@@ -3779,7 +3760,7 @@ Person
 ```js
 const { Model } = require('objection');
 
-Person
+const models = await Person
   .query()
   .joinRelation('children.pets')
   .select([
@@ -4147,12 +4128,10 @@ const query = Person
   .query()
   .where('age', '>', 20);
 
-Promise.all([
+const [total, models] = await Promise.all([
   query.resultSize(),
   query.offset(100).limit(50)
-]).spread((total, models) => {
-  ...
-});
+]);
 ```
 
 Returns the amount of rows the current query would produce without [`limit`](#limit) and [`offset`](#offset) applied.
@@ -4175,14 +4154,13 @@ const builder = queryBuilder.page(page, pageSize);
 ```
 
 ```js
-Person
+const result = await Person
   .query()
   .where('age', '>', 20)
-  .page(5, 100)
-  .then(result => {
-    console.log(result.results.length); // --> 100
-    console.log(result.total); // --> 3341
-  });
+  .page(5, 100);
+
+console.log(result.results.length); // --> 100
+console.log(result.total); // --> 3341
 ```
 
 Two queries are performed by this method: the actual query and a query to get the `total` count.
@@ -4219,28 +4197,26 @@ const builder = queryBuilder.range(start, end);
 ```
 
 ```js
-Person
+const result = await Person
   .query()
   .where('age', '>', 20)
-  .range(0, 100)
-  .then(result => {
-    console.log(result.results.length); // --> 101
-    console.log(result.total); // --> 3341
-  });
+  .range(0, 100);
+
+console.log(result.results.length); // --> 101
+console.log(result.total); // --> 3341
 ```
 
 > `range` can be called without arguments if you want to specify the limit and offset explicitly:
 
 ```js
-Person
+const result = await Person
   .query()
   .where('age', '>', 20)
   .limit(10)
-  .range()
-  .then(result => {
-    console.log(result.results.length); // --> 101
-    console.log(result.total); // --> 3341
-  });
+  .range();
+
+console.log(result.results.length); // --> 101
+console.log(result.total); // --> 3341
 ```
 
 Only returns the given range of results.
@@ -4279,13 +4255,12 @@ const builder = queryBuilder.pluck(propertyName);
 ```
 
 ```js
-Person
+const firstNames = await Person
   .query()
   .where('age', '>', 20)
-  .pluck('firstName')
-  .then(firstNames => {
-    console.log(typeof firstNames[0]); // --> string
-  });
+  .pluck('firstName');
+
+console.log(typeof firstNames[0]); // --> string
 ```
 
 If the result is an array, plucks a property from each object.
@@ -4313,12 +4288,11 @@ const builder = queryBuilder.first();
 ```
 
 ```js
-Person
+const firstPerson = await Person
   .query()
   .first()
-  .then(firstPerson => {
-    console.log(person.age);
-  });
+
+console.log(firstPerson.age);
 ```
 
 If the result is an array, selects the first item.
@@ -4346,15 +4320,16 @@ const builder = queryBuilder.throwIfNotFound();
 ```
 
 ```js
-Language
-  .query()
-  .where('name', 'Java')
-  .andWhere('isModern', true)
-  .throwIfNotFound()
-  .catch(err => {
-    // No results found.
-    console.log(err instanceof Language.NotFoundError); // --> true
-  });
+try {
+  await Language
+    .query()
+    .where('name', 'Java')
+    .andWhere('isModern', true)
+    .throwIfNotFound()
+} catch (err) {
+  // No results found.
+  console.log(err instanceof Language.NotFoundError); // --> true
+}
 ```
 
 Causes a [`Model.NotFoundError`](#notfounderror) to be thrown if the query result is empty.
@@ -4379,29 +4354,27 @@ var builder = queryBuilder.traverse(modelClass, traverser);
 ```
 
 ```js
-Person
+const people = await Person
   .query()
   .eager('pets')
   .traverse((model, parentModel, relationName) => {
     delete model.id;
-  })
-  .then(people => {
-    console.log(people[0].id); // --> undefined
-    console.log(people[0].pets[0].id); // --> undefined
   });
+
+console.log(people[0].id); // --> undefined
+console.log(people[0].pets[0].id); // --> undefined
 ```
 
 ```js
-Person
+const persons = await Person
   .query()
   .eager('pets')
   .traverse(Animal, (animal, parentModel, relationName) => {
     delete animal.id;
-  })
-  .then(persons => {
-    console.log(persons[0].id); // --> 1
-    console.log(persons[0].pets[0].id); // --> undefined
   });
+
+console.log(persons[0].id); // --> 1
+console.log(persons[0].pets[0].id); // --> undefined
 ```
 
 Traverses through all models in the result, including the eagerly loaded relations.
@@ -4819,6 +4792,30 @@ class Person extends Model {
 }
 ```
 
+> Using a shared `BaseModel` superclass:
+
+```js
+const { Model } = require('objection');
+
+// models/BaseModel.js
+class BaseModel extends Model {
+  static get modelPaths() {
+    return [__dirname];
+  }
+}
+
+module.exports = {
+  BaseModel
+};
+
+// models/Person.js
+const { BaseModel } = require('./BaseModel');
+
+class Person extends BaseModel {
+  ...
+}
+```
+
 > ESNext:
 
 ```js
@@ -4834,6 +4831,10 @@ A model class can be defined for a relation in [`relationMappings`](#relationmap
 1. A model class constructor
 2. An absolute path to a module that exports a model class
 3. A path relative to one of the paths in `modelPaths` array.
+
+You probably don't want to define `modelPaths` property for each model. Once again we
+recommend that you create a `BaseModel` super class for all your models and define
+shared configuration such as this there.
 
 
 
@@ -5135,6 +5136,10 @@ const person = Person.fromJson({
   gender: 'female'
 });
 
+// Note that `toJSON` is always called automatically when an object is serialized
+// to a JSON string using JSON.stringify. You very rarely need to call `toJSON`
+// explicitly. koa, express and all other frameworks I'm aware of use JSON.stringify
+// to serialize objects to JSON.
 console.log(person.toJSON());
 // --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
 ```
@@ -5160,6 +5165,10 @@ const person = Person.fromJson({
   gender: 'female'
 });
 
+// Note that `toJSON` is always called automatically when an object is serialized
+// to a JSON string using JSON.stringify. You very rarely need to call `toJSON`
+// explicitly. koa, express and all other frameworks I'm aware of use JSON.stringify
+// to serialize objects to JSON.
 console.log(person.toJSON());
 // --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
 ```
@@ -5455,15 +5464,14 @@ const queryBuilder = Person.query(transactionOrKnex);
 
 ```js
 // Get all rows.
-Person.query().then(people => {
-  console.log('there are', people.length, 'people in the database');
-});
+const people = await Person.query();
+console.log('there are', people.length, 'people in the database');
 
 // Example of a more complex WHERE clause. This generates:
 // SELECT FROM "Person"
 // WHERE ("firstName" = 'Jennifer' AND "age" < 30)
 // OR ("firstName" = 'Mark' AND "age" > 30)
-Person
+const marksAndJennifers = await Person
   .query()
   .where(builder => {
     builder
@@ -5474,48 +5482,46 @@ Person
     builder
       .where('firstName', 'Mark')
       .where('age', '>', 30);
-  })
-  .then(marksAndJennifers => {
-    console.log(marksAndJennifers);
   });
+
+console.log(marksAndJennifers);
+
 
 // Get a subset of rows and fetch related models
 // for each row.
-Person
+const oldPeople = await Person
   .query()
   .where('age', '>', 60)
-  .eager('children.children.movies')
-  .then(oldPeople => {
-    console.log('some old person\'s grand child has appeared in',
-      oldPeople[0].children[0].children[0].movies.length,
-      'movies');
-  });
+  .eager('children.children.movies');
+
+console.log('some old person\'s grand child has appeared in',
+  oldPeople[0].children[0].children[0].movies.length,
+  'movies');
 ```
 
 > Insert models to the database:
 
 ```js
-Person.query()
-  .insert({firstName: 'Sylvester', lastName: 'Stallone'})
-  .then(sylvester => {
-    console.log(sylvester.fullName());
-    // --> 'Sylvester Stallone'.
-  });
+const sylvester = await Person
+  .query()
+  .insert({firstName: 'Sylvester', lastName: 'Stallone'});
+
+console.log(sylvester.fullName());
+// --> 'Sylvester Stallone'.
 
 // Batch insert. This only works on Postgresql as it is
 // the only database that returns the identifiers of
 // _all_ inserted rows. If you need to do batch inserts
 // on other databases useknex* directly.
 // (See .knexQuery() method).
-Person
+const inserted = await Person
   .query()
   .insert([
     {firstName: 'Arnold', lastName: 'Schwarzenegger'},
     {firstName: 'Sylvester', lastName: 'Stallone'}
-  ])
-  .then(inserted => {
-    console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
-  });
+  ]);
+
+console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
 ```
 
 > `update` and `patch` can be used to update models. Only difference between the mentioned methods
@@ -5524,38 +5530,35 @@ Person
 > of a model and `patch` when only a subset should be updated.
 
 ```js
-Person
+const numUpdatedRows = await Person
   .query()
   .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 35})
-  .where('id', jennifer.id)
-  .then(numUpdatedRows => {
-    console.log(numUpdatedRows);
-  });
+  .where('id', jennifer.id);
+
+console.log(numUpdatedRows);
 
 // This will throw assuming that `firstName` or `lastName`
 // is a required property for a Person.
-Person.query().update({age: 100});
+await Person.query().update({age: 100});
 
 // This will _not_ throw.
-Person
+await Person
   .query()
-  .patch({age: 100})
-  .then(() => {
-    console.log('Everyone is now 100 years old');
-  });
+  .patch({age: 100});
+
+console.log('Everyone is now 100 years old');
 ```
 
 > Models can be deleted using the delete method. Naturally the delete query can be chained with
 > any knex* methods:
 
 ```js
-Person
+await Person
   .query()
   .delete()
-  .where('age', '>', 90)
-  .then(() => {
-    console.log('anyone over 90 is now removed from the database');
-  });
+  .where('age', '>', 90);
+
+console.log('anyone over 90 is now removed from the database');
 ```
 
 Creates a query builder for the model's table.
@@ -5567,6 +5570,60 @@ See the [query examples](#query-examples) section for more examples.
 Argument|Type|Description
 --------|----|--------------------
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. for a query. Falsy values are ignored.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|The created query builder
+
+
+
+
+#### relatedQuery
+
+```js
+const queryBuilder = Person.relatedQuery(relationName);
+```
+
+> Select count of a relation and the maximum value of another one:
+
+```js
+const people = await Person
+  .query()
+  .select([
+    'Person.*',
+
+    Person.relatedQuery('pets')
+      .count()
+      .where('species', 'dog')
+      .as('dogCount'),
+
+    Person.relatedQuery('movies')
+      .max('createdAt')
+      .as('mostRecentMovieDate')
+  ]);
+
+console.log(people[0].id);
+console.log(people[0].dogCount)
+console.log(people[0].mostRecentMovieDate);
+```
+
+> Find models that have at least one item in a relation:
+
+```js
+const peopleThatHavePets = await Person
+  .query()
+  .whereExists(Person.relatedQuery('pets'));
+```
+
+Creates a subquery to a relation.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationName|string|The name of the relation to create subquery for.
 
 ##### Return value
 
@@ -5659,19 +5716,19 @@ const BoundModel1 = SomeModel.bindKnex(knex1);
 const BoundModel2 = SomeModel.bindKnex(knex2);
 
 // Throws since the knex instance is null.
-SomeModel.query().then();
+await SomeModel.query();
 
 // Works.
-BoundModel1.query().then(models => {
- console.log(models[0] instanceof SomeModel); // --> true
- console.log(models[0] instanceof BoundModel1); // --> true
-});
+const models = await BoundModel1.query();
+
+console.log(models[0] instanceof SomeModel); // --> true
+console.log(models[0] instanceof BoundModel1); // --> true
 
 // Works.
-BoundModel2.query().then(models => {
- console.log(models[0] instanceof SomeModel); // --> true
- console.log(models[0] instanceof BoundModel2); // --> true
-});
+const models = await BoundModel2.query();
+
+console.log(models[0] instanceof SomeModel); // --> true
+console.log(models[0] instanceof BoundModel2); // --> true
 ```
 
 Creates an anonymous subclass of this class that is bound to the given knex.
@@ -5697,9 +5754,10 @@ function|The create model subclass constructor
 #### bindTransaction
 
 ```js
+const { transaction } = require('objection');
 const Person = require('./models/Person');
 
-objection.transaction(Person.knex(), async (trx) => {
+await transaction(Person.knex(), async (trx) => {
   const TransactingPerson =  Person.bindTransaction(trx);
 
   await TransactingPerson
@@ -5882,8 +5940,8 @@ Type|Description
 
 ```js
 class BaseModel extends Model {
-  static createValidationError(errorHash) {
-    return new MyCustomValidationError(errorHash);
+  static createValidationError({type, message, data}) {
+    return new MyCustomValidationError({type, message, data});
   }
 }
 ```
@@ -5892,8 +5950,8 @@ class BaseModel extends Model {
 
 ```js
 class Model {
-  static createValidationError(errorHash) {
-    return new this.ValidationError(errorHash);
+  static createValidationError({type, message, data}) {
+    return new this.ValidationError({type, message, data});
   }
 }
 ```
@@ -5942,16 +6000,16 @@ const promise = Person.loadRelated(models, expression, filters, transactionOrKne
 > Examples:
 
 ```js
-Person.loadRelated([person1, person2], 'children.pets').then(people => {
-  var person1 = people[0];
-  var person2 = people[1];
-});
+const people = await Person.loadRelated([person1, person2], 'children.pets');
+
+const person1 = people[0];
+const person2 = people[1];
 ```
 
 > Relations can be filtered by giving named filter functions as arguments to the relations:
 
 ```js
-Person
+const people = await Person
   .loadRelated([person1, person2], 'children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
     orderByAge: (builder) => {
       builder.orderBy('age');
@@ -5962,10 +6020,9 @@ Person
     onlyDogs: (builder) => {
       builder.where('species', 'dog');
     }
-  })
-  .then(people => {
-    console.log(people[1].children.pets[0]);
   });
+
+console.log(people[1].children.pets[0]);
 ```
 
 Load related models for a set of models using a [`RelationExpression`](#relationexpression).
@@ -6141,6 +6198,7 @@ Exports this model as a database JSON object.
 
 This method is called internally to convert a model into a database row.
 
+
 ##### Return value
 
 Type|Description
@@ -6153,10 +6211,20 @@ Object|Database row.
 #### $toJson
 
 ```js
-const jsonObj = modelInstance.$toJson();
+const jsonObj = modelInstance.$toJson(opt);
+```
+
+```js
+const shallowObj = modelInstance.$toJson({shallow: true});
 ```
 
 Exports this model as a JSON object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+opt|[`CloneOptions`](#cloneoptions)|Optional options
 
 ##### Return value
 
@@ -6170,10 +6238,20 @@ Object|Model as a JSON object.
 #### toJSON
 
 ```js
-const jsonObj = modelInstance.toJSON();
+const jsonObj = modelInstance.toJSON(opt);
+```
+
+```js
+const shallowObj = modelInstance.toJSON({shallow: true});
 ```
 
 Exports this model as a JSON object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+opt|[`CloneOptions`](#cloneoptions)|Optional options
 
 ##### Return value
 
@@ -6654,13 +6732,24 @@ Type|Description
 #### $clone
 
 ```js
-const clone = modelInstance.$clone;
+const clone = modelInstance.$clone(options);
 ```
 
-Returns a deep copy of this model.
+```js
+const shallowClone = modelInstance.$clone({shallow: true});
+```
+
+Returns a (deep) copy of this model.
 
 If this object has instances of [`Model`](#model) as properties (or arrays of them)
-they are cloned using their `$clone()` method.
+they are cloned using their `$clone()` method. A shallow copy without relations
+can be created by passing the `shallow: true` option.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+opt|[`CloneOptions`](#cloneoptions)|Optional options
 
 ##### Return value
 
@@ -6680,43 +6769,35 @@ const queryBuilder = person.$query(transactionOrKnex);
 > Re-fetch the instance from the database:
 
 ```js
-person.$query().then(reFetchedPerson => {
-  // Note that `person` did not get modified by the fetch.
-  console.log(reFetchedPerson);
-});
-
 // If you need to refresh the same instance you can do this:
-person.$query().then(reFetchedPerson => {
-  // Note that `person` did not get modified by the fetch.
-  person.$set(reFetchedPerson);
-});
+const reFetchedPerson = await person.$query();
 
-// Or this:
-person = await person.$query();
+// Note that `person` did not get modified by the fetch.
+person.$set(reFetchedPerson);
 ```
 
 > Insert a new model to database:
 
 ```js
-Person.fromJson({firstName: 'Jennifer'}).$query().insert().then(jennifer => {
-  console.log(jennifer.id);
-});
+const jennifer = await Person.fromJson({firstName: 'Jennifer'}).$query().insert();
+
+console.log(jennifer.id);
 ```
 
 > Patch a model:
 
 ```js
-person.$query().patch({lastName: 'Cooper'}).then(() => {
-  console.log('person updated');
-});
+await person.$query().patch({lastName: 'Cooper'});
+
+console.log('person updated');
 ```
 
 > Delete a model.
 
 ```js
-person.$query().delete().then(() => {
-  console.log('person deleted');
-});
+await person.$query().delete();
+
+console.log('person deleted');
 ```
 
 Creates a query builder for this model instance.
@@ -6748,39 +6829,37 @@ const builder = model.$relatedQuery(relationName, transactionOrKnex);
 > also stored to the owner model's property named after the relation:
 
 ```js
-jennifer.$relatedQuery('pets').then(pets => {
-  console.log('jennifer has', pets.length, 'pets');
-  console.log(jennifer.pets === pets); // --> true
-});
+const pets = await jennifer.$relatedQuery('pets');
+
+console.log('jennifer has', pets.length, 'pets');
+console.log(jennifer.pets === pets); // --> true
 ```
 
 > The related query is just like any other query. All knex methods are available:
 
 ```js
-jennifer
+const dogsAndCats = await jennifer
   .$relatedQuery('pets')
   .select('Animal.*', 'Person.name as ownerName')
   .where('species', '=', 'dog')
   .orWhere('breed', '=', 'cat')
   .innerJoin('Person', 'Person.id', 'Animal.ownerId')
-  .orderBy('Animal.name')
-  .then(dogsAndCats => {
-    // All the dogs and cats have the owner's name "Jennifer"
-    // joined as the `ownerName` property.
-    console.log(dogsAndCats);
-  });
+  .orderBy('Animal.name');
+
+// All the dogs and cats have the owner's name "Jennifer"
+// joined as the `ownerName` property.
+console.log(dogsAndCats);
 ```
 
 > This inserts a new model to the database and binds it to the owner model as defined
 > by the relation:
 
 ```js
-jennifer
+const waldo = await jennifer
   .$relatedQuery('pets')
-  .insert({species: 'dog', name: 'Fluffy'})
-  .then(waldo => {
-    console.log(waldo.id);
-  });
+  .insert({species: 'dog', name: 'Fluffy'});
+
+console.log(waldo.id);
 ```
 
 > To add an existing model to a relation the `relate` method can be used. In this example
@@ -6788,12 +6867,11 @@ jennifer
 > the `pets` relation. We can make the connection like this:
 
 ```js
-jennifer
+await jennifer
   .$relatedQuery('pets')
-  .relate(fluffy.id)
-  .then(() => {
-    console.log('fluffy is now related to jennifer through pets relation');
-  });
+  .relate(fluffy.id);
+
+console.log('fluffy is now related to jennifer through pets relation');
 ```
 
 > The connection can be removed using the `unrelate` method. Again, this doesn't delete the
@@ -6801,13 +6879,12 @@ jennifer
 > the join table entries are deleted.
 
 ```js
-jennifer
+await jennifer
   .$relatedQuery('pets')
   .unrelate()
-  .where('id', fluffy.id)
-  .then(() => {
-    console.log('jennifer no longer has fluffy as a pet');
-  });
+  .where('id', fluffy.id);
+
+console.log('jennifer no longer has fluffy as a pet');
 ```
 
 > Related models can be deleted using the delete method. Note that in the case of ManyToManyRelation
@@ -6815,13 +6892,12 @@ jennifer
 > methods.
 
 ```js
-jennifer
+await jennifer
   .$relatedQuery('pets')
   .delete()
   .where('species', 'cat')
-  .then(() => {
-    console.log('jennifer no longer has any cats');
-  });
+
+console.log('jennifer no longer has any cats');
 ```
 
 > `update` and `patch` can be used to update related models. Only difference between the mentioned
@@ -6830,29 +6906,27 @@ jennifer
 > _all_ properties of a model and `patch` when only a subset should be updated.
 
 ```js
-jennifer
+const updatedFluffy = await jennifer
   .$relatedQuery('pets')
   .update({species: 'dog', name: 'Fluffy the great', vaccinated: false})
-  .where('id', fluffy.id)
-  .then(updatedFluffy => {
-    console.log('fluffy\'s new name is', updatedFluffy.name);
-  });
+  .where('id', fluffy.id);
+
+console.log('fluffy\'s new name is', updatedFluffy.name);
 
 // This query will be rejected assuming that `name` or `species`
 // is a required property for an Animal.
-jennifer
+await jennifer
   .$relatedQuery('pets')
   .update({vaccinated: true})
   .where('species', 'dog');
 
 // This query will succeed.
-jennifer
+await jennifer
   .$relatedQuery('pets')
   .patch({vaccinated: true})
-  .where('species', 'dog')
-  .then(() => {
-    console.log('jennifer just got all her dogs vaccinated');
-  });
+  .where('species', 'dog');
+
+console.log('jennifer just got all her dogs vaccinated');
 ```
 
 Use this to build a query that only affects the models related to this instance through a relation.
@@ -6882,19 +6956,19 @@ const builder = modelInstance.$loadRelated(expression, filters, transactionOrKne
 > Examples:
 
 ```js
-jennifer.$loadRelated('[pets, children.[pets, father]]').then(jennifer => {
-  console.log('Jennifer has', jennifer.pets.length, 'pets');
-  console.log('Jennifer has', jennifer.children.length, 'children');
-  console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pets');
-  console.log('Jennifer had her first child with', jennifer.children[0].father.name);
-});
+await jennifer.$loadRelated('[pets, children.[pets, father]]');
+
+console.log('Jennifer has', jennifer.pets.length, 'pets');
+console.log('Jennifer has', jennifer.children.length, 'children');
+console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pets');
+console.log('Jennifer had her first child with', jennifer.children[0].father.name);
 ```
 
 > Relations can be filtered by giving named filter functions as arguments
 > to the relations:
 
 ```js
-jennifer
+await jennifer
   .$loadRelated('children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
     orderByAge: (builder) => {
       builder.orderBy('age');
@@ -6905,10 +6979,9 @@ jennifer
     onlyDogs: (builder) => {
       builder.where('species', 'dog');
     }
-  })
-  .then(jennifer => {
-    console.log(jennifer.children.pets[0]);
   });
+
+console.log(jennifer.children.pets[0]);
 ```
 
 Loads related models using a [`RelationExpression`](#relationexpression) and assigns them to the target model instances.
@@ -7012,7 +7085,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $afterInsert(queryContext) {
+  async $afterInsert(queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -7047,7 +7120,7 @@ Type|Description
 
 ```js
 class Person extends Model {
-  $beforeUpdate(opt, queryContext) {
+  async $beforeUpdate(opt, queryContext) {
     return doPossiblyAsyncStuff();
   }
 }
@@ -7057,7 +7130,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $beforeUpdate(opt, queryContext) {
+  async $beforeUpdate(opt, queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -7069,7 +7142,7 @@ class Person extends Model {
 }
 ```
 
-> Note that the the `opt.old` object is only populated for instance queries started with `$query`:
+> Note that the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
 somePerson
@@ -7122,7 +7195,7 @@ Type|Description
 
 ```js
 class Person extends Model {
-  $afterUpdate(opt, queryContext) {
+  async $afterUpdate(opt, queryContext) {
     return doPossiblyAsyncStuff();
   }
 }
@@ -7132,7 +7205,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $afterUpdate(opt, queryContext) {
+  async $afterUpdate(opt, queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -7144,7 +7217,7 @@ class Person extends Model {
 }
 ```
 
-> Note that the the `opt.old` object is only populated for instance queries started with `$query`:
+> Note that the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
 somePerson
@@ -7194,7 +7267,7 @@ Type|Description
 
 ```js
 class Person extends Model {
-  $beforeDelete(queryContext) {
+  async $beforeDelete(queryContext) {
     return doPossiblyAsyncStuff();
   }
 }
@@ -7204,7 +7277,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $beforeDelete(queryContext) {
+  async $beforeDelete(queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -7241,7 +7314,7 @@ Type|Description
 
 ```js
 class Person extends Model {
-  $afterDelete(queryContext) {
+  async $afterDelete(queryContext) {
     return doPossiblyAsyncStuff();
   }
 }
@@ -7251,7 +7324,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $afterDelete(queryContext) {
+  async $afterDelete(queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -7288,7 +7361,7 @@ Type|Description
 
 ```js
 class Person extends Model {
-  $afterGet(queryContext) {
+  async $afterGet(queryContext) {
     return doPossiblyAsyncStuff();
   }
 }
@@ -7298,7 +7371,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $afterGet(queryContext) {
+  async $afterGet(queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
@@ -7449,13 +7522,12 @@ Caveats when using special characters in keys:
 > of functions in objection.js. For example:
 
 ```js
-Person
+const people = await Person
   .query()
-  .eager('children.[movies.actors.[pets, children], pets]')
-  .then(people => {
-    // All persons have the given relation tree fetched.
-    console.log(people[0].children[0].movies[0].actors[0].pets[0].name);
-  });
+  .eager('children.[movies.actors.[pets, children], pets]');
+
+// All persons have the given relation tree fetched.
+console.log(people[0].children[0].movies[0].actors[0].pets[0].name);
 ```
 
 > Relation expressions can have arguments. Arguments are listed in parenthesis after the relation names
@@ -7636,7 +7708,7 @@ method of [`Model`](#model) like in the example to modify the validator.
 ```js
 const ValidationError = require('objection').ValidationError;
 
-throw new ValidationError(data);
+throw new ValidationError({type, message, data});
 ```
 
 > Or
@@ -7644,10 +7716,10 @@ throw new ValidationError(data);
 ```js
 const ValidationError = require('objection').Model.ValidationError;
 
-throw new ValidationError(data);
+throw new ValidationError({type, message, data});
 ```
 
-> The `data` object should follow this pattern:
+> If `type` is `"ModelValidation"` then `data` object should follow this pattern:
 
 ```js
 {
@@ -7679,6 +7751,8 @@ throw new ValidationError(data);
 > For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword`
 > string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
 
+> If `type` is anything else but `"ModelValidation"`, `data` can be any object that describes the error.
+
 Error of this class is thrown by default if a model validation fails.
 
 You can replace this error by overriding [`Model.createValidationError()`](#createvalidationerror) method.
@@ -7686,7 +7760,8 @@ You can replace this error by overriding [`Model.createValidationError()`](#crea
 Property|Type|Description
 --------|----|-----------
 statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
-data|Object|Dictionary of errors.
+type|string|One of "ModelValidation", "RelationExpression", "UnallowedRelation" and "InvalidGraph"a
+data|object|Dictionary of errors.
 
 
 
@@ -7723,6 +7798,16 @@ Property|Type|Description
 patch|boolean|If true the json is treated as a patch and the `required` field of the json schema is ignored in the validation. This allows us to create models with a subset of required properties for patch operations.
 skipValidation|boolean|If true the json schema validation is skipped
 old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`.
+
+
+
+
+
+## CloneOptions
+
+Property|Type|Description
+--------|----|-----------
+shallow|boolean|If true, relations are ignored
 
 
 

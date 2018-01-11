@@ -122,15 +122,39 @@ declare namespace Objection {
     constructor(config: AjvConfig);
   }
 
+  export interface CloneOptions {
+    shallow?: boolean;
+  }
+
+  export type ValidationErrorType =
+    | 'ModelValidation'
+    | 'RelationExpression'
+    | 'UnallowedRelation'
+    | 'InvalidGraph';
+
   export class ValidationError extends Error {
-    constructor(errors: any);
+    constructor(args: CreateValidationErrorArgs);
+
     statusCode: number;
-    data: any;
     message: string;
+    data?: ErrorHash | any;
+    type: ValidationErrorType;
+  }
+
+  export interface ValidationErrorItem {
+    message: string;
+    keyword: string;
+    params: Pojo;
   }
 
   export interface ErrorHash {
-    [columnName: string]: ValidationError[];
+    [columnName: string]: ValidationErrorItem[];
+  }
+
+  export interface CreateValidationErrorArgs {
+    message?: string;
+    data?: ErrorHash | any;
+    type: ValidationErrorType;
   }
 
   export interface RelationMappings {
@@ -316,6 +340,8 @@ declare namespace Objection {
     HasOneThroughRelation: Relation;
 
     query(trxOrKnex?: Transaction | knex): QueryBuilder<M>;
+    // This can only be used as a subquery so the result model type is irrelevant.
+    relatedQuery(relationName: string): QueryBuilder<any>;
     knex(knex?: knex): knex;
     formatter(): any; // < the knex typings punts here too
     knexQuery(): knex.QueryBuilder;
@@ -323,7 +349,7 @@ declare namespace Objection {
     bindKnex(knex: knex): this;
     bindTransaction(transaction: Transaction): this;
     createValidator(): Validator;
-    createValidationError(errorHash: ErrorHash): ValidationError;
+    createValidationError(args: CreateValidationErrorArgs): Error;
 
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
@@ -381,13 +407,15 @@ declare namespace Objection {
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
     static query<T>(this: Constructor<T>, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
+    // This can only be used as a subquery so the result model type is irrelevant.
+    static relatedQuery(relationName: string): QueryBuilder<any>;
     static knex(knex?: knex): knex;
     static formatter(): any; // < the knex typings punts here too
     static knexQuery(): knex.QueryBuilder;
     static bindKnex<T>(this: T, knex: knex): T;
     static bindTransaction<T>(this: T, transaction: Transaction): T;
     static createValidator(): Validator;
-    static createValidationError(errorHash: ErrorHash): ValidationError;
+    static createValidationError(args: CreateValidationErrorArgs): Error;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
     static fromJson<T>(this: Constructor<T>, json: Pojo, opt?: ModelOptions): T;
@@ -418,8 +446,8 @@ declare namespace Objection {
     $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $toDatabaseJson(): object;
-    $toJson(): object;
-    toJSON(): object;
+    $toJson(opt?: CloneOptions): object;
+    toJSON(opt?: CloneOptions): object;
     $parseDatabaseJson(json: Pojo): Pojo;
     $formatDatabaseJson(json: Pojo): Pojo;
     $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
@@ -438,7 +466,7 @@ declare namespace Objection {
     $set(obj: Pojo): this;
     $omit(keys: string | string[] | Properties): this;
     $pick(keys: string | string[] | Properties): this;
-    $clone(): this;
+    $clone(opt?: CloneOptions): this;
 
     /**
      * AKA `reload` in ActiveRecord parlance
@@ -1037,7 +1065,7 @@ declare namespace Objection {
     ): QueryBuilder<T>;
     (
       tableName: TableName,
-      columns: {[key: string]: string | number | Raw | Reference}
+      columns: { [key: string]: string | number | Raw | Reference }
     ): QueryBuilder<T>;
     (tableName: TableName, raw: Raw): QueryBuilder<T>;
     (tableName: TableName, column1: ColumnRef, column2: ColumnRef): QueryBuilder<T>;
@@ -1262,17 +1290,17 @@ declare namespace Objection {
      * Holds simple JSON Schema definitions for
      * referencing from elsewhere.
      */
-    definitions?: {[key: string]: JsonSchema};
+    definitions?: { [key: string]: JsonSchema };
     /**
      * The keys that can exist on the object with the
      * json schema that should validate their value
      */
-    properties?: {[property: string]: JsonSchema};
+    properties?: { [property: string]: JsonSchema };
     /**
      * The key of this object is a regex for which
      * properties the schema applies to
      */
-    patternProperties?: {[pattern: string]: JsonSchema};
+    patternProperties?: { [pattern: string]: JsonSchema };
     /**
      * If the key is present as a property then the
      * string of properties must also be present.
@@ -1280,7 +1308,7 @@ declare namespace Objection {
      * also be valid for the object if the key is
      * present.
      */
-    dependencies?: {[key: string]: JsonSchema | string[]};
+    dependencies?: { [key: string]: JsonSchema | string[] };
 
     /////////////////////////////////////////////////
     // Generic

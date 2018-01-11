@@ -1,5 +1,3 @@
-'use strict';
-
 const util = require('util');
 const expect = require('expect.js');
 const utils = require('../../lib/utils/classUtils');
@@ -143,10 +141,10 @@ describe('utils', () => {
 
         it(`${camel} --> ${snake} --> ${backToCamel}`, () => {
           expect(snakeCase(camel)).to.equal(snake);
-          expect(snakeCaseKeys({[camel]: 'foo'})).to.eql({[snake]: 'foo'});
+          expect(snakeCaseKeys({ [camel]: 'foo' })).to.eql({ [snake]: 'foo' });
 
           expect(camelCase(snakeCase(camel))).to.equal(backToCamel);
-          expect(camelCaseKeys(snakeCaseKeys({[camel]: 'foo'}))).to.eql({[backToCamel]: 'foo'});
+          expect(camelCaseKeys(snakeCaseKeys({ [camel]: 'foo' }))).to.eql({ [backToCamel]: 'foo' });
         });
       }
     });

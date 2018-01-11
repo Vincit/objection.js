@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
@@ -20,7 +18,7 @@ function expectIdsEqual(resultArray, expectedIds) {
 }
 
 function expectArraysEqual(arr1, arr2) {
-  expect({arr: arr1}).to.eql({arr: arr2});
+  expect({ arr: arr1 }).to.eql({ arr: arr2 });
 }
 
 module.exports = session => {
@@ -34,10 +32,10 @@ module.exports = session => {
         return {
           type: 'object',
           properties: {
-            id: {type: 'integer'},
-            name: {type: 'string'},
-            jsonObject: {type: 'object'},
-            jsonArray: {type: 'array'}
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            jsonObject: { type: 'object' },
+            jsonArray: { type: 'array' }
           }
         };
       }
@@ -61,10 +59,10 @@ module.exports = session => {
             .delete()
             .then(() => {
               return BoundModel.query().insert([
-                {id: 1, name: 'test1', jsonObject: {}, jsonArray: [1]},
-                {id: 2, name: 'test2', jsonObject: {attr: 2}, jsonArray: [2]},
-                {id: 3, name: 'test3', jsonObject: {attr: 3}, jsonArray: [3]},
-                {id: 4, name: 'test4', jsonObject: {attr: 4}, jsonArray: [4]}
+                { id: 1, name: 'test1', jsonObject: {}, jsonArray: [1] },
+                { id: 2, name: 'test2', jsonObject: { attr: 2 }, jsonArray: [2] },
+                { id: 3, name: 'test3', jsonObject: { attr: 3 }, jsonArray: [3] },
+                { id: 4, name: 'test4', jsonObject: { attr: 4 }, jsonArray: [4] }
               ]);
             });
         });
@@ -75,7 +73,7 @@ module.exports = session => {
             .orderBy('foo', 'desc')
             .then(result => {
               expect(result).to.have.length(4);
-              expect(_.first(result)).eql({foo: 4});
+              expect(_.first(result)).eql({ foo: 4 });
             });
         });
 
@@ -90,7 +88,7 @@ module.exports = session => {
             .orderBy('foo')
             .then(result => {
               expect(result).to.have.length(4);
-              expect(_.first(result)).eql({foo: 1, bar: null});
+              expect(_.first(result)).eql({ foo: 1, bar: null });
             });
         });
 
@@ -111,7 +109,7 @@ module.exports = session => {
             .then(result => {
               expect(result).to.have.length(4);
               // foo is always name of the last row of the table (quite a nonsense query)
-              expect(_.first(result)).eql({foo: 'test4', firstArrayItem: 4});
+              expect(_.first(result)).eql({ foo: 'test4', firstArrayItem: 4 });
             });
         });
 
@@ -178,7 +176,7 @@ module.exports = session => {
             .orderBy('foo')
             .then(result => {
               expect(result).to.have.length(3);
-              expect(_.first(result)).to.eql({id: 2, foo: 2});
+              expect(_.first(result)).to.eql({ id: 2, foo: 2 });
             });
         });
 
@@ -190,7 +188,7 @@ module.exports = session => {
             .orderBy('foo')
             .then(result => {
               expect(result).to.have.length(3);
-              expect(_.first(result)).to.eql({id: 2, foo: 2});
+              expect(_.first(result)).to.eql({ id: 2, foo: 2 });
             });
         });
 
@@ -207,7 +205,7 @@ module.exports = session => {
             .orderBy('foo')
             .then(result => {
               expect(result).to.have.length(3);
-              expect(_.first(result)).to.eql({id: 2, foo: 2});
+              expect(_.first(result)).to.eql({ id: 2, foo: 2 });
             });
         });
       });
@@ -232,10 +230,10 @@ module.exports = session => {
             .truncate()
             .then(() => {
               return BoundModel.query().insert([
-                {id: 1, name: 'test1', jsonObject: {}, jsonArray: [1]},
-                {id: 2, name: 'test2', jsonObject: {attr: 2}, jsonArray: [2]},
-                {id: 3, name: 'test3', jsonObject: {attr: 3}, jsonArray: [3]},
-                {id: 4, name: 'test4', jsonObject: {attr: 4}, jsonArray: [4]}
+                { id: 1, name: 'test1', jsonObject: {}, jsonArray: [1] },
+                { id: 2, name: 'test2', jsonObject: { attr: 2 }, jsonArray: [2] },
+                { id: 3, name: 'test3', jsonObject: { attr: 3 }, jsonArray: [3] },
+                { id: 4, name: 'test4', jsonObject: { attr: 4 }, jsonArray: [4] }
               ]);
             });
         });
@@ -272,7 +270,7 @@ module.exports = session => {
                 {
                   id: 1,
                   name: '1',
-                  jsonObject: {attr: 'test1'},
+                  jsonObject: { attr: 'test1' },
                   jsonArray: 'test1'
                 }
               ]);
@@ -294,7 +292,7 @@ module.exports = session => {
                 {
                   id: 1,
                   name: '1',
-                  jsonObject: {attr: 'test1'},
+                  jsonObject: { attr: 'test1' },
                   jsonArray: 'test1'
                 }
               ]);
@@ -314,7 +312,7 @@ module.exports = session => {
             )
             .then(result => {
               expect(result).to.eql({
-                jsonObject: {attr: [1, 2, 5, 7]}
+                jsonObject: { attr: [1, 2, 5, 7] }
               });
             });
         });
@@ -322,7 +320,7 @@ module.exports = session => {
         it('should be able to patch internal field of json column using an object literal', () => {
           return BoundModel.query()
             .patch({
-              'IGNOREME.jsonObject:attr': {foo: 'bar'}
+              'IGNOREME.jsonObject:attr': { foo: 'bar' }
             })
             .where('id', 1)
             .then(() =>
@@ -332,7 +330,7 @@ module.exports = session => {
             )
             .then(result => {
               expect(result).to.eql({
-                jsonObject: {attr: {foo: 'bar'}}
+                jsonObject: { attr: { foo: 'bar' } }
               });
             });
         });
@@ -350,7 +348,7 @@ module.exports = session => {
             )
             .then(result => {
               expect(result).to.eql({
-                jsonObject: {attr: 'baz'}
+                jsonObject: { attr: 'baz' }
               });
             });
         });
@@ -368,7 +366,7 @@ module.exports = session => {
             )
             .then(result => {
               expect(result).to.eql({
-                jsonObject: {attr: 'baz'}
+                jsonObject: { attr: 'baz' }
               });
             });
         });
@@ -387,7 +385,13 @@ module.exports = session => {
             numberField: 1.5,
             nullField: null,
             booleanField: false,
-            arrayField: [{noMoreLevels: true}, 1, true, null, 'string in jsonObject.arrayField[4]'],
+            arrayField: [
+              { noMoreLevels: true },
+              1,
+              true,
+              null,
+              'string in jsonObject.arrayField[4]'
+            ],
             objectField: {
               object: 'string in jsonObject.objectField.object'
             }
@@ -398,7 +402,7 @@ module.exports = session => {
               numberField: 5.5,
               nullField: null,
               booleanField: true,
-              arrayField: [{noMoreLevels: true}],
+              arrayField: [{ noMoreLevels: true }],
               objectField: {
                 object: `I'm string in jsonArray[0].objectField.object`
               }
@@ -407,7 +411,7 @@ module.exports = session => {
             1,
             'string in jsonArray[3]',
             false,
-            [{noMoreLevels: true}, null, 1, 'string in jsonArray[5][3]', true]
+            [{ noMoreLevels: true }, null, 1, 'string in jsonArray[5][3]', true]
           ]
         };
 
@@ -424,7 +428,7 @@ module.exports = session => {
                 jsonObject: {},
                 jsonArray: []
               }),
-              BoundModel.query().insert({id: 3, name: 'null object and array'}),
+              BoundModel.query().insert({ id: 3, name: 'null object and array' }),
               BoundModel.query().insert({
                 id: 4,
                 name: 'empty object and [1,2]',
@@ -440,13 +444,13 @@ module.exports = session => {
               BoundModel.query().insert({
                 id: 6,
                 name: '{a: 1} and empty array',
-                jsonObject: {a: 1},
+                jsonObject: { a: 1 },
                 jsonArray: []
               }),
               BoundModel.query().insert({
                 id: 7,
                 name: '{a: {1:1, 2:2}, b:{2:2, 1:1}} for equality comparisons',
-                jsonObject: {a: {1: 1, 2: 2}, b: {2: 2, 1: 1}},
+                jsonObject: { a: { 1: 1, 2: 2 }, b: { 2: 2, 1: 1 } },
                 jsonArray: []
               })
             ]);
@@ -455,7 +459,7 @@ module.exports = session => {
 
       it('should have test data', () => {
         return BoundModel.query().then(all => {
-          expect(_.find(all, {name: 'complex line'}).jsonObject.stringField).to.be(
+          expect(_.find(all, { name: 'complex line' }).jsonObject.stringField).to.be(
             complexJsonObj.jsonObject.stringField
           );
         });
@@ -627,7 +631,7 @@ module.exports = session => {
 
         it('should find result for jsonObject == {a: 1}', () => {
           return BoundModel.query()
-            .whereJsonEquals('jsonObject', {a: 1})
+            .whereJsonEquals('jsonObject', { a: 1 })
             .then(results => {
               expectIdsEqual(results, [6]);
             });
@@ -635,7 +639,7 @@ module.exports = session => {
 
         it('should find result for jsonObject == {a: 1}', () => {
           return BoundModel.query()
-            .where('jsonObject', lit({a: 1}))
+            .where('jsonObject', lit({ a: 1 }))
             .then(results => {
               expectIdsEqual(results, [6]);
             });
@@ -659,7 +663,7 @@ module.exports = session => {
 
         it('should find result where keys are in different order jsonObject.a == {2:2, 1:1}', () => {
           return BoundModel.query()
-            .whereJsonEquals('jsonObject:a', {2: 2, 1: 1})
+            .whereJsonEquals('jsonObject:a', { 2: 2, 1: 1 })
             .then(results => {
               expectIdsEqual(results, [7]);
             });
@@ -667,7 +671,7 @@ module.exports = session => {
 
         it('should find result where keys are in different order jsonObject.a == {2:2, 1:1}', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:a'), lit({2: 2, 1: 1}))
+            .where(ref('jsonObject:a'), lit({ 2: 2, 1: 1 }))
             .then(results => {
               expectIdsEqual(results, [7]);
             });
@@ -675,7 +679,7 @@ module.exports = session => {
 
         it('should not find result with wrong type as value jsonObject == {a: "1"}', () => {
           return BoundModel.query()
-            .whereJsonEquals('jsonObject', {a: '1'})
+            .whereJsonEquals('jsonObject', { a: '1' })
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -683,7 +687,7 @@ module.exports = session => {
 
         it('should not find result with wrong type as value jsonObject == {a: "1"}', () => {
           return BoundModel.query()
-            .where('jsonObject', lit({a: '1'}))
+            .where('jsonObject', lit({ a: '1' }))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -691,7 +695,7 @@ module.exports = session => {
 
         it('should find results jsonArray[0].arrayField[0] == { noMoreLevels: true }', () => {
           return BoundModel.query()
-            .whereJsonEquals('jsonArray:[0].arrayField[0]', {noMoreLevels: true})
+            .whereJsonEquals('jsonArray:[0].arrayField[0]', { noMoreLevels: true })
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -699,7 +703,7 @@ module.exports = session => {
 
         it('should find results jsonArray[0].arrayField[0] == { noMoreLevels: true }', () => {
           return BoundModel.query()
-            .where(ref('jsonArray:[0].arrayField[0]'), lit({noMoreLevels: true}))
+            .where(ref('jsonArray:[0].arrayField[0]'), lit({ noMoreLevels: true }))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -707,7 +711,7 @@ module.exports = session => {
 
         it('should not find results jsonArray[0].arrayField[0] == { noMoreLevels: false }', () => {
           return BoundModel.query()
-            .whereJsonEquals('jsonArray:[0].arrayField[0]', {noMoreLevels: false})
+            .whereJsonEquals('jsonArray:[0].arrayField[0]', { noMoreLevels: false })
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -715,7 +719,7 @@ module.exports = session => {
 
         it('should not find results jsonArray[0].arrayField[0] == { noMoreLevels: false }', () => {
           return BoundModel.query()
-            .where(ref('jsonArray:[0].arrayField[0]'), lit({noMoreLevels: false}))
+            .where(ref('jsonArray:[0].arrayField[0]'), lit({ noMoreLevels: false }))
             .then(results => {
               expect(results).to.have.length(0);
             });

@@ -1,5 +1,3 @@
-'use strict';
-
 const raw = require('../../').raw;
 const expect = require('expect.js');
 const chai = require('chai');
@@ -171,9 +169,9 @@ module.exports = session => {
                     'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
                     'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
 
-                    'update "Model1" set "id" = 3, "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
-                    'update "model2" set "id_col" = 1, "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
-                    'update "Model1" set "id" = 4, "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
+                    'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
+                    'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
+                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
                   ]);
               }
 
@@ -396,12 +394,12 @@ module.exports = session => {
         id: 1,
         // This causes the parent model's model1Id to change
         // which in turn should cause the parent to get updated.
-        model1Relation1: {id: 3}
+        model1Relation1: { id: 3 }
       };
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {relate: true})
+          .upsertGraph(upsert, { relate: true })
           .then(result => {
             expect(result.$beforeUpdateCalled).to.equal(1);
             expect(result.$afterUpdateCalled).to.equal(1);
@@ -415,6 +413,35 @@ module.exports = session => {
         })
         .then(model => {
           expect(model.model1Id).to.equal(3);
+        });
+    });
+
+    it('should update model if the model changes and a belongsToOne relation changes', () => {
+      const upsert = {
+        id: 1,
+        model1Prop1: 'updated',
+        // This causes the parent model's model1Id to change
+        // which in turn should cause the parent to get updated.
+        model1Relation1: { id: 3 }
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1.query(trx)
+          .upsertGraph(upsert, { relate: true })
+          .then(result => {
+            expect(result.$beforeUpdateCalled).to.equal(1);
+            expect(result.$afterUpdateCalled).to.equal(1);
+
+            expect(result.model1Relation1.$beforeUpdateCalled).to.equal(undefined);
+            expect(result.model1Relation1.$afterUpdateCalled).to.equal(undefined);
+          });
+      })
+        .then(() => {
+          return Model1.query(session.knex).findById(1);
+        })
+        .then(model => {
+          expect(model.model1Id).to.equal(3);
+          expect(model.model1Prop1).to.equal('updated');
         });
     });
 
@@ -534,88 +561,139 @@ module.exports = session => {
       };
 
       return transaction(session.knex, trx => {
-        return Model1.query(trx)
-          .upsertGraph(upsert, {unrelate: true, relate: true})
-          .then(result => {
-            expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(
-              undefined
-            );
+        const sql = [];
 
-            // Fetch the graph from the database.
-            return Model1.query(trx)
-              .findById(2)
-              .eager('[model1Relation1, model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
-          })
-          .then(omitIrrelevantProps)
-          .then(result => {
-            expect(result).to.eql({
-              id: 2,
-              model1Id: null,
-              model1Prop1: 'updated root 2',
+        // Wrap the transaction to catch the executed sql.
+        trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
+          sql.push(this.toString());
+          return oldImpl.apply(this, args);
+        });
 
-              model1Relation1: null,
-
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model1Id: 2,
-                  model2Prop1: 'updated hasMany 1',
-
-                  model2Relation1: [
-                    {
-                      id: 4,
-                      model1Id: null,
-                      model1Prop1: 'updated manyToMany 1'
-                    },
-                    {
-                      id: 6,
-                      model1Id: null,
-                      model1Prop1: 'manyToMany 3'
-                    },
-                    {
-                      id: 8,
-                      model1Id: null,
-                      model1Prop1: 'inserted manyToMany'
-                    }
-                  ]
-                },
-                {
-                  idCol: 3,
-                  model1Id: 2,
-                  model2Prop1: 'inserted hasMany',
-                  model2Relation1: []
+        return (
+          Model1.query(trx)
+            .upsertGraph(upsert, { unrelate: true, relate: true })
+            // Sort all result by id to make the SQL we test below consistent.
+            .mergeContext({
+              onBuild(builder) {
+                if (!builder.isFindQuery()) {
+                  return;
                 }
-              ]
-            });
 
-            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
-              // Row 3 should NOT be deleted.
-              expect(model1Rows.find(it => it.id == 3)).to.eql({
-                id: 3,
+                if (builder.modelClass().tableName === 'Model1') {
+                  builder.orderBy('Model1.id');
+                } else if (builder.modelClass().tableName === 'model2') {
+                  builder.orderBy('model2.id_col');
+                }
+              }
+            })
+            .then(result => {
+              expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(
+                undefined
+              );
+
+              if (session.isPostgres()) {
+                expect(sql.length).to.equal(13);
+
+                chai
+                  .expect(sql)
+                  .to.containSubset([
+                    'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc',
+                    'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                    'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
+                    'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
+
+                    'update "Model1" set "model1Id" = NULL where "Model1"."id" = 2',
+                    'update "model2" set "model1_id" = NULL where "model2"."id_col" in (2) and "model2"."model1_id" = 2',
+                    'delete from "Model1Model2" where "Model1Model2"."model2Id" = 1 and "Model1Model2"."model1Id" in (select "Model1"."id" from "Model1" where "Model1"."id" in (5) order by "Model1"."id" asc)',
+
+                    'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                    'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
+                    'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
+
+                    'update "Model1" set "model1Prop1" = \'updated root 2\', "model1Id" = NULL where "Model1"."id" = 2',
+                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
+                    'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)'
+                  ]);
+              }
+
+              // Fetch the graph from the database.
+              return Model1.query(trx)
+                .findById(2)
+                .eager('[model1Relation1, model1Relation2.model2Relation1]')
+                .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+                .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+            })
+            .then(omitIrrelevantProps)
+            .then(result => {
+              expect(result).to.eql({
+                id: 2,
                 model1Id: null,
-                model1Prop1: 'belongsToOne',
-                model1Prop2: null
+                model1Prop1: 'updated root 2',
+
+                model1Relation1: null,
+
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model1Id: 2,
+                    model2Prop1: 'updated hasMany 1',
+
+                    model2Relation1: [
+                      {
+                        id: 4,
+                        model1Id: null,
+                        model1Prop1: 'updated manyToMany 1'
+                      },
+                      {
+                        id: 6,
+                        model1Id: null,
+                        model1Prop1: 'manyToMany 3'
+                      },
+                      {
+                        id: 8,
+                        model1Id: null,
+                        model1Prop1: 'inserted manyToMany'
+                      }
+                    ]
+                  },
+                  {
+                    idCol: 3,
+                    model1Id: 2,
+                    model2Prop1: 'inserted hasMany',
+                    model2Relation1: []
+                  }
+                ]
               });
 
-              // Row 5 should NOT be deleted.
-              expect(model1Rows.find(it => it.id == 5)).to.eql({
-                id: 5,
-                model1Id: null,
-                model1Prop1: 'manyToMany 2',
-                model1Prop2: null
-              });
+              return Promise.all([trx('Model1'), trx('model2')]).spread(
+                (model1Rows, model2Rows) => {
+                  // Row 3 should NOT be deleted.
+                  expect(model1Rows.find(it => it.id == 3)).to.eql({
+                    id: 3,
+                    model1Id: null,
+                    model1Prop1: 'belongsToOne',
+                    model1Prop2: null
+                  });
 
-              // Row 2 should NOT be deleted.
-              expect(model2Rows.find(it => it.id_col == 2)).to.eql({
-                id_col: 2,
-                model1_id: null,
-                model2_prop1: 'hasMany 2',
-                model2_prop2: null
-              });
-            });
-          });
+                  // Row 5 should NOT be deleted.
+                  expect(model1Rows.find(it => it.id == 5)).to.eql({
+                    id: 5,
+                    model1Id: null,
+                    model1Prop1: 'manyToMany 2',
+                    model1Prop2: null
+                  });
+
+                  // Row 2 should NOT be deleted.
+                  expect(model2Rows.find(it => it.id_col == 2)).to.eql({
+                    id_col: 2,
+                    model1_id: null,
+                    model2_prop1: 'hasMany 2',
+                    model2_prop2: null
+                  });
+                }
+              );
+            })
+        );
       });
     });
 
@@ -638,7 +716,7 @@ module.exports = session => {
       };
 
       return BoundModel1.query()
-        .upsertGraph(upsert, {relate: true})
+        .upsertGraph(upsert, { relate: true })
         .then(result => {
           return BoundModel1.query()
             .findById(1)
@@ -707,7 +785,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {unrelate: true, relate: true})
+          .upsertGraph(upsert, { unrelate: true, relate: true })
           .then(result => {
             expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(1);
 
@@ -1033,12 +1111,12 @@ module.exports = session => {
       const upsert = {
         id: 1,
         // This is a BelongsToOneRelation
-        model1Relation1: {id: 3}
+        model1Relation1: { id: 3 }
       };
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {relate: true, unrelate: true})
+          .upsertGraph(upsert, { relate: true, unrelate: true })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1064,12 +1142,12 @@ module.exports = session => {
       const upsert = {
         id: 1,
         // This is a BelongsToOneRelation
-        model1Relation1: {model1Prop1}
+        model1Relation1: { model1Prop1 }
       };
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, {relate: true, unrelate: true})
+          .upsertGraph(upsert, { relate: true, unrelate: true })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1133,6 +1211,70 @@ module.exports = session => {
       });
     });
 
+    it('should unrelate and relate belongsToOneRelation', () => {
+      const upsert = {
+        id: 2,
+
+        // The model with id 3 should get unrelated and this new one inserted.
+        model1Relation1: {
+          id: 4
+        }
+      };
+
+      const options = {
+        unrelate: true,
+        relate: true
+      };
+
+      return transaction(session.knex, trx => {
+        const sql = [];
+
+        // Wrap the transaction to catch the executed sql.
+        trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
+          sql.push(this.toString());
+          return oldImpl.apply(this, args);
+        });
+
+        return Model1.query(trx)
+          .upsertGraph(upsert, options)
+          .then(result => {
+            if (session.isPostgres()) {
+              expect(sql.length).to.equal(3);
+              chai.expect(sql).to.containSubset([
+                'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2)',
+                'select "Model1"."id" from "Model1" where "Model1"."id" in (3)',
+                // There should only be one `model1Id` update here. If you see two, something is broken.
+                'update "Model1" set "model1Id" = 4 where "Model1"."id" = 2'
+              ]);
+            }
+
+            // Fetch the graph from the database.
+            return Model1.query(trx)
+              .findById(2)
+              .eager('model1Relation1');
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 4,
+              model1Prop1: 'root 2',
+
+              model1Relation1: {
+                id: 4,
+                model1Id: null,
+                model1Prop1: 'manyToMany 1'
+              }
+            });
+
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
+              // Row 3 should not be deleted.
+              expect(model1Rows.find(it => it.id == 3)).to.not.equal(undefined);
+            });
+          });
+      });
+    });
+
     it('should insert with an id instead of throwing an error if `insertMissing` option is true', () => {
       const upsert = {
         id: 2,
@@ -1169,7 +1311,7 @@ module.exports = session => {
       };
 
       return transaction(session.knex, trx => {
-        return Model1.query(trx).upsertGraph(upsert, {insertMissing: true});
+        return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
       })
         .then(result => {
           // Fetch the graph from the database.
@@ -1229,7 +1371,7 @@ module.exports = session => {
 
       const upsertAndCompare = () => {
         return transaction(session.knex, trx => {
-          return Model1.query(trx).upsertGraph(upsert, {insertMissing: true});
+          return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
         })
           .then(result => {
             // Fetch the graph from the database.
@@ -1371,14 +1513,14 @@ module.exports = session => {
 
       // This should fail.
       return Model1.query(session.knex)
-        .upsertGraph(upsert, {unrelate: true, relate: true})
+        .upsertGraph(upsert, { unrelate: true, relate: true })
         .allowUpsert('[model1Relation1, model1Relation2]')
         .catch(err => {
           errors.push(err);
 
           // This should also fail.
           return Model1.query(session.knex)
-            .upsertGraph(upsert, {unrelate: true, relate: true})
+            .upsertGraph(upsert, { unrelate: true, relate: true })
             .allowUpsert('[model1Relation2.model2Relation1]');
         })
         .catch(err => {
@@ -1386,7 +1528,7 @@ module.exports = session => {
 
           // This should succeed.
           return Model1.query(session.knex)
-            .upsertGraph(upsert, {unrelate: true, relate: true})
+            .upsertGraph(upsert, { unrelate: true, relate: true })
             .allowUpsert('[model1Relation1, model1Relation2.model2Relation1]');
         })
         .then(result => {
@@ -1403,7 +1545,8 @@ module.exports = session => {
 
           errors.forEach(error => {
             expect(error).to.be.a(ValidationError);
-            expect(error.data.allowedRelations).to.equal('trying to upsert an unallowed relation');
+            expect(error.type).to.equal('UnallowedRelation');
+            expect(error.message).to.equal('trying to upsert an unallowed relation');
           });
 
           expect(result).to.eql({
@@ -1593,8 +1736,8 @@ module.exports = session => {
           required: ['model1Prop1', 'model1Prop2'],
 
           properties: {
-            model1Prop1: {type: ['string', 'null']},
-            model1Prop2: {type: ['integer', 'null']}
+            model1Prop1: { type: ['string', 'null'] },
+            model1Prop2: { type: ['integer', 'null'] }
           }
         };
       });
@@ -1835,8 +1978,8 @@ module.exports = session => {
           required: ['model1Prop1', 'model1Prop2'],
 
           properties: {
-            model1Prop1: {type: 'string'},
-            model1Prop2: {type: 'integer'}
+            model1Prop1: { type: 'string' },
+            model1Prop2: { type: 'integer' }
           }
         };
       });
@@ -1890,7 +2033,7 @@ module.exports = session => {
 
         return Promise.map(fails, fail => {
           return transaction(session.knex, trx =>
-            Model1.query(trx).upsertGraph(fail, {update: true})
+            Model1.query(trx).upsertGraph(fail, { update: true })
           ).reflect();
         })
           .then(results => {
@@ -1905,7 +2048,7 @@ module.exports = session => {
           .then(() => {
             return transaction(session.knex, trx => {
               return Model1.query(trx)
-                .upsertGraph(success, {update: true})
+                .upsertGraph(success, { update: true })
                 .then(result => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)

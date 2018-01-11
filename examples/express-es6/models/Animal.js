@@ -17,10 +17,10 @@ class Animal extends Model {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        ownerId: {type: ['integer', 'null']},
-        name: {type: 'string', minLength: 1, maxLength: 255},
-        species: {type: 'string', minLength: 1, maxLength: 255}
+        id: { type: 'integer' },
+        ownerId: { type: ['integer', 'null'] },
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        species: { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
   }

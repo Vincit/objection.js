@@ -1,5 +1,3 @@
-'use strict';
-
 const expect = require('expect.js');
 const Model = require('../../../').Model;
 const AjvValidator = require('../../../').AjvValidator;
@@ -13,7 +11,7 @@ module.exports = session => {
         return {
           type: 'object',
           properties: {
-            foo: {type: 'string'}
+            foo: { type: 'string' }
           }
         };
       }
@@ -41,7 +39,7 @@ module.exports = session => {
     }
 
     it('test', () => {
-      const model = Person.fromJson({foo: 'bar'});
+      const model = Person.fromJson({ foo: 'bar' });
       expect(ajvValidator.cache.has('blaa blaa')).to.equal(true);
     });
   });

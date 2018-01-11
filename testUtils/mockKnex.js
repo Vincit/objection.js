@@ -1,7 +1,5 @@
-'use strict';
-
-var _ = require('lodash');
-var knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
+const _ = require('lodash');
+const knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
 
 /**
  * @param {function} knex
@@ -14,35 +12,36 @@ var knexMethods = require('knex/lib/query/methods').concat('queryBuilder');
  *    Mocked knex.
  */
 module.exports = function mockKnex(knex, mockExecutor) {
-  var mock = function (table) {
+  const mock = (table) => {
     return mock.queryBuilder().table(table);
   };
 
   // Mock query builder methods.
-  _.each(knexMethods, function (methodName) {
-    mock[methodName] = function () {
-      return wrapBuilder(knex[methodName].apply(knex, arguments));
+  knexMethods.forEach(methodName => {
+    mock[methodName] = (...args) => {
+      return wrapBuilder(knex[methodName](...args));
     }
   });
 
   // Mock all other methods and properties.
-  _.forOwn(knex, function (value, key) {
+  _.forOwn(knex, (value, key) => {
     if (knexMethods.indexOf(key) !== -1) {
       return;
     }
 
     if (_.isFunction(value)) {
-      mock[key] = function () {
-        return knex[key].apply(knex, arguments);
+      mock[key] = (...args) => {
+        return knex[key](...args);
       };
     } else {
       Object.defineProperty(mock, key, {
         enumerable: true,
 
-        get: function () {
+        get() {
           return knex[key];
         },
-        set: function (value) {
+
+        set(value) {
           knex[key] = value;
         }
       });
@@ -50,10 +49,10 @@ module.exports = function mockKnex(knex, mockExecutor) {
   });
 
   function wrapBuilder(builder) {
-    var oldImpl = builder.then;
+    const oldImpl = builder.then;
 
-    builder.then = function () {
-      return mockExecutor.call(this, mock, oldImpl, _.toArray(arguments));
+    builder.then = function (...args) {
+      return mockExecutor.call(this, mock, oldImpl, args);
     };
 
     return builder;

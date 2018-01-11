@@ -1,6 +1,6 @@
 'use strict';
 
-const {transaction} = require('objection');
+const { transaction } = require('objection');
 const Person = require('./models/Person');
 const Movie = require('./models/Movie');
 

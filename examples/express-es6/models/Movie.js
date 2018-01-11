@@ -17,8 +17,8 @@ class Movie extends Model {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        name: {type: 'string', minLength: 1, maxLength: 255}
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
   }

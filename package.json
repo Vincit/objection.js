@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "0.9.4",
+  "version": "1.0.0-rc.1",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -33,13 +33,14 @@
     "url": "git://github.com/vincit/objection.js.git"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=6.0.0"
   },
   "keywords": [
     "orm",
     "knex",
     "sql",
     "query",
+    "query builder",
     "postgresql",
     "mysql",
     "sqlite3"
@@ -52,8 +53,8 @@
   ],
   "types": "./typings/objection/index.d.ts",
   "dependencies": {
-    "ajv": "^5.1.1",
-    "bluebird": "^3.5.0",
+    "ajv": "^5.5.2",
+    "bluebird": "^3.5.1",
     "lodash": "^4.17.4"
   },
   "peerDependencies": {
@@ -65,17 +66,17 @@
     "babel-eslint": "^8.0.1",
     "chai": "^4.1.2",
     "chai-subset": "^1.6.0",
-    "coveralls": "^2.13.1",
+    "coveralls": "^3.0.0",
     "eslint": "^4.10.0",
     "eslint-plugin-prettier": "^2.3.1",
     "expect.js": "^0.3.1",
-    "fs-extra": "3.0.1",
+    "fs-extra": "5.0.0",
     "glob": "^7.1.1",
     "istanbul": "^0.4.5",
     "knex": "0.x",
-    "mocha": "^3.4.1",
+    "mocha": "^4.0.1",
     "mysql": "^2.13.0",
-    "pg": "^6.2.2",
+    "pg": "^7.4.0",
     "prettier": "^1.9.1",
     "sqlite3": "3.1.13",
     "typescript": "^2.6.2"

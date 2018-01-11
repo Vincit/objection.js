@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import promiseRouter from 'express-promise-router';
 import knexConfig from '../knexfile';
 import registerApi from './api';
-import {Model} from 'objection';
+import { Model } from 'objection';
 
 // Initialize knex.
 const knex = Knex(knexConfig.development);
