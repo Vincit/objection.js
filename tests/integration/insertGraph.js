@@ -236,56 +236,80 @@ module.exports = session => {
           });
       });
 
-      it('should validate models upon insertion', done => {
-        insertion.model1Relation1.model1Prop1 = 666;
+      const testValidation = (modifyGraph, expectedProperty) => {
+        return done => {
+          const graph = _.cloneDeep(insertion);
+          modifyGraph(graph);
 
-        transaction(Model1, Model2, (Model1, Model2) => {
-          // We can modify Model1 and Model2 here since it is a subclass of the actual
-          // models shared between tests.
-          Model1.jsonSchema = {
-            type: 'object',
-            properties: {
-              id: { type: 'integer' },
-              model1Id: { type: 'integer' },
-              model1Prop1: { type: 'string' },
-              model1Prop2: { type: 'integer' }
-            }
-          };
+          transaction(Model1, Model2, (Model1, Model2) => {
+            // We can modify Model1 and Model2 here since it is a subclass of the actual
+            // models shared between tests.
+            Model1.jsonSchema = {
+              type: 'object',
+              properties: {
+                id: { type: 'integer' },
+                model1Id: { type: 'integer' },
+                model1Prop1: { type: 'string' },
+                model1Prop2: { type: 'integer' }
+              }
+            };
 
-          Model2.jsonSchema = {
-            type: 'object',
-            properties: {
-              idCol: { type: 'integer' },
-              model1Id: { type: 'integer' },
-              model2Prop1: { type: 'string' },
-              model2Prop2: { type: 'integer' }
-            }
-          };
+            Model2.jsonSchema = {
+              type: 'object',
+              properties: {
+                idCol: { type: 'integer' },
+                model1Id: { type: 'integer' },
+                model2Prop1: { type: 'string' },
+                model2Prop2: { type: 'integer' }
+              }
+            };
 
-          delete Model1.$$jsonSchema;
-          delete Model2.$$jsonSchema;
+            delete Model1.$$jsonSchema;
+            delete Model2.$$jsonSchema;
 
-          expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
-          expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
+            expect(Model1.getJsonSchema()).to.equal(Model1.jsonSchema);
+            expect(Model2.getJsonSchema()).to.equal(Model2.jsonSchema);
 
-          return Model1.query().insertGraph(insertion);
-        })
-          .then(() => {
-            done(new Error('should not get here'));
+            return Model1.query().insertGraph(graph);
           })
-          .catch(err => {
-            expect(err).to.be.a(ValidationError);
-            expect(err.data).to.have.property('model1Prop1');
+            .then(() => {
+              done(new Error('should not get here'));
+            })
+            .catch(err => {
+              expect(err).to.be.a(ValidationError);
+              expect(err.data).to.have.property(expectedProperty);
 
-            return Promise.all([session.knex('Model1'), session.knex('model2')]);
-          })
-          .spread((rows1, rows2) => {
-            expect(rows1).to.have.length(1);
-            expect(rows2).to.have.length(1);
-            done();
-          })
-          .catch(done);
-      });
+              return Promise.all([session.knex('Model1'), session.knex('model2')]);
+            })
+            .spread((rows1, rows2) => {
+              expect(rows1).to.have.length(1);
+              expect(rows2).to.have.length(1);
+              done();
+            })
+            .catch(done);
+        };
+      };
+
+      it(
+        'should validate models upon insertion and return correct validation paths',
+        testValidation(graph => {
+          graph.model1Relation1.model1Prop1 = 666;
+        }, 'model1Relation1.model1Prop1')
+      );
+
+      it(
+        'should return correct validation paths with has-many relations',
+        testValidation(graph => {
+          graph.model1Relation2[0].model2Prop1 = 666;
+        }, 'model1Relation2.0.model2Prop1')
+      );
+
+      it(
+        'should return correct validation paths with many-to-many relations',
+        testValidation(graph => {
+          graph.model1Relation1.model1Relation3[1].model2Prop1 = 666;
+        }, 'model1Relation1.model1Relation3.1.model2Prop1')
+      );
 
       it('should validate models upon insertion: references in integer columns should be accepted', () => {
         return transaction(Model1, Model2, (Model1, Model2) => {

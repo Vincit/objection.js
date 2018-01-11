@@ -1885,14 +1885,22 @@ module.exports = session => {
           ]
         };
 
+        const errorKeys = [
+          'model1Prop1',
+          'model1Relation1.model1Prop1',
+          'model1Relation2.0.model2Relation1.1.model1Prop1'
+        ];
+
         return Promise.map(fails, fail => {
           return transaction(session.knex, trx => Model1.query(trx).upsertGraph(fail)).reflect();
         })
           .then(results => {
             // Check that all transactions have failed because of a validation error.
-            results.forEach(res => {
+            results.forEach((res, index) => {
               expect(res.isRejected()).to.equal(true);
-              expect(res.reason().data.model1Prop1[0].message).to.equal('should be string,null');
+              expect(res.reason().data[errorKeys[index]][0].message).to.equal(
+                'should be string,null'
+              );
             });
 
             return Model1.query(session.knex)
@@ -2031,6 +2039,8 @@ module.exports = session => {
           }
         ];
 
+        const errorKeys = ['model1Prop2', 'model1Relation1.model1Prop2'];
+
         return Promise.map(fails, fail => {
           return transaction(session.knex, trx =>
             Model1.query(trx).upsertGraph(fail, { update: true })
@@ -2038,9 +2048,9 @@ module.exports = session => {
         })
           .then(results => {
             // Check that all transactions have failed because of a validation error.
-            results.forEach(res => {
+            results.forEach((res, index) => {
               expect(res.isRejected()).to.equal(true);
-              expect(res.reason().data.model1Prop2[0].message).to.equal(
+              expect(res.reason().data[errorKeys[index]][0].message).to.equal(
                 "should have required property 'model1Prop2'"
               );
             });
