@@ -13,7 +13,7 @@ const { lit, raw, ref } = objection;
 
 class CustomValidationError extends Error {}
 
-class CustomValidator extends objection.Validator{
+class CustomValidator extends objection.Validator {
   beforeValidate(args: objection.ValidatorArgs): void {
     if (!args.options.skipValidation) {
       args.ctx.whatever = 'anything';
