@@ -1,5 +1,6 @@
 // tslint:disable:no-unused-variable
 import * as knex from 'knex';
+import * as ajv from 'ajv';
 import * as objection from '../../typings/objection';
 
 const { lit, raw, ref } = objection;
@@ -11,6 +12,27 @@ const { lit, raw, ref } = objection;
 // This "test" passes if the TypeScript compiler is satisfied.
 
 class CustomValidationError extends Error {}
+
+class CustomValidator extends objection.Validator{
+  beforeValidate(args: objection.ValidatorArgs): void {
+    if (!args.options.skipValidation) {
+      args.ctx.whatever = 'anything';
+      args.ctx.foo = args.json.required;
+      const id = args.model.$id;
+    }
+  }
+
+  validate(args: objection.ValidatorArgs): objection.Pojo {
+    if (args.options.patch) {
+      args.json.required = [];
+    }
+    return args.json;
+  }
+
+  afterValidate(args: objection.ValidatorArgs): void {
+    args.json.required = args.ctx.foo;
+  }
+}
 
 class Person extends objection.Model {
   firstName: string;
@@ -47,6 +69,17 @@ class Person extends objection.Model {
     // Test that any property can be accessed and set.
     json.foo = json.bar;
     return json;
+  }
+
+  static createValidator() {
+    return new objection.AjvValidator({
+      onCreateAjv(ajvalidator: ajv.Ajv) {
+        // modify ajvalidator
+      },
+      options: {
+        allErrors: false
+      }
+    });
   }
 
   static createValidationError(args: objection.CreateValidationErrorArgs) {
