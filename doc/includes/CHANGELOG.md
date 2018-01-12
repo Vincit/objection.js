@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.0.0 🎉
+
+### What's new
+
+  * The static [`relatedQuery`](#relatedquery) method.
+
+### Breaking changes
+
+  * `modelInstance.$query().delete().returning(something)` now returns a single instance instead of an array. [#659](https://github.com/Vincit/objection.js/issues/659)
+
+  * Node 6.0.0 is now the minimum. Objection will not work on node < 6.0.0.
+
+  * [`ValidationError`](#validationerror) overhaul. This is a big one, so read this carefully! There are three things to check when you migrate to 1.0:
+    1. The [`createValidationError`](#createvalidationerror) interface has changed. If you have overridden the createValidationError method in
+       your project, you need migrate to the [new interface](#createvalidationerror).
+    2. The model validation errors (jsonSchema violations) have remained pretty much the same but there are couple of differences. Before, the
+       keys of `error.data` were property names even when a nested object in a graph failed a validation. Now the keys for nested
+       validation errors are key paths like `foo.bar[2].spam`. Another tiny difference is the order of validation errors for each key in
+       `error.data`. Let's say a property `spam` failed for your model and `error.data.spam` contains an array of objects that describe
+       the failures. Before, the first failed validation was the last item in the array, now it is the first item.
+    3. All [`ValidationErrors`](#validationerror) now have a `type` field. Before all [`ValidationErrors`](#validationerror) but the model
+       validation errors (errors like "invalid relation expression", or "cyclic model graph") had no type, and could only be identified
+       based on the existence of some weird key in `error.data`. The `error.data` is now removed from those errors and the `type` should be
+       used instead. The message from the data is now stored in `error.message`.
+
 ## 0.9.4
 
 ### What's new
