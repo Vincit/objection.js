@@ -229,8 +229,8 @@ declare namespace Objection {
     [namedFilter: string]: FilterFunction<T>;
   }
 
-  interface RelationExpressionMethod {
-    <T>(relationExpression: RelationExpression): QueryBuilder<T>;
+  interface RelationExpressionMethod<T> {
+    (relationExpression: RelationExpression): QueryBuilder<T>;
   }
 
   interface TraverserFunction {
@@ -770,12 +770,12 @@ declare namespace Objection {
     naiveEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
     mergeNaiveEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
 
-    allowEager: RelationExpressionMethod;
+    allowEager: RelationExpressionMethod<T>;
     modifyEager: ModifyEager<T>;
     filterEager: ModifyEager<T>;
 
-    allowInsert: RelationExpressionMethod;
-    allowUpsert: RelationExpressionMethod;
+    allowInsert: RelationExpressionMethod<T>;
+    allowUpsert: RelationExpressionMethod<T>;
 
     modelClass(): typeof Model;
 
