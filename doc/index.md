@@ -1217,9 +1217,9 @@ await Person
     movies: [{
       id: 2636
     }]
-  }, {
+  }], {
     relate: true
-  }]);
+  });
 ```
 
 > The query above would create a new person `Jennifer Lawrence` and add an existing movie (id = 2636) to its
@@ -1235,11 +1235,11 @@ await Person
     movies: [{
       id: 2636
     }]
-  }, {
+  }], {
     relate: [
       'movies'
     ]
-  }]);
+  });
 ```
 
 > If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef`
@@ -1258,7 +1258,6 @@ await Person
       id: 100,
       name: 'New movie'
     }]
-  }
   }]);
 ```
 
