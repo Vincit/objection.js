@@ -256,6 +256,7 @@ module.exports = session => {
             done(new Error('should not get here'));
           })
           .catch(err => {
+            expect(err.message).to.equal('model1Prop1: should be string');
             expect(err).to.be.a(ValidationError);
             expect(err).to.be.a(ModelWithSchema.ValidationError);
 
