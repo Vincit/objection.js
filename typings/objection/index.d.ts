@@ -1,4 +1,4 @@
-// Type definitions for objection v0.9.0
+// Type definitions for objection
 // Project: Objection.js <http://vincit.github.io/objection.js/>
 // Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
 
@@ -1157,7 +1157,7 @@ declare namespace Objection {
   interface GroupBy<T> extends RawMethod<T>, ColumnNamesMethod<T> {}
 
   interface OrderBy<T> {
-    (column: ColumnRef, direction?: string): QueryBuilder<T>;
+    (column: ColumnRef, direction?: 'ASC' | 'DESC'): QueryBuilder<T>;
   }
 
   interface Union<T> {
