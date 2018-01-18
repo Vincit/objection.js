@@ -93,7 +93,7 @@ export default (router: express.Router) => {
   router.delete('/persons/:id', async (req, res) => {
     const count = await Person.query().deleteById(req.params.id);
 
-    res.send({ dropped: count === 1});
+    res.send({ dropped: count === 1 });
   });
 
   // Add a child for a Person.

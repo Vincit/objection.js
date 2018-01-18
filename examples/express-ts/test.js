@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 const assert = require('chai').assert;
 const Knex = require('knex');
@@ -19,68 +18,67 @@ const req = axios.create({
 });
 
 const bradley = {
-  "firstName": "Bradley",
-  "lastName": "Cooper",
-  "age": 40
+  firstName: 'Bradley',
+  lastName: 'Cooper',
+  age: 40
 };
 const jennifer = {
-  "firstName": "Jennifer",
-  "lastName": "Lawrence",
-  "age": 24
+  firstName: 'Jennifer',
+  lastName: 'Lawrence',
+  age: 24
 };
 const kent = {
-  "firstName": "Kent",
-  "lastName": "Damon",
-  "age": 70
+  firstName: 'Kent',
+  lastName: 'Damon',
+  age: 70
 };
 const matt = {
-  "firstName": "Matt",
-  "lastName": "Damon",
-  "age": 42
+  firstName: 'Matt',
+  lastName: 'Damon',
+  age: 42
 };
 const sage = {
-  "firstName": "Sage",
-  "lastName": "Stallone",
-  "age": 36
+  firstName: 'Sage',
+  lastName: 'Stallone',
+  age: 36
 };
 const sylvester = {
-  "firstName": "Sylvester",
-  "lastName": "Stallone",
-  "age": 68
+  firstName: 'Sylvester',
+  lastName: 'Stallone',
+  age: 68
 };
 
-const allPersons = [ bradley, jennifer, kent, matt, sage, sylvester ];
+const allPersons = [bradley, jennifer, kent, matt, sage, sylvester];
 
 const coco = {
-  "name": "Coco",
-  "species": "dog"
+  name: 'Coco',
+  species: 'dog'
 };
 const fluffy = {
-  "name": "Fluffy",
-  "species": "dog"
+  name: 'Fluffy',
+  species: 'dog'
 };
 const kitty = {
-  "name": "Kitty",
-  "species": "cat"
-}; 
+  name: 'Kitty',
+  species: 'cat'
+};
 const scrappy = {
-  "name": "Scrappy",
-  "species": "dog"
+  name: 'Scrappy',
+  species: 'dog'
 };
 
 const hungerGames = {
-  "name": "The Hunger Games"
+  name: 'The Hunger Games'
 };
 const rockyV = {
-  "name": "Rocky V"
+  name: 'Rocky V'
 };
 const silverLinings = {
-  "name": "Silver Linings Playbook"
+  name: 'Silver Linings Playbook'
 };
 
-describe("adding persons", async () => {
-
-  it("creates individual persons", async () => {
+describe('adding persons', async () => {
+  it('creates individual persons', async () => {
     const createdAt = new Date();
 
     let output = await req.post('persons', jennifer);
@@ -98,9 +96,9 @@ describe("adding persons", async () => {
     sylvester.id = output.data.id;
   });
 
-  it("creates person with relations", async () => {
+  it('creates person with relations', async () => {
     const createdAt = new Date();
-    const graph = Object.assign({}, matt, {parent: kent});
+    const graph = Object.assign({}, matt, { parent: kent });
 
     let output = await req.post('persons', graph);
     const kentOut = output.data.parent;
@@ -118,9 +116,8 @@ describe("adding persons", async () => {
   });
 });
 
-describe("modifying persons", () => {
-
-  it("adds child to a person", async () => {
+describe('modifying persons', () => {
+  it('adds child to a person', async () => {
     const createdAt = new Date();
 
     let output = await req.post(`persons/${sylvester.id}/children`, sage);
@@ -130,7 +127,7 @@ describe("modifying persons", () => {
     checkSubset(output.data, sage, createdAt, createdAt);
   });
 
-  it("adds pets to a person", async () => {
+  it('adds pets to a person', async () => {
     let output = await req.post(`persons/${jennifer.id}/pets`, fluffy);
     checkSubset(output.data, fluffy);
     fluffy.id = output.data.id;
@@ -154,7 +151,7 @@ describe("modifying persons", () => {
     coco.ownerId = kent.id;
   });
 
-  it("adds movies to a person", async () => {
+  it('adds movies to a person', async () => {
     let output = await req.post(`persons/${jennifer.id}/movies`, silverLinings);
     checkSubset(output.data, silverLinings);
     silverLinings.id = output.data.id;
@@ -170,8 +167,8 @@ describe("modifying persons", () => {
     rockyV.id = output.data.id;
   });
 
-  it("adds an actor to a movie", async () => {
-    await req.post(`movies/${silverLinings.id}/actors`, {id: bradley.id});
+  it('adds an actor to a movie', async () => {
+    await req.post(`movies/${silverLinings.id}/actors`, { id: bradley.id });
     let output = await req.get(`movies/${silverLinings.id}/actors`);
     const actors = output.data;
     assert.isArray(actors);
@@ -179,14 +176,14 @@ describe("modifying persons", () => {
     checkSubset(actors[1], bradley);
   });
 
-  it("updates a person", async () => {
+  it('updates a person', async () => {
     const updatedAt = new Date();
     const patch = {
-      "address": {
-        "street": "Somestreet 10",
-        "city": "Tampere"
+      address: {
+        street: 'Somestreet 10',
+        city: 'Tampere'
       },
-      "age": 25
+      age: 25
     };
     Object.assign(jennifer, patch);
 
@@ -197,9 +194,8 @@ describe("modifying persons", () => {
   });
 });
 
-describe("reading persons", () => {
-
-  it("reads all persons", async () => {
+describe('reading persons', () => {
+  it('reads all persons', async () => {
     const personMap = new Map();
     allPersons.forEach(person => {
       personMap.set(person.id, person);
@@ -213,8 +209,9 @@ describe("reading persons", () => {
     });
   });
 
-  it("filters persons without eager", async () => {
-    const minAge = 30, maxAge = 50;
+  it('filters persons without eager', async () => {
+    const minAge = 30,
+      maxAge = 50;
     const personMap = new Map();
     allPersons.forEach(person => {
       if (person.age >= minAge && person.age <= maxAge) {
@@ -232,7 +229,7 @@ describe("reading persons", () => {
     });
   });
 
-  it("filters persons with eager", async () => {
+  it('filters persons with eager', async () => {
     const output = await req.get(`persons?minAge=60&eager=%5Bpets,children.%5Bmovies,pets%5D%5D`);
     const personsOut = output.data;
     assert.isArray(personsOut);
@@ -243,13 +240,13 @@ describe("reading persons", () => {
 
     checkSubset(kentOut, kent);
     assert.isArray(kentOut.children);
-    assert.equal(kentOut.children.length, 1, "child count");
+    assert.equal(kentOut.children.length, 1, 'child count');
     checkSubset(kentOut.children[0], matt);
     assert.deepEqual(kentOut.pets, [coco]);
 
     checkSubset(sylvesterOut, sylvester);
     assert.isArray(sylvesterOut.children);
-    assert.equal(sylvesterOut.children.length, 1, "child count");
+    assert.equal(sylvesterOut.children.length, 1, 'child count');
     checkSubset(sylvesterOut.children[0], sage);
     assert.deepEqual(sylvesterOut.pets, []);
   });
@@ -281,18 +278,15 @@ describe("reading persons", () => {
   });
 });
 
-describe("error handling", () => {
-
+describe('error handling', () => {
   it("declines an insert post that's missing a required field", async () => {
-
     try {
       let output = await req.post('persons', {
-        lastName: "Lawrence",
+        lastName: 'Lawrence',
         age: 24
       });
-      assert(false, "should have errored");
-    }
-    catch (err) {
+      assert(false, 'should have errored');
+    } catch (err) {
       const response = err.response;
       assert.strictEqual(response.status, 400);
       const firstNameData = response.data.firstName;
@@ -302,14 +296,12 @@ describe("error handling", () => {
   });
 
   it("declines an eager insert post that's missing a required field", async () => {
-
     try {
       let output = await req.post(`persons/${jennifer.id}/pets`, {
         species: 'dog'
       });
-      assert(false, "should have errored");
-    }
-    catch (err) {
+      assert(false, 'should have errored');
+    } catch (err) {
       const response = err.response;
       assert.strictEqual(response.status, 400);
       const nameData = response.data.name;
@@ -318,28 +310,24 @@ describe("error handling", () => {
     }
   });
 
-  it("declines an eager insert post into an invalid model ID", async () => {
-
+  it('declines an eager insert post into an invalid model ID', async () => {
     try {
       let output = await req.post(`persons/9999/pets`, {
         name: 'Rex',
         species: 'dog'
       });
-      assert(false, "should have errored");
-    }
-    catch (err) {
+      assert(false, 'should have errored');
+    } catch (err) {
       assert.strictEqual(err.response.status, 404);
     }
   });
 });
 
-describe("deleting objects", () => {
-
-  it("deletes a person", async () => {
-
+describe('deleting objects', () => {
+  it('deletes a person', async () => {
     let output = await req.delete(`persons/${bradley.id}`);
     assert.strictEqual(output.status, 200);
-    assert(output.data.dropped, "confirmed drop");
+    assert(output.data.dropped, 'confirmed drop');
   });
 });
 
@@ -360,12 +348,7 @@ function checkSubset(actual, expected, updatedAfter = null, createdAfter = null)
 }
 
 function clearDatabase(knex) {
-  const tables = [
-    'Person',
-    'Movie',
-    'Animal',
-    'Person_Movie'
-  ];
+  const tables = ['Person', 'Movie', 'Animal', 'Person_Movie'];
   const jobs = [];
   tables.forEach(table => {
     jobs.push(knex(table).del());
