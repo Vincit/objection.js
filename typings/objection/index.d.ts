@@ -1165,7 +1165,7 @@ declare namespace Objection {
   interface GroupBy<T> extends RawMethod<T>, ColumnNamesMethod<T> {}
 
   interface OrderBy<T> {
-    (column: ColumnRef, direction?: 'ASC' | 'DESC'): QueryBuilder<T>;
+    (column: ColumnRef, direction?: 'ASC' | 'DESC' | 'asc' | 'desc'): QueryBuilder<T>;
   }
 
   interface Union<T> {
