@@ -696,7 +696,7 @@ module.exports = session => {
       model1Relation1(select:id, localNamedFilter),
       model1Relation2.[
         model2Relation1(select:model1Prop1).[
-          model1Relation1(select:id, select:model1Prop1),
+          model1Relation1(select:id, select:model1Prop1, select:model1Prop1Aliased),
           model1Relation2
         ]
       ]
@@ -747,6 +747,7 @@ module.exports = session => {
                     model1Relation1: {
                       id: 7,
                       model1Prop1: 'hello 7',
+                      aliasedInFilter: 'hello 7',
                       $afterGetCalled: 1
                     },
 

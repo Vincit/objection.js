@@ -44,6 +44,7 @@ class TestSession {
         return {
           'select:id': (builder) => builder.select('id'),
           'select:model1Prop1': (builder) => builder.select('model1Prop1'),
+          'select:model1Prop1Aliased': (builder) => builder.select('model1Prop1 as aliasedInFilter'),
           'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1'),
           'idGreaterThan': (builder) => builder.where('id', '>', builder.context().filterArgs[0])
         };
