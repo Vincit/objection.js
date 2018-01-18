@@ -9,7 +9,7 @@ export default class Animal extends Model {
   species: string;
 
   // Optional eager relations.
-  owner?: Person;
+  owner?: Partial<Person>;
 
   // Table name is the only required property.
   static tableName = 'Animal';

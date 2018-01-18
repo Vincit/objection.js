@@ -7,7 +7,7 @@ export default class Movie extends Model {
   name: string;
 
   // Optional eager relations.
-  actors?: Person[];
+  actors?: Partial<Person>[];
 
   // Table name is the only required property.
   static tableName = 'Movie';
