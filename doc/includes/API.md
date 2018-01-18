@@ -5949,9 +5949,11 @@ class BaseModel extends Model {
 > The default implementation:
 
 ```js
+const { ValidationError } = require('objection');
+
 class Model {
   static createValidationError({type, message, data}) {
-    return new this.ValidationError({type, message, data});
+    return new ValidationError({type, message, data});
   }
 }
 ```
@@ -5959,17 +5961,11 @@ class Model {
 Creates an error thrown when validation fails for a model. You can override this
 to throw any error you want.
 
-##### Arguments
-
-Argument|Type|Description
---------|----|-------------------
-errorHash|Object|The failed validations. See [`ValidationError`](#validationerror) documentation for details.
-
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-`Error`|The created error. [`Model.ValidationError`](#validationerror) by default.
+`Error`|The created error. [`objection.ValidationError`](#validationerror) by default.
 
 
 

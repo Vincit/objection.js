@@ -2051,7 +2051,7 @@ module.exports = session => {
             results.forEach((res, index) => {
               expect(res.isRejected()).to.equal(true);
               expect(res.reason().data[errorKeys[index]][0].message).to.equal(
-                "should have required property 'model1Prop2'"
+                'is a required property'
               );
             });
           })

@@ -140,7 +140,7 @@ describe('Model', () => {
         Model1.fromJson({ a: 'a', c: { d: 'test', e: [{ additional: true }] } });
       }).to.throwException(exp => {
         expect(exp).to.be.a(ValidationError);
-        expect(exp.data).to.have.property('c.e[0]');
+        expect(exp.data).to.have.property('c.e[0].additional');
       });
     });
 

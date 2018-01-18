@@ -337,6 +337,17 @@ const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eager('foo.bar');
 
+const children: Promise<Person[]> = Person.query()
+  .skipUndefined()
+  .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
+  .eager('children')
+  .where('age', '>=', 42);
+
+const childrenAndPets: Promise<Person[]> = Person.query()
+  .eager('children')
+  .where('age', '>=', 42)
+  .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'));
+
 const rowsPage: Promise<{
   total: number;
   results: Person[];

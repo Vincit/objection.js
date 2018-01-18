@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -53,7 +53,7 @@
   ],
   "types": "./typings/objection/index.d.ts",
   "dependencies": {
-    "ajv": "^6.0.0",
+    "ajv": "^6.0.1",
     "bluebird": "^3.5.1",
     "lodash": "^4.17.4"
   },
