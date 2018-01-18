@@ -750,6 +750,8 @@ describe('RelationExpression', () => {
     testMerge('a.^', 'a.^6', 'a.^');
     testMerge('a.^6', 'a.^', 'a.^');
     testMerge('a.a', 'a.^', 'a.^');
+    testMerge('a(f)', 'a(g)', 'a(f, g)');
+    testMerge('a.b(f)', 'a.b(g)', 'a.b(f, g)');
   });
 
   describe('#toString', () => {
