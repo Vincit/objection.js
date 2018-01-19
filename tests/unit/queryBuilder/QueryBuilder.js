@@ -1,6 +1,7 @@
 const _ = require('lodash'),
   Knex = require('knex'),
   expect = require('expect.js'),
+  chai = require('chai'),
   Promise = require('bluebird'),
   objection = require('../../../'),
   knexUtils = require('../../../lib/utils/knexUtils'),
@@ -8,7 +9,6 @@ const _ = require('lodash'),
   Model = objection.Model,
   QueryBuilder = objection.QueryBuilder,
   QueryBuilderBase = objection.QueryBuilderBase,
-  QueryBuilderOperation = objection.QueryBuilderOperation,
   RelationExpression = objection.RelationExpression;
 
 describe('QueryBuilder', () => {
@@ -759,47 +759,125 @@ describe('QueryBuilder', () => {
       .catch(done);
   });
 
-  it('isFindQuery should return true if none of the insert, update, patch, delete, relate or unrelate has been called', () => {
-    expect(QueryBuilder.forClass(TestModel).isFindQuery()).to.equal(true);
-    expect(
-      QueryBuilder.forClass(TestModel)
-        .insert()
-        .isFindQuery()
-    ).to.equal(false);
-    expect(
-      QueryBuilder.forClass(TestModel)
-        .update()
-        .isFindQuery()
-    ).to.equal(false);
-    expect(
-      QueryBuilder.forClass(TestModel)
-        .patchOperationFactory(builder => {
-          return createUpdateOperation(builder, {});
-        })
-        .patch()
-        .isFindQuery()
-    ).to.equal(false);
-    expect(
-      QueryBuilder.forClass(TestModel)
-        .delete()
-        .isFindQuery()
-    ).to.equal(false);
-    expect(
-      QueryBuilder.forClass(TestModel)
-        .relateOperationFactory(builder => {
-          return createUpdateOperation(builder, {});
-        })
-        .relate(1)
-        .isFindQuery()
-    ).to.equal(false);
-    expect(
-      QueryBuilder.forClass(TestModel)
-        .unrelateOperationFactory(builder => {
-          return createUpdateOperation(builder, {});
-        })
-        .unrelate()
-        .isFindQuery()
-    ).to.equal(false);
+  it('isFind, isInsert, isUpdate, isPatch, isDelete, isRelate, isUnrelate should return true only for the right operations', () => {
+    TestModel.relationMappings = {
+      someRel: {
+        relation: Model.HasManyRelation,
+        modelClass: TestModel,
+        join: {
+          from: 'Model.id',
+          to: 'Model.someRelId'
+        }
+      }
+    };
+
+    const queries = {
+      find: TestModel.query(),
+      insert: TestModel.query().insert(),
+      update: TestModel.query().update(),
+      patch: TestModel.query().patch(),
+      delete: TestModel.query().delete(),
+      relate: TestModel.relatedQuery('someRel').relate(1),
+      unrelate: TestModel.relatedQuery('someRel').unrelate()
+    };
+
+    // Check all types of operations, call all available checks for reach of them,
+    // (e.g. isFind(), isUpdate(), etc) and see if they return the expected result.
+    const getMethodName = name => `is${_.capitalize(name === 'patch' ? 'update' : name)}`;
+
+    for (const name in queries) {
+      const query = queries[name];
+      for (const other in queries) {
+        const method = getMethodName(other);
+        chai
+          .expect(query[method](), `queries.${name}.${method}()`)
+          .to.equal(method === getMethodName(name));
+        chai.expect(query.hasWheres(), `queries.${name}.hasWheres()`).to.equal(false);
+        chai.expect(query.hasSelects(), `queries.${name}.hasSelects()`).to.equal(false);
+      }
+    }
+  });
+
+  it('hasWheres() should return true for all variants of where queries', () => {
+    const wheres = [
+      'where',
+      'andWhere',
+      'orWhere',
+      'whereNot',
+      'orWhereNot',
+      'whereRaw',
+      'whereWrapped',
+      'orWhereRaw',
+      'whereExists',
+      'orWhereExists',
+      'whereNotExists',
+      'orWhereNotExists',
+      'whereIn',
+      'orWhereIn',
+      'whereNotIn',
+      'orWhereNotIn',
+      'whereNull',
+      'orWhereNull',
+      'whereNotNull',
+      'orWhereNotNull',
+      'whereBetween',
+      'andWhereBetween',
+      'whereNotBetween',
+      'andWhereNotBetween',
+      'orWhereBetween',
+      'orWhereNotBetween'
+    ];
+
+    for (let i = 0; i < wheres.length; i++) {
+      const name = wheres[i];
+      const query = TestModel.query()[name]();
+      chai.expect(query.hasWheres(), `TestModel.query().${name}().hasWheres()`).to.equal(true);
+    }
+  });
+
+  it('hasSelects() should return true for all variants of select queries', () => {
+    const selects = [
+      'select',
+      'columns',
+      'column',
+      'distinct',
+      'count',
+      'countDistinct',
+      'min',
+      'max',
+      'sum',
+      'sumDistinct',
+      'avg',
+      'avgDistinct'
+    ];
+
+    for (let i = 0; i < selects.length; i++) {
+      const name = selects[i];
+      const query = TestModel.query()[name]('arg');
+      chai
+        .expect(query.hasSelects(), `TestModel.query().${name}('arg').hasSelects()`)
+        .to.equal(true);
+    }
+  });
+
+  it('hasEager() should return true for queries with eager statements', () => {
+    TestModel.relationMappings = {
+      someRel: {
+        relation: Model.HasManyRelation,
+        modelClass: TestModel,
+        join: {
+          from: 'Model.id',
+          to: 'Model.someRelId'
+        }
+      }
+    };
+
+    const query = TestModel.query();
+    expect(query.hasEager(), false);
+    query.eager('someRel');
+    expect(query.hasEager(), true);
+    query.clearEager();
+    expect(query.hasEager(), false);
   });
 
   it('update() should call $beforeUpdate on the model', done => {
@@ -1881,57 +1959,64 @@ describe('QueryBuilder', () => {
   });
 });
 
-function createFindOperation(builder, whereObj) {
-  let method = new QueryBuilderOperation('find');
+const operationBuilder = QueryBuilder.forClass(Model);
 
-  method.onBuildKnex = knexBuilder => {
+function createFindOperation(builder, whereObj) {
+  const operation = operationBuilder._findOperationFactory(builder);
+
+  operation.onBefore2 = operation.onAfter2 = () => {};
+
+  operation.onBuildKnex = knexBuilder => {
     knexBuilder.where(whereObj);
   };
 
-  return method;
+  return operation;
 }
 
 function createInsertOperation(builder, mergeWithModel) {
-  let method = new QueryBuilderOperation('insert');
-  method.isWriteOperation = true;
+  const operation = operationBuilder._insertOperationFactory(builder);
 
-  method.onAdd = function(builder, args) {
-    this.model = args[0];
+  operation.onBefore2 = operation.onAfter2 = () => {};
+
+  operation.onAdd = function(builder, args) {
+    this.models = [args[0]];
     return true;
   };
 
-  method.onBuildKnex = function(knexBuilder) {
-    let json = _.merge(this.model, mergeWithModel);
+  operation.onBuildKnex = function(knexBuilder) {
+    let json = _.merge(this.models[0], mergeWithModel);
     knexBuilder.insert(json);
   };
 
-  return method;
+  return operation;
 }
 
 function createUpdateOperation(builder, mergeWithModel) {
-  let method = new QueryBuilderOperation('update');
-  method.isWriteOperation = true;
+  const operation = operationBuilder._updateOperationFactory(builder);
 
-  method.onAdd = function(builder, args) {
-    this.model = args[0];
+  operation.onBefore2 = operation.onAfter2 = () => {};
+
+  operation.onAdd = function(builder, args) {
+    this.models = [args[0]];
     return true;
   };
 
-  method.onBuildKnex = function(knexBuilder) {
-    let json = _.merge(this.model, mergeWithModel);
+  operation.onBuildKnex = function(knexBuilder) {
+    let json = _.merge(this.models[0], mergeWithModel);
     knexBuilder.update(json);
   };
 
-  return method;
+  return operation;
 }
 
 function createDeleteOperation(builder, whereObj) {
-  let method = new QueryBuilderOperation('delete');
-  method.isWriteOperation = true;
+  const operation = operationBuilder._updateOperationFactory(builder);
 
-  method.onBuildKnex = knexBuilder => {
+  operation.onBefore2 = operation.onAfter2 = () => {};
+
+  operation.onBuildKnex = knexBuilder => {
     knexBuilder.delete().where(whereObj);
   };
 
-  return method;
+  return operation;
 }

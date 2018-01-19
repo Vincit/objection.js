@@ -139,7 +139,7 @@ module.exports = session => {
             // Sort all result by id to make the SQL we test below consistent.
             .mergeContext({
               onBuild(builder) {
-                if (!builder.isFindQuery()) {
+                if (!builder.isFind()) {
                   return;
                 }
 
@@ -575,7 +575,7 @@ module.exports = session => {
             // Sort all result by id to make the SQL we test below consistent.
             .mergeContext({
               onBuild(builder) {
-                if (!builder.isFindQuery()) {
+                if (!builder.isFind()) {
                   return;
                 }
 

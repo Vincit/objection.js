@@ -753,7 +753,15 @@ declare namespace Objection {
     resolve(value: any): this;
 
     isExecutable(): boolean;
-    isFindQuery(): boolean;
+    isFind(): boolean;
+    isInsert(): boolean;
+    isUpdate(): boolean;
+    isDelete(): boolean;
+    isRelate(): boolean;
+    isUnrelate(): boolean;
+    hasWheres(): boolean;
+    hasSelects(): boolean;
+    hasEager(): boolean;
 
     runBefore(fn: (result: any, builder: this) => any): this;
     onBuild(fn: (builder: this) => void): this;

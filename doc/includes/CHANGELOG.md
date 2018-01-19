@@ -5,6 +5,16 @@
 ### What's new
 
   * The static [`relatedQuery`](#relatedquery) method.
+  * New reflection methods:
+    [`isFind`](http://vincit.github.io/objection.js/#isfind),
+    [`isInsert`](http://vincit.github.io/objection.js/#isinsert),
+    [`isUpdate`](http://vincit.github.io/objection.js/#isupdate),
+    [`isDelete`](http://vincit.github.io/objection.js/#isdelete),
+    [`isRelate`](http://vincit.github.io/objection.js/#isrelate),
+    [`isUnrelate`](http://vincit.github.io/objection.js/#isunrelate),
+    [`hasWheres`](http://vincit.github.io/objection.js/#haswheres),
+    [`hasSelects`](http://vincit.github.io/objection.js/#hasselects),
+    [`hasEager`](http://vincit.github.io/objection.js/#haseager).
 
 ### Breaking changes
 
@@ -24,6 +34,11 @@
        validation errors (errors like "invalid relation expression", or "cyclic model graph") had no type, and could only be identified
        based on the existence of some weird key in `error.data`. The `error.data` is now removed from those errors and the `type` should be
        used instead. The message from the data is now stored in `error.message`.
+
+### Changes
+
+  * `isFindQuery` is renamed to [`isFind`](http://vincit.github.io/objection.js/#isfind) and deprecated.
+
 
 ## 0.9.4
 
@@ -111,7 +126,7 @@
   * New shorthand methods [`joinEager`](http://vincit.github.io/objection.js/#joineager), [`naiveEager`](http://vincit.github.io/objection.js/#naiveeager),
     [`mergeJoinEager`](http://vincit.github.io/objection.js/#mergejoineager) and [`mergeNaiveEager`](http://vincit.github.io/objection.js/#mergenaiveeager).
   * New shorthand method [`findOne`](http://vincit.github.io/objection.js/#findone)
-  * New reflection method [`isFindQuery`](http://vincit.github.io/objection.js/#isfindquery)
+  * New reflection method [`isFindQuery`](http://vincit.github.io/objection.js/#isfind)
   * ManyToMany extra properties can now be updated [#413](https://github.com/Vincit/objection.js/issues/413)
 
 ## 0.8.3
