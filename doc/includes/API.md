@@ -2989,10 +2989,10 @@ boolean|false if the query will never be executed.
 
 
 
-#### isFindQuery
+#### isFind
 
 ```js
-const isFindQuery = queryBuilder.isFindQuery();
+const isFind = queryBuilder.isFind();
 ```
 
 Returns true if the query is read-only.
@@ -3002,6 +3002,143 @@ Returns true if the query is read-only.
 Type|Description
 ----|-----------------------------
 boolean|true if the query is read-only.
+
+
+
+
+#### isInsert
+
+```js
+const isInsert = queryBuilder.isInsert();
+```
+
+Returns true if the query performs an insert operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an insert operation.
+
+
+
+
+#### isUpdate
+
+```js
+const isUpdate = queryBuilder.isUpdate();
+```
+
+Returns true if the query performs an update operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an update operation.
+
+
+
+
+#### isDelete
+
+```js
+const isDelete = queryBuilder.isDelete();
+```
+
+Returns true if the query performs a delete operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs a delete operation.
+
+
+
+
+#### isRelate
+
+```js
+const isRelate = queryBuilder.isRelate();
+```
+
+Returns true if the query performs a relate operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs a relate operation.
+
+
+
+
+#### isUnrelate
+
+```js
+const isUnrelate = queryBuilder.isUnrelate();
+```
+
+Returns true if the query performs an unrelate operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an unrelate operation.
+
+
+
+
+#### hasWheres
+
+```js
+const hasWheres = queryBuilder.hasWheres();
+```
+
+Returns true if the query contains where statements.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query contains where statements.
+
+
+
+
+#### hasSelects
+
+```js
+const hasSelects = queryBuilder.hasSelects();
+```
+
+Returns true if the query contains any specific select staments, such as:
+`'select'`, `'columns'`, `'column'`, `'distinct'`, `'count'`, `'countDistinct'`, `'min'`, `'max'`, `'sum'`, `'sumDistinct'`, `'avg'`, `'avgDistinct'`
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query contains any specific select staments.
+
+
+
+
+#### hasEager
+
+```js
+const hasEager = queryBuilder.hasEager();
+```
+
+Returns true if the query defines any eager expressions.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query defines any eager expressions.
 
 
 
