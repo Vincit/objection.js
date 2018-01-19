@@ -33,7 +33,7 @@ module.exports = session => {
         .insert({ length: 10 })
         .then(model => {
           expect(model).to.eql({ id: 1, length: 10 });
-          return session.knex(TestModel.tableName);
+          return session.knex(TestModel.getTableName());
         })
         .then(rows => {
           expect(rows.length).to.equal(1);

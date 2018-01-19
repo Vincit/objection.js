@@ -52,7 +52,7 @@ module.exports = session => {
           .insert({ binary: buffer() })
           .then(ret => {
             expect(bufferEquals(buffer(), ret.binary)).to.equal(true);
-            return session.knex(TestModel.tableName);
+            return session.knex(TestModel.getTableName());
           })
           .then(rows => {
             expect(bufferEquals(buffer(), rows[0].binary)).to.equal(true);

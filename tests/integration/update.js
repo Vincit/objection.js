@@ -170,7 +170,7 @@ module.exports = session => {
                 }
               ]
             });
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -197,7 +197,7 @@ module.exports = session => {
           })
           .catch(err => {
             expect(err).to.be.a(ValidationError);
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -246,7 +246,7 @@ module.exports = session => {
               ]
             });
 
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);

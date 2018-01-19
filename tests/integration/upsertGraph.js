@@ -143,9 +143,9 @@ module.exports = session => {
                   return;
                 }
 
-                if (builder.modelClass().tableName === 'Model1') {
+                if (builder.modelClass().getTableName() === 'Model1') {
                   builder.orderBy('Model1.id');
-                } else if (builder.modelClass().tableName === 'model2') {
+                } else if (builder.modelClass().getTableName() === 'model2') {
                   builder.orderBy('model2.id_col');
                 }
               }
@@ -579,9 +579,9 @@ module.exports = session => {
                   return;
                 }
 
-                if (builder.modelClass().tableName === 'Model1') {
+                if (builder.modelClass().getTableName() === 'Model1') {
                   builder.orderBy('Model1.id');
-                } else if (builder.modelClass().tableName === 'model2') {
+                } else if (builder.modelClass().getTableName() === 'model2') {
                   builder.orderBy('model2.id_col');
                 }
               }

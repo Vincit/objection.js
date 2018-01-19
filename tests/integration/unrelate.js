@@ -51,7 +51,7 @@ module.exports = session => {
             })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
-              return session.knex(Model1.tableName).orderBy('id');
+              return session.knex(Model1.getTableName()).orderBy('id');
             })
             .then(rows => {
               expect(rows).to.have.length(4);
@@ -131,7 +131,7 @@ module.exports = session => {
             })
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
-              return session.knex(Model2.tableName).orderBy('id_col');
+              return session.knex(Model2.getTableName()).orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(4);
@@ -154,7 +154,7 @@ module.exports = session => {
             })
             .then(numUpdated => {
               expect(numUpdated).to.equal(2);
-              return session.knex(Model2.tableName).orderBy('id_col');
+              return session.knex(Model2.getTableName()).orderBy('id_col');
             })
             .then(rows => {
               expect(rows).to.have.length(4);

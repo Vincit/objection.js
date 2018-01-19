@@ -50,7 +50,7 @@ module.exports = session => {
         .then(model => {
           expect(model.value1).to.equal('hello');
           expect(model.value2).to.equal('bar');
-          return session.knex(TestModel.tableName);
+          return session.knex(TestModel.getTableName());
         })
         .then(rows => {
           expect(rows[0].value1).to.equal('hello');
@@ -64,7 +64,7 @@ module.exports = session => {
         .then(model => {
           expect(model.value1).to.equal('hello');
           expect(model.value2).to.equal('bar');
-          return session.knex(TestModel.tableName);
+          return session.knex(TestModel.getTableName());
         })
         .then(rows => {
           expect(rows[0].value1).to.equal('hello');

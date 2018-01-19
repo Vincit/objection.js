@@ -41,7 +41,7 @@ module.exports = session => {
         .insert({ value: 'hello' })
         .then(ret => {
           expect(ret.idCol).to.equal('someRandomId');
-          return session.knex(TestModel.tableName);
+          return session.knex(TestModel.getTableName());
         })
         .then(rows => {
           expect(rows[0]).to.eql({ value: 'hello', idCol: 'someRandomId' });

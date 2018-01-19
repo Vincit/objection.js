@@ -44,7 +44,7 @@ module.exports = session => {
             expect(inserted.$afterInsertCalled).to.equal(1);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -71,7 +71,7 @@ module.exports = session => {
             expect(inserted.$afterInsertCalled).to.equal(1);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -93,7 +93,7 @@ module.exports = session => {
             expect(inserted.$afterInsertCalled).to.equal(1);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -111,7 +111,7 @@ module.exports = session => {
             expect(inserted.$beforeInsertCalled).to.equal(1);
             expect(inserted.$afterInsertCalled).to.equal(1);
             expect(inserted.model1Prop1).to.equal('hello 3');
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.filter(rows, { id: 1000, model1Prop1: 'hello 3' })).to.have.length(1);
@@ -137,7 +137,7 @@ module.exports = session => {
               expect(inserted[1].$afterInsertCalled).to.equal(1);
               expect(_.map(inserted, 'id').sort()).to.eql([3, 4]);
               expect(_.map(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
-              return session.knex(Model1.tableName);
+              return session.knex(Model1.getTableName());
             })
             .then(rows => {
               expect(_.map(rows, 'model1Prop1').sort()).to.eql([
@@ -158,7 +158,7 @@ module.exports = session => {
             expect(inserted).to.be.a(Model1);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -174,7 +174,7 @@ module.exports = session => {
           .then(inserted => {
             expect(inserted).to.be.a(Model1);
             expect(inserted.id).to.eql(3);
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'test 2']);
@@ -191,7 +191,7 @@ module.exports = session => {
               expect(inserted[1]).to.be.a(Model1);
               expect(_.map(inserted, 'id').sort()).to.eql([3, 4]);
               expect(_.map(inserted, 'model1Prop1').sort()).to.eql(['hello 3', 'hello 4']);
-              return session.knex(Model1.tableName);
+              return session.knex(Model1.getTableName());
             })
             .then(rows => {
               expect(_.map(rows, 'model1Prop1').sort()).to.eql([
@@ -216,7 +216,7 @@ module.exports = session => {
                 model1Prop1: 'hello 3',
                 model1Prop2: null
               });
-              return session.knex(Model1.tableName);
+              return session.knex(Model1.getTableName());
             })
             .then(rows => {
               expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -231,7 +231,7 @@ module.exports = session => {
             .then(inserted => {
               expect(inserted).to.be.a(Model1);
               expect(inserted.$toJson()).to.eql({ model1Prop1: 'hello 3' });
-              return session.knex(Model1.tableName);
+              return session.knex(Model1.getTableName());
             })
             .then(rows => {
               expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -260,7 +260,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err).to.be.a(ModelWithSchema.ValidationError);
 
-            return session.knex(Model1.tableName).then(rows => {
+            return session.knex(Model1.getTableName()).then(rows => {
               expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
               done();
             });
@@ -308,7 +308,7 @@ module.exports = session => {
               ]
             });
 
-            return session.knex(Model1.tableName).then(rows => {
+            return session.knex(Model1.getTableName()).then(rows => {
               expect(_.map(rows, 'id').sort()).to.eql([1, 2]);
               done();
             });
@@ -376,7 +376,7 @@ module.exports = session => {
               $beforeInsertCalled: true,
               $afterInsertCalled: true
             });
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
@@ -415,7 +415,7 @@ module.exports = session => {
                 $afterInsertCalled: true
               });
 
-              return session.knex(Model1.tableName);
+              return session.knex(Model1.getTableName());
             })
             .then(rows => {
               expect(_.map(rows, 'model1Prop1').sort()).to.eql([
@@ -453,7 +453,7 @@ module.exports = session => {
             expect(inserted.$afterInsertCalled).to.equal(1);
             expect(inserted.id).to.eql(3);
             expect(inserted.model1Prop1).to.equal('hello 3');
-            return session.knex(Model1.tableName);
+            return session.knex(Model1.getTableName());
           })
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);

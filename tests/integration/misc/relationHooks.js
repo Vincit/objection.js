@@ -144,7 +144,7 @@ module.exports = session => {
             .mergeContext({ belongsToOneValue: 42 })
             .then(model => {
               return session
-                .knex(Model1.tableName)
+                .knex(Model1.getTableName())
                 .where({ model1Prop1: 'new' })
                 .first();
             })
@@ -160,7 +160,7 @@ module.exports = session => {
             .mergeContext({ hasManyValue: 100 })
             .then(model => {
               return session
-                .knex(Model2.tableName)
+                .knex(Model2.getTableName())
                 .where({ model2_prop1: 'new' })
                 .first();
             })
@@ -179,7 +179,7 @@ module.exports = session => {
             })
             .then(model => {
               return session
-                .knex(Model2.tableName)
+                .knex(Model2.getTableName())
                 .where({ model2_prop1: 'new' })
                 .first();
             })

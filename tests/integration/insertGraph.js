@@ -803,7 +803,7 @@ module.exports = session => {
       expect(model.model1Relation2[1].model2Relation2.model1Prop1).to.equal('child3');
       shouldCheckHooks && checkHooks(model.model1Relation2[1].model2Relation2);
 
-      return knex(Model2.tableName).then(rows => {
+      return knex(Model2.getTableName()).then(rows => {
         // Check that the reference model was only inserted once.
         expect(_.filter(rows, { model2_prop1: 'child1' })).to.have.length(1);
       });

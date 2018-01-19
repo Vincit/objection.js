@@ -40,6 +40,11 @@ class TestSession {
         return 'Model1';
       }
 
+      // Function instead of getter on purpose.
+      static idColumn() {
+        return 'id';
+      }
+
       static get namedFilters() {
         return {
           'select:id': (builder) => builder.select('id'),
@@ -97,7 +102,8 @@ class TestSession {
     }
 
     class Model2 extends Model {
-      static get tableName() {
+      // Function instead of getter on purpose.
+      static tableName() {
         return 'model2';
       }
 
@@ -216,7 +222,7 @@ class TestSession {
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
           return Promise.resolve(['Model1', 'model2', 'Model1Model2']).map(table => {
-            const idCol = (_.find(this.models, {tableName: table}) || {idColumn: 'id'}).idColumn;
+            const idCol = (_.find(this.models, it => it.getTableName() === table) || {getIdColumn: () => 'id'}).getIdColumn();
 
             return trx(table).max(idCol).then(res => {
               const maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
