@@ -6925,7 +6925,7 @@ await jennifer
 console.log('jennifer just got all her dogs vaccinated');
 ```
 
-Use this to build a query that only affects the models related to this instance through a relation.
+Use this to build a query that only affects the models related to this instance through a relation. Any fetched models are also stored to the owner model’s property named after the relation.
 
 ##### Arguments
 
