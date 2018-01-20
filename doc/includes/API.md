@@ -6822,7 +6822,7 @@ const builder = model.$relatedQuery(relationName, transactionOrKnex);
 ```
 
 > Fetch all models related to a model through a relation. The fetched models are
-> also stored to the owner model's property named after the relation:
+> also stored to the owner model's property named after the relation (by default):
 
 ```js
 const pets = await jennifer.$relatedQuery('pets');
@@ -6848,7 +6848,7 @@ console.log(dogsAndCats);
 ```
 
 > This inserts a new model to the database and binds it to the owner model as defined
-> by the relation:
+> by the relation (by default):
 
 ```js
 const waldo = await jennifer
@@ -6925,7 +6925,7 @@ await jennifer
 console.log('jennifer just got all her dogs vaccinated');
 ```
 
-Use this to build a query that only affects the models related to this instance through a relation. Any fetched models are also stored to the owner model’s property named after the relation.
+Use this to build a query that only affects the models related to this instance through a relation. By default, any fetched or inserted models are also stored to the owner model’s property named after the relation. See [relatedFindQueryMutates](#relatedfindquerymutates) or [relatedInsertQueryMutates](#relatedinsertquerymutates) to change this behaviour.
 
 ##### Arguments
 
