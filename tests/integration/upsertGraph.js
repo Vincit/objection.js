@@ -108,7 +108,10 @@ module.exports = session => {
             // and insert one new
             model2Relation1: [
               {
-                id: 4,
+                // This is a string instead of a number on purpose to test
+                // that no id update is generated even if they only match
+                // non-strictly.
+                id: '4',
                 model1Prop1: 'updated manyToMany 1'
               },
               {
@@ -171,7 +174,7 @@ module.exports = session => {
 
                     'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
                     'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
-                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
+                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = \'4\' and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
                   ]);
               }
 
