@@ -9,6 +9,7 @@
     "test-travis": "npm run eslint && istanbul --config=.istanbul.yml cover _mocha -- --slow 100 --timeout 60000 --reporter spec --recursive tests && npm run test-typings",
     "test-fast": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail",
     "test-opt": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --bail --trace_opt --trace_deopt",
+    "test-prof": "mocha --slow 10 --timeout 15000 --reporter spec --recursive tests --prof",
     "test-typings": "tsc",
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
