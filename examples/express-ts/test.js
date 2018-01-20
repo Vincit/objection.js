@@ -349,9 +349,5 @@ function checkSubset(actual, expected, updatedAfter = null, createdAfter = null)
 
 function clearDatabase(knex) {
   const tables = ['Person', 'Movie', 'Animal', 'Person_Movie'];
-  const jobs = [];
-  tables.forEach(table => {
-    jobs.push(knex(table).del());
-  });
-  return Promise.all(jobs);
+  return Promise.all(tables.map(table => knex(table).del()));
 }
