@@ -236,7 +236,7 @@ const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).f
 
 // QueryBuilder.findById accepts single and array values:
 
-let qb: objection.QueryBuilder<Person> = BoundPerson.query().where('name', 'foo');
+let qb: objection.QueryBuilder<Person, Person[]> = BoundPerson.query().where('name', 'foo');
 
 // QueryBuilder.throwIfNotFound makes an option query return exactly one:
 
@@ -285,8 +285,8 @@ qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 qb = qb.alias('someAlias');
 
 // query builder hooks
-qb = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => {});
-qb = qb.runAfter(async (result: Person[], builder: objection.QueryBuilder<Person>) => {});
+qb = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => {});
+qb = qb.runAfter(async (result: Person[], builder: objection.QueryBuilder<Person, Person[]>) => {});
 
 // signature-changing QueryBuilder methods:
 
@@ -354,6 +354,9 @@ const rowsPage: Promise<{
 }> = Person.query().page(1, 10);
 
 const rowsRange: Promise<objection.Page<Person>> = Person.query().range(1, 10);
+
+const rowsPageRunAfter: Promise<objection.Page<Person>> = Person.query().page(1, 10).
+  runAfter(async (result: objection.Page<Person>, builder: objection.QueryBuilder<Person, objection.Page<Person>>) => {});
 
 // `retuning` should change the return value from number to T[]
 const rowsUpdateReturning: Promise<Person[]> = Person.query()
@@ -583,6 +586,31 @@ Person.query()
 Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
 Person.query().where('age', '>', lit(10));
 Person.query().where('firstName', lit('Jennifer').castText());
+
+// Preserving result type after result type changing methods.
+
+const findByIdSelect: Promise<Person> = Person.query().findById(32).select('firstName').throwIfNotFound();
+const findByIdJoin: Promise<Person> = Person.query().findById(32).join('tablename', 'column1', '=', 'column2').throwIfNotFound();
+const findByIdJoinRaw: Promise<Person> = Person.query().findById(32).joinRaw('raw sql').throwIfNotFound();
+const findOneWhere: Promise<Person> = Person.query().findOne('raw sql').where('more raw sql').throwIfNotFound(); 
+const findOneSelect: Promise<Person> = Person.query().findOne('raw sql').select('firstName').throwIfNotFound(); 
+const findOneWhereIn: Promise<Person> = Person.query().findOne('raw sql').whereIn('status', ['active', 'pending']).throwIfNotFound(); 
+const findOneWhereJson: Promise<Person> = Person.query().findOne('raw sql').whereJsonSupersetOf('x:y', 'abc').throwIfNotFound(); 
+const findOneWhereJsonIsArray: Promise<Person> = Person.query().findOne('raw sql').whereJsonIsArray('x:y').throwIfNotFound(); 
+const patchWhere: Promise<number> = Person.query().patch({firstName: 'Mo'}).where('id', 32); 
+const patchWhereIn: Promise<number> = Person.query().patch({firstName: 'Mo'}).whereIn('id', [1, 2, 3]); 
+const patchWhereJson: Promise<number> = Person.query().patch({firstName: 'Mo'}).whereJsonSupersetOf('x:y', 'abc'); 
+const patchWhereJsonIsArray: Promise<number> = Person.query().patch({firstName: 'Mo'}).whereJsonIsArray('x:y'); 
+const patchThrow: Promise<number> = Person.query().patch({firstName: 'Mo'}).throwIfNotFound(); 
+const updateWhere: Promise<number> = Person.query().update({firstName: 'Mo'}).where('id', 32); ;
+const updateWhereIn: Promise<number> = Person.query().update({firstName: 'Mo'}).whereIn('id', [1, 2, 3]); ;
+const updateWhereJson: Promise<number> = Person.query().update({firstName: 'Mo'}).whereJsonSupersetOf('x:y', 'abc'); ;
+const updateWhereJsonIsArray: Promise<number> = Person.query().update({firstName: 'Mo'}).whereJsonIsArray('x:y'); ;
+const updateThrow: Promise<number> = Person.query().update({firstName: 'Mo'}).throwIfNotFound(); 
+const deleteWhere: Promise<number> = Person.query().delete().where('raw sql'); 
+const deleteWhereIn: Promise<number> = Person.query().delete().whereIn('id', [1, 2, 3]); 
+const deleteThrow: Promise<number> = Person.query().delete().throwIfNotFound(); 
+const deleteByIDThrow: Promise<number> = Person.query().deleteById(32).throwIfNotFound(); 
 
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy
