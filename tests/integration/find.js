@@ -738,7 +738,7 @@ module.exports = session => {
               'Model1.*',
               Model2.query()
                 .sum('model2_prop2')
-                .whereRef('Model1.id', 'model2.model1_id')
+                .where('Model1.id', ref('model2.model1_id'))
                 .as('sum')
             )
             .orderBy('id')
@@ -754,7 +754,7 @@ module.exports = session => {
               'Model1.*',
               Model2.query()
                 .sum('model2_prop2')
-                .whereRef('Model1.id', 'model2.model1_id')
+                .where('Model1.id', ref('model2.model1_id'))
                 .as('sum')
             ])
             .orderBy('id')

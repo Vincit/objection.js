@@ -6,6 +6,7 @@ const _ = require('lodash'),
   objection = require('../../../'),
   knexUtils = require('../../../lib/utils/knexUtils'),
   knexMocker = require('../../../testUtils/mockKnex'),
+  ref = objection.ref,
   Model = objection.Model,
   QueryBuilder = objection.QueryBuilder,
   QueryBuilderBase = objection.QueryBuilderBase,
@@ -265,10 +266,10 @@ describe('QueryBuilder', () => {
       });
   });
 
-  describe('whereRef', () => {
+  describe('where(..., ref(...))', () => {
     it('should create a where clause using column references instead of values (1)', () => {
       return QueryBuilder.forClass(TestModel)
-        .whereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
+        .where('SomeTable.someColumn', ref('SomeOtherTable.someOtherColumn'))
         .then(() => {
           expect(executedQueries).to.eql([
             'select "Model".* from "Model" where "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'
@@ -278,7 +279,7 @@ describe('QueryBuilder', () => {
 
     it('should create a where clause using column references instead of values (2)', () => {
       return QueryBuilder.forClass(TestModel)
-        .whereRef('SomeTable.someColumn', '>', 'SomeOtherTable.someOtherColumn')
+        .where('SomeTable.someColumn', '>', ref('SomeOtherTable.someOtherColumn'))
         .then(() => {
           expect(executedQueries).to.eql([
             'select "Model".* from "Model" where "SomeTable"."someColumn" > "SomeOtherTable"."someOtherColumn"'
@@ -289,17 +290,17 @@ describe('QueryBuilder', () => {
     it('should fail with invalid operator', () => {
       expect(
         QueryBuilder.forClass(TestModel)
-          .whereRef('SomeTable.someColumn', 'lol', 'SomeOtherTable.someOtherColumn')
+          .where('SomeTable.someColumn', 'lol', ref('SomeOtherTable.someOtherColumn'))
           .toString()
       ).to.equal(
         'This query cannot be built synchronously. Consider using debug() method instead.'
       );
     });
 
-    it('orWhereRef should create a where clause using column references instead of values', () => {
+    it('orWhere(..., ref(...)) should create a where clause using column references instead of values', () => {
       return QueryBuilder.forClass(TestModel)
         .where('id', 10)
-        .orWhereRef('SomeTable.someColumn', 'SomeOtherTable.someOtherColumn')
+        .orWhere('SomeTable.someColumn', ref('SomeOtherTable.someOtherColumn'))
         .then(() => {
           expect(executedQueries).to.eql([
             'select "Model".* from "Model" where "id" = 10 or "SomeTable"."someColumn" = "SomeOtherTable"."someOtherColumn"'

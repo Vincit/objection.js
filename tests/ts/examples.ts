@@ -414,14 +414,6 @@ const sql: string = qb.toSql();
 const tableName: string = qb.tableNameFor(Person);
 const tableRef: string = qb.tableRefFor(Person);
 
-qb = qb.whereJsonEquals('Person.jsonColumnName:details.names[1]', {
-  details: { names: ['First', 'Second', 'Last'] }
-});
-qb = qb.whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
-qb = qb.whereJsonEquals('additionalData:myDogs[0]', { name: 'peter' });
-qb = qb.whereJsonNotEquals('jsonObject:a', 'jsonObject:b');
-qb = qb.whereJsonField('column:field', 'IS', null);
-
 function noop() {
   // no-op
 }

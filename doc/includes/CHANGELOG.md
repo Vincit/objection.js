@@ -35,6 +35,9 @@
        based on the existence of some weird key in `error.data`. The `error.data` is now removed from those errors and the `type` should be
        used instead. The message from the data is now stored in `error.message`.
 
+  * Removed deprecated methods `whereRef`, `whereJsonField` and `whereJsonEquals`. The [`ref`](#ref) helper can be used to replace the
+    `whereRef` calls. [`ref`](#ref) and [`lit`](#lit) can be used to replace the removed json methods.
+
 ### Changes
 
   * `isFindQuery` is renamed to [`isFind`](http://vincit.github.io/objection.js/#isfind) and deprecated.

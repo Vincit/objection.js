@@ -1419,22 +1419,6 @@ describe('Model', () => {
     expect(model2).to.eql(inputJson);
   });
 
-  it('formatter() should return a knex formatter', () => {
-    let Model = modelClass('Model');
-
-    // Broken in knex 0.14
-    /*
-    Model.knex(knex({client: 'sqlite3'}));
-    expect(Model.formatter().wrap('SomeTable.id')).to.equal('"SomeTable"."id"');
-    */
-
-    Model.knex(knex({ client: 'pg' }));
-    expect(Model.formatter().wrap('SomeTable.id')).to.equal('"SomeTable"."id"');
-
-    Model.knex(knex({ client: 'mysql' }));
-    expect(Model.formatter().wrap('SomeTable.id')).to.equal('`SomeTable`.`id`');
-  });
-
   it('$setJson should do nothing if null is given', () => {
     let Model = modelClass('Model');
     let model = Model.fromJson({ a: 1, b: 2 });

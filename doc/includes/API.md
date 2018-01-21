@@ -2257,48 +2257,6 @@ Type|Description
 
 
 
-#### whereRef
-
-```js
-const builder = queryBuilder.whereRef(leftRef, operator, rightRef);
-```
-
-```js
-builder.whereRef('Person.id', '=', 'Animal.ownerId');
-```
-
-Compares a column reference to another
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
-#### orWhereRef
-
-```js
-const builder = queryBuilder.orWhereRef(leftRef, operator, rightRef);
-```
-
-```js
-builder.orWhereRef('Person.id', '=', 'Animal.ownerId');
-```
-
-Compares a column reference to another
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
 #### whereComposite
 
 ```js
@@ -2355,68 +2313,6 @@ builder.whereInComposite(['a', 'b'], SomeModel.query().select('a', 'b'));
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
-#### whereJsonEquals
-
-```js
-const builder = queryBuilder.whereJsonEquals(fieldExpression, jsonObjectOrFieldExpression);
-```
-
-```js
-const people = await Person
-  .query()
-  .whereJsonEquals('additionalData:myDogs', 'additionalData:dogsAtHome');
-
-// oh joy! these people have all their dogs at home!
-
-const people = await Person
-  .query()
-  .whereJsonEquals('additionalData:myDogs[0]', { name: "peter"});
-
-// these people's first dog name is "peter" and the dog has no other
-// attributes, but its name
-```
-
-Where jsonb field reference equals jsonb object or other field reference.
-
-Also supports having field expression in both sides of equality.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-fieldExpression|[`FieldExpression`](#fieldexpression)|Reference to column / json field
-jsonObjectOrFieldExpression|Object&#124;Array&#124;[`FieldExpression`](#fieldexpression)|Reference to column / json field or json object
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
-#### orWhereJsonEquals
-
-See [`whereJsonEquals`](#wherejsonequals)
-
-
-
-
-#### whereJsonNotEquals
-
-See [`whereJsonEquals`](#wherejsonequals)
-
-
-
-
-#### orWhereJsonNotEquals
-
-See [`whereJsonEquals`](#wherejsonequals)
 
 
 
@@ -2709,49 +2605,6 @@ Type|Description
 #### orWhereJsonHasAll
 
 See [`whereJsonHasAll`](#wherejsonhasall)
-
-
-
-
-#### whereJsonField
-
-```js
-const builder = queryBuilder.whereJsonField(fieldExpression, operator, value);
-```
-
-Where referred json field value casted to same type with value fulfill given operand.
-
-Value may be number, string, null, boolean and referred json field is converted
-to TEXT, NUMERIC or BOOLEAN sql type for comparison.
-
-If left hand field does not exist rows appear IS null so if one needs to get only
-rows, which has key and it's value is null one may use e.g.
-[`.whereJsonSupersetOf("column", { field: null })`](#wherejsonsupersetof) or check is key exist and
-then [`.whereJsonField('column:field', 'IS', null)`](#wherejsonfield)
-
-For testing against objects or arrays one should see tested with [`whereJsonEqual`](#wherejsonequal),
-[`whereJsonSupersetOf`](#wherejsonsupersetof) and [`whereJsonSubsetOf`](#wherejsonsubsetof) methods.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-fieldExpression|[`FieldExpression`](#fieldexpression)|Expression pointing to certain value
-operator|string|SQL comparator usually `<`, `>`, `<>`, `=` or `!=`
-value|boolean&#124;number&#124;string&#124;null|Value to which field is compared to
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
-
-
-
-
-#### orWhereJsonField
-
-See [`whereJsonField`](#wherejsonfield)
 
 
 
