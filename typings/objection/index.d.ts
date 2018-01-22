@@ -531,10 +531,7 @@ declare namespace Objection {
       Executable<RV> {
     throwIfNotFound(): QueryBuilder<QM, RM>;
     runAfter(fn: (result: RV, builder: this) => any): this;
-  }
-  
-  export interface QueryBuilderWithReturning<QM, RM=QM, RV=RM> extends QueryBuilder<QM, RM, RV> {
-    returning(columns: string | string[]): QueryBuilderWithReturning<QM, RM>;
+    returning(columns: string | string[]): QueryBuilder<QM, RM>;
   }
 
   export interface QueryBuilderYieldingOneOrNone<QM>
@@ -544,19 +541,19 @@ declare namespace Objection {
     extends QueryBuilderBase<QM, RM, number>,
       Executable<number> {
     throwIfNotFound(): this;
-    returning(columns: string | string[]): QueryBuilderWithReturning<QM, RM>;
+    returning(columns: string | string[]): QueryBuilder<QM, RM>;
     runAfter(fn: (result: number, builder: this) => any): this;
   }
 
   interface Insert<QM> {
-    (modelsOrObjects?: Partial<QM>[]): QueryBuilderWithReturning<QM, QM[]>;
-    (modelOrObject?: Partial<QM>): QueryBuilderWithReturning<QM, QM>;
+    (modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: Partial<QM>): QueryBuilder<QM, QM>;
     (): this;
   }
 
   interface InsertGraph<QM> {
-    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilderWithReturning<QM, QM[]>;
-    (modelOrObject?: Partial<QM>, options?: InsertGraphOptions): QueryBuilderWithReturning<QM, QM>;
+    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
     (): this;
   }
 
@@ -566,8 +563,8 @@ declare namespace Objection {
   }
 
   interface InsertGraphAndFetch<QM> {
-    (modelsOrObjects?: Partial<QM>, options?: InsertGraphOptions): QueryBuilderWithReturning<QM, QM>;
-    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilderWithReturning<QM, QM[]>;
+    (modelsOrObjects?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
+    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
   }
 
   interface QueryBuilderBase<QM, RM=QM, RV=RM> extends QueryInterface<QM, RM, RV> {
@@ -581,8 +578,8 @@ declare namespace Objection {
     findOne: FindOne<QM>;
 
     insert: Insert<QM>;
-    insertAndFetch(modelOrObject: Partial<QM>): QueryBuilderWithReturning<QM, QM>;
-    insertAndFetch(modelsOrObjects?: Partial<QM>[]): QueryBuilderWithReturning<QM, QM[]>;
+    insertAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    insertAndFetch(modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
 
     insertGraph: InsertGraph<QM>;
     insertGraphAndFetch: InsertGraphAndFetch<QM>;
