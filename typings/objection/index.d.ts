@@ -522,15 +522,15 @@ declare namespace Objection {
     static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
-  export interface Executable<M> extends Promise<M> {
-    execute(): Promise<M>;
+  export interface Executable<RV> extends Promise<RV> {
+    execute(): Promise<RV>;
   }
 
   export interface QueryBuilder<QM, RM = QM, RV = RM>
     extends QueryBuilderBase<QM, RM, RV>,
       Executable<RV> {
     throwIfNotFound(): QueryBuilder<QM, RM>;
-    runAfter(fn: (result: RV, builder: this) => any): this;
+    runAfter(fn: (result: any, builder: this) => any): this;
     returning(columns: string | string[]): QueryBuilder<QM, RM>;
   }
 
@@ -541,7 +541,7 @@ declare namespace Objection {
       Executable<number> {
     throwIfNotFound(): this;
     returning(columns: string | string[]): QueryBuilder<QM, RM>;
-    runAfter(fn: (result: number, builder: this) => any): this;
+    runAfter(fn: (result: any, builder: this) => any): this;
   }
 
   interface Insert<QM> {

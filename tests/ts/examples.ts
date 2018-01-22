@@ -284,9 +284,13 @@ qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 qb = qb.alias('someAlias');
 
-// query builder hooks
-qb = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => {});
-qb = qb.runAfter(async (result: Person[], builder: objection.QueryBuilder<Person, Person[]>) => {});
+// Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
+
+const runBeforePerson: Promise<Person> = qb.first().throwIfNotFound().runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+const runBeforePersons: Promise<Person[]> = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88);
+
+const runAfterPerson: Promise<Person> = qb.first().throwIfNotFound().runAfter(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+const runAfterPersons: Promise<Person[]> = qb.runAfter(async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88);
 
 // signature-changing QueryBuilder methods:
 
