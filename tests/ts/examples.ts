@@ -286,11 +286,21 @@ qb = qb.alias('someAlias');
 
 // Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
 
-const runBeforePerson: Promise<Person> = qb.first().throwIfNotFound().runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
-const runBeforePersons: Promise<Person[]> = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88);
+const runBeforePerson: Promise<Person> = qb
+  .first()
+  .throwIfNotFound()
+  .runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+const runBeforePersons: Promise<Person[]> = qb.runBefore(
+  async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88
+);
 
-const runAfterPerson: Promise<Person> = qb.first().throwIfNotFound().runAfter(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
-const runAfterPersons: Promise<Person[]> = qb.runAfter(async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88);
+const runAfterPerson: Promise<Person> = qb
+  .first()
+  .throwIfNotFound()
+  .runAfter(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+const runAfterPersons: Promise<Person[]> = qb.runAfter(
+  async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88
+);
 
 // signature-changing QueryBuilder methods:
 
@@ -601,9 +611,7 @@ Person.query().where('firstName', lit('Jennifer').castText());
 
 qb = Person.query();
 
-const findByIdSelect: Promise<Person | undefined> = qb
-  .findById(32)
-  .select('firstName');
+const findByIdSelect: Promise<Person | undefined> = qb.findById(32).select('firstName');
 const findByIdSelectThrow: Promise<Person> = qb
   .findById(32)
   .select('firstName')
@@ -615,9 +623,7 @@ const findByIdJoinThrow: Promise<Person> = qb
   .findById(32)
   .join('tablename', 'column1', '=', 'column2')
   .throwIfNotFound();
-const findByIdJoinRaw: Promise<Person | undefined> = qb
-  .findById(32)
-  .joinRaw('raw sql');
+const findByIdJoinRaw: Promise<Person | undefined> = qb.findById(32).joinRaw('raw sql');
 const findByIdJoinRawThrow: Promise<Person> = qb
   .findById(32)
   .joinRaw('raw sql')
@@ -657,48 +663,28 @@ const findOneWhereJsonIsArrayThrow: Promise<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonIsArray('x:y')
   .throwIfNotFound();
-const patchWhere: Promise<number> = qb
-  .patch({ firstName: 'Mo' })
-  .where('id', 32);
-const patchWhereIn: Promise<number> = qb
-  .patch({ firstName: 'Mo' })
-  .whereIn('id', [1, 2, 3]);
+const patchWhere: Promise<number> = qb.patch({ firstName: 'Mo' }).where('id', 32);
+const patchWhereIn: Promise<number> = qb.patch({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
 const patchWhereJson: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
 const patchWhereJsonIsArray: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const patchThrow: Promise<number> = qb
-  .patch({ firstName: 'Mo' })
-  .throwIfNotFound();
-const updateWhere: Promise<number> = qb
-  .update({ firstName: 'Mo' })
-  .where('id', 32);
-const updateWhereIn: Promise<number> = qb
-  .update({ firstName: 'Mo' })
-  .whereIn('id', [1, 2, 3]);
+const patchThrow: Promise<number> = qb.patch({ firstName: 'Mo' }).throwIfNotFound();
+const updateWhere: Promise<number> = qb.update({ firstName: 'Mo' }).where('id', 32);
+const updateWhereIn: Promise<number> = qb.update({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
 const updateWhereJson: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
 const updateWhereJsonIsArray: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const updateThrow: Promise<number> = qb
-  .update({ firstName: 'Mo' })
-  .throwIfNotFound();
-const deleteWhere: Promise<number> = qb
-  .delete()
-  .where('lastName', 'like', 'Mac%');
-const deleteWhereIn: Promise<number> = qb
-  .delete()
-  .whereIn('id', [1, 2, 3]);
-const deleteThrow: Promise<number> = qb
-  .delete()
-  .throwIfNotFound();
-const deleteByIDThrow: Promise<number> = qb
-  .deleteById(32)
-  .throwIfNotFound();
+const updateThrow: Promise<number> = qb.update({ firstName: 'Mo' }).throwIfNotFound();
+const deleteWhere: Promise<number> = qb.delete().where('lastName', 'like', 'Mac%');
+const deleteWhereIn: Promise<number> = qb.delete().whereIn('id', [1, 2, 3]);
+const deleteThrow: Promise<number> = qb.delete().throwIfNotFound();
+const deleteByIDThrow: Promise<number> = qb.deleteById(32).throwIfNotFound();
 
 // The location of `first` doesn't matter.
 
@@ -733,10 +719,11 @@ const whereDelRetFirstWhere: Promise<Person | undefined> = qb
 // Confirming this prevent us from having to duplicate the tests for each.
 
 async function checkQueryEquivalence() {
-
   // Confirm that every $query() type is a query() type
 
-  let staticQB = Person.query().first().throwIfNotFound();
+  let staticQB = Person.query()
+    .first()
+    .throwIfNotFound();
   const person = await staticQB;
   staticQB = person.$query();
 
