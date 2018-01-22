@@ -595,35 +595,59 @@ Person.query().where('firstName', lit('Jennifer').castText());
 
 // Preserving result type after result type changing methods.
 
-const findByIdSelect: Promise<Person> = Person.query()
+const findByIdSelect: Promise<Person | undefined> = Person.query()
+  .findById(32)
+  .select('firstName');
+const findByIdSelectThrow: Promise<Person> = Person.query()
   .findById(32)
   .select('firstName')
   .throwIfNotFound();
-const findByIdJoin: Promise<Person> = Person.query()
+const findByIdJoin: Promise<Person | undefined> = Person.query()
+  .findById(32)
+  .join('tablename', 'column1', '=', 'column2');
+const findByIdJoinThrow: Promise<Person> = Person.query()
   .findById(32)
   .join('tablename', 'column1', '=', 'column2')
   .throwIfNotFound();
-const findByIdJoinRaw: Promise<Person> = Person.query()
+const findByIdJoinRaw: Promise<Person | undefined> = Person.query()
+  .findById(32)
+  .joinRaw('raw sql');
+const findByIdJoinRawThrow: Promise<Person> = Person.query()
   .findById(32)
   .joinRaw('raw sql')
   .throwIfNotFound();
-const findOneWhere: Promise<Person> = Person.query()
+const findOneWhere: Promise<Person | undefined> = Person.query()
+  .findOne('raw sql')
+  .where('more raw sql');
+const findOneWhereThrow: Promise<Person> = Person.query()
   .findOne('raw sql')
   .where('more raw sql')
   .throwIfNotFound();
-const findOneSelect: Promise<Person> = Person.query()
+const findOneSelect: Promise<Person | undefined> = Person.query()
+  .findOne('raw sql')
+  .select('firstName');
+const findOneSelectThrow: Promise<Person> = Person.query()
   .findOne('raw sql')
   .select('firstName')
   .throwIfNotFound();
-const findOneWhereIn: Promise<Person> = Person.query()
+const findOneWhereIn: Promise<Person | undefined> = Person.query()
+  .findOne('raw sql')
+  .whereIn('status', ['active', 'pending']);
+const findOneWhereInThrow: Promise<Person> = Person.query()
   .findOne('raw sql')
   .whereIn('status', ['active', 'pending'])
   .throwIfNotFound();
-const findOneWhereJson: Promise<Person> = Person.query()
+const findOneWhereJson: Promise<Person | undefined> = Person.query()
+  .findOne('raw sql')
+  .whereJsonSupersetOf('x:y', 'abc');
+const findOneWhereJsonThrow: Promise<Person> = Person.query()
   .findOne('raw sql')
   .whereJsonSupersetOf('x:y', 'abc')
   .throwIfNotFound();
-const findOneWhereJsonIsArray: Promise<Person> = Person.query()
+const findOneWhereJsonIsArray: Promise<Person | undefined> = Person.query()
+  .findOne('raw sql')
+  .whereJsonIsArray('x:y');
+const findOneWhereJsonIsArrayThrow: Promise<Person> = Person.query()
   .findOne('raw sql')
   .whereJsonIsArray('x:y')
   .throwIfNotFound();
