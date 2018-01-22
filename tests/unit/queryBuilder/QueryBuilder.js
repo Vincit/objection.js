@@ -723,7 +723,7 @@ describe('QueryBuilder', () => {
   });
 
   it('range should return a range and the total count', done => {
-    mockKnexQueryResults = [[{ count: 123 }], [{ a: 1 }]];
+    mockKnexQueryResults = [[{ a: 1 }], [{ count: 123 }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
@@ -731,8 +731,8 @@ describe('QueryBuilder', () => {
       .then(res => {
         expect(executedQueries).to.have.length(2);
         expect(executedQueries).to.eql([
-          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"',
-          'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 101 offset 100'
+          'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 101 offset 100',
+          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"'
         ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{ a: 1 }]);
@@ -742,7 +742,7 @@ describe('QueryBuilder', () => {
   });
 
   it('page should return a page and the total count', done => {
-    mockKnexQueryResults = [[{ count: 123 }], [{ a: 1 }]];
+    mockKnexQueryResults = [[{ a: 1 }], [{ count: 123 }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
@@ -750,8 +750,8 @@ describe('QueryBuilder', () => {
       .then(res => {
         expect(executedQueries).to.have.length(2);
         expect(executedQueries).to.eql([
-          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"',
-          'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000'
+          'select "Model".* from "Model" where "test" = 100 order by "order" asc limit 100 offset 1000',
+          'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"'
         ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{ a: 1 }]);

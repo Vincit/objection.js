@@ -1019,6 +1019,16 @@ module.exports = session => {
         });
     });
 
+    it('range should work with joinEager', () => {
+      return Model1.query()
+        .where('Model1.id', 1)
+        .joinEager('model1Relation1')
+        .range(0, 0)
+        .then(res => {
+          expect(res.results[0].model1Relation1.id).to.equal(2);
+        });
+    });
+
     describe('JoinEagerAlgorithm', () => {
       it('select should work', () => {
         return Model1.query()
