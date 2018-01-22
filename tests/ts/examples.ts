@@ -599,102 +599,104 @@ Person.query().where('firstName', lit('Jennifer').castText());
 
 // Preserving result type after result type changing methods.
 
-const findByIdSelect: Promise<Person | undefined> = Person.query()
+qb = Person.query();
+
+const findByIdSelect: Promise<Person | undefined> = qb
   .findById(32)
   .select('firstName');
-const findByIdSelectThrow: Promise<Person> = Person.query()
+const findByIdSelectThrow: Promise<Person> = qb
   .findById(32)
   .select('firstName')
   .throwIfNotFound();
-const findByIdJoin: Promise<Person | undefined> = Person.query()
+const findByIdJoin: Promise<Person | undefined> = qb
   .findById(32)
   .join('tablename', 'column1', '=', 'column2');
-const findByIdJoinThrow: Promise<Person> = Person.query()
+const findByIdJoinThrow: Promise<Person> = qb
   .findById(32)
   .join('tablename', 'column1', '=', 'column2')
   .throwIfNotFound();
-const findByIdJoinRaw: Promise<Person | undefined> = Person.query()
+const findByIdJoinRaw: Promise<Person | undefined> = qb
   .findById(32)
   .joinRaw('raw sql');
-const findByIdJoinRawThrow: Promise<Person> = Person.query()
+const findByIdJoinRawThrow: Promise<Person> = qb
   .findById(32)
   .joinRaw('raw sql')
   .throwIfNotFound();
-const findOneWhere: Promise<Person | undefined> = Person.query()
+const findOneWhere: Promise<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .where('lastName', 'like', 'Mac%');
-const findOneWhereThrow: Promise<Person> = Person.query()
+const findOneWhereThrow: Promise<Person> = qb
   .findOne({ firstName: 'Mo' })
   .where('lastName', 'like', 'Mac%')
   .throwIfNotFound();
-const findOneSelect: Promise<Person | undefined> = Person.query()
+const findOneSelect: Promise<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .select('firstName');
-const findOneSelectThrow: Promise<Person> = Person.query()
+const findOneSelectThrow: Promise<Person> = qb
   .findOne({ firstName: 'Mo' })
   .select('firstName')
   .throwIfNotFound();
-const findOneWhereIn: Promise<Person | undefined> = Person.query()
+const findOneWhereIn: Promise<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .whereIn('status', ['active', 'pending']);
-const findOneWhereInThrow: Promise<Person> = Person.query()
+const findOneWhereInThrow: Promise<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereIn('status', ['active', 'pending'])
   .throwIfNotFound();
-const findOneWhereJson: Promise<Person | undefined> = Person.query()
+const findOneWhereJson: Promise<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
-const findOneWhereJsonThrow: Promise<Person> = Person.query()
+const findOneWhereJsonThrow: Promise<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc')
   .throwIfNotFound();
-const findOneWhereJsonIsArray: Promise<Person | undefined> = Person.query()
+const findOneWhereJsonIsArray: Promise<Person | undefined> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const findOneWhereJsonIsArrayThrow: Promise<Person> = Person.query()
+const findOneWhereJsonIsArrayThrow: Promise<Person> = qb
   .findOne({ firstName: 'Mo' })
   .whereJsonIsArray('x:y')
   .throwIfNotFound();
-const patchWhere: Promise<number> = Person.query()
+const patchWhere: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .where('id', 32);
-const patchWhereIn: Promise<number> = Person.query()
+const patchWhereIn: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .whereIn('id', [1, 2, 3]);
-const patchWhereJson: Promise<number> = Person.query()
+const patchWhereJson: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
-const patchWhereJsonIsArray: Promise<number> = Person.query()
+const patchWhereJsonIsArray: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const patchThrow: Promise<number> = Person.query()
+const patchThrow: Promise<number> = qb
   .patch({ firstName: 'Mo' })
   .throwIfNotFound();
-const updateWhere: Promise<number> = Person.query()
+const updateWhere: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .where('id', 32);
-const updateWhereIn: Promise<number> = Person.query()
+const updateWhereIn: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .whereIn('id', [1, 2, 3]);
-const updateWhereJson: Promise<number> = Person.query()
+const updateWhereJson: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .whereJsonSupersetOf('x:y', 'abc');
-const updateWhereJsonIsArray: Promise<number> = Person.query()
+const updateWhereJsonIsArray: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .whereJsonIsArray('x:y');
-const updateThrow: Promise<number> = Person.query()
+const updateThrow: Promise<number> = qb
   .update({ firstName: 'Mo' })
   .throwIfNotFound();
-const deleteWhere: Promise<number> = Person.query()
+const deleteWhere: Promise<number> = qb
   .delete()
   .where('lastName', 'like', 'Mac%');
-const deleteWhereIn: Promise<number> = Person.query()
+const deleteWhereIn: Promise<number> = qb
   .delete()
   .whereIn('id', [1, 2, 3]);
-const deleteThrow: Promise<number> = Person.query()
+const deleteThrow: Promise<number> = qb
   .delete()
   .throwIfNotFound();
-const deleteByIDThrow: Promise<number> = Person.query()
+const deleteByIDThrow: Promise<number> = qb
   .deleteById(32)
   .throwIfNotFound();
 
@@ -702,13 +704,6 @@ const deleteByIDThrow: Promise<number> = Person.query()
 
 const whereFirst: Promise<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
 const firstWhere: Promise<Person | undefined> = qb.first().where({ firstName: 'Mo' });
-
-const staticWhereFirst: Promise<Person | undefined> = Person.query()
-  .where({ firstName: 'Mo' })
-  .first();
-const staticFirstWhere: Promise<Person | undefined> = Person.query()
-  .first()
-  .where({ firstName: 'Mo' });
 
 // Returning restores the result to Model or Model[].
 
@@ -734,27 +729,22 @@ const whereDelRetFirstWhere: Promise<Person | undefined> = qb
   .first()
   .where({ firstName: 'Mo' });
 
-const staticWhereInsertRet: Promise<Person> = Person.query()
-  .where({ lastName: 'MacMoo' })
-  .insert({ firstName: 'Mo' })
-  .returning('dbGeneratedColumn');
-const staticWhereMultiInsertRet: Promise<Person[]> = Person.query()
-  .where({ lastName: 'MacMoo' })
-  .insert([{ firstName: 'Mo' }, { firstName: 'Bob' }])
-  .returning('dbGeneratedColumn');
-const staticWhereUpdateRet: Promise<Person[]> = Person.query()
-  .where({ lastName: 'MacMoo' })
-  .update({ firstName: 'Bob' })
-  .returning('dbGeneratedColumn');
-const staticWherePatchRet: Promise<Person[]> = Person.query()
-  .where({ lastName: 'MacMoo' })
-  .patch({ firstName: 'Mo' })
-  .returning('age');
-const staticWhereDelRetFirstWhere: Promise<Person | undefined> = Person.query()
-  .delete()
-  .returning('lastName')
-  .first()
-  .where({ firstName: 'Mo' });
+// Verify that Model.query() and model.$query() return the same type of query builder.
+// Confirming this prevent us from having to duplicate the tests for each.
+
+async function checkQueryEquivalence() {
+
+  // Confirm that every $query() type is a query() type
+
+  let staticQB = Person.query().first().throwIfNotFound();
+  const person = await staticQB;
+  staticQB = person.$query();
+
+  // Confirm that every query() type is a $query() type
+
+  let instanceQB = person.$query();
+  instanceQB = staticQB;
+}
 
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy
