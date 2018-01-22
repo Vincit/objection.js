@@ -530,8 +530,6 @@ declare namespace Objection {
     extends QueryBuilderBase<QM, RM, RV>,
       Executable<RV> {
     throwIfNotFound(): QueryBuilder<QM, RM>;
-    runAfter(fn: (result: any, builder: this) => any): this;
-    returning(columns: string | string[]): QueryBuilder<QM, RM>;
   }
 
   export interface QueryBuilderYieldingOneOrNone<QM> extends QueryBuilder<QM, QM, QM | undefined> {}
@@ -540,8 +538,6 @@ declare namespace Objection {
     extends QueryBuilderBase<QM, RM, number>,
       Executable<number> {
     throwIfNotFound(): this;
-    returning(columns: string | string[]): QueryBuilder<QM, RM>;
-    runAfter(fn: (result: any, builder: this) => any): this;
   }
 
   interface Insert<QM> {
@@ -701,6 +697,7 @@ declare namespace Objection {
     hasEager(): boolean;
 
     runBefore(fn: (result: any, builder: this) => any): this;
+    runAfter(fn: (result: any, builder: this) => any): this;
     onBuild(fn: (builder: this) => void): this;
     onError(fn: (error: Error, builder: this) => any): this;
 
@@ -763,6 +760,8 @@ declare namespace Objection {
 
     omit(modelClass: typeof Model, properties: string[]): this;
     omit(properties: string[]): this;
+
+    returning(columns: string | string[]): QueryBuilder<QM, RM>;
   }
 
   export interface transaction<T> {
