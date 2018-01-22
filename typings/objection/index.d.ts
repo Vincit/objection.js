@@ -518,7 +518,7 @@ declare namespace Objection {
     $afterDelete(queryContext: QueryContext): Promise<any> | void;
   }
 
-  export class QueryBuilder<QM, RM=QM, RV=RM> {
+  export class QueryBuilder<QM, RM = QM, RV = RM> {
     static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
@@ -526,7 +526,7 @@ declare namespace Objection {
     execute(): Promise<M>;
   }
 
-  export interface QueryBuilder<QM, RM=QM, RV=RM>
+  export interface QueryBuilder<QM, RM = QM, RV = RM>
     extends QueryBuilderBase<QM, RM, RV>,
       Executable<RV> {
     throwIfNotFound(): QueryBuilder<QM, RM>;
@@ -534,10 +534,9 @@ declare namespace Objection {
     returning(columns: string | string[]): QueryBuilder<QM, RM>;
   }
 
-  export interface QueryBuilderYieldingOneOrNone<QM>
-    extends QueryBuilder<QM, QM, QM | undefined> { }
+  export interface QueryBuilderYieldingOneOrNone<QM> extends QueryBuilder<QM, QM, QM | undefined> {}
 
-  export interface QueryBuilderYieldingCount<QM, RM=QM>
+  export interface QueryBuilderYieldingCount<QM, RM = QM>
     extends QueryBuilderBase<QM, RM, number>,
       Executable<number> {
     throwIfNotFound(): this;
@@ -567,7 +566,7 @@ declare namespace Objection {
     (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
   }
 
-  interface QueryBuilderBase<QM, RM=QM, RV=RM> extends QueryInterface<QM, RM, RV> {
+  interface QueryBuilderBase<QM, RM = QM, RV = RM> extends QueryInterface<QM, RM, RV> {
     modify(func: (builder: this) => void): this;
     modify(namedFilter: string): this;
 
@@ -639,8 +638,16 @@ declare namespace Objection {
 
     whereComposite(column: ColumnRef, value: Value | QueryBuilder<any, any[]>): this;
     whereComposite(column: ColumnRef[], value: Value[] | QueryBuilder<any, any[]>): this;
-    whereComposite(column: ColumnRef, operator: string, value: Value | QueryBuilder<any, any[]>): this;
-    whereComposite(column: ColumnRef[], operator: string, value: Value[] | QueryBuilder<any, any[]>): this;
+    whereComposite(
+      column: ColumnRef,
+      operator: string,
+      value: Value | QueryBuilder<any, any[]>
+    ): this;
+    whereComposite(
+      column: ColumnRef[],
+      operator: string,
+      value: Value[] | QueryBuilder<any, any[]>
+    ): this;
     whereInComposite(column: ColumnRef, values: Value[] | QueryBuilder<any, any[]>): this;
 
     whereJsonSupersetOf: WhereJson<QM, RM, RV>;
@@ -1007,7 +1014,11 @@ declare namespace Objection {
     ): QueryBuilder<QM, RM, RV>;
     (tableName: TableName, raw: Raw): QueryBuilder<QM, RM, RV>;
     (tableName: TableName, column1: ColumnRef, column2: ColumnRef): QueryBuilder<QM, RM, RV>;
-    (tableName: TableName, column1: ColumnRef, operator: string, column2: ColumnRef): QueryBuilder<QM, RM, RV>;
+    (tableName: TableName, column1: ColumnRef, operator: string, column2: ColumnRef): QueryBuilder<
+      QM,
+      RM,
+      RV
+    >;
   }
 
   interface JoinRaw<QM, RM, RV> {
@@ -1023,13 +1034,21 @@ declare namespace Objection {
   }
 
   interface WithWrapped<QM, RM, RV> {
-    (alias: string, callback: (queryBuilder: QueryBuilder<QM, QM[]>) => any): QueryBuilder<QM, RM, RV>;
+    (alias: string, callback: (queryBuilder: QueryBuilder<QM, QM[]>) => any): QueryBuilder<
+      QM,
+      RM,
+      RV
+    >;
   }
 
   interface Where<QM, RM, RV> extends WhereRaw<QM, RM, RV> {
     (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
     (object: object): QueryBuilder<QM, RM, RV>;
-    (column: ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilder<
+      QM,
+      RM,
+      RV
+    >;
     (
       column: ColumnRef,
       operator: string,
@@ -1047,7 +1066,10 @@ declare namespace Objection {
     (object: object): QueryBuilderYieldingOneOrNone<QM>;
     (sql: string, ...bindings: any[]): QueryBuilderYieldingOneOrNone<QM>;
     (sql: string, bindings: any): QueryBuilderYieldingOneOrNone<QM>;
-    (column: ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilderYieldingOneOrNone<QM>;
+    (
+      column: ColumnRef,
+      value: Value | Reference | QueryBuilder<any, any[]>
+    ): QueryBuilderYieldingOneOrNone<QM>;
     (
       column: ColumnRef,
       operator: string,
@@ -1085,7 +1107,9 @@ declare namespace Objection {
   }
 
   interface WhereExists<QM, RM, RV> {
-    (callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilder<QM, RM, RV>;
     (query: QueryBuilder<any, any[]>): QueryBuilder<QM, RM, RV>;
     (raw: Raw): QueryBuilder<QM, RM, RV>;
   }
