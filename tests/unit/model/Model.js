@@ -616,6 +616,42 @@ describe('Model', () => {
       expect(json).to.have.property('relation2');
     });
 
+    it('should parse relations into Model instances if source that is being parsed is already a Model instance', () => {
+      let Model2 = modelClass('Model2');
+
+      Model1.relationMappings = {
+        relation1: {
+          relation: Model.HasManyRelation,
+          modelClass: Model2,
+          join: {
+            from: 'Model1.id',
+            to: 'Model2.model1Id'
+          }
+        },
+        relation2: {
+          relation: Model.BelongsToOneRelation,
+          modelClass: Model1,
+          join: {
+            from: 'Model1.id',
+            to: 'Model1.model1Id'
+          }
+        }
+      };
+
+      let model = Model1.fromJson({
+        id: 10,
+        model1Id: 13
+      });
+      model.relation1 = [{ id: 11, model1Id: 10 }, { id: 12, model1Id: 10 }];
+      model.relation2 = { id: 13, model1Id: null };
+
+      let modelWithRelationships = Model1.fromJson(model);
+
+      expect(modelWithRelationships.relation1[0]).to.be.a(Model2);
+      expect(modelWithRelationships.relation1[1]).to.be.a(Model2);
+      expect(modelWithRelationships.relation2).to.be.a(Model1);
+    });
+
     it('should NOT parse relations into Model instances if skipParseRelations option is given', () => {
       let Model2 = modelClass('Model2');
 
