@@ -407,6 +407,31 @@ describe('Model', () => {
       expect(model.c).not.to.equal(obj);
     });
 
+    it('should merge default values from jsonSchema when validating a model instance', () => {
+      let obj = { a: 100, b: 200 };
+
+      Model1.jsonSchema = {
+        required: ['a'],
+        properties: {
+          a: { type: 'string', default: 'default string' },
+          b: { type: 'number', default: 666 },
+          c: { type: 'object', default: obj }
+        }
+      };
+
+      let model = Model1.fromJson({ a: 'str' }, { skipValidation: true });
+
+      expect(model.b).to.equal(undefined);
+      expect(model.c).to.equal(undefined);
+
+      model.$validate();
+
+      expect(model.a).to.equal('str');
+      expect(model.b).to.equal(666);
+      expect(model.c).to.eql(obj);
+      expect(model.c).not.to.equal(obj);
+    });
+
     // regression introduced in 0.6
     // https://github.com/Vincit/objection.js/issues/205
     it('should not throw TypeError when jsonSchema.properties == undefined', () => {
