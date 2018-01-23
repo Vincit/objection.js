@@ -696,8 +696,8 @@ declare namespace Objection {
     hasSelects(): boolean;
     hasEager(): boolean;
 
-    runBefore(fn: (result: any, builder: this) => any): this;
-    runAfter(fn: (result: any, builder: this) => any): this;
+    runBefore(fn: (result: any, builder: QueryBuilder<QM, any>) => any): this;
+    runAfter(fn: (result: any, builder: QueryBuilder<QM, any>) => any): this;
     onBuild(fn: (builder: this) => void): this;
     onError(fn: (error: Error, builder: this) => any): this;
 
