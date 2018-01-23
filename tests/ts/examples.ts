@@ -1,6 +1,8 @@
 // tslint:disable:no-unused-variable
 import * as knex from 'knex';
+
 import * as objection from '../../typings/objection';
+import { RelationMappings } from '../../typings/objection';
 
 const { lit, raw, ref } = objection;
 
@@ -132,7 +134,7 @@ class Movie extends objection.Model {
    * relations. By making relationMappings a thunk, we avoid require loops
    * caused by other class references.
    */
-  static relationMappings = () => ({
+  static relationMappings: RelationMappings = {
     actors: {
       relation: objection.Model.ManyToManyRelation,
       modelClass: Person,
@@ -143,9 +145,10 @@ class Movie extends objection.Model {
           to: ref('Actors.personId').castInt()
         },
         to: [ref('Person.id1'), 'Person.id2']
-      }
+      },
+      filter: qb => qb.orderByRaw('coalesce(title, id)')
     }
-  });
+  };
 }
 
 async () => {

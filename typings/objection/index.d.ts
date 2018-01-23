@@ -194,8 +194,8 @@ declare namespace Objection {
     relation: Relation;
     modelClass: ModelClass<any> | string;
     join: RelationJoin;
-    modify?: <QM>(queryBuilder: QueryBuilder<QM, QM[]>) => QueryBuilder<QM, QM[]>;
-    filter?: <QM>(queryBuilder: QueryBuilder<QM, QM[]>) => QueryBuilder<QM, QM[]>;
+    modify?: (queryBuilder: QueryBuilder<any>) => QueryBuilder<any>;
+    filter?: (queryBuilder: QueryBuilder<any>) => QueryBuilder<any>;
   }
 
   export interface EagerAlgorithm {
