@@ -474,7 +474,7 @@ declare namespace Objection {
     /**
      * AKA `reload` in ActiveRecord parlance
      */
-    $query(trxOrKnex?: Transaction | knex): QueryBuilder<this>;
+    $query(trxOrKnex?: Transaction | knex): QueryBuilder<this, this>;
 
     /**
      * If you add model relations as fields, $relatedQuery works
@@ -495,13 +495,13 @@ declare namespace Objection {
     $relatedQuery<QM extends Model>(
       relationName: string,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilder<QM, QM[]>;
+    ): QueryBuilder<QM>;
 
     $loadRelated<QM>(
       expression: keyof this | RelationExpression,
       filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilder<this>;
+    ): QueryBuilder<this, this>;
 
     $traverse(traverser: TraverserFunction): void;
     $traverse(filterConstructor: this, traverser: TraverserFunction): void;
@@ -518,7 +518,7 @@ declare namespace Objection {
     $afterDelete(queryContext: QueryContext): Promise<any> | void;
   }
 
-  export class QueryBuilder<QM, RM = QM, RV = RM> {
+  export class QueryBuilder<QM, RM, RV> {
     static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
@@ -526,7 +526,7 @@ declare namespace Objection {
     execute(): Promise<RV>;
   }
 
-  export interface QueryBuilder<QM, RM = QM, RV = RM>
+  export interface QueryBuilder<QM, RM = QM[], RV = RM>
     extends QueryBuilderBase<QM, RM, RV>,
       Executable<RV> {
     throwIfNotFound(): QueryBuilder<QM, RM>;
@@ -534,7 +534,7 @@ declare namespace Objection {
 
   export interface QueryBuilderYieldingOneOrNone<QM> extends QueryBuilder<QM, QM, QM | undefined> {}
 
-  export interface QueryBuilderYieldingCount<QM, RM = QM>
+  export interface QueryBuilderYieldingCount<QM, RM = QM[]>
     extends QueryBuilderBase<QM, RM, number>,
       Executable<number> {
     throwIfNotFound(): this;
@@ -562,7 +562,7 @@ declare namespace Objection {
     (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
   }
 
-  interface QueryBuilderBase<QM, RM = QM, RV = RM> extends QueryInterface<QM, RM, RV> {
+  interface QueryBuilderBase<QM, RM, RV> extends QueryInterface<QM, RM, RV> {
     modify(func: (builder: this) => void): this;
     modify(namedFilter: string): this;
 
