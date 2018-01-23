@@ -729,31 +729,38 @@ const {
 function errorHandler(err, res) {
   if (err instanceof ValidationError) {
     switch (err.type) {
-      case ValidationError.Type.ModelValidation:
+      case 'ModelValidation':
         res.status(400).send({
           message: err.message,
           type: 'ModelValidation',
           data: err.data
         });
         break;
-      case ValidationError.Type.RelationExpression:
+      case 'RelationExpression':
         res.status(400).send({
           message: err.message,
           type: 'InvalidRelationExpression',
           data: {}
         });
         break;
-      case ValidationError.Type.UnallowedRelation:
+      case 'UnallowedRelation':
         res.status(400).send({
           message: err.message,
           type: 'UnallowedRelation',
           data: {}
         });
         break;
-      case ValidationError.Type.InvalidGraph:
+      case 'InvalidGraph':
         res.status(400).send({
           message: err.message,
           type: 'InvalidGraph',
+          data: {}
+        });
+        break;
+      default:
+        res.status(400).send({
+          message: err.message,
+          type: 'UnknownValidationError',
           data: {}
         });
         break;
@@ -825,18 +832,18 @@ function errorHandler(err, res) {
 
 Objection throws four kinds of errors:
 
- 1. [`ValidationError`](#validationerror) when an input that could come from the outside world is invalid. These inputs
+1. [`ValidationError`](#validationerror) when an input that could come from the outside world is invalid. These inputs
     include model instances and POJO's, eager expressions object graphs etc. `ValidationError` has a `type` property
     that can be used to distinguish the different error types.
 
-  2. [`NotFoundError`](#notfounderror) when [`throwIfNotFound`](#throwifnotfound) was called for a query and no
-     results were found.
+2. [`NotFoundError`](#notfounderror) when [`throwIfNotFound`](#throwifnotfound) was called for a query and no
+    results were found.
 
-  3. Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the
-     library. You can use the [`objection-db-errors`](https://github.com/Vincit/objection-db-errors) plugin to handle these.
+3. Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the
+    library. You can use the [`objection-db-errors`](https://github.com/Vincit/objection-db-errors) plugin to handle these.
 
-  4. A basic javascript `Error` when a programming or logic error is detected. In these cases there is nothing the users
-     can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
+4. A basic javascript `Error` when a programming or logic error is detected. In these cases there is nothing the users
+    can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
 
 See the example error handler that handles each error type.
 
