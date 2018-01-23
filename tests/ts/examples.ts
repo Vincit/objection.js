@@ -24,15 +24,12 @@ class Person extends objection.Model {
 
   examplePersonMethod = (arg: string) => 1;
 
-  // $relatedQuery can either take a cast, if you don't want to add the field
-  // to your model:
   petsWithId(petId: number): Promise<Animal[]> {
-    return this.$relatedQuery('pets').where('id', petId);
+    return this.$relatedQuery<Animal>('pets').where('id', petId);
   }
 
-  // Or, if you add the field, this.$relatedQuery just works:
-  fetchMom(): Promise<Person> {
-    return this.$relatedQuery('mom');
+  fetchMom(): Promise<Person | undefined> {
+    return this.$relatedQuery<Person>('mom').first();
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -149,13 +146,6 @@ class Movie extends objection.Model {
     }
   });
 }
-
-async () => {
-  // Another example of strongly-typed $relatedQuery without a cast:
-  takesPeople(await new Movie().$relatedQuery('actors'));
-};
-const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
-const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 
 class Animal extends objection.Model {
   species: string;
@@ -538,7 +528,7 @@ Person.query().insert({ firstName: 'Chuck' });
 // (albeit with a cast to Movie):
 
 const relatedQueryResult: Promise<Movie> = new Person()
-  .$relatedQuery('movies')
+  .$relatedQuery<Movie>('movies')
   .insert({ title: 'Total Recall' });
 
 // Verify if is possible transaction class can be shared across models

@@ -477,20 +477,8 @@ declare namespace Objection {
     $query(trxOrKnex?: Transaction | knex): QueryBuilder<this, this>;
 
     /**
-     * If you add model relations as fields, $relatedQuery works
-     * automatically:
-     */
-    $relatedQuery<K extends keyof this>(
-      relationName: K,
-      trxOrKnex?: Transaction | knex
-    ): QueryBuilder<this[K]>;
-
-    // PLEASE NOTE: `$relatedQuery<K extends keyof this>` MUST BE DEFINED
-    // BEFORE `$relatedQuery<RelatedM extends Model>`!
-
-    /**
-     * If you don't want to add the fields to your model, you can cast the
-     * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
+     * $relatedQuery() requires a type parameter specifying the model type.
+     * (e.g. $relatedQuery<Animal>('pets') to yield result type Animal[].)
      */
     $relatedQuery<QM extends Model>(
       relationName: string,
