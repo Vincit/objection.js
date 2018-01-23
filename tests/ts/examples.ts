@@ -154,7 +154,12 @@ class Movie extends objection.Model {
 async () => {
   // Another example of strongly-typed $relatedQuery without a cast:
   takesPeople(await new Movie().$relatedQuery('actors'));
+
+  // If you need to do subsequent changes to $relatedQuery, though, you need
+  // to cast: :\
+  takesMaybePerson(await new Movie().$relatedQuery<Person>("actors").first())
 };
+
 const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
 const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 
