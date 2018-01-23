@@ -1,6 +1,18 @@
-// Type definitions for objection
-// Project: Objection.js <http://vincit.github.io/objection.js/>
-// Definitions by: Matthew McEachen <https://github.com/mceachen> & Drew R. <https://github.com/drew-r>
+// Type definitions for Objection.js
+// Project: <http://vincit.github.io/objection.js/>
+// Contributions by:
+// * Matthew McEachen <https://github.com/mceachen>
+// * Sami Koskimäki <https://github.com/koskimas>
+// * Mikael Lepistö <https://github.com/elhigu>
+// * Joseph T Lapp <https://github.com/jtlapp>
+// * Drew R. <https://github.com/drew-r>
+// * Karl Blomster <https://github.com/kblomster>
+// * And many others: See <https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts>
+
+// PLEASE NOTE, the generic type symbols in this file follow this definition
+//   QM - queried model
+//   RM - candidate result model or model array
+//   RV - actual result value
 
 /// <reference types="node" />
 import * as knex from 'knex';
@@ -86,9 +98,9 @@ declare namespace Objection {
     postProcessResponse(response: any): any;
   }
 
-  export interface Page<T> {
+  export interface Page<QM> {
     total: number;
-    results: T[];
+    results: QM[];
   }
 
   export interface ModelOptions {
@@ -182,8 +194,8 @@ declare namespace Objection {
     relation: Relation;
     modelClass: ModelClass<any> | string;
     join: RelationJoin;
-    modify?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
-    filter?: <T>(queryBuilder: QueryBuilder<T>) => QueryBuilder<T>;
+    modify?: <QM>(queryBuilder: QueryBuilder<QM, QM[]>) => QueryBuilder<QM, QM[]>;
+    filter?: <QM>(queryBuilder: QueryBuilder<QM, QM[]>) => QueryBuilder<QM, QM[]>;
   }
 
   export interface EagerAlgorithm {
@@ -221,16 +233,16 @@ declare namespace Objection {
    */
   type RelationExpression = string;
 
-  interface FilterFunction<T> {
-    (queryBuilder: QueryBuilder<T>): void;
+  interface FilterFunction<QM> {
+    (queryBuilder: QueryBuilder<QM, QM[]>): void;
   }
 
-  interface FilterExpression<T> {
-    [namedFilter: string]: FilterFunction<T>;
+  interface FilterExpression<QM> {
+    [namedFilter: string]: FilterFunction<QM>;
   }
 
-  interface RelationExpressionMethod<T> {
-    (relationExpression: RelationExpression): QueryBuilder<T>;
+  interface RelationExpressionMethod<QM, RM, RV> {
+    (relationExpression: RelationExpression): QueryBuilder<QM, RM, RV>;
   }
 
   interface TraverserFunction {
@@ -254,39 +266,39 @@ declare namespace Objection {
   }
 
   interface JoinRelation {
-    <T>(relationName: string, opt?: RelationOptions): QueryBuilder<T>;
+    <QM>(relationName: string, opt?: RelationOptions): QueryBuilder<QM, QM[]>;
   }
 
   type JsonObjectOrFieldExpression = object | object[] | FieldExpression;
 
-  interface WhereJson<T> {
+  interface WhereJson<QM, RM, RV> {
     (
       fieldExpression: FieldExpression,
       jsonObjectOrFieldExpression: JsonObjectOrFieldExpression
-    ): QueryBuilder<T>;
+    ): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereFieldExpression<T> {
-    (fieldExpression: FieldExpression): QueryBuilder<T>;
+  interface WhereFieldExpression<QM, RM, RV> {
+    (fieldExpression: FieldExpression): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereJsonExpression<T> {
-    (fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder<T>;
+  interface WhereJsonExpression<QM, RM, RV> {
+    (fieldExpression: FieldExpression, keys: string | string[]): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereJsonField<T> {
+  interface WhereJsonField<QM, RM, RV> {
     (
       fieldExpression: FieldExpression,
       operator: string,
       value: boolean | number | string | null
-    ): QueryBuilder<T>;
+    ): QueryBuilder<QM, RM, RV>;
   }
 
-  interface ModifyEager<T1> {
-    <T2>(
+  interface ModifyEager<QM1, RM1, RV1> {
+    <QM2>(
       relationExpression: string | RelationExpression,
-      modifier: (builder: QueryBuilder<T2>) => void
-    ): QueryBuilder<T1>;
+      modifier: (builder: QueryBuilder<QM2, QM2[]>) => void
+    ): QueryBuilder<QM1, RM1, RV1>;
   }
 
   interface BluebirdMapper<T, Result> {
@@ -297,8 +309,8 @@ declare namespace Objection {
     (err: any, result?: any): void;
   }
 
-  interface Filters<T> {
-    [filterName: string]: (queryBuilder: QueryBuilder<T>) => void;
+  interface Filters<QM> {
+    [filterName: string]: (queryBuilder: QueryBuilder<QM, QM[]>) => void;
   }
 
   interface Properties {
@@ -339,9 +351,9 @@ declare namespace Objection {
     ManyToManyRelation: Relation;
     HasOneThroughRelation: Relation;
 
-    query(trxOrKnex?: Transaction | knex): QueryBuilder<M>;
+    query(trxOrKnex?: Transaction | knex): QueryBuilder<M, M[]>;
     // This can only be used as a subquery so the result model type is irrelevant.
-    relatedQuery(relationName: string): QueryBuilder<any>;
+    relatedQuery(relationName: string): QueryBuilder<any, any[]>;
     knex(knex?: knex): knex;
     knexQuery(): knex.QueryBuilder;
 
@@ -405,29 +417,29 @@ declare namespace Objection {
     static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
-    static query<T>(this: Constructor<T>, trxOrKnex?: Transaction | knex): QueryBuilder<T>;
+    static query<QM>(this: Constructor<QM>, trxOrKnex?: Transaction | knex): QueryBuilder<QM, QM[]>;
     // This can only be used as a subquery so the result model type is irrelevant.
-    static relatedQuery(relationName: string): QueryBuilder<any>;
+    static relatedQuery(relationName: string): QueryBuilder<any, any[]>;
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
-    static bindKnex<T>(this: T, knex: knex): T;
-    static bindTransaction<T>(this: T, transaction: Transaction): T;
+    static bindKnex<M>(this: M, knex: knex): M;
+    static bindTransaction<M>(this: M, transaction: Transaction): M;
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
-    static fromJson<T>(this: Constructor<T>, json: Pojo, opt?: ModelOptions): T;
-    static fromDatabaseJson<T>(this: Constructor<T>, row: Pojo): T;
+    static fromJson<M>(this: Constructor<M>, json: Pojo, opt?: ModelOptions): M;
+    static fromDatabaseJson<M>(this: Constructor<M>, row: Pojo): M;
 
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
-    static loadRelated<T>(
-      this: Constructor<T>,
-      models: (T | object)[],
+    static loadRelated<QM>(
+      this: Constructor<QM>,
+      models: (QM | object)[],
       expression: RelationExpression,
-      filters?: Filters<T>,
+      filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
-    ): Promise<T[]>;
+    ): Promise<QM[]>;
 
     static traverse(
       filterConstructor: typeof Model,
@@ -452,13 +464,13 @@ declare namespace Objection {
     $formatJson(json: Pojo): Pojo;
     $setJson(json: Pojo, opt?: ModelOptions): this;
     $setDatabaseJson(json: Pojo): this;
-    $setRelated<M extends Model>(
+    $setRelated<RelatedM extends Model>(
       relation: String | Relation,
-      related: M | M[] | null | undefined
+      related: RelatedM | RelatedM[] | null | undefined
     ): this;
-    $appendRelated<M extends Model>(
+    $appendRelated<RelatedM extends Model>(
       relation: String | Relation,
-      related: M | M[] | null | undefined
+      related: RelatedM | RelatedM[] | null | undefined
     ): this;
 
     $set(obj: Pojo): this;
@@ -469,34 +481,22 @@ declare namespace Objection {
     /**
      * AKA `reload` in ActiveRecord parlance
      */
-    $query(trxOrKnex?: Transaction | knex): QueryBuilderSingle<this>;
+    $query(trxOrKnex?: Transaction | knex): QueryBuilder<this, this>;
 
     /**
-     * If you add model relations as fields, $relatedQuery works
-     * automatically:
+     * $relatedQuery() requires a type parameter specifying the model type.
+     * (e.g. $relatedQuery<Animal>('pets') to yield result type Animal[].)
      */
-    $relatedQuery<K extends keyof this>(
-      relationName: K,
-      trxOrKnex?: Transaction | knex
-    ): QueryBuilderSingle<this[K]>;
-
-    // PLEASE NOTE: `$relatedQuery<K extends keyof this>` MUST BE DEFINED
-    // BEFORE `$relatedQuery<M extends Model>`!
-
-    /**
-     * If you don't want to add the fields to your model, you can cast the
-     * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
-     */
-    $relatedQuery<M extends Model>(
+    $relatedQuery<QM extends Model>(
       relationName: string,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilder<M>;
+    ): QueryBuilder<QM>;
 
-    $loadRelated<T>(
+    $loadRelated<QM>(
       expression: keyof this | RelationExpression,
-      filters?: Filters<T>,
+      filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilderSingle<this>;
+    ): QueryBuilder<this, this>;
 
     $traverse(traverser: TraverserFunction): void;
     $traverse(filterConstructor: this, traverser: TraverserFunction): void;
@@ -513,164 +513,96 @@ declare namespace Objection {
     $afterDelete(queryContext: QueryContext): Promise<any> | void;
   }
 
-  export class QueryBuilder<T> {
+  export class QueryBuilder<QM, RM, RV> {
     static forClass<M extends Model>(modelClass: ModelClass<M>): QueryBuilder<M>;
   }
 
-  export interface ThrowIfNotFound {
+  export interface Executable<RV> extends Promise<RV> {
+    execute(): Promise<RV>;
+  }
+
+  export interface QueryBuilder<QM, RM = QM[], RV = RM>
+    extends QueryBuilderBase<QM, RM, RV>,
+      Executable<RV> {
+    throwIfNotFound(): QueryBuilder<QM, RM>;
+  }
+
+  export interface QueryBuilderYieldingOneOrNone<QM> extends QueryBuilder<QM, QM, QM | undefined> {}
+
+  export interface QueryBuilderYieldingCount<QM, RM = QM[]>
+    extends QueryBuilderBase<QM, RM, number>,
+      Executable<number> {
     throwIfNotFound(): this;
   }
 
-  export interface Executable<T> extends Promise<T> {
-    execute(): Promise<T>;
-  }
-
-  /**
-   * QueryBuilder with one expected result
-   */
-  export interface QueryBuilderSingle<T>
-    extends QueryBuilderBase<T>,
-      ThrowIfNotFound,
-      Executable<T> {
-    runAfter(fn: (result: T, builder: this) => any): this;
-  }
-
-  /**
-   * Query builder for update operations
-   */
-  export interface QueryBuilderUpdate<T>
-    extends QueryBuilderBase<T>,
-      ThrowIfNotFound,
-      Executable<number> {
-    returning(columns: string | string[]): QueryBuilder<T>;
-    runAfter(fn: (result: number, builder: this) => any): this;
-  }
-
-  /**
-   * Query builder for delete operations
-   */
-  export interface QueryBuilderDelete<T>
-    extends QueryBuilderBase<T>,
-      ThrowIfNotFound,
-      Executable<number> {
-    returning(columns: string | string[]): QueryBuilder<T>;
-    runAfter(fn: (result: number, builder: this) => any): this;
-  }
-
-  /**
-   * Query builder for batch insert operations
-   */
-  export interface QueryBuilderInsert<T>
-    extends QueryBuilderBase<T>,
-      ThrowIfNotFound,
-      Executable<T[]> {
-    returning(columns: string | string[]): this;
-    runAfter(fn: (result: T[], builder: this) => any): this;
-  }
-
-  /**
-   * Query builder for single insert operations
-   */
-  export interface QueryBuilderInsertSingle<T>
-    extends QueryBuilderBase<T>,
-      ThrowIfNotFound,
-      Executable<T> {
-    returning(columns: string | string[]): this;
-    runAfter(fn: (result: T, builder: this) => any): this;
-  }
-
-  /**
-   * QueryBuilder with zero or one expected result
-   * (Using the Scala `Option` terminology)
-   */
-  export interface QueryBuilderOption<T> extends QueryBuilderBase<T>, Executable<T | undefined> {
-    throwIfNotFound(): QueryBuilderSingle<T>;
-    runAfter(fn: (result: T | undefined, builder: this) => any): this;
-  }
-
-  /**
-   * QueryBuilder with zero or more expected results
-   */
-  export interface QueryBuilder<T> extends QueryBuilderBase<T>, ThrowIfNotFound, Executable<T[]> {
-    runAfter(fn: (result: T[], builder: this) => any): this;
-  }
-
-  /**
-   * QueryBuilder with a page result.
-   */
-  export interface QueryBuilderPage<T>
-    extends QueryBuilderBase<T>,
-      ThrowIfNotFound,
-      Executable<Page<T>> {}
-
-  interface Insert<T> {
-    (modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
-    (modelOrObject?: Partial<T>): QueryBuilderInsertSingle<T>;
+  interface Insert<QM> {
+    (modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: Partial<QM>): QueryBuilder<QM, QM>;
     (): this;
   }
 
-  interface InsertGraph<T> {
-    (modelsOrObjects?: Partial<T>[], options?: InsertGraphOptions): QueryBuilderInsert<T>;
-    (modelOrObject?: Partial<T>, options?: InsertGraphOptions): QueryBuilderInsertSingle<T>;
+  interface InsertGraph<QM> {
+    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
     (): this;
   }
 
-  interface Upsert<T> {
-    (modelsOrObjects?: Partial<T>[], options?: UpsertOptions): QueryBuilder<T>;
-    (modelOrObject?: Partial<T>, options?: UpsertOptions): QueryBuilderSingle<T>;
+  interface Upsert<QM> {
+    (modelsOrObjects?: Partial<QM>[], options?: UpsertOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: Partial<QM>, options?: UpsertOptions): QueryBuilder<QM, QM>;
   }
 
-  interface InsertGraphAndFetch<T> {
-    (modelsOrObjects?: Partial<T>, options?: InsertGraphOptions): QueryBuilderInsertSingle<T>;
-    (modelsOrObjects?: Partial<T>[], options?: InsertGraphOptions): QueryBuilderInsert<T>;
+  interface InsertGraphAndFetch<QM> {
+    (modelsOrObjects?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
+    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
   }
 
-  interface QueryBuilderBase<T> extends QueryInterface<T> {
+  interface QueryBuilderBase<QM, RM, RV> extends QueryInterface<QM, RM, RV> {
     modify(func: (builder: this) => void): this;
     modify(namedFilter: string): this;
 
-    findById(id: Id): QueryBuilderOption<T>;
+    findById(id: Id): QueryBuilderYieldingOneOrNone<QM>;
     findById(idOrIds: IdOrIds): this;
     findByIds(ids: Id[] | Id[][]): this;
     /** findOne is shorthand for .where(...whereArgs).first() */
-    findOne: FindOne<T>;
+    findOne: FindOne<QM>;
 
-    insert: Insert<T>;
-    insertAndFetch(modelOrObject: Partial<T>): QueryBuilderInsertSingle<T>;
-    insertAndFetch(modelsOrObjects?: Partial<T>[]): QueryBuilderInsert<T>;
+    insert: Insert<QM>;
+    insertAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    insertAndFetch(modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
 
-    insertGraph: InsertGraph<T>;
-    insertGraphAndFetch: InsertGraphAndFetch<T>;
+    insertGraph: InsertGraph<QM>;
+    insertGraphAndFetch: InsertGraphAndFetch<QM>;
 
     /**
      * insertWithRelated is an alias for insertGraph.
      */
-    insertWithRelated: InsertGraph<T>;
-    insertWithRelatedAndFetch: InsertGraphAndFetch<T>;
+    insertWithRelated: InsertGraph<QM>;
+    insertWithRelatedAndFetch: InsertGraphAndFetch<QM>;
 
     /**
      * @return a Promise of the number of updated rows
      */
-    update(modelOrObject: Partial<T>): QueryBuilderUpdate<T>;
-    updateAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
-    updateAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
+    update(modelOrObject: Partial<QM>): QueryBuilderYieldingCount<QM, RM>;
+    updateAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    updateAndFetchById(id: Id, modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
 
     /**
      * @return a Promise of the number of patched rows
      */
-    patch(modelOrObject: Partial<T>): QueryBuilderUpdate<T>;
-    patchAndFetchById(id: Id, modelOrObject: Partial<T>): QueryBuilderSingle<T>;
-    patchAndFetch(modelOrObject: Partial<T>): QueryBuilderSingle<T>;
+    patch(modelOrObject: Partial<QM>): QueryBuilderYieldingCount<QM, RM>;
+    patchAndFetchById(id: Id, modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    patchAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
 
-    upsertGraph: Upsert<T>;
-    upsertGraphAndFetch: Upsert<T>;
+    upsertGraph: Upsert<QM>;
+    upsertGraphAndFetch: Upsert<QM>;
 
     /**
      * @return a Promise of the number of deleted rows
      */
-    deleteById(idOrIds: IdOrIds): QueryBuilderDelete<T>;
+    deleteById(idOrIds: IdOrIds): QueryBuilderYieldingCount<QM, RM>;
 
-    relate<M extends Model>(ids: IdOrIds | Partial<M> | Partial<M>[]): this;
+    relate<RelatedM extends Model>(ids: IdOrIds | Partial<RelatedM> | Partial<RelatedM>[]): this;
     unrelate(): this;
 
     forUpdate(): this;
@@ -695,41 +627,49 @@ declare namespace Objection {
     // The Objection documentation incorrectly states this returns a QueryBuilder.
     columnInfo(column?: string): Promise<knex.ColumnInfo>;
 
-    whereComposite(column: ColumnRef, value: Value | QueryBuilder<any>): this;
-    whereComposite(column: ColumnRef[], value: Value[] | QueryBuilder<any>): this;
-    whereComposite(column: ColumnRef, operator: string, value: Value | QueryBuilder<any>): this;
-    whereComposite(column: ColumnRef[], operator: string, value: Value[] | QueryBuilder<any>): this;
-    whereInComposite(column: ColumnRef, values: Value[] | QueryBuilder<any>): this;
+    whereComposite(column: ColumnRef, value: Value | QueryBuilder<any, any[]>): this;
+    whereComposite(column: ColumnRef[], value: Value[] | QueryBuilder<any, any[]>): this;
+    whereComposite(
+      column: ColumnRef,
+      operator: string,
+      value: Value | QueryBuilder<any, any[]>
+    ): this;
+    whereComposite(
+      column: ColumnRef[],
+      operator: string,
+      value: Value[] | QueryBuilder<any, any[]>
+    ): this;
+    whereInComposite(column: ColumnRef, values: Value[] | QueryBuilder<any, any[]>): this;
 
-    whereJsonSupersetOf: WhereJson<T>;
-    orWhereJsonSupersetOf: WhereJson<T>;
+    whereJsonSupersetOf: WhereJson<QM, RM, RV>;
+    orWhereJsonSupersetOf: WhereJson<QM, RM, RV>;
 
-    whereJsonNotSupersetOf: WhereJson<T>;
-    orWhereJsonNotSupersetOf: WhereJson<T>;
+    whereJsonNotSupersetOf: WhereJson<QM, RM, RV>;
+    orWhereJsonNotSupersetOf: WhereJson<QM, RM, RV>;
 
-    whereJsonSubsetOf: WhereJson<T>;
-    orWhereJsonSubsetOf: WhereJson<T>;
+    whereJsonSubsetOf: WhereJson<QM, RM, RV>;
+    orWhereJsonSubsetOf: WhereJson<QM, RM, RV>;
 
-    whereJsonNotSubsetOf: WhereJson<T>;
-    orWhereJsonNotSubsetOf: WhereJson<T>;
+    whereJsonNotSubsetOf: WhereJson<QM, RM, RV>;
+    orWhereJsonNotSubsetOf: WhereJson<QM, RM, RV>;
 
-    whereJsonIsArray: WhereFieldExpression<T>;
-    orWhereJsonIsArray: WhereFieldExpression<T>;
+    whereJsonIsArray: WhereFieldExpression<QM, RM, RV>;
+    orWhereJsonIsArray: WhereFieldExpression<QM, RM, RV>;
 
-    whereJsonNotArray: WhereFieldExpression<T>;
-    orWhereJsonNotArray: WhereFieldExpression<T>;
+    whereJsonNotArray: WhereFieldExpression<QM, RM, RV>;
+    orWhereJsonNotArray: WhereFieldExpression<QM, RM, RV>;
 
-    whereJsonIsObject: WhereFieldExpression<T>;
-    orWhereJsonIsObject: WhereFieldExpression<T>;
+    whereJsonIsObject: WhereFieldExpression<QM, RM, RV>;
+    orWhereJsonIsObject: WhereFieldExpression<QM, RM, RV>;
 
-    whereJsonNotObject: WhereFieldExpression<T>;
-    orWhereJsonNotObject: WhereFieldExpression<T>;
+    whereJsonNotObject: WhereFieldExpression<QM, RM, RV>;
+    orWhereJsonNotObject: WhereFieldExpression<QM, RM, RV>;
 
-    whereJsonHasAny: WhereJsonExpression<T>;
-    orWhereJsonHasAny: WhereJsonExpression<T>;
+    whereJsonHasAny: WhereJsonExpression<QM, RM, RV>;
+    orWhereJsonHasAny: WhereJsonExpression<QM, RM, RV>;
 
-    whereJsonHasAll: WhereJsonExpression<T>;
-    orWhereJsonHasAll: WhereJsonExpression<T>;
+    whereJsonHasAll: WhereJsonExpression<QM, RM, RV>;
+    orWhereJsonHasAll: WhereJsonExpression<QM, RM, RV>;
 
     // Non-query methods:
 
@@ -751,27 +691,28 @@ declare namespace Objection {
     hasSelects(): boolean;
     hasEager(): boolean;
 
-    runBefore(fn: (result: any, builder: this) => any): this;
+    runBefore(fn: (result: any, builder: QueryBuilder<QM, any>) => any): this;
+    runAfter(fn: (result: any, builder: QueryBuilder<QM, any>) => any): this;
     onBuild(fn: (builder: this) => void): this;
     onError(fn: (error: Error, builder: this) => any): this;
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
 
-    eager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
-    mergeEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+    eager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
+    mergeEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
 
-    joinEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
-    mergeJoinEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+    joinEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
+    mergeJoinEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
 
-    naiveEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
-    mergeNaiveEager(relationExpression: RelationExpression, filters?: FilterExpression<T>): this;
+    naiveEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
+    mergeNaiveEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
 
-    allowEager: RelationExpressionMethod<T>;
-    modifyEager: ModifyEager<T>;
-    filterEager: ModifyEager<T>;
+    allowEager: RelationExpressionMethod<QM, RM, RV>;
+    modifyEager: ModifyEager<QM, RM, RV>;
+    filterEager: ModifyEager<QM, RM, RV>;
 
-    allowInsert: RelationExpressionMethod<T>;
-    allowUpsert: RelationExpressionMethod<T>;
+    allowInsert: RelationExpressionMethod<QM, RM, RV>;
+    allowUpsert: RelationExpressionMethod<QM, RM, RV>;
 
     modelClass(): typeof Model;
 
@@ -789,19 +730,19 @@ declare namespace Objection {
 
     map<V, Result>(mapper: BluebirdMapper<V, Result>): Promise<Result[]>;
     return<V>(returnValue: V): Promise<V>;
-    bind(context: any): Promise<T>;
-    reflect(): Promise<T>;
+    bind(context: any): Promise<QM>;
+    reflect(): Promise<QM>;
 
-    asCallback(callback: NodeStyleCallback): Promise<T>;
+    asCallback(callback: NodeStyleCallback): Promise<QM>;
 
-    nodeify(callback: NodeStyleCallback): Promise<T>;
+    nodeify(callback: NodeStyleCallback): Promise<QM>;
 
     resultSize(): Promise<number>;
 
-    page(page: number, pageSize: number): QueryBuilderPage<T>;
-    range(start: number, end: number): QueryBuilderPage<T>;
+    page(page: number, pageSize: number): QueryBuilder<QM, Page<QM>>;
+    range(start: number, end: number): QueryBuilder<QM, Page<QM>>;
     pluck(propertyName: string): this;
-    first(): QueryBuilderOption<T>;
+    first(): QueryBuilderYieldingOneOrNone<QM>;
 
     alias(alias: string): this;
     tableRefFor(modelClass: ModelClass<any>): string;
@@ -814,6 +755,8 @@ declare namespace Objection {
 
     omit(modelClass: typeof Model, properties: string[]): this;
     omit(properties: string[]): this;
+
+    returning(columns: string | string[]): QueryBuilder<QM, RM>;
   }
 
   export interface transaction<T> {
@@ -911,101 +854,101 @@ declare namespace Objection {
     | Buffer
     | Raw
     | Literal;
-  type ColumnRef = string | Raw | Reference | QueryBuilder<any>;
-  type TableName = string | Raw | Reference | QueryBuilder<any>;
+  type ColumnRef = string | Raw | Reference | QueryBuilder<any, any[]>;
+  type TableName = string | Raw | Reference | QueryBuilder<any, any[]>;
 
-  interface QueryInterface<T> {
-    select: Select<T>;
-    as: As<T>;
-    columns: Select<T>;
-    column: Select<T>;
-    from: Table<T>;
-    into: Table<T>;
-    table: Table<T>;
-    distinct: Distinct<T>;
+  interface QueryInterface<QM, RM, RV> {
+    select: Select<QM, RM, RV>;
+    as: As<QM, RM, RV>;
+    columns: Select<QM, RM, RV>;
+    column: Select<QM, RM, RV>;
+    from: Table<QM, RM, RV>;
+    into: Table<QM, RM, RV>;
+    table: Table<QM, RM, RV>;
+    distinct: Distinct<QM, RM, RV>;
 
     // Joins
-    join: Join<T>;
-    joinRaw: JoinRaw<T>;
-    innerJoin: Join<T>;
-    leftJoin: Join<T>;
-    leftOuterJoin: Join<T>;
-    rightJoin: Join<T>;
-    rightOuterJoin: Join<T>;
-    outerJoin: Join<T>;
-    fullOuterJoin: Join<T>;
-    crossJoin: Join<T>;
+    join: Join<QM, RM, RV>;
+    joinRaw: JoinRaw<QM, RM, RV>;
+    innerJoin: Join<QM, RM, RV>;
+    leftJoin: Join<QM, RM, RV>;
+    leftOuterJoin: Join<QM, RM, RV>;
+    rightJoin: Join<QM, RM, RV>;
+    rightOuterJoin: Join<QM, RM, RV>;
+    outerJoin: Join<QM, RM, RV>;
+    fullOuterJoin: Join<QM, RM, RV>;
+    crossJoin: Join<QM, RM, RV>;
 
     // Withs
-    with: With<T>;
-    withRaw: WithRaw<T>;
-    withWrapped: WithWrapped<T>;
+    with: With<QM, RM, RV>;
+    withRaw: WithRaw<QM, RM, RV>;
+    withWrapped: WithWrapped<QM, RM, RV>;
 
     // Wheres
-    where: Where<T>;
-    andWhere: Where<T>;
-    orWhere: Where<T>;
-    whereNot: Where<T>;
-    andWhereNot: Where<T>;
-    orWhereNot: Where<T>;
-    whereRaw: WhereRaw<T>;
-    orWhereRaw: WhereRaw<T>;
-    andWhereRaw: WhereRaw<T>;
-    whereWrapped: WhereWrapped<T>;
-    havingWrapped: WhereWrapped<T>;
-    whereExists: WhereExists<T>;
-    orWhereExists: WhereExists<T>;
-    whereNotExists: WhereExists<T>;
-    orWhereNotExists: WhereExists<T>;
-    whereIn: WhereIn<T>;
-    orWhereIn: WhereIn<T>;
-    whereNotIn: WhereIn<T>;
-    orWhereNotIn: WhereIn<T>;
-    whereNull: WhereNull<T>;
-    orWhereNull: WhereNull<T>;
-    whereNotNull: WhereNull<T>;
-    orWhereNotNull: WhereNull<T>;
-    whereBetween: WhereBetween<T>;
-    orWhereBetween: WhereBetween<T>;
-    andWhereBetween: WhereBetween<T>;
-    whereNotBetween: WhereBetween<T>;
-    orWhereNotBetween: WhereBetween<T>;
-    andWhereNotBetween: WhereBetween<T>;
+    where: Where<QM, RM, RV>;
+    andWhere: Where<QM, RM, RV>;
+    orWhere: Where<QM, RM, RV>;
+    whereNot: Where<QM, RM, RV>;
+    andWhereNot: Where<QM, RM, RV>;
+    orWhereNot: Where<QM, RM, RV>;
+    whereRaw: WhereRaw<QM, RM, RV>;
+    orWhereRaw: WhereRaw<QM, RM, RV>;
+    andWhereRaw: WhereRaw<QM, RM, RV>;
+    whereWrapped: WhereWrapped<QM, RM, RV>;
+    havingWrapped: WhereWrapped<QM, RM, RV>;
+    whereExists: WhereExists<QM, RM, RV>;
+    orWhereExists: WhereExists<QM, RM, RV>;
+    whereNotExists: WhereExists<QM, RM, RV>;
+    orWhereNotExists: WhereExists<QM, RM, RV>;
+    whereIn: WhereIn<QM, RM, RV>;
+    orWhereIn: WhereIn<QM, RM, RV>;
+    whereNotIn: WhereIn<QM, RM, RV>;
+    orWhereNotIn: WhereIn<QM, RM, RV>;
+    whereNull: WhereNull<QM, RM, RV>;
+    orWhereNull: WhereNull<QM, RM, RV>;
+    whereNotNull: WhereNull<QM, RM, RV>;
+    orWhereNotNull: WhereNull<QM, RM, RV>;
+    whereBetween: WhereBetween<QM, RM, RV>;
+    orWhereBetween: WhereBetween<QM, RM, RV>;
+    andWhereBetween: WhereBetween<QM, RM, RV>;
+    whereNotBetween: WhereBetween<QM, RM, RV>;
+    orWhereNotBetween: WhereBetween<QM, RM, RV>;
+    andWhereNotBetween: WhereBetween<QM, RM, RV>;
 
     // Group by
-    groupBy: GroupBy<T>;
-    groupByRaw: RawMethod<T>;
+    groupBy: GroupBy<QM, RM, RV>;
+    groupByRaw: RawMethod<QM, RM, RV>;
 
     // Order by
-    orderBy: OrderBy<T>;
-    orderByRaw: RawMethod<T>;
+    orderBy: OrderBy<QM, RM, RV>;
+    orderByRaw: RawMethod<QM, RM, RV>;
 
     // Union
-    union: Union<T>;
+    union: Union<QM>;
     unionAll(callback: () => void): this;
 
     // Having
-    having: Where<T>;
-    andHaving: Where<T>;
-    orHaving: Where<T>;
-    havingRaw: WhereRaw<T>;
-    orHavingRaw: WhereRaw<T>;
-    havingIn: WhereIn<T>;
-    orHavingIn: WhereIn<T>;
-    havingNotIn: WhereIn<T>;
-    orHavingNotIn: WhereIn<T>;
-    havingNull: WhereNull<T>;
-    orHavingNull: WhereNull<T>;
-    havingNotNull: WhereNull<T>;
-    orHavingNotNull: WhereNull<T>;
-    havingExists: WhereExists<T>;
-    orHavingExists: WhereExists<T>;
-    havingNotExists: WhereExists<T>;
-    orHavingNotExists: WhereExists<T>;
-    havingBetween: WhereBetween<T>;
-    orHavingBetween: WhereBetween<T>;
-    havingNotBetween: WhereBetween<T>;
-    orHavingNotBetween: WhereBetween<T>;
+    having: Where<QM, RM, RV>;
+    andHaving: Where<QM, RM, RV>;
+    orHaving: Where<QM, RM, RV>;
+    havingRaw: WhereRaw<QM, RM, RV>;
+    orHavingRaw: WhereRaw<QM, RM, RV>;
+    havingIn: WhereIn<QM, RM, RV>;
+    orHavingIn: WhereIn<QM, RM, RV>;
+    havingNotIn: WhereIn<QM, RM, RV>;
+    orHavingNotIn: WhereIn<QM, RM, RV>;
+    havingNull: WhereNull<QM, RM, RV>;
+    orHavingNull: WhereNull<QM, RM, RV>;
+    havingNotNull: WhereNull<QM, RM, RV>;
+    orHavingNotNull: WhereNull<QM, RM, RV>;
+    havingExists: WhereExists<QM, RM, RV>;
+    orHavingExists: WhereExists<QM, RM, RV>;
+    havingNotExists: WhereExists<QM, RM, RV>;
+    orHavingNotExists: WhereExists<QM, RM, RV>;
+    havingBetween: WhereBetween<QM, RM, RV>;
+    orHavingBetween: WhereBetween<QM, RM, RV>;
+    havingNotBetween: WhereBetween<QM, RM, RV>;
+    orHavingNotBetween: WhereBetween<QM, RM, RV>;
 
     // Clear
     clearSelect(): this;
@@ -1030,8 +973,8 @@ declare namespace Objection {
     debug(enabled?: boolean): this;
     pluck(column: string): this;
 
-    del(): QueryBuilderDelete<T>;
-    delete(): QueryBuilderDelete<T>;
+    del(): QueryBuilderYieldingCount<QM, RM>;
+    delete(): QueryBuilderYieldingCount<QM, RM>;
     truncate(): this;
 
     transacting(trx: Transaction): this;
@@ -1040,145 +983,160 @@ declare namespace Objection {
     clone(): this;
   }
 
-  interface As<T> {
-    (alias: string): QueryBuilder<T>;
+  interface As<QM, RM, RV> {
+    (alias: string): QueryBuilder<QM, RM, RV>;
   }
 
-  interface Select<T> extends ColumnNamesMethod<T> {}
+  interface Select<QM, RM, RV> extends ColumnNamesMethod<QM, RM, RV> {}
 
-  interface Table<T> {
-    (tableName: TableName): QueryBuilder<T>;
-    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+  interface Table<QM, RM, RV> {
+    (tableName: TableName): QueryBuilder<QM, RM, RV>;
+    (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
   }
 
-  interface Distinct<T> extends ColumnNamesMethod<T> {}
+  interface Distinct<QM, RM, RV> extends ColumnNamesMethod<QM, RM, RV> {}
 
-  interface Join<T> {
-    (raw: Raw): QueryBuilder<T>;
+  interface Join<QM, RM, RV> {
+    (raw: Raw): QueryBuilder<QM, RM, RV>;
     (
       tableName: TableName,
       clause: (this: knex.JoinClause, join: knex.JoinClause) => void
-    ): QueryBuilder<T>;
+    ): QueryBuilder<QM, RM, RV>;
     (
       tableName: TableName,
       columns: { [key: string]: string | number | Raw | Reference }
-    ): QueryBuilder<T>;
-    (tableName: TableName, raw: Raw): QueryBuilder<T>;
-    (tableName: TableName, column1: ColumnRef, column2: ColumnRef): QueryBuilder<T>;
+    ): QueryBuilder<QM, RM, RV>;
+    (tableName: TableName, raw: Raw): QueryBuilder<QM, RM, RV>;
+    (tableName: TableName, column1: ColumnRef, column2: ColumnRef): QueryBuilder<QM, RM, RV>;
     (tableName: TableName, column1: ColumnRef, operator: string, column2: ColumnRef): QueryBuilder<
-      T
+      QM,
+      RM,
+      RV
     >;
   }
 
-  interface JoinRaw<T> {
-    (sql: string, bindings?: any): QueryBuilder<T>;
+  interface JoinRaw<QM, RM, RV> {
+    (sql: string, bindings?: any): QueryBuilder<QM, RM, RV>;
   }
 
-  interface With<T> extends WithRaw<T>, WithWrapped<T> {}
+  interface With<QM, RM, RV> extends WithRaw<QM, RM, RV>, WithWrapped<QM, RM, RV> {}
 
-  interface WithRaw<T> {
-    (alias: string, raw: Raw): QueryBuilder<T>;
+  interface WithRaw<QM, RM, RV> {
+    (alias: string, raw: Raw): QueryBuilder<QM, RM, RV>;
     join: knex.JoinClause;
-    (alias: string, sql: string, bindings?: any): QueryBuilder<T>;
+    (alias: string, sql: string, bindings?: any): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WithWrapped<T> {
-    (alias: string, callback: (queryBuilder: QueryBuilder<T>) => any): QueryBuilder<T>;
+  interface WithWrapped<QM, RM, RV> {
+    (alias: string, callback: (queryBuilder: QueryBuilder<QM, QM[]>) => any): QueryBuilder<
+      QM,
+      RM,
+      RV
+    >;
   }
 
-  interface Where<T> extends WhereRaw<T> {
-    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
-    (object: object): QueryBuilder<T>;
-    (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilder<T>;
+  interface Where<QM, RM, RV> extends WhereRaw<QM, RM, RV> {
+    (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
+    (object: object): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilder<
+      QM,
+      RM,
+      RV
+    >;
     (
       column: ColumnRef,
       operator: string,
-      value: Value | Reference | QueryBuilder<any>
-    ): QueryBuilder<T>;
+      value: Value | Reference | QueryBuilder<any, any[]>
+    ): QueryBuilder<QM, RM, RV>;
     (
       column: ColumnRef,
-      callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void
-    ): QueryBuilder<T>;
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilder<QM, RM, RV>;
   }
 
-  interface FindOne<T> {
-    (condition: boolean): QueryBuilderOption<T>;
-    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilderOption<T>;
-    (object: object): QueryBuilderOption<T>;
-    (sql: string, ...bindings: any[]): QueryBuilderOption<T>;
-    (sql: string, bindings: any): QueryBuilderOption<T>;
-    (column: ColumnRef, value: Value | Reference | QueryBuilder<any>): QueryBuilderOption<T>;
+  interface FindOne<QM> {
+    (condition: boolean): QueryBuilderYieldingOneOrNone<QM>;
+    (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilderYieldingOneOrNone<QM>;
+    (object: object): QueryBuilderYieldingOneOrNone<QM>;
+    (sql: string, ...bindings: any[]): QueryBuilderYieldingOneOrNone<QM>;
+    (sql: string, bindings: any): QueryBuilderYieldingOneOrNone<QM>;
+    (
+      column: ColumnRef,
+      value: Value | Reference | QueryBuilder<any, any[]>
+    ): QueryBuilderYieldingOneOrNone<QM>;
     (
       column: ColumnRef,
       operator: string,
-      value: Value | Reference | QueryBuilder<any>
-    ): QueryBuilderOption<T>;
+      value: Value | Reference | QueryBuilder<any, any[]>
+    ): QueryBuilderYieldingOneOrNone<QM>;
     (
       column: ColumnRef,
-      callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void
-    ): QueryBuilderOption<T>;
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilderYieldingOneOrNone<QM>;
   }
 
-  interface WhereRaw<T> extends RawMethod<T> {
-    (condition: boolean): QueryBuilder<T>;
+  interface WhereRaw<QM, RM, RV> extends RawMethod<QM, RM, RV> {
+    (condition: boolean): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereWrapped<T> {
-    (callback: (queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
+  interface WhereWrapped<QM, RM, RV> {
+    (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereNull<T> {
-    (column: ColumnRef): QueryBuilder<T>;
+  interface WhereNull<QM, RM, RV> {
+    (column: ColumnRef): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereIn<T> {
-    (column: ColumnRef, values: Value[]): QueryBuilder<T>;
+  interface WhereIn<QM, RM, RV> {
+    (column: ColumnRef, values: Value[]): QueryBuilder<QM, RM, RV>;
     (
       column: ColumnRef,
-      callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void
-    ): QueryBuilder<T>;
-    (column: ColumnRef, query: QueryBuilder<any>): QueryBuilder<T>;
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef, query: QueryBuilder<any, any[]>): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereBetween<T> {
-    (column: ColumnRef, range: [Value, Value]): QueryBuilder<T>;
+  interface WhereBetween<QM, RM, RV> {
+    (column: ColumnRef, range: [Value, Value]): QueryBuilder<QM, RM, RV>;
   }
 
-  interface WhereExists<T> {
-    (callback: (this: QueryBuilder<T>, queryBuilder: QueryBuilder<T>) => void): QueryBuilder<T>;
-    (query: QueryBuilder<any>): QueryBuilder<T>;
-    (raw: Raw): QueryBuilder<T>;
+  interface WhereExists<QM, RM, RV> {
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilder<QM, RM, RV>;
+    (query: QueryBuilder<any, any[]>): QueryBuilder<QM, RM, RV>;
+    (raw: Raw): QueryBuilder<QM, RM, RV>;
   }
 
-  interface GroupBy<T> extends RawMethod<T>, ColumnNamesMethod<T> {}
+  interface GroupBy<QM, RM, RV> extends RawMethod<QM, RM, RV>, ColumnNamesMethod<QM, RM, RV> {}
 
-  interface OrderBy<T> {
-    (column: ColumnRef, direction?: 'ASC' | 'DESC' | 'asc' | 'desc'): QueryBuilder<T>;
+  interface OrderBy<QM, RM, RV> {
+    (column: ColumnRef, direction?: string): QueryBuilder<QM, RM, RV>;
   }
 
-  interface Union<T> {
-    (callback: () => void, wrap?: boolean): QueryBuilder<T>;
-    (callbacks: (() => void)[], wrap?: boolean): QueryBuilder<T>;
-    (...callbacks: (() => void)[]): QueryBuilder<T>;
+  interface Union<QM> {
+    (callback: () => void, wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (callbacks: (() => void)[], wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (...callbacks: (() => void)[]): QueryBuilder<QM, QM[]>;
   }
 
   // commons
 
-  interface ColumnNamesMethod<T> {
-    (...columnNames: ColumnRef[]): QueryBuilder<T>;
-    (columnNames: ColumnRef[]): QueryBuilder<T>;
+  interface ColumnNamesMethod<QM, RM, RV> {
+    (...columnNames: ColumnRef[]): QueryBuilder<QM, RM, RV>;
+    (columnNames: ColumnRef[]): QueryBuilder<QM, RM, RV>;
   }
 
-  interface RawMethod<T> {
-    (sql: string, ...bindings: any[]): QueryBuilder<T>;
-    (sql: string, bindings: any): QueryBuilder<T>;
-    (raw: Raw): QueryBuilder<T>;
+  interface RawMethod<QM, RM, RV> {
+    (sql: string, ...bindings: any[]): QueryBuilder<QM, RM, RV>;
+    (sql: string, bindings: any): QueryBuilder<QM, RM, RV>;
+    (raw: Raw): QueryBuilder<QM, RM, RV>;
   }
 
   interface Transaction extends knex {
     savepoint(transactionScope: (trx: Transaction) => any): Promise<any>;
-    commit<T>(value?: any): Promise<T>;
-    rollback<T>(error?: Error): Promise<T>;
+    commit<QM>(value?: any): Promise<QM>;
+    rollback<QM>(error?: Error): Promise<QM>;
   }
 
   // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
