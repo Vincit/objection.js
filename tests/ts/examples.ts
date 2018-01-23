@@ -128,6 +128,7 @@ async () => {
 class Movie extends objection.Model {
   title: string;
   actors: Person[];
+  director: Person;
 
   /**
    * This static field instructs Objection how to hydrate and persist
@@ -147,6 +148,14 @@ class Movie extends objection.Model {
         to: [ref('Person.id1'), 'Person.id2']
       },
       filter: qb => qb.orderByRaw('coalesce(title, id)')
+    },
+    director: {
+      relation: objection.Model.BelongsToOneRelation,
+      modelClass: Person,
+      join: {
+        from: 'Movie.directorId',
+        to: 'Person.id'
+      }
     }
   };
 }
@@ -154,10 +163,12 @@ class Movie extends objection.Model {
 async () => {
   // Another example of strongly-typed $relatedQuery without a cast:
   takesPeople(await new Movie().$relatedQuery('actors'));
+  takesPerson(await new Movie().$relatedQuery('director'));
 
   // If you need to do subsequent changes to $relatedQuery, though, you need
   // to cast: :\
-  takesMaybePerson(await new Movie().$relatedQuery<Person>("actors").first())
+  takesMaybePerson(await new Movie().$relatedQuery<Person>('actors').first());
+  takesMaybePerson(await new Movie().$relatedQuery<Person, Person>('director').where("age", ">", 32));
 };
 
 const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');

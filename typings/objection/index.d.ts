@@ -485,7 +485,11 @@ declare namespace Objection {
 
     /**
      * If you add fields to your model, you get $relatedQuery typings for
-     * free:
+     * free.
+     *
+     * Note that if you make any chained calls to the QueryBuilder,
+     * though, you should apply a cast, which will make your code use not this
+     * signatue, but the following signature.
      */
     $relatedQuery<K extends keyof this, V extends this[K]>(
       relationName: K,
@@ -496,10 +500,10 @@ declare namespace Objection {
      * If you don't want to add the fields to your model, you can cast the
      * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
      */
-    $relatedQuery<QM extends Model>(
+    $relatedQuery<QM extends Model, RM = QM[]>(
       relationName: keyof this | string,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilder<QM>;
+    ): QueryBuilder<QM, RM>;
 
     $loadRelated<QM>(
       expression: keyof this | RelationExpression,
@@ -1047,11 +1051,10 @@ declare namespace Objection {
   interface Where<QM, RM, RV> extends WhereRaw<QM, RM, RV> {
     (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
     (object: object): QueryBuilder<QM, RM, RV>;
-    (column: keyof QM | ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilder<
-      QM,
-      RM,
-      RV
-    >;
+    (
+      column: keyof QM | ColumnRef,
+      value: Value | Reference | QueryBuilder<any, any[]>
+    ): QueryBuilder<QM, RM, RV>;
     (
       column: keyof QM | ColumnRef,
       operator: string,
