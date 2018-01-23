@@ -706,6 +706,140 @@ select "Tweet".*, (select count(*) from "Like" where "Like"."tweetId" = "Tweet".
 Naturally you can add as many subquery selects as you like. For example you could also get the count of retweets
 in the same query. [`relatedQuery`](#relatedquery) method works with all relations and not just `HasManyRelation`.
 
+## Error handling
+
+> An example error handler function that handles all possible errors. This example uses the [`objection-db-errors`](https://github.com/Vincit/objection-db-errors) library.
+
+```js
+const {
+  ValidationError,
+  NotFoundError
+} = require('objection');
+
+const {
+  DbError,
+  ConstraintViolationError,
+  UniqueViolationError,
+  NotNullViolationError,
+  ForeignKeyViolationError,
+  CheckViolationError,
+  DataError
+} = require('objection-db-errors');
+
+function errorHandler(err, res) {
+  if (err instanceof ValidationError) {
+    switch (err.type) {
+      case ValidationError.Type.ModelValidation:
+        res.status(400).send({
+          message: err.message,
+          type: 'ModelValidation',
+          data: err.data
+        });
+        break;
+      case ValidationError.Type.RelationExpression:
+        res.status(400).send({
+          message: err.message,
+          type: 'InvalidRelationExpression',
+          data: {}
+        });
+        break;
+      case ValidationError.Type.UnallowedRelation:
+        res.status(400).send({
+          message: err.message,
+          type: 'UnallowedRelation',
+          data: {}
+        });
+        break;
+      case ValidationError.Type.InvalidGraph:
+        res.status(400).send({
+          message: err.message,
+          type: 'InvalidGraph',
+          data: {}
+        });
+        break;
+    }
+  } else if (err instanceof NotFoundError) {
+    res.status(404).send({
+      message: err.message,
+      type: 'NotFound',
+      data: {}
+    });
+  } else if (err instanceof UniqueViolationError) {
+    res.status(409).send({
+      message: err.message,
+      type: 'UniqueViolation',
+      data: {
+        columns: err.columns,
+        table: err.table,
+        constraint: err.constraint
+      }
+    });
+  } else if (err instanceof NotNullViolationError) {
+    res.status(400).send({
+      message: err.message,
+      type: 'NotNullViolation',
+      data: {
+        column: err.column,
+        table: err.table,
+      }
+    });
+  } else if (err instanceof ForeignKeyViolationError) {
+    res.status(409).send({
+      message: err.message,
+      type: 'ForeignKeyViolation',
+      data: {
+        table: err.table,
+        constraint: err.constraint
+      }
+    });
+  } else if (err instanceof CheckViolationError) {
+    res.status(400).send({
+      message: err.message,
+      type: 'CheckViolation',
+      data: {
+        table: err.table,
+        constraint: err.constraint
+      }
+    });
+  } else if (err instanceof DataError) {
+    res.status(400).send({
+      message: err.message,
+      type: 'InvalidData',
+      data: {}
+    });
+  } else if (err instanceof DbError) {
+    res.status(500).send({
+      message: err.message,
+      type: 'UnknownDatabaseError',
+      data: {}
+    });
+  } else {
+    res.status(500).send({
+      message: err.message,
+      type: 'UnknownError',
+      data: {}
+    });
+  }
+}
+```
+
+Objection throws four kinds of errors:
+
+ 1. [`ValidationError`](#validationerror) when an input that could come from the outside world is invalid. These inputs
+    include model instances and POJO's, eager expressions object graphs etc. `ValidationError` has a `type` property
+    that can be used to distinguish the different error types.
+
+  2. [`NotFoundError`](#notfounderror) when [`throwIfNotFound`](#throwifnotfound) was called for a query and no
+     results were found.
+
+  3. Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the
+     library. You can use the [`objection-db-errors`](https://github.com/Vincit/objection-db-errors) plugin to handle these.
+
+  4. A basic javascript `Error` when a programming or logic error is detected. In these cases there is nothing the users
+     can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
+
+See the example error handler that handles each error type.
+
 ## Indexing PostgreSQL JSONB columns
 
 Good reading on the subject:
