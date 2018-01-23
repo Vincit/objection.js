@@ -5672,11 +5672,6 @@ Shortcut for `Person.knex().fn`
 
 
 
-#### formatter
-
-Shortcut for `Person.knex().client.formatter()`
-
-
 
 #### knexQuery
 
@@ -6086,6 +6081,70 @@ This method is mainly useful for plugin developers and for other generic usages.
 Type|Description
 ----|-----------------------------
 Object.&lt;string, [`Relation`](#relation)&gt;|Object whose keys are relation names and values are [`Relation`](#relation) instances.
+
+
+
+
+#### columnNameToPropertyName
+
+```js
+const propertyName = Person.columnNameToPropertyName(columnName);
+```
+
+> For example, if you have defined `columnNameMappers = snakeCaseMappers()` for your model:
+
+```js
+const propName = Person.columnNameToPropertyName('foo_bar');
+console.log(propName); // --> 'fooBar'
+```
+
+Runs the property through possible `columnNameMappers` and `$parseDatabaseJson` hooks to apply
+any possible conversion for the column name.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+columnName|string|A column name
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The property name
+
+
+
+
+
+#### propertyNameToColumnName
+
+```js
+const columnName = Person.propertyNameToColumnName(propertyName);
+```
+
+> For example, if you have defined `columnNameMappers = snakeCaseMappers()` for your model:
+
+```js
+const columnName = Person.propertyNameToColumnName('fooBar');
+console.log(columnName); // --> 'foo_bar'
+```
+
+Runs the property through possible `columnNameMappers` and `$formatDatabaseJson` hooks to apply
+any possible conversion for the property name.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+propertyName|string|A property name
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The column name
+
 
 
 

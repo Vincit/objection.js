@@ -6,15 +6,17 @@
 
   * The static [`relatedQuery`](#relatedquery) method.
   * New reflection methods:
-    [`isFind`](http://vincit.github.io/objection.js/#isfind),
-    [`isInsert`](http://vincit.github.io/objection.js/#isinsert),
-    [`isUpdate`](http://vincit.github.io/objection.js/#isupdate),
-    [`isDelete`](http://vincit.github.io/objection.js/#isdelete),
-    [`isRelate`](http://vincit.github.io/objection.js/#isrelate),
-    [`isUnrelate`](http://vincit.github.io/objection.js/#isunrelate),
-    [`hasWheres`](http://vincit.github.io/objection.js/#haswheres),
-    [`hasSelects`](http://vincit.github.io/objection.js/#hasselects),
-    [`hasEager`](http://vincit.github.io/objection.js/#haseager).
+    [`isFind`](#isfind),
+    [`isInsert`](#isinsert),
+    [`isUpdate`](#isupdate),
+    [`isDelete`](#isdelete),
+    [`isRelate`](#isrelate),
+    [`isUnrelate`](#isunrelate),
+    [`hasWheres`](#haswheres),
+    [`hasSelects`](#hasselects),
+    [`hasEager`](#haseager),
+    [`columnNameToPropertyName`](#columnnametopropertyname),
+    [`propertyNameToColumnName`](#propertynametocolumnname).
 
 ### Breaking changes
 
