@@ -240,7 +240,7 @@ const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).f
 
 // QueryBuilder.findById accepts single and array values:
 
-let qb: objection.QueryBuilder<Person, Person[]> = BoundPerson.query().where('name', 'foo');
+let qb: objection.QueryBuilder<Person> = BoundPerson.query().where('name', 'foo');
 
 // QueryBuilder.throwIfNotFound makes an option query return exactly one:
 
@@ -295,7 +295,7 @@ const runBeforePerson: Promise<Person> = qb
   .throwIfNotFound()
   .runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
 const runBeforePersons: Promise<Person[]> = qb.runBefore(
-  async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88
+  async (result: any, builder: objection.QueryBuilder<Person>) => 88
 );
 
 const runAfterPerson: Promise<Person> = qb
@@ -303,7 +303,7 @@ const runAfterPerson: Promise<Person> = qb
   .throwIfNotFound()
   .runAfter(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
 const runAfterPersons: Promise<Person[]> = qb.runAfter(
-  async (result: any, builder: objection.QueryBuilder<Person, Person[]>) => 88
+  async (result: any, builder: objection.QueryBuilder<Person>) => 88
 );
 
 // signature-changing QueryBuilder methods:
