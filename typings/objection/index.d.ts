@@ -9,7 +9,7 @@
 // * Karl Blomster <https://github.com/kblomster>
 // * And many others: See <https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts>
 
-// PLEASE NOTE, the generic type symbols in this file follow this definition
+// PLEASE NOTE, the generic type symbols in this file follow this definition:
 //   QM - queried model
 //   RM - candidate result model or model array
 //   RV - actual result value
@@ -484,8 +484,17 @@ declare namespace Objection {
     $query(trxOrKnex?: Transaction | knex): QueryBuilder<this, this>;
 
     /**
-     * $relatedQuery() requires a type parameter specifying the model type.
-     * (e.g. $relatedQuery<Animal>('pets') to yield result type Animal[].)
+     * If you add fields to your model, you get $relatedQuery typings for
+     * free:
+     */
+    $relatedQuery<K extends keyof this, V extends this[K]>(
+      relationName: K,
+      trxOrKnex?: Transaction | knex
+    ): QueryBuilder<V, V, V>;
+
+    /**
+     * If you don't want to add the fields to your model, you can cast the
+     * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
      */
     $relatedQuery<QM extends Model>(
       relationName: string,

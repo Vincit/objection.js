@@ -19,13 +19,14 @@ class Person extends objection.Model {
   children: Person[];
   pets: Animal[];
   comments: Comment[];
+  movies: Movie[];
 
   static columnNameMappers = objection.snakeCaseMappers();
 
   examplePersonMethod = (arg: string) => 1;
 
   petsWithId(petId: number): Promise<Animal[]> {
-    return this.$relatedQuery<Animal>('pets').where('id', petId);
+    return this.$relatedQuery('pets').where('id', petId);
   }
 
   fetchMom(): Promise<Person | undefined> {
@@ -146,6 +147,13 @@ class Movie extends objection.Model {
     }
   });
 }
+
+async () => {
+  // Another example of strongly-typed $relatedQuery without a cast:
+  takesPeople(await new Movie().$relatedQuery('actors'));
+};
+const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
+const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 
 class Animal extends objection.Model {
   species: string;
