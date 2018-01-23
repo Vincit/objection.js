@@ -497,7 +497,7 @@ declare namespace Objection {
      * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
      */
     $relatedQuery<QM extends Model>(
-      relationName: string,
+      relationName: keyof this | string,
       trxOrKnex?: Transaction | knex
     ): QueryBuilder<QM>;
 
@@ -1047,13 +1047,13 @@ declare namespace Objection {
   interface Where<QM, RM, RV> extends WhereRaw<QM, RM, RV> {
     (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
     (object: object): QueryBuilder<QM, RM, RV>;
-    (column: ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilder<
+    (column: keyof QM | ColumnRef, value: Value | Reference | QueryBuilder<any, any[]>): QueryBuilder<
       QM,
       RM,
       RV
     >;
     (
-      column: ColumnRef,
+      column: keyof QM | ColumnRef,
       operator: string,
       value: Value | Reference | QueryBuilder<any, any[]>
     ): QueryBuilder<QM, RM, RV>;
