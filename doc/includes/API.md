@@ -3000,6 +3000,33 @@ boolean|true if the query defines any eager expressions.
 
 
 
+#### has
+
+```js
+const has = queryBuilder.has(selector);
+```
+
+```js
+console.log(Person.query().range(0, 4).has('range'));
+```
+
+Returns true if the query defines an operation that matches the given selector.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+selector|string&#124;regexp|A name or regular expression to match all defined operations against.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query defines an operation that matches the given selector.
+
+
+
+
 #### runBefore
 
 ```js
