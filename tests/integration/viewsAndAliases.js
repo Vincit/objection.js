@@ -359,7 +359,7 @@ module.exports = session => {
       describe('views', () => {
         before(() => {
           return session.knex.schema.raw(`
-            create view "someView" as (select * from "Model1")
+            create view "someView" as (select "Model1".*, "Model1"."model1Prop1" as "viewProp" from "Model1")
           `);
         });
 
@@ -422,7 +422,85 @@ module.exports = session => {
                 expect(queries[i]).to.match(expectedQuery);
               });
 
-              expect(model).to.eql(fullEagerResult);
+              expect(model).to.eql([
+                {
+                  id: 1,
+                  model1Id: 2,
+                  model1Prop1: 'hello 1',
+                  model1Prop2: null,
+                  viewProp: 'hello 1',
+                  $afterGetCalled: 1,
+
+                  model1Relation1: {
+                    id: 2,
+                    model1Id: 3,
+                    model1Prop1: 'hello 2',
+                    model1Prop2: null,
+                    viewProp: 'hello 2',
+                    $afterGetCalled: 1
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: 1,
+                      model1Id: 1,
+                      model2Prop1: 'hejsan 1',
+                      model2Prop2: null,
+                      $afterGetCalled: 1,
+                      model2Relation1: []
+                    },
+                    {
+                      idCol: 2,
+                      model1Id: 1,
+                      model2Prop1: 'hejsan 2',
+                      model2Prop2: null,
+                      $afterGetCalled: 1,
+
+                      model2Relation1: [
+                        {
+                          id: 5,
+                          model1Id: null,
+                          model1Prop1: 'hello 5',
+                          model1Prop2: null,
+                          viewProp: 'hello 5',
+                          aliasedExtra: 'extra 5',
+                          model1Relation1: null,
+                          model1Relation2: [],
+                          $afterGetCalled: 1
+                        },
+                        {
+                          id: 6,
+                          model1Id: 7,
+                          model1Prop1: 'hello 6',
+                          model1Prop2: null,
+                          viewProp: 'hello 6',
+                          aliasedExtra: 'extra 6',
+                          $afterGetCalled: 1,
+
+                          model1Relation1: {
+                            id: 7,
+                            model1Id: null,
+                            model1Prop1: 'hello 7',
+                            model1Prop2: null,
+                            viewProp: 'hello 7',
+                            $afterGetCalled: 1
+                          },
+
+                          model1Relation2: [
+                            {
+                              idCol: 3,
+                              model1Id: 6,
+                              model2Prop1: 'hejsan 3',
+                              model2Prop2: null,
+                              $afterGetCalled: 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]);
             });
         });
 
@@ -442,10 +520,12 @@ module.exports = session => {
                   "someView"."model1Id" as "model1Id",
                   "someView"."model1Prop1" as "model1Prop1",
                   "someView"."model1Prop2" as "model1Prop2",
+                  "someView"."viewProp" as "viewProp",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
                   "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2",
+                  "model1Relation1"."viewProp" as "model1Relation1:viewProp",
                   "model1Relation2"."id_col" as "model1Relation2:id_col",
                   "model1Relation2"."model1_id" as "model1Relation2:model1_id",
                   "model1Relation2"."model2_prop1" as "model1Relation2:model2_prop1",
@@ -454,11 +534,13 @@ module.exports = session => {
                   "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id",
                   "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1",
                   "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1"."viewProp" as "model1Relation2:model2Relation1:viewProp",
                   "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra",
                   "model1Relation2:model2Relation1:model1Relation1"."id" as "model1Relation2:model2Relation1:model1Relation1:id",
                   "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id",
                   "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1",
                   "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1:model1Relation1"."viewProp" as "model1Relation2:model2Relation1:model1Relation1:viewProp",
                   "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col",
                   "model1Relation2:model2Relation1:model1Relation2"."model1_id" as "model1Relation2:model2Relation1:model1Relation2:model1_id",
                   "model1Relation2:model2Relation1:model1Relation2"."model2_prop1" as "model1Relation2:model2Relation1:model1Relation2:model2_prop1",
@@ -482,7 +564,87 @@ module.exports = session => {
                 `.replace(/\s/g, '')
               );
 
-              expect(model).to.eql(fullEagerResult);
+              // This makes sure, `Model1` and `someView` have different metadata.
+              expect(Object.keys(Model1.$$dbMetadata).sort()).to.eql(['Model1', 'someView']);
+              expect(model).to.eql([
+                {
+                  id: 1,
+                  model1Id: 2,
+                  model1Prop1: 'hello 1',
+                  model1Prop2: null,
+                  viewProp: 'hello 1',
+                  $afterGetCalled: 1,
+
+                  model1Relation1: {
+                    id: 2,
+                    model1Id: 3,
+                    model1Prop1: 'hello 2',
+                    model1Prop2: null,
+                    viewProp: 'hello 2',
+                    $afterGetCalled: 1
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: 1,
+                      model1Id: 1,
+                      model2Prop1: 'hejsan 1',
+                      model2Prop2: null,
+                      $afterGetCalled: 1,
+                      model2Relation1: []
+                    },
+                    {
+                      idCol: 2,
+                      model1Id: 1,
+                      model2Prop1: 'hejsan 2',
+                      model2Prop2: null,
+                      $afterGetCalled: 1,
+
+                      model2Relation1: [
+                        {
+                          id: 5,
+                          model1Id: null,
+                          model1Prop1: 'hello 5',
+                          model1Prop2: null,
+                          viewProp: 'hello 5',
+                          aliasedExtra: 'extra 5',
+                          model1Relation1: null,
+                          model1Relation2: [],
+                          $afterGetCalled: 1
+                        },
+                        {
+                          id: 6,
+                          model1Id: 7,
+                          model1Prop1: 'hello 6',
+                          model1Prop2: null,
+                          viewProp: 'hello 6',
+                          aliasedExtra: 'extra 6',
+                          $afterGetCalled: 1,
+
+                          model1Relation1: {
+                            id: 7,
+                            model1Id: null,
+                            model1Prop1: 'hello 7',
+                            model1Prop2: null,
+                            viewProp: 'hello 7',
+                            $afterGetCalled: 1
+                          },
+
+                          model1Relation2: [
+                            {
+                              idCol: 3,
+                              model1Id: 6,
+                              model2Prop1: 'hejsan 3',
+                              model2Prop2: null,
+                              $afterGetCalled: 1
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]);
             });
         });
 
@@ -504,6 +666,7 @@ module.exports = session => {
                   "someView"."model1Id" as "model1Id",
                   "someView"."model1Prop1" as "model1Prop1",
                   "someView"."model1Prop2" as "model1Prop2",
+                  "someView"."viewProp" as "viewProp",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation2"."id_col" as "model1Relation2:id_col",
                   "model1Relation2"."model1_id" as "model1Relation2:model1_id",
@@ -514,6 +677,7 @@ module.exports = session => {
                   "model1Relation2:model2Relation1:model1Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Relation1:model1Id",
                   "model1Relation2:model2Relation1:model1Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Relation1:model1Prop1",
                   "model1Relation2:model2Relation1:model1Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1:model1Relation1"."viewProp" as "model1Relation2:model2Relation1:model1Relation1:viewProp",
                   "model1Relation2:model2Relation1:model1Relation2"."id_col" as "model1Relation2:model2Relation1:model1Relation2:id_col",
                   "model1Relation2:model2Relation1:model1Relation2"."model1_id" as "model1Relation2:model2Relation1:model1Relation2:model1_id",
                   "model1Relation2:model2Relation1:model1Relation2"."model2_prop1" as "model1Relation2:model2Relation1:model1Relation2:model2_prop1",
