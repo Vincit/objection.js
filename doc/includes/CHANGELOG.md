@@ -15,6 +15,7 @@
     [`hasWheres`](#haswheres),
     [`hasSelects`](#hasselects),
     [`hasEager`](#haseager),
+    [`has`](#has).
     [`columnNameToPropertyName`](#columnnametopropertyname),
     [`propertyNameToColumnName`](#propertynametocolumnname).
 

@@ -881,6 +881,43 @@ describe('QueryBuilder', () => {
     expect(query.hasEager(), false);
   });
 
+  it('has() should match defined query operations', () => {
+    // A bunch of random operators to test against.
+    const operators = [
+      'range',
+      'orderBy',
+      'limit',
+      'where',
+      'andWhere',
+      'whereRaw',
+      'havingWrapped',
+      'rightOuterJoin',
+      'crossJoin',
+      'offset',
+      'union',
+      'count',
+      'avg',
+      'with'
+    ];
+
+    const test = (query, name, expected) => {
+      const regexp = new RegExp(`^${name}$`);
+      chai
+        .expect(query.has(name), `TestModel.query().${name}('arg').has('${name}')`)
+        .to.equal(expected);
+      chai
+        .expect(query.has(regexp), `TestModel.query().${name}('arg').has(${regexp})`)
+        .to.equal(expected);
+    };
+
+    for (let i = 0; i < operators.length; i++) {
+      const query = TestModel.query()[operators[i]]('arg');
+      for (let j = 0; j < operators.length; j++) {
+        test(query, operators[j], i === j);
+      }
+    }
+  });
+
   it('update() should call $beforeUpdate on the model', done => {
     TestModel.prototype.$beforeUpdate = function() {
       this.c = 'beforeUpdate';
