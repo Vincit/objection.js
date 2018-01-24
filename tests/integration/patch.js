@@ -52,6 +52,10 @@ module.exports = session => {
           .where('id', '=', 2)
           .then(numUpdated => {
             expect(numUpdated).to.equal(1);
+            expect(model.$beforeInsertCalled).to.equal(undefined);
+            expect(model.$afterInsertCalled).to.equal(undefined);
+            expect(model.$beforeDeleteCalled).to.equal(undefined);
+            expect(model.$afterDeleteCalled).to.equal(undefined);
             expect(model.$beforeUpdateCalled).to.equal(1);
             expect(model.$beforeUpdateOptions).to.eql({ patch: true });
             expect(model.$afterUpdateCalled).to.equal(1);
@@ -74,6 +78,10 @@ module.exports = session => {
           .where('id_col', '=', 1)
           .then(numUpdated => {
             expect(numUpdated).to.equal(1);
+            expect(model.$beforeInsertCalled).to.equal(undefined);
+            expect(model.$afterInsertCalled).to.equal(undefined);
+            expect(model.$beforeDeleteCalled).to.equal(undefined);
+            expect(model.$afterDeleteCalled).to.equal(undefined);
             expect(model.$beforeUpdateCalled).to.equal(1);
             expect(model.$beforeUpdateOptions).to.eql({ patch: true });
             expect(model.$afterUpdateCalled).to.equal(1);
@@ -306,6 +314,10 @@ module.exports = session => {
         return Model1.query()
           .patchAndFetchById(2, model)
           .then(fetchedModel => {
+            expect(model.$beforeInsertCalled).to.equal(undefined);
+            expect(model.$afterInsertCalled).to.equal(undefined);
+            expect(model.$beforeDeleteCalled).to.equal(undefined);
+            expect(model.$afterDeleteCalled).to.equal(undefined);
             expect(model.$beforeUpdateCalled).to.equal(1);
             expect(model.$beforeUpdateOptions).to.eql({ patch: true });
             expect(model.$afterUpdateCalled).to.equal(1);
@@ -540,6 +552,10 @@ module.exports = session => {
           .$query()
           .patch(patch)
           .then(() => {
+            expect(patch.$beforeInsertCalled).to.equal(undefined);
+            expect(patch.$afterInsertCalled).to.equal(undefined);
+            expect(patch.$beforeDeleteCalled).to.equal(undefined);
+            expect(patch.$afterDeleteCalled).to.equal(undefined);
             expect(patch.$beforeUpdateCalled).to.equal(1);
             expect(patch.$beforeUpdateOptions).to.eql({ patch: true, old: { id: 1 } });
             expect(patch.$afterUpdateCalled).to.equal(1);
@@ -703,6 +719,10 @@ module.exports = session => {
             .then(rows => {
               expect(rows).to.have.length(4);
 
+              expect(model.$beforeInsertCalled).to.equal(undefined);
+              expect(model.$afterInsertCalled).to.equal(undefined);
+              expect(model.$beforeDeleteCalled).to.equal(undefined);
+              expect(model.$afterDeleteCalled).to.equal(undefined);
               expect(model.$beforeUpdateCalled).to.equal(1);
               expect(model.$beforeUpdateOptions).to.eql({ patch: true });
               expect(model.$afterUpdateCalled).to.equal(1);
@@ -801,6 +821,10 @@ module.exports = session => {
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
 
+              expect(model.$beforeInsertCalled).to.equal(undefined);
+              expect(model.$afterInsertCalled).to.equal(undefined);
+              expect(model.$beforeDeleteCalled).to.equal(undefined);
+              expect(model.$afterDeleteCalled).to.equal(undefined);
               expect(model.$beforeUpdateCalled).to.equal(1);
               expect(model.$beforeUpdateOptions).to.eql({ patch: true });
               expect(model.$afterUpdateCalled).to.equal(1);
@@ -979,6 +1003,10 @@ module.exports = session => {
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
 
+              expect(model.$beforeInsertCalled).to.equal(undefined);
+              expect(model.$afterInsertCalled).to.equal(undefined);
+              expect(model.$beforeDeleteCalled).to.equal(undefined);
+              expect(model.$afterDeleteCalled).to.equal(undefined);
               expect(model.$beforeUpdateCalled).to.equal(1);
               expect(model.$beforeUpdateOptions).to.eql({ patch: true });
               expect(model.$afterUpdateCalled).to.equal(1);
