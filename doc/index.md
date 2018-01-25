@@ -419,7 +419,7 @@ class Person extends Model {
 }
 ```
 
-Models are created by inheriting from the [`Model`](#model) class. A `Model` subclass reprents a database table
+Models are created by inheriting from the [`Model`](#model) class. A `Model` subclass represents a database table
 and instances of that class represent table rows. A `Model` class can define [relationships](#relations) (aka. relations, associations)
 to other models using the static [`relationMappings`](#relationmappings) property.
 

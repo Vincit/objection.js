@@ -565,7 +565,7 @@ module.exports = session => {
               );
 
               // This makes sure, `Model1` and `someView` have different metadata.
-              expect(Object.keys(Model1.$$dbMetadata).sort()).to.eql(['Model1', 'someView']);
+              expect(Array.from(Model1.$$dbMetadata.keys()).sort()).to.eql(['Model1', 'someView']);
               expect(model).to.eql([
                 {
                   id: 1,
