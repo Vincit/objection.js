@@ -1,36 +1,61 @@
-// tslint:disable:no-unused-variable
+import * as ajv from 'ajv';
 import * as knex from 'knex';
+
 import * as objection from '../../typings/objection';
+import { RelationMappings } from '../../typings/objection';
 
 const { lit, raw, ref } = objection;
 
 // This file exercises the Objection.js typings.
 
-// These calls are WHOLLY NONSENSICAL and are for TypeScript testing only.
+// These calls are WHOLLY NONSENSICAL and are for TypeScript testing only. If
+// you're new to Objection, and want to see how to use TypeScript, please look
+// at the code in ../examples/express-ts.
 
-// This "test" passes if the TypeScript compiler is satisfied.
+// These "tests" pass if the TypeScript compiler is satisfied.
 
 class CustomValidationError extends Error {}
+
+class CustomValidator extends objection.Validator {
+  beforeValidate(args: objection.ValidatorArgs): void {
+    if (!args.options.skipValidation) {
+      args.ctx.whatever = 'anything';
+      args.ctx.foo = args.json.required;
+      const id = args.model.$id;
+    }
+  }
+
+  validate(args: objection.ValidatorArgs): objection.Pojo {
+    if (args.options.patch) {
+      args.json.required = [];
+    }
+    return args.json;
+  }
+
+  afterValidate(args: objection.ValidatorArgs): void {
+    args.json.required = args.ctx.foo;
+  }
+}
 
 class Person extends objection.Model {
   firstName: string;
   lastName: string;
   mom: Person;
+  children: Person[];
+  pets: Animal[];
   comments: Comment[];
+  movies: Movie[];
 
   static columnNameMappers = objection.snakeCaseMappers();
 
   examplePersonMethod = (arg: string) => 1;
 
-  // $relatedQuery can either take a cast, if you don't want to add the field
-  // to your model:
   petsWithId(petId: number): Promise<Animal[]> {
-    return this.$relatedQuery<Animal>('pets').where('id', petId);
+    return this.$relatedQuery('pets').where('id', petId);
   }
 
-  // Or, if you add the field, this.$relatedQuery just works:
-  fetchMom(): Promise<Person> {
-    return this.$relatedQuery('mom');
+  fetchMom(): Promise<Person | undefined> {
+    return this.$relatedQuery<Person>('mom').first();
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -47,6 +72,17 @@ class Person extends objection.Model {
     // Test that any property can be accessed and set.
     json.foo = json.bar;
     return json;
+  }
+
+  static createValidator() {
+    return new objection.AjvValidator({
+      onCreateAjv(ajvalidator: ajv.Ajv) {
+        // modify ajvalidator
+      },
+      options: {
+        allErrors: false
+      }
+    });
   }
 
   static createValidationError(args: objection.CreateValidationErrorArgs) {
@@ -126,13 +162,14 @@ async () => {
 class Movie extends objection.Model {
   title: string;
   actors: Person[];
+  director: Person;
 
   /**
    * This static field instructs Objection how to hydrate and persist
    * relations. By making relationMappings a thunk, we avoid require loops
    * caused by other class references.
    */
-  static relationMappings = () => ({
+  static relationMappings: RelationMappings = {
     actors: {
       relation: objection.Model.ManyToManyRelation,
       modelClass: Person,
@@ -143,15 +180,35 @@ class Movie extends objection.Model {
           to: ref('Actors.personId').castInt()
         },
         to: [ref('Person.id1'), 'Person.id2']
+      },
+      filter: qb => qb.orderByRaw('coalesce(title, id)')
+    },
+    director: {
+      relation: objection.Model.BelongsToOneRelation,
+      modelClass: Person,
+      join: {
+        from: 'Movie.directorId',
+        to: 'Person.id'
       }
     }
-  });
+  };
 }
 
 async () => {
   // Another example of strongly-typed $relatedQuery without a cast:
   takesPeople(await new Movie().$relatedQuery('actors'));
+  takesPerson(await new Movie().$relatedQuery('director'));
+
+  // If you need to do subsequent changes to $relatedQuery, though, you need
+  // to cast: :\
+  takesMaybePerson(await new Movie().$relatedQuery<Person>('actors').first());
+  takesMaybePerson(
+    await new Movie().$relatedQuery<Person, Person>('director').where('age', '>', 32)
+  );
 };
+
+const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
+const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 
 class Animal extends objection.Model {
   species: string;
@@ -284,9 +341,23 @@ qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 qb = qb.alias('someAlias');
 
-// query builder hooks
-qb = qb.runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => {});
-qb = qb.runAfter(async (result: Person[], builder: objection.QueryBuilder<Person>) => {});
+// Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
+
+const runBeforePerson: Promise<Person> = qb
+  .first()
+  .throwIfNotFound()
+  .runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+const runBeforePersons: Promise<Person[]> = qb.runBefore(
+  async (result: any, builder: objection.QueryBuilder<Person>) => 88
+);
+
+const runAfterPerson: Promise<Person> = qb
+  .first()
+  .throwIfNotFound()
+  .runAfter(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+const runAfterPersons: Promise<Person[]> = qb.runAfter(
+  async (result: any, builder: objection.QueryBuilder<Person>) => 88
+);
 
 // signature-changing QueryBuilder methods:
 
@@ -354,6 +425,15 @@ const rowsPage: Promise<{
 }> = Person.query().page(1, 10);
 
 const rowsRange: Promise<objection.Page<Person>> = Person.query().range(1, 10);
+
+const rowsPageRunAfter: Promise<objection.Page<Person>> = Person.query()
+  .page(1, 10)
+  .runAfter(
+    async (
+      result: objection.Page<Person>,
+      builder: objection.QueryBuilder<Person, objection.Page<Person>>
+    ) => {}
+  );
 
 // `retuning` should change the return value from number to T[]
 const rowsUpdateReturning: Promise<Person[]> = Person.query()
@@ -583,6 +663,132 @@ Person.query()
 Person.query().where(ref('Model.jsonColumn:details'), '=', lit({ name: 'Jennifer', age: 29 }));
 Person.query().where('age', '>', lit(10));
 Person.query().where('firstName', lit('Jennifer').castText());
+
+// Preserving result type after result type changing methods.
+
+qb = Person.query();
+
+const findByIdSelect: Promise<Person | undefined> = qb.findById(32).select('firstName');
+const findByIdSelectThrow: Promise<Person> = qb
+  .findById(32)
+  .select('firstName')
+  .throwIfNotFound();
+const findByIdJoin: Promise<Person | undefined> = qb
+  .findById(32)
+  .join('tablename', 'column1', '=', 'column2');
+const findByIdJoinThrow: Promise<Person> = qb
+  .findById(32)
+  .join('tablename', 'column1', '=', 'column2')
+  .throwIfNotFound();
+const findByIdJoinRaw: Promise<Person | undefined> = qb.findById(32).joinRaw('raw sql');
+const findByIdJoinRawThrow: Promise<Person> = qb
+  .findById(32)
+  .joinRaw('raw sql')
+  .throwIfNotFound();
+const findOneWhere: Promise<Person | undefined> = qb
+  .findOne({ firstName: 'Mo' })
+  .where('lastName', 'like', 'Mac%');
+const findOneWhereThrow: Promise<Person> = qb
+  .findOne({ firstName: 'Mo' })
+  .where('lastName', 'like', 'Mac%')
+  .throwIfNotFound();
+const findOneSelect: Promise<Person | undefined> = qb
+  .findOne({ firstName: 'Mo' })
+  .select('firstName');
+const findOneSelectThrow: Promise<Person> = qb
+  .findOne({ firstName: 'Mo' })
+  .select('firstName')
+  .throwIfNotFound();
+const findOneWhereIn: Promise<Person | undefined> = qb
+  .findOne({ firstName: 'Mo' })
+  .whereIn('status', ['active', 'pending']);
+const findOneWhereInThrow: Promise<Person> = qb
+  .findOne({ firstName: 'Mo' })
+  .whereIn('status', ['active', 'pending'])
+  .throwIfNotFound();
+const findOneWhereJson: Promise<Person | undefined> = qb
+  .findOne({ firstName: 'Mo' })
+  .whereJsonSupersetOf('x:y', 'abc');
+const findOneWhereJsonThrow: Promise<Person> = qb
+  .findOne({ firstName: 'Mo' })
+  .whereJsonSupersetOf('x:y', 'abc')
+  .throwIfNotFound();
+const findOneWhereJsonIsArray: Promise<Person | undefined> = qb
+  .findOne({ firstName: 'Mo' })
+  .whereJsonIsArray('x:y');
+const findOneWhereJsonIsArrayThrow: Promise<Person> = qb
+  .findOne({ firstName: 'Mo' })
+  .whereJsonIsArray('x:y')
+  .throwIfNotFound();
+const patchWhere: Promise<number> = qb.patch({ firstName: 'Mo' }).where('id', 32);
+const patchWhereIn: Promise<number> = qb.patch({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
+const patchWhereJson: Promise<number> = qb
+  .patch({ firstName: 'Mo' })
+  .whereJsonSupersetOf('x:y', 'abc');
+const patchWhereJsonIsArray: Promise<number> = qb
+  .patch({ firstName: 'Mo' })
+  .whereJsonIsArray('x:y');
+const patchThrow: Promise<number> = qb.patch({ firstName: 'Mo' }).throwIfNotFound();
+const updateWhere: Promise<number> = qb.update({ firstName: 'Mo' }).where('id', 32);
+const updateWhereIn: Promise<number> = qb.update({ firstName: 'Mo' }).whereIn('id', [1, 2, 3]);
+const updateWhereJson: Promise<number> = qb
+  .update({ firstName: 'Mo' })
+  .whereJsonSupersetOf('x:y', 'abc');
+const updateWhereJsonIsArray: Promise<number> = qb
+  .update({ firstName: 'Mo' })
+  .whereJsonIsArray('x:y');
+const updateThrow: Promise<number> = qb.update({ firstName: 'Mo' }).throwIfNotFound();
+const deleteWhere: Promise<number> = qb.delete().where('lastName', 'like', 'Mac%');
+const deleteWhereIn: Promise<number> = qb.delete().whereIn('id', [1, 2, 3]);
+const deleteThrow: Promise<number> = qb.delete().throwIfNotFound();
+const deleteByIDThrow: Promise<number> = qb.deleteById(32).throwIfNotFound();
+
+// The location of `first` doesn't matter.
+
+const whereFirst: Promise<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
+const firstWhere: Promise<Person | undefined> = qb.first().where({ firstName: 'Mo' });
+
+// Returning restores the result to Model or Model[].
+
+const whereInsertRet: Promise<Person> = qb
+  .where({ lastName: 'MacMoo' })
+  .insert({ firstName: 'Mo' })
+  .returning('dbGeneratedColumn');
+const whereMultiInsertRet: Promise<Person[]> = qb
+  .where({ lastName: 'MacMoo' })
+  .insert([{ firstName: 'Mo' }, { firstName: 'Bob' }])
+  .returning('dbGeneratedColumn');
+const whereUpdateRet: Promise<Person[]> = qb
+  .where({ lastName: 'MacMoo' })
+  .update({ firstName: 'Bob' })
+  .returning('dbGeneratedColumn');
+const wherePatchRet: Promise<Person[]> = qb
+  .where({ lastName: 'MacMoo' })
+  .patch({ firstName: 'Mo' })
+  .returning('age');
+const whereDelRetFirstWhere: Promise<Person | undefined> = qb
+  .delete()
+  .returning('lastName')
+  .first()
+  .where({ firstName: 'Mo' });
+
+// Verify that Model.query() and model.$query() return the same type of query builder.
+// Confirming this prevent us from having to duplicate the tests for each.
+
+async function checkQueryEquivalence() {
+  // Confirm that every $query() type is a query() type
+
+  let staticQB = Person.query()
+    .first()
+    .throwIfNotFound();
+  const person = await staticQB;
+  staticQB = person.$query();
+
+  // Confirm that every query() type is a $query() type
+
+  let instanceQB = person.$query();
+  instanceQB = staticQB;
+}
 
 // .query, .$query, and .$relatedQuery can take a Knex instance to support
 // multitenancy
