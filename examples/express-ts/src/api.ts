@@ -1,6 +1,7 @@
 import { transaction } from 'objection';
 import * as express from 'express';
 import Person from './models/Person';
+import Animal from './models/Animal';
 import Movie from './models/Movie';
 
 export default (router: express.Router) => {
@@ -81,11 +82,18 @@ export default (router: express.Router) => {
     res.send(persons);
   });
 
+  // Get a single person.
+  router.get('/persons/:id', async (req, res) => {
+    const person = await Person.query().findById(req.params.id);
+
+    res.send(person);
+  });
+
   // Delete a person.
   router.delete('/persons/:id', async (req, res) => {
-    await Person.query().deleteById(req.params.id);
+    const count = await Person.query().deleteById(req.params.id);
 
-    res.send({});
+    res.send({ dropped: count === 1 });
   });
 
   // Add a child for a Person.
@@ -109,7 +117,7 @@ export default (router: express.Router) => {
       throw createStatusCodeError(404);
     }
 
-    const pet = await person.$relatedQuery('pets').insert(req.body);
+    const pet = await person.$relatedQuery<Animal>('pets').insert(req.body);
 
     res.send(pet);
   });
@@ -127,7 +135,7 @@ export default (router: express.Router) => {
     // we call the `skipUndefined` method. It causes the query builder methods
     // to do nothing if one of the values is undefined.
     const pets = await person
-      .$relatedQuery('pets')
+      .$relatedQuery<Animal>('pets')
       .skipUndefined()
       .where('name', 'like', req.query.name)
       .where('species', req.query.species);
@@ -146,10 +154,30 @@ export default (router: express.Router) => {
         throw createStatusCodeError(404);
       }
 
-      return person.$relatedQuery('movies', trx).insert(req.body);
+      return person.$relatedQuery<Movie>('movies', trx).insert(req.body);
     });
 
     res.send(movie);
+  });
+
+  // Get a person's movies.
+  router.get('/persons/:id/movies', async (req, res) => {
+    const person = await Person.query().findById(req.params.id);
+
+    if (!person) {
+      throw createStatusCodeError(404);
+    }
+
+    const movies = await person.$relatedQuery<Movie>('movies');
+
+    res.send(movies);
+  });
+
+  // Get a single pet.
+  router.get('/pets/:id', async (req, res) => {
+    const pet = await Animal.query().findById(req.params.id);
+
+    res.send(pet);
   });
 
   // Add existing Person as an actor to a movie.
@@ -160,7 +188,7 @@ export default (router: express.Router) => {
       throw createStatusCodeError(404);
     }
 
-    await movie.$relatedQuery('actors').relate(req.body.id);
+    await movie.$relatedQuery<Person>('actors').relate(req.body.id);
 
     res.send(req.body);
   });
@@ -173,9 +201,16 @@ export default (router: express.Router) => {
       throw createStatusCodeError(404);
     }
 
-    const actors = await movie.$relatedQuery('actors');
+    const actors = await movie.$relatedQuery<Person>('actors');
 
     res.send(actors);
+  });
+
+  // Get a single movie.
+  router.get('/movies/:id', async (req, res) => {
+    const movie = await Movie.query().findById(req.params.id);
+
+    res.send(movie);
   });
 };
 

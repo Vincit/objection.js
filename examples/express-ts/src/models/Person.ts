@@ -20,10 +20,10 @@ export default class Person extends Model {
   updatedAt: Date;
 
   // Optional eager relations.
-  parent?: Person;
-  children?: Person[];
-  pets?: Animal[];
-  movies?: Movie[];
+  parent?: Partial<Person>;
+  children?: Partial<Person>[];
+  pets?: Partial<Animal>[];
+  movies?: Partial<Movie>[];
 
   // Table name is the only required property.
   static tableName = 'Person';
