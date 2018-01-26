@@ -5,24 +5,22 @@
 ```js
 const { raw } = require('objection');
 
-Person
+const childAgeSums = await Person
   .query()
   .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
   .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
-  .orderBy(raw('random()'))
-  .then(childAgeSums => {
-    console.log(childAgeSums[0].childAgeSum);
-  });
+  .orderBy(raw('random()'));
+
+console.log(childAgeSums[0].childAgeSum);
 ```
 
 ```js
-Person
+const childAgeSums = await Person
   .query()
   .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
-  .groupBy('parentId')
-  .then(childAgeSums => {
-    console.log(childAgeSums[0].childAgeSum);
-  });
+  .groupBy('parentId');
+
+console.log(childAgeSums[0].childAgeSum);
 ```
 
 To mix raw SQL with queries, use the [`raw`](#raw) function from the main module
@@ -39,7 +37,7 @@ There are also some helper methods such as [`whereRaw`](#whereraw) in the [`Quer
 ```js
 import { ref } from 'objection';
 
-Person
+await Person
   .query()
   .select([
     'id',
@@ -53,7 +51,7 @@ Person
 > Individual json fields can be updated like this:
 
 ```js
-Person
+await Person
   .query()
   .patch({
     'jsonColumn:details.name': 'Jennifer',
@@ -264,14 +262,13 @@ from the client that also uses camel case.
 ## Paging
 
 ```js
-Person
+const result = await Person
   .query()
   .where('age', '>', 20)
-  .page(5, 100)
-  .then(result => {
-    console.log(result.results.length); // --> 100
-    console.log(result.total); // --> 3341
-  });
+  .page(5, 100);
+
+console.log(result.results.length); // --> 100
+console.log(result.total); // --> 3341
 ```
 
 Any query can be paged using the [`page`](#page) or [`range`](#range) method.
@@ -281,25 +278,23 @@ Any query can be paged using the [`page`](#page) or [`range`](#range) method.
 > You can use functions:
 
 ```js
-Person
+const peopleOlderThanAverage = await Person
   .query()
   .where('age', '>', builder => {
     builder.avg('age').from('Person');
-  })
-  .then(peopleOlderThanAverage => {
-    console.log(peopleOlderThanAverage);
   });
+
+console.log(peopleOlderThanAverage);
 ```
 
 > Or `QueryBuilder`s:
 
 ```js
-Person
+const peopleOlderThanAverage = await Person
   .query()
-  .where('age', '>', Person.query().avg('age'))
-  .then(peopleOlderThanAverage => {
-    console.log(peopleOlderThanAverage);
-  });
+  .where('age', '>', Person.query().avg('age'));
+
+console.log(peopleOlderThanAverage);
 ```
 
 Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
@@ -311,25 +306,23 @@ you would expect. You can also pass [`QueryBuilder`](#querybuilder) instances or
 > Normal knex-style join:
 
 ```js
-Person
+const people = await Person
   .query()
   .select('Person.*', 'Parent.firstName as parentName')
-  .join('Person as Parent', 'Person.parentId', 'Parent.id')
-  .then(people => {
-    console.log(people[0].parentName);
-  });
+  .join('Person as Parent', 'Person.parentId', 'Parent.id');
+
+console.log(people[0].parentName);
 ```
 
 > [`joinRelation`](#joinrelation) helper for joining relation graphs:
 
 ```js
-Person
+const people = await Person
   .query()
   .select('parent:parent.name as grandParentName')
-  .joinRelation('parent.parent')
-  .then(people => {
-    console.log(people[0].grandParentName);
-  });
+  .joinRelation('parent.parent');
+
+console.log(people[0].grandParentName);
 ```
 
 Again, [do as you would with a knex query builder](http://knexjs.org/#Builder-join). Objection also has helpers like
@@ -340,76 +333,66 @@ the [`joinRelation`](#joinrelation) method family.
 > Insert and return a Model instance in 1 query:
 
 ```js
-Person
+const jennifer = await Person
   .query()
   .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
-  .returning('*')
-  .then(jennifer => {
-    console.log(jennifer.createdAt); // NOW()-ish
-    console.log(jennifer.id); // Sequence ID
-  });
+  .returning('*');
 
+console.log(jennifer.createdAt); // NOW()-ish
+console.log(jennifer.id); // Sequence ID
 ```
 
 > Update a single row by ID and return the updated Model instance in 1 query:
 
 ```js
-Person
+const jennifer = await Person
   .query()
   .patch({firstName: 'Jenn', lastName: 'Lawrence'})
   .where('id', 1234)
   .first() // Ensures we're returned a single row in the promise resolution
-  .returning('*')
-  .then(jennifer => {
-    console.log(jennifer.updatedAt); // NOW()-ish
-    console.log(jennifer.firstName); // "Jenn"
-  });
+  .returning('*');
 
+console.log(jennifer.updatedAt); // NOW()-ish
+console.log(jennifer.firstName); // "Jenn"
 ```
 
 > Patch a Model instance and receive DB updates to Model instance in 1 query:
 
 ```js
-jennifer
+const updateJennifer = await jennifer
   .$query()
   .patch({firstName: 'J.', lastName: 'Lawrence'})
   .first() // Ensures we're returned a single row in the promise resolution
-  .returning('*')
-  .then(jennifer => {
-    console.log(jennifer.updatedAt); // NOW()-ish
-    console.log(jennifer.firstName); // "J."
-  });
+  .returning('*');
 
+console.log(updateJennifer.updatedAt); // NOW()-ish
+console.log(updateJennifer.firstName); // "J."
 ```
 
 > Delete all Persons named Jennifer and return the deleted rows as Model instances in 1 query:
 
 ```js
-Person
+const deletedJennifers = await Person
   .query()
   .delete()
   .where({firstName: 'Jenn'})
-  .returning('*')
-  .then(deletedJennifers => {
-    console.log(deletedJennifers.length); // However many Jennifers there were
-    console.log(deletedJennifers[0].lastName); // Maybe "Lawrence"
-  });
+  .returning('*');
 
+console.log(deletedJennifers.length); // However many Jennifers there were
+console.log(deletedJennifers[0].lastName); // Maybe "Lawrence"
 ```
 
 > Delete all of Jennifer's dogs and return the deleted Model instances in 1 query:
 
 ```js
-jennifer
+const jennsDeletedDogs = await jennifer
   .$relatedQuery('pets')
   .delete()
   .where({'species': 'dog'})
-  .returning('*')
-  .then(jennsDeletedDogs => {
-    console.log(jennsDeletedDogs.length); // However many dogs Jennifer had
-    console.log(jennsDeletedDogs[0].name); // Maybe "Fido"
-  });
+  .returning('*');
 
+console.log(jennsDeletedDogs.length); // However many dogs Jennifer had
+console.log(jennsDeletedDogs[0].name); // Maybe "Fido"
 ```
 
 Because PostgreSQL (and some others) support `returning('*')` chaining, you can actually `insert` a row, or
@@ -511,9 +494,7 @@ class Person extends Model {
 > Now you can do this:
 
 ```js
-Person.query().upsert(person).then(() => {
-  ...
-});
+await Person.query().upsert(person);
 ```
 
 You can extend the [`QueryBuilder`](#querybuilder) returned by [`Model.query()`](#query), [`modelInstance.$relatedQuery()`](#_s_relatedquery)
@@ -547,11 +528,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/people', (req, res) => {
-  req.models.Person
+app.get('/people', async (req, res) => {
+  const people = await req.models.Person
     .query()
-    .findById(req.params.id)
-    .then(people => res.send(people));
+    .findById(req.params.id);
+
+  res.send(people);
 });
 ```
 
@@ -571,11 +553,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/people', (req, res) => {
-  Person
+app.get('/people', async (req, res) => {
+  const people = await Person
     .query(req.knex)
-    .findById(req.params.id)
-    .then(people => res.send(people));
+    .findById(req.params.id);
+
+  res.send(people)
 });
 ```
 
@@ -588,7 +571,7 @@ object is a query builder just like the normal knex instance). This gives you a 
 ## SQL clause precedence and parentheses
 
 ```js
-Person
+await Person
   .query()
   .where('id', 1)
   .where(builder => {

@@ -1,5 +1,3 @@
-'use strict';
-
 const _ = require('lodash');
 const Knex = require('knex');
 const morgan = require('morgan');
