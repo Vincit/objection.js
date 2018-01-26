@@ -43,7 +43,7 @@
   <span class="p">});</span>
 </code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
   <span class="p">.</span><span class="nx">groupBy</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">childAgeSums</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
@@ -655,6 +655,169 @@ class.</p>
 <li><a href="#_s_id"><code class="prettyprint">$id</code></a></li>
 <li><a href="#_s_values"><code class="prettyprint">$values</code></a></li>
 </ul>
+
+<h2 id="getting-count-of-relations">Getting count of relations</h2>
+
+<p>Let&rsquo;s say you have a <code class="prettyprint">Tweet</code> model and a <code class="prettyprint">Like</code> model. <code class="prettyprint">Tweet</code> has a <code class="prettyprint">HasManyRelation</code> named <code class="prettyprint">likers</code> to <code class="prettyprint">Like</code> table.
+Now let&rsquo;s assume you&rsquo;d like to fetch a list of <code class="prettyprint">Tweet</code>s and get the number of likes for each of them without fetching
+the actual <code class="prettyprint">Like</code> rows. This cannot be easily achieved using <code class="prettyprint">eager</code> because of the way the queries are optimized
+(you can read more <a href="#eager">here</a>). You can leverage SQL&rsquo;s subqueries and the <a href="#relatedquery"><code class="prettyprint">relatedQuery</code></a> helper:</p>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">tweets</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Tweet</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span>
+    <span class="s1">'Tweet.*'</span><span class="p">,</span>
+    <span class="nx">Tweet</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'likers'</span><span class="p">).</span><span class="nx">count</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'numberOfLikes'</span><span class="p">)</span>
+  <span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tweets</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="nx">numberOfLikes</span><span class="p">);</span>
+</code></pre>
+<p>The generated SQL is something like this:</p>
+<pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"Tweet"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span> <span class="p">(</span><span class="k">select</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">from</span> <span class="nv">"Like"</span> <span class="k">where</span> <span class="nv">"Like"</span><span class="p">.</span><span class="nv">"tweetId"</span> <span class="o">=</span> <span class="nv">"Tweet"</span><span class="p">.</span><span class="nv">"id"</span><span class="p">)</span> <span class="k">as</span> <span class="nv">"numberOfLikes"</span> <span class="k">from</span> <span class="nv">"Tweet"</span>
+</code></pre>
+<p>Naturally you can add as many subquery selects as you like. For example you could also get the count of retweets
+in the same query. <a href="#relatedquery"><code class="prettyprint">relatedQuery</code></a> method works with all relations and not just <code class="prettyprint">HasManyRelation</code>.</p>
+
+<h2 id="error-handling">Error handling</h2>
+
+<blockquote>
+<p>An example error handler function that handles all possible errors. This example uses the <a href="https://github.com/Vincit/objection-db-errors"><code class="prettyprint">objection-db-errors</code></a> library. Note that you should never send the errors directly to
+the client as they may contains SQL and other information that reveals too much about the inner workings of your
+app.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span>
+  <span class="nx">ValidationError</span><span class="p">,</span>
+  <span class="nx">NotFoundError</span>
+<span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="p">{</span>
+  <span class="nx">DbError</span><span class="p">,</span>
+  <span class="nx">ConstraintViolationError</span><span class="p">,</span>
+  <span class="nx">UniqueViolationError</span><span class="p">,</span>
+  <span class="nx">NotNullViolationError</span><span class="p">,</span>
+  <span class="nx">ForeignKeyViolationError</span><span class="p">,</span>
+  <span class="nx">CheckViolationError</span><span class="p">,</span>
+  <span class="nx">DataError</span>
+<span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection-db-errors'</span><span class="p">);</span>
+
+<span class="c1">// In this example `res` is an express response object.</span>
+<span class="kd">function</span> <span class="nx">errorHandler</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">ValidationError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="s1">'ModelValidation'</span><span class="p">:</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+          <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'ModelValidation'</span><span class="p">,</span>
+          <span class="na">data</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">data</span>
+        <span class="p">});</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="s1">'RelationExpression'</span><span class="p">:</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+          <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'InvalidRelationExpression'</span><span class="p">,</span>
+          <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">});</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="s1">'UnallowedRelation'</span><span class="p">:</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+          <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'UnallowedRelation'</span><span class="p">,</span>
+          <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">});</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="k">case</span> <span class="s1">'InvalidGraph'</span><span class="p">:</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+          <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'InvalidGraph'</span><span class="p">,</span>
+          <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">});</span>
+        <span class="k">break</span><span class="p">;</span>
+      <span class="nl">default</span><span class="p">:</span>
+        <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+          <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+          <span class="na">type</span><span class="p">:</span> <span class="s1">'UnknownValidationError'</span><span class="p">,</span>
+          <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+        <span class="p">});</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">NotFoundError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">404</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'NotFound'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">UniqueViolationError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">409</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'UniqueViolation'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">columns</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">columns</span><span class="p">,</span>
+        <span class="na">table</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">table</span><span class="p">,</span>
+        <span class="na">constraint</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">constraint</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">NotNullViolationError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'NotNullViolation'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">column</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">column</span><span class="p">,</span>
+        <span class="na">table</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">table</span><span class="p">,</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">ForeignKeyViolationError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">409</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'ForeignKeyViolation'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">table</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">table</span><span class="p">,</span>
+        <span class="na">constraint</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">constraint</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">CheckViolationError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'CheckViolation'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">table</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">table</span><span class="p">,</span>
+        <span class="na">constraint</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">constraint</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">DataError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'InvalidData'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">DbError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'UnknownDatabaseError'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
+      <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+      <span class="na">type</span><span class="p">:</span> <span class="s1">'UnknownError'</span><span class="p">,</span>
+      <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Objection throws four kinds of errors:</p>
+
+<ol>
+<li><p><a href="#validationerror"><code class="prettyprint">ValidationError</code></a> when an input that could come from the outside world is invalid. These inputs
+include model instances and POJOs, eager expressions object graphs etc. <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> has
+a <code class="prettyprint">type</code> property that can be used to distinguish between the different error types.</p></li>
+<li><p><a href="#notfounderror"><code class="prettyprint">NotFoundError</code></a> when <a href="#throwifnotfound"><code class="prettyprint">throwIfNotFound</code></a> was called for a query and no
+results were found.</p></li>
+<li><p>Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the
+library. You can use the <a href="https://github.com/Vincit/objection-db-errors"><code class="prettyprint">objection-db-errors</code></a> plugin to handle these.</p></li>
+<li><p>A basic javascript <code class="prettyprint">Error</code> when a programming or logic error is detected. In these cases there is nothing the users
+can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.</p></li>
+</ol>
+
+<p>See the example error handler that handles each error type.</p>
 
 <h2 id="indexing-postgresql-jsonb-columns">Indexing PostgreSQL JSONB columns</h2>
 
