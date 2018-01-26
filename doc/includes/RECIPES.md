@@ -708,7 +708,9 @@ in the same query. [`relatedQuery`](#relatedquery) method works with all relatio
 
 ## Error handling
 
-> An example error handler function that handles all possible errors. This example uses the [`objection-db-errors`](https://github.com/Vincit/objection-db-errors) library.
+> An example error handler function that handles all possible errors. This example uses the [`objection-db-errors`](https://github.com/Vincit/objection-db-errors) library. Note that you should never send the errors directly to
+the client as they may contains SQL and other information that reveals too much about the inner workings of your
+app.
 
 ```js
 const {
@@ -726,6 +728,7 @@ const {
   DataError
 } = require('objection-db-errors');
 
+// In this example `res` is an express response object.
 function errorHandler(err, res) {
   if (err instanceof ValidationError) {
     switch (err.type) {
@@ -833,8 +836,8 @@ function errorHandler(err, res) {
 Objection throws four kinds of errors:
 
 1. [`ValidationError`](#validationerror) when an input that could come from the outside world is invalid. These inputs
-    include model instances and POJO's, eager expressions object graphs etc. `ValidationError` has a `type` property
-    that can be used to distinguish the different error types.
+    include model instances and POJOs, eager expressions object graphs etc. [`ValidationError`](#validationerror) has
+    a `type` property that can be used to distinguish between the different error types.
 
 2. [`NotFoundError`](#notfounderror) when [`throwIfNotFound`](#throwifnotfound) was called for a query and no
     results were found.

@@ -28,6 +28,9 @@ registerApi(router);
 
 // Error handling. The `ValidationError` instances thrown by objection.js have a `statusCode`
 // property that is sent as the status code of the response.
+//
+// NOTE: This is not a good error handler, this is the simplest one. See the error handing
+//       recipe for a better handler: http://vincit.github.io/objection.js/#error-handling
 app.use((err, req, res, next) => {
   if (err) {
     res.status(err.statusCode || err.status || 500).send(err.data || err.message || {});

@@ -166,7 +166,9 @@ declare namespace Objection {
   export interface CreateValidationErrorArgs {
     message?: string;
     data?: ErrorHash | any;
-    type: ValidationErrorType;
+    // This can be any string for custom errors. ValidationErrorType is there
+    // only to document the default values objection uses internally.
+    type: ValidationErrorType | string;
   }
 
   export interface RelationMappings {

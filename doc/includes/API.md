@@ -5975,13 +5975,15 @@ class Model {
 ```
 
 Creates an error thrown when validation fails for a model. You can override this
-to throw any error you want.
+to throw any error you want. The errors created by this function don't have to
+implement any interface or have the same properties as `ValidationError`. Objection
+only throws errors created by this function an never catches them.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-`Error`|The created error. [`objection.ValidationError`](#validationerror) by default.
+`Error`|The created error. [`ValidationError`](#validationerror) by default.
 
 
 
@@ -7829,15 +7831,18 @@ throw new ValidationError({type, message, data});
 
 > If `type` is anything else but `"ModelValidation"`, `data` can be any object that describes the error.
 
-Error of this class is thrown by default if a model validation fails.
+Error of this class is thrown by default if validation of any input fails. By input we mean any data that can come
+from the outside world, like model instances (or POJOs), relation expressions object graphs etc.
 
 You can replace this error by overriding [`Model.createValidationError()`](#createvalidationerror) method.
+
+See the [error handling recipe](#error-handling) for more info.
 
 Property|Type|Description
 --------|----|-----------
 statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
-type|string|One of "ModelValidation", "RelationExpression", "UnallowedRelation" and "InvalidGraph"a
-data|object|Dictionary of errors.
+type|string|One of "ModelValidation", "RelationExpression", "UnallowedRelation" and "InvalidGraph". This can be any string for your own custom errors. The listed values are used internally by objection.
+data|object|Any additional data. The content of this property is documented in the example in this section for "ModelValidation" errors.
 
 
 
@@ -7862,6 +7867,8 @@ throw new NotFoundError(data);
 Error of this class is thrown by default by [`throwIfNotFound()`](#throwifnotfound)
 
 You can replace this error by overriding [`Model.createNotFoundError()`](#createnotfounderror) method.
+
+See the [error handling recipe](#error-handling) for more info.
 
 
 
