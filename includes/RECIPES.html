@@ -33,21 +33,19 @@
 <h2 id="raw-queries">Raw queries</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 
-<span class="nx">Person</span>
+<span class="kr">const</span> <span class="nx">childAgeSums</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s2">`?? || ' ' || ??`</span><span class="p">,</span> <span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">),</span> <span class="s1">'Arnold Schwarzenegger'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random()'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">childAgeSums</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
-  <span class="p">});</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random()'</span><span class="p">));</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">childAgeSums</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
-  <span class="p">.</span><span class="nx">groupBy</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">childAgeSums</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">groupBy</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
 </code></pre>
 <p>To mix raw SQL with queries, use the <a href="#raw"><code class="prettyprint">raw</code></a> function from the main module
 or the <code class="prettyprint">raw</code> method of any <a href="#model"><code class="prettyprint">Model</code></a> subclass. The only difference between
@@ -61,7 +59,7 @@ And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
 <h2 id="json-queries">JSON queries</h2>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">ref</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
 
-<span class="nx">Person</span>
+<span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
     <span class="s1">'id'</span><span class="p">,</span>
@@ -74,7 +72,7 @@ And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
 <blockquote>
 <p>Individual json fields can be updated like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patch</span><span class="p">({</span>
     <span class="s1">'jsonColumn:details.name'</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
@@ -273,14 +271,13 @@ from the client that also uses camel case.</p></li>
 </ol>
 
 <h2 id="paging">Paging</h2>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">page</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 100</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">page</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 100</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
 </code></pre>
 <p>Any query can be paged using the <a href="#page"><code class="prettyprint">page</code></a> or <a href="#range"><code class="prettyprint">range</code></a> method.</p>
 
@@ -289,24 +286,22 @@ from the client that also uses camel case.</p></li>
 <blockquote>
 <p>You can use functions:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">peopleOlderThanAverage</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">);</span>
-  <span class="p">})</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
   <span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>Or <code class="prettyprint">QueryBuilder</code>s:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">peopleOlderThanAverage</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">));</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
 </code></pre>
 <p>Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building
 methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places
@@ -317,24 +312,22 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 <blockquote>
 <p>Normal knex-style join:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentName'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p><a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> helper for joining relation graphs:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'parent:parent.name as grandParentName'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'parent.parent'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">grandParentName</span><span class="p">);</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'parent.parent'</span><span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">grandParentName</span><span class="p">);</span>
 </code></pre>
 <p>Again, <a href="http://knexjs.org/#Builder-join">do as you would with a knex query builder</a>. Objection also has helpers like
 the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> method family.</p>
@@ -344,72 +337,62 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 <blockquote>
 <p>Insert and return a Model instance in 1 query:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jennifer</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span> <span class="c1">// Sequence ID</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">createdAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span> <span class="c1">// Sequence ID</span>
 </code></pre>
 <blockquote>
 <p>Update a single row by ID and return the updated Model instance in 1 query:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jennifer</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
 </code></pre>
 <blockquote>
 <p>Patch a Model instance and receive DB updates to Model instance in 1 query:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">jennifer</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">updateJennifer</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennifer</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "J."</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">updateJennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">updateJennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "J."</span>
 </code></pre>
 <blockquote>
 <p>Delete all Persons named Jennifer and return the deleted rows as Model instances in 1 query:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">deletedJennifers</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="k">delete</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">deletedJennifers</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many Jennifers there were</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// Maybe "Lawrence"</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many Jennifers there were</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// Maybe "Lawrence"</span>
 </code></pre>
 <blockquote>
 <p>Delete all of Jennifer&rsquo;s dogs and return the deleted Model instances in 1 query:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">jennifer</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jennsDeletedDogs</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
   <span class="p">.</span><span class="k">delete</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="s1">'species'</span><span class="p">:</span> <span class="s1">'dog'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many dogs Jennifer had</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span> <span class="c1">// Maybe "Fido"</span>
-  <span class="p">});</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many dogs Jennifer had</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennsDeletedDogs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span> <span class="c1">// Maybe "Fido"</span>
 </code></pre>
 <p>Because PostgreSQL (and some others) support <code class="prettyprint">returning(&#39;*&#39;)</code> chaining, you can actually <code class="prettyprint">insert</code> a row, or
 <code class="prettyprint">update</code> / <code class="prettyprint">patch</code> / <code class="prettyprint">delete</code> (an) existing row(s), <strong>and</strong> receive the affected row(s) as Model instances in a single query, thus improving efficiency. See the examples for more clarity.</p>
@@ -502,9 +485,7 @@ your models, you can simply create common base class that implements these metho
 <blockquote>
 <p>Now you can do this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">upsert</span><span class="p">(</span><span class="nx">person</span><span class="p">).</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="p">...</span>
-<span class="p">});</span>
+<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">upsert</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
 </code></pre>
 <p>You can extend the <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> returned by <a href="#query"><code class="prettyprint">Model.query()</code></a>, <a href="#_s_relatedquery"><code class="prettyprint">modelInstance.$relatedQuery()</code></a>
 and <a href="#_s_query"><code class="prettyprint">modelInstance.$query()</code></a> methods by setting the model class&rsquo;s static <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>.</p>
@@ -535,11 +516,12 @@ are (at least) two patterns for dealing with this kind of setup:</p>
   <span class="nx">next</span><span class="p">();</span>
 <span class="p">});</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/people'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">req</span><span class="p">.</span><span class="nx">models</span><span class="p">.</span><span class="nx">Person</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/people'</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">req</span><span class="p">.</span><span class="nx">models</span><span class="p">.</span><span class="nx">Person</span>
     <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">people</span><span class="p">));</span>
+    <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+
+  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">people</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
 <p>If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to
@@ -556,11 +538,12 @@ knex connection. That way the database connection doesn&rsquo;t change for the o
   <span class="nx">next</span><span class="p">();</span>
 <span class="p">});</span>
 
-<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/people'</span><span class="p">,</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-  <span class="nx">Person</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/people'</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
     <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">knex</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">people</span> <span class="o">=&gt;</span> <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">people</span><span class="p">));</span>
+    <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+
+  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">people</span><span class="p">)</span>
 <span class="p">});</span>
 </code></pre>
 <p>Another option is to add the knex instance to the request using a middleware and not bind models at all (not even using <code class="prettyprint">Model.knex()</code>).
@@ -570,7 +553,7 @@ in a knex instance. A great thing about this is that you can pass a transaction 
 object is a query builder just like the normal knex instance). This gives you a fine grained control over your transactions.</p>
 
 <h2 id="sql-clause-precedence-and-parentheses">SQL clause precedence and parentheses</h2>
-<pre class="highlight javascript"><code><span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
