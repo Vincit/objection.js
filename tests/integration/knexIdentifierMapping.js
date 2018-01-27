@@ -2,11 +2,11 @@ const Knex = require('knex');
 const Model = require('../../').Model;
 const sortBy = require('lodash/sortBy');
 const Promise = require('bluebird');
-const knexSnakeCaseMappers = require('../../').knexSnakeCaseMappers;
+const knexIdentifierMapping = require('../../').knexIdentifierMapping;
 const expect = require('chai').expect;
 
 module.exports = session => {
-  describe('knexSnakeCaseMappers', () => {
+  describe('knexIdentifierMapping', () => {
     let knex;
 
     class Person extends Model {
@@ -91,7 +91,22 @@ module.exports = session => {
     });
 
     before(() => {
-      const config = Object.assign({}, session.opt.knexConfig, knexSnakeCaseMappers());
+      const config = Object.assign(
+        {},
+        session.opt.knexConfig,
+        knexIdentifierMapping({
+          person_movie: 'personMovie',
+          first_name: 'fName',
+          parent_id: 'parentId',
+          owner_id: 'ownerId',
+          movie_name: 'movieName',
+          person_id: 'personId',
+          movie_id: 'movieId',
+          snake_case_test_table: 'snakeCaseTestTable',
+          animal_name: 'animalName'
+        })
+      );
+
       knex = Knex(config);
     });
 
@@ -114,16 +129,16 @@ module.exports = session => {
         return knex.schema
           .createTable(table, table => {
             table.increments('id');
-            table.string('firstName');
+            table.string('fName');
           })
           .then(() => {
-            return knex(table).insert({ id: 1, firstName: 'fooBar' });
+            return knex(table).insert({ id: 1, fName: 'fooBar' });
           })
           .then(() => {
             return knex(table);
           })
           .then(rows => {
-            expect(rows).to.eql([{ id: 1, firstName: 'fooBar' }]);
+            expect(rows).to.eql([{ id: 1, fName: 'fooBar' }]);
 
             // Query with a knex without case mapping.
             return session.knex('snake_case_test_table');
@@ -162,13 +177,13 @@ module.exports = session => {
     describe('queries', () => {
       beforeEach(() => {
         return Person.query(knex).insertGraph({
-          firstName: 'Seppo',
+          fName: 'Seppo',
 
           parent: {
-            firstName: 'Teppo',
+            fName: 'Teppo',
 
             parent: {
-              firstName: 'Matti'
+              fName: 'Matti'
             }
           },
 
@@ -200,7 +215,7 @@ module.exports = session => {
 
       it('$relatedQuery', () => {
         return Person.query(knex)
-          .findOne({ firstName: 'Seppo' })
+          .findOne({ fName: 'Seppo' })
           .then(model => {
             return model.$relatedQuery('pets', knex).orderBy('animalName');
           })
@@ -220,12 +235,12 @@ module.exports = session => {
         eagerAlgo => {
           it(`eager (${eagerAlgo.name})`, () => {
             return Person.query(knex)
-              .select('person.firstName as rootFirstName')
-              .modifyEager('parent', qb => qb.select('firstName as parentFirstName'))
-              .modifyEager('parent.parent', qb => qb.select('firstName as grandParentFirstName'))
+              .select('person.fName as rootFirstName')
+              .modifyEager('parent', qb => qb.select('fName as parentFirstName'))
+              .modifyEager('parent.parent', qb => qb.select('fName as grandParentFirstName'))
               .eager('[parent.parent, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
-              .orderBy('person.firstName')
+              .orderBy('person.fName')
               .then(people => {
                 expect(people.length).to.equal(3);
                 expect(people).to.containSubset([

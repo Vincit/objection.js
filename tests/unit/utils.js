@@ -3,10 +3,10 @@ const expect = require('expect.js');
 const utils = require('../../lib/utils/classUtils');
 const compose = require('../../lib/utils/mixin').compose;
 const mixin = require('../../lib/utils/mixin').mixin;
-const snakeCase = require('../../lib/utils/snakeCase').snakeCase;
-const camelCase = require('../../lib/utils/snakeCase').camelCase;
-const snakeCaseKeys = require('../../lib/utils/snakeCase').snakeCaseKeys;
-const camelCaseKeys = require('../../lib/utils/snakeCase').camelCaseKeys;
+const snakeCase = require('../../lib/utils/identifierMapping').snakeCase;
+const camelCase = require('../../lib/utils/identifierMapping').camelCase;
+const snakeCaseKeys = require('../../lib/utils/identifierMapping').snakeCaseKeys;
+const camelCaseKeys = require('../../lib/utils/identifierMapping').camelCaseKeys;
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
