@@ -1078,6 +1078,54 @@ module.exports = session => {
           });
       });
 
+      it('select should work with alias', () => {
+        return Model1.query()
+          .select('Model1.id as theId', 'Model1.model1Prop1 as leProp')
+          .where('Model1.id', 1)
+          .where('model1Relation2.id_col', 2)
+          .where('model1Relation2:model2Relation1.id', 6)
+          .eager('[model1Relation1, model1Relation2.model2Relation1]')
+          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+          .then(models => {
+            expect(models).to.eql([
+              {
+                theId: 1,
+                leProp: 'hello 1',
+                $afterGetCalled: 1,
+
+                model1Relation1: {
+                  id: 2,
+                  model1Id: 3,
+                  model1Prop1: 'hello 2',
+                  model1Prop2: null,
+                  $afterGetCalled: 1
+                },
+
+                model1Relation2: [
+                  {
+                    idCol: 2,
+                    model1Id: 1,
+                    model2Prop1: 'hejsan 2',
+                    model2Prop2: null,
+                    $afterGetCalled: 1,
+
+                    model2Relation1: [
+                      {
+                        id: 6,
+                        model1Id: 7,
+                        model1Prop1: 'hello 6',
+                        model1Prop2: null,
+                        aliasedExtra: 'extra 6',
+                        $afterGetCalled: 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]);
+          });
+      });
+
       it('should be able to change the join type', () => {
         return Model1.query()
           .select('Model1.id', 'Model1.model1Prop1')
