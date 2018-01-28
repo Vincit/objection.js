@@ -211,9 +211,15 @@ declare namespace Objection {
   }
 
   export interface UpsertOptions {
-    relate?: boolean;
-    unrelate?: boolean;
-    insertMissing?: boolean;
+    relate?: boolean | string[];
+    unrelate?: boolean | string[];
+    insertMissing?: boolean | string[];
+    update?: boolean;
+    noInsert?: boolean | string[];
+    noUpdate?: boolean | string[];
+    noDelete?: boolean | string[];
+    noRelate?: boolean | string[];
+    noUnrelate?: boolean | string[];
   }
 
   export interface InsertGraphOptions {
