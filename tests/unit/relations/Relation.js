@@ -494,4 +494,14 @@ describe('Relation', () => {
     expect(relation.relatedProp.cols).to.eql(['owner_id']);
     expect(relation.relatedProp.props).to.eql(['owner_id']);
   });
+
+  it('should correctly resolve join alias for relation with schema', () => {
+    let relation = new Relation('testRelation', OwnerModel);
+    const stuff = relation.relatedTableAlias({
+      tableRefFor: function() {
+        return 'schema.table';
+      }
+    });
+    expect(stuff).to.eql('schema_table_rel_testRelation');
+  });
 });
