@@ -13,6 +13,7 @@
     "test-typings": "tsc",
     "coveralls": "cat ./testCoverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "perf": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf",
+    "perf-prof": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --prof",
     "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt",
     "prettier": "prettier --write \"{examples,lib,tests,typings}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\""
