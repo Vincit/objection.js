@@ -3,6 +3,8 @@ const Promise = require('bluebird');
 const Model = require('../../').Model;
 
 module.exports = session => {
+  // TODO igor PR test
+
   if (session.isPostgres()) {
     describe('table names with postgres schema', () => {
       class Person extends Model {

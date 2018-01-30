@@ -166,7 +166,7 @@ module.exports = session => {
                     'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
 
                     'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
-                    'delete from "Model1" where "Model1"."id" in (5) and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
+                    'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
 
                     'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
                     'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
@@ -174,7 +174,7 @@ module.exports = session => {
 
                     'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
                     'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
-                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = \'4\' and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)'
+                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)'
                   ]);
               }
 
@@ -607,14 +607,14 @@ module.exports = session => {
 
                     'update "Model1" set "model1Id" = NULL where "Model1"."id" = 2',
                     'update "model2" set "model1_id" = NULL where "model2"."id_col" in (2) and "model2"."model1_id" = 2',
-                    'delete from "Model1Model2" where "Model1Model2"."model2Id" = 1 and "Model1Model2"."model1Id" in (select "Model1"."id" from "Model1" where "Model1"."id" in (5) order by "Model1"."id" asc)',
+                    'delete from "Model1Model2" where "Model1Model2"."model1Id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc) and "Model1Model2"."model2Id" = 1',
 
                     'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
                     'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
                     'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
 
                     'update "Model1" set "model1Prop1" = \'updated root 2\', "model1Id" = NULL where "Model1"."id" = 2',
-                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" = 4 and "Model1"."id" in (select "Model1Model2"."model1Id" from "Model1Model2" where "Model1Model2"."model2Id" = 1)',
+                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = 4 order by "Model1"."id" asc)',
                     'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)'
                   ]);
               }

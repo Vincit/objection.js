@@ -18,6 +18,7 @@
     [`has`](#has).
     [`columnNameToPropertyName`](#columnnametopropertyname),
     [`propertyNameToColumnName`](#propertynametocolumnname).
+  * `ManyToMany` extras now work consistently in queries and filters. [#760](https://github.com/Vincit/objection.js/issues/760)
 
 ### Breaking changes
 
@@ -40,6 +41,10 @@
 
   * Removed deprecated methods `whereRef`, `whereJsonField` and `whereJsonEquals`. The [`ref`](#ref) helper can be used to replace the
     `whereRef` calls. [`ref`](#ref) and [`lit`](#lit) can be used to replace the removed json methods.
+
+  * `ManyToMany` extras now work consistently in queries and filters. [#760](https://github.com/Vincit/objection.js/issues/760). This is not
+    a breaking change per se, but can cause some queries to fail with a "ambiguous identifier" error because the join table is now joined
+    in places where it recently wasn't. You need to explicitly specify the table for those failing columns using `Table.theColumn` syntax.
 
 ### Changes
 

@@ -981,7 +981,7 @@ module.exports = session => {
               model
                 .$relatedQuery('model2Relation1')
                 .unrelate()
-                .where('id', 4)
+                .where('Model1.id', 4)
                 // withSchema uses the context to share the schema between all queries.
                 .withSchema('public')
                 .context({
@@ -994,7 +994,7 @@ module.exports = session => {
                 .then(() => {
                   expect(mockKnex.executedQueries).to.eql(queries);
                   expect(mockKnex.executedQueries).to.eql([
-                    'delete from "public"."Model1Model2" where "Model1Model2"."model2Id" = 1 and "Model1Model2"."model1Id" in (select "Model1"."id" from "public"."Model1" where "id" = 4)'
+                    `delete from \"public\".\"Model1Model2\" where \"Model1Model2\".\"model1Id\" in (select \"Model1\".\"id\" from \"public\".\"Model1\" inner join \"public\".\"Model1Model2\" on \"Model1\".\"id\" = \"Model1Model2\".\"model1Id\" where \"Model1Model2\".\"model2Id\" in (1) and \"Model1\".\"id\" = 4) and \"Model1Model2\".\"model2Id\" = 1`
                   ]);
 
                   return session.knex('Model1Model2');
