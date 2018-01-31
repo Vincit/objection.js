@@ -70,23 +70,27 @@ module.exports = session => {
       Person.knex(knex);
     });
 
-    before(() => {
-      return Person.query().insertGraph({
-        id: 1,
-        name: 'parent',
-        relatives: [
-          {
-            id: 2,
-            awesomeness: 1,
-            name: 'relative 1'
-          },
-          {
-            id: 3,
-            awesomeness: 2,
-            name: 'relative 2'
-          }
-        ]
-      });
+    beforeEach(() => {
+      return Person.query()
+        .delete()
+        .then(() => {
+          return Person.query().insertGraph({
+            id: 1,
+            name: 'parent',
+            relatives: [
+              {
+                id: 2,
+                awesomeness: 1,
+                name: 'relative 1'
+              },
+              {
+                id: 3,
+                awesomeness: 2,
+                name: 'relative 2'
+              }
+            ]
+          });
+        });
     });
 
     it('eager', () => {
@@ -139,6 +143,38 @@ module.exports = session => {
             relatives: [
               { id: 2, name: 'relative 11', awesomeness: 11 },
               { id: 3, name: 'relative 22', awesomeness: 22 }
+            ]
+          });
+        });
+    });
+
+    it('upsertGraph (only extra properties)', () => {
+      return Person.query()
+        .upsertGraph({
+          id: 1,
+          relatives: [
+            {
+              id: 2,
+              awesomeness: 11
+            },
+            {
+              id: 3,
+              awesomeness: 22
+            }
+          ]
+        })
+        .then(() => {
+          return Person.query()
+            .findById(1)
+            .eager('relatives');
+        })
+        .then(result => {
+          expect(result).to.containSubset({
+            id: 1,
+            name: 'parent',
+            relatives: [
+              { id: 2, name: 'relative 1', awesomeness: 11 },
+              { id: 3, name: 'relative 2', awesomeness: 22 }
             ]
           });
         });
