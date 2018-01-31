@@ -1444,7 +1444,7 @@ describe('GraphInserter', () => {
   function test(opt) {
     // Convert the input object graph into model graph. The input may be
     // an array of objects or a single object.
-    if (_.isArray(opt.models)) {
+    if (Array.isArray(opt.models)) {
       opt.models = _.map(opt.models, model => {
         return opt.modelClass.fromJson(model);
       });
@@ -1459,7 +1459,7 @@ describe('GraphInserter', () => {
       };
 
       if (opt.allowedRelations) {
-        insertOpt.allowedRelations = RelationExpression.parse(opt.allowedRelations);
+        insertOpt.allowedRelations = RelationExpression.create(opt.allowedRelations);
       }
 
       return new GraphInserter(insertOpt);

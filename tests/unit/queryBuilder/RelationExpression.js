@@ -881,49 +881,49 @@ describe('RelationExpression', () => {
   });
 
   function testParse(str, parsed) {
-    expect(RelationExpression.parse(str)).to.eql(parsed);
+    expect(RelationExpression.create(str)).to.eql(parsed);
   }
 
   function testMerge(str1, str2, parsed) {
     it(str1 + ' + ' + str2 + ' --> ' + parsed, () => {
       expect(
-        RelationExpression.parse(str1)
+        RelationExpression.create(str1)
           .merge(str2)
           .toString()
       ).to.equal(parsed);
       expect(
-        RelationExpression.parse(str1)
-          .merge(RelationExpression.parse(str2))
+        RelationExpression.create(str1)
+          .merge(RelationExpression.create(str2))
           .toString()
       ).to.equal(parsed);
     });
   }
 
   function testPath(str, path, expected) {
-    expect(RelationExpression.parse(str).rawNodesAtPath(path)).to.eql(expected);
+    expect(RelationExpression.create(str).rawNodesAtPath(path)).to.eql(expected);
   }
 
   function testToString(str) {
     it(str, () => {
-      expect(RelationExpression.parse(str).toString()).to.equal(str);
+      expect(RelationExpression.create(str).toString()).to.equal(str);
     });
   }
 
   function testParseFail(str) {
     expect(() => {
-      RelationExpression.parse(str);
+      RelationExpression.create(str);
     }).to.throwException();
   }
 
   function testSubExpression(str, subStr) {
     it('"' + subStr + '" is a sub expression of "' + str + '"', () => {
-      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(true);
+      expect(RelationExpression.create(str).isSubExpression(subStr)).to.equal(true);
     });
   }
 
   function testNotSubExpression(str, subStr) {
     it('"' + subStr + '" is not a sub expression of "' + str + '"', () => {
-      expect(RelationExpression.parse(str).isSubExpression(subStr)).to.equal(false);
+      expect(RelationExpression.create(str).isSubExpression(subStr)).to.equal(false);
     });
   }
 });

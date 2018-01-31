@@ -1191,12 +1191,12 @@ describe('QueryBuilder', () => {
       .filterEager('a', _.noop);
 
     expect(builder._eagerExpression).to.be.a(RelationExpression);
-    expect(builder._eagerFilterExpressions).to.have.length(1);
+    expect(builder._eagerFiltersAtPath).to.have.length(1);
 
     builder.clearEager();
 
     expect(builder._eagerExpression).to.equal(null);
-    expect(builder._eagerFilterExpressions).to.have.length(0);
+    expect(builder._eagerFiltersAtPath).to.have.length(0);
   });
 
   it('clearReject() should clear remove explicit rejection', () => {
