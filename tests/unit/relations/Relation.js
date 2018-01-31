@@ -121,6 +121,25 @@ describe('Relation', () => {
     expect(relation.relatedProp.props).to.eql(['ownerName', 'ownerDateOfBirth']);
   });
 
+  it('should fail if relation property and the relation itself have the same name', () => {
+    let relation = new Relation('foo', OwnerModel);
+
+    expect(() => {
+      relation.setMapping({
+        relation: Relation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'OwnerModel.foo',
+          to: 'RelatedModel.ownerId'
+        }
+      });
+    }).to.throwException(err => {
+      expect(err.message).to.equal(
+        "OwnerModel.relationMappings.foo: join: relation name and join property 'foo' cannot have the same name. If you cannot change one or the other, you can use $parseDatabaseJson and $formatDatabaseJson methods to convert the column name."
+      );
+    });
+  });
+
   it('should fail if modelClass is not a subclass of Model', () => {
     let relation = new Relation('testRelation', OwnerModel);
 
