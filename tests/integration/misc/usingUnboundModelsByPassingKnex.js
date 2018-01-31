@@ -235,6 +235,21 @@ module.exports = session => {
           expect(models[0].id).to.equal(3);
         });
       });
+
+      it('static relatedQuery', () => {
+        const query = Model1.query()
+          .findById(1)
+          .select(
+            'Model1.*',
+            Model1.relatedQuery('model1Relation2')
+              .count()
+              .as('count')
+          );
+
+        return query.knex(session.knex).then(model => {
+          expect(model.count).to.eql(2);
+        });
+      });
     });
 
     describe('$relatedQuery', () => {
