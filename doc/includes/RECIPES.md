@@ -98,11 +98,9 @@ class Person extends Model {
   $beforeInsert() {
     if (this.id) {
       throw new objection.ValidationError({
-        id: [{
-          message: 'identifier should not be defined before insert'
-          keyword: null,
-          params: null
-        }]
+        message: 'identifier should not be defined before insert',
+        type: 'MyCustomError',
+        data: someObjectWithSomeData
       });
     }
   }
