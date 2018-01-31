@@ -1,7 +1,6 @@
 import registerApi from './api';
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import * as promiseRouter from 'express-promise-router';
 import * as Knex from 'knex';
 import * as morgan from 'morgan';
 import { Model } from 'objection';
@@ -18,7 +17,8 @@ knex.migrate.latest();
 // the Model.bindKnex method.
 Model.knex(knex);
 
-const router = promiseRouter();
+// Unfortunately the express-promise-router types are borked. Just require():
+const router = require('express-promise-router')();
 const app = express()
   .use(bodyParser.json())
   .use(morgan('dev'))

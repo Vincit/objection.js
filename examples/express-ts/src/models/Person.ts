@@ -10,20 +10,20 @@ export interface Address {
 }
 
 export default class Person extends Model {
-  readonly id: number;
-  parentId: number | null;
-  firstName: string;
-  lastName: string;
-  age: number;
-  address: Address;
-  createdAt: Date;
-  updatedAt: Date;
+  readonly id!: number;
+  parentId?: number ;
+  firstName?: string;
+  lastName?: string;
+  age?: number;
+  address?: Address;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   // Optional eager relations.
-  parent?: Partial<Person>;
-  children?: Partial<Person>[];
-  pets?: Partial<Animal>[];
-  movies?: Partial<Movie>[];
+  parent?: Person;
+  children?: Person[];
+  pets?: Animal[];
+  movies?: Movie[];
 
   // Table name is the only required property.
   static tableName = 'Person';

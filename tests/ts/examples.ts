@@ -38,13 +38,16 @@ class CustomValidator extends objection.Validator {
 }
 
 class Person extends objection.Model {
-  firstName: string;
-  lastName: string;
-  mom: Person;
-  children: Person[];
-  pets: Animal[];
-  comments: Comment[];
-  movies: Movie[];
+  // With TypeScript 2.7, fields in models need either optionality:
+  firstName?: string;
+  // Or for not-null fields that are always initialized, you can use the new ! syntax:
+  lastName!: string;
+  mom?: Person;
+  children?: Person[];
+  // Note that $relatedQuery won't work for optional fields (at least until TS 2.8), so this gets a !:
+  pets!: Animal[];
+  comments?: Comment[];
+  movies?: Movie[];
 
   static columnNameMappers = objection.snakeCaseMappers();
 
@@ -160,9 +163,9 @@ async () => {
 };
 
 class Movie extends objection.Model {
-  title: string;
-  actors: Person[];
-  director: Person;
+  title!: string;
+  actors!: Person[];
+  director!: Person;
 
   /**
    * This static field instructs Objection how to hydrate and persist
@@ -211,7 +214,7 @@ const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children')
 const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 
 class Animal extends objection.Model {
-  species: string;
+  species!: string;
 
   // Tests the ColumnNameMappers interface.
   static columnNameMappers = {
@@ -226,7 +229,7 @@ class Animal extends objection.Model {
 }
 
 class Comment extends objection.Model {
-  comment: string;
+  comment!: string;
 }
 
 // !!! see examples/express-ts/src/app.ts for a valid knex setup. The following is bogus:
@@ -268,7 +271,7 @@ const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
 const people: Promise<Person[]> = Person.loadRelated([new Person()], 'movies');
 
 class Actor {
-  canAct: boolean;
+  canAct?: boolean;
 }
 
 // Optional<Person> typing for findById():
@@ -289,7 +292,8 @@ function whereSpecies(species: string): Promise<Animal[]> {
   return Animal.query().where('species', species);
 }
 
-const personPromise: Promise<Person> = objection.QueryBuilder.forClass(Person).findById(1);
+const pqb: objection.QueryBuilder<Person> = objection.QueryBuilder.forClass(Person)
+const personPromise: Promise<Person | undefined> = pqb.findById(1);
 
 // QueryBuilder.findById accepts single and array values:
 
