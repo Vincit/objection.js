@@ -82,6 +82,6 @@
     "pg": "^7.4.0",
     "prettier": "^1.9.1",
     "sqlite3": "3.1.13",
-    "typescript": "^2.6.2"
+    "typescript": "2.6.2"
   }
 }
