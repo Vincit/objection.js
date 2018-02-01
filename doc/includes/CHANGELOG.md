@@ -45,7 +45,7 @@
 
   * `ManyToMany` extras now work consistently in queries and filters. [#760](https://github.com/Vincit/objection.js/issues/760). This is not
     a breaking change per se, but can cause some queries to fail with a "ambiguous identifier" error because the join table is now joined
-    in places where it recently wasn't. You need to explicitly specify the table for those failing columns using `Table.theColumn` syntax.
+    in places where it previously wasn't. You need to explicitly specify the table for those failing columns using `Table.theColumn` syntax.
 
 ### Changes
 
