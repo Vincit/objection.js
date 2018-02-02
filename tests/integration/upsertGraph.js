@@ -897,6 +897,63 @@ module.exports = session => {
       });
     });
 
+	  it('should be able to automatically convert children that are plain JS objects into entities', () => {
+		  const parent = Model1.fromJson({
+			  id: 2,
+			  model1Prop1: null
+		  });
+
+		  const children = [
+			  {
+				  idCol: 1,
+				  model2Relation1: [
+					  {
+						  id: 4,
+						  model1Prop1: null
+					  }
+				  ]
+			  }
+		  ];
+		  parent.model1Relation2 = children;
+
+		  return transaction(session.knex, trx => {
+			  return Model1.query(trx)
+				  .upsertGraph(parent, { unrelate: true, relate: true })
+				  .then(result => {
+					  // Fetch the graph from the database.
+					  return Model1.query(trx)
+						  .findById(2)
+						  .eager('[model1Relation2.model2Relation1]')
+						  .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+						  .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+				  })
+				  .then(omitIrrelevantProps)
+				  .then(result => {
+					  expect(result).to.eql({
+						  id: 2,
+						  model1Id: 3,
+						  model1Prop1: null,
+
+						  model1Relation2: [
+							  {
+								  idCol: 1,
+								  model1Id: 2,
+								  model2Prop1: 'hasMany 1',
+
+								  model2Relation1: [
+									  {
+										  id: 4,
+										  model1Id: null,
+										  model1Prop1: null
+									  }
+								  ]
+							  }
+						  ]
+					  });
+				  });
+		  });
+	  });
+
     it('should respect noRelate and noUnrelate flags', () => {
       const upsert = {
         // the root gets updated because it has an id
