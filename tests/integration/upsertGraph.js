@@ -897,7 +897,7 @@ module.exports = session => {
       });
     });
 
-	  it('should be able to automatically convert children that are plain JS objects into entities', () => {
+	  it.skip('should be able to automatically convert children that are plain JS objects into entities', () => {
 		  const parent = Model1.fromJson({
 			  id: 2,
 			  model1Prop1: null
