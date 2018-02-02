@@ -897,13 +897,13 @@ module.exports = session => {
       });
     });
 
-    it.skip('should be able to automatically convert children that are plain JS objects into entities', () => {
+    it('should be able to automatically convert children that are plain JS objects into model instances', () => {
       const parent = Model1.fromJson({
         id: 2,
         model1Prop1: null
       });
 
-      const children = [
+      parent.model1Relation2 = [
         {
           idCol: 1,
           model2Relation1: [
@@ -914,7 +914,6 @@ module.exports = session => {
           ]
         }
       ];
-      parent.model1Relation2 = children;
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
