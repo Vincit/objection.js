@@ -27,8 +27,9 @@
   * Node 6.0.0 is now the minimum. Objection will not work on node < 6.0.0.
 
   * [`ValidationError`](#validationerror) overhaul. This is a big one, so read this carefully! There are three things to check when you migrate to 1.0:
-    1. The [`createValidationError`](#createvalidationerror) interface has changed. If you have overridden the createValidationError method in
-       your project, you need migrate to the [new interface](#createvalidationerror).
+    1. The [`createValidationError`](#createvalidationerror) and [`ValidationError`](#validationerror) interfaces have changed.
+       If you have overridden the `createValidationError` method in your project, or you create custom `ValidationError` instances
+       you need migrate to the interfaces.
     2. The model validation errors (jsonSchema violations) have remained pretty much the same but there are couple of differences. Before, the
        keys of `error.data` were property names even when a nested object in a graph failed a validation. Now the keys for nested
        validation errors are key paths like `foo.bar[2].spam`. Another tiny difference is the order of validation errors for each key in
@@ -44,7 +45,7 @@
 
   * `ManyToMany` extras now work consistently in queries and filters. [#760](https://github.com/Vincit/objection.js/issues/760). This is not
     a breaking change per se, but can cause some queries to fail with a "ambiguous identifier" error because the join table is now joined
-    in places where it recently wasn't. You need to explicitly specify the table for those failing columns using `Table.theColumn` syntax.
+    in places where it previously wasn't. You need to explicitly specify the table for those failing columns using `Table.theColumn` syntax.
 
 ### Changes
 

@@ -842,6 +842,117 @@ module.exports = session => {
       });
     });
 
+    it('should be able to modify previously set properties to be null', () => {
+      const upsert = {
+        id: 2,
+        model1Prop1: null,
+        model1Relation2: [
+          {
+            idCol: 1,
+            model2Relation1: [
+              {
+                id: 4,
+                model1Prop1: null
+              }
+            ]
+          }
+        ]
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1.query(trx)
+          .upsertGraph(upsert, { unrelate: true, relate: true })
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1.query(trx)
+              .findById(2)
+              .eager('[model1Relation2.model2Relation1]')
+              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 3,
+              model1Prop1: null,
+
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model1Id: 2,
+                  model2Prop1: 'hasMany 1',
+
+                  model2Relation1: [
+                    {
+                      id: 4,
+                      model1Id: null,
+                      model1Prop1: null
+                    }
+                  ]
+                }
+              ]
+            });
+          });
+      });
+    });
+
+    it('should be able to automatically convert children that are plain JS objects into model instances', () => {
+      const parent = Model1.fromJson({
+        id: 2,
+        model1Prop1: null
+      });
+
+      parent.model1Relation2 = [
+        {
+          idCol: 1,
+          model2Relation1: [
+            {
+              id: 4,
+              model1Prop1: null
+            }
+          ]
+        }
+      ];
+
+      return transaction(session.knex, trx => {
+        return Model1.query(trx)
+          .upsertGraph(parent, { unrelate: true, relate: true })
+          .then(result => {
+            // Fetch the graph from the database.
+            return Model1.query(trx)
+              .findById(2)
+              .eager('[model1Relation2.model2Relation1]')
+              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            expect(result).to.eql({
+              id: 2,
+              model1Id: 3,
+              model1Prop1: null,
+
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model1Id: 2,
+                  model2Prop1: 'hasMany 1',
+
+                  model2Relation1: [
+                    {
+                      id: 4,
+                      model1Id: null,
+                      model1Prop1: null
+                    }
+                  ]
+                }
+              ]
+            });
+          });
+      });
+    });
+
     it('should respect noRelate and noUnrelate flags', () => {
       const upsert = {
         // the root gets updated because it has an id
@@ -1422,7 +1533,7 @@ module.exports = session => {
         })
         .catch(err => {
           expect(err.message).to.equal(
-            'root model (id=1000) does not exist. If you want to insert it with an id, use the insertMissing: true option'
+            'root model (id=1000) does not exist. If you want to insert it with an id, use the insertMissing option'
           );
           return session
             .knex('Model1')
@@ -1455,7 +1566,7 @@ module.exports = session => {
         })
         .catch(err => {
           expect(err.message).to.equal(
-            'model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate: true option. If you want to insert it with an id, use the insertMissing: true option'
+            'model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate option. If you want to insert it with an id, use the insertMissing option'
           );
           return session
             .knex('Model1')
