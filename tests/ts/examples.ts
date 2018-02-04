@@ -2,9 +2,7 @@ import * as ajv from 'ajv';
 import * as knex from 'knex';
 
 import * as objection from '../../typings/objection';
-import { RelationMappings } from '../../typings/objection';
-
-const { lit, raw, ref } = objection;
+import { lit, raw, ref, RelationMappings } from '../../typings/objection';
 
 // This file exercises the Objection.js typings.
 
@@ -41,10 +39,12 @@ class Person extends objection.Model {
   // With TypeScript 2.7, fields in models need either optionality:
   firstName?: string;
   // Or for not-null fields that are always initialized, you can use the new ! syntax:
+  // prettier-ignore
   lastName!: string;
   mom?: Person;
   children?: Person[];
   // Note that $relatedQuery won't work for optional fields (at least until TS 2.8), so this gets a !:
+  // prettier-ignore
   pets!: Animal[];
   comments?: Comment[];
   movies?: Movie[];
@@ -111,6 +111,10 @@ async function takesPersonClass(PersonClass: typeof Person) {
   takesMaybePerson(await PersonClass.query().findById(123));
 }
 
+function takesPersonQueryBuilder(qb: objection.QueryBuilder<Person>): Promise<Person[]> {
+  return qb.execute();
+}
+
 const lastName = 'Lawrence';
 
 // Note that at least with TypeScript 2.3 or earlier, type assertions made
@@ -119,6 +123,8 @@ const lastName = 'Lawrence';
 
 // It also seems that Promise types are not as rigorously asserted as their
 // resolved types, hence these async/await blocks:
+
+takesPersonQueryBuilder(Person.query());
 
 async () => {
   takesPeople(await Person.query().where('lastName', lastName));
@@ -163,8 +169,11 @@ async () => {
 };
 
 class Movie extends objection.Model {
+  // prettier-ignore
   title!: string;
+  // prettier-ignore
   actors!: Person[];
+  // prettier-ignore
   director!: Person;
 
   /**
@@ -197,6 +206,10 @@ class Movie extends objection.Model {
   };
 }
 
+function takesMovie(m: Movie) {
+  m.title = '';
+}
+
 async () => {
   // Another example of strongly-typed $relatedQuery without a cast:
   takesPeople(await new Movie().$relatedQuery('actors'));
@@ -214,6 +227,7 @@ const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children')
 const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 
 class Animal extends objection.Model {
+  // prettier-ignore
   species!: string;
 
   // Tests the ColumnNameMappers interface.
@@ -229,6 +243,7 @@ class Animal extends objection.Model {
 }
 
 class Comment extends objection.Model {
+  // prettier-ignore
   comment!: string;
 }
 
@@ -268,6 +283,7 @@ const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
 
 // static methods from Model should return the subclass type
 
+const person: Promise<Person> = Person.loadRelated(new Person(), 'movies');
 const people: Promise<Person[]> = Person.loadRelated([new Person()], 'movies');
 
 class Actor {
@@ -292,7 +308,7 @@ function whereSpecies(species: string): Promise<Animal[]> {
   return Animal.query().where('species', species);
 }
 
-const pqb: objection.QueryBuilder<Person> = objection.QueryBuilder.forClass(Person)
+const pqb: objection.QueryBuilder<Person> = objection.QueryBuilder.forClass(Person);
 const personPromise: Promise<Person | undefined> = pqb.findById(1);
 
 // QueryBuilder.findById accepts single and array values:
@@ -594,9 +610,11 @@ Person.query().insert({ firstName: 'Chuck' });
 // Verify we can call `.insert` via $relatedQuery
 // (albeit with a cast to Movie):
 
-const relatedQueryResult: Promise<Movie> = new Person()
-  .$relatedQuery<Movie>('movies')
-  .insert({ title: 'Total Recall' });
+async () => {
+  const m = await new Person().$relatedQuery<Movie>('movies').insert({ title: 'Total Recall' });
+  takesModel(m);
+  takesMovie(m);
+};
 
 // Verify if is possible transaction class can be shared across models
 objection.transaction(Person.knex(), async trx => {

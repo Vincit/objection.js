@@ -13,6 +13,7 @@
 //   QM - queried model
 //   RM - candidate result model or model array
 //   RV - actual result value
+//   T  - `<T>(this: T, ...): T` workaround
 
 /// <reference types="node" />
 import * as knex from 'knex';
@@ -375,12 +376,20 @@ declare namespace Objection {
 
     omitImpl(f: (obj: object, prop: string) => void): void;
 
+    // loadRelated is overloaded to support both Model and Model[] variants:
     loadRelated(
-      models: (Model | object)[],
+      models: M[],
       expression: RelationExpression,
       filters?: Filters<M>,
       trxOrKnex?: Transaction | knex
-    ): Promise<(Model | object)[]>;
+    ): Promise<M[]>;
+
+    loadRelated(
+      model: M,
+      expression: RelationExpression,
+      filters?: Filters<M>,
+      trxOrKnex?: Transaction | knex
+    ): Promise<M>;
 
     traverse(
       filterConstructor: typeof Model,
@@ -425,7 +434,10 @@ declare namespace Objection {
     static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
-    static query<QM extends Model>(this: Constructor<QM>, trxOrKnex?: Transaction | knex): QueryBuilder<QM, QM[]>;
+    static query<QM extends Model>(
+      this: Constructor<QM>,
+      trxOrKnex?: Transaction | knex
+    ): QueryBuilder<QM>;
     // This can only be used as a subquery so the result model type is irrelevant.
     static relatedQuery(relationName: string): QueryBuilder<any, any[]>;
     static knex(knex?: knex): knex;
@@ -441,13 +453,23 @@ declare namespace Objection {
 
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
+    // loadRelated is overloaded to support both Model and Model[] variants:
+    
     static loadRelated<QM extends Model>(
       this: Constructor<QM>,
-      models: (QM | object)[],
+      models: QM[],
       expression: RelationExpression,
       filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
     ): Promise<QM[]>;
+
+    static loadRelated<QM extends Model>(
+      this: Constructor<QM>,
+      model: QM,
+      expression: RelationExpression,
+      filters?: Filters<QM>,
+      trxOrKnex?: Transaction | knex
+    ): Promise<QM>;
 
     static traverse(
       filterConstructor: typeof Model,
@@ -455,6 +477,12 @@ declare namespace Objection {
       traverser: TraverserFunction
     ): void;
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
+
+    // Implementation note: At least as of TypeScript 2.7, subclasses of
+    // methods that return `this` are not compatible with their superclass.
+    // For example, `class Movie extends Model` could not be passed as a
+    // "Model" to a function, because the methods that return `this` return
+    // `Movie`, and not `Model`. The `foo<M>(this: M, ...` is a workaround.
 
     $id(): any;
     $id(id: any): void;
@@ -470,27 +498,28 @@ declare namespace Objection {
     $formatDatabaseJson(json: Pojo): Pojo;
     $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
     $formatJson(json: Pojo): Pojo;
-    $setJson<M>(this: M, json: Pojo, opt?: ModelOptions): M;
+    $setJson<T>(this: T, json: Pojo, opt?: ModelOptions): T;
     $setDatabaseJson<M>(this: M, json: Pojo): M;
-    $setRelated<RelatedM extends Model>(
+    $setRelated<T, RelatedM extends Model>(
+      this: T,
       relation: String | Relation,
       related: RelatedM | RelatedM[] | null | undefined
-    ): this;
-    $appendRelated<M, RelatedM extends Model>(
-      this: M,
+    ): T;
+    $appendRelated<T, RelatedM extends Model>(
+      this: T,
       relation: String | Relation,
       related: RelatedM | RelatedM[] | null | undefined
-    ): M;
+    ): T;
 
-    $set<M>(this: M, obj: Pojo): M;
-    $omit<M>(this: M, keys: string | string[] | Properties): M;
-    $pick<M>(this: M, keys: string | string[] | Properties): M;
-    $clone<M>(this: M, opt?: CloneOptions): M;
+    $set<T>(this: T, obj: Pojo): T;
+    $omit<T>(this: T, keys: string | string[] | Properties): T;
+    $pick<T>(this: T, keys: string | string[] | Properties): T;
+    $clone<T>(this: T, opt?: CloneOptions): T;
 
     /**
      * AKA `reload` in ActiveRecord parlance
      */
-    $query<M extends Model>(this: M, trxOrKnex?: Transaction | knex): QueryBuilder<M, M>;
+    $query<QM extends Model>(this: QM, trxOrKnex?: Transaction | knex): QueryBuilder<QM, QM>;
 
     /**
      * If you add fields to your model, you get $relatedQuery typings for
@@ -506,19 +535,21 @@ declare namespace Objection {
     ): QueryBuilder<V, V, V>;
 
     /**
-     * If you don't want to add the fields to your model, you can cast the
-     * call to the expected Model subclass (`$relatedQuery<Animal>('pets')`).
+     * Builds a query that only affects the models related to this instance
+     * through a relation. Note that this signature requires a
+     * type cast (like `bob.$relatedQuery<Animal>('pets')`).
      */
     $relatedQuery<QM extends Model, RM = QM[]>(
       relationName: keyof this | string,
       trxOrKnex?: Transaction | knex
     ): QueryBuilder<QM, RM>;
 
-    $loadRelated<M extends Model, QM extends Model>(this: M,
+    $loadRelated<QM extends Model>(
+      this: QM,
       expression: keyof this | RelationExpression,
       filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilder<M, M>;
+    ): QueryBuilder<QM, QM>;
 
     $traverse(traverser: TraverserFunction): void;
     $traverse(filterConstructor: this, traverser: TraverserFunction): void;
@@ -536,7 +567,7 @@ declare namespace Objection {
   }
 
   export class QueryBuilder<QM extends Model, RM, RV> {
-    static forClass<M extends Model,MC extends ModelClass<M>>(modelClass: MC): QueryBuilder<M>;
+    static forClass<M extends Model, MC extends ModelClass<M>>(modelClass: MC): QueryBuilder<M>;
   }
 
   export interface Executable<RV> extends Promise<RV> {
@@ -549,13 +580,14 @@ declare namespace Objection {
     throwIfNotFound(): QueryBuilder<QM, RM>;
   }
 
-  export interface QueryBuilderYieldingOneOrNone<QM extends Model> extends QueryBuilder<QM, QM, QM | undefined> {}
+  export interface QueryBuilderYieldingOneOrNone<QM extends Model>
+    extends QueryBuilder<QM, QM, QM | undefined> {}
 
   export interface QueryBuilderYieldingCount<QM extends Model, RM = QM[]>
     extends QueryBuilderBase<QM, RM, number>,
       Executable<number> {
-    throwIfNotFound(): this;
-  }
+        throwIfNotFound(): this;
+      }
 
   interface Insert<QM extends Model> {
     (modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
@@ -1129,7 +1161,9 @@ declare namespace Objection {
     (raw: Raw): QueryBuilder<QM, RM, RV>;
   }
 
-  interface GroupBy<QM extends Model, RM, RV> extends RawMethod<QM, RM, RV>, ColumnNamesMethod<QM, RM, RV> {}
+  interface GroupBy<QM extends Model, RM, RV>
+    extends RawMethod<QM, RM, RV>,
+      ColumnNamesMethod<QM, RM, RV> {}
 
   interface OrderBy<QM extends Model, RM, RV> {
     (column: ColumnRef, direction?: string): QueryBuilder<QM, RM, RV>;
