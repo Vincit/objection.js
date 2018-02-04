@@ -10,6 +10,7 @@ export interface Address {
 }
 
 export default class Person extends Model {
+  // prettier-ignore
   readonly id!: number;
   parentId?: number ;
   firstName?: string;

@@ -3,9 +3,12 @@ import Person from './Person';
 import { join } from 'path';
 
 export default class Animal extends Model {
+  // prettier-ignore
   readonly id!: number;
   ownerId?: number;
+  // prettier-ignore
   name!: string;
+  // prettier-ignore
   species!: string;
 
   // Optional eager relations.
