@@ -834,7 +834,7 @@ describe('Model', () => {
       expect(model2.relation2.relation1[0] === model2.relation2.relation1[0]).to.equal(true);
     });
 
-    it('should work with circulare references', () => {
+    it('should work with circular references', () => {
       let obj1 = { value: 1 };
       let obj2 = { value: 2 };
 
