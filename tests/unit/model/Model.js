@@ -833,6 +833,21 @@ describe('Model', () => {
       expect(model2.relation2 === model2.relation2).to.equal(true);
       expect(model2.relation2.relation1[0] === model2.relation2.relation1[0]).to.equal(true);
     });
+
+    it('should work with circulare references', () => {
+      let obj1 = { value: 1 };
+      let obj2 = { value: 2 };
+
+      obj1.relation2 = obj2;
+      obj2.relation2 = obj1;
+
+      const model = Model1.ensureModel(obj1);
+      expect(model).to.be.a(Model1);
+      expect(model.relation2).to.be.a(Model1);
+      expect(model.relation2.relation2 === model).to.equal(true);
+      expect(model.value).to.equal(1);
+      expect(model.relation2.value).to.equal(2);
+    });
   });
 
   describe('fromDatabaseJson', () => {
