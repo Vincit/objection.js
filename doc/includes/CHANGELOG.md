@@ -16,6 +16,7 @@
     [`hasSelects`](#hasselects),
     [`hasEager`](#haseager),
     [`has`](#has).
+    [`clear`](#clear).
     [`columnNameToPropertyName`](#columnnametopropertyname),
     [`propertyNameToColumnName`](#propertynametocolumnname).
   * `ManyToMany` extras now work consistently in queries and filters. [#760](https://github.com/Vincit/objection.js/issues/760)

@@ -882,8 +882,8 @@ describe('QueryBuilder', () => {
   });
 
   it('has() should match defined query operations', () => {
-    // A bunch of random operators to test against.
-    const operators = [
+    // A bunch of random operations to test against.
+    const operations = [
       'range',
       'orderBy',
       'limit',
@@ -899,7 +899,6 @@ describe('QueryBuilder', () => {
       'avg',
       'with'
     ];
-
     const test = (query, name, expected) => {
       const regexp = new RegExp(`^${name}$`);
       chai
@@ -910,12 +909,34 @@ describe('QueryBuilder', () => {
         .to.equal(expected);
     };
 
-    for (let i = 0; i < operators.length; i++) {
-      const query = TestModel.query()[operators[i]]('arg');
-      for (let j = 0; j < operators.length; j++) {
-        test(query, operators[j], i === j);
-      }
-    }
+    operations.forEach(operation => {
+      const query = TestModel.query()[operation]('arg');
+      operations.forEach(testOperation => {
+        test(query, testOperation, testOperation === operation);
+      });
+    });
+  });
+
+  it('clear() should remove matching query operations', () => {
+    // A bunch of random operations to test against.
+    const operations = ['where', 'limit', 'offset', 'count'];
+
+    operations.forEach(operation => {
+      const query = TestModel.query();
+      operations.forEach(operation => query[operation]('arg'));
+      chai.expect(query.has(operation), `query().has('${operation}')`).to.equal(true);
+      chai
+        .expect(
+          query.clear(operation).has(operation),
+          `query().clear('${operation}').has('${operation}')`
+        )
+        .to.equal(false);
+      operations.forEach(testOperation => {
+        chai
+          .expect(query.has(testOperation), `query().has('${testOperation}')`)
+          .to.equal(testOperation !== operation);
+      });
+    });
   });
 
   it('update() should call $beforeUpdate on the model', done => {

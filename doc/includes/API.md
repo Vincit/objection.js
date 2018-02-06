@@ -3027,6 +3027,33 @@ boolean|true if the query defines an operation that matches the given selector.
 
 
 
+#### clear
+
+```js
+queryBuilder.clear(selector);
+```
+
+```js
+console.log(Person.query().orderBy('firstName').clear('orderBy').has('orderBy'));
+```
+
+Removes all operations in the query that match the given selector.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+selector|string&#124;regexp|A name or regular expression to match all operations that are to be removed against.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### runBefore
 
 ```js
