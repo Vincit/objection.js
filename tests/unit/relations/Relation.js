@@ -140,6 +140,32 @@ describe('Relation', () => {
     });
   });
 
+  it('should pass through erros thrown from jsonSchema getter', () => {
+    Object.defineProperties(OwnerModel, {
+      jsonSchema: {
+        enumerable: true,
+        get() {
+          throw new Error('whoops, invalid json shchema getter');
+        }
+      }
+    });
+
+    let relation = new Relation('testRelation', OwnerModel);
+
+    expect(() => {
+      relation.setMapping({
+        relation: Relation,
+        modelClass: RelatedModel,
+        join: {
+          from: 'OwnerModel.id',
+          to: 'RelatedModel.ownerId'
+        }
+      });
+    }).to.throwException(err => {
+      expect(err.message).to.equal('whoops, invalid json shchema getter');
+    });
+  });
+
   it('should fail if modelClass is not a subclass of Model', () => {
     let relation = new Relation('testRelation', OwnerModel);
 
