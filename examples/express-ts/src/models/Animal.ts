@@ -3,13 +3,16 @@ import Person from './Person';
 import { join } from 'path';
 
 export default class Animal extends Model {
-  readonly id: number;
-  ownerId: number | null;
-  name: string;
-  species: string;
+  // prettier-ignore
+  readonly id!: number;
+  ownerId?: number;
+  // prettier-ignore
+  name!: string;
+  // prettier-ignore
+  species!: string;
 
   // Optional eager relations.
-  owner?: Partial<Person>;
+  owner?: Person;
 
   // Table name is the only required property.
   static tableName = 'Animal';

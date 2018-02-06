@@ -3,11 +3,11 @@ import Person from './Person';
 import { join } from 'path';
 
 export default class Movie extends Model {
-  readonly id: number;
-  name: string;
+  readonly id!: number;
+  name?: string;
 
   // Optional eager relations.
-  actors?: Partial<Person>[];
+  actors?: Person[];
 
   // Table name is the only required property.
   static tableName = 'Movie';

@@ -24,14 +24,14 @@
   "author": "Sami Koskimäki",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.17.0",
+    "axios": "^0.17.1",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
-    "express-promise-router": "^2.0.0",
-    "knex": "^0.13.0",
+    "express-promise-router": "^3.0.1",
+    "knex": "^0.13.",
     "lodash": "^4.17.4",
     "morgan": "^1.9.0",
-    "objection": "^0.9.0",
+    "objection": "^1.0.0-rc.11",
     "sqlite3": "^3.1.13"
   },
   "devDependencies": {
