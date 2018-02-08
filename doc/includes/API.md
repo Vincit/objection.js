@@ -1488,8 +1488,8 @@ await Person
 await Person
   .query()
   .joinRelation('[pets, parent]')
-  .where('pets.species', 'dog');
-  .where('parent.name', 'Arnold')
+  .where('pets.species', 'dog')
+  .where('parent.name', 'Arnold');
 ```
 
 > Join two multiple and nested relations. Note that when referring to nested relations
