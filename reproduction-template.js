@@ -41,7 +41,7 @@ async function main() {
   });
 
   const jennifer = await Person.query()
-    .findOne({firstName: 'Jennifer'})
+    .findOne({ firstName: 'Jennifer' })
     .eager('pets');
 
   chai.expect(jennifer.pets[0].name).to.equal('Doggo');
@@ -76,18 +76,18 @@ class Person extends Model {
       required: ['firstName', 'lastName'],
 
       properties: {
-        id: {type: 'integer'},
-        parentId: {type: ['integer', 'null']},
-        firstName: {type: 'string', minLength: 1, maxLength: 255},
-        lastName: {type: 'string', minLength: 1, maxLength: 255},
-        age: {type: 'number'},
+        id: { type: 'integer' },
+        parentId: { type: ['integer', 'null'] },
+        firstName: { type: 'string', minLength: 1, maxLength: 255 },
+        lastName: { type: 'string', minLength: 1, maxLength: 255 },
+        age: { type: 'number' },
 
         address: {
           type: 'object',
           properties: {
-            street: {type: 'string'},
-            city: {type: 'string'},
-            zipCode: {type: 'string'}
+            street: { type: 'string' },
+            city: { type: 'string' },
+            zipCode: { type: 'string' }
           }
         }
       }
@@ -150,10 +150,10 @@ class Animal extends Model {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        ownerId: {type: ['integer', 'null']},
-        name: {type: 'string', minLength: 1, maxLength: 255},
-        species: {type: 'string', minLength: 1, maxLength: 255}
+        id: { type: 'integer' },
+        ownerId: { type: ['integer', 'null'] },
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        species: { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
   }
@@ -183,8 +183,8 @@ class Movie extends Model {
       required: ['name'],
 
       properties: {
-        id: {type: 'integer'},
-        name: {type: 'string', minLength: 1, maxLength: 255}
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1, maxLength: 255 }
       }
     };
   }
