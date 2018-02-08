@@ -1320,6 +1320,42 @@ module.exports = session => {
             expect(models.map(it => it.id)).to.not.contain(5);
           });
       });
+
+      if (session.isPostgres()) {
+        it('should work with raw selects in namedFilters', () => {
+          class TestModel2 extends Model2 {
+            static get namedFilters() {
+              return {
+                rawSelect: qb =>
+                  qb.select('*').select(raw(`model2_prop1 || ' ' || model2_prop1 as "rawSelect"`))
+              };
+            }
+          }
+
+          class TestModel1 extends Model1 {
+            static get relationMappings() {
+              return {
+                model1Relation2: {
+                  relation: Model.HasManyRelation,
+                  modelClass: TestModel2,
+                  join: {
+                    from: 'Model1.id',
+                    to: 'model2.model1_id'
+                  }
+                }
+              };
+            }
+          }
+
+          return TestModel1.query()
+            .joinRelation('model1Relation2(rawSelect)')
+            .select('rawSelect')
+            .findById(1)
+            .then(model => {
+              expect(model.rawSelect).to.equal('hejsan 2 hejsan 2');
+            });
+        });
+      }
     });
 
     describe('.$query()', () => {
