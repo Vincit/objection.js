@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { Model } = require('../../../');
 
 module.exports = session => {
-  describe(`Cannot relate two or more levels in a single query using upsertGraph. #782`, () => {
+  describe(`Cannot upsert anything under a node that is going to be related in upsertGraph. #782`, () => {
     let knex = session.knex;
     let Person, Movie, Prop;
     let graph;
