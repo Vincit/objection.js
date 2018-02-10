@@ -133,6 +133,94 @@ const knex = Knex(Object.assign({
 
 Documented [here](#snake-case-to-camel-case-conversion).
 
+<h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
+
+```js
+const { knexIdentifierMapping } = require('objection');
+const Knex = require('knex');
+
+const knex = Knex({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+
+  // Merge `postProcessResponse` and `wrapIdentifier` mappers.
+  ...knexIdentifierMapping({
+    MyId: 'id',
+    MyProp: 'prop',
+    MyAnotherProp: 'anotherProp'
+  })
+});
+```
+
+> Note that you can pretty easily define the conversions in some static property
+> of your model. In this example we have added a property `column` to jsonSchema
+> and use that to create the mapping object.
+
+```js
+const { knexIdentifierMapping } = require('objection');
+const Knex = require('knex');
+const path = require('path')
+const fs = require('fs');
+
+// Path to your model folder.
+const MODELS_PATH = path.join(__dirname, 'models');
+
+const knex = Knex({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+
+  // Go through all models and add conversions using the custom property
+  // `column` in json schema.
+  ...knexIdentifierMapping(fs.readdirSync(MODELS_PATH)
+    .filter(it => it.endsWith('.js'))
+    .map(it => require(path.join(MODELS_PATH, it)))
+    .reduce((mapping, modelClass) => {
+      const properties = modelClass.jsonSchema.properties;
+      return Object.keys(properties).reduce((mapping, propName) => {
+        mapping[properties[propName].column] = propName;
+        return mapping;
+      }, mapping);
+    }, {});
+  )
+});
+```
+
+> For older nodes:
+
+```js
+const Knex = require('knex');
+const knexSnakeCaseMappers = require('objection').knexSnakeCaseMappers;
+
+const knex = Knex(Object.assign({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+}, knexIdentifierMapping({
+  MyId: 'id',
+  MyProp: 'prop',
+  MyAnotherProp: 'anotherProp'
+})));
+```
+
+Like [knexSnakeCaseMappers](#objection-knexsnakecasemappers), but can be used to make an arbitrary
+static mapping between column names and property names. In the examples, you would have identifiers
+`MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop`
+and `anotherProp` in the code.
+
 <h4 id="objection-snakecasemappers">snakeCaseMappers</h4>
 
 ```js
@@ -156,6 +244,7 @@ class Person extends Model {
 ```
 
 Documented [here](#snake-case-to-camel-case-conversion).
+
 
 
 
