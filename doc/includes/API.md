@@ -7567,9 +7567,8 @@ Type|Description
 
 ```js
 class Person extends Model {
-  async $afterGet(queryContext) {
-    await super.$afterGet(queryContext);
-    await doPossiblyAsyncStuff();
+  $afterGet(queryContext) {
+    return doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7578,13 +7577,12 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  async $afterGet(queryContext) {
-    await super.$afterGet(queryContext);
+  $afterGet(queryContext) {
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    await SomeModel
+    return SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
