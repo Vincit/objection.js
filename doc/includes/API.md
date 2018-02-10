@@ -7222,8 +7222,9 @@ Shortcut for [`return this.constructor.knex()`](#knex).
 
 ```js
 class Person extends Model {
-  $beforeInsert(queryContext) {
-    return doPossiblyAsyncStuff();
+  async $beforeInsert(queryContext) {
+    await super.$beforeInsert(queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7232,12 +7233,13 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  $beforeInsert(queryContext) {
+  async $beforeInsert(queryContext) {
+    await super.$beforeInsert(queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
@@ -7269,8 +7271,9 @@ Type|Description
 
 ```js
 class Person extends Model {
-  $afterInsert(queryContext) {
-    return doPossiblyAsyncStuff();
+  async $afterInsert(queryContext) {
+    await super.$afterInsert(queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7280,11 +7283,12 @@ class Person extends Model {
 ```js
 class Person extends Model {
   async $afterInsert(queryContext) {
+    await super.$afterInsert(queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
@@ -7315,7 +7319,8 @@ Type|Description
 ```js
 class Person extends Model {
   async $beforeUpdate(opt, queryContext) {
-    return doPossiblyAsyncStuff();
+    await super.$beforeUpdate(opt, queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7325,11 +7330,12 @@ class Person extends Model {
 ```js
 class Person extends Model {
   async $beforeUpdate(opt, queryContext) {
+    await super.$beforeUpdate(opt, queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
@@ -7390,7 +7396,8 @@ Type|Description
 ```js
 class Person extends Model {
   async $afterUpdate(opt, queryContext) {
-    return doPossiblyAsyncStuff();
+    await super.$afterUpdate(opt, queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7400,11 +7407,12 @@ class Person extends Model {
 ```js
 class Person extends Model {
   async $afterUpdate(opt, queryContext) {
+    await super.$afterUpdate(opt, queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
@@ -7462,7 +7470,8 @@ Type|Description
 ```js
 class Person extends Model {
   async $beforeDelete(queryContext) {
-    return doPossiblyAsyncStuff();
+    await super.$beforeDelete(queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7472,11 +7481,12 @@ class Person extends Model {
 ```js
 class Person extends Model {
   async $beforeDelete(queryContext) {
+    await super.$beforeDelete(queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
@@ -7509,7 +7519,8 @@ Type|Description
 ```js
 class Person extends Model {
   async $afterDelete(queryContext) {
-    return doPossiblyAsyncStuff();
+    await super.$afterDelete(queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7519,11 +7530,12 @@ class Person extends Model {
 ```js
 class Person extends Model {
   async $afterDelete(queryContext) {
+    await super.$afterDelete(queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
@@ -7556,7 +7568,8 @@ Type|Description
 ```js
 class Person extends Model {
   async $afterGet(queryContext) {
-    return doPossiblyAsyncStuff();
+    await super.$afterGet(queryContext);
+    await doPossiblyAsyncStuff();
   }
 }
 ```
@@ -7566,11 +7579,12 @@ class Person extends Model {
 ```js
 class Person extends Model {
   async $afterGet(queryContext) {
+    await super.$afterGet(queryContext);
     // This can always be done even if there is no running transaction. In that
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    return SomeModel
+    await SomeModel
       .query(queryContext.transaction)
       .insert(whatever);
   }
