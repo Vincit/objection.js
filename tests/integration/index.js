@@ -38,18 +38,14 @@ describe('integration tests', () => {
     }
   ];
 
-  testDatabaseConfigs.forEach(knexConfig => {
+  const sessions = testDatabaseConfigs.map(knexConfig => {
     const session = new TestSession({
-      knexConfig: knexConfig
+      knexConfig
     });
 
     describe(knexConfig.client, () => {
       before(() => {
         return session.createDb();
-      });
-
-      after(() => {
-        return session.destroy();
       });
 
       require('./misc')(session);
@@ -77,5 +73,15 @@ describe('integration tests', () => {
         require('./jsonRelations')(session);
       }
     });
+
+    return session;
+  });
+
+  after(() => {
+    return Promise.all(
+      sessions.map(session => {
+        return session.destroy();
+      })
+    );
   });
 });
