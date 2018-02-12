@@ -612,6 +612,17 @@ module.exports = session => {
             });
           });
       });
+
+      it('should not fetch relations that are set to undefined', () => {
+        return Model2.query()
+          .insertGraphAndFetch({
+            model2Prop1: 'foo',
+            model2Relation1: undefined
+          })
+          .then(inserted => {
+            expect(inserted).to.not.have.property('model2Relation1');
+          });
+      });
     });
 
     describe('.query().insertGraph().allowRelated()', () => {
