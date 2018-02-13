@@ -2736,8 +2736,8 @@ const context = builder.context();
 Person
   .query()
   .context({
-    runBefore: (builder) => {},
-    runAfter: (builder) => {},
+    runBefore: (result, builder) => {},
+    runAfter: (result, builder) => {},
     onBuild: (builder) => {}
   });
 ```
