@@ -30,6 +30,63 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="1-0-0">1.0.0 🎉</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>The static <a href="#relatedquery"><code class="prettyprint">relatedQuery</code></a> method.</li>
+<li>New reflection methods:
+<a href="#isfind"><code class="prettyprint">isFind</code></a>,
+<a href="#isinsert"><code class="prettyprint">isInsert</code></a>,
+<a href="#isupdate"><code class="prettyprint">isUpdate</code></a>,
+<a href="#isdelete"><code class="prettyprint">isDelete</code></a>,
+<a href="#isrelate"><code class="prettyprint">isRelate</code></a>,
+<a href="#isunrelate"><code class="prettyprint">isUnrelate</code></a>,
+<a href="#haswheres"><code class="prettyprint">hasWheres</code></a>,
+<a href="#hasselects"><code class="prettyprint">hasSelects</code></a>,
+<a href="#haseager"><code class="prettyprint">hasEager</code></a>,
+<a href="#has"><code class="prettyprint">has</code></a>.
+<a href="#clear"><code class="prettyprint">clear</code></a>.
+<a href="#columnnametopropertyname"><code class="prettyprint">columnNameToPropertyName</code></a>,
+<a href="#propertynametocolumnname"><code class="prettyprint">propertyNameToColumnName</code></a>.</li>
+<li><code class="prettyprint">ManyToMany</code> extras now work consistently in queries and filters. <a href="https://github.com/Vincit/objection.js/issues/760">#760</a></li>
+</ul>
+
+<h3 id="breaking-changes">Breaking changes</h3>
+
+<ul>
+<li><p><code class="prettyprint">modelInstance.$query().delete().returning(something)</code> now returns a single instance instead of an array. <a href="https://github.com/Vincit/objection.js/issues/659">#659</a></p></li>
+<li><p>Node 6.0.0 is now the minimum. Objection will not work on node &lt; 6.0.0.</p></li>
+<li><p><a href="#validationerror"><code class="prettyprint">ValidationError</code></a> overhaul. This is a big one, so read this carefully! There are three things to check when you migrate to 1.0:</p>
+
+<ol>
+<li>The <a href="#createvalidationerror"><code class="prettyprint">createValidationError</code></a> and <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> interfaces have changed.
+If you have overridden the <code class="prettyprint">createValidationError</code> method in your project, or you create custom <code class="prettyprint">ValidationError</code> instances
+you need migrate to the interfaces.</li>
+<li>The model validation errors (jsonSchema violations) have remained pretty much the same but there are couple of differences. Before, the
+keys of <code class="prettyprint">error.data</code> were property names even when a nested object in a graph failed a validation. Now the keys for nested
+validation errors are key paths like <code class="prettyprint">foo.bar[2].spam</code>. Another tiny difference is the order of validation errors for each key in
+<code class="prettyprint">error.data</code>. Let&rsquo;s say a property <code class="prettyprint">spam</code> failed for your model and <code class="prettyprint">error.data.spam</code> contains an array of objects that describe
+the failures. Before, the first failed validation was the last item in the array, now it is the first item.</li>
+<li>All <a href="#validationerror"><code class="prettyprint">ValidationErrors</code></a> now have a <code class="prettyprint">type</code> field. Before all <a href="#validationerror"><code class="prettyprint">ValidationErrors</code></a> but the model
+validation errors (errors like &ldquo;invalid relation expression&rdquo;, or &ldquo;cyclic model graph&rdquo;) had no type, and could only be identified
+based on the existence of some weird key in <code class="prettyprint">error.data</code>. The <code class="prettyprint">error.data</code> is now removed from those errors and the <code class="prettyprint">type</code> should be
+used instead. The message from the data is now stored in <code class="prettyprint">error.message</code>.</li>
+</ol></li>
+<li><p>Removed deprecated methods <code class="prettyprint">whereRef</code>, <code class="prettyprint">whereJsonField</code> and <code class="prettyprint">whereJsonEquals</code>. The <a href="#ref"><code class="prettyprint">ref</code></a> helper can be used to replace the
+<code class="prettyprint">whereRef</code> calls. <a href="#ref"><code class="prettyprint">ref</code></a> and <a href="#lit"><code class="prettyprint">lit</code></a> can be used to replace the removed json methods.</p></li>
+<li><p><code class="prettyprint">ManyToMany</code> extras now work consistently in queries and filters. <a href="https://github.com/Vincit/objection.js/issues/760">#760</a>. This is not
+a breaking change per se, but can cause some queries to fail with a &ldquo;ambiguous identifier&rdquo; error because the join table is now joined
+in places where it previously wasn&rsquo;t. You need to explicitly specify the table for those failing columns using <code class="prettyprint">Table.theColumn</code> syntax.</p></li>
+</ul>
+
+<h3 id="changes">Changes</h3>
+
+<ul>
+<li><code class="prettyprint">isFindQuery</code> is renamed to <a href="http://vincit.github.io/objection.js/#isfind"><code class="prettyprint">isFind</code></a> and deprecated.</li>
+</ul>
+
 <h2 id="0-9-4">0.9.4</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
@@ -136,7 +193,7 @@ has changed a bit.</p></li>
 <li>New shorthand methods <a href="http://vincit.github.io/objection.js/#joineager"><code class="prettyprint">joinEager</code></a>, <a href="http://vincit.github.io/objection.js/#naiveeager"><code class="prettyprint">naiveEager</code></a>,
 <a href="http://vincit.github.io/objection.js/#mergejoineager"><code class="prettyprint">mergeJoinEager</code></a> and <a href="http://vincit.github.io/objection.js/#mergenaiveeager"><code class="prettyprint">mergeNaiveEager</code></a>.</li>
 <li>New shorthand method <a href="http://vincit.github.io/objection.js/#findone"><code class="prettyprint">findOne</code></a></li>
-<li>New reflection method <a href="http://vincit.github.io/objection.js/#isfindquery"><code class="prettyprint">isFindQuery</code></a></li>
+<li>New reflection method <a href="http://vincit.github.io/objection.js/#isfind"><code class="prettyprint">isFindQuery</code></a></li>
 <li>ManyToMany extra properties can now be updated <a href="https://github.com/Vincit/objection.js/issues/413">#413</a></li>
 </ul>
 

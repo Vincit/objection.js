@@ -30,6 +30,10 @@
       <div class="content">
         <h1 id="api-reference">API reference</h1>
 
+<p><strong>NOTE</strong>: Everything not mentioned in the API documentation is considered private implementation
+and shouldn&rsquo;t be relied upon. Private implemementation can change without any notice even between
+patch versions. Public API described here follows <a href="https://semver.org/">semantic versioning</a>.</p>
+
 <h2 id="the-main-module">The main module</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">mainModule</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
@@ -118,6 +122,89 @@ documented elsewhere in the API docs.</p>
 <span class="p">},</span> <span class="nx">knexSnakeCaseMappers</span><span class="p">()));</span>
 </code></pre>
 <p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>.</p>
+
+<h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexIdentifierMapping</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">({</span>
+  <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
+
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">host</span><span class="p">:</span> <span class="s1">'127.0.0.1'</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="s1">'objection'</span><span class="p">,</span>
+    <span class="na">database</span><span class="p">:</span> <span class="s1">'objection_test'</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Merge `postProcessResponse` and `wrapIdentifier` mappers.</span>
+  <span class="p">...</span><span class="nx">knexIdentifierMapping</span><span class="p">({</span>
+    <span class="na">MyId</span><span class="p">:</span> <span class="s1">'id'</span><span class="p">,</span>
+    <span class="na">MyProp</span><span class="p">:</span> <span class="s1">'prop'</span><span class="p">,</span>
+    <span class="na">MyAnotherProp</span><span class="p">:</span> <span class="s1">'anotherProp'</span>
+  <span class="p">})</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>Note that you can pretty easily define the conversions in some static property
+of your model. In this example we have added a property <code class="prettyprint">column</code> to jsonSchema
+and use that to create the mapping object.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexIdentifierMapping</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path'</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span>
+
+<span class="c1">// Path to your model folder.</span>
+<span class="kr">const</span> <span class="nx">MODELS_PATH</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'models'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">({</span>
+  <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
+
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">host</span><span class="p">:</span> <span class="s1">'127.0.0.1'</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="s1">'objection'</span><span class="p">,</span>
+    <span class="na">database</span><span class="p">:</span> <span class="s1">'objection_test'</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Go through all models and add conversions using the custom property</span>
+  <span class="c1">// `column` in json schema.</span>
+  <span class="p">...</span><span class="nx">knexIdentifierMapping</span><span class="p">(</span><span class="nx">fs</span><span class="p">.</span><span class="nx">readdirSync</span><span class="p">(</span><span class="nx">MODELS_PATH</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">it</span> <span class="o">=&gt;</span> <span class="nx">it</span><span class="p">.</span><span class="nx">endsWith</span><span class="p">(</span><span class="s1">'.js'</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">it</span> <span class="o">=&gt;</span> <span class="nx">require</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">MODELS_PATH</span><span class="p">,</span> <span class="nx">it</span><span class="p">)))</span>
+    <span class="p">.</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">mapping</span><span class="p">,</span> <span class="nx">modelClass</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="kr">const</span> <span class="nx">properties</span> <span class="o">=</span> <span class="nx">modelClass</span><span class="p">.</span><span class="nx">jsonSchema</span><span class="p">.</span><span class="nx">properties</span><span class="p">;</span>
+      <span class="k">return</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">properties</span><span class="p">).</span><span class="nx">reduce</span><span class="p">((</span><span class="nx">mapping</span><span class="p">,</span> <span class="nx">propName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">mapping</span><span class="p">[</span><span class="nx">properties</span><span class="p">[</span><span class="nx">propName</span><span class="p">].</span><span class="nx">column</span><span class="p">]</span> <span class="o">=</span> <span class="nx">propName</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">mapping</span><span class="p">;</span>
+      <span class="p">},</span> <span class="nx">mapping</span><span class="p">);</span>
+    <span class="p">},</span> <span class="p">{});</span>
+  <span class="p">)</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>For older nodes:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">knexSnakeCaseMappers</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">knexSnakeCaseMappers</span><span class="p">;</span>
+
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({</span>
+  <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
+
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">host</span><span class="p">:</span> <span class="s1">'127.0.0.1'</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="s1">'objection'</span><span class="p">,</span>
+    <span class="na">database</span><span class="p">:</span> <span class="s1">'objection_test'</span>
+  <span class="p">}</span>
+<span class="p">},</span> <span class="nx">knexIdentifierMapping</span><span class="p">({</span>
+  <span class="na">MyId</span><span class="p">:</span> <span class="s1">'id'</span><span class="p">,</span>
+  <span class="na">MyProp</span><span class="p">:</span> <span class="s1">'prop'</span><span class="p">,</span>
+  <span class="na">MyAnotherProp</span><span class="p">:</span> <span class="s1">'anotherProp'</span>
+<span class="p">})));</span>
+</code></pre>
+<p>Like <a href="#objection-knexsnakecasemappers">knexSnakeCaseMappers</a>, but can be used to make an arbitrary
+static mapping between column names and property names. In the examples, you would have identifiers
+<code class="prettyprint">MyId</code>, <code class="prettyprint">MyProp</code> and <code class="prettyprint">MyAnotherProp</code> in the database and you would like to map them into <code class="prettyprint">id</code>, <code class="prettyprint">prop</code>
+and <code class="prettyprint">anotherProp</code> in the code.</p>
 
 <h4 id="objection-snakecasemappers">snakeCaseMappers</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
@@ -241,12 +328,12 @@ converted to knex raw instances lazily when the query is executed.</p>
 
 <h4 id="findbyid">findById</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>Composite key:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">]);</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">]);</span>
 </code></pre>
 <h5 id="arguments">Arguments</h5>
 
@@ -280,12 +367,12 @@ converted to knex raw instances lazily when the query is executed.</p>
 
 <h4 id="findbyids">findByIds</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">findByIds</span><span class="p">([</span><span class="nx">id1</span><span class="p">,</span> <span class="nx">id2</span><span class="p">]);</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findByIds</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">[</span><span class="nx">person1</span><span class="p">,</span> <span class="nx">person2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findByIds</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
 </code></pre>
 <blockquote>
 <p>Composite key:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findByIds</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">]]);</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">[</span><span class="nx">person1</span><span class="p">,</span> <span class="nx">person2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findByIds</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">]]);</span>
 </code></pre>
 <h5 id="arguments">Arguments</h5>
 
@@ -319,9 +406,9 @@ converted to knex raw instances lazily when the query is executed.</p>
 
 <h4 id="findone">findOne</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">findOne</span><span class="p">(...</span><span class="nx">whereArgs</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">});</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random() &lt; 0.5'</span><span class="p">));</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">20</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random() &lt; 0.5'</span><span class="p">));</span>
 </code></pre>
 <p>Shorthand for <code class="prettyprint">where(...whereArgs).first()</code>.</p>
 
@@ -379,11 +466,13 @@ converted to knex raw instances lazily when the query is executed.</p>
 <blockquote>
 <p>You can also give raw expressions and subqueries as values like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">),</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
   <span class="p">});</span>
 </code></pre>
 <blockquote>
@@ -551,10 +640,12 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 <blockquote>
 <p>You can also give raw expressions, subqueries and <code class="prettyprint">ref()</code> as values like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">update</span><span class="p">({</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">),</span>
     <span class="na">oldLastName</span><span class="p">:</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'lastName'</span><span class="p">)</span> <span class="c1">// same as knex.raw('??', ['lastName'])</span>
@@ -623,10 +714,12 @@ or <em>take a look at <a href="#postgresql-quot-returning-quot-tricks">this reci
 <blockquote>
 <p>You can also give raw expressions and subqueries as values like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">updateAndFetchById</span><span class="p">(</span><span class="mi">134</span><span class="p">,</span> <span class="p">{</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
   <span class="p">});</span>
@@ -688,10 +781,12 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 <blockquote>
 <p>You can also give raw expressions and subqueries as values like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">person</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">updateAndFetch</span><span class="p">({</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">),</span>
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
   <span class="p">});</span>
@@ -862,11 +957,13 @@ or <em>take a look at <a href="#postgresql-quot-returning-quot-tricks">this reci
 <blockquote>
 <p>You can also give raw expressions and subqueries as values like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patchAndFetchById</span><span class="p">(</span><span class="mi">134</span><span class="p">,</span> <span class="p">{</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">),</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
   <span class="p">});</span>
 </code></pre>
 <p>Patches a single model by id and fetches it from the database afterwards.</p>
@@ -926,11 +1023,13 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 <blockquote>
 <p>You can also give raw expressions and subqueries as values like this:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">person</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">person</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patchAndFetch</span><span class="p">({</span>
     <span class="na">age</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">),</span>
-    <span class="na">firstName</span><span class="p">:</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s2">"'Jenni' || 'fer'"</span><span class="p">)</span>
   <span class="p">});</span>
 </code></pre>
 <p>Patches a single model and fetches it from the database afterwards. This only works with instance queries
@@ -1685,8 +1784,8 @@ Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">del
 <pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'[pets, parent]'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'parent.name'</span><span class="p">,</span> <span class="s1">'Arnold'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'parent.name'</span><span class="p">,</span> <span class="s1">'Arnold'</span><span class="p">);</span>
 </code></pre>
 <blockquote>
 <p>Join two multiple and nested relations. Note that when referring to nested relations
@@ -2736,46 +2835,6 @@ knex parses table references.</p>
 </tr>
 </tbody></table>
 
-<h4 id="whereref">whereRef</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereRef</span><span class="p">(</span><span class="nx">leftRef</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">rightRef</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereRef</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Animal.ownerId'</span><span class="p">);</span>
-</code></pre>
-<p>Compares a column reference to another</p>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
-
-<h4 id="orwhereref">orWhereRef</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">orWhereRef</span><span class="p">(</span><span class="nx">leftRef</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">rightRef</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">orWhereRef</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'Animal.ownerId'</span><span class="p">);</span>
-</code></pre>
-<p>Compares a column reference to another</p>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
-
 <h4 id="wherecomposite">whereComposite</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereComposite</span><span class="p">(</span><span class="nx">columns</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">values</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="nx">builder</span><span class="p">.</span><span class="nx">whereComposite</span><span class="p">([</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'name'</span><span class="p">],</span> <span class="s1">'='</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'Jennifer'</span><span class="p">]);</span>
@@ -2823,72 +2882,6 @@ knex parses table references.</p>
 <td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
-
-<h4 id="wherejsonequals">whereJsonEquals</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereJsonEquals</span><span class="p">(</span><span class="nx">fieldExpression</span><span class="p">,</span> <span class="nx">jsonObjectOrFieldExpression</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">whereJsonEquals</span><span class="p">(</span><span class="s1">'additionalData:myDogs'</span><span class="p">,</span> <span class="s1">'additionalData:dogsAtHome'</span><span class="p">);</span>
-
-<span class="c1">// oh joy! these people have all their dogs at home!</span>
-
-<span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">whereJsonEquals</span><span class="p">(</span><span class="s1">'additionalData:myDogs[0]'</span><span class="p">,</span> <span class="p">{</span> <span class="na">name</span><span class="p">:</span> <span class="s2">"peter"</span><span class="p">});</span>
-
-<span class="c1">// these people's first dog name is "peter" and the dog has no other</span>
-<span class="c1">// attributes, but its name</span>
-</code></pre>
-<p>Where jsonb field reference equals jsonb object or other field reference.</p>
-
-<p>Also supports having field expression in both sides of equality.</p>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>fieldExpression</td>
-<td><a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a></td>
-<td>Reference to column / json field</td>
-</tr>
-<tr>
-<td>jsonObjectOrFieldExpression</td>
-<td>Object&#124;Array&#124;<a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a></td>
-<td>Reference to column / json field or json object</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
-
-<h4 id="orwherejsonequals">orWhereJsonEquals</h4>
-
-<p>See <a href="#wherejsonequals"><code class="prettyprint">whereJsonEquals</code></a></p>
-
-<h4 id="wherejsonnotequals">whereJsonNotEquals</h4>
-
-<p>See <a href="#wherejsonequals"><code class="prettyprint">whereJsonEquals</code></a></p>
-
-<h4 id="orwherejsonnotequals">orWhereJsonNotEquals</h4>
-
-<p>See <a href="#wherejsonequals"><code class="prettyprint">whereJsonEquals</code></a></p>
 
 <h4 id="wherejsonsupersetof">whereJsonSupersetOf</h4>
 <pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereJsonSupersetOf</span><span class="p">(</span><span class="nx">fieldExpression</span><span class="p">,</span> <span class="nx">jsonObjectOrFieldExpression</span><span class="p">);</span>
@@ -3226,66 +3219,6 @@ does not have <code class="prettyprint">jsonObject.a</code> or <code class="pret
 
 <p>See <a href="#wherejsonhasall"><code class="prettyprint">whereJsonHasAll</code></a></p>
 
-<h4 id="wherejsonfield">whereJsonField</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">whereJsonField</span><span class="p">(</span><span class="nx">fieldExpression</span><span class="p">,</span> <span class="nx">operator</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
-</code></pre>
-<p>Where referred json field value casted to same type with value fulfill given operand.</p>
-
-<p>Value may be number, string, null, boolean and referred json field is converted
-to TEXT, NUMERIC or BOOLEAN sql type for comparison.</p>
-
-<p>If left hand field does not exist rows appear IS null so if one needs to get only
-rows, which has key and it&rsquo;s value is null one may use e.g.
-<a href="#wherejsonsupersetof"><code class="prettyprint">.whereJsonSupersetOf(&quot;column&quot;, { field: null })</code></a> or check is key exist and
-then <a href="#wherejsonfield"><code class="prettyprint">.whereJsonField(&#39;column:field&#39;, &#39;IS&#39;, null)</code></a></p>
-
-<p>For testing against objects or arrays one should see tested with <a href="#wherejsonequal"><code class="prettyprint">whereJsonEqual</code></a>,
-<a href="#wherejsonsupersetof"><code class="prettyprint">whereJsonSupersetOf</code></a> and <a href="#wherejsonsubsetof"><code class="prettyprint">whereJsonSubsetOf</code></a> methods.</p>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>fieldExpression</td>
-<td><a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a></td>
-<td>Expression pointing to certain value</td>
-</tr>
-<tr>
-<td>operator</td>
-<td>string</td>
-<td>SQL comparator usually <code class="prettyprint">&lt;</code>, <code class="prettyprint">&gt;</code>, <code class="prettyprint">&lt;&gt;</code>, <code class="prettyprint">=</code> or <code class="prettyprint">!=</code></td>
-</tr>
-<tr>
-<td>value</td>
-<td>boolean&#124;number&#124;string&#124;null</td>
-<td>Value to which field is compared to</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td><code class="prettyprint">this</code> query builder for chaining.</td>
-</tr>
-</tbody></table>
-
-<h4 id="orwherejsonfield">orWhereJsonField</h4>
-
-<p>See <a href="#wherejsonfield"><code class="prettyprint">whereJsonField</code></a></p>
-
 <h3 id="other-instance-methods">Other instance methods</h3>
 
 <h4 id="context">context</h4>
@@ -3310,8 +3243,8 @@ for <em>all</em> queries that share the context:</p>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">context</span><span class="p">({</span>
-    <span class="na">runBefore</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{},</span>
-    <span class="na">runAfter</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{},</span>
+    <span class="na">runBefore</span><span class="p">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{},</span>
+    <span class="na">runAfter</span><span class="p">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{},</span>
     <span class="na">onBuild</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{}</span>
   <span class="p">});</span>
 </code></pre>
@@ -3584,8 +3517,8 @@ value for example in case an alias has been given.</p>
 </tr>
 </tbody></table>
 
-<h4 id="isfindquery">isFindQuery</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isFindQuery</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isFindQuery</span><span class="p">();</span>
+<h4 id="isfind">isFind</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isFind</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isFind</span><span class="p">();</span>
 </code></pre>
 <p>Returns true if the query is read-only.</p>
 
@@ -3600,6 +3533,231 @@ value for example in case an alias has been given.</p>
 <tr>
 <td>boolean</td>
 <td>true if the query is read-only.</td>
+</tr>
+</tbody></table>
+
+<h4 id="isinsert">isInsert</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isInsert</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isInsert</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query performs an insert operation.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query performs an insert operation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="isupdate">isUpdate</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isUpdate</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isUpdate</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query performs an update operation.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query performs an update operation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="isdelete">isDelete</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isDelete</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isDelete</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query performs a delete operation.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query performs a delete operation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="isrelate">isRelate</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isRelate</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isRelate</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query performs a relate operation.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query performs a relate operation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="isunrelate">isUnrelate</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isUnrelate</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isUnrelate</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query performs an unrelate operation.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query performs an unrelate operation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="haswheres">hasWheres</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">hasWheres</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">hasWheres</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query contains where statements.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query contains where statements.</td>
+</tr>
+</tbody></table>
+
+<h4 id="hasselects">hasSelects</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">hasSelects</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">hasSelects</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query contains any specific select staments, such as:
+<code class="prettyprint">&#39;select&#39;</code>, <code class="prettyprint">&#39;columns&#39;</code>, <code class="prettyprint">&#39;column&#39;</code>, <code class="prettyprint">&#39;distinct&#39;</code>, <code class="prettyprint">&#39;count&#39;</code>, <code class="prettyprint">&#39;countDistinct&#39;</code>, <code class="prettyprint">&#39;min&#39;</code>, <code class="prettyprint">&#39;max&#39;</code>, <code class="prettyprint">&#39;sum&#39;</code>, <code class="prettyprint">&#39;sumDistinct&#39;</code>, <code class="prettyprint">&#39;avg&#39;</code>, <code class="prettyprint">&#39;avgDistinct&#39;</code></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query contains any specific select staments.</td>
+</tr>
+</tbody></table>
+
+<h4 id="haseager">hasEager</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">hasEager</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">hasEager</span><span class="p">();</span>
+</code></pre>
+<p>Returns true if the query defines any eager expressions.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query defines any eager expressions.</td>
+</tr>
+</tbody></table>
+
+<h4 id="has">has</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">has</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">selector</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">).</span><span class="nx">has</span><span class="p">(</span><span class="s1">'range'</span><span class="p">));</span>
+</code></pre>
+<p>Returns true if the query defines an operation that matches the given selector.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>selector</td>
+<td>string&#124;regexp</td>
+<td>A name or regular expression to match all defined operations against.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query defines an operation that matches the given selector.</td>
+</tr>
+</tbody></table>
+
+<h4 id="clear">clear</h4>
+<pre class="highlight javascript"><code><span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">clear</span><span class="p">(</span><span class="nx">selector</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">).</span><span class="nx">clear</span><span class="p">(</span><span class="s1">'orderBy'</span><span class="p">).</span><span class="nx">has</span><span class="p">(</span><span class="s1">'orderBy'</span><span class="p">));</span>
+</code></pre>
+<p>Removes all operations in the query that match the given selector.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>selector</td>
+<td>string&#124;regexp</td>
+<td>A name or regular expression to match all operations that are to be removed against.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
 
@@ -4994,7 +5152,7 @@ Note that this executes a query (not the one we are building) and returns a Prom
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// --&gt; 100</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">total</span><span class="p">);</span> <span class="c1">// --&gt; 3341</span>
 </code></pre>
-<p>Two queries queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
+<p>Two queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
 
 <p>Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and <code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size,
 but according to my tests and <a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the
@@ -5063,7 +5221,7 @@ The problem with this is that if the result set is empty, we don&rsquo;t get the
 </code></pre>
 <p>Only returns the given range of results.</p>
 
-<p>Two queries queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
+<p>Two queries are performed by this method: the actual query and a query to get the <code class="prettyprint">total</code> count.</p>
 
 <p>Mysql has the <code class="prettyprint">SQL_CALC_FOUND_ROWS</code> option and <code class="prettyprint">FOUND_ROWS()</code> function that can be used to calculate the result size,
 but according to my tests and <a href="http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance">the interwebs</a> the
@@ -6053,6 +6211,10 @@ The default is true.</p>
   <span class="na">gender</span><span class="p">:</span> <span class="s1">'female'</span>
 <span class="p">});</span>
 
+<span class="c1">// Note that `toJSON` is always called automatically when an object is serialized</span>
+<span class="c1">// to a JSON string using JSON.stringify. You very rarely need to call `toJSON`</span>
+<span class="c1">// explicitly. koa, express and all other frameworks I'm aware of use JSON.stringify</span>
+<span class="c1">// to serialize objects to JSON.</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">());</span>
 <span class="c1">// --&gt; {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}</span>
 </code></pre>
@@ -6077,6 +6239,10 @@ The default is true.</p>
   <span class="na">gender</span><span class="p">:</span> <span class="s1">'female'</span>
 <span class="p">});</span>
 
+<span class="c1">// Note that `toJSON` is always called automatically when an object is serialized</span>
+<span class="c1">// to a JSON string using JSON.stringify. You very rarely need to call `toJSON`</span>
+<span class="c1">// explicitly. koa, express and all other frameworks I'm aware of use JSON.stringify</span>
+<span class="c1">// to serialize objects to JSON.</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">());</span>
 <span class="c1">// --&gt; {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}</span>
 </code></pre>
@@ -6423,6 +6589,70 @@ any knex* methods:</p>
 </tr>
 </tbody></table>
 
+<h4 id="relatedquery">relatedQuery</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">queryBuilder</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="nx">relationName</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Select count of a relation and the maximum value of another one:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
+    <span class="s1">'Person.*'</span><span class="p">,</span>
+
+    <span class="nx">Person</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">count</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">as</span><span class="p">(</span><span class="s1">'dogCount'</span><span class="p">),</span>
+
+    <span class="nx">Person</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'movies'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="s1">'createdAt'</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">as</span><span class="p">(</span><span class="s1">'mostRecentMovieDate'</span><span class="p">)</span>
+  <span class="p">]);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">dogCount</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">mostRecentMovieDate</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>Find models that have at least one item in a relation:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">peopleThatHavePets</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">whereExists</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">));</span>
+</code></pre>
+<p>Creates a subquery to a relation.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>relationName</td>
+<td>string</td>
+<td>The name of the relation to create subquery for.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td>The created query builder</td>
+</tr>
+</tbody></table>
+
 <h4 id="knex">knex</h4>
 
 <blockquote>
@@ -6458,10 +6688,6 @@ application.</p>
 <h4 id="fn">fn</h4>
 
 <p>Shortcut for <code class="prettyprint">Person.knex().fn</code></p>
-
-<h4 id="formatter">formatter</h4>
-
-<p>Shortcut for <code class="prettyprint">Person.knex().client.formatter()</code></p>
 
 <h4 id="knexquery">knexQuery</h4>
 
@@ -6758,38 +6984,26 @@ to throw any error you want.</p>
 
 <h4 id="createvalidationerror">createValidationError</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">createValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyCustomValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">);</span>
+  <span class="kr">static</span> <span class="nx">createValidationError</span><span class="p">({</span><span class="nx">type</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">})</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">MyCustomValidationError</span><span class="p">({</span><span class="nx">type</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
 <p>The default implementation:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">createValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="k">this</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">(</span><span class="nx">errorHash</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">ValidationError</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">createValidationError</span><span class="p">({</span><span class="nx">type</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">})</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">({</span><span class="nx">type</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">});</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 <p>Creates an error thrown when validation fails for a model. You can override this
-to throw any error you want.</p>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>errorHash</td>
-<td>Object</td>
-<td>The failed validations. See <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> documentation for details.</td>
-</tr>
-</tbody></table>
+to throw any error you want. The errors created by this function don&rsquo;t have to
+implement any interface or have the same properties as <code class="prettyprint">ValidationError</code>. Objection
+only throws errors created by this function an never catches them.</p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -6801,7 +7015,7 @@ to throw any error you want.</p>
 </thead><tbody>
 <tr>
 <td><code class="prettyprint">Error</code></td>
-<td>The created error. <a href="#validationerror"><code class="prettyprint">Model.ValidationError</code></a> by default.</td>
+<td>The created error. <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> by default.</td>
 </tr>
 </tbody></table>
 
@@ -6960,6 +7174,90 @@ also for the input models themselves.</p>
 </tr>
 </tbody></table>
 
+<h4 id="columnnametopropertyname">columnNameToPropertyName</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">propertyName</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">columnNameToPropertyName</span><span class="p">(</span><span class="nx">columnName</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>For example, if you have defined <code class="prettyprint">columnNameMappers = snakeCaseMappers()</code> for your model:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">propName</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">columnNameToPropertyName</span><span class="p">(</span><span class="s1">'foo_bar'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">propName</span><span class="p">);</span> <span class="c1">// --&gt; 'fooBar'</span>
+</code></pre>
+<p>Runs the property through possible <code class="prettyprint">columnNameMappers</code> and <code class="prettyprint">$parseDatabaseJson</code> hooks to apply
+any possible conversion for the column name.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>columnName</td>
+<td>string</td>
+<td>A column name</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>string</td>
+<td>The property name</td>
+</tr>
+</tbody></table>
+
+<h4 id="propertynametocolumnname">propertyNameToColumnName</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">columnName</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">propertyNameToColumnName</span><span class="p">(</span><span class="nx">propertyName</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>For example, if you have defined <code class="prettyprint">columnNameMappers = snakeCaseMappers()</code> for your model:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">columnName</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">propertyNameToColumnName</span><span class="p">(</span><span class="s1">'fooBar'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">columnName</span><span class="p">);</span> <span class="c1">// --&gt; 'foo_bar'</span>
+</code></pre>
+<p>Runs the property through possible <code class="prettyprint">columnNameMappers</code> and <code class="prettyprint">$formatDatabaseJson</code> hooks to apply
+any possible conversion for the property name.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>propertyName</td>
+<td>string</td>
+<td>A property name</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>string</td>
+<td>The column name</td>
+</tr>
+</tbody></table>
+
 <h3 id="instance-methods">Instance methods</h3>
 
 <h4 id="id">$id</h4>
@@ -7081,9 +7379,26 @@ called explicitly when needed.</p>
 </tbody></table>
 
 <h4 id="tojson">$toJson</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">();</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
 </code></pre>
 <p>Exports this model as a JSON object.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>opt</td>
+<td><a href="#cloneoptions"><code class="prettyprint">CloneOptions</code></a></td>
+<td>Optional options</td>
+</tr>
+</tbody></table>
 
 <h5 id="return-value">Return value</h5>
 
@@ -7100,9 +7415,26 @@ called explicitly when needed.</p>
 </tbody></table>
 
 <h4 id="tojson">toJSON</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">();</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
 </code></pre>
 <p>Exports this model as a JSON object.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>opt</td>
+<td><a href="#cloneoptions"><code class="prettyprint">CloneOptions</code></a></td>
+<td>Optional options</td>
+</tr>
+</tbody></table>
 
 <h5 id="return-value">Return value</h5>
 
@@ -7715,12 +8047,30 @@ them for performance reasons (V8 doesn&rsquo;t like delete).</p>
 </tbody></table>
 
 <h4 id="clone">$clone</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">clone</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$clone</span><span class="p">();</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">clone</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$clone</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowClone</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$clone</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
 </code></pre>
-<p>Returns a deep copy of this model.</p>
+<p>Returns a (deep) copy of this model.</p>
 
 <p>If this object has instances of <a href="#model"><code class="prettyprint">Model</code></a> as properties (or arrays of them)
-they are cloned using their <code class="prettyprint">$clone()</code> method.</p>
+they are cloned using their <code class="prettyprint">$clone()</code> method. A shallow copy without relations
+can be created by passing the <code class="prettyprint">shallow: true</code> option.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>opt</td>
+<td><a href="#cloneoptions"><code class="prettyprint">CloneOptions</code></a></td>
+<td>Optional options</td>
+</tr>
+</tbody></table>
 
 <h5 id="return-value">Return value</h5>
 
@@ -7808,7 +8158,7 @@ they are cloned using their <code class="prettyprint">$clone()</code> method.</p
 </code></pre>
 <blockquote>
 <p>Fetch all models related to a model through a relation. The fetched models are
-also stored to the owner model&rsquo;s property named after the relation:</p>
+also stored to the owner model&rsquo;s property named after the relation (by default):</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">pets</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">jennifer</span><span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">);</span>
 
@@ -7832,7 +8182,7 @@ also stored to the owner model&rsquo;s property named after the relation:</p>
 </code></pre>
 <blockquote>
 <p>This inserts a new model to the database and binds it to the owner model as defined
-by the relation:</p>
+by the relation (by default):</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">waldo</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
@@ -7903,7 +8253,7 @@ and <code class="prettyprint">patch</code> ignores the <code class="prettyprint"
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'jennifer just got all her dogs vaccinated'</span><span class="p">);</span>
 </code></pre>
-<p>Use this to build a query that only affects the models related to this instance through a relation.</p>
+<p>Use this to build a query that only affects the models related to this instance through a relation. By default, any fetched or inserted models are also stored to the owner model’s property named after the relation. See <a href="#relatedfindquerymutates">relatedFindQueryMutates</a> or <a href="#relatedinsertquerymutates">relatedInsertQueryMutates</a> to change this behaviour.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -8028,8 +8378,9 @@ to the relations:</p>
 
 <h4 id="beforeinsert">$beforeInsert</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="nx">async</span> <span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8037,12 +8388,13 @@ to the relations:</p>
 <p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">async</span> <span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$beforeInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
     <span class="c1">// transaction.</span>
-    <span class="k">return</span> <span class="nx">SomeModel</span>
+    <span class="nx">await</span> <span class="nx">SomeModel</span>
       <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
@@ -8086,8 +8438,9 @@ you need to do insert specific validation.</p>
 
 <h4 id="afterinsert">$afterInsert</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+  <span class="nx">async</span> <span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8096,11 +8449,12 @@ you need to do insert specific validation.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$afterInsert</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
     <span class="c1">// transaction.</span>
-    <span class="k">return</span> <span class="nx">SomeModel</span>
+    <span class="nx">await</span> <span class="nx">SomeModel</span>
       <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
@@ -8143,7 +8497,8 @@ you need to do insert specific validation.</p>
 <h4 id="beforeupdate">$beforeUpdate</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8152,18 +8507,19 @@ you need to do insert specific validation.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$beforeUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">);</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
     <span class="c1">// transaction.</span>
-    <span class="k">return</span> <span class="nx">SomeModel</span>
+    <span class="nx">await</span> <span class="nx">SomeModel</span>
       <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
-<p>Note that the the <code class="prettyprint">opt.old</code> object is only populated for instance queries started with <code class="prettyprint">$query</code>:</p>
+<p>Note that the <code class="prettyprint">opt.old</code> object is only populated for instance queries started with <code class="prettyprint">$query</code>:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">somePerson</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
@@ -8231,7 +8587,8 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <h4 id="afterupdate">$afterUpdate</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8240,18 +8597,19 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$afterUpdate</span><span class="p">(</span><span class="nx">opt</span><span class="p">,</span> <span class="nx">queryContext</span><span class="p">);</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
     <span class="c1">// transaction.</span>
-    <span class="k">return</span> <span class="nx">SomeModel</span>
+    <span class="nx">await</span> <span class="nx">SomeModel</span>
       <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
-<p>Note that the the <code class="prettyprint">opt.old</code> object is only populated for instance queries started with <code class="prettyprint">$query</code>:</p>
+<p>Note that the <code class="prettyprint">opt.old</code> object is only populated for instance queries started with <code class="prettyprint">$query</code>:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">somePerson</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
@@ -8317,7 +8675,8 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <h4 id="beforedelete">$beforeDelete</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8326,11 +8685,12 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$beforeDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
     <span class="c1">// transaction.</span>
-    <span class="k">return</span> <span class="nx">SomeModel</span>
+    <span class="nx">await</span> <span class="nx">SomeModel</span>
       <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
@@ -8375,7 +8735,8 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <h4 id="afterdelete">$afterDelete</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8384,11 +8745,12 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">async</span> <span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">await</span> <span class="kr">super</span><span class="p">.</span><span class="nx">$afterDelete</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">);</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
     <span class="c1">// transaction.</span>
-    <span class="k">return</span> <span class="nx">SomeModel</span>
+    <span class="nx">await</span> <span class="nx">SomeModel</span>
       <span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">.</span><span class="nx">transaction</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">whatever</span><span class="p">);</span>
   <span class="p">}</span>
@@ -8432,7 +8794,7 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 
 <h4 id="afterget">$afterGet</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">async</span> <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="nx">doPossiblyAsyncStuff</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -8441,7 +8803,7 @@ object is <code class="prettyprint">undefined</code>. See the examples &ndash;&g
 <p>The current query&rsquo;s transaction/knex instance can always be accessed through <code class="prettyprint">queryContext.transaction</code>.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="nx">async</span> <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$afterGet</span><span class="p">(</span><span class="nx">queryContext</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// This can always be done even if there is no running transaction. In that</span>
     <span class="c1">// case `queryContext.transaction` returns the normal knex instance. This</span>
     <span class="c1">// makes sure that the query is not executed outside the original query's</span>
@@ -8757,17 +9119,17 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
 <h2 id="validationerror">ValidationError</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">ValidationError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">ValidationError</span><span class="p">;</span>
 
-<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">({</span><span class="nx">type</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">});</span>
 </code></pre>
 <blockquote>
 <p>Or</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">ValidationError</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Model</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">;</span>
 
-<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+<span class="k">throw</span> <span class="k">new</span> <span class="nx">ValidationError</span><span class="p">({</span><span class="nx">type</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">data</span><span class="p">});</span>
 </code></pre>
 <blockquote>
-<p>The <code class="prettyprint">data</code> object should follow this pattern:</p>
+<p>If <code class="prettyprint">type</code> is <code class="prettyprint">&quot;ModelValidation&quot;</code> then <code class="prettyprint">data</code> object should follow this pattern:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="p">{</span>
   <span class="nl">key1</span><span class="p">:</span> <span class="p">[{</span>
@@ -8797,11 +9159,16 @@ method of <a href="#model"><code class="prettyprint">Model</code></a> like in th
 <blockquote>
 <p>For each <code class="prettyprint">key</code>, a list of errors is given. Each error contains the default <code class="prettyprint">message</code> (as returned by the validator), an optional <code class="prettyprint">keyword</code>
 string to identify the validation rule which didn&rsquo;t pass and a <code class="prettyprint">param</code> object which optionally contains more details about the context of the validation error.</p>
+
+<p>If <code class="prettyprint">type</code> is anything else but <code class="prettyprint">&quot;ModelValidation&quot;</code>, <code class="prettyprint">data</code> can be any object that describes the error.</p>
 </blockquote>
 
-<p>Error of this class is thrown by default if a model validation fails.</p>
+<p>Error of this class is thrown by default if validation of any input fails. By input we mean any data that can come
+from the outside world, like model instances (or POJOs), relation expressions object graphs etc.</p>
 
 <p>You can replace this error by overriding <a href="#createvalidationerror"><code class="prettyprint">Model.createValidationError()</code></a> method.</p>
+
+<p>See the <a href="#error-handling">error handling recipe</a> for more info.</p>
 
 <table><thead>
 <tr>
@@ -8816,9 +9183,14 @@ string to identify the validation rule which didn&rsquo;t pass and a <code class
 <td>HTTP status code for interop with express error handlers and other libraries that search for status code from errors.</td>
 </tr>
 <tr>
+<td>type</td>
+<td>string</td>
+<td>One of &ldquo;ModelValidation&rdquo;, &ldquo;RelationExpression&rdquo;, &ldquo;UnallowedRelation&rdquo; and &ldquo;InvalidGraph&rdquo;. This can be any string for your own custom errors. The listed values are used internally by objection.</td>
+</tr>
+<tr>
 <td>data</td>
-<td>Object</td>
-<td>Dictionary of errors.</td>
+<td>object</td>
+<td>Any additional data. The content of this property is documented in the example in this section for &ldquo;ModelValidation&rdquo; errors.</td>
 </tr>
 </tbody></table>
 
@@ -8837,6 +9209,8 @@ string to identify the validation rule which didn&rsquo;t pass and a <code class
 <p>Error of this class is thrown by default by <a href="#throwifnotfound"><code class="prettyprint">throwIfNotFound()</code></a></p>
 
 <p>You can replace this error by overriding <a href="#createnotfounderror"><code class="prettyprint">Model.createNotFoundError()</code></a> method.</p>
+
+<p>See the <a href="#error-handling">error handling recipe</a> for more info.</p>
 
 <h2 id="modeloptions">ModelOptions</h2>
 
@@ -8861,6 +9235,22 @@ string to identify the validation rule which didn&rsquo;t pass and a <code class
 <td>old</td>
 <td>object</td>
 <td>The old values for methods like <code class="prettyprint">$beforeUpdate</code> and <code class="prettyprint">$beforeValidate</code>.</td>
+</tr>
+</tbody></table>
+
+<h2 id="cloneoptions">CloneOptions</h2>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>shallow</td>
+<td>boolean</td>
+<td>If true, relations are ignored</td>
 </tr>
 </tbody></table>
 

@@ -114,11 +114,9 @@ Composite key can be defined by using an array of column names.</p>
   <span class="nx">$beforeInsert</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">throw</span> <span class="k">new</span> <span class="nx">objection</span><span class="p">.</span><span class="nx">ValidationError</span><span class="p">({</span>
-        <span class="na">id</span><span class="p">:</span> <span class="p">[{</span>
-          <span class="na">message</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span>
-          <span class="na">keyword</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
-          <span class="na">params</span><span class="p">:</span> <span class="kc">null</span>
-        <span class="p">}]</span>
+        <span class="na">message</span><span class="p">:</span> <span class="s1">'identifier should not be defined before insert'</span><span class="p">,</span>
+        <span class="na">type</span><span class="p">:</span> <span class="s1">'MyCustomError'</span><span class="p">,</span>
+        <span class="na">data</span><span class="p">:</span> <span class="nx">someObjectWithSomeData</span>
       <span class="p">});</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -352,7 +350,6 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
@@ -364,7 +361,6 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">updateJennifer</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'J.'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
-  <span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1">// Ensures we're returned a single row in the promise resolution</span>
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">updateJennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
@@ -376,7 +372,7 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">deletedJennifers</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="k">delete</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">})</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">deletedJennifers</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// However many Jennifers there were</span>
@@ -673,7 +669,7 @@ app.</p>
 <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 
 <span class="kr">const</span> <span class="p">{</span>
-  <span class="nx">DbError</span><span class="p">,</span>
+  <span class="nx">DBError</span><span class="p">,</span>
   <span class="nx">ConstraintViolationError</span><span class="p">,</span>
   <span class="nx">UniqueViolationError</span><span class="p">,</span>
   <span class="nx">NotNullViolationError</span><span class="p">,</span>
@@ -771,7 +767,7 @@ app.</p>
       <span class="na">type</span><span class="p">:</span> <span class="s1">'InvalidData'</span><span class="p">,</span>
       <span class="na">data</span><span class="p">:</span> <span class="p">{}</span>
     <span class="p">});</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">DbError</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="k">instanceof</span> <span class="nx">DBError</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">500</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span>
       <span class="na">message</span><span class="p">:</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
       <span class="na">type</span><span class="p">:</span> <span class="s1">'UnknownDatabaseError'</span><span class="p">,</span>
