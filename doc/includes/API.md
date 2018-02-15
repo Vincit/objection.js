@@ -2736,9 +2736,13 @@ const context = builder.context();
 Person
   .query()
   .context({
-    runBefore: (result, builder) => {},
-    runAfter: (result, builder) => {},
-    onBuild: (builder) => {}
+    runBefore: (result, builder) => {
+      return result;
+    },
+    runAfter: (result, builder) => {
+      return result;
+    },
+    onBuild: builder => {}
   });
 ```
 
@@ -2750,7 +2754,7 @@ Person
   .query()
   .eager('[movies, children.movies]')
   .context({
-    onBuild: (builder) => {
+    onBuild: builder => {
       builder.withSchema('someSchema');
     }
   });
@@ -3153,16 +3157,18 @@ const builder = queryBuilder.runBefore(runBefore);
 const query = Person.query();
 
 query
- .runBefore(async () => {
-   console.log('hello 1');
+  .runBefore(async result => {
+    console.log('hello 1');
 
-   await Promise.delay(10);
+    await Promise.delay(10);
 
     console.log('hello 2');
- })
- .runBefore(() => {
-   console.log('hello 3');
- });
+    return result
+  })
+  .runBefore(result => {
+    console.log('hello 3');
+    return result
+  });
 
 await query;
 // --> hello 1
@@ -3177,7 +3183,7 @@ chained like [`then`](#then) methods of a promise.
 
 Argument|Type|Description
 --------|----|--------------------
-runBefore|function(any, [`QueryBuilder`](#querybuilder))|The function to be executed.
+runBefore|function(result, [`QueryBuilder`](#querybuilder))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
 
 ##### Return value
 
@@ -3245,6 +3251,7 @@ query
  })
  .runAfter(async (models, queryBuilder) => {
    models.push(Person.fromJson({firstName: 'Jennifer'}));
+   return models;
  });
 
 const models = await query;
@@ -3260,7 +3267,7 @@ registered using the [`then`](#then) method. Multiple functions can be chained l
 
 Argument|Type|Description
 --------|----|--------------------
-runAfter|function(*, [`QueryBuilder`](#querybuilder))|The function to be executed.
+runAfter|function(result, [`QueryBuilder`](#querybuilder))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
 
 ##### Return value
 
@@ -5122,7 +5129,7 @@ modelClass|[`Model`](#model)&#124;string|Constructor of the related model class,
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
 modify|function([`QueryBuilder`](#querybuilder))|Optional modifier for the relation query. This is called each time the relation is fetched.
 filter|function([`QueryBuilder`](#querybuilder))|Alias for modify.
-beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted model instance.  This function can be async.
+beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
 
 ##### RelationJoin
 
