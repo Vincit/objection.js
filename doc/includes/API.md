@@ -5265,7 +5265,7 @@ class Person extends Model {
     return ['fullName', 'isFemale'];
   }
 
-  fullName() {
+  get fullName() {
     return `${this.firstName} ${this.lastName}`;
   }
 
