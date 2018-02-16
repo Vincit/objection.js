@@ -248,7 +248,7 @@ class Person extends Model {
 You may want to use snake_cased names in database and camelCased names in code. There are two ways to achieve this:
 
 1. _Conversion in knex using [`knexSnakeCaseMappers`](#objection-knexsnakecasemappers)_.
-When the conversion is done on knex level __everything__ is converted to came case including properties and identifiers
+When the conversion is done on knex level __everything__ is converted to camel case including properties and identifiers
 in `relationMappings` and queries. `knexSnakeCaseMappers` use knex's `postProcessResponse` and `wrapIdentifier` hooks.
 
 2. _Conversion in objection using [`snakeCaseMappers`](#objection-snakecasemappers)_.
