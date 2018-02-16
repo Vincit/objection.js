@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/Vincit/objection.js.svg?branch=master)](https://travis-ci.org/Vincit/objection.js) [![Coverage Status](https://coveralls.io/repos/github/Vincit/objection.js/badge.svg?branch=master)](https://coveralls.io/github/Vincit/objection.js?branch=master) [![Join the chat at https://gitter.im/Vincit/objection.js](https://badges.gitter.im/Vincit/objection.js.svg)](https://gitter.im/Vincit/objection.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-# [Objection.js](http://vincit.github.io/objection.js)
+# [Objection.js](https://vincit.github.io/objection.js)
 
-[Objection.js](http://vincit.github.io/objection.js) is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
+[Objection.js](https://vincit.github.io/objection.js) is an [ORM](https://en.wikipedia.org/wiki/Object-relational_mapping)
 for [Node.js](https://nodejs.org/) that aims to stay out of your way and make it as easy as possible to use the full
 power of SQL and the underlying database engine while keeping magic to a minimum.
 
@@ -11,14 +11,14 @@ are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thor
 
 What objection.js gives you:
 
- * **An easy declarative way of [defining models](http://vincit.github.io/objection.js/#models) and relationships between them**
- * **Simple and fun way to [fetch, insert, update and delete](http://vincit.github.io/objection.js/#query-examples) objects using the full power of SQL**
- * **Powerful mechanisms for [eager loading](http://vincit.github.io/objection.js/#eager-loading), [inserting](http://vincit.github.io/objection.js/#graph-inserts) and [upserting](http://vincit.github.io/objection.js/#graph-upserts) object graphs**
- * **A way to [store complex documents](http://vincit.github.io/objection.js/#documents) as single rows**
+ * **An easy declarative way of [defining models](https://vincit.github.io/objection.js/#models) and relationships between them**
+ * **Simple and fun way to [fetch, insert, update and delete](https://vincit.github.io/objection.js/#query-examples) objects using the full power of SQL**
+ * **Powerful mechanisms for [eager loading](https://vincit.github.io/objection.js/#eager-loading), [inserting](https://vincit.github.io/objection.js/#graph-inserts) and [upserting](https://vincit.github.io/objection.js/#graph-upserts) object graphs**
+ * **A way to [store complex documents](https://vincit.github.io/objection.js/#documents) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
- * **Easy to use [transactions](http://vincit.github.io/objection.js/#transactions)**
+ * **Easy to use [transactions](https://vincit.github.io/objection.js/#transactions)**
  * **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**
- * **Optional [JSON schema](http://vincit.github.io/objection.js/#validation) validation**
+ * **Optional [JSON schema](https://vincit.github.io/objection.js/#validation) validation**
 
 What objection.js **doesn't** give you:
 
@@ -36,7 +36,7 @@ using node ">=7.6.0" or alternatively with a transpiler such as [Babel](https://
 and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
 
 Shortcuts:
- * [API reference](http://vincit.github.io/objection.js/#api-reference)
- * [Changelog](http://vincit.github.io/objection.js/#changelog)
- * [Contribution guide](http://vincit.github.io/objection.js/#contribution-guide)
- * [Plugins](http://vincit.github.io/objection.js/#plugins)
+ * [API reference](https://vincit.github.io/objection.js/#api-reference)
+ * [Changelog](https://vincit.github.io/objection.js/#changelog)
+ * [Contribution guide](https://vincit.github.io/objection.js/#contribution-guide)
+ * [Plugins](https://vincit.github.io/objection.js/#plugins)
