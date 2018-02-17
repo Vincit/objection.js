@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const knex = require('knex');
+const Knex = require('knex');
 const expect = require('expect.js');
 const objection = require('../../../');
 
@@ -548,5 +548,21 @@ describe('Relation', () => {
       }
     });
     expect(stuff).to.eql('schema_table_rel_testRelation');
+  });
+
+  it('joinModelClass should return null for relations without join models', () => {
+    let relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: RelatedModel,
+      join: {
+        from: 'RelatedModel.ownerId',
+        to: 'OwnerModel.id'
+      }
+    });
+
+    const knex = Knex({ client: 'pg' });
+    expect(relation.joinModelClass).to.equal(null);
   });
 });

@@ -140,7 +140,7 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTable).to.equal('JoinModel');
     expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
     expect(relation.joinTableRelatedProp.props).to.eql(['relatedId']);
-    expect(classUtils.isSubclassOf(relation.joinModelClass(mockKnex), JoinModel)).to.equal(true);
+    expect(classUtils.isSubclassOf(relation.joinModelClass, JoinModel)).to.equal(true);
   });
 
   it('should accept an absolute file path to a join model in join.through object', () => {
@@ -163,9 +163,9 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTable).to.equal('JoinModel');
     expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
     expect(relation.joinTableRelatedProp.cols).to.eql(['relatedId']);
-    expect(
-      classUtils.isSubclassOf(relation.joinModelClass(mockKnex), require('./files/JoinModel'))
-    ).to.equal(true);
+    expect(classUtils.isSubclassOf(relation.joinModelClass, require('./files/JoinModel'))).to.equal(
+      true
+    );
   });
 
   it('should accept a composite keys in join.through object (1)', () => {
