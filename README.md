@@ -23,6 +23,9 @@ What objection.js gives you:
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
+ This doesn't mean you have to write SQL strings though. A query builder based on [`knex`](http://knexjs.org) is 
+    used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily 
+    written using the [raw](http://vincit.github.io/objection.js/#raw) helper function.
  * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
     but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
