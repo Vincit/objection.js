@@ -1503,7 +1503,7 @@ describe('Model', () => {
   it('should convert objects to json based on jsonAttributes array', () => {
     class TestModel extends Model {
       static get tableName() {
-        return tableName;
+        return 'TestModel';
       }
 
       static get jsonSchema() {
