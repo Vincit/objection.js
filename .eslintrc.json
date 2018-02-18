@@ -4,6 +4,12 @@
     "prettier"
   ],
   "rules": {
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "no-undef": "error"
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "mocha": true
   }
 }
