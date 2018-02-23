@@ -520,7 +520,7 @@ module.exports = session => {
         });
 
         if (session.isPostgres()) {
-          it.skip('smoke test for various methods', () => {
+          it('smoke test for various methods', () => {
             // This test doesn't actually test that the methods work. Knex has tests
             // for these. This is a smoke test in case of typos and such.
             return Model2.query()
@@ -538,8 +538,6 @@ module.exports = session => {
               .clearSelect()
               .clearWhere()
               .columns('model2.model2_prop2')
-              .forUpdate()
-              .forShare()
               .where(raw('? = ?', ref('model2.id_col'), ref('model2.model2_prop2')))
               .where(raw('? in (?)', ref('model2.id_col'), Model1.query().select('id')))
               .whereNot('model2.id_col', 1)
