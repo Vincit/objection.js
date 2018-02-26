@@ -3955,13 +3955,24 @@ Type|Description
 const sql = queryBuilder.toString();
 ```
 
-Returns the SQL string. If this query builder executes multiple queries, only the first query's SQL is returned.
+Returns the SQL string suitable for logging input _but not for execution_, via Knex as `this.build().toString()`. This method should not be used to create queries for database execution because it makes no guarantees about escaping bindings properly.
+
+Note: In the current release, if the query builder attempts to execute multiple queries or throw any exception whatsoever, **no error will throw** and instead the following string is returned:
+
+```
+This query cannot be built synchronously. Consider using debug() method instead.
+```
+
+Later versions of Objection may introduce a native way to retrieve an executable SQL statement, or handle this behavior differently. If you need executable SQL, consider `this.build().toSQL()`, which is the native Knex method that can [provide formatted bindings](http://knexjs.org/#Interfaces-toSQL).
+
+
+
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-string|The SQL this query builder will build
+string|The SQL this query builder will build, or `This query cannot be built synchronously. Consider using debug() method instead.` if an exception is thrown
 
 
 
@@ -3972,13 +3983,15 @@ string|The SQL this query builder will build
 const sql = queryBuilder.toSql();
 ```
 
-Returns the SQL string. If this query builder executes multiple queries, only the first query's SQL is returned.
+An alias for `toSql()`.
+
+Note: The behavior of Objection's `toSql()` is different from Knex's `toSql()`, which can be accessed via `build().toSQL()` (see above). This method may be deprecated soon.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-string|The SQL this query builder will build
+string|The SQL this query builder will build, or `This query cannot be built synchronously. Consider using debug() method instead.` if an exception is thrown
 
 
 
