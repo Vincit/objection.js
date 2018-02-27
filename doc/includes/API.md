@@ -5127,8 +5127,8 @@ Property|Type|Description
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
 modelClass|[`Model`](#model)&#124;string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [`modelPaths`](#modelpaths) that exports a model class.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
-modify|function([`QueryBuilder`](#querybuilder))|Optional modifier for the relation query. This is called each time the relation is fetched.
-filter|function([`QueryBuilder`](#querybuilder))|Alias for modify.
+modify|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
+filter|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Alias for modify.
 beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
 
 ##### RelationJoin
