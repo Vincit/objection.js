@@ -1,18 +1,13 @@
 {
   "compilerOptions": {
     "allowJs": false,
-    "alwaysStrict": true,
     "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmit": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "noImplicitUseStrict": false,
     "strict": true,
-    "strictFunctionTypes": true,
-    "strictNullChecks": true,
     "target": "es6"
   },
   "files": [
