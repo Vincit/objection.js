@@ -3955,7 +3955,7 @@ Type|Description
 const sql = queryBuilder.toString();
 ```
 
-Returns the SQL string suitable for logging input _but not for execution_, via Knex as `this.build().toString()`. This method should not be used to create queries for database execution because it makes no guarantees about escaping bindings properly.
+Returns the SQL string suitable for logging input _but not for execution_, via Knex's `toString()`. This method should not be used to create queries for database execution because it makes no guarantees about escaping bindings properly.
 
 Note: In the current release, if the query builder attempts to execute multiple queries or throw any exception whatsoever, **no error will throw** and instead the following string is returned:
 
@@ -3963,7 +3963,7 @@ Note: In the current release, if the query builder attempts to execute multiple 
 This query cannot be built synchronously. Consider using debug() method instead.
 ```
 
-Later versions of Objection may introduce a native way to retrieve an executable SQL statement, or handle this behavior differently. If you need executable SQL, consider `this.build().toSQL()`, which is the native Knex method that can [provide formatted bindings](http://knexjs.org/#Interfaces-toSQL).
+Later versions of Objection may introduce a native way to retrieve an executable SQL statement, or handle this behavior differently. If you need executable SQL, you can consider the unstable/private API `this.build().toSQL()`, which is the native Knex method that can [provide formatted bindings](http://knexjs.org/#Interfaces-toSQL).
 
 
 
@@ -3985,7 +3985,7 @@ const sql = queryBuilder.toSql();
 
 An alias for `toSql()`.
 
-Note: The behavior of Objection's `toSql()` is different from Knex's `toSql()`, which can be accessed via `build().toSQL()` (see above). This method may be deprecated soon.
+Note: The behavior of Objection's `toSql()` is different from Knex's `toSql()` (see above). This method may be deprecated soon.
 
 ##### Return value
 
