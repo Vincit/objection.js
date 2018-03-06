@@ -1399,6 +1399,44 @@ module.exports = session => {
             expect(model.model1Prop1).to.equal('hello 1');
           });
       });
+
+      it('should throw if the id is undefined', done => {
+        Model1.query()
+          .then(models => {
+            expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
+            delete models[0].id;
+            return models[0].$query();
+          })
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+            );
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should throw if the id is null', done => {
+        Model1.query()
+          .then(models => {
+            expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2']);
+            models[0].id = null;
+            return models[0].$query();
+          })
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+            );
+            done();
+          })
+          .catch(done);
+      });
     });
 
     describe('.$relatedQuery()', () => {

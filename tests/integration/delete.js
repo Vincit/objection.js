@@ -215,6 +215,42 @@ module.exports = session => {
             expectPartEql(rows[0], { id: 2, model1Prop1: 'hello 2' });
           });
       });
+
+      it('should throw if the id is undefiend', done => {
+        let model = Model1.fromJson({ model1Prop2: 1 });
+
+        model
+          .$query()
+          .delete()
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+            );
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should throw if the id is null', done => {
+        let model = Model1.fromJson({ id: null });
+
+        model
+          .$query()
+          .delete()
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              `one of the identifier columns [id] is null or undefined. Have you specified the correct identifier column for the model 'Model1' using the 'idColumn' property?`
+            );
+            done();
+          })
+          .catch(done);
+      });
     });
 
     describe('.$relatedQuery().delete()', () => {

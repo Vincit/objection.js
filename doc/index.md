@@ -223,6 +223,17 @@ class Person extends Model {
     return 'persons';
   }
 
+  // Each model must have a column (or a set of columns) that uniquely
+  // identifies the rows. The colum(s) can be specified using the `idColumn`
+  // property. `idColumn` returns `id` by default and doesn't need to be
+  // specified unless the model's primary key is something else.
+  static get idColumn() {
+    return 'id';
+  }
+
+  // Methods can be defined for model classes just as you would for
+  // any javascript class. If you want to include the result of these
+  // method in the output json, see `virtualAttributes`.
   fullName() {
     return this.firstName + ' ' + this.lastName;
   }
@@ -328,6 +339,15 @@ class Person extends Model {
   // Table name is the only required property.
   static tableName = 'persons';
 
+  // Each model must have a column (or a set of columns) that uniquely
+  // identifies the rows. The colum(s) can be specified using the `idColumn`
+  // property. `idColumn` returns `id` by default and doesn't need to be
+  // specified unless the model's primary key is something else.
+  static idColumn = 'id';
+
+  // Methods can be defined for model classes just as you would for
+  // any javascript class. If you want to include the result of these
+  // method in the output json, see `virtualAttributes`.
   fullName() {
     return this.firstName + ' ' + this.lastName;
   }
@@ -444,7 +464,8 @@ Composite id can be set by giving an array of column names. Composite keys are f
 
 ```js
 class Animal extends Model {
-  static tableName = 'animal';
+  static tableName = 'animals';
+
   static relationMappings = {
     owner: {
       relation: Model.BelongsToOneRelation,
@@ -463,6 +484,7 @@ class Animal extends Model {
 ```js
 class Person extends Model {
   static tableName = 'persons';
+
   static relationMappings = {
     animals: {
       relation: Model.HasManyRelation,
@@ -481,6 +503,7 @@ class Person extends Model {
 ```js
 class Person extends Model {
   static tableName = 'persons';
+
   static relationMappings = {
     animal: {
       relation: Model.HasOneRelation,
