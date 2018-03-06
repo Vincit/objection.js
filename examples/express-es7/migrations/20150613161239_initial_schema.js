@@ -1,52 +1,52 @@
 exports.up = knex => {
   return knex.schema
-    .createTable('Person', table => {
+    .createTable('persons', table => {
       table.increments('id').primary();
       table
         .integer('parentId')
         .unsigned()
         .references('id')
-        .inTable('Person');
+        .inTable('persons');
       table.string('firstName');
       table.string('lastName');
       table.integer('age');
       table.json('address');
     })
-    .createTable('Movie', table => {
+    .createTable('movies', table => {
       table.increments('id').primary();
       table.string('name');
     })
-    .createTable('Animal', table => {
+    .createTable('animals', table => {
       table.increments('id').primary();
       table
         .integer('ownerId')
         .unsigned()
         .references('id')
-        .inTable('Person');
+        .inTable('persons');
       table.string('name');
       table.string('species');
     })
-    .createTable('Person_Movie', table => {
+    .createTable('persons_movies', table => {
       table.increments('id').primary();
       table
         .integer('personId')
         .unsigned()
         .references('id')
-        .inTable('Person')
+        .inTable('persons')
         .onDelete('CASCADE');
       table
         .integer('movieId')
         .unsigned()
         .references('id')
-        .inTable('Movie')
+        .inTable('movies')
         .onDelete('CASCADE');
     });
 };
 
 exports.down = knex => {
   return knex.schema
-    .dropTableIfExists('Person_Movie')
-    .dropTableIfExists('Animal')
-    .dropTableIfExists('Movie')
-    .dropTableIfExists('Person');
+    .dropTableIfExists('persons_movies')
+    .dropTableIfExists('animals')
+    .dropTableIfExists('movies')
+    .dropTableIfExists('persons');
 };

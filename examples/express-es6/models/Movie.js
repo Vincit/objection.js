@@ -5,7 +5,7 @@ const Model = require('objection').Model;
 class Movie extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'Movie';
+    return 'movies';
   }
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
@@ -32,13 +32,13 @@ class Movie extends Model {
         // here to prevent require loops.
         modelClass: __dirname + '/Person',
         join: {
-          from: 'Movie.id',
+          from: 'movies.id',
           // ManyToMany relation needs the `through` object to describe the join table.
           through: {
-            from: 'Person_Movie.movieId',
-            to: 'Person_Movie.personId'
+            from: 'persons_movies.movieId',
+            to: 'persons_movies.personId'
           },
-          to: 'Person.id'
+          to: 'persons.id'
         }
       }
     };

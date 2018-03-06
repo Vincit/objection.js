@@ -113,7 +113,7 @@ Model.knex(knex);
 // Person model.
 class Person extends Model {
   static get tableName() {
-    return 'Person';
+    return 'persons';
   }
 
   static get relationMappings() {
@@ -122,8 +122,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
-          from: 'Person.id',
-          to: 'Person.parentId'
+          from: 'persons.id',
+          to: 'persons.parentId'
         }
       }
     };
@@ -133,9 +133,9 @@ class Person extends Model {
 async function createSchema() {
   // Create database schema. You should use knex migration files to do this. We
   // create it here for simplicity.
-  await knex.schema.createTableIfNotExists('Person', table => {
+  await knex.schema.createTableIfNotExists('persons', table => {
     table.increments('id').primary();
-    table.integer('parentId').references('Person.id');
+    table.integer('parentId').references('persons.id');
     table.string('firstName');
   });
 }
@@ -194,7 +194,7 @@ const { Model } = require('objection');
 
 class MinimalModel extends Model {
   static get tableName() {
-    return 'SomeTableName';
+    return 'someTableName';
   }
 }
 
@@ -207,7 +207,7 @@ module.exports = MinimalModel;
 import { Model } from 'objection';
 
 export default class MinimalModel extends Model {
-  static tableName = 'SomeTableName';
+  static tableName = 'someTableName';
 }
 ```
 
@@ -220,7 +220,7 @@ class Person extends Model {
 
   // Table name is the only required property.
   static get tableName() {
-    return 'Person';
+    return 'persons';
   }
 
   fullName() {
@@ -276,8 +276,8 @@ class Person extends Model {
         // to a module that exports one.
         modelClass: Animal,
         join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
+          from: 'persons.id',
+          to: 'animals.ownerId'
         }
       },
 
@@ -285,17 +285,17 @@ class Person extends Model {
         relation: Model.ManyToManyRelation,
         modelClass: Movie,
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           // ManyToMany relation needs the `through` object
           // to describe the join table.
           through: {
             // If you have a model class for the join table
             // you need to specify it like this:
             // modelClass: PersonMovie,
-            from: 'Person_Movie.personId',
-            to: 'Person_Movie.movieId'
+            from: 'persons_movies.personId',
+            to: 'persons_movies.movieId'
           },
-          to: 'Movie.id'
+          to: 'movies.id'
         }
       },
 
@@ -303,8 +303,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
-          from: 'Person.id',
-          to: 'Person.parentId'
+          from: 'persons.id',
+          to: 'persons.parentId'
         }
       },
 
@@ -312,8 +312,8 @@ class Person extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
-          from: 'Person.parentId',
-          to: 'Person.id'
+          from: 'persons.parentId',
+          to: 'persons.id'
         }
       }
     };
@@ -326,7 +326,7 @@ class Person extends Model {
 ```js
 class Person extends Model {
   // Table name is the only required property.
-  static tableName = 'Person';
+  static tableName = 'persons';
 
   fullName() {
     return this.firstName + ' ' + this.lastName;
@@ -375,8 +375,8 @@ class Person extends Model {
       // path version here to prevent require loops.
       modelClass: __dirname + '/Animal',
       join: {
-        from: 'Person.id',
-        to: 'Animal.ownerId'
+        from: 'persons.id',
+        to: 'animals.ownerId'
       }
     },
 
@@ -384,17 +384,17 @@ class Person extends Model {
       relation: Model.ManyToManyRelation,
       modelClass: __dirname + '/Movie',
       join: {
-        from: 'Person.id',
+        from: 'persons.id',
         // ManyToMany relation needs the `through` object
         // to describe the join table.
         through: {
           // If you have a model class for the join table
           // you need to specify it like this:
           // modelClass: PersonMovie,
-          from: 'Person_Movie.personId',
-          to: 'Person_Movie.movieId'
+          from: 'persons_movies.personId',
+          to: 'persons_movies.movieId'
         },
-        to: 'Movie.id'
+        to: 'movies.id'
       }
     },
 
@@ -402,8 +402,8 @@ class Person extends Model {
       relation: Model.HasManyRelation,
       modelClass: Person,
       join: {
-        from: 'Person.id',
-        to: 'Person.parentId'
+        from: 'persons.id',
+        to: 'persons.parentId'
       }
     },
 
@@ -411,8 +411,8 @@ class Person extends Model {
       relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
-        from: 'Person.parentId',
-        to: 'Person.id'
+        from: 'persons.parentId',
+        to: 'persons.id'
       }
     }
   };
@@ -450,8 +450,8 @@ class Animal extends Model {
       relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
-        from: 'animal.ownerId',
-        to: 'person.id'
+        from: 'animals.ownerId',
+        to: 'persons.id'
       }
     }
   }
@@ -462,14 +462,14 @@ class Animal extends Model {
 
 ```js
 class Person extends Model {
-  static tableName = 'person';
+  static tableName = 'persons';
   static relationMappings = {
     animals: {
       relation: Model.HasManyRelation,
       modelClass: Animal,
       join: {
-        from: 'person.id',
-        to: 'animal.ownerId'
+        from: 'persons.id',
+        to: 'animals.ownerId'
       }
     }
   }
@@ -480,14 +480,14 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  static tableName = 'person';
+  static tableName = 'persons';
   static relationMappings = {
     animal: {
       relation: Model.HasOneRelation,
       modelClass: Animal,
       join: {
-        from: 'person.id',
-        to: 'animal.ownerId'
+        from: 'persons.id',
+        to: 'animals.ownerId'
       }
     }
   }
@@ -498,19 +498,20 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  static tableName = 'Person';
+  static tableName = 'persons';
+
   static relationMappings = {
     movies: {
       relation: Model.ManyToManyRelation,
       modelClass: Movie,
       join: {
-        from: 'Person.id',
+        from: 'persons.id',
         through: {
-          // Person_Movie is the join table.
-          from: 'Person_Movie.personId',
-          to: 'Person_Movie.movieId'
+          // persons_movies is the join table.
+          from: 'persons_movies.personId',
+          to: 'persons_movies.movieId'
         },
-        to: 'Movie.id'
+        to: 'movies.id'
       }
     }
   }
@@ -521,19 +522,20 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  static tableName = 'Person';
+  static tableName = 'persons';
+
   static relationMappings = {
     movie: {
       relation: Model.HasOneThroughRelation,
       modelClass: Movie,
       join: {
-        from: 'Person.id',
+        from: 'persons.id',
         through: {
-          // Person_Movie is the join table.
-          from: 'Person_Movie.personId',
-          to: 'Person_Movie.movieId'
+          // persons_movies is the join table.
+          from: 'persons_movies.personId',
+          to: 'persons_movies.movieId'
         },
-        to: 'Movie.id'
+        to: 'movies.id'
       }
     }
   }
@@ -545,7 +547,7 @@ class Person extends Model {
 ```js
 class Person extends Model {
   static get tableName() {
-    return 'person';
+    return 'persons';
   }
 
   static get relationMappings() {
@@ -563,8 +565,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         modelClass: Animal,
         join: {
-          from: 'person.id',
-          to: 'animal.ownerId'
+          from: 'persons.id',
+          to: 'animals.ownerId'
         }
       },
 
@@ -577,13 +579,13 @@ class Person extends Model {
         // is that you need to give an absolute file path because of the way `require` works.
         modelClass: `${__dirname}/Movie`,
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           through: {
-            // Person_Movie is the join table.
-            from: 'Person_Movie.personId',
-            to: 'Person_Movie.movieId'
+            // persons_movies is the join table.
+            from: 'persons_movies.personId',
+            to: 'persons_movies.movieId'
           },
-          to: 'Movie.id'
+          to: 'movies.id'
         }
       },
 
@@ -595,12 +597,12 @@ class Person extends Model {
         // of your model). Search for `modelPaths` from the docs for more info.
         modelClass: 'Movie',
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           through: {
-            from: 'Person_Movie.personId',
-            to: 'Person_Movie.movieId'
+            from: 'persons_movies.personId',
+            to: 'persons_movies.movieId'
           },
-          to: 'Movie.id'
+          to: 'movies.id'
         }
       }
     };
@@ -677,7 +679,7 @@ console.log('there are', people.length, 'People in total');
 ```
 
 ```sql
-select "Person".* from "Person"
+select "people".* from "people"
 ```
 
 > The return value of the [`query`](#query) method is an instance of [`QueryBuilder`](#querybuilder)
@@ -697,7 +699,7 @@ console.log(middleAgedJennifers[0].lastName);
 ```
 
 ```sql
-select "Person".* from "Person"
+select "persons".* from "persons"
 where "age" > 40
 and "age" < 60
 and "firstName" = 'Jennifer'
@@ -718,9 +720,9 @@ console.log(people[0].grandParentName)
 
 ```sql
 select "parent:parent"."firstName" as "grandParentName"
-from "Person"
-inner join "Person" as "parent" on "parent"."id" = "Person"."parentId"
-inner join "Person" as "parent:parent" on "parent:parent"."id" = "parent"."parentId"
+from "persons"
+inner join "persons" as "parent" on "parent"."id" = "persons"."parentId"
+inner join "persons" as "parent:parent" on "parent:parent"."id" = "parent"."parentId"
 ```
 
 > The next example shows how easy it is to build complex queries:
@@ -728,22 +730,22 @@ inner join "Person" as "parent:parent" on "parent:parent"."id" = "parent"."paren
 ```js
 const people = await Person
   .query()
-  .select('Person.*', 'Parent.firstName as parentFirstName')
-  .join('Person as Parent', 'Person.parentId', 'Parent.id')
-  .where('Person.age', '<', Person.query().avg('Person.age'))
-  .whereExists(Animal.query().select(1).where('Person.id', ref('Animal.ownerId')))
-  .orderBy('Person.lastName');
+  .select('persons.*', 'Parent.firstName as parentFirstName')
+  .join('persons as parent', 'persons.parentId', 'parent.id')
+  .where('persons.age', '<', Person.query().avg('persons.age'))
+  .whereExists(Animal.query().select(1).where('persons.id', ref('animals.ownerId')))
+  .orderBy('persons.lastName');
 
 console.log(people[0].parentFirstName);
 ```
 
 ```sql
-select "Person".*, "Parent"."firstName" as "parentFirstName"
-from "Person"
-inner join "Person" as "Parent" on "Person"."parentId" = "Parent"."id"
-where "Person"."age" < (select avg("Person"."age") from "Person")
-and exists (select 1 from "Animal" where "Person"."id" = "Animal"."ownerId")
-order by "Person"."lastName" asc
+select "persons".*, "parent"."firstName" as "parentFirstName"
+from "persons"
+inner join "persons" as "parent" on "persons"."parentId" = "parent"."id"
+where "persons"."age" < (select avg("persons"."age") from "persons")
+and exists (select 1 from "animals" where "persons"."id" = "animals"."ownerId")
+order by "persons"."lastName" asc
 ```
 
 Fetch queries can be created simply by calling [`Model.query()`](#query) and chaining query builder methods for the returned
@@ -763,7 +765,7 @@ console.log(jennifer.fullName()); // --> 'Jennifer Lawrence'
 ```
 
 ```sql
-insert into "Person" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
+insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 ```
 
 Insert queries are created by chaining the [`insert`](#insert) method to the query. See the [`insertGraph`](#insertgraph) method
@@ -781,7 +783,7 @@ console.log(numUpdated, 'people were updated');
 ```
 
 ```sql
-update "Person" set "lastName" = 'Dinosaur' where "age" > 60
+update "persons" set "lastName" = 'Dinosaur' where "age" > 60
 ```
 
 ```js
@@ -793,8 +795,8 @@ console.log(updatedPerson.lastName); // --> Updated.
 ```
 
 ```sql
-update "Person" set "lastName" = 'Updated' where "id" = 246
-select "Person".* from "Person" where "id" = 246
+update "persons" set "lastName" = 'Updated' where "id" = 246
+select "persons".* from "persons" where "id" = 246
 ```
 
 Update queries are created by chaining the [`update`](#update) or [`patch`](#patch) method to the query. The [`patch`](#patch) and [`update`](#update)
@@ -814,7 +816,7 @@ console.log(numDeleted, 'people were deleted');
 ```
 
 ```sql
-delete from "Person" where lower("firstName") like '%ennif%'
+delete from "persons" where lower("firstName") like '%ennif%'
 ```
 
 Delete queries are created by chaining the [`delete`](#delete) method to the query.
@@ -840,9 +842,9 @@ console.log(pets[0] instanceof Animal); // --> true
 ```
 
 ```sql
-select "Animal".* from "Animal"
+select "animals".* from "animals"
 where "species" = 'dog'
-and "Animal"."ownerId" = 1
+and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
@@ -870,7 +872,7 @@ console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 ```
 
 ```sql
-insert into "Animal" ("name", "ownerId") values ('Fluffy', 1)
+insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
 ```
 
 > If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in
@@ -888,8 +890,8 @@ console.log('best movie ever was added');
 ```
 
 ```sql
-insert into "Movie" ("name") values ('The room')
-insert into "Person_Movie" ("movieId", "personId", "awesomeness") values (14, 25, 9001)
+insert into "movies" ("name") values ('The room')
+insert into "persons_movies" ("movieId", "personId", "awesomeness") values (14, 25, 9001)
 ```
 
 Chain the [`insert`](#insert) method to the [`$relatedQuery`](#_s_relatedquery) call to insert a related object for a model
@@ -1738,7 +1740,7 @@ await transaction(Person, async (Person, trx) => {
   // It can be passed to `transacting`, `query` etc.
   // methods, or used as a knex query builder.
 
-  const jennifer = await trx('Person').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+  const jennifer = await trx('persons').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
   const scrappy = await Animal.query(trx).insert({name: 'Scrappy'});
   const fluffy = await Animal.query().transacting(trx).insert({name: 'Fluffy'});
 

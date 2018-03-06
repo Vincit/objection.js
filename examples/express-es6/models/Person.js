@@ -7,7 +7,7 @@ const Movie = require('./Movie');
 class Person extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'Person';
+    return 'persons';
   }
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
@@ -46,8 +46,8 @@ class Person extends Model {
         // absolute file path to a module that exports one.
         modelClass: Animal,
         join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
+          from: 'persons.id',
+          to: 'animals.ownerId'
         }
       },
 
@@ -55,13 +55,13 @@ class Person extends Model {
         relation: Model.ManyToManyRelation,
         modelClass: Movie,
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           // ManyToMany relation needs the `through` object to describe the join table.
           through: {
-            from: 'Person_Movie.personId',
-            to: 'Person_Movie.movieId'
+            from: 'persons_movies.personId',
+            to: 'persons_movies.movieId'
           },
-          to: 'Movie.id'
+          to: 'movies.id'
         }
       },
 
@@ -69,8 +69,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
-          from: 'Person.id',
-          to: 'Person.parentId'
+          from: 'persons.id',
+          to: 'persons.parentId'
         }
       },
 
@@ -78,8 +78,8 @@ class Person extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
-          from: 'Person.parentId',
-          to: 'Person.id'
+          from: 'persons.parentId',
+          to: 'persons.id'
         }
       }
     };

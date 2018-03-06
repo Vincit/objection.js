@@ -44,8 +44,8 @@ await Person
     ref('jsonColumn:details.name').castText().as('name'),
     ref('jsonColumn:details.age').castInt().as('age')
   ])
-  .join('Animal', ref('Person.jsonColumn:details.name').castText(), '=', ref('Animal.name'))
-  .where('age', '>', ref('Animal.jsonData:details.ageLimit'));
+  .join('animals', ref('persons.jsonColumn:details.name').castText(), '=', ref('animals.name'))
+  .where('age', '>', ref('animals.jsonData:details.ageLimit'));
 ```
 
 > Individual json fields can be updated like this:
@@ -279,7 +279,7 @@ Any query can be paged using the [`page`](#page) or [`range`](#range) method.
 const peopleOlderThanAverage = await Person
   .query()
   .where('age', '>', builder => {
-    builder.avg('age').from('Person');
+    builder.avg('age').from('persons');
   });
 
 console.log(peopleOlderThanAverage);
@@ -306,8 +306,8 @@ you would expect. You can also pass [`QueryBuilder`](#querybuilder) instances or
 ```js
 const people = await Person
   .query()
-  .select('Person.*', 'Parent.firstName as parentName')
-  .join('Person as Parent', 'Person.parentId', 'Parent.id');
+  .select('persons.*', 'parent.firstName as parentName')
+  .join('persons as parent', 'persons.parentId', 'parent.id');
 
 console.log(people[0].parentName);
 ```
@@ -578,7 +578,7 @@ await Person
 > SQL:
 
 ```sql
-select * from "Person" where "id" = 1 and ("foo" = 2 or "bar" = 3)
+select * from "persons" where "id" = 1 and ("foo" = 2 or "bar" = 3)
 ```
 
 You can add parentheses to queries by passing a function to the [`where`](#where) method.
@@ -620,6 +620,10 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
+  static get tableName() {
+    return 'persons';
+  }
+
   static get relationMappings() {
     return {
       pets: {
@@ -627,14 +631,14 @@ class Person extends Model {
         modelClass: Animal,
         join: {
           from: [
-            'Person.firstName',
-            'Person.lastName',
-            'Person.dateOfBirth'
+            'persons.firstName',
+            'persons.lastName',
+            'persons.dateOfBirth'
           ],
           to: [
-            'Animal.ownerFirstName',
-            'Animal.ownerLastName',
-            'Animal.ownerDateOfBirth'
+            'animals.ownerFirstName',
+            'animals.ownerLastName',
+            'animals.ownerDateOfBirth'
           ]
         }
       }

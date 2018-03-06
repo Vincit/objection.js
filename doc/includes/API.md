@@ -1200,7 +1200,7 @@ await Person
   .query()
   .alias('p')
   .where('p.id', 1)
-  .join('Person as parent', 'parent.id', 'p.parentId')
+  .join('persons as parent', 'parent.id', 'p.parentId')
 ```
 
 Give an alias for the table to be used in the query.
@@ -1588,7 +1588,7 @@ await Person
 ```js
 await Person
   .query()
-  .select('Person.id', 'parent:parent.name as grandParentName')
+  .select('persons.id', 'parent:parent.name as grandParentName')
   .joinRelation('[pets, parent.[pets, parent]]')
   .where('parent:pets.species', 'dog');
 ```
@@ -1598,7 +1598,7 @@ await Person
 ```js
 await Person
   .query()
-  .select('Person.id', 'pr:pr.name as grandParentName')
+  .select('persons.id', 'pr:pr.name as grandParentName')
   .joinRelation('[pets, parent.[pets, parent]]', {
     aliases: {
       parent: 'pr',
@@ -4659,7 +4659,7 @@ Type|Description
 class Person extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'Person';
+    return 'persons';
   }
 
   // Optional JSON schema. This is not the database schema!
@@ -4708,8 +4708,8 @@ class Person extends Model {
         // path version here to prevent require loops.
         modelClass: __dirname + '/Animal',
         join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
+          from: 'persons.id',
+          to: 'animals.ownerId'
         }
       },
 
@@ -4717,12 +4717,12 @@ class Person extends Model {
         relation: Model.ManyToManyRelation,
         modelClass: __dirname + '/Movie',
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           // ManyToMany relation needs the `through` object
           // to describe the join table.
           through: {
-            from: 'Person_Movie.actorId',
-            to: 'Person_Movie.movieId'
+            from: 'persons_movies.actorId',
+            to: 'persons_movies.movieId'
 
             // If you have a model class for the join table
             // you can specify it like this:
@@ -4736,7 +4736,7 @@ class Person extends Model {
             //
             // extra: ['someExtra']
           },
-          to: 'Movie.id'
+          to: 'movies.id'
         }
       },
 
@@ -4744,8 +4744,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         modelClass: Person,
         join: {
-          from: 'Person.id',
-          to: 'Person.parentId'
+          from: 'persons.id',
+          to: 'persons.parentId'
         }
       },
 
@@ -4753,8 +4753,8 @@ class Person extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
-          from: 'Person.parentId',
-          to: 'Person.id'
+          from: 'persons.parentId',
+          to: 'persons.id'
         }
       }
     };
@@ -4805,7 +4805,7 @@ properties. All properties that start with `$` are also removed from `database` 
 ```js
 class Person extends Model {
   static get tableName() {
-    return 'Person';
+    return 'persons';
   }
 }
 ```
@@ -4814,7 +4814,7 @@ class Person extends Model {
 
 ```js
 class Person extends Model {
-  static tableName = 'Person';
+  static tableName = 'persons';
 }
 ```
 
@@ -5002,19 +5002,23 @@ shared configuration such as this there.
 const { Model, ref } = require('objection');
 
 class Person extends Model {
+  static get tableName() {
+    return 'persons';
+  }
+
   static get relationMappings() {
     return {
       pets: {
         relation: Model.HasManyRelation,
         modelClass: Animal,
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           // Any of the `to` and `from` fields can also be
           // references to nested fields (or arrays of references).
-          // Here the relation is created between `Person.id` and
-          // `Animal.json.details.ownerId` properties. The reference
+          // Here the relation is created between `persons.id` and
+          // `animals.json.details.ownerId` properties. The reference
           // must be casted to the same type as the other key.
-          to: ref('Animal.json:details.ownerId').castInt()
+          to: ref('animals.json:details.ownerId').castInt()
         }
       },
 
@@ -5022,8 +5026,8 @@ class Person extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Person,
         join: {
-          from: 'Person.fatherId',
-          to: 'Person.id'
+          from: 'persons.fatherId',
+          to: 'persons.id'
         }
       },
 
@@ -5031,10 +5035,10 @@ class Person extends Model {
         relation: Model.ManyToManyRelation,
         modelClass: Movie,
         join: {
-          from: 'Person.id',
+          from: 'persons.id',
           through: {
-            from: 'Person_Movie.actorId',
-            to: 'Person_Movie.movieId'
+            from: 'persons_movies.actorId',
+            to: 'persons_movies.movieId'
 
             // If you have a model class for the join table
             // you can specify it like this:
@@ -5048,7 +5052,7 @@ class Person extends Model {
             //
             // extra: ['someExtra']
           },
-          to: 'Movie.id'
+          to: 'movies.id'
         }
       }
     };
@@ -5062,18 +5066,20 @@ class Person extends Model {
 import { Model, ref } from 'objection';
 
 class Person extends Model {
+  static tableName = 'persons';
+
   static relationMappings = {
     pets: {
       relation: Model.HasManyRelation,
       modelClass: Animal,
       join: {
-        from: 'Person.id',
+        from: 'persons.id',
         // Any of the `to` and `from` fields can also be
         // references to nested fields (or arrays of references).
-        // Here the relation is created between `Person.id` and
-        // `Animal.json.details.ownerId` properties. The reference
+        // Here the relation is created between `persons.id` and
+        // `animals.json.details.ownerId` properties. The reference
         // must be casted to the same type as the other key.
-        to: ref('Animal.json:details.ownerId').castInt()
+        to: ref('animals.json:details.ownerId').castInt()
       }
     },
 
@@ -5081,8 +5087,8 @@ class Person extends Model {
       relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
-        from: 'Person.fatherId',
-        to: 'Person.id'
+        from: 'persons.fatherId',
+        to: 'persons.id'
       }
     },
 
@@ -5090,10 +5096,10 @@ class Person extends Model {
       relation: Model.ManyToManyRelation,
       modelClass: Movie,
       join: {
-        from: 'Person.id',
+        from: 'persons.id',
         through: {
-          from: 'Person_Movie.actorId',
-          to: 'Person_Movie.movieId'
+          from: 'persons_movies.actorId',
+          to: 'persons_movies.movieId'
 
           // If you have a model class for the join table
           // you can specify it like this:
@@ -5107,7 +5113,7 @@ class Person extends Model {
           //
           // extra: ['someExtra']
         },
-        to: 'Movie.id'
+        to: 'movies.id'
       }
     }
   };
@@ -5148,16 +5154,16 @@ beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional in
 
 Property|Type|Description
 --------|----|-----------
-from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The relation column in the owner table. Must be given with the table name. For example `Person.id`. Composite key can be specified using an array of columns e.g. `['Person.a', 'Person.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [`ref`](#ref) helper.
-to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The relation column in the related table. Must be given with the table name. For example `Movie.id`. Composite key can be specified using an array of columns e.g. `['Movie.a', 'Movie.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [`ref`](#ref) helper.
+from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The relation column in the owner table. Must be given with the table name. For example `persons.id`. Composite key can be specified using an array of columns e.g. `['persons.a', 'persons.b']`. Note that neither this nor `to` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [`ref`](#ref) helper.
+to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The relation column in the related table. Must be given with the table name. For example `movies.id`. Composite key can be specified using an array of columns e.g. `['movies.a', 'movies.b']`. Note that neither this nor `from` need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the [`ref`](#ref) helper.
 through|[`RelationThrough`](#relationthrough)|Describes the join table if the models are related through one.
 
 ##### RelationThrough
 
 Property|Type|Description
 --------|----|-----------
-from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `from` property of the `RelationJoin`. For example `Person_Movie.actorId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
-to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_Movie.movieId` where `Person_Movie` is the join table. Composite key can be specified using an array of columns e.g. `['Person_Movie.a', 'Person_Movie.b']`. You can join nested json fields using the [`ref`](#ref) helper.
+from|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `from` property of the `RelationJoin`. For example `Person_movies.actorId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [`ref`](#ref) helper.
+to|string&#124;[`ReferenceBuilder`](#ref)&#124;Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_movies.movieId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [`ref`](#ref) helper.
 modelClass|string&#124;ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
 extra|string[]&#124;Object|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
 beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
@@ -5625,7 +5631,8 @@ const people = await Person.query();
 console.log('there are', people.length, 'people in the database');
 
 // Example of a more complex WHERE clause. This generates:
-// SELECT FROM "Person"
+// SELECT "persons".*
+// FROM "persons"
 // WHERE ("firstName" = 'Jennifer' AND "age" < 30)
 // OR ("firstName" = 'Mark' AND "age" > 30)
 const marksAndJennifers = await Person
@@ -5749,7 +5756,7 @@ const queryBuilder = Person.relatedQuery(relationName);
 const people = await Person
   .query()
   .select([
-    'Person.*',
+    'persons.*',
 
     Person.relatedQuery('pets')
       .count()
@@ -7054,11 +7061,11 @@ console.log(jennifer.pets === pets); // --> true
 ```js
 const dogsAndCats = await jennifer
   .$relatedQuery('pets')
-  .select('Animal.*', 'Person.name as ownerName')
+  .select('animals.*', 'persons.name as ownerName')
   .where('species', '=', 'dog')
   .orWhere('breed', '=', 'cat')
-  .innerJoin('Person', 'Person.id', 'Animal.ownerId')
-  .orderBy('Animal.name');
+  .innerJoin('persons', 'persons.id', 'animals.ownerId')
+  .orderBy('animals.name');
 
 // All the dogs and cats have the owner's name "Jennifer"
 // joined as the `ownerName` property.
@@ -7690,8 +7697,8 @@ Field expressions allow one to refer to JSONB fields inside columns.
 
 Syntax: `<column reference>[:<json field reference>]`
 
-e.g. `Person.jsonColumnName:details.names[1]` would refer to value `'Second'`
-in column `Person.jsonColumnName` which has
+e.g. `persons.jsonColumnName:details.names[1]` would refer to value `'Second'`
+in column `persons.jsonColumnName` which has
 `{ details: { names: ['First', 'Second', 'Last'] } }` object stored in it.
 
 First part `<column reference>` is compatible with column references used in
@@ -8087,8 +8094,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         modelClass: Animal,
         join: {
-          from: 'Person.id',
-          to: 'Animal.ownerId'
+          from: 'persons.id',
+          to: 'animals.ownerId'
         }
       }
     };

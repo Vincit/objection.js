@@ -2,7 +2,7 @@ import { Model } from 'objection';
 
 export default class Animal extends Model {
   // Table name is the only required property.
-  static tableName = 'Animal';
+  static tableName = 'animals';
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
   // based on this. This is only used for validation. Whenever a model instance
@@ -28,8 +28,8 @@ export default class Animal extends Model {
       // here to prevent require loops.
       modelClass: `${__dirname}/Person`,
       join: {
-        from: 'Animal.ownerId',
-        to: 'Person.id'
+        from: 'animals.ownerId',
+        to: 'persons.id'
       }
     }
   };

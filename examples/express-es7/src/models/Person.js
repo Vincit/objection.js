@@ -4,7 +4,7 @@ import Movie from './Movie';
 
 export default class Person extends Model {
   // Table name is the only required property.
-  static tableName = 'Person';
+  static tableName = 'persons';
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
   // based on this. This is only used for validation. Whenever a model instance
@@ -40,8 +40,8 @@ export default class Person extends Model {
       // here to prevent require loops.
       modelClass: Animal,
       join: {
-        from: 'Person.id',
-        to: 'Animal.ownerId'
+        from: 'persons.id',
+        to: 'animals.ownerId'
       }
     },
 
@@ -49,13 +49,13 @@ export default class Person extends Model {
       relation: Model.ManyToManyRelation,
       modelClass: Movie,
       join: {
-        from: 'Person.id',
+        from: 'persons.id',
         // ManyToMany relation needs the `through` object to describe the join table.
         through: {
-          from: 'Person_Movie.personId',
-          to: 'Person_Movie.movieId'
+          from: 'persons_movies.personId',
+          to: 'persons_movies.movieId'
         },
-        to: 'Movie.id'
+        to: 'movies.id'
       }
     },
 
@@ -63,8 +63,8 @@ export default class Person extends Model {
       relation: Model.HasManyRelation,
       modelClass: Person,
       join: {
-        from: 'Person.id',
-        to: 'Person.parentId'
+        from: 'persons.id',
+        to: 'persons.parentId'
       }
     },
 
@@ -72,8 +72,8 @@ export default class Person extends Model {
       relation: Model.BelongsToOneRelation,
       modelClass: Person,
       join: {
-        from: 'Person.parentId',
-        to: 'Person.id'
+        from: 'persons.parentId',
+        to: 'persons.id'
       }
     }
   };
