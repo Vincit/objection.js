@@ -1571,7 +1571,7 @@ const { transaction } = require('objection');
 const knex = Person.knex();
 
 try {
-  const scrappy = await transaction(knex, async (trx) => {
+  await transaction(knex, async (trx) => {
     const jennifer = await Person
       .query(trx)
       .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
