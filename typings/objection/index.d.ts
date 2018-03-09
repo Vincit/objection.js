@@ -382,14 +382,14 @@ declare namespace Objection {
       expression: RelationExpression,
       filters?: Filters<M>,
       trxOrKnex?: Transaction | knex
-    ): Promise<M[]>;
+    ): QueryBuilder<M>;
 
     loadRelated(
       model: M,
       expression: RelationExpression,
       filters?: Filters<M>,
       trxOrKnex?: Transaction | knex
-    ): Promise<M>;
+    ): QueryBuilderYieldingOne<M>;
 
     traverse(
       filterConstructor: typeof Model,
@@ -454,14 +454,13 @@ declare namespace Objection {
     static omitImpl(f: (obj: object, prop: string) => void): void;
 
     // loadRelated is overloaded to support both Model and Model[] variants:
-    
     static loadRelated<QM extends Model>(
       this: Constructor<QM>,
       models: QM[],
       expression: RelationExpression,
       filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
-    ): Promise<QM[]>;
+    ): QueryBuilder<QM>;
 
     static loadRelated<QM extends Model>(
       this: Constructor<QM>,
@@ -469,7 +468,7 @@ declare namespace Objection {
       expression: RelationExpression,
       filters?: Filters<QM>,
       trxOrKnex?: Transaction | knex
-    ): Promise<QM>;
+    ): QueryBuilderYieldingOne<QM>;
 
     static traverse(
       filterConstructor: typeof Model,
