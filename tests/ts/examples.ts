@@ -282,9 +282,11 @@ const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
 ]);
 
 // static methods from Model should return the subclass type
+const personQB: objection.QueryBuilderYieldingOne<Person> = Person.loadRelated(new Person(), 'movies');
+const peopleQB: objection.QueryBuilder<Person> = Person.loadRelated([new Person()], 'movies');
 
-const person: Promise<Person> = Person.loadRelated(new Person(), 'movies');
-const people: Promise<Person[]> = Person.loadRelated([new Person()], 'movies');
+const person: Promise<Person> = personQB;
+const people: Promise<Person[]> = peopleQB;
 
 class Actor {
   canAct?: boolean;
