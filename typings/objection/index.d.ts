@@ -580,6 +580,9 @@ declare namespace Objection {
     throwIfNotFound(): QueryBuilder<QM, RM>;
   }
 
+  export interface QueryBuilderYieldingOne<QM extends Model>
+    extends QueryBuilder<QM, QM, QM> {}
+
   export interface QueryBuilderYieldingOneOrNone<QM extends Model>
     extends QueryBuilder<QM, QM, QM | undefined> {}
 
