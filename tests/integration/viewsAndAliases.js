@@ -654,8 +654,10 @@ module.exports = session => {
             .table('someView')
             .eager(fullEager)
             .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-            .modifyEager('model1Relation1', builder => builder.select('id'))
-            .modifyEager('model1Relation2.model2Relation1', builder => builder.select('id'))
+            .modifyEager('model1Relation1', builder => builder.select('someView.id'))
+            .modifyEager('model1Relation2.model2Relation1', builder =>
+              builder.select('someView.id')
+            )
             .then(sortEager)
             .then(model => {
               expect(queries.length).to.equal(1);
@@ -685,13 +687,13 @@ module.exports = session => {
                 from
                   "someView"
                 left join
-                  (select "id", "model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
+                  (select "someView"."id", "someView"."model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
                 left join
                   "model2" as "model1Relation2" on "model1Relation2"."model1_id" = "someView"."id"
                 left join
                   "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
                 left join
-                  (select "id", "model1Id" from "someView") as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
+                  (select "someView"."id", "someView"."model1Id" from "someView") as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
                 left join
                   "someView" as "model1Relation2:model2Relation1:model1Relation1" on "model1Relation2:model2Relation1:model1Relation1"."id" = "model1Relation2:model2Relation1"."model1Id"
                 left join
