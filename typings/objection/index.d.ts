@@ -579,8 +579,7 @@ declare namespace Objection {
     throwIfNotFound(): QueryBuilder<QM, RM>;
   }
 
-  export interface QueryBuilderYieldingOne<QM extends Model>
-    extends QueryBuilder<QM, QM, QM> {}
+  export interface QueryBuilderYieldingOne<QM extends Model> extends QueryBuilder<QM, QM, QM> {}
 
   export interface QueryBuilderYieldingOneOrNone<QM extends Model>
     extends QueryBuilder<QM, QM, QM | undefined> {}
@@ -588,8 +587,8 @@ declare namespace Objection {
   export interface QueryBuilderYieldingCount<QM extends Model, RM = QM[]>
     extends QueryBuilderBase<QM, RM, number>,
       Executable<number> {
-        throwIfNotFound(): this;
-      }
+    throwIfNotFound(): this;
+  }
 
   interface Insert<QM extends Model> {
     (modelsOrObjects?: Partial<QM>[]): QueryBuilder<QM, QM[]>;
