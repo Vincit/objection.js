@@ -190,7 +190,7 @@ declare namespace Objection {
     from: string | Reference | (string | Reference)[];
     to: string | Reference | (string | Reference)[];
     modelClass?: string | typeof Model;
-    extra?: string[];
+    extra?: string[] | object;
   }
 
   export interface RelationMapping {
