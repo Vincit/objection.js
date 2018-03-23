@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.1
+
+### What's new
+
+  * Added public [Relation.joinModelClass](#relation) accessor
+  * Don't call `returning` on sqlite (prevents a warning message added in knex 0.14.4)
+  * fix [#844](https://github.com/Vincit/objection.js/issues/844)
+  * Small documentation updates
+  * Small typing fixes end updates
+
 ## 1.0.0 🎉
 
 ### What's new
