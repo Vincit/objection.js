@@ -139,6 +139,11 @@ declare namespace Objection {
     shallow?: boolean;
   }
 
+  export class NotFoundError extends Error {
+    statusCode: number;
+    data?: any;
+  }
+
   export type ValidationErrorType =
     | 'ModelValidation'
     | 'RelationExpression'
@@ -370,6 +375,7 @@ declare namespace Objection {
     bindTransaction(transaction: Transaction): this;
     createValidator(): Validator;
     createValidationError(args: CreateValidationErrorArgs): Error;
+    createNotFoundError(): Error;
 
     fromJson(json: object, opt?: ModelOptions): M;
     fromDatabaseJson(row: object): M;
@@ -446,6 +452,7 @@ declare namespace Objection {
     static bindTransaction<M>(this: M, transaction: Transaction): M;
     static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
+    static createNotFoundError(): Error;
 
     // fromJson and fromDatabaseJson both return an instance of Model, not a Model class:
     static fromJson<M>(this: Constructor<M>, json: Pojo, opt?: ModelOptions): M;
