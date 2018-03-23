@@ -66,8 +66,8 @@ And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
     <span class="nx">ref</span><span class="p">(</span><span class="s1">'jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
     <span class="nx">ref</span><span class="p">(</span><span class="s1">'jsonColumn:details.age'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
   <span class="p">])</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Animal'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Person.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.name'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.jsonData:details.ageLimit'</span><span class="p">));</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'animals'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'persons.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.name'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.jsonData:details.ageLimit'</span><span class="p">));</span>
 </code></pre>
 <blockquote>
 <p>Individual json fields can be updated like this:</p>
@@ -259,7 +259,7 @@ It is completely optional. If you want to use some other validation library you 
 
 <ol>
 <li><p><em>Conversion in knex using <a href="#objection-knexsnakecasemappers"><code class="prettyprint">knexSnakeCaseMappers</code></a></em>.
-When the conversion is done on knex level <strong>everything</strong> is converted to came case including properties and identifiers
+When the conversion is done on knex level <strong>everything</strong> is converted to camel case including properties and identifiers
 in <code class="prettyprint">relationMappings</code> and queries. <code class="prettyprint">knexSnakeCaseMappers</code> use knex&rsquo;s <code class="prettyprint">postProcessResponse</code> and <code class="prettyprint">wrapIdentifier</code> hooks.</p></li>
 <li><p><em>Conversion in objection using <a href="#objection-snakecasemappers"><code class="prettyprint">snakeCaseMappers</code></a></em>.
 When the conversion is done on objection level only database columns of the returned rows (model instances) are convered
@@ -287,7 +287,7 @@ from the client that also uses camel case.</p></li>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">peopleOlderThanAverage</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">);</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">);</span>
   <span class="p">});</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
@@ -312,8 +312,8 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentName'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'persons.*'</span><span class="p">,</span> <span class="s1">'parent.firstName as parentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'persons as parent'</span><span class="p">,</span> <span class="s1">'persons.parentId'</span><span class="p">,</span> <span class="s1">'parent.id'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
 </code></pre>
@@ -559,7 +559,7 @@ object is a query builder just like the normal knex instance). This gives you a 
 <blockquote>
 <p>SQL:</p>
 </blockquote>
-<pre class="highlight sql"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">and</span> <span class="p">(</span><span class="nv">"foo"</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">or</span> <span class="nv">"bar"</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<pre class="highlight sql"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"persons"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">and</span> <span class="p">(</span><span class="nv">"foo"</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">or</span> <span class="nv">"bar"</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </code></pre>
 <p>You can add parentheses to queries by passing a function to the <a href="#where"><code class="prettyprint">where</code></a> method.</p>
 
@@ -596,6 +596,10 @@ object is a query builder just like the normal knex instance). This gives you a 
 <p>Specifying a relation using a composite primary key and a composite foreign key:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
+  <span class="p">}</span>
+
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
@@ -603,14 +607,14 @@ object is a query builder just like the normal knex instance). This gives you a 
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s1">'Person.firstName'</span><span class="p">,</span>
-            <span class="s1">'Person.lastName'</span><span class="p">,</span>
-            <span class="s1">'Person.dateOfBirth'</span>
+            <span class="s1">'persons.firstName'</span><span class="p">,</span>
+            <span class="s1">'persons.lastName'</span><span class="p">,</span>
+            <span class="s1">'persons.dateOfBirth'</span>
           <span class="p">],</span>
           <span class="na">to</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s1">'Animal.ownerFirstName'</span><span class="p">,</span>
-            <span class="s1">'Animal.ownerLastName'</span><span class="p">,</span>
-            <span class="s1">'Animal.ownerDateOfBirth'</span>
+            <span class="s1">'animals.ownerFirstName'</span><span class="p">,</span>
+            <span class="s1">'animals.ownerLastName'</span><span class="p">,</span>
+            <span class="s1">'animals.ownerDateOfBirth'</span>
           <span class="p">]</span>
         <span class="p">}</span>
       <span class="p">}</span>

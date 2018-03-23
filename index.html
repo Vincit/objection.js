@@ -133,7 +133,7 @@ npm start
 <span class="c1">// Person model.</span>
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
@@ -142,8 +142,8 @@ npm start
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.parentId'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -153,9 +153,9 @@ npm start
 <span class="nx">async</span> <span class="kd">function</span> <span class="nx">createSchema</span><span class="p">()</span> <span class="p">{</span>
   <span class="c1">// Create database schema. You should use knex migration files to do this. We</span>
   <span class="c1">// create it here for simplicity.</span>
-  <span class="nx">await</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTableIfNotExists</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">,</span> <span class="nx">table</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTableIfNotExists</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">,</span> <span class="nx">table</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
-    <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">).</span><span class="nx">references</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">);</span>
+    <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">).</span><span class="nx">references</span><span class="p">(</span><span class="s1">'persons.id'</span><span class="p">);</span>
     <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">);</span>
   <span class="p">});</span>
 <span class="p">}</span>
@@ -213,7 +213,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
 
 <span class="kr">class</span> <span class="nx">MinimalModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'SomeTableName'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">'someTableName'</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 
@@ -225,7 +225,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
 
 <span class="kr">export</span> <span class="k">default</span> <span class="kr">class</span> <span class="nx">MinimalModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'SomeTableName'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'someTableName'</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
@@ -237,9 +237,20 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
 
   <span class="c1">// Table name is the only required property.</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
   <span class="p">}</span>
 
+  <span class="c1">// Each model must have a column (or a set of columns) that uniquely</span>
+  <span class="c1">// identifies the rows. The colum(s) can be specified using the `idColumn`</span>
+  <span class="c1">// property. `idColumn` returns `id` by default and doesn't need to be</span>
+  <span class="c1">// specified unless the model's primary key is something else.</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'id'</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Methods can be defined for model classes just as you would for</span>
+  <span class="c1">// any javascript class. If you want to include the result of these</span>
+  <span class="c1">// method in the output json, see `virtualAttributes`.</span>
   <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
   <span class="p">}</span>
@@ -293,8 +304,8 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
         <span class="c1">// to a module that exports one.</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -302,17 +313,17 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
           <span class="c1">// ManyToMany relation needs the `through` object</span>
           <span class="c1">// to describe the join table.</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
             <span class="c1">// If you have a model class for the join table</span>
             <span class="c1">// you need to specify it like this:</span>
             <span class="c1">// modelClass: PersonMovie,</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.personId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
           <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -320,8 +331,8 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.parentId'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -329,8 +340,8 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.parentId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.id'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -342,8 +353,17 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="c1">// Table name is the only required property.</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
 
+  <span class="c1">// Each model must have a column (or a set of columns) that uniquely</span>
+  <span class="c1">// identifies the rows. The colum(s) can be specified using the `idColumn`</span>
+  <span class="c1">// property. `idColumn` returns `id` by default and doesn't need to be</span>
+  <span class="c1">// specified unless the model's primary key is something else.</span>
+  <span class="kr">static</span> <span class="nx">idColumn</span> <span class="o">=</span> <span class="s1">'id'</span><span class="p">;</span>
+
+  <span class="c1">// Methods can be defined for model classes just as you would for</span>
+  <span class="c1">// any javascript class. If you want to include the result of these</span>
+  <span class="c1">// method in the output json, see `virtualAttributes`.</span>
   <span class="nx">fullName</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">' '</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
   <span class="p">}</span>
@@ -391,8 +411,8 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
       <span class="c1">// path version here to prevent require loops.</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
       <span class="p">}</span>
     <span class="p">},</span>
 
@@ -400,17 +420,17 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
         <span class="c1">// ManyToMany relation needs the `through` object</span>
         <span class="c1">// to describe the join table.</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
           <span class="c1">// If you have a model class for the join table</span>
           <span class="c1">// you need to specify it like this:</span>
           <span class="c1">// modelClass: PersonMovie,</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.personId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
         <span class="p">},</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
       <span class="p">}</span>
     <span class="p">},</span>
 
@@ -418,8 +438,8 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.parentId'</span>
       <span class="p">}</span>
     <span class="p">},</span>
 
@@ -427,8 +447,8 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.parentId'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.id'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">};</span>
@@ -459,14 +479,15 @@ Composite id can be set by giving an array of column names. Composite keys are f
 <p><code class="prettyprint">BelongsToOneRelation</code>: Use this relation when the source model has the foreign key</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'animal'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'animals'</span><span class="p">;</span>
+
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">owner</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'animal.ownerId'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'person.id'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.id'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -476,14 +497,15 @@ Composite id can be set by giving an array of column names. Composite keys are f
 <p><code class="prettyprint">HasManyRelation</code>: Use this relation when the related model has the foreign key</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'person'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
+
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">animals</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'person.id'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'animal.ownerId'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -493,14 +515,15 @@ Composite id can be set by giving an array of column names. Composite keys are f
 <p><code class="prettyprint">HasOneRelation</code>: Just like <code class="prettyprint">HasManyRelation</code> but for one related row</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'person'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
+
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">animal</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasOneRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'person.id'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'animal.ownerId'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -510,19 +533,20 @@ Composite id can be set by giving an array of column names. Composite keys are f
 <p><code class="prettyprint">ManyToManyRelation</code>: Use this relation when the model is related to a list of other models through a join table</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
+
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">movies</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-          <span class="c1">// Person_Movie is the join table.</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="c1">// persons_movies is the join table.</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.personId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
         <span class="p">},</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -532,19 +556,20 @@ Composite id can be set by giving an array of column names. Composite keys are f
 <p><code class="prettyprint">HasOneThroughRelation</code>: Use this relation when the model is related to a single model through a join table</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
+
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">movie</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasOneThroughRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-          <span class="c1">// Person_Movie is the join table.</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="c1">// persons_movies is the join table.</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.personId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
         <span class="p">},</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -555,7 +580,7 @@ Composite id can be set by giving an array of column names. Composite keys are f
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'person'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
@@ -573,8 +598,8 @@ Composite id can be set by giving an array of column names. Composite keys are f
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'animal.ownerId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -587,13 +612,13 @@ Composite id can be set by giving an array of column names. Composite keys are f
         <span class="c1">// is that you need to give an absolute file path because of the way `require` works.</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">__dirname</span><span class="p">}</span><span class="s2">/Movie`</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="c1">// Person_Movie is the join table.</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+            <span class="c1">// persons_movies is the join table.</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.personId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
           <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -605,12 +630,12 @@ Composite id can be set by giving an array of column names. Composite keys are f
         <span class="c1">// of your model). Search for `modelPaths` from the docs for more info.</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="s1">'Movie'</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.personId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.personId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
           <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -683,7 +708,7 @@ that has all the methods a <a href="http://knexjs.org/#Builder">knex QueryBuilde
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">instanceof</span> <span class="nx">Person</span><span class="p">);</span> <span class="c1">// --&gt; true</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'there are'</span><span class="p">,</span> <span class="nx">people</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="s1">'People in total'</span><span class="p">);</span>
-</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"Person"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span>
+</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"people"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"people"</span>
 </code></pre>
 <blockquote>
 <p>The return value of the <a href="#query"><code class="prettyprint">query</code></a> method is an instance of <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>
@@ -699,7 +724,7 @@ that uses some of them:</p>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'The last name of the first middle aged Jennifer is'</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">middleAgedJennifers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">lastName</span><span class="p">);</span>
-</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"Person"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span>
+</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"persons"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"persons"</span>
 <span class="k">where</span> <span class="nv">"age"</span> <span class="o">&gt;</span> <span class="mi">40</span>
 <span class="k">and</span> <span class="nv">"age"</span> <span class="o">&lt;</span> <span class="mi">60</span>
 <span class="k">and</span> <span class="nv">"firstName"</span> <span class="o">=</span> <span class="s1">'Jennifer'</span>
@@ -716,28 +741,28 @@ relations like the <a href="#joinrelation"><code class="prettyprint">joinRelatio
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">grandParentName</span><span class="p">)</span>
 </code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"parent:parent"</span><span class="p">.</span><span class="nv">"firstName"</span> <span class="k">as</span> <span class="nv">"grandParentName"</span>
-<span class="k">from</span> <span class="nv">"Person"</span>
-<span class="k">inner</span> <span class="k">join</span> <span class="nv">"Person"</span> <span class="k">as</span> <span class="nv">"parent"</span> <span class="k">on</span> <span class="nv">"parent"</span><span class="p">.</span><span class="nv">"id"</span> <span class="o">=</span> <span class="nv">"Person"</span><span class="p">.</span><span class="nv">"parentId"</span>
-<span class="k">inner</span> <span class="k">join</span> <span class="nv">"Person"</span> <span class="k">as</span> <span class="nv">"parent:parent"</span> <span class="k">on</span> <span class="nv">"parent:parent"</span><span class="p">.</span><span class="nv">"id"</span> <span class="o">=</span> <span class="nv">"parent"</span><span class="p">.</span><span class="nv">"parentId"</span>
+<span class="k">from</span> <span class="nv">"persons"</span>
+<span class="k">inner</span> <span class="k">join</span> <span class="nv">"persons"</span> <span class="k">as</span> <span class="nv">"parent"</span> <span class="k">on</span> <span class="nv">"parent"</span><span class="p">.</span><span class="nv">"id"</span> <span class="o">=</span> <span class="nv">"persons"</span><span class="p">.</span><span class="nv">"parentId"</span>
+<span class="k">inner</span> <span class="k">join</span> <span class="nv">"persons"</span> <span class="k">as</span> <span class="nv">"parent:parent"</span> <span class="k">on</span> <span class="nv">"parent:parent"</span><span class="p">.</span><span class="nv">"id"</span> <span class="o">=</span> <span class="nv">"parent"</span><span class="p">.</span><span class="nv">"parentId"</span>
 </code></pre>
 <blockquote>
 <p>The next example shows how easy it is to build complex queries:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentFirstName'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'Person.age'</span><span class="p">,</span> <span class="s1">'&lt;'</span><span class="p">,</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'Person.age'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">whereExists</span><span class="p">(</span><span class="nx">Animal</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">select</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.ownerId'</span><span class="p">)))</span>
-  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'Person.lastName'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'persons.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentFirstName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'persons as parent'</span><span class="p">,</span> <span class="s1">'persons.parentId'</span><span class="p">,</span> <span class="s1">'parent.id'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'persons.age'</span><span class="p">,</span> <span class="s1">'&lt;'</span><span class="p">,</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'persons.age'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">whereExists</span><span class="p">(</span><span class="nx">Animal</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">select</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">where</span><span class="p">(</span><span class="s1">'persons.id'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.ownerId'</span><span class="p">)))</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'persons.lastName'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentFirstName</span><span class="p">);</span>
-</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"Person"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span> <span class="nv">"Parent"</span><span class="p">.</span><span class="nv">"firstName"</span> <span class="k">as</span> <span class="nv">"parentFirstName"</span>
-<span class="k">from</span> <span class="nv">"Person"</span>
-<span class="k">inner</span> <span class="k">join</span> <span class="nv">"Person"</span> <span class="k">as</span> <span class="nv">"Parent"</span> <span class="k">on</span> <span class="nv">"Person"</span><span class="p">.</span><span class="nv">"parentId"</span> <span class="o">=</span> <span class="nv">"Parent"</span><span class="p">.</span><span class="nv">"id"</span>
-<span class="k">where</span> <span class="nv">"Person"</span><span class="p">.</span><span class="nv">"age"</span> <span class="o">&lt;</span> <span class="p">(</span><span class="k">select</span> <span class="k">avg</span><span class="p">(</span><span class="nv">"Person"</span><span class="p">.</span><span class="nv">"age"</span><span class="p">)</span> <span class="k">from</span> <span class="nv">"Person"</span><span class="p">)</span>
-<span class="k">and</span> <span class="k">exists</span> <span class="p">(</span><span class="k">select</span> <span class="mi">1</span> <span class="k">from</span> <span class="nv">"Animal"</span> <span class="k">where</span> <span class="nv">"Person"</span><span class="p">.</span><span class="nv">"id"</span> <span class="o">=</span> <span class="nv">"Animal"</span><span class="p">.</span><span class="nv">"ownerId"</span><span class="p">)</span>
-<span class="k">order</span> <span class="k">by</span> <span class="nv">"Person"</span><span class="p">.</span><span class="nv">"lastName"</span> <span class="k">asc</span>
+</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"persons"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span> <span class="nv">"parent"</span><span class="p">.</span><span class="nv">"firstName"</span> <span class="k">as</span> <span class="nv">"parentFirstName"</span>
+<span class="k">from</span> <span class="nv">"persons"</span>
+<span class="k">inner</span> <span class="k">join</span> <span class="nv">"persons"</span> <span class="k">as</span> <span class="nv">"parent"</span> <span class="k">on</span> <span class="nv">"persons"</span><span class="p">.</span><span class="nv">"parentId"</span> <span class="o">=</span> <span class="nv">"parent"</span><span class="p">.</span><span class="nv">"id"</span>
+<span class="k">where</span> <span class="nv">"persons"</span><span class="p">.</span><span class="nv">"age"</span> <span class="o">&lt;</span> <span class="p">(</span><span class="k">select</span> <span class="k">avg</span><span class="p">(</span><span class="nv">"persons"</span><span class="p">.</span><span class="nv">"age"</span><span class="p">)</span> <span class="k">from</span> <span class="nv">"persons"</span><span class="p">)</span>
+<span class="k">and</span> <span class="k">exists</span> <span class="p">(</span><span class="k">select</span> <span class="mi">1</span> <span class="k">from</span> <span class="nv">"animals"</span> <span class="k">where</span> <span class="nv">"persons"</span><span class="p">.</span><span class="nv">"id"</span> <span class="o">=</span> <span class="nv">"animals"</span><span class="p">.</span><span class="nv">"ownerId"</span><span class="p">)</span>
+<span class="k">order</span> <span class="k">by</span> <span class="nv">"persons"</span><span class="p">.</span><span class="nv">"lastName"</span> <span class="k">asc</span>
 </code></pre>
 <p>Fetch queries can be created simply by calling <a href="#query"><code class="prettyprint">Model.query()</code></a> and chaining query builder methods for the returned
 <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a> instance. The query is executed by calling the <a href="#then"><code class="prettyprint">then</code></a> method, which converts the query
@@ -751,7 +776,7 @@ into a <a href="http://bluebirdjs.com/docs/getting-started.html"><code class="pr
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span> <span class="k">instanceof</span> <span class="nx">Person</span><span class="p">);</span> <span class="c1">// --&gt; true</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// --&gt; 'Jennifer'</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">fullName</span><span class="p">());</span> <span class="c1">// --&gt; 'Jennifer Lawrence'</span>
-</code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"Person"</span> <span class="p">(</span><span class="nv">"firstName"</span><span class="p">,</span> <span class="nv">"lastName"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'Jennifer'</span><span class="p">,</span> <span class="s1">'Lawrence'</span><span class="p">)</span>
+</code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"persons"</span> <span class="p">(</span><span class="nv">"firstName"</span><span class="p">,</span> <span class="nv">"lastName"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'Jennifer'</span><span class="p">,</span> <span class="s1">'Lawrence'</span><span class="p">)</span>
 </code></pre>
 <p>Insert queries are created by chaining the <a href="#insert"><code class="prettyprint">insert</code></a> method to the query. See the <a href="#insertgraph"><code class="prettyprint">insertGraph</code></a> method
 for inserting object graphs.</p>
@@ -763,14 +788,14 @@ for inserting object graphs.</p>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'all people over 60 years old are now dinosaurs'</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">numUpdated</span><span class="p">,</span> <span class="s1">'people were updated'</span><span class="p">);</span>
-</code></pre><pre class="highlight sql"><code><span class="k">update</span> <span class="nv">"Person"</span> <span class="k">set</span> <span class="nv">"lastName"</span> <span class="o">=</span> <span class="s1">'Dinosaur'</span> <span class="k">where</span> <span class="nv">"age"</span> <span class="o">&gt;</span> <span class="mi">60</span>
+</code></pre><pre class="highlight sql"><code><span class="k">update</span> <span class="nv">"persons"</span> <span class="k">set</span> <span class="nv">"lastName"</span> <span class="o">=</span> <span class="s1">'Dinosaur'</span> <span class="k">where</span> <span class="nv">"age"</span> <span class="o">&gt;</span> <span class="mi">60</span>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">updatedPerson</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patchAndFetchById</span><span class="p">(</span><span class="mi">246</span><span class="p">,</span> <span class="p">{</span><span class="na">lastName</span><span class="p">:</span> <span class="s1">'Updated'</span><span class="p">});</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">updatedPerson</span><span class="p">.</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// --&gt; Updated.</span>
-</code></pre><pre class="highlight sql"><code><span class="k">update</span> <span class="nv">"Person"</span> <span class="k">set</span> <span class="nv">"lastName"</span> <span class="o">=</span> <span class="s1">'Updated'</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">246</span>
-<span class="k">select</span> <span class="nv">"Person"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">246</span>
+</code></pre><pre class="highlight sql"><code><span class="k">update</span> <span class="nv">"persons"</span> <span class="k">set</span> <span class="nv">"lastName"</span> <span class="o">=</span> <span class="s1">'Updated'</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">246</span>
+<span class="k">select</span> <span class="nv">"persons"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"persons"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">246</span>
 </code></pre>
 <p>Update queries are created by chaining the <a href="#update"><code class="prettyprint">update</code></a> or <a href="#patch"><code class="prettyprint">patch</code></a> method to the query. The <a href="#patch"><code class="prettyprint">patch</code></a> and <a href="#update"><code class="prettyprint">update</code></a>
 methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper
@@ -784,7 +809,7 @@ simply chain <code class="prettyprint">.returning(&#39;*&#39;)</code> or take a 
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'lower("firstName")'</span><span class="p">),</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'%ennif%'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">numDeleted</span><span class="p">,</span> <span class="s1">'people were deleted'</span><span class="p">);</span>
-</code></pre><pre class="highlight sql"><code><span class="k">delete</span> <span class="k">from</span> <span class="nv">"Person"</span> <span class="k">where</span> <span class="k">lower</span><span class="p">(</span><span class="nv">"firstName"</span><span class="p">)</span> <span class="k">like</span> <span class="s1">'%ennif%'</span>
+</code></pre><pre class="highlight sql"><code><span class="k">delete</span> <span class="k">from</span> <span class="nv">"persons"</span> <span class="k">where</span> <span class="k">lower</span><span class="p">(</span><span class="nv">"firstName"</span><span class="p">)</span> <span class="k">like</span> <span class="s1">'%ennif%'</span>
 </code></pre>
 <p>Delete queries are created by chaining the <a href="#delete"><code class="prettyprint">delete</code></a> method to the query.
 NOTE: The return value of the query will be the number of deleted rows. <em>If you&rsquo;re using Postgres take a look at <a href="#postgresql-quot-returning-quot-tricks">this recipe</a> if you&rsquo;d like the deleted rows to be returned as Model instances</em>.</p>
@@ -804,9 +829,9 @@ just like the <a href="#query"><code class="prettyprint">query</code></a> method
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">pets</span> <span class="o">===</span> <span class="nx">pets</span><span class="p">);</span> <span class="c1">// --&gt; true</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">instanceof</span> <span class="nx">Animal</span><span class="p">);</span> <span class="c1">// --&gt; true</span>
-</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"Animal"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"Animal"</span>
+</code></pre><pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"animals"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"animals"</span>
 <span class="k">where</span> <span class="nv">"species"</span> <span class="o">=</span> <span class="s1">'dog'</span>
-<span class="k">and</span> <span class="nv">"Animal"</span><span class="p">.</span><span class="nv">"ownerId"</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">and</span> <span class="nv">"animals"</span><span class="p">.</span><span class="nv">"ownerId"</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="k">order</span> <span class="k">by</span> <span class="nv">"name"</span> <span class="k">asc</span>
 </code></pre>
 <p>Simply call <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery(&#39;pets&#39;)</code></a> for a model <em>instance</em> to fetch a relation for it. The relation name is
@@ -830,7 +855,7 @@ can be modified using <a href="#relatedfindquerymutates"><code class="prettyprin
   <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'Fluffy'</span><span class="p">});</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">pets</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">fluffy</span><span class="p">)</span> <span class="o">!==</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// --&gt; true</span>
-</code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"Animal"</span> <span class="p">(</span><span class="nv">"name"</span><span class="p">,</span> <span class="nv">"ownerId"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'Fluffy'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"animals"</span> <span class="p">(</span><span class="nv">"name"</span><span class="p">,</span> <span class="nv">"ownerId"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'Fluffy'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 </code></pre>
 <blockquote>
 <p>If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in
@@ -844,8 +869,8 @@ the join table in the following example:</p>
   <span class="p">.</span><span class="nx">insert</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'The room'</span><span class="p">,</span> <span class="na">awesomeness</span><span class="p">:</span> <span class="mi">9001</span><span class="p">});</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'best movie ever was added'</span><span class="p">);</span>
-</code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"Movie"</span> <span class="p">(</span><span class="nv">"name"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'The room'</span><span class="p">)</span>
-<span class="k">insert</span> <span class="k">into</span> <span class="nv">"Person_Movie"</span> <span class="p">(</span><span class="nv">"movieId"</span><span class="p">,</span> <span class="nv">"personId"</span><span class="p">,</span> <span class="nv">"awesomeness"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9001</span><span class="p">)</span>
+</code></pre><pre class="highlight sql"><code><span class="k">insert</span> <span class="k">into</span> <span class="nv">"movies"</span> <span class="p">(</span><span class="nv">"name"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="s1">'The room'</span><span class="p">)</span>
+<span class="k">insert</span> <span class="k">into</span> <span class="nv">"persons_movies"</span> <span class="p">(</span><span class="nv">"movieId"</span><span class="p">,</span> <span class="nv">"personId"</span><span class="p">,</span> <span class="nv">"awesomeness"</span><span class="p">)</span> <span class="k">values</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">9001</span><span class="p">)</span>
 </code></pre>
 <p>Chain the <a href="#insert"><code class="prettyprint">insert</code></a> method to the <a href="#_s_relatedquery"><code class="prettyprint">$relatedQuery</code></a> call to insert a related object for a model
 <em>instance</em>. The query inserts a new object to the related table and updates the needed tables to create the relation.
@@ -1668,7 +1693,7 @@ that is not bound to the transaction:</p>
   <span class="c1">// It can be passed to `transacting`, `query` etc.</span>
   <span class="c1">// methods, or used as a knex query builder.</span>
 
-  <span class="kr">const</span> <span class="nx">jennifer</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">trx</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">});</span>
+  <span class="kr">const</span> <span class="nx">jennifer</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">trx</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">});</span>
   <span class="kr">const</span> <span class="nx">scrappy</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Animal</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">trx</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'Scrappy'</span><span class="p">});</span>
   <span class="kr">const</span> <span class="nx">fluffy</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Animal</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">transacting</span><span class="p">(</span><span class="nx">trx</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'Fluffy'</span><span class="p">});</span>
 
@@ -1998,8 +2023,8 @@ And of course you can just use <code class="prettyprint">knex.raw()</code>.</p>
     <span class="nx">ref</span><span class="p">(</span><span class="s1">'jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
     <span class="nx">ref</span><span class="p">(</span><span class="s1">'jsonColumn:details.age'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
   <span class="p">])</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Animal'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Person.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.name'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.jsonData:details.ageLimit'</span><span class="p">));</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'animals'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'persons.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.name'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.jsonData:details.ageLimit'</span><span class="p">));</span>
 </code></pre>
 <blockquote>
 <p>Individual json fields can be updated like this:</p>
@@ -2191,7 +2216,7 @@ It is completely optional. If you want to use some other validation library you 
 
 <ol>
 <li><p><em>Conversion in knex using <a href="#objection-knexsnakecasemappers"><code class="prettyprint">knexSnakeCaseMappers</code></a></em>.
-When the conversion is done on knex level <strong>everything</strong> is converted to came case including properties and identifiers
+When the conversion is done on knex level <strong>everything</strong> is converted to camel case including properties and identifiers
 in <code class="prettyprint">relationMappings</code> and queries. <code class="prettyprint">knexSnakeCaseMappers</code> use knex&rsquo;s <code class="prettyprint">postProcessResponse</code> and <code class="prettyprint">wrapIdentifier</code> hooks.</p></li>
 <li><p><em>Conversion in objection using <a href="#objection-snakecasemappers"><code class="prettyprint">snakeCaseMappers</code></a></em>.
 When the conversion is done on objection level only database columns of the returned rows (model instances) are convered
@@ -2219,7 +2244,7 @@ from the client that also uses camel case.</p></li>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">peopleOlderThanAverage</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">);</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">avg</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">from</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">);</span>
   <span class="p">});</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">peopleOlderThanAverage</span><span class="p">);</span>
@@ -2244,8 +2269,8 @@ you would expect. You can also pass <a href="#querybuilder"><code class="prettyp
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.*'</span><span class="p">,</span> <span class="s1">'Parent.firstName as parentName'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as Parent'</span><span class="p">,</span> <span class="s1">'Person.parentId'</span><span class="p">,</span> <span class="s1">'Parent.id'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'persons.*'</span><span class="p">,</span> <span class="s1">'parent.firstName as parentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'persons as parent'</span><span class="p">,</span> <span class="s1">'persons.parentId'</span><span class="p">,</span> <span class="s1">'parent.id'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">parentName</span><span class="p">);</span>
 </code></pre>
@@ -2491,7 +2516,7 @@ object is a query builder just like the normal knex instance). This gives you a 
 <blockquote>
 <p>SQL:</p>
 </blockquote>
-<pre class="highlight sql"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"Person"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">and</span> <span class="p">(</span><span class="nv">"foo"</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">or</span> <span class="nv">"bar"</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<pre class="highlight sql"><code><span class="k">select</span> <span class="o">*</span> <span class="k">from</span> <span class="nv">"persons"</span> <span class="k">where</span> <span class="nv">"id"</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">and</span> <span class="p">(</span><span class="nv">"foo"</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">or</span> <span class="nv">"bar"</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
 </code></pre>
 <p>You can add parentheses to queries by passing a function to the <a href="#where"><code class="prettyprint">where</code></a> method.</p>
 
@@ -2528,6 +2553,10 @@ object is a query builder just like the normal knex instance). This gives you a 
 <p>Specifying a relation using a composite primary key and a composite foreign key:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
+  <span class="p">}</span>
+
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
@@ -2535,14 +2564,14 @@ object is a query builder just like the normal knex instance). This gives you a 
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
           <span class="na">from</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s1">'Person.firstName'</span><span class="p">,</span>
-            <span class="s1">'Person.lastName'</span><span class="p">,</span>
-            <span class="s1">'Person.dateOfBirth'</span>
+            <span class="s1">'persons.firstName'</span><span class="p">,</span>
+            <span class="s1">'persons.lastName'</span><span class="p">,</span>
+            <span class="s1">'persons.dateOfBirth'</span>
           <span class="p">],</span>
           <span class="na">to</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s1">'Animal.ownerFirstName'</span><span class="p">,</span>
-            <span class="s1">'Animal.ownerLastName'</span><span class="p">,</span>
-            <span class="s1">'Animal.ownerDateOfBirth'</span>
+            <span class="s1">'animals.ownerFirstName'</span><span class="p">,</span>
+            <span class="s1">'animals.ownerLastName'</span><span class="p">,</span>
+            <span class="s1">'animals.ownerDateOfBirth'</span>
           <span class="p">]</span>
         <span class="p">}</span>
       <span class="p">}</span>
@@ -4301,7 +4330,7 @@ Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">del
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">alias</span><span class="p">(</span><span class="s1">'p'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'p.id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'Person as parent'</span><span class="p">,</span> <span class="s1">'parent.id'</span><span class="p">,</span> <span class="s1">'p.parentId'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'persons as parent'</span><span class="p">,</span> <span class="s1">'parent.id'</span><span class="p">,</span> <span class="s1">'p.parentId'</span><span class="p">)</span>
 </code></pre>
 <p>Give an alias for the table to be used in the query.</p>
 
@@ -4822,7 +4851,7 @@ knex parses table references.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'parent:parent.name as grandParentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'persons.id'</span><span class="p">,</span> <span class="s1">'parent:parent.name as grandParentName'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'[pets, parent.[pets, parent]]'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'parent:pets.species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
 </code></pre>
@@ -4831,7 +4860,7 @@ knex parses table references.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'pr:pr.name as grandParentName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'persons.id'</span><span class="p">,</span> <span class="s1">'pr:pr.name as grandParentName'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'[pets, parent.[pets, parent]]'</span><span class="p">,</span> <span class="p">{</span>
     <span class="na">aliases</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">parent</span><span class="p">:</span> <span class="s1">'pr'</span><span class="p">,</span>
@@ -6271,9 +6300,13 @@ for <em>all</em> queries that share the context:</p>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">context</span><span class="p">({</span>
-    <span class="na">runBefore</span><span class="p">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{},</span>
-    <span class="na">runAfter</span><span class="p">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{},</span>
-    <span class="na">onBuild</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{}</span>
+    <span class="na">runBefore</span><span class="p">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+    <span class="p">},</span>
+    <span class="na">runAfter</span><span class="p">:</span> <span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+    <span class="p">},</span>
+    <span class="na">onBuild</span><span class="p">:</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{}</span>
   <span class="p">});</span>
 </code></pre>
 <blockquote>
@@ -6284,7 +6317,7 @@ If you wanted to make all of them use the same schema you could write this:</p>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[movies, children.movies]'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">context</span><span class="p">({</span>
-    <span class="na">onBuild</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="na">onBuild</span><span class="p">:</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">builder</span><span class="p">.</span><span class="nx">withSchema</span><span class="p">(</span><span class="s1">'someSchema'</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">});</span>
@@ -6794,16 +6827,18 @@ value for example in case an alias has been given.</p>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
 
 <span class="nx">query</span>
- <span class="p">.</span><span class="nx">runBefore</span><span class="p">(</span><span class="nx">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hello 1'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">runBefore</span><span class="p">(</span><span class="nx">async</span> <span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hello 1'</span><span class="p">);</span>
 
-   <span class="nx">await</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+    <span class="nx">await</span> <span class="nx">Promise</span><span class="p">.</span><span class="nx">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 
     <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hello 2'</span><span class="p">);</span>
- <span class="p">})</span>
- <span class="p">.</span><span class="nx">runBefore</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
-   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hello 3'</span><span class="p">);</span>
- <span class="p">});</span>
+    <span class="k">return</span> <span class="nx">result</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nx">runBefore</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'hello 3'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">result</span>
+  <span class="p">});</span>
 
 <span class="nx">await</span> <span class="nx">query</span><span class="p">;</span>
 <span class="c1">// --&gt; hello 1</span>
@@ -6824,8 +6859,8 @@ chained like <a href="#then"><code class="prettyprint">then</code></a> methods o
 </thead><tbody>
 <tr>
 <td>runBefore</td>
-<td>function(any, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
-<td>The function to be executed.</td>
+<td>function(result, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.</td>
 </tr>
 </tbody></table>
 
@@ -6904,6 +6939,7 @@ from these. You should <em>only</em> call the query building methods of the buil
  <span class="p">})</span>
  <span class="p">.</span><span class="nx">runAfter</span><span class="p">(</span><span class="nx">async</span> <span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="nx">queryBuilder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
    <span class="nx">models</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">fromJson</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">}));</span>
+   <span class="k">return</span> <span class="nx">models</span><span class="p">;</span>
  <span class="p">});</span>
 
 <span class="kr">const</span> <span class="nx">models</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">query</span><span class="p">;</span>
@@ -6925,8 +6961,8 @@ registered using the <a href="#then"><code class="prettyprint">then</code></a> m
 </thead><tbody>
 <tr>
 <td>runAfter</td>
-<td>function(*, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
-<td>The function to be executed.</td>
+<td>function(result, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.</td>
 </tr>
 </tbody></table>
 
@@ -7698,7 +7734,12 @@ of <code class="prettyprint">Person</code> instances.</p>
 <h4 id="tostring">toString</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">sql</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
 </code></pre>
-<p>Returns the SQL string. If this query builder executes multiple queries, only the first query&rsquo;s SQL is returned.</p>
+<p>Returns the SQL string suitable for logging input <em>but not for execution</em>, via Knex&rsquo;s <code class="prettyprint">toString()</code>. This method should not be used to create queries for database execution because it makes no guarantees about escaping bindings properly.</p>
+
+<p>Note: In the current release, if the query builder attempts to execute multiple queries or throw any exception whatsoever, <strong>no error will throw</strong> and instead the following string is returned:</p>
+<pre class="highlight plaintext"><code>This query cannot be built synchronously. Consider using debug() method instead.
+</code></pre>
+<p>Later versions of Objection may introduce a native way to retrieve an executable SQL statement, or handle this behavior differently. If you need executable SQL, you can consider the unstable/private API <code class="prettyprint">this.build().toSQL()</code>, which is the native Knex method that can <a href="http://knexjs.org/#Interfaces-toSQL">provide formatted bindings</a>.</p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -7710,14 +7751,16 @@ of <code class="prettyprint">Person</code> instances.</p>
 </thead><tbody>
 <tr>
 <td>string</td>
-<td>The SQL this query builder will build</td>
+<td>The SQL this query builder will build, or <code class="prettyprint">This query cannot be built synchronously. Consider using debug() method instead.</code> if an exception is thrown</td>
 </tr>
 </tbody></table>
 
 <h4 id="tosql">toSql</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">sql</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">toSql</span><span class="p">();</span>
 </code></pre>
-<p>Returns the SQL string. If this query builder executes multiple queries, only the first query&rsquo;s SQL is returned.</p>
+<p>An alias for <code class="prettyprint">toSql()</code>.</p>
+
+<p>Note: The behavior of Objection&rsquo;s <code class="prettyprint">toSql()</code> is different from Knex&rsquo;s <code class="prettyprint">toSql()</code> (see above). This method may be deprecated soon.</p>
 
 <h5 id="return-value">Return value</h5>
 
@@ -7729,7 +7772,7 @@ of <code class="prettyprint">Person</code> instances.</p>
 </thead><tbody>
 <tr>
 <td>string</td>
-<td>The SQL this query builder will build</td>
+<td>The SQL this query builder will build, or <code class="prettyprint">This query cannot be built synchronously. Consider using debug() method instead.</code> if an exception is thrown</td>
 </tr>
 </tbody></table>
 
@@ -8586,7 +8629,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="c1">// Table name is the only required property.</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
   <span class="p">}</span>
 
   <span class="c1">// Optional JSON schema. This is not the database schema!</span>
@@ -8635,8 +8678,8 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
         <span class="c1">// path version here to prevent require loops.</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Animal'</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -8644,12 +8687,12 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">'/Movie'</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
           <span class="c1">// ManyToMany relation needs the `through` object</span>
           <span class="c1">// to describe the join table.</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.actorId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
 
             <span class="c1">// If you have a model class for the join table</span>
             <span class="c1">// you can specify it like this:</span>
@@ -8663,7 +8706,7 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
             <span class="c1">//</span>
             <span class="c1">// extra: ['someExtra']</span>
           <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -8671,8 +8714,8 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.parentId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.parentId'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -8680,8 +8723,8 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.parentId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.parentId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.id'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -8733,7 +8776,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <h4 id="tablename">tableName</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s1">'Person'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
@@ -8741,7 +8784,7 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <p>ESNext:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'Person'</span><span class="p">;</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre>
 <p>Name of the database table for this model.</p>
@@ -8905,19 +8948,23 @@ shared configuration such as this there.</p>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">tableName</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="s1">'persons'</span><span class="p">;</span>
+  <span class="p">}</span>
+
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">relationMappings</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
           <span class="c1">// Any of the `to` and `from` fields can also be</span>
           <span class="c1">// references to nested fields (or arrays of references).</span>
-          <span class="c1">// Here the relation is created between `Person.id` and</span>
-          <span class="c1">// `Animal.json.details.ownerId` properties. The reference</span>
+          <span class="c1">// Here the relation is created between `persons.id` and</span>
+          <span class="c1">// `animals.json.details.ownerId` properties. The reference</span>
           <span class="c1">// must be casted to the same type as the other key.</span>
-          <span class="na">to</span><span class="p">:</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.json:details.ownerId'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">()</span>
+          <span class="na">to</span><span class="p">:</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.json:details.ownerId'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">()</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -8925,8 +8972,8 @@ shared configuration such as this there.</p>
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.fatherId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.id'</span>
         <span class="p">}</span>
       <span class="p">},</span>
 
@@ -8934,10 +8981,10 @@ shared configuration such as this there.</p>
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
           <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
-            <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+            <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.actorId'</span><span class="p">,</span>
+            <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
 
             <span class="c1">// If you have a model class for the join table</span>
             <span class="c1">// you can specify it like this:</span>
@@ -8951,7 +8998,7 @@ shared configuration such as this there.</p>
             <span class="c1">//</span>
             <span class="c1">// extra: ['someExtra']</span>
           <span class="p">},</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -8964,18 +9011,20 @@ shared configuration such as this there.</p>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
 
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableName</span> <span class="o">=</span> <span class="s1">'persons'</span><span class="p">;</span>
+
   <span class="kr">static</span> <span class="nx">relationMappings</span> <span class="o">=</span> <span class="p">{</span>
     <span class="na">pets</span><span class="p">:</span> <span class="p">{</span>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
         <span class="c1">// Any of the `to` and `from` fields can also be</span>
         <span class="c1">// references to nested fields (or arrays of references).</span>
-        <span class="c1">// Here the relation is created between `Person.id` and</span>
-        <span class="c1">// `Animal.json.details.ownerId` properties. The reference</span>
+        <span class="c1">// Here the relation is created between `persons.id` and</span>
+        <span class="c1">// `animals.json.details.ownerId` properties. The reference</span>
         <span class="c1">// must be casted to the same type as the other key.</span>
-        <span class="na">to</span><span class="p">:</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Animal.json:details.ownerId'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">()</span>
+        <span class="na">to</span><span class="p">:</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'animals.json:details.ownerId'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">()</span>
       <span class="p">}</span>
     <span class="p">},</span>
 
@@ -8983,8 +9032,8 @@ shared configuration such as this there.</p>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">BelongsToOneRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Person</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.fatherId'</span><span class="p">,</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Person.id'</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.fatherId'</span><span class="p">,</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'persons.id'</span>
       <span class="p">}</span>
     <span class="p">},</span>
 
@@ -8992,10 +9041,10 @@ shared configuration such as this there.</p>
       <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">ManyToManyRelation</span><span class="p">,</span>
       <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Movie</span><span class="p">,</span>
       <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
+        <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
         <span class="na">through</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person_Movie.actorId'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Person_Movie.movieId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons_movies.actorId'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'persons_movies.movieId'</span>
 
           <span class="c1">// If you have a model class for the join table</span>
           <span class="c1">// you can specify it like this:</span>
@@ -9009,7 +9058,7 @@ shared configuration such as this there.</p>
           <span class="c1">//</span>
           <span class="c1">// extra: ['someExtra']</span>
         <span class="p">},</span>
-        <span class="na">to</span><span class="p">:</span> <span class="s1">'Movie.id'</span>
+        <span class="na">to</span><span class="p">:</span> <span class="s1">'movies.id'</span>
       <span class="p">}</span>
     <span class="p">}</span>
   <span class="p">};</span>
@@ -9062,18 +9111,18 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 </tr>
 <tr>
 <td>modify</td>
-<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
-<td>Optional modifier for the relation query. This is called each time the relation is fetched.</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&#124;string&#124;object</td>
+<td>Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: &#39;Jenny&rsquo;} would additionally narrow fetched rows to the ones with the name &#39;Jenny&rsquo;.</td>
 </tr>
 <tr>
 <td>filter</td>
-<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&#124;string&#124;object</td>
 <td>Alias for modify.</td>
 </tr>
 <tr>
 <td>beforeInsert</td>
 <td>function(<a href="#model"><code class="prettyprint">Model</code></a>, <a href="#context"><code class="prettyprint">QueryContext</code></a>)</td>
-<td>Optional insert hook that is called for each inserted model instance.  This function can be async.</td>
+<td>Optional insert hook that is called for each inserted model instance. This function can be async.</td>
 </tr>
 </tbody></table>
 
@@ -9089,12 +9138,12 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 <tr>
 <td>from</td>
 <td>string&#124;<a href="#ref"><code class="prettyprint">ReferenceBuilder</code></a>&#124;Array</td>
-<td>The relation column in the owner table. Must be given with the table name. For example <code class="prettyprint">Person.id</code>. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person.a&#39;, &#39;Person.b&#39;]</code>. Note that neither this nor <code class="prettyprint">to</code> need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
+<td>The relation column in the owner table. Must be given with the table name. For example <code class="prettyprint">persons.id</code>. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;persons.a&#39;, &#39;persons.b&#39;]</code>. Note that neither this nor <code class="prettyprint">to</code> need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
 </tr>
 <tr>
 <td>to</td>
 <td>string&#124;<a href="#ref"><code class="prettyprint">ReferenceBuilder</code></a>&#124;Array</td>
-<td>The relation column in the related table. Must be given with the table name. For example <code class="prettyprint">Movie.id</code>. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Movie.a&#39;, &#39;Movie.b&#39;]</code>. Note that neither this nor <code class="prettyprint">from</code> need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
+<td>The relation column in the related table. Must be given with the table name. For example <code class="prettyprint">movies.id</code>. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;movies.a&#39;, &#39;movies.b&#39;]</code>. Note that neither this nor <code class="prettyprint">from</code> need to be foreign keys or primary keys. You can join any column to any column. You can even join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
 </tr>
 <tr>
 <td>through</td>
@@ -9115,12 +9164,12 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 <tr>
 <td>from</td>
 <td>string&#124;<a href="#ref"><code class="prettyprint">ReferenceBuilder</code></a>&#124;Array</td>
-<td>The column that is joined to <code class="prettyprint">from</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.actorId</code> where <code class="prettyprint">Person_Movie</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person_Movie.a&#39;, &#39;Person_Movie.b&#39;]</code>. You can join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
+<td>The column that is joined to <code class="prettyprint">from</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_movies.actorId</code> where <code class="prettyprint">Person_movies</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;persons_movies.a&#39;, &#39;persons_movies.b&#39;]</code>. You can join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
 </tr>
 <tr>
 <td>to</td>
 <td>string&#124;<a href="#ref"><code class="prettyprint">ReferenceBuilder</code></a>&#124;Array</td>
-<td>The column that is joined to <code class="prettyprint">to</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_Movie.movieId</code> where <code class="prettyprint">Person_Movie</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;Person_Movie.a&#39;, &#39;Person_Movie.b&#39;]</code>. You can join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
+<td>The column that is joined to <code class="prettyprint">to</code> property of the <code class="prettyprint">RelationJoin</code>. For example <code class="prettyprint">Person_movies.movieId</code> where <code class="prettyprint">Person_movies</code> is the join table. Composite key can be specified using an array of columns e.g. <code class="prettyprint">[&#39;persons_movies.a&#39;, &#39;persons_movies.b&#39;]</code>. You can join nested json fields using the <a href="#ref"><code class="prettyprint">ref</code></a> helper.</td>
 </tr>
 <tr>
 <td>modelClass</td>
@@ -9494,7 +9543,8 @@ You can override this to use your own <a href="#querybuilder"><code class="prett
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'there are'</span><span class="p">,</span> <span class="nx">people</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="s1">'people in the database'</span><span class="p">);</span>
 
 <span class="c1">// Example of a more complex WHERE clause. This generates:</span>
-<span class="c1">// SELECT FROM "Person"</span>
+<span class="c1">// SELECT "persons".*</span>
+<span class="c1">// FROM "persons"</span>
 <span class="c1">// WHERE ("firstName" = 'Jennifer' AND "age" &lt; 30)</span>
 <span class="c1">// OR ("firstName" = 'Mark' AND "age" &gt; 30)</span>
 <span class="kr">const</span> <span class="nx">marksAndJennifers</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
@@ -9626,7 +9676,7 @@ any knex* methods:</p>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
-    <span class="s1">'Person.*'</span><span class="p">,</span>
+    <span class="s1">'persons.*'</span><span class="p">,</span>
 
     <span class="nx">Person</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
       <span class="p">.</span><span class="nx">count</span><span class="p">()</span>
@@ -11198,11 +11248,11 @@ also stored to the owner model&rsquo;s property named after the relation (by def
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">dogsAndCats</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">jennifer</span>
   <span class="p">.</span><span class="nx">$relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'Animal.*'</span><span class="p">,</span> <span class="s1">'Person.name as ownerName'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'animals.*'</span><span class="p">,</span> <span class="s1">'persons.name as ownerName'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">orWhere</span><span class="p">(</span><span class="s1">'breed'</span><span class="p">,</span> <span class="s1">'='</span><span class="p">,</span> <span class="s1">'cat'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">innerJoin</span><span class="p">(</span><span class="s1">'Person'</span><span class="p">,</span> <span class="s1">'Person.id'</span><span class="p">,</span> <span class="s1">'Animal.ownerId'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'Animal.name'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">innerJoin</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">,</span> <span class="s1">'persons.id'</span><span class="p">,</span> <span class="s1">'animals.ownerId'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'animals.name'</span><span class="p">);</span>
 
 <span class="c1">// All the dogs and cats have the owner's name "Jennifer"</span>
 <span class="c1">// joined as the `ownerName` property.</span>
@@ -11923,8 +11973,8 @@ You need to pass the error to the method as the only argument.</p>
 
 <p>Syntax: <code class="prettyprint">&lt;column reference&gt;[:&lt;json field reference&gt;]</code></p>
 
-<p>e.g. <code class="prettyprint">Person.jsonColumnName:details.names[1]</code> would refer to value <code class="prettyprint">&#39;Second&#39;</code>
-in column <code class="prettyprint">Person.jsonColumnName</code> which has
+<p>e.g. <code class="prettyprint">persons.jsonColumnName:details.names[1]</code> would refer to value <code class="prettyprint">&#39;Second&#39;</code>
+in column <code class="prettyprint">persons.jsonColumnName</code> which has
 <code class="prettyprint">{ details: { names: [&#39;First&#39;, &#39;Second&#39;, &#39;Last&#39;] } }</code> object stored in it.</p>
 
 <p>First part <code class="prettyprint">&lt;column reference&gt;</code> is compatible with column references used in
@@ -12397,8 +12447,8 @@ from the outside world, like model instances (or POJOs), relation expressions ob
         <span class="na">relation</span><span class="p">:</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">HasManyRelation</span><span class="p">,</span>
         <span class="na">modelClass</span><span class="p">:</span> <span class="nx">Animal</span><span class="p">,</span>
         <span class="na">join</span><span class="p">:</span> <span class="p">{</span>
-          <span class="na">from</span><span class="p">:</span> <span class="s1">'Person.id'</span><span class="p">,</span>
-          <span class="na">to</span><span class="p">:</span> <span class="s1">'Animal.ownerId'</span>
+          <span class="na">from</span><span class="p">:</span> <span class="s1">'persons.id'</span><span class="p">,</span>
+          <span class="na">to</span><span class="p">:</span> <span class="s1">'animals.ownerId'</span>
         <span class="p">}</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -12451,6 +12501,11 @@ is a subclass of <code class="prettyprint">ManyToManyRelation</code>. Arrange yo
 <td>relatedProp</td>
 <td><a href="#relationproperty"><code class="prettyprint">RelationProperty</code></a></td>
 <td>The relation property in the <code class="prettyprint">relatedModelClass</code>.</td>
+</tr>
+<tr>
+<td>joinModelClass</td>
+<td>function</td>
+<td>The model class representing the join table. This class is automatically generated by Objection if none is provided in the <code class="prettyprint">join.through.modelClass</code> setting of the relation mapping, see <a href="#relationthrough"><code class="prettyprint">RelationThrough</code></a>.</td>
 </tr>
 <tr>
 <td>joinTable</td>
@@ -12654,6 +12709,18 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-0-1">1.0.1</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Added public <a href="#relation">Relation.joinModelClass</a> accessor</li>
+<li>Don&rsquo;t call <code class="prettyprint">returning</code> on sqlite (prevents a warning message added in knex 0.14.4)</li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/844">#844</a></li>
+<li>Small documentation updates</li>
+<li>Small typing fixes end updates</li>
+</ul>
 
 <h2 id="1-0-0">1.0.0 🎉</h2>
 
