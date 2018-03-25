@@ -108,6 +108,28 @@ module.exports = session => {
       expect(models[0].model1Relation1).to.be.a(Model1);
     });
 
+    test({ model1Relation1: true }, models => {
+      expect(models).to.eql([
+        {
+          id: 1,
+          model1Id: 2,
+          model1Prop1: 'hello 1',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1: {
+            id: 2,
+            model1Id: 3,
+            model1Prop1: 'hello 2',
+            model1Prop2: null,
+            $afterGetCalled: 1
+          }
+        }
+      ]);
+
+      expect(models[0]).to.be.a(Model1);
+      expect(models[0].model1Relation1).to.be.a(Model1);
+    });
+
     test('model1Relation1(select:model1Prop1)', models => {
       expect(models).to.eql([
         {
@@ -127,7 +149,59 @@ module.exports = session => {
       expect(models[0].model1Relation1).to.be.a(Model1);
     });
 
+    test(
+      {
+        model1Relation1: {
+          $modify: ['select:model1Prop1']
+        }
+      },
+      models => {
+        expect(models).to.eql([
+          {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              model1Prop1: 'hello 2',
+              $afterGetCalled: 1
+            }
+          }
+        ]);
+
+        expect(models[0]).to.be.a(Model1);
+        expect(models[0].model1Relation1).to.be.a(Model1);
+      }
+    );
+
     test('model1Relation1.model1Relation1', models => {
+      expect(models).to.eql([
+        {
+          id: 1,
+          model1Id: 2,
+          model1Prop1: 'hello 1',
+          model1Prop2: null,
+          $afterGetCalled: 1,
+          model1Relation1: {
+            id: 2,
+            model1Id: 3,
+            model1Prop1: 'hello 2',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+            model1Relation1: {
+              id: 3,
+              model1Id: 4,
+              model1Prop1: 'hello 3',
+              model1Prop2: null,
+              $afterGetCalled: 1
+            }
+          }
+        }
+      ]);
+    });
+
+    test({ model1Relation1: { model1Relation1: {} } }, models => {
       expect(models).to.eql([
         {
           id: 1,
@@ -2671,6 +2745,14 @@ module.exports = session => {
 
   // Tests all ways to fetch eagerly.
   function test(expr, tester, opt) {
+    let testName;
+
+    if (typeof expr === 'object') {
+      testName = JSON.stringify(expr);
+    } else {
+      testName = expr.replace(/\s/g, '');
+    }
+
     opt = _.defaults(opt || {}, {
       Model: Model1,
       filters: {},
@@ -2679,7 +2761,6 @@ module.exports = session => {
 
     let idCol = opt.Model.query().fullIdColumnFor(opt.Model);
     let testFn = opt.only ? it.only.bind(it) : it;
-    let testName = expr.replace(/\s/g, '');
 
     if (!opt.disableWhereIn) {
       testFn(testName + ' (QueryBuilder.eager)', () => {
