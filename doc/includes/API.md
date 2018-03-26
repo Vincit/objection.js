@@ -7830,6 +7830,87 @@ the `^` character. For example `parent.^3` is equal to `parent.parent.parent`.
 
 Relations can be aliased using the `as` keyword.
 
+### RelationExpression object notation
+
+> The string expression in the comment is equivalent to the object expression below it:
+
+```js
+// `children`
+{
+  children: true
+}
+```
+
+```js
+// `children.movies`
+{
+  children: {
+    movies: true
+  }
+}
+```
+
+```js
+// `[children, pets]`
+{
+  children: true
+  pets: true
+}
+```
+
+```js
+// `[children.[movies, pets], pets]`
+{
+  children: {
+    movies: true,
+    pets: true
+  }
+  pets: true
+}
+```
+
+```js
+// `parent.^`
+{
+  parent: {
+    $recursive: true
+  }
+}
+```
+
+```js
+// `parent.^5`
+{
+  parent: {
+    $recursive: 5
+  }
+}
+```
+
+```js
+// `parent.*`
+{
+  parent: {
+    $allRecursive: true
+  }
+}
+```
+
+```js
+// `[children as kids, pets(filterDogs) as dogs]`
+{
+  kids: {
+    $relation: 'children'
+  },
+
+  dogs: {
+    $relation: 'pets',
+    $modify: ['filterDogs']
+  }
+}
+```
+
+In addition to the string expressions, a more verbose object notation can also be used.
 
 ## Validator
 

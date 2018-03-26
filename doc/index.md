@@ -975,6 +975,20 @@ console.log(people[1].children[2].pets[1].name);
 console.log(people[1].children[2].children[0].name);
 ```
 
+> Here's the previous query using the optional [object notation](#relationexpression-object-notation)
+
+```js
+const people = await Person
+  .query()
+  .eager({
+    pets: true,
+    children: {
+      pets: true,
+      children: true
+    }
+  });
+```
+
 > Fetch one relation recursively:
 
 ```js
@@ -1117,7 +1131,8 @@ You can fetch an arbitrary graph of relations for the results of any query by ch
 [`eager`](#eager) takes a [relation expression](#relationexpression) string as a parameter. In addition to making your
 life easier, eager queries avoid the "select N+1" problem and provide a great performance.
 
-Because the eager expressions are strings they can be easily passed for example as a query parameter of an HTTP
+Because the eager expressions are strings (there's also an optional [object notation](#relationexpression-object-notation))
+they can be easily passed for example as a query parameter of an HTTP
 request. However, allowing the client to pass expressions like this without any limitations is not very secure.
 Therefore the [`QueryBuilder`](#querybuilder) has the [`allowEager`](#alloweager) method. [`allowEager`](#alloweager)
 can be used to  limit the allowed eager expression to a certain subset.
