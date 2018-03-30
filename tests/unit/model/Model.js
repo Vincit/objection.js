@@ -1680,6 +1680,26 @@ describe('Model', () => {
     expect(model1.manyToMany).to.eql([{ id: 1 }, { id: 2 }]);
   });
 
+  it('$toJson should return result without relations if {shallow: true} is given as argument', () => {
+    let Model = modelClass('Model');
+
+    Model.relationMappings = {
+      someRelation: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Model,
+        join: {
+          from: 'Model.id',
+          to: 'Model.model1Id'
+        }
+      }
+    };
+
+    let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+
+    expect(model.$toJson()).to.eql({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+    expect(model.$toJson({ shallow: true })).to.eql({ a: 1, b: 2 });
+  });
+
   it('toJSON should return result without relations if {shallow: true} is given as argument', () => {
     let Model = modelClass('Model');
 
