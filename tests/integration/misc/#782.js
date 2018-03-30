@@ -202,7 +202,9 @@ module.exports = session => {
         })
         .catch(err => {
           expect(err.message).to.equal(
-            "graph node (id=2) is going to be related. cannot upsert any children of that node. objection doesn't support that yet. See the issue #782"
+            `graph node (id=${
+              movie2.id
+            }) is going to be related. cannot upsert any children of that node. objection doesn't support that yet. See the issue #782`
           );
           done();
         })
