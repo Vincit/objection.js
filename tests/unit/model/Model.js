@@ -1568,24 +1568,116 @@ describe('Model', () => {
     expect(model).to.eql({ a: 1, b: 2 });
   });
 
-  it('$toJson should return result without relations if {shallow: true} is given as argument', () => {
-    let Model = modelClass('Model');
+  it('$setRelated should set related model instances', () => {
+    let Model1 = modelClass('Model1');
+    let Model2 = modelClass('Model2');
 
-    Model.relationMappings = {
-      someRelation: {
-        relation: Model.BelongsToOneRelation,
-        modelClass: Model,
+    Model1.relationMappings = {
+      hasMany: {
+        relation: Model.HasManyRelation,
+        modelClass: Model2,
         join: {
-          from: 'Model.id',
-          to: 'Model.model1Id'
+          from: 'Model1.id',
+          to: 'Model2.model1Id'
+        }
+      },
+      belongsToOne: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Model1,
+        join: {
+          from: 'Model1.id',
+          to: 'Model1.model1Id'
+        }
+      },
+      manyToMany: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Model1,
+        join: {
+          from: 'Model1.id',
+          through: {
+            from: 'Model1_Model1.id1',
+            to: 'Model1_Model1.id2'
+          },
+          to: 'Model1.id'
         }
       }
     };
 
-    let model = Model.fromJson({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
+    const model1 = Model1.fromJson({});
 
-    expect(model.$toJson()).to.eql({ a: 1, b: 2, someRelation: { a: 3, b: 4 } });
-    expect(model.$toJson({ shallow: true })).to.eql({ a: 1, b: 2 });
+    model1.$setRelated('hasMany', Model2.fromJson({ id: 1 }));
+    expect(model1.hasMany).to.eql([{ id: 1 }]);
+
+    model1.$setRelated('hasMany', [Model2.fromJson({ id: 2 })]);
+    expect(model1.hasMany).to.eql([{ id: 2 }]);
+
+    model1.$setRelated('belongsToOne', Model1.fromJson({ id: 1 }));
+    expect(model1.belongsToOne).to.eql({ id: 1 });
+
+    model1.$setRelated('belongsToOne', [Model1.fromJson({ id: 2 })]);
+    expect(model1.belongsToOne).to.eql({ id: 2 });
+
+    model1.$setRelated('manyToMany', Model1.fromJson({ id: 1 }));
+    expect(model1.manyToMany).to.eql([{ id: 1 }]);
+
+    model1.$setRelated('manyToMany', [Model1.fromJson({ id: 2 })]);
+    expect(model1.manyToMany).to.eql([{ id: 2 }]);
+  });
+
+  it('appendRelated should append related model instances', () => {
+    let Model1 = modelClass('Model1');
+    let Model2 = modelClass('Model2');
+
+    Model1.relationMappings = {
+      hasMany: {
+        relation: Model.HasManyRelation,
+        modelClass: Model2,
+        join: {
+          from: 'Model1.id',
+          to: 'Model2.model1Id'
+        }
+      },
+      belongsToOne: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: Model1,
+        join: {
+          from: 'Model1.id',
+          to: 'Model1.model1Id'
+        }
+      },
+      manyToMany: {
+        relation: Model.ManyToManyRelation,
+        modelClass: Model1,
+        join: {
+          from: 'Model1.id',
+          through: {
+            from: 'Model1_Model1.id1',
+            to: 'Model1_Model1.id2'
+          },
+          to: 'Model1.id'
+        }
+      }
+    };
+
+    const model1 = Model1.fromJson({});
+
+    model1.$appendRelated('hasMany', Model2.fromJson({ id: 1 }));
+    expect(model1.hasMany).to.eql([{ id: 1 }]);
+
+    model1.$appendRelated('hasMany', [Model2.fromJson({ id: 2 })]);
+    expect(model1.hasMany).to.eql([{ id: 1 }, { id: 2 }]);
+
+    model1.$appendRelated('belongsToOne', Model1.fromJson({ id: 1 }));
+    expect(model1.belongsToOne).to.eql({ id: 1 });
+
+    model1.$appendRelated('belongsToOne', [Model1.fromJson({ id: 2 })]);
+    expect(model1.belongsToOne).to.eql({ id: 2 });
+
+    model1.$appendRelated('manyToMany', Model1.fromJson({ id: 1 }));
+    expect(model1.manyToMany).to.eql([{ id: 1 }]);
+
+    model1.$appendRelated('manyToMany', [Model1.fromJson({ id: 2 })]);
+    expect(model1.manyToMany).to.eql([{ id: 1 }, { id: 2 }]);
   });
 
   it('toJSON should return result without relations if {shallow: true} is given as argument', () => {
