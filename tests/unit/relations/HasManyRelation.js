@@ -915,6 +915,26 @@ describe('HasManyRelation', () => {
           );
         });
     });
+
+    it('should throw is a `through` object is given', () => {
+      expect(() => {
+        relation = new HasManyRelation('nameOfOurRelation', OwnerModel);
+
+        relation.setMapping({
+          modelClass: RelatedModel,
+          relation: HasManyRelation,
+          join: {
+            from: 'OwnerModel.oid',
+            through: {},
+            to: 'RelatedModel.ownerId'
+          }
+        });
+      }).to.throwException(err => {
+        expect(err.message).to.equal(
+          'OwnerModel.relationMappings.nameOfOurRelation: Property join.through is not supported for this relation type.'
+        );
+      });
+    });
   });
 
   function createModifiedRelation(filter) {

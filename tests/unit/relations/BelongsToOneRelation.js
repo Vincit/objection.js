@@ -945,6 +945,26 @@ describe('BelongsToOneRelation', () => {
         );
       });
     });
+
+    it('should throw is a `through` object is given', () => {
+      expect(() => {
+        relation = new BelongsToOneRelation('nameOfOurRelation', OwnerModel);
+
+        relation.setMapping({
+          modelClass: RelatedModel,
+          relation: BelongsToOneRelation,
+          join: {
+            from: 'OwnerModel.relatedId',
+            through: {},
+            to: 'RelatedModel.rid'
+          }
+        });
+      }).to.throwException(err => {
+        expect(err.message).to.equal(
+          'OwnerModel.relationMappings.nameOfOurRelation: Property join.through is not supported for this relation type.'
+        );
+      });
+    });
   });
 
   function createModifiedRelation(modifier) {
