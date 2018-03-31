@@ -860,6 +860,10 @@ module.exports = session => {
           {
             id: 1,
 
+            model1Relation1: {
+              id: 3
+            },
+
             model1Relation2: [
               {
                 idCol: 1
@@ -913,7 +917,8 @@ module.exports = session => {
           .then(res => {
             expect(res).to.eql([
               { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 }
+              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
+              { id: 3, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
             ]);
           });
       });
@@ -936,7 +941,46 @@ module.exports = session => {
           .then(res => {
             expect(res).to.eql([
               { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 }
+              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
+              { id: 3, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+            ]);
+          });
+      });
+
+      it('self referential relations should work', () => {
+        return Model1.query()
+          .select([
+            'id',
+            Model1.relatedQuery('model1Relation1')
+              .select('id')
+              .as('relId')
+          ])
+          .orderBy('id')
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, relId: 3, $afterGetCalled: 1 },
+              { id: 2, relId: null, $afterGetCalled: 1 },
+              { id: 3, relId: null, $afterGetCalled: 1 }
+            ]);
+          });
+      });
+
+      it('should work with subquery alias', () => {
+        return Model1.query()
+          .select([
+            'id',
+            Model1.relatedQuery('model1Relation1')
+              .alias('a2')
+              .select('a2.id')
+              .as('relId')
+          ])
+          .alias('a1')
+          .orderBy('id')
+          .then(res => {
+            expect(res).to.eql([
+              { id: 1, relId: 3, $afterGetCalled: 1 },
+              { id: 2, relId: null, $afterGetCalled: 1 },
+              { id: 3, relId: null, $afterGetCalled: 1 }
             ]);
           });
       });

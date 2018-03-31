@@ -2529,14 +2529,9 @@ module.exports = session => {
               .alias('m1')
               .select('m1.id')
               .eagerAlgorithm(eagerAlgo)
-              .eager(
-                `[
-              model1Relation1(f1) as a
-            ]`,
-                {
-                  f1: builder => builder.select('id')
-                }
-              )
+              .eager(`[model1Relation1(f1) as a]`, {
+                f1: builder => builder.select('id')
+              })
               .findOne({ 'm1.id': 1 })
               .then(model => {
                 expect(model).to.eql({
