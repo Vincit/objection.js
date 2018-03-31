@@ -78,6 +78,62 @@ module.exports = session => {
           });
       });
 
+      it('should work with relations', () => {
+        let model = {
+          model1Prop1: 'hello 3',
+          model1Relation1: { model1Prop1: 'hello 4' },
+          model1Relation2: [{ model2Prop1: 'moro 1' }]
+        };
+
+        return Model1.query()
+          .insert(model)
+          .then(inserted => {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.$beforeInsertCalled).to.equal(1);
+            expect(inserted.$afterInsertCalled).to.equal(1);
+            expect(inserted.id).to.eql(3);
+            expect(inserted.model1Prop1).to.equal('hello 3');
+            return session.knex(Model1.getTableName());
+          })
+          .then(rows => {
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
+      it('should work with relations and additionalProperties = false', () => {
+        let Mod = inheritModel(Model1);
+
+        let model = {
+          model1Prop1: 'hello 3',
+          model1Relation1: { model1Prop1: 'hello 4' },
+          model1Relation2: [{ model2Prop1: 'moro 1' }]
+        };
+
+        Mod.jsonSchema = {
+          type: 'object',
+          additionalProperties: false,
+
+          properties: {
+            model1Prop1: { type: 'string' },
+            model1Prop2: { type: 'number' }
+          }
+        };
+
+        return Mod.query()
+          .insert(model)
+          .then(inserted => {
+            expect(inserted).to.be.a(Model1);
+            expect(inserted.$beforeInsertCalled).to.equal(1);
+            expect(inserted.$afterInsertCalled).to.equal(1);
+            expect(inserted.id).to.eql(3);
+            expect(inserted.model1Prop1).to.equal('hello 3');
+            return session.knex(Mod.getTableName());
+          })
+          .then(rows => {
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
+      });
+
       it('should ignore non-objects in relation properties', () => {
         let model = {
           model1Prop1: 'hello 3',
