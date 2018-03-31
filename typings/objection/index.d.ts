@@ -245,7 +245,7 @@ declare namespace Objection {
   /**
    * @see http://vincit.github.io/objection.js/#relationexpression
    */
-  type RelationExpression = string;
+  type RelationExpression = string | object;
 
   interface FilterFunction<QM extends Model> {
     (queryBuilder: QueryBuilder<QM, QM[]>): void;
@@ -310,7 +310,7 @@ declare namespace Objection {
 
   interface ModifyEager<QM1 extends Model, RM1, RV1> {
     <QM2 extends Model>(
-      relationExpression: string | RelationExpression,
+      relationExpression: RelationExpression,
       modifier: (builder: QueryBuilder<QM2, QM2[]>) => void
     ): QueryBuilder<QM1, RM1, RV1>;
   }

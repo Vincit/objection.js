@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+### What's new
+
+  * Optional [object notation](#relationexpression-object-notation) for relation expressions.
+  * fix [#855](https://github.com/Vincit/objection.js/issues/855)
+  * fix [#858](https://github.com/Vincit/objection.js/issues/858)
+
 ## 1.0.1
 
 ### What's new

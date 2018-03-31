@@ -433,6 +433,12 @@ const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
   .eager('foo.bar');
 
+const rowsEager2: Promise<Person[]> = Person.query().eager({
+  foo: {
+    bar: true
+  }
+});
+
 const children: Promise<Person[]> = Person.query()
   .skipUndefined()
   .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
