@@ -9046,6 +9046,66 @@ the <code class="prettyprint">^</code> character. For example <code class="prett
 
 <p>Relations can be aliased using the <code class="prettyprint">as</code> keyword.</p>
 
+<h3 id="relationexpression-object-notation">RelationExpression object notation</h3>
+
+<blockquote>
+<p>The string expression in the comment is equivalent to the object expression below it:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="c1">// `children`</span>
+<span class="p">{</span>
+  <span class="nl">children</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `children.movies`</span>
+<span class="p">{</span>
+  <span class="nl">children</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">movies</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `[children, pets]`</span>
+<span class="p">{</span>
+  <span class="nl">children</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="nl">pets</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `[children.[movies, pets], pets]`</span>
+<span class="p">{</span>
+  <span class="nl">children</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">movies</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="nx">pets</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+  <span class="nl">pets</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `parent.^`</span>
+<span class="p">{</span>
+  <span class="nl">parent</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">$recursive</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `parent.^5`</span>
+<span class="p">{</span>
+  <span class="nl">parent</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">$recursive</span><span class="p">:</span> <span class="mi">5</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `parent.*`</span>
+<span class="p">{</span>
+  <span class="nl">parent</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">$allRecursive</span><span class="p">:</span> <span class="kc">true</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// `[children as kids, pets(filterDogs) as dogs]`</span>
+<span class="p">{</span>
+  <span class="nl">kids</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">$relation</span><span class="p">:</span> <span class="s1">'children'</span>
+  <span class="p">},</span>
+
+  <span class="nx">dogs</span><span class="p">:</span> <span class="p">{</span>
+    <span class="nl">$relation</span><span class="p">:</span> <span class="s1">'pets'</span><span class="p">,</span>
+    <span class="nx">$modify</span><span class="p">:</span> <span class="p">[</span><span class="s1">'filterDogs'</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>In addition to the string expressions, a more verbose object notation can also be used.</p>
+
 <h2 id="validator">Validator</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Validator</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">Validator</span><span class="p">;</span>
 </code></pre>
