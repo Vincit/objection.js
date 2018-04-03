@@ -371,7 +371,7 @@ module.exports = session => {
             });
         });
 
-        it('should be able to patch multiple fields insidw the same json object', () => {
+        it('should be able to patch multiple fields inside the same json object', () => {
           return BoundModel.query()
             .patch({
               'jsonObject:attr1': 'foo',
