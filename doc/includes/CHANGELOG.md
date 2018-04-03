@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+### What's new
+
+  * fix [#865](https://github.com/Vincit/objection.js/issues/865)
+  * fix bug where the static `Model.relatedQuery` didn't use the relation name as an alias for the table. This may break
+    code if you have explicitly referenced the a table in a query started by `Model.relatedQuery`. [#859](https://github.com/Vincit/objection.js/issues/859)
+
 ## 1.1.0
 
 ### What's new

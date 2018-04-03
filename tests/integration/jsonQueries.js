@@ -370,6 +370,29 @@ module.exports = session => {
               });
             });
         });
+
+        it('should be able to patch multiple fields insidw the same json object', () => {
+          return BoundModel.query()
+            .patch({
+              'jsonObject:attr1': 'foo',
+              'jsonObject:attr2': 'bar'
+            })
+            .where('id', 2)
+            .then(() =>
+              BoundModel.query()
+                .findById(2)
+                .select('jsonObject')
+            )
+            .then(result => {
+              expect(result).to.eql({
+                jsonObject: {
+                  attr: 2,
+                  attr1: 'foo',
+                  attr2: 'bar'
+                }
+              });
+            });
+        });
       });
     });
 
