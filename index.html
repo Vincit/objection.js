@@ -12784,6 +12784,16 @@ cast type for object values.</p>
 
           <h1 id="changelog">Changelog</h1>
 
+<h2 id="1-1-1">1.1.1</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/865">#865</a></li>
+<li>fix bug where the static <code class="prettyprint">Model.relatedQuery</code> didn&rsquo;t use the relation name as an alias for the table. This may break
+code if you have explicitly referenced the subquery table. <a href="https://github.com/Vincit/objection.js/issues/859">#859</a></li>
+</ul>
+
 <h2 id="1-1-0">1.1.0</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
