@@ -6436,7 +6436,7 @@ const jsonObj = modelInstance.$toJson(opt);
 ```
 
 ```js
-const shallowObj = modelInstance.$toJson({shallow: true});
+const shallowObj = modelInstance.$toJson({shallow: true, virtuals: true});
 ```
 
 Exports this model as a JSON object.
@@ -6445,7 +6445,7 @@ Exports this model as a JSON object.
 
 Argument|Type|Description
 --------|----|--------------------
-opt|[`CloneOptions`](#cloneoptions)|Optional options
+opt|[`ToJsonOptions`](#tojsonoptions)|Optional options
 
 ##### Return value
 
@@ -6463,7 +6463,7 @@ const jsonObj = modelInstance.toJSON(opt);
 ```
 
 ```js
-const shallowObj = modelInstance.toJSON({shallow: true});
+const shallowObj = modelInstance.toJSON({shallow: true, virtuals: true});
 ```
 
 Exports this model as a JSON object.
@@ -6472,7 +6472,7 @@ Exports this model as a JSON object.
 
 Argument|Type|Description
 --------|----|--------------------
-opt|[`CloneOptions`](#cloneoptions)|Optional options
+opt|[`ToJsonOptions`](#tojsonoptions)|Optional options
 
 ##### Return value
 
@@ -8127,6 +8127,17 @@ old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`
 Property|Type|Description
 --------|----|-----------
 shallow|boolean|If true, relations are ignored
+
+
+
+
+
+## ToJsonOptions
+
+Property|Type|Description
+--------|----|-----------
+shallow|boolean|If true, relations are ignored. Default is false.
+virtuals|boolean|If false, virtual attributes are omitted from the output. Default is true.
 
 
 

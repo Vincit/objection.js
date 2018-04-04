@@ -1220,10 +1220,95 @@ describe('Model', () => {
         }
       }
 
-      expect(Model1.fromJson({ a: 100, b: 10 }).toJSON()).to.eql({
+      expect(
+        Model1.fromJson({
+          a: 100,
+          b: 10,
+          rel1: Model1.fromJson({ a: 101, b: 11 }),
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+        }).toJSON()
+      ).to.eql({
         a: 100,
         b: 10,
-        foo: 110
+        foo: 110,
+
+        rel1: {
+          a: 101,
+          b: 11,
+          foo: 112
+        },
+
+        rel2: [{ a: 102, b: 12, foo: 114 }, { a: 103, b: 13, foo: 116 }]
+      });
+    });
+
+    it('should ignore virtuals when virtuals: false option is passed to toJSON', () => {
+      class Model1 extends Model {
+        get foo() {
+          return this.a + this.b;
+        }
+
+        get bar() {
+          return this.a + this.b;
+        }
+
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+      }
+
+      expect(
+        Model1.fromJson({
+          a: 100,
+          b: 10,
+          rel1: Model1.fromJson({ a: 101, b: 11 }),
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+        }).toJSON({ virtuals: false })
+      ).to.eql({
+        a: 100,
+        b: 10,
+
+        rel1: {
+          a: 101,
+          b: 11
+        },
+
+        rel2: [{ a: 102, b: 12 }, { a: 103, b: 13 }]
+      });
+    });
+
+    it('should ignore virtuals when virtuals: false option is passed to $toJson', () => {
+      class Model1 extends Model {
+        get foo() {
+          return this.a + this.b;
+        }
+
+        get bar() {
+          return this.a + this.b;
+        }
+
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+      }
+
+      expect(
+        Model1.fromJson({
+          a: 100,
+          b: 10,
+          rel1: Model1.fromJson({ a: 101, b: 11 }),
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+        }).$toJson({ virtuals: false })
+      ).to.eql({
+        a: 100,
+        b: 10,
+
+        rel1: {
+          a: 101,
+          b: 11
+        },
+
+        rel2: [{ a: 102, b: 12 }, { a: 103, b: 13 }]
       });
     });
 
