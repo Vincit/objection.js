@@ -10472,7 +10472,7 @@ called explicitly when needed.</p>
 
 <h4 id="tojson">$toJson</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">virtuals</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
 </code></pre>
 <p>Exports this model as a JSON object.</p>
 
@@ -10487,7 +10487,7 @@ called explicitly when needed.</p>
 </thead><tbody>
 <tr>
 <td>opt</td>
-<td><a href="#cloneoptions"><code class="prettyprint">CloneOptions</code></a></td>
+<td><a href="#tojsonoptions"><code class="prettyprint">ToJsonOptions</code></a></td>
 <td>Optional options</td>
 </tr>
 </tbody></table>
@@ -10508,7 +10508,7 @@ called explicitly when needed.</p>
 
 <h4 id="tojson">toJSON</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
-</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">virtuals</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
 </code></pre>
 <p>Exports this model as a JSON object.</p>
 
@@ -10523,7 +10523,7 @@ called explicitly when needed.</p>
 </thead><tbody>
 <tr>
 <td>opt</td>
-<td><a href="#cloneoptions"><code class="prettyprint">CloneOptions</code></a></td>
+<td><a href="#tojsonoptions"><code class="prettyprint">ToJsonOptions</code></a></td>
 <td>Optional options</td>
 </tr>
 </tbody></table>
@@ -12406,6 +12406,27 @@ from the outside world, like model instances (or POJOs), relation expressions ob
 </tr>
 </tbody></table>
 
+<h2 id="tojsonoptions">ToJsonOptions</h2>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>shallow</td>
+<td>boolean</td>
+<td>If true, relations are ignored. Default is false.</td>
+</tr>
+<tr>
+<td>virtuals</td>
+<td>boolean</td>
+<td>If false, virtual attributes are omitted from the output. Default is true.</td>
+</tr>
+</tbody></table>
+
 <h2 id="eageroptions">EagerOptions</h2>
 
 <table><thead>
@@ -12783,6 +12804,15 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-1-2">1.1.2</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Add <code class="prettyprint">virtuals</code> option for <code class="prettyprint">toJSON</code> and <code class="prettyprint">$toJson</code> <a href="https://github.com/Vincit/objection.js/issues/866">#866</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/868">#868</a></li>
+</ul>
 
 <h2 id="1-1-1">1.1.1</h2>
 
