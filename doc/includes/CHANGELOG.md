@@ -5,6 +5,7 @@
 ### What's new
 
   * Add `virtuals` option for `toJSON` and `$toJson` [#866](https://github.com/Vincit/objection.js/issues/866)
+  * fix [#868](https://github.com/Vincit/objection.js/issues/868)
 
 ## 1.1.1
 
