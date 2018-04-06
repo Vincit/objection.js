@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+### What's new
+
+  * fix regression in 1.1.2 (sorry about this) [#869](https://github.com/Vincit/objection.js/issues/869)
+
 ## 1.1.2
 
 ### What's new

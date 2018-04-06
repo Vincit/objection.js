@@ -2130,6 +2130,19 @@ describe('Model', () => {
     expect(Model1.fn()).to.eql({ a: 1 });
   });
 
+  it('make sure JSON.stringify works with toJSON', () => {
+    class Person extends Model {
+      static get idColumn() {
+        return 'key';
+      }
+    }
+
+    const p1 = Person.fromJson({ key: 1 });
+    const p2 = Person.fromJson({ key: 2 });
+
+    JSON.stringify([p1, p2]);
+  });
+
   function modelClass(tableName) {
     return class TestModel extends Model {
       static get tableName() {
