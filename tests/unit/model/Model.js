@@ -972,6 +972,29 @@ describe('Model', () => {
       expect(model.$toJson()).to.eql({ a: 1 });
       expect(model).to.eql({ a: 1, b: 2, c: 3 });
     });
+
+    // reproduces #869
+    it.skip('stringifies array of entities with custom id column correctly', () => {
+      class Person extends Model {
+        static get tableName() {
+          return `person`;
+        }
+        static get idColumn() {
+          return 'key';
+        }
+        static get jsonSchema() {
+          return {
+            properties: {
+              key: { type: 'string' }
+            }
+          };
+        }
+      }
+
+      const p1 = Person.fromJson({ key: 'dummy' });
+      const stringified = JSON.stringify([p1]);
+      expect(stringified).to.eql('[{}]');
+    });
   });
 
   describe('$toDatabaseJson', () => {
