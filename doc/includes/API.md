@@ -880,6 +880,8 @@ The patch object is validated against the model's [`jsonSchema`](#jsonschema) _b
 of the [`jsonSchema`](#jsonschema) is ignored. This way the properties in the patch object are still validated
 but an error isn't thrown if the patch object doesn't contain all required properties.
 
+Values specified using field expressions and literals are not validated.
+
 If validation fails the Promise is rejected with a [`ValidationError`](#validationerror).
 
 NOTE: The return value of the query will be the number of affected rows. If you want to patch a single row and
