@@ -393,6 +393,30 @@ module.exports = session => {
               });
             });
         });
+
+        it('should be able to patch fields using $query().patch()', () => {
+          return BoundModel.query()
+            .findById(1)
+            .then(model => {
+              return model.$query().patch({
+                name: 'updated name',
+                'jsonObject:attr': 'bar'
+              });
+            })
+            .then(() => {
+              return BoundModel.query()
+                .findById(1)
+                .select('name', 'jsonObject');
+            })
+            .then(result => {
+              expect(result).to.eql({
+                name: 'updated name',
+                jsonObject: {
+                  attr: 'bar'
+                }
+              });
+            });
+        });
       });
     });
 

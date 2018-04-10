@@ -363,7 +363,7 @@ describe('QueryBuilder', () => {
         .whereInComposite(['A.a', 'B.b'], [[1, 2], [3, 4]])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2),(3, 4))'
+            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2), (3, 4))'
           ]);
         });
     });

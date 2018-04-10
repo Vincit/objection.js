@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+### What's new
+
+  * fix subquery bug causing incompatibility with knex 0.14.5 and sqlite3
+
 ## 1.1.3
 
 ### What's new

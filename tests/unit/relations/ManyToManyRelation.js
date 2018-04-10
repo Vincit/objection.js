@@ -532,7 +532,7 @@ describe('ManyToManyRelation', () => {
             'select "RelatedModel".*, "JoinModel"."ownerAId" as "objectiontmpjoin0", "JoinModel"."ownerBId" as "objectiontmpjoin1"',
             'from "RelatedModel"',
             'inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId"',
-            'where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22),(11, 33))',
+            'where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22), (11, 33))',
             'and "name" = \'Teppo\'',
             'or "age" > 60'
           ].join(' ')

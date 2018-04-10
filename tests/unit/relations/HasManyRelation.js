@@ -152,7 +152,7 @@ describe('HasManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal(
-          'select "RelatedModel".* from "RelatedModel" where ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((11, 22),(11, 33)) and "name" = \'Teppo\' or "age" > 60'
+          'select "RelatedModel".* from "RelatedModel" where ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((11, 22), (11, 33)) and "name" = \'Teppo\' or "age" > 60'
         );
       });
     });

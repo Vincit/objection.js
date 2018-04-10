@@ -2130,7 +2130,7 @@ describe('Model', () => {
     expect(Model1.fn()).to.eql({ a: 1 });
   });
 
-  it('make sure JSON.stringify works with toJSON', () => {
+  it('make sure JSON.stringify works with toJSON (#869)', () => {
     class Person extends Model {
       static get idColumn() {
         return 'key';

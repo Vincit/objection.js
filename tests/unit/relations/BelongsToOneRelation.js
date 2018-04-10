@@ -131,7 +131,7 @@ describe('BelongsToOneRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.equal(
-          'select "RelatedModel".* from "RelatedModel" where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22),(11, 33))'
+          'select "RelatedModel".* from "RelatedModel" where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22), (11, 33))'
         );
       });
     });
