@@ -3981,6 +3981,8 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 of the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> is ignored. This way the properties in the patch object are still validated
 but an error isn&rsquo;t thrown if the patch object doesn&rsquo;t contain all required properties.</p>
 
+<p>Values specified using field expressions and literals are not validated.</p>
+
 <p>If validation fails the Promise is rejected with a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
 
 <p>NOTE: The return value of the query will be the number of affected rows. If you want to patch a single row and
@@ -12804,6 +12806,14 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-1-4">1.1.4</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix subquery bug causing incompatibility with knex 0.14.5 and sqlite3</li>
+</ul>
 
 <h2 id="1-1-3">1.1.3</h2>
 

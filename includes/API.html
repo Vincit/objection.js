@@ -910,6 +910,8 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 of the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> is ignored. This way the properties in the patch object are still validated
 but an error isn&rsquo;t thrown if the patch object doesn&rsquo;t contain all required properties.</p>
 
+<p>Values specified using field expressions and literals are not validated.</p>
+
 <p>If validation fails the Promise is rejected with a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
 
 <p>NOTE: The return value of the query will be the number of affected rows. If you want to patch a single row and
