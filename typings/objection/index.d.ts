@@ -367,7 +367,7 @@ declare namespace Objection {
 
     query(trxOrKnex?: Transaction | knex): QueryBuilder<M, M[]>;
     // This can only be used as a subquery so the result model type is irrelevant.
-    relatedQuery(relationName: string): QueryBuilder<any, any[]>;
+    relatedQuery(relationName: string, trxOrKnex?: Transaction | knex): QueryBuilder<any, any[]>;
     knex(knex?: knex): knex;
     knexQuery(): knex.QueryBuilder;
 
@@ -445,7 +445,7 @@ declare namespace Objection {
       trxOrKnex?: Transaction | knex
     ): QueryBuilder<QM>;
     // This can only be used as a subquery so the result model type is irrelevant.
-    static relatedQuery(relationName: string): QueryBuilder<any, any[]>;
+    static relatedQuery(relationName: string, trxOrKnex?: Transaction | knex): QueryBuilder<any, any[]>;
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
     static bindKnex<M>(this: M, knex: knex): M;

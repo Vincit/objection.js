@@ -5749,7 +5749,7 @@ Type|Description
 #### relatedQuery
 
 ```js
-const queryBuilder = Person.relatedQuery(relationName);
+const queryBuilder = Person.relatedQuery(relationName, transactionOrKnex);
 ```
 
 > Select count of a relation and the maximum value of another one:
@@ -5790,6 +5790,7 @@ Creates a subquery to a relation.
 Argument|Type|Description
 --------|----|--------------------
 relationName|string|The name of the relation to create subquery for.
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
 
 ##### Return value
 
