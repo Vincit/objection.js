@@ -5783,7 +5783,17 @@ const peopleThatHavePets = await Person
   .whereExists(Person.relatedQuery('pets'));
 ```
 
+> Generates something like this:
+
+```sql
+select "persons".* from "persons" where exists (select "pets".* from "animals" as "pets" where "pets"."ownerId" = "persons"."id")
+```
+
 Creates a subquery to a relation.
+
+This query can only be used as a subquery and therefore there is no need to ever pass
+a transaction or a knex instance to it. It will always inherit its parent query's
+transaction because it is compiled and executed as a part of the parent query.
 
 ##### Arguments
 
