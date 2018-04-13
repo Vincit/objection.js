@@ -246,7 +246,6 @@ declare namespace Objection {
   }
 
   export interface FetchTableMetadataOptions {
-    parentBuilder?: QueryBuilder<Model>;
     knex?: knex;
     force?: boolean;
     table?: string;
