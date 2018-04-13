@@ -3220,7 +3220,7 @@ after [`runBefore`](#runbefore) methods but before [`runAfter`](#runafter) metho
 If you need to modify the SQL query at query build time, this is the place to do it. You shouldn't
 modify the query in any of the `run` methods.
 
-Unlike the run methods these must be synchronous. Also you should not register any run methods
+Unlike the `run` methods (`runAfter`, `runBefore` etc.) these must be synchronous. Also you should not register any `run` methods
 from these. You should _only_ call the query building methods of the builder provided as a parameter.
 
 ##### Arguments
@@ -3228,6 +3228,52 @@ from these. You should _only_ call the query building methods of the builder pro
 Argument|Type|Description
 --------|----|--------------------
 onBuild|function([`QueryBuilder`](#querybuilder))|The function to be executed.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### onBuildKnex
+
+```js
+const builder = queryBuilder.onBuildKnex(onBuildKnex);
+```
+
+```js
+const query = Person.query();
+
+query
+ .onBuildKnex((knexBuilder, objectionBuilder) => {
+   knexBuilder.where('id', 1);
+ });
+```
+
+Functions registered with this method are called each time the query is built into an SQL string. This method is ran
+after [`onBuild`](#onbuild) methods but before [`runAfter`](#runafter) methods.
+
+If you need to modify the SQL query at query build time, this is the place to do it in addition to `onBuild`. The only
+difference between `onBuildKnex` and `onBuild` is that in `onBuild` you can modify the objection's query builder. In
+`onBuildKnex` the objection builder has been compiled into a knex query builder and any modifications to the objection
+builder will be ignored.
+
+Unlike the `run`  methods (`runAfter`, `runBefore` etc.) these must be synchronous. Also you should not register any `run` methods
+from these. You should _only_ call the query building methods of the __knexBuilder__ provided as a parameter.
+
+WARNING: You should never call any query building (or any other mutating) method on the `objectionBuilder` in
+         this function. If you do, those calls will get ignored. At this point the query builder has been
+         compiled into a knex query builder and you should only modify that. You can call non mutating methods
+         like `hasSelects`, `hasWheres` etc. on the objection builder.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+onBuildKnex|function(`KnexQueryBuilder`, [`QueryBuilder`](#querybuilder))|The function to be executed.
 
 ##### Return value
 

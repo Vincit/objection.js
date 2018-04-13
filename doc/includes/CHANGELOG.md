@@ -5,6 +5,7 @@
 ### What's new
 
   * Make [Model.fetchTableMetadata](#fetchtablemetadata) and [Model.tableMetadata](#tablemetadata) methods public. [#871](https://github.com/Vincit/objection.js/issues/871)
+  * Add [onBuildKnex](#onbuildknex) query builder hook. [#807](https://github.com/Vincit/objection.js/issues/807)
 
 ## 1.1.4
 

@@ -447,15 +447,21 @@ describe('QueryBuilder', () => {
         expect(this).to.equal(builder);
         text += 'b';
       })
-      .runAfter(function(data, builder) {
+      .onBuildKnex(function(knexBuilder, builder) {
         expect(builder).to.be.a(QueryBuilder);
-        expect(this).to.equal(builder);
+        expect(knexUtils.isKnexQueryBuilder(knexBuilder)).to.equal(true);
+        expect(this).to.equal(knexBuilder);
         text += 'c';
       })
       .runAfter(function(data, builder) {
         expect(builder).to.be.a(QueryBuilder);
         expect(this).to.equal(builder);
         text += 'd';
+      })
+      .runAfter(function(data, builder) {
+        expect(builder).to.be.a(QueryBuilder);
+        expect(this).to.equal(builder);
+        text += 'e';
       })
       .runAfter(() => {
         throw new Error('abort');
@@ -464,10 +470,10 @@ describe('QueryBuilder', () => {
         expect(builder).to.be.a(QueryBuilder);
         expect(this).to.equal(builder);
         expect(err.message).to.equal('abort');
-        text += 'e';
+        text += 'f';
       })
       .then(() => {
-        expect(text).to.equal('abcde');
+        expect(text).to.equal('abcdef');
         done();
       })
       .catch(err => {
