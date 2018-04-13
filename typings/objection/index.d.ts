@@ -245,8 +245,8 @@ declare namespace Objection {
     table: string;
   }
 
-  export interface FetchTableMetadataOptions<T extends Model> {
-    parentBuilder?: QueryBuilder<T>;
+  export interface FetchTableMetadataOptions {
+    parentBuilder?: QueryBuilder<Model>;
     knex?: knex;
     force?: boolean;
     table?: string;
@@ -419,7 +419,7 @@ declare namespace Objection {
     ): void;
     traverse(models: Model | Model[], traverser: TraverserFunction): void;
     tableMetadata(opt?: TableMetadataOptions): TableMetadata;
-    fetchTableMetadata(opt?: FetchTableMetadataOptions<Model>): Promise<TableMetadata>;
+    fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
   }
 
   // TS 2.5 doesn't support interfaces with static methods or fields, so
@@ -502,7 +502,7 @@ declare namespace Objection {
     static traverse(models: Model | Model[], traverser: TraverserFunction): void;
 
     static tableMetadata(opt?: TableMetadataOptions): TableMetadata;
-    static fetchTableMetadata(opt?: FetchTableMetadataOptions<Model>): Promise<TableMetadata>;
+    static fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
     // Implementation note: At least as of TypeScript 2.7, subclasses of
     // methods that return `this` are not compatible with their superclass.
     // For example, `class Movie extends Model` could not be passed as a
