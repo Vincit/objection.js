@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.5
+
+### What's new
+
+  * Make [Model.fetchTableMetadata](#fetchtablemetadata) and [Model.tableMetadata](#tablemetadata) methods public. [#871](https://github.com/Vincit/objection.js/issues/871)
+
 ## 1.1.4
 
 ### What's new

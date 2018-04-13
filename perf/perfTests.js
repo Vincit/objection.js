@@ -573,15 +573,17 @@ describe('Performance tests', () => {
         const BoundPerson = Person.bindKnex(mockKnex);
         const BoundAnimal = Animal.bindKnex(mockKnex);
 
-        BoundPerson.$$dbMetadata = new Map();
-        BoundPerson.$$dbMetadata.set('Person', {
-          columns: ['id', 'parentId', 'firstName', 'lastName', 'age']
-        });
+        BoundPerson.tableMetadata = () => {
+          return {
+            columns: ['id', 'parentId', 'firstName', 'lastName', 'age']
+          };
+        };
 
-        BoundAnimal.$$dbMetadata = new Map();
-        BoundAnimal.$$dbMetadata.set('Animal', {
-          columns: ['id', 'name', 'ownerId', 'species']
-        });
+        BoundAnimal.tableMetadata = () => {
+          return {
+            columns: ['id', 'name', 'ownerId', 'species']
+          };
+        };
 
         return BoundPerson;
       },

@@ -1,6 +1,10 @@
 const os = require('os');
 const path = require('path');
 const TestSession = require('./../../testUtils/TestSession');
+const Bluebird = require('bluebird');
+
+// Helps debugging.
+Bluebird.longStackTraces();
 
 describe('integration tests', () => {
   const testDatabaseConfigs = [

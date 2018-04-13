@@ -5729,6 +5729,10 @@ console.log('anyone over 90 is now removed from the database');
 
 Creates a query builder for the model's table.
 
+All query builders are created using this function, including $query, $relatedQuery and relatedQuery.
+That means you can modify each query by overriding this method for your model class. This is especially
+useful when combined with the use of [`onBuild`](#onbuild).
+
 See the [query examples](#query-examples) section for more examples.
 
 ##### Arguments
@@ -6328,6 +6332,84 @@ propertyName|string|A property name
 Type|Description
 ----|-----------------------------
 string|The column name
+
+
+
+
+
+#### fetchTableMetadata
+
+```js
+const metadata = await Person.fetchTableMetadata(opt);
+```
+
+Fetches and caches the table metadata.
+
+Most of the time objection doesn't need this metadata, but some methods like `joinEager` do. This
+method is called by objection when the metadata is needed. The result is cached and after the first
+call the cached promise is returned and no queries are executed.
+
+Because objection uses this on demand, the first query that needs this information can have
+unpredicable performance. If that's a problem, you can call this method for each of your models
+during your app's startup.
+
+If you've implemented [`tableMetadata`](#tablemetadata) method to return a custom metadata object,
+this method doesn't execute database queries, but returns `Promise.resolve(this.tableMetadata())`
+instead.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+opt|[`TableMetadataFetchOptions`](#tablemetadatafetchoptions)|Optional options
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+Promise&lt;[`TableMetadata`](#tablemetadata-prop)&gt;|The table metadata object
+
+
+
+
+
+
+#### tableMetadata
+
+```js
+const metadata = Person.tableMetadata(opt);
+```
+
+> A custom override that uses the property information in `jsonSchema`.
+
+```js
+class Person extends Model {
+  static tableMetadata() {
+    return {
+      columns: Object.keys(this.jsonSchema.properties)
+    };
+  }
+}
+```
+
+Synchronously returns the table metadata object from the cache.
+
+You can override this method to return a custom object if you don't want objection to use
+[`fetchTableMetadata`](#fetchtablemetadata).
+
+See [`fetchTableMetadata`](#fetchtablemetadata) for more information.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+opt|[`TableMetadataOptions`](#tablemetadataoptions)|Optional options
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`TableMetadata`](#tablemetadata-prop)|The table metadata object
 
 
 
@@ -8185,6 +8267,25 @@ noUnrelate|boolean&#124;string[]|If true, no unrelate operations are performed. 
 Property|Type|Description
 --------|----|-----------
 relate|boolean&#124;string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](#graph-inserts).
+
+## TableMetadataFetchOptions
+
+Property|Type|Description
+--------|----|-----------
+table|string|A custom table name. If not given, Model.tableName is used.
+knex|knex&#124;Transaction|A knex instance or a transaction
+
+## TableMetadataOptions
+
+Property|Type|Description
+--------|----|-----------
+table|string|A custom table name. If not given, Model.tableName is used.
+
+<h2 id="tablemetadata-prop">TableMetadata</h2>
+
+Property|Type|Description
+--------|----|-----------
+columns|string[]|Names of all the columns in a table.
 
 ## Relation
 

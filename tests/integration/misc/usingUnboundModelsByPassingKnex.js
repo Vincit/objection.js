@@ -111,6 +111,14 @@ module.exports = session => {
 
     it('eager', () => {
       return Promise.all([
+        // Give connection after building the query.
+        Model1.query()
+          .findById(1)
+          .joinEager(
+            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
+          )
+          .knex(session.knex),
+
         Model1.query(session.knex)
           .findById(1)
           .eager(
@@ -121,15 +129,7 @@ module.exports = session => {
           .findById(1)
           .joinEager(
             '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
-          ),
-
-        // Give connection after building the query.
-        Model1.query()
-          .findById(1)
-          .joinEager(
-            '[model1Relation1, model1Relation2.model2Relation1.[model1Relation1, model1Relation2]]'
           )
-          .knex(session.knex)
       ]).then(results => {
         results.forEach(models => {
           expect(sortRelations(models)).to.eql({
