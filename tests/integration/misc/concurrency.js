@@ -97,7 +97,9 @@ module.exports = session => {
         });
       });
 
-      Object.keys(models).map(it => models[it]).forEach(model => model.knex(knex));
+      Object.keys(models)
+        .map(it => models[it])
+        .forEach(model => model.knex(knex));
     });
 
     it('insertGraph', () => {
