@@ -93,6 +93,10 @@ module.exports = session => {
             expect(metadata === metadatas[0]).to.equal(true);
           });
 
+          expect(Table1.tableMetadata()).to.eql({
+            columns: ['id', 'relId', 'value']
+          });
+
           return Table1.fetchTableMetadata();
         })
         .then(metadata => {
@@ -169,6 +173,12 @@ module.exports = session => {
     });
 
     it('joinEager should work with overridden tableMetadata', () => {
+      const metadata = OverriddenTable1.tableMetadata();
+
+      expect(metadata).to.eql({
+        columns: ['id', 'relId', 'value']
+      });
+
       return OverriddenTable1.query(knex)
         .insertGraph({
           value: '1',
