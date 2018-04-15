@@ -241,7 +241,7 @@ that uses <a href="https://babeljs.io/">Babel</a> for ESNext &ndash;&gt; ES2015 
   <span class="p">}</span>
 
   <span class="c1">// Each model must have a column (or a set of columns) that uniquely</span>
-  <span class="c1">// identifies the rows. The colum(s) can be specified using the `idColumn`</span>
+  <span class="c1">// identifies the rows. The column(s) can be specified using the `idColumn`</span>
   <span class="c1">// property. `idColumn` returns `id` by default and doesn't need to be</span>
   <span class="c1">// specified unless the model's primary key is something else.</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">idColumn</span><span class="p">()</span> <span class="p">{</span>
@@ -6912,7 +6912,7 @@ after <a href="#runbefore"><code class="prettyprint">runBefore</code></a> method
 <p>If you need to modify the SQL query at query build time, this is the place to do it. You shouldn&rsquo;t
 modify the query in any of the <code class="prettyprint">run</code> methods.</p>
 
-<p>Unlike the run methods these must be synchronous. Also you should not register any run methods
+<p>Unlike the <code class="prettyprint">run</code> methods (<code class="prettyprint">runAfter</code>, <code class="prettyprint">runBefore</code> etc.) these must be synchronous. Also you should not register any <code class="prettyprint">run</code> methods
 from these. You should <em>only</em> call the query building methods of the builder provided as a parameter.</p>
 
 <h5 id="arguments">Arguments</h5>
@@ -6927,6 +6927,61 @@ from these. You should <em>only</em> call the query building methods of the buil
 <tr>
 <td>onBuild</td>
 <td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
+<td>The function to be executed.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="onbuildknex">onBuildKnex</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">onBuildKnex</span><span class="p">(</span><span class="nx">onBuildKnex</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">query</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">query</span>
+ <span class="p">.</span><span class="nx">onBuildKnex</span><span class="p">((</span><span class="nx">knexBuilder</span><span class="p">,</span> <span class="nx">objectionBuilder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+   <span class="nx">knexBuilder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+ <span class="p">});</span>
+</code></pre>
+<p>Functions registered with this method are called each time the query is built into an SQL string. This method is ran
+after <a href="#onbuild"><code class="prettyprint">onBuild</code></a> methods but before <a href="#runafter"><code class="prettyprint">runAfter</code></a> methods.</p>
+
+<p>If you need to modify the SQL query at query build time, this is the place to do it in addition to <code class="prettyprint">onBuild</code>. The only
+difference between <code class="prettyprint">onBuildKnex</code> and <code class="prettyprint">onBuild</code> is that in <code class="prettyprint">onBuild</code> you can modify the objection&rsquo;s query builder. In
+<code class="prettyprint">onBuildKnex</code> the objection builder has been compiled into a knex query builder and any modifications to the objection
+builder will be ignored.</p>
+
+<p>Unlike the <code class="prettyprint">run</code>  methods (<code class="prettyprint">runAfter</code>, <code class="prettyprint">runBefore</code> etc.) these must be synchronous. Also you should not register any <code class="prettyprint">run</code> methods
+from these. You should <em>only</em> call the query building methods of the <strong>knexBuilder</strong> provided as a parameter.</p>
+
+<p>WARNING: You should never call any query building (or any other mutating) method on the <code class="prettyprint">objectionBuilder</code> in
+         this function. If you do, those calls will get ignored. At this point the query builder has been
+         compiled into a knex query builder and you should only modify that. You can call non mutating methods
+         like <code class="prettyprint">hasSelects</code>, <code class="prettyprint">hasWheres</code> etc. on the objection builder.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>onBuildKnex</td>
+<td>function(<code class="prettyprint">KnexQueryBuilder</code>, <a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)</td>
 <td>The function to be executed.</td>
 </tr>
 </tbody></table>
@@ -9651,6 +9706,10 @@ any knex* methods:</p>
 </code></pre>
 <p>Creates a query builder for the model&rsquo;s table.</p>
 
+<p>All query builders are created using this function, including $query, $relatedQuery and relatedQuery.
+That means you can modify each query by overriding this method for your model class. This is especially
+useful when combined with the use of <a href="#onbuild"><code class="prettyprint">onBuild</code></a>.</p>
+
 <p>See the <a href="#query-examples">query examples</a> section for more examples.</p>
 
 <h5 id="arguments">Arguments</h5>
@@ -9715,7 +9774,16 @@ any knex* methods:</p>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">whereExists</span><span class="p">(</span><span class="nx">Person</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">));</span>
 </code></pre>
+<blockquote>
+<p>Generates something like this:</p>
+</blockquote>
+<pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"persons"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"persons"</span> <span class="k">where</span> <span class="k">exists</span> <span class="p">(</span><span class="k">select</span> <span class="nv">"pets"</span><span class="p">.</span><span class="o">*</span> <span class="k">from</span> <span class="nv">"animals"</span> <span class="k">as</span> <span class="nv">"pets"</span> <span class="k">where</span> <span class="nv">"pets"</span><span class="p">.</span><span class="nv">"ownerId"</span> <span class="o">=</span> <span class="nv">"persons"</span><span class="p">.</span><span class="nv">"id"</span><span class="p">)</span>
+</code></pre>
 <p>Creates a subquery to a relation.</p>
+
+<p>This query can only be used as a subquery and therefore there is no need to ever pass
+a transaction or a knex instance to it. It will always inherit its parent query&rsquo;s
+transaction because it is compiled and executed as a part of the parent query.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -10349,6 +10417,104 @@ any possible conversion for the property name.</p>
 <tr>
 <td>string</td>
 <td>The column name</td>
+</tr>
+</tbody></table>
+
+<h4 id="fetchtablemetadata">fetchTableMetadata</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">metadata</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">fetchTableMetadata</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<p>Fetches and caches the table metadata.</p>
+
+<p>Most of the time objection doesn&rsquo;t need this metadata, but some methods like <code class="prettyprint">joinEager</code> do. This
+method is called by objection when the metadata is needed. The result is cached and after the first
+call the cached promise is returned and no queries are executed.</p>
+
+<p>Because objection uses this on demand, the first query that needs this information can have
+unpredicable performance. If that&rsquo;s a problem, you can call this method for each of your models
+during your app&rsquo;s startup.</p>
+
+<p>If you&rsquo;ve implemented <a href="#tablemetadata"><code class="prettyprint">tableMetadata</code></a> method to return a custom metadata object,
+this method doesn&rsquo;t execute database queries, but returns <code class="prettyprint">Promise.resolve(this.tableMetadata())</code>
+instead.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>opt</td>
+<td><a href="#tablemetadatafetchoptions"><code class="prettyprint">TableMetadataFetchOptions</code></a></td>
+<td>Optional options</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Promise&lt;<a href="#tablemetadata-prop"><code class="prettyprint">TableMetadata</code></a>&gt;</td>
+<td>The table metadata object</td>
+</tr>
+</tbody></table>
+
+<h4 id="tablemetadata">tableMetadata</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">metadata</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">tableMetadata</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
+</code></pre>
+<blockquote>
+<p>A custom override that uses the property information in <code class="prettyprint">jsonSchema</code>.</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">tableMetadata</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="na">columns</span><span class="p">:</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">jsonSchema</span><span class="p">.</span><span class="nx">properties</span><span class="p">)</span>
+    <span class="p">};</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Synchronously returns the table metadata object from the cache.</p>
+
+<p>You can override this method to return a custom object if you don&rsquo;t want objection to use
+<a href="#fetchtablemetadata"><code class="prettyprint">fetchTableMetadata</code></a>.</p>
+
+<p>See <a href="#fetchtablemetadata"><code class="prettyprint">fetchTableMetadata</code></a> for more information.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>opt</td>
+<td><a href="#tablemetadataoptions"><code class="prettyprint">TableMetadataOptions</code></a></td>
+<td>Optional options</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#tablemetadata-prop"><code class="prettyprint">TableMetadata</code></a></td>
+<td>The table metadata object</td>
 </tr>
 </tbody></table>
 
@@ -12532,6 +12698,59 @@ from the outside world, like model instances (or POJOs), relation expressions ob
 </tr>
 </tbody></table>
 
+<h2 id="tablemetadatafetchoptions">TableMetadataFetchOptions</h2>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>table</td>
+<td>string</td>
+<td>A custom table name. If not given, Model.tableName is used.</td>
+</tr>
+<tr>
+<td>knex</td>
+<td>knex&#124;Transaction</td>
+<td>A knex instance or a transaction</td>
+</tr>
+</tbody></table>
+
+<h2 id="tablemetadataoptions">TableMetadataOptions</h2>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>table</td>
+<td>string</td>
+<td>A custom table name. If not given, Model.tableName is used.</td>
+</tr>
+</tbody></table>
+
+<h2 id="tablemetadata-prop">TableMetadata</h2>
+
+<table><thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>columns</td>
+<td>string[]</td>
+<td>Names of all the columns in a table.</td>
+</tr>
+</tbody></table>
+
 <h2 id="relation">Relation</h2>
 
 <blockquote>
@@ -12806,6 +13025,23 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-1-6">1.1.6</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Add typings for fetchTableMetadata, tableMetadata and onbuildknex</li>
+</ul>
+
+<h2 id="1-1-5">1.1.5</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Make <a href="#fetchtablemetadata">Model.fetchTableMetadata</a> and <a href="#tablemetadata">Model.tableMetadata</a> methods public. <a href="https://github.com/Vincit/objection.js/issues/871">#871</a></li>
+<li>Add <a href="#onbuildknex">onBuildKnex</a> query builder hook. <a href="https://github.com/Vincit/objection.js/issues/807">#807</a></li>
+</ul>
 
 <h2 id="1-1-4">1.1.4</h2>
 
