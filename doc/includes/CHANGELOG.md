@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.6
+
+### What's new
+
+  * Add typings for fetchTableMetadata, tableMetadata and onbuildknex
+
 ## 1.1.5
 
 ### What's new
