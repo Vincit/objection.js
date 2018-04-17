@@ -361,6 +361,39 @@ describe('Model', () => {
       }).to.not.throwException(err => console.log(err));
     });
 
+    it('should skip requirement validation if options.patch == true (if/then)', () => {
+      Model1.jsonSchema = {
+        properties: {
+          a: { type: 'string' },
+          b: { type: 'number' },
+          c: { type: 'string' }
+        },
+
+        if: {
+          properties: {
+            a: {
+              enum: ['foo']
+            }
+          }
+        },
+        then: {
+          required: ['b']
+        }
+      };
+
+      expect(() => {
+        Model1.fromJson({ a: 'foo' });
+      }).to.throwException();
+
+      expect(() => {
+        Model1.fromJson({ a: 'foo', b: 1 });
+      }).to.not.throwException();
+
+      expect(() => {
+        Model1.fromJson({ a: 'foo' }, { patch: true });
+      }).to.not.throwException();
+    });
+
     it('should skip validation if options.skipValidation == true', () => {
       Model1.jsonSchema = {
         required: ['a'],
