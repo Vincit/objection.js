@@ -378,6 +378,9 @@ describe('Model', () => {
         },
         then: {
           required: ['b']
+        },
+        else: {
+          required: ['c']
         }
       };
 
@@ -386,11 +389,23 @@ describe('Model', () => {
       }).to.throwException();
 
       expect(() => {
+        Model1.fromJson({ a: 'bar' });
+      }).to.throwException();
+
+      expect(() => {
         Model1.fromJson({ a: 'foo', b: 1 });
       }).to.not.throwException();
 
       expect(() => {
+        Model1.fromJson({ a: 'bar', c: 'baz' });
+      }).to.not.throwException();
+
+      expect(() => {
         Model1.fromJson({ a: 'foo' }, { patch: true });
+      }).to.not.throwException();
+
+      expect(() => {
+        Model1.fromJson({ a: 'bar' }, { patch: true });
       }).to.not.throwException();
     });
 
