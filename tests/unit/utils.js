@@ -7,6 +7,7 @@ const snakeCase = require('../../lib/utils/identifierMapping').snakeCase;
 const camelCase = require('../../lib/utils/identifierMapping').camelCase;
 const snakeCaseKeys = require('../../lib/utils/identifierMapping').snakeCaseKeys;
 const camelCaseKeys = require('../../lib/utils/identifierMapping').camelCaseKeys;
+const get = require('../../lib/utils/objectUtils').get;
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
