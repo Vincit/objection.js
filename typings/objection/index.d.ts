@@ -204,6 +204,7 @@ declare namespace Objection {
     join: RelationJoin;
     modify?: (queryBuilder: QueryBuilder<any>) => QueryBuilder<any>;
     filter?: (queryBuilder: QueryBuilder<any>) => QueryBuilder<any>;
+    beforeInsert?: (queryContext: QueryContext) => Promise<any> | void;
   }
 
   export interface EagerAlgorithm {
