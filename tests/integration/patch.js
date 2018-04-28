@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
 const ValidationError = require('../../').ValidationError;
+const Model = require('../../').Model;
 const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
 const mockKnexFactory = require('../../testUtils/mockKnex');
@@ -275,6 +276,35 @@ module.exports = session => {
             done();
           })
           .catch(done);
+      });
+
+      it('should be able to use objection.raw in hooks', () => {
+        class Test extends Model {
+          static get tableName() {
+            return 'Model1';
+          }
+
+          $beforeUpdate(opt, ctx) {
+            this.model1Prop2 = raw(`100 + 200`);
+          }
+        }
+
+        return Test.query(session.knex)
+          .findById(2)
+          .patch({
+            model1Prop1: 'updated'
+          })
+          .then(() => {
+            return Test.query(session.knex).findById(2);
+          })
+          .then(model => {
+            expect(model).to.eql({
+              id: 2,
+              model1Id: null,
+              model1Prop1: 'updated',
+              model1Prop2: 300
+            });
+          });
       });
     });
 

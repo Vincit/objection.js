@@ -43,7 +43,7 @@ module.exports = session => {
         ]);
       });
 
-      it('should return all rows when no knex m§ethods are chained', () => {
+      it('should return all rows when no knex methods are chained', () => {
         return Model1.query()
           .then(models => {
             expect(models[0]).to.be.a(Model1);
