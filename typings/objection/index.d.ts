@@ -641,7 +641,7 @@ declare namespace Objection {
     modify(func: (builder: this) => void): this;
     modify(namedFilter: string): this;
 
-    applyFilter(...namedFilters: string): this;
+    applyFilter(...namedFilters: string[]): this;
 
     findById(id: Id): QueryBuilderYieldingOneOrNone<QM>;
     findById(idOrIds: IdOrIds): this;
