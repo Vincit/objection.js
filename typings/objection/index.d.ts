@@ -194,7 +194,7 @@ declare namespace Objection {
   export interface RelationThrough {
     from: string | Reference | (string | Reference)[];
     to: string | Reference | (string | Reference)[];
-    modelClass?: string | typeof Model;
+    modelClass?: ModelClass<any> | string;
     extra?: string[] | object;
   }
 
