@@ -641,6 +641,8 @@ declare namespace Objection {
     modify(func: (builder: this) => void): this;
     modify(namedFilter: string): this;
 
+    applyFilter(...namedFilters: string): this;
+
     findById(id: Id): QueryBuilderYieldingOneOrNone<QM>;
     findById(idOrIds: IdOrIds): this;
     findByIds(ids: Id[] | Id[][]): this;
@@ -778,6 +780,7 @@ declare namespace Objection {
     onError(fn: (error: Error, builder: this) => any): this;
 
     eagerAlgorithm(algo: EagerAlgorithm): this;
+    eagerOptions(opts: EagerOptions): this;
 
     eager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
     mergeEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
