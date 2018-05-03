@@ -172,6 +172,23 @@ module.exports = session => {
             });
         });
 
+        it('.join() with objection.raw', () => {
+          return Model1.query()
+            .findByIds(1)
+            .select('Model1.id as model1Id', 'model2.id_col as model2Id')
+            .join('model2', builder => {
+              builder.andOn(raw('?? = ??', ['Model1.id', 'model2.model1_id']));
+            })
+            .orderBy('model2.id_col')
+            .then(result => {
+              expect(result).to.eql([
+                { model1Id: 1, model2Id: 1, $afterGetCalled: 1 },
+                { model1Id: 1, model2Id: 2, $afterGetCalled: 1 },
+                { model1Id: 1, model2Id: 3, $afterGetCalled: 1 }
+              ]);
+            });
+        });
+
         it('.where() with an a raw instance', () => {
           return Model2.query()
             .where(raw('model2_prop2 = 20'))
