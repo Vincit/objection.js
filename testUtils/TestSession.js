@@ -10,7 +10,6 @@ const chai = require('chai');
 chai.use(require('chai-subset'));
 
 class TestSession {
-
   static init() {
     if (this.staticInitCalled) {
       return;
@@ -47,11 +46,11 @@ class TestSession {
 
       static get namedFilters() {
         return {
-          'select:id': (builder) => builder.select('id'),
-          'select:model1Prop1': (builder) => builder.select('model1Prop1'),
-          'select:model1Prop1Aliased': (builder) => builder.select('model1Prop1 as aliasedInFilter'),
-          'orderBy:model1Prop1': (builder) => builder.orderBy('model1Prop1'),
-          'idGreaterThan': (builder) => builder.where('id', '>', builder.context().filterArgs[0])
+          'select:id': builder => builder.select('id'),
+          'select:model1Prop1': builder => builder.select('model1Prop1'),
+          'select:model1Prop1Aliased': builder => builder.select('model1Prop1 as aliasedInFilter'),
+          'orderBy:model1Prop1': builder => builder.orderBy('model1Prop1'),
+          idGreaterThan: builder => builder.where('id', '>', builder.context().filterArgs[0])
         };
       }
 
@@ -125,7 +124,7 @@ class TestSession {
               through: {
                 from: 'Model1Model2.model2Id',
                 to: 'Model1Model2.model1Id',
-                extra: {aliasedExtra: 'extra3'}
+                extra: { aliasedExtra: 'extra3' }
               },
               to: 'Model1.id'
             }
@@ -142,8 +141,32 @@ class TestSession {
               },
               to: 'Model1.id'
             }
+          },
+
+          model2Relation3: {
+            relation: Model.ManyToManyRelation,
+            modelClass: Model3,
+            join: {
+              from: 'model2.id_col',
+              through: {
+                from: 'Model2Model3ManyToMany.model2Id',
+                to: 'Model2Model3ManyToMany.model3Id'
+              },
+              to: 'model3.id'
+            }
           }
         };
+      }
+    }
+
+    class Model3 extends Model {
+      // Function instead of getter on purpose.
+      static tableName() {
+        return 'model3';
+      }
+
+      static get idColumn() {
+        return 'id';
       }
     }
 
@@ -152,17 +175,19 @@ class TestSession {
       ['$afterInsert', 0],
       ['$beforeDelete', 1],
       ['$afterDelete', 1],
-      ['$beforeUpdate', 1, (self, args) => self.$beforeUpdateOptions = _.cloneDeep(args[0])],
-      ['$afterUpdate', 1, (self, args) => self.$afterUpdateOptions = _.cloneDeep(args[0])],
+      ['$beforeUpdate', 1, (self, args) => (self.$beforeUpdateOptions = _.cloneDeep(args[0]))],
+      ['$afterUpdate', 1, (self, args) => (self.$afterUpdateOptions = _.cloneDeep(args[0]))],
       ['$afterGet', 1]
     ].forEach(hook => {
       Model1.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
       Model2.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
+      Model3.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
     });
 
     return {
       Model1: Model1,
-      Model2: Model2
+      Model2: Model2,
+      Model3: Model3
     };
   }
 
@@ -173,8 +198,10 @@ class TestSession {
     return Promise.resolve()
       .then(() => knex.schema.dropTableIfExists('Model1Model2'))
       .then(() => knex.schema.dropTableIfExists('Model1Model2One'))
+      .then(() => knex.schema.dropTableIfExists('Model2Model3ManyToMany'))
       .then(() => knex.schema.dropTableIfExists('Model1'))
       .then(() => knex.schema.dropTableIfExists('model2'))
+      .then(() => knex.schema.dropTableIfExists('model3'))
       .then(() => {
         return knex.schema
           .createTable('Model1', table => {
@@ -189,26 +216,78 @@ class TestSession {
             table.string('model2_prop1');
             table.integer('model2_prop2');
           })
+          .createTable('model3', table => {
+            table.increments('id').primary();
+            table.string('model3Prop1');
+          })
           .createTable('Model1Model2', table => {
             table.increments('id').primary();
             table.string('extra1');
             table.string('extra2');
             table.string('extra3');
-            table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model2').onDelete('CASCADE').index();
+            table
+              .integer('model1Id')
+              .unsigned()
+              .notNullable()
+              .references('id')
+              .inTable('Model1')
+              .onDelete('CASCADE')
+              .index();
+            table
+              .integer('model2Id')
+              .unsigned()
+              .notNullable()
+              .references('id_col')
+              .inTable('model2')
+              .onDelete('CASCADE')
+              .index();
           })
           .createTable('Model1Model2One', table => {
-            table.integer('model1Id').unsigned().notNullable().references('id').inTable('Model1').onDelete('CASCADE').index();
-            table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model2').onDelete('CASCADE').index();
+            table
+              .integer('model1Id')
+              .unsigned()
+              .notNullable()
+              .references('id')
+              .inTable('Model1')
+              .onDelete('CASCADE')
+              .index();
+            table
+              .integer('model2Id')
+              .unsigned()
+              .notNullable()
+              .references('id_col')
+              .inTable('model2')
+              .onDelete('CASCADE')
+              .index();
+          })
+          .createTable('Model2Model3ManyToMany', table => {
+            table
+              .integer('model2Id')
+              .unsigned()
+              .notNullable()
+              .references('id_col')
+              .inTable('Model1')
+              .onDelete('CASCADE')
+              .index();
+            table
+              .integer('model3Id')
+              .unsigned()
+              .notNullable()
+              .references('id')
+              .inTable('model3')
+              .onDelete('CASCADE')
+              .index();
           });
       })
       .catch(cause => {
-        const err = new Error('Could not connect to '
-          + opt.knexConfig.client
-          + '. Make sure the server is running and the database '
-          + opt.knexConfig.connection.database
-          + ' is created. You can see the test database configurations from file '
-          + path.join(__dirname, 'index.js'));
+        const err = new Error(
+          'Could not connect to ' +
+            opt.knexConfig.client +
+            '. Make sure the server is running and the database ' +
+            opt.knexConfig.connection.database +
+            ' is created. You can see the test database configurations from file ' +
+            path.join(__dirname, 'index.js')
+        );
 
         const oldStack = err.stack;
         Object.defineProperties(err, {
@@ -224,31 +303,41 @@ class TestSession {
   }
 
   populate(data) {
-    return transaction(this.knex, (trx) => {
+    return transaction(this.knex, trx => {
       return trx('Model1Model2')
         .delete()
         .then(() => trx('Model1Model2One').delete())
+        .then(() => trx('Model2Model3ManyToMany').delete())
         .then(() => trx('Model1').delete())
         .then(() => trx('model2').delete())
+        .then(() => trx('model3').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
           return Promise.resolve(['Model1', 'model2', 'Model1Model2']).map(table => {
-            const idCol = (_.find(this.models, it => it.getTableName() === table) || {getIdColumn: () => 'id'}).getIdColumn();
+            const idCol = (
+              _.find(this.models, it => it.getTableName() === table) || { getIdColumn: () => 'id' }
+            ).getIdColumn();
 
-            return trx(table).max(idCol).then(res => {
-              const maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
+            return trx(table)
+              .max(idCol)
+              .then(res => {
+                const maxId = parseInt(res[0][_.keys(res[0])[0]], 10) || 0;
 
-              // Reset sequence.
-              if (knexUtils.isSqlite(trx)) {
-                return trx.raw('UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"');
-              } else if (knexUtils.isPostgres(trx)) {
-                return trx.raw('ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1));
-              } else if (knexUtils.isMySql(trx)) {
-                return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
-              } else {
-                throw new Error('sequence truncate not implemented for the given database');
-              }
-            });
+                // Reset sequence.
+                if (knexUtils.isSqlite(trx)) {
+                  return trx.raw(
+                    'UPDATE sqlite_sequence SET seq = ' + maxId + ' WHERE name = "' + table + '"'
+                  );
+                } else if (knexUtils.isPostgres(trx)) {
+                  return trx.raw(
+                    'ALTER SEQUENCE "' + table + '_' + idCol + '_seq" RESTART WITH ' + (maxId + 1)
+                  );
+                } else if (knexUtils.isMySql(trx)) {
+                  return trx.raw('ALTER TABLE ' + table + ' AUTO_INCREMENT = ' + (maxId + 1));
+                } else {
+                  throw new Error('sequence truncate not implemented for the given database');
+                }
+              });
           });
         })
         .then(() => data);
@@ -295,7 +384,7 @@ function createHook(name, delay, extraAction) {
     (extraAction || _.noop)(model, args);
   };
 
-  return function () {
+  return function() {
     const args = arguments;
 
     if (TestSession.hookCounter++ % 2 === 0) {
