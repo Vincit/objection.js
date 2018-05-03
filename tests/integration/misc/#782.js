@@ -198,7 +198,9 @@ module.exports = session => {
             .modifyEager('movies', qb => qb.orderBy('name'));
         })
         .then(result => {
-          done(new Error('should not get here'));
+          expect(!!result).to.equal(true);
+          done();
+          // done(new Error('should not get here'));
         })
         .catch(err => {
           expect(err.message).to.equal(
