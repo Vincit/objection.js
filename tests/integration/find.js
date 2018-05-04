@@ -536,87 +536,6 @@ module.exports = session => {
             });
         });
 
-        if (session.isPostgres()) {
-          it('smoke test for various methods', () => {
-            // This test doesn't actually test that the methods work. Knex has tests
-            // for these. This is a smoke test in case of typos and such.
-            return Model2.query()
-              .with('wm1', builder =>
-                builder
-                  .insert({ a: 1 })
-                  .update({ a: 2 })
-                  .delete()
-                  .del()
-                  .table('model2')
-                  .clear(QueryBuilderOperation)
-                  .select('*')
-                  .from('model2')
-              )
-              .clearSelect()
-              .clearWhere()
-              .columns('model2.model2_prop2')
-              .where(raw('? = ?', ref('model2.id_col'), ref('model2.model2_prop2')))
-              .where(raw('? in (?)', ref('model2.id_col'), Model1.query().select('id')))
-              .whereNot('model2.id_col', 1)
-              .orWhereNot('model2.id_col', 2)
-              .whereRaw('model2.id_col is null')
-              .orWhereRaw('model2.id_col is null')
-              .whereExists(Model2.query())
-              .orWhereExists(Model2.query())
-              .whereNotExists(Model2.query())
-              .orWhereNotExists(Model2.query())
-              .orWhereIn('model2.id_col', [1, 2, 3])
-              .whereNotIn('model2.id_col', [1, 2, 3])
-              .orWhereNotIn('model2.id_col', [1, 2, 3])
-              .whereNull('model2.id_col')
-              .orWhereNull('model2.id_col')
-              .orWhereNotNull('model2.id_col')
-              .andWhereBetween('model2.id_col', [0, 1])
-              .whereNotBetween('model2.id_col', [0, 1])
-              .andWhereNotBetween('model2.id_col', [0, 1])
-              .orWhereBetween('model2.id_col', [0, 1])
-              .orWhereNotBetween('model2.id_col', [0, 1])
-              .orderByRaw('model2.id_col')
-              .into('model2')
-              .table('model2')
-              .joinRaw('inner join model2 as m1 on m1.model2_prop2 = 1')
-              .leftOuterJoin('model2 as m2', join =>
-                join
-                  .onBetween('m2.model2_prop2', [1, 2])
-                  .onNotBetween('m2.model2_prop2', [1, 2])
-                  .orOnBetween('m2.model2_prop2', [1, 2])
-                  .orOnNotBetween('m2.model2_prop2', [1, 2])
-                  .onIn('m2.model2_prop2', [1, 2])
-                  .onNotIn('m2.model2_prop2', [1, 2])
-                  .orOnIn('m2.model2_prop2', [1, 2])
-                  .andOnIn('m2.model2_prop2', [1, 2])
-                  .orOnNotIn('m2.model2_prop2', [1, 2])
-                  .onNull('m2.model2_prop2')
-                  .orOnNull('m2.model2_prop2')
-                  .onNotNull('m2.model2_prop2')
-                  .orOnNotNull('m2.model2_prop2')
-                  .onExists(Model2.query())
-                  .orOnExists(Model2.query())
-                  .onNotExists(Model2.query())
-                  .orOnNotExists(Model2.query())
-                  .andOnExists(Model2.query())
-                  .andOnNotExists(Model2.query())
-                  .andOnBetween('m2.model2_prop2', [1, 2])
-                  .andOnNotBetween('m2.model2_prop2', [1, 2])
-                  .andOn('m2.model2_prop2', 1)
-                  .orOnNotIn('m2.model2_prop2', [1, 2])
-                  .andOnNotIn('m2.model2_prop2', [1, 2])
-                  .andOnNull('m2.model2_prop2')
-                  .andOnNotNull('m2.model2_prop2')
-              )
-              .rightJoin('model2 as m3', 'm3.model2_prop2', 'm1.model2_prop2')
-              .rightOuterJoin('model2 as m4', 'm4.model2_prop2', 'm1.model2_prop2')
-              .fullOuterJoin('model2 as m6', 'm6.model2_prop2', 'm1.model2_prop2')
-              .crossJoin('model2 as m7')
-              .whereWrapped('model2.id_col < 10');
-          });
-        }
-
         it('.throwIfNotFound() with empty result', done => {
           Model1.query()
             .where('model1Prop1', 'There is no value like me')
@@ -868,6 +787,87 @@ module.exports = session => {
               ]);
             });
         });
+
+        if (session.isPostgres()) {
+          it('smoke test for various methods', () => {
+            // This test doesn't actually test that the methods work. Knex has tests
+            // for these. This is a smoke test in case of typos and such.
+            return Model2.query()
+              .with('wm1', builder =>
+                builder
+                  .insert({ a: 1 })
+                  .update({ a: 2 })
+                  .delete()
+                  .del()
+                  .table('model2')
+                  .clear(QueryBuilderOperation)
+                  .select('*')
+                  .from('model2')
+              )
+              .clearSelect()
+              .clearWhere()
+              .columns('model2.model2_prop2')
+              .where(raw('? = ?', ref('model2.id_col'), ref('model2.model2_prop2')))
+              .where(raw('? in (?)', ref('model2.id_col'), Model1.query().select('id')))
+              .whereNot('model2.id_col', 1)
+              .orWhereNot('model2.id_col', 2)
+              .whereRaw('model2.id_col is null')
+              .orWhereRaw('model2.id_col is null')
+              .whereExists(Model2.query())
+              .orWhereExists(Model2.query())
+              .whereNotExists(Model2.query())
+              .orWhereNotExists(Model2.query())
+              .orWhereIn('model2.id_col', [1, 2, 3])
+              .whereNotIn('model2.id_col', [1, 2, 3])
+              .orWhereNotIn('model2.id_col', [1, 2, 3])
+              .whereNull('model2.id_col')
+              .orWhereNull('model2.id_col')
+              .orWhereNotNull('model2.id_col')
+              .andWhereBetween('model2.id_col', [0, 1])
+              .whereNotBetween('model2.id_col', [0, 1])
+              .andWhereNotBetween('model2.id_col', [0, 1])
+              .orWhereBetween('model2.id_col', [0, 1])
+              .orWhereNotBetween('model2.id_col', [0, 1])
+              .orderByRaw('model2.id_col')
+              .into('model2')
+              .table('model2')
+              .joinRaw('inner join model2 as m1 on m1.model2_prop2 = 1')
+              .leftOuterJoin('model2 as m2', join =>
+                join
+                  .onBetween('m2.model2_prop2', [1, 2])
+                  .onNotBetween('m2.model2_prop2', [1, 2])
+                  .orOnBetween('m2.model2_prop2', [1, 2])
+                  .orOnNotBetween('m2.model2_prop2', [1, 2])
+                  .onIn('m2.model2_prop2', [1, 2])
+                  .onNotIn('m2.model2_prop2', [1, 2])
+                  .orOnIn('m2.model2_prop2', [1, 2])
+                  .andOnIn('m2.model2_prop2', [1, 2])
+                  .orOnNotIn('m2.model2_prop2', [1, 2])
+                  .onNull('m2.model2_prop2')
+                  .orOnNull('m2.model2_prop2')
+                  .onNotNull('m2.model2_prop2')
+                  .orOnNotNull('m2.model2_prop2')
+                  .onExists(Model2.query())
+                  .orOnExists(Model2.query())
+                  .onNotExists(Model2.query())
+                  .orOnNotExists(Model2.query())
+                  .andOnExists(Model2.query())
+                  .andOnNotExists(Model2.query())
+                  .andOnBetween('m2.model2_prop2', [1, 2])
+                  .andOnNotBetween('m2.model2_prop2', [1, 2])
+                  .andOn('m2.model2_prop2', 1)
+                  .orOnNotIn('m2.model2_prop2', [1, 2])
+                  .andOnNotIn('m2.model2_prop2', [1, 2])
+                  .andOnNull('m2.model2_prop2')
+                  .andOnNotNull('m2.model2_prop2')
+              )
+              .rightJoin('model2 as m3', 'm3.model2_prop2', 'm1.model2_prop2')
+              .rightOuterJoin('model2 as m4', 'm4.model2_prop2', 'm1.model2_prop2')
+              .fullOuterJoin('model2 as m6', 'm6.model2_prop2', 'm1.model2_prop2')
+              .crossJoin('model2 as m7')
+              .whereWrapped('model2.id_col < 10');
+          });
+        }
       });
     });
 
