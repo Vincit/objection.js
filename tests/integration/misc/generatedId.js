@@ -9,7 +9,7 @@ module.exports = session => {
       return session.knex.schema
         .dropTableIfExists('generated_id_test')
         .createTable('generated_id_test', table => {
-          table.string('idCol').primary();
+          table.string('idCol', 32).primary();
           table.string('value');
         });
     });

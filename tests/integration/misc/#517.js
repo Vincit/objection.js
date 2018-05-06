@@ -16,7 +16,7 @@ module.exports = session => {
         })
         .createTable('Preferences', table => {
           table.integer('userId');
-          table.string('category');
+          table.string('category', 16);
           table.string('setting');
           table.primary(['userId', 'category']);
         });

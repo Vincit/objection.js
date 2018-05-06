@@ -15,7 +15,7 @@ module.exports = session => {
         .dropTableIfExists('B')
         .createTable('A', table => {
           table.integer('id1');
-          table.string('id2');
+          table.string('id2', 32);
           table.string('aval');
           table.integer('bid3');
           table.string('bid4');
@@ -23,7 +23,7 @@ module.exports = session => {
         })
         .createTable('B', table => {
           table.integer('id3');
-          table.string('id4');
+          table.string('id4', 32);
           table.string('bval');
           table.primary(['id3', 'id4']);
         })
