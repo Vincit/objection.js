@@ -814,8 +814,6 @@ declare namespace Objection {
 
     clone(): this;
 
-    timeout(ms: number, options?: TimeoutOptions): this;
-
     // We get `then` and `catch` by extending Promise
 
     map<V, Result>(mapper: BluebirdMapper<V, Result>): Promise<Result[]>;
@@ -847,6 +845,8 @@ declare namespace Objection {
     omit(properties: string[]): this;
 
     returning(columns: string | string[]): QueryBuilder<QM, RM>;
+
+    timeout(ms: number, options: TimeoutOptions): this;
   }
 
   export interface transaction<T> {
