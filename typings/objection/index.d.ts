@@ -846,7 +846,7 @@ declare namespace Objection {
 
     returning(columns: string | string[]): QueryBuilder<QM, RM>;
 
-    timeout(ms: number, options: TimeoutOptions): this;
+    timeout(ms: number, options?: TimeoutOptions): this;
   }
 
   export interface transaction<T> {
