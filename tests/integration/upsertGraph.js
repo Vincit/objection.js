@@ -1843,7 +1843,7 @@ module.exports = session => {
       });
     });
 
-    describe.only('relate with children, recursively call upsertGraph', () => {
+    describe('relate with children => upsertGraph recursively called', () => {
       beforeEach(() => {
         population = [
           {
@@ -1914,7 +1914,7 @@ module.exports = session => {
         return session.populate(population);
       });
 
-      it.only('should relate BelongsToOne relation and nested children as expected', () => {
+      it('should relate BelongsToOne relation and nested children as expected', () => {
         const upsert = {
           id: 2,
           model1Prop1: 'updated root 2',
@@ -1934,14 +1934,6 @@ module.exports = session => {
         };
 
         return transaction(session.knex, trx => {
-          const sql = [];
-
-          // Wrap the transaction to catch the executed sql.
-          trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
-            sql.push(this.toString());
-            return oldImpl.apply(this, args);
-          });
-
           return Model1.query(trx)
             .upsertGraph(upsert, { relate: true, unrelate: true })
             .then(() => {
@@ -1977,7 +1969,7 @@ module.exports = session => {
         });
       });
 
-      it.only('should relate ManyToMany relations and children as expected', () => {
+      it('should relate ManyToMany relations and children as expected', () => {
         const upsert = {
           id: 2,
           model1Prop1: 'updated root 2',
@@ -2000,14 +1992,6 @@ module.exports = session => {
         };
 
         return transaction(session.knex, trx => {
-          const sql = [];
-
-          // Wrap the transaction to catch the executed sql.
-          trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
-            sql.push(this.toString());
-            return oldImpl.apply(this, args);
-          });
-
           return Model1.query(trx)
             .upsertGraph(upsert, { relate: true, unrelate: true })
             .then(() => {
@@ -2047,6 +2031,65 @@ module.exports = session => {
         });
       });
 
+      it('should relate HasMany relations and children as expected', () => {
+        const upsert = {
+          id: 2,
+          model1Prop1: 'updated root 2',
+          // Relate new and update ManyToMany relation
+          model1Relation2: [
+            {
+              idCol: 1,
+              model2Prop1: 'updated model2Prop1',
+              // Relate new and update Has Many relation
+              model2Relation2: {
+                id: 5,
+                model1Prop1: 'updated root 5',
+                // Update BelongsToOne
+                model1Relation1: {
+                  id: 1
+                }
+              }
+            }
+          ]
+        };
+
+        return transaction(session.knex, trx => {
+          return Model1.query(trx)
+            .upsertGraph(upsert, { relate: true, unrelate: true })
+            .then(() => {
+              return Model1.query(trx)
+                .findById(2)
+                .eager('[model1Relation2.[model2Relation2.model1Relation1]]')
+                .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+                .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+            })
+            .then(omitIrrelevantProps)
+            .then(result => {
+              expect(result).to.eql({
+                id: 2,
+                model1Id: null,
+                model1Prop1: 'updated root 2',
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model1Id: 2,
+                    model2Prop1: 'updated model2Prop1',
+                    model2Relation2: {
+                      id: 5,
+                      model1Id: 1,
+                      model1Prop1: 'updated root 5',
+                      model1Relation1: {
+                        id: 1,
+                        model1Id: null,
+                        model1Prop1: 'root 1'
+                      }
+                    }
+                  }
+                ]
+              });
+            });
+        });
+      });
     });
 
     describe('validation and transactions', () => {
