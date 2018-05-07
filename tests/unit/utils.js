@@ -8,6 +8,8 @@ const camelCase = require('../../lib/utils/identifierMapping').camelCase;
 const snakeCaseKeys = require('../../lib/utils/identifierMapping').snakeCaseKeys;
 const camelCaseKeys = require('../../lib/utils/identifierMapping').camelCaseKeys;
 const get = require('../../lib/utils/objectUtils').get;
+const getOptionsWithRelPathFromRoot = require('../../lib/utils/transformOptionsFromPath');
+const UpsertNode = require('../../lib/queryBuilder/graphUpserter/UpsertNode');
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
@@ -148,6 +150,48 @@ describe('utils', () => {
           expect(camelCaseKeys(snakeCaseKeys({ [camel]: 'foo' }))).to.eql({ [backToCamel]: 'foo' });
         });
       }
+    });
+  });
+
+  describe('getOptionsWithRelPathFromRoot', () => {
+    it('should return true for options set to true', () => {
+      const opt = {
+        [UpsertNode.OptionType.Relate]: true,
+        [UpsertNode.OptionType.Unrelate]: true
+      };
+
+      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'bogus.path');
+
+      expect(optTransformed).to.eql(opt);
+    });
+
+    it('should remove option for options set to unknown path', () => {
+      const opt = {
+        [UpsertNode.OptionType.Relate]: ['begins.with.this.path'],
+        [UpsertNode.OptionType.Unrelate]: true
+      };
+
+      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'begins.with.different.path');
+
+      expect(optTransformed).to.eql({
+        [UpsertNode.OptionType.Unrelate]: true
+      });
+    });
+
+    it('should remove equal and update longer paths', () => {
+      const opt = {
+        [UpsertNode.OptionType.Relate]: ['begins'],
+        [UpsertNode.OptionType.Unrelate]: ['begins.with'],
+        [UpsertNode.OptionType.InsertMissing]: ['begins.with.this'],
+        [UpsertNode.OptionType.Update]: ['begins.with.this.path']
+      };
+      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'begins');
+
+      expect(optTransformed).to.eql({
+        [UpsertNode.OptionType.Unrelate]: ['with'],
+        [UpsertNode.OptionType.InsertMissing]: ['with.this'],
+        [UpsertNode.OptionType.Update]: ['with.this.path']
+      });
     });
   });
 });
