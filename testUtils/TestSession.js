@@ -266,7 +266,7 @@ class TestSession {
               .unsigned()
               .notNullable()
               .references('id_col')
-              .inTable('Model1')
+              .inTable('model2')
               .onDelete('CASCADE')
               .index();
             table
