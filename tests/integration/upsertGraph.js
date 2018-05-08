@@ -11,7 +11,7 @@ module.exports = session => {
   const Model2 = session.unboundModels.Model2;
   const NONEXISTENT_ID = 1000;
 
-  describe.only('upsertGraph', () => {
+  describe('upsertGraph', () => {
     let population;
 
     beforeEach(() => {
@@ -1861,7 +1861,7 @@ module.exports = session => {
                   },
                   {
                     id: 3,
-                    model3Prop1: 'model3Prop1 2'
+                    model3Prop1: 'model3Prop1 3'
                   }
                 ],
                 model2Relation2: {
@@ -1883,7 +1883,7 @@ module.exports = session => {
                 model2Relation3: [
                   {
                     id: 2,
-                    model3Prop1: 'model3Prop1 3'
+                    model3Prop1: 'model3Prop1 2'
                   },
                   {
                     id: 4,
@@ -1927,7 +1927,7 @@ module.exports = session => {
               {
                 idCol: 2,
                 // Relate new and update ManyToMany relation
-                model2Relation3: { id: 1 }
+                model2Relation3: [{ id: 1 }]
               }
             ]
           }
@@ -2084,6 +2084,72 @@ module.exports = session => {
                         model1Prop1: 'root 1'
                       }
                     }
+                  }
+                ]
+              });
+            });
+        });
+      });
+
+      it('should upsert recursively and respect options', () => {
+        const upsert = {
+          id: 2,
+          model1Prop1: 'updated root 2',
+          // Relate new and update ManyToMany relation
+          model1Relation3: [
+            {
+              idCol: 1,
+              model2Prop1: 'updated model2Prop1',
+              // Relate new and update ManyToMany relation
+              model2Relation3: [{ id: 2 }]
+            }
+          ]
+        };
+
+        return transaction(session.knex, trx => {
+          return Model1.query(trx)
+            .upsertGraph(upsert, {
+              relate: ['model1Relation3', 'model1Relation3.model2Relation3'],
+              noUnrelate: ['model1Relation3.model2Relation3'],
+              noDelete: ['model1Relation3.model2Relation3']
+            })
+            .then(() => {
+              return Model1.query(trx)
+                .findById(2)
+                .eager('[model1Relation3.[model2Relation3]]')
+                .modifyEager('model1Relation3', qb => qb.orderBy('id_col'))
+                .modifyEager('model1Relation3.model2Relation3', qb => qb.orderBy('id'));
+            })
+            .then(omitIrrelevantProps)
+            .then(result => {
+              expect(result).to.eql({
+                id: 2,
+                model1Id: null,
+                model1Prop1: 'updated root 2',
+                model1Relation3: [
+                  {
+                    extra1: null,
+                    extra2: null,
+                    idCol: 1,
+                    model1Id: null,
+                    model2Prop1: 'updated model2Prop1',
+                    model2Relation3: [
+                      // Existing, but not removed
+                      {
+                        id: 1,
+                        model3Prop1: 'model3Prop1 1'
+                      },
+                      // Related
+                      {
+                        id: 2,
+                        model3Prop1: 'model3Prop1 2'
+                      },
+                      // Existing, but not removed
+                      {
+                        id: 3,
+                        model3Prop1: 'model3Prop1 3'
+                      }
+                    ]
                   }
                 ]
               });
