@@ -31,7 +31,7 @@ module.exports = session => {
       });
 
       function buffer() {
-        return new Buffer([192, 168, 163, 17]);
+        return Buffer.from([192, 168, 163, 17]);
       }
 
       function bufferEquals(a, b) {

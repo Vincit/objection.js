@@ -8499,7 +8499,15 @@ Cast reference to sql type `boolean`.
 
 Give custom type to which referenced value is casted to.
 
+**DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
+
 `.castType('mytype') --> CAST(?? as mytype)`
+
+#### castTo
+
+Give custom type to which referenced value is casted to.
+
+`.castTo('mytype') --> CAST(?? as mytype)`
 
 #### castJson
 
@@ -8551,9 +8559,17 @@ Cast to sql type `boolean`.
 
 #### castType
 
-Cast to custom type
+Give custom type to which referenced value is casted to.
+
+**DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
 
 `.castType('mytype') --> CAST(?? as mytype)`
+
+#### castTo
+
+Give custom type to which referenced value is casted to.
+
+`.castTo('mytype') --> CAST(?? as mytype)`
 
 #### castJson
 
@@ -8563,6 +8579,18 @@ cast type for object values.
 #### castArray
 
 Converts the value to an array literal.
+
+**DEPRECATED:** Use `asArray` instead. `castArray` Will be removed in 2.0.
+
+#### asArray
+
+Converts the value to an array literal.
+
+`lit([1, 2, 3]).asArray() --> ARRAY[?, ?, ?]`
+
+Can be used in conjuction with `castTo`.
+
+`lit([1, 2, 3]).asArray().castTo('real[]') -> CAST(ARRAY[?, ?, ?] AS real[])`
 
 #### as
 

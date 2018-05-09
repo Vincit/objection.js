@@ -57,7 +57,9 @@ declare namespace Objection {
     castBool(): this;
     castJson(): this;
     castArray(): this;
+    asArray(): this;
     castType(sqlType: string): this;
+    castTo(sqlType: string): this;
     as(alias: string): this;
   }
 
