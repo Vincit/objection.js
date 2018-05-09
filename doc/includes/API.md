@@ -337,6 +337,12 @@ import { lit, ref } from 'objection';
 await Model
   .query()
   .where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}))
+
+await Model
+  .query()
+  .insert({
+    numbers: lit([1, 2, 3]).asArray().castTo('real[]')
+  })
 ```
 
 Factory function that returns a [`LiteralBuilder`](#literalbuilder) instance. `LiteralBuilder`

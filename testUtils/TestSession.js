@@ -202,13 +202,24 @@ class TestSession {
             table.integer('model2Id').unsigned().notNullable().references('id_col').inTable('model2').onDelete('CASCADE').index();
           });
       })
-      .catch(() => {
-        throw new Error('Could not connect to '
+      .catch(cause => {
+        const err = new Error('Could not connect to '
           + opt.knexConfig.client
           + '. Make sure the server is running and the database '
           + opt.knexConfig.connection.database
           + ' is created. You can see the test database configurations from file '
           + path.join(__dirname, 'index.js'));
+
+        const oldStack = err.stack;
+        Object.defineProperties(err, {
+          stack: {
+            get() {
+              return oldStack + `\n\nCaused by:\n${cause.stack}`;
+            }
+          }
+        });
+
+        throw err;
       });
   }
 
