@@ -12959,7 +12959,15 @@ The first argument must be an objection <a href="#querybuilder"><code class="pre
 
 <p>Give custom type to which referenced value is casted to.</p>
 
+<p><strong>DEPRECATED:</strong> Use <code class="prettyprint">castTo</code> instead. <code class="prettyprint">castType</code> Will be removed in 2.0.</p>
+
 <p><code class="prettyprint">.castType(&#39;mytype&#39;) --&gt; CAST(?? as mytype)</code></p>
+
+<h4 id="castto">castTo</h4>
+
+<p>Give custom type to which referenced value is casted to.</p>
+
+<p><code class="prettyprint">.castTo(&#39;mytype&#39;) --&gt; CAST(?? as mytype)</code></p>
 
 <h4 id="castjson">castJson</h4>
 
@@ -13007,9 +13015,17 @@ is given as a value, it is casted to json by default.</p>
 
 <h4 id="casttype">castType</h4>
 
-<p>Cast to custom type</p>
+<p>Give custom type to which referenced value is casted to.</p>
+
+<p><strong>DEPRECATED:</strong> Use <code class="prettyprint">castTo</code> instead. <code class="prettyprint">castType</code> Will be removed in 2.0.</p>
 
 <p><code class="prettyprint">.castType(&#39;mytype&#39;) --&gt; CAST(?? as mytype)</code></p>
+
+<h4 id="castto">castTo</h4>
+
+<p>Give custom type to which referenced value is casted to.</p>
+
+<p><code class="prettyprint">.castTo(&#39;mytype&#39;) --&gt; CAST(?? as mytype)</code></p>
 
 <h4 id="castjson">castJson</h4>
 
@@ -13020,11 +13036,31 @@ cast type for object values.</p>
 
 <p>Converts the value to an array literal.</p>
 
+<p><strong>DEPRECATED:</strong> Use <code class="prettyprint">asArray</code> instead. <code class="prettyprint">castArray</code> Will be removed in 2.0.</p>
+
+<h4 id="asarray">asArray</h4>
+
+<p>Converts the value to an array literal.</p>
+
+<p><code class="prettyprint">lit([1, 2, 3]).asArray() --&gt; ARRAY[?, ?, ?]</code></p>
+
+<p>Can be used in conjuction with <code class="prettyprint">castTo</code>.</p>
+
+<p><code class="prettyprint">lit([1, 2, 3]).asArray().castTo(&#39;real[]&#39;) -&gt; CAST(ARRAY[?, ?, ?] AS real[])</code></p>
+
 <h4 id="as">as</h4>
 
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-1-8">1.1.8</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/909">#909</a></li>
+</ul>
 
 <h2 id="1-1-7">1.1.7</h2>
 
