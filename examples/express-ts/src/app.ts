@@ -40,7 +40,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
     next();
   }
 });
-
-const server = app.listen(8641, function() {
-  console.log('Example app listening at port %s', server.address().port);
+const port = process.env.PORT || 8641
+const server = app.listen(port, function() {
+  console.log('Example app listening at port %s', port);
 });
