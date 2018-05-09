@@ -66,7 +66,6 @@ module.exports = session => {
           name: 'Margot',
           uuids: lit(uuids.map(it => lit(it).castTo('uuid'))).asArray()
         })
-        .debug()
         .then(() => {
           return Person.query();
         })
@@ -88,7 +87,6 @@ module.exports = session => {
           name: 'Margot',
           uuids: lit(uuids.map(it => raw('?::uuid', it))).asArray()
         })
-        .debug()
         .then(() => {
           return Person.query();
         })
