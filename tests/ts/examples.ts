@@ -164,8 +164,16 @@ async () => {
 
 // instance methods:
 async () => {
-  takesPerson(await new Person().$loadRelated('movies'));
-  takesPerson(await new Person().$query());
+  const person = new Person();
+
+  takesPerson(await person.$loadRelated('movies'));
+  takesPerson(await person.$query());
+  takesPerson(
+    await person.$query().patchAndFetch({
+      firstName: 'Test',
+      lastName: 'Name'
+    })
+  );
 };
 
 class Movie extends objection.Model {

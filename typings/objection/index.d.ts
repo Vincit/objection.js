@@ -542,9 +542,6 @@ declare namespace Objection {
     $pick<T>(this: T, keys: string | string[] | Properties): T;
     $clone<T>(this: T, opt?: CloneOptions): T;
 
-    /**
-     * AKA `reload` in ActiveRecord parlance
-     */
     $query<QM extends Model>(this: QM, trxOrKnex?: Transaction | knex): QueryBuilder<QM, QM>;
 
     /**
