@@ -13,9 +13,9 @@
   "license": "MIT",
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "knex": "^0.13.0",
-    "mocha": "^3.4.1",
-    "objection": "^0.8.6",
-    "sqlite3": "^3.1.8"
+    "knex": "^0.14.6",
+    "mocha": "^5.1.1",
+    "objection": "^1.1.8",
+    "sqlite3": "^4.0.0"
   }
 }

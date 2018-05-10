@@ -24,15 +24,15 @@
   "author": "Sami Koskimäki",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "express-promise-router": "^3.0.1",
-    "knex": "^0.13.0",
+    "knex": "^0.14.6",
     "lodash": "^4.17.4",
     "morgan": "^1.9.0",
-    "objection": "^1.0.0",
-    "sqlite3": "^3.1.13"
+    "objection": "^1.1.8",
+    "sqlite3": "^4.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
