@@ -305,6 +305,12 @@ to tables, columns, json attributes etc. <code class="prettyprint">ReferenceBuil
 <span class="nx">await</span> <span class="nx">Model</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details'</span><span class="p">),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">lit</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">age</span><span class="p">:</span> <span class="mi">29</span><span class="p">}))</span>
+
+<span class="nx">await</span> <span class="nx">Model</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+    <span class="na">numbers</span><span class="p">:</span> <span class="nx">lit</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]).</span><span class="nx">asArray</span><span class="p">().</span><span class="nx">castTo</span><span class="p">(</span><span class="s1">'real[]'</span><span class="p">)</span>
+  <span class="p">})</span>
 </code></pre>
 <p>Factory function that returns a <a href="#literalbuilder"><code class="prettyprint">LiteralBuilder</code></a> instance. <code class="prettyprint">LiteralBuilder</code>
 helps build literals of different types.</p>
@@ -1384,6 +1390,24 @@ Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">del
 <h4 id="forshare">forShare</h4>
 
 <p>See <a href="http://knexjs.org/#Builder-forShare">knex documentation</a></p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="timeout">timeout</h4>
+
+<p>See <a href="http://knexjs.org/#Builder-timeout">knex documentation</a></p>
 
 <h5 id="return-value">Return value</h5>
 
