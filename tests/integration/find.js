@@ -1,11 +1,10 @@
 const _ = require('lodash');
-const raw = require('../../').raw;
-const ref = require('../../').ref;
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const Model = require('../../').Model;
-const QueryBuilderOperation = require('../../').QueryBuilderOperation;
+
+const { TimeoutError } = require('bluebird');
+const { raw, ref, Model, QueryBuilderOperation } = require('../..');
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -789,6 +788,27 @@ module.exports = session => {
         });
 
         if (session.isPostgres()) {
+          it('timeout should throw a TimeOutError', done => {
+            const knexQuery = Model1.query()
+              .timeout(50)
+              .build();
+
+            // Now the tricky part. We add `pg_sleep` as another source table so that the query
+            // takes a long time.
+            knexQuery.from({
+              sleep: session.knex.raw('pg_sleep(0.1)'),
+              Model1: 'Model1'
+            });
+
+            knexQuery
+              .then(() => done(new Error('should not get here')))
+              .catch(err => {
+                expect(err).to.be.a(TimeoutError);
+                done();
+              })
+              .catch(done);
+          });
+
           it('smoke test for various methods', () => {
             // This test doesn't actually test that the methods work. Knex has tests
             // for these. This is a smoke test in case of typos and such.
