@@ -1293,6 +1293,19 @@ Type|Description
 
 
 
+#### timeout
+
+See [knex documentation](http://knexjs.org/#Builder-timeout)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
 #### as
 
 See [knex documentation](http://knexjs.org/#Builder-as)

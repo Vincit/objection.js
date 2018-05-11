@@ -347,6 +347,10 @@ declare namespace Objection {
     [propertyName: string]: boolean;
   }
 
+  interface TimeoutOptions {
+    cancel: boolean;
+  }
+
   /**
    * ModelClass is a TypeScript hack to support referencing a Model
    * subclass constructor and not losing access to static members. See
@@ -840,6 +844,8 @@ declare namespace Objection {
     omit(properties: string[]): this;
 
     returning(columns: string | string[]): QueryBuilder<QM, RM>;
+
+    timeout(ms: number, options?: TimeoutOptions): this;
   }
 
   export interface transaction<T> {

@@ -266,6 +266,13 @@ describe('QueryBuilder', () => {
       });
   });
 
+  it('should return a QueryBuilder from .timeout method', () => {
+    const builder = QueryBuilder.forClass(TestModel).timeout(3000);
+
+    expect(builder).to.be.a(QueryBuilder);
+    return builder;
+  });
+
   describe('where(..., ref(...))', () => {
     it('should create a where clause using column references instead of values (1)', () => {
       return QueryBuilder.forClass(TestModel)
