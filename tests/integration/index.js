@@ -6,6 +6,10 @@ const Bluebird = require('bluebird');
 // Helps debugging.
 Bluebird.longStackTraces();
 
+// DATABASES environment variable can contain a comma separated list
+// of databases to test.
+const DATABASES = (process.env.DATABASES && process.env.DATABASES.split(',')) || [];
+
 describe('integration tests', () => {
   const testDatabaseConfigs = [
     {
@@ -40,7 +44,9 @@ describe('integration tests', () => {
         database: 'objection_test'
       }
     }
-  ];
+  ].filter(it => {
+    return DATABASES.length === 0 || DATABASES.includes(it.client);
+  });
 
   const sessions = testDatabaseConfigs.map(knexConfig => {
     const session = new TestSession({
