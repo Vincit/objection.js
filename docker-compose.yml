@@ -1,0 +1,15 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres'
+    container_name: 'objection_postgres'
+    command: postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c random_page_cost=1.0 
+    ports:
+      - '5432:5432'
+  mysql:
+    image: 'mysql:5'
+    container_name: 'objection_mysql'
+    ports:
+      - '3306:3306'
+    environment:
+      - 'MYSQL_ALLOW_EMPTY_PASSWORD=yes'
