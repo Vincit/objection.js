@@ -1477,6 +1477,7 @@ module.exports = session => {
             .joinRelation('model1Relation2(rawSelect)')
             .select('rawSelect')
             .findById(1)
+            .where('model1Relation2.id_col', 2)
             .then(model => {
               expect(model.rawSelect).to.equal('hejsan 2 hejsan 2');
             });
