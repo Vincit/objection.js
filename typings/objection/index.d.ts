@@ -676,7 +676,7 @@ declare namespace Objection {
      * @return a Promise of the number of patched rows
      */
     patch(modelOrObject: Partial<QM>): QueryBuilderYieldingCount<QM, RM>;
-    patchAndFetchById(id: Id, modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    patchAndFetchById(idOrIds: IdOrIds, modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
     patchAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
 
     upsertGraph: Upsert<QM>;
