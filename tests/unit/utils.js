@@ -1,15 +1,21 @@
 const util = require('util');
 const expect = require('expect.js');
-const utils = require('../../lib/utils/classUtils');
-const compose = require('../../lib/utils/mixin').compose;
-const mixin = require('../../lib/utils/mixin').mixin;
-const snakeCase = require('../../lib/utils/identifierMapping').snakeCase;
-const camelCase = require('../../lib/utils/identifierMapping').camelCase;
-const snakeCaseKeys = require('../../lib/utils/identifierMapping').snakeCaseKeys;
-const camelCaseKeys = require('../../lib/utils/identifierMapping').camelCaseKeys;
-const get = require('../../lib/utils/objectUtils').get;
-const getOptionsWithRelPathFromRoot = require('../../lib/utils/transformOptionsFromPath');
+const Promise = require('bluebird');
+const classUtils = require('../../lib/utils/classUtils');
 const UpsertNode = require('../../lib/queryBuilder/graphUpserter/UpsertNode');
+const getOptionsWithRelPathFromRoot = require('../../lib/utils/transformOptionsFromPath');
+
+const {
+  snakeCase,
+  camelCase,
+  snakeCaseKeys,
+  camelCaseKeys
+} = require('../../lib/utils/identifierMapping');
+
+const { range } = require('lodash');
+const { compose, mixin } = require('../../lib/utils/mixin');
+const { get } = require('../../lib/utils/objectUtils');
+const { map } = require('../../lib/utils/promiseUtils');
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
@@ -21,18 +27,18 @@ describe('utils', () => {
     util.inherits(C, B);
 
     it('should return true for subclass constructor', () => {
-      expect(utils.isSubclassOf(A, Object)).to.equal(true);
-      expect(utils.isSubclassOf(B, A)).to.equal(true);
-      expect(utils.isSubclassOf(C, B)).to.equal(true);
-      expect(utils.isSubclassOf(C, A)).to.equal(true);
-      expect(utils.isSubclassOf(A, B)).to.equal(false);
-      expect(utils.isSubclassOf(B, C)).to.equal(false);
-      expect(utils.isSubclassOf(A, C)).to.equal(false);
+      expect(classUtils.isSubclassOf(A, Object)).to.equal(true);
+      expect(classUtils.isSubclassOf(B, A)).to.equal(true);
+      expect(classUtils.isSubclassOf(C, B)).to.equal(true);
+      expect(classUtils.isSubclassOf(C, A)).to.equal(true);
+      expect(classUtils.isSubclassOf(A, B)).to.equal(false);
+      expect(classUtils.isSubclassOf(B, C)).to.equal(false);
+      expect(classUtils.isSubclassOf(A, C)).to.equal(false);
     });
 
     it('should return false if one of the inputs is not a constructor', () => {
-      expect(utils.isSubclassOf(function() {}, {})).to.equal(false);
-      expect(utils.isSubclassOf({}, function() {})).to.equal(false);
+      expect(classUtils.isSubclassOf(function() {}, {})).to.equal(false);
+      expect(classUtils.isSubclassOf({}, function() {})).to.equal(false);
     });
   });
 
@@ -182,15 +188,120 @@ describe('utils', () => {
       const opt = {
         [UpsertNode.OptionType.Relate]: ['begins'],
         [UpsertNode.OptionType.Unrelate]: ['begins.with'],
-        [UpsertNode.OptionType.InsertMissing]: ['begins.with.this'],
+        [UpsertNode.OptionType.InsertMissing]: ['begins.with.this', 'begins.with.also.this'],
         [UpsertNode.OptionType.Update]: ['begins.with.this.path']
       };
-      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'begins');
+
+      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'begins.with');
 
       expect(optTransformed).to.eql({
-        [UpsertNode.OptionType.Unrelate]: ['with'],
-        [UpsertNode.OptionType.InsertMissing]: ['with.this'],
-        [UpsertNode.OptionType.Update]: ['with.this.path']
+        [UpsertNode.OptionType.InsertMissing]: ['this', 'also.this'],
+        [UpsertNode.OptionType.Update]: ['this.path']
+      });
+    });
+  });
+
+  describe('promiseUtils', () => {
+    describe('map', () => {
+      it('should work like Promise.all if concurrency is not given', () => {
+        const numItems = 20;
+        let running = 0;
+        let maxRunning = 0;
+        let startOrder = [];
+
+        return map(range(numItems), (item, index) => {
+          startOrder.push(item);
+          running++;
+          maxRunning = Math.max(maxRunning, running);
+
+          return Promise.delay(Math.round(Math.random() * 10))
+            .return(2 * item)
+            .then(result => {
+              --running;
+              return result;
+            });
+        }).then(result => {
+          expect(maxRunning).to.equal(numItems);
+          expect(result).to.eql(range(numItems).map(it => it * 2));
+          expect(startOrder).to.eql(range(numItems));
+        });
+      });
+
+      it('should not start new operations after an error has been thrown', done => {
+        const numItems = 20;
+
+        let errorThrown = false;
+        let callbackCalledAfterError = false;
+
+        map(range(numItems), (item, index) => {
+          if (errorThrown) {
+            callbackCalledAfterError = true;
+          }
+
+          return Promise.delay(Math.round(Math.random() * 10)).then(() => {
+            if (index === 10) {
+              errorThrown = true;
+              throw new Error('fail');
+            } else {
+              return item;
+            }
+          });
+        })
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.message).to.equal('fail');
+            expect(callbackCalledAfterError).to.equal(false);
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should only run opt.concurrency operations at a time', () => {
+        const concurrency = 4;
+        const numItems = 20;
+
+        let running = 0;
+        let startOrder = [];
+
+        return map(
+          range(numItems),
+          (item, index) => {
+            startOrder.push(item);
+            running++;
+            expect(running).to.be.lessThan(concurrency + 1);
+
+            return Promise.delay(Math.round(Math.random() * 10))
+              .return(2 * item)
+              .then(result => {
+                --running;
+                return result;
+              });
+          },
+          { concurrency }
+        ).then(result => {
+          expect(result).to.eql(range(numItems).map(it => it * 2));
+          expect(startOrder).to.eql(range(numItems));
+        });
+      });
+
+      it('should work with synchronous callbacks', () => {
+        const concurrency = 4;
+        const numItems = 20;
+        let startOrder = [];
+
+        return map(
+          range(numItems),
+          (item, index) => {
+            startOrder.push(item);
+            return 2 * item;
+          },
+          { concurrency }
+        ).then(result => {
+          expect(result).to.eql(range(numItems).map(it => it * 2));
+          expect(startOrder).to.eql(range(numItems));
+        });
       });
     });
   });
