@@ -1103,6 +1103,17 @@ module.exports = session => {
         });
     });
 
+    // TODO: enable for v2.0.
+    it.skip('should fail with a clear error when a duplicate relation is detected', () => {
+      expect(() => {
+        Model1.query().eager('[model1Relation1, model1Relation1.model1Relation2]');
+      }).to.throwException(err => {
+        expect(err.message).to.equal(
+          `Duplicate relation name "model1Relation1" in relation expression "[model1Relation1, model1Relation1.model1Relation2]". Use "a.[b, c]" instead of "[a.b, a.c]".`
+        );
+      });
+    });
+
     describe('JoinEagerAlgorithm', () => {
       it('select should work', () => {
         return Model1.query()

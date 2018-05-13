@@ -10,7 +10,7 @@ describe('main module', () => {
       require('../lib/queryBuilder/operations/QueryBuilderOperation')
     );
     expect(objection.RelationExpression).to.equal(
-      require('../lib/queryBuilder/RelationExpression')
+      require('../lib/queryBuilder/RelationExpression').RelationExpression
     );
     expect(objection.ValidationError).to.equal(require('../lib/model/ValidationError'));
     expect(objection.NotFoundError).to.equal(require('../lib/model/NotFoundError'));

@@ -853,6 +853,9 @@ describe('RelationExpression', () => {
       testParseFail('a asb');
       testParseFail('aas b');
       testParseFail('a asd b');
+      // TODO: enable for v2.0.
+      // testParseFail('[a.b, a.c]');
+      // testParseFail('a.[b.c, b.d]');
     });
   });
 
@@ -1244,8 +1247,6 @@ describe('RelationExpression', () => {
     testSubExpression('[a.^, b.[c.^, d]]', 'b.c');
     testSubExpression('[a.^, b.[c.^, d]]', 'b.c.^');
     testSubExpression('[a.^, b.[c.^, d]]', '[a, b]');
-    testSubExpression('[a.^, b.[c.^, d]]', '[b.c, b.d]');
-    testSubExpression('[a.^, b.[c.^, d]]', '[b.c.c.c, b.d]');
     testSubExpression('[a.^, b.[c.^, d]]', '[a.^, b]');
     testSubExpression('[a.^, b.[c.^, d]]', '[a.a, b]');
     testSubExpression('[a.^, b.[c.^, d]]', '[a.a.^, b.c]');
