@@ -133,6 +133,22 @@ module.exports = session => {
           });
       });
 
+      if (session.isPostgres()) {
+        // TODO: Enable when the bug in knex is fixed. Objection issue #918
+        it.skip('alter', () => {
+          return knex.schema
+            .createTable(table, table => {
+              table.increments('id');
+              table.string('firstName');
+            })
+            .then(() => {
+              return knex.schema.table(table, table => {
+                table.text('firstName').alter();
+              });
+            });
+        });
+      }
+
       it('dropTable', () => {
         return knex.schema
           .createTable(table, table => {

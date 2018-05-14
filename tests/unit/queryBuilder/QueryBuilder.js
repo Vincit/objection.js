@@ -1413,6 +1413,26 @@ describe('QueryBuilder', () => {
       });
   });
 
+  it('tableNameFor should return the table name', () => {
+    const query = TestModel.query();
+    expect(query.tableNameFor(TestModel)).to.equal('Model');
+  });
+
+  it('tableNameFor should return the table name given in from', () => {
+    const query = TestModel.query().from('Lol');
+    expect(query.tableNameFor(TestModel)).to.equal('Lol');
+  });
+
+  it('tableRefFor should return the table name by default', () => {
+    const query = TestModel.query();
+    expect(query.tableRefFor(TestModel)).to.equal('Model');
+  });
+
+  it('tableRefFor should return the alias', () => {
+    const query = TestModel.query().alias('Lyl');
+    expect(query.tableRefFor(TestModel)).to.equal('Lyl');
+  });
+
   describe('eager, allowEager, and mergeAllowEager', () => {
     beforeEach(() => {
       const rel = {

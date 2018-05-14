@@ -12,7 +12,7 @@ module.exports = session => {
 
   describe('Model find queries', () => {
     describe('.query()', () => {
-      before(() => {
+      beforeEach(() => {
         return session.populate([
           {
             id: 1,
@@ -784,6 +784,18 @@ module.exports = session => {
                   $afterGetCalled: 1
                 }
               ]);
+            });
+        });
+
+        it('whereExists in nested where with relatedQuery', () => {
+          return Model1.query()
+            .where(builder => {
+              builder.whereExists(Model1.relatedQuery('model1Relation2'));
+            })
+            .eager('model1Relation2')
+            .then(results => {
+              expect(results.length).to.equal(1);
+              expect(results[0].model1Prop1).to.equal('hello 1');
             });
         });
 

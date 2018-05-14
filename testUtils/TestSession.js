@@ -365,6 +365,10 @@ class TestSession {
   isMySql() {
     return knexUtils.isMySql(this.knex);
   }
+
+  isSqlite() {
+    return knexUtils.isSqlite(this.knex);
+  }
 }
 
 TestSession.staticInitCalled = false;
