@@ -1847,13 +1847,24 @@ module.exports = session => {
               });
           });
 
-          it('.pluck()', () => {
+          it('.pluck() array', () => {
             return parent2
               .$relatedQuery('model1Relation2')
               .orderBy('id_col')
               .pluck('idCol')
               .then(values => {
                 expect(values).to.eql([4, 5, 6]);
+              });
+          });
+
+          it('.pluck() object', () => {
+            return parent2
+              .$relatedQuery('model1Relation2')
+              .orderBy('id_col')
+              .first()
+              .pluck('idCol')
+              .then(values => {
+                expect(values).to.eql(4);
               });
           });
 
