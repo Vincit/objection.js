@@ -1675,7 +1675,7 @@ as their last argument.
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise
 is rejected or an error is thrown inside the callback the transaction is rolled back.
 
-Another way to start a trasnsaction is the `transaction.start` function. See the examples.
+Another way to start a transaction is the `transaction.start` function. See the examples.
 
 Transactions in javascript are a bit of a PITA if you are used to threaded frameworks and languages like java. In those
 a single chain of operations (for example a single request) is handled in a dedicated thread. Transactions are usually
