@@ -17,7 +17,8 @@
     "perf-debug": "mocha --slow 60000 --timeout 60000 --reporter spec --inspect-brk perf",
     "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt",
     "prettier": "prettier --write \"{examples,lib,tests,typings}/**/*.{js,ts}\"",
-    "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\""
+    "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
+    "docs:dev": "vuepress dev newDoc"
   },
   "publishConfig": {
     "tag": "next"
@@ -86,6 +87,7 @@
     "pg": "^7.6.1",
     "prettier": "1.13.6",
     "sqlite3": "^4.0.4",
+    "vuepress": "^0.14.9",
     "typescript": "^2.9.2"
   },
   "nyc": {
