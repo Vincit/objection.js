@@ -26,6 +26,7 @@ module.exports = {
           'installation',
           'getting-started',
           'models',
+          'relations',
           'query-examples',
           'transactions',
           'documents'
