@@ -2,9 +2,9 @@
 
 Models are created by inheriting from the [Model](/api/model.html) class. A [Model](/api/model.html) subclass represents a database table and instances of that class represent table rows. A [Model](/api/model.html) class can define [relationships](/guide/relations.html) (aka. relations, associations) to other models using the static [relationMappings](/api/model.html#static-relationmappings) property.
 
-In objection, all configuration is done through [Model](/api/model.html) classes and there is no global configuration or state. This allows you to create isolated components and for example to use multiple different databases with different configurations in one app. Most of the time you want the same configuration for all models and a good pattern is to create a `BaseModel` superclass and inherit all your models from that. You can then add all shared configuration to `BaseModel`. See the [Reference --> Model --> Static properties](/api/model.html#static-tablename) section for all available configuration options.
+In objection, all configuration is done through [Model](/api/model.html) classes and there is no global configuration or state. This allows you to create isolated components and for example to use multiple different databases with different configurations in one app. Most of the time you want the same configuration for all models and a good pattern is to create a `BaseModel` superclass and inherit all your models from that. You can then add all shared configuration to `BaseModel`. See the the static properties in [API Reference --> class Model](/api/model.html#static-tablename) section for all available configuration options.
 
-Models can optionally define a [jsonSchema](/api/model.html#static-jsonschema) object that is used for input validation. Every time a [Model](/api/model.html) instance is created, it is validated against the [jsonSchema](/api/model.html#static-tablename). Note that [Model](/api/model.html) instances are implicitly created whenever you call [insert](/api/query-builder.html#insert), [insertGraph](/api/query-builder.html#insertgraph), [patch](/api/query-builder.html#patch) or any other method that takes model properties (no validation is done when reading from the database).
+Models can optionally define a [jsonSchema](/api/model.html#static-jsonschema) object that is used for input validation. Every time a [Model](/api/model.html) instance is created, it is validated against the [jsonSchema](/api/model.html#static-tablename). Note that [Model](/api/model.html) instances are implicitly created whenever you call [insert](/api/query-builder.html#insert), [insertGraph](/api/query-builder.html#insertgraph), [patch](/api/query-builder.html#patch) or any other method that takes in model properties (no validation is done when reading from the database).
 
 Each model must have an identifier column. The identifier column name can be set using the [idColumn](/api/model.html#static-idcolumn) property. [idColumn](/api/model.html#static-idcolumn) defaults to `"id"`. If your table's identifier is something else, you need to set [idColumn](/api/model.html#static-idcolumn). Composite id can be set by giving an array of column names. Composite keys are first class citizens in objection.
 
@@ -62,10 +62,10 @@ class Person extends Model {
   }
 
   // Optional JSON schema. This is not the database schema!
-  // Nothing is generated based on this. This is only used
-  // for input validation. Whenever a model instance is created
+  // No tables or columns are generated based on this. This is only
+  // used for input validation. Whenever a model instance is created
   // either explicitly or implicitly it is checked against this schema.
-  // http://json-schema.org/.
+  // See http://json-schema.org/ for more info.
   static get jsonSchema () {
     return {
       type: 'object',
@@ -83,7 +83,7 @@ class Person extends Model {
         // writing to database and back to objects and arrays
         // when reading from database. To override this
         // behaviour, you can override the
-        // Person.jsonAttributes property.
+        // Model.jsonAttributes property.
         address: {
           type: 'object',
           properties: {
@@ -98,7 +98,7 @@ class Person extends Model {
 
   // This object defines the relations to other models.
   static get relationMappings() {
-    // Import models here to prevent require loops.
+    // Importing models here is a one way to avoid require loops.
     const Animal = require('./Animal');
     const Movie = require('./Movie');
 
@@ -107,7 +107,8 @@ class Person extends Model {
         relation: Model.HasManyRelation,
         // The related model. This can be either a Model
         // subclass constructor or an absolute file path
-        // to a module that exports one.
+        // to a module that exports one. We use a model
+        // subclass constructor `Animal` here.
         modelClass: Animal,
         join: {
           from: 'persons.id',
@@ -158,6 +159,8 @@ class Person extends Model {
 ESNext:
 
 ```js
+import * as path from 'path';
+
 class Person extends Model {
   // Table name is the only required property.
   static tableName = 'persons';
@@ -176,10 +179,10 @@ class Person extends Model {
   }
 
   // Optional JSON schema. This is not the database schema!
-  // Nothing is generated based on this. This is only used
-  // for input validation. Whenever a model instance is created
+  // No tables or columns are generated based on this. This is only
+  // used for input validation. Whenever a model instance is created
   // either explicitly or implicitly it is checked against this schema.
-  // http://json-schema.org/.
+  // See http://json-schema.org/ for more info.
   static jsonSchema = {
     type: 'object',
     required: ['firstName', 'lastName'],
@@ -196,7 +199,7 @@ class Person extends Model {
       // writing to database and back to objects and arrays
       // when reading from database. To override this
       // behaviour, you can override the
-      // Person.jsonAttributes property.
+      // Model.jsonAttributes property.
       address: {
         type: 'object',
         properties: {
@@ -216,7 +219,7 @@ class Person extends Model {
       // subclass constructor or an absolute file path
       // to a module that exports one. We use the file
       // path version here to prevent require loops.
-      modelClass: __dirname + '/Animal',
+      modelClass: path.join(__dirname, 'Animal'),
       join: {
         from: 'persons.id',
         to: 'animals.ownerId'
@@ -225,7 +228,7 @@ class Person extends Model {
 
     movies: {
       relation: Model.ManyToManyRelation,
-      modelClass: __dirname + '/Movie',
+      modelClass: path.join(__dirname, 'Movie'),
       join: {
         from: 'persons.id',
         // ManyToMany relation needs the `through` object
