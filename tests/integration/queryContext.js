@@ -496,7 +496,7 @@ module.exports = session => {
                 'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (2)',
                 'select "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" where "Model1"."id" in (3)',
                 'select "model2".*, "model2_prop1" || \' computed2\' as computed from "public"."model2" where "model2"."model1_id" in (2) order by "id_col" asc',
-                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2)'
+                'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1".*, "model1Prop1" || \' computed1\' as computed from "public"."Model1" inner join "public"."Model1Model2" as "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2)'
               ]);
 
               expect(models).to.eql([
@@ -994,7 +994,7 @@ module.exports = session => {
                 .then(() => {
                   expect(mockKnex.executedQueries).to.eql(queries);
                   expect(mockKnex.executedQueries).to.eql([
-                    `delete from \"public\".\"Model1Model2\" where \"Model1Model2\".\"model1Id\" in (select \"Model1\".\"id\" from \"public\".\"Model1\" inner join \"public\".\"Model1Model2\" on \"Model1\".\"id\" = \"Model1Model2\".\"model1Id\" where \"Model1Model2\".\"model2Id\" in (1) and \"Model1\".\"id\" = 4) and \"Model1Model2\".\"model2Id\" = 1`
+                    `delete from \"public\".\"Model1Model2\" where \"Model1Model2\".\"model1Id\" in (select \"Model1\".\"id\" from \"public\".\"Model1\" inner join \"public\".\"Model1Model2\" as \"Model1Model2\" on \"Model1\".\"id\" = \"Model1Model2\".\"model1Id\" where \"Model1Model2\".\"model2Id\" in (1) and \"Model1\".\"id\" = 4) and \"Model1Model2\".\"model2Id\" = 1`
                   ]);
 
                   return session.knex('Model1Model2');

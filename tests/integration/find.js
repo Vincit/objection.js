@@ -2062,6 +2062,25 @@ module.exports = session => {
             });
         });
 
+        it('should be able to alias the join table using aliasFor', () => {
+          return parent2
+            .$relatedQuery('model2Relation1')
+            .aliasFor('Model1Model2', 'm1m2')
+            .where('extra3', 'extra 6')
+            .then(related => {
+              expect(related).to.eql([
+                {
+                  id: 8,
+                  model1Id: null,
+                  model1Prop1: 'blaa 6',
+                  model1Prop2: 1,
+                  aliasedExtra: 'extra 6',
+                  $afterGetCalled: 1
+                }
+              ]);
+            });
+        });
+
         // This doesn't belong here, but there is no better place at the moment.
         it('should join the related rows', () => {
           return Model2.getRelation('model2Relation1')
