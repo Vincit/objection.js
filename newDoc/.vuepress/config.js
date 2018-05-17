@@ -3,6 +3,9 @@ module.exports = {
   description: 'An SQL friendly ORM for node.js',
 
   themeConfig: {
+    repo: 'vincit/objection.js',
+    repoLabel: 'Github',
+
     nav: [
       {
         text: 'Guide',
