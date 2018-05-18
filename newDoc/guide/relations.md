@@ -149,10 +149,11 @@ class Person extends Model {
   static get relationMappings() {
     // Solution 1:
     //
-    // relationMappings getter is accessed lazily when you execute your first query
-    // that needs it. Therefore if you `require` your models inside the getter, you
-    // don't end up with a require loop. Note that only one end of the relation needs
-    // to be required like this, not both. `relationMappings` can also be a method or
+    // relationMappings getter is accessed lazily when you execute
+    // your first query that needs it. Therefore if you `require`
+    // your models inside the getter, you don't end up with a require loop.
+    // Note that only one end of the relation needs to be required like
+    // this, not both. `relationMappings` can also be a method or
     // a thunk if you prefer those instead of getters.
     const Animal = require('./Animal');
 
@@ -170,9 +171,10 @@ class Person extends Model {
         relation: Model.ManyToManyRelation,
         // Solution 2:
         //
-        // Absolute file path to a module that exports the model class. This is similar
-        // to solution 1, but objection calls `require` under the hood. The downside here
-        // is that you need to give an absolute file path because of the way `require` works.
+        // Absolute file path to a module that exports the model class.
+        // This is similar to solution 1, but objection calls `require`
+        // under the hood. The downside here is that you need to give
+        // an absolute file path because of the way `require` works.
         modelClass: path.join(__dirname, 'Movie'),
         join: {
           from: 'persons.id',
@@ -189,8 +191,9 @@ class Person extends Model {
         relation: Model.ManyToManyRelation,
         // Solution 3:
         //
-        // Use only a module name and define a `modelPaths` property for your model (or a superclass
-        // of your model). Search for `modelPaths` from the docs for more info.
+        // Use only a module name and define a `modelPaths` property
+        // for your model (or a superclass of your model). Search for
+        // `modelPaths` from the docs for more info.
         modelClass: 'Movie',
         join: {
           from: 'persons.id',
