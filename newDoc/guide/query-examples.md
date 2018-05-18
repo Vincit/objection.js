@@ -90,6 +90,26 @@ and exists (select 1 from "animals" where "persons"."id" = "animals"."ownerId")
 order by "persons"."lastName" asc
 ```
 
+Objection allows a bit more modern syntax with groupings and subqueries. Where knex requires you to use an old fashioned `function` an `this`, with objection you can use arrow functions:
+
+```js
+const nonMiddleAgedJennifers = await Person
+  .query()
+  .where(builder => builder.where('age', '<', 4).orWhere('age', '>', 60))
+  .where('firstName', 'Jennifer')
+  .orderBy('lastName')
+
+console.log('The last name of the first non middle aged Jennifer is');
+console.log(nonMiddleAgedJennifers[0].lastName);
+```
+
+```sql
+select "persons".* from "persons"
+where ("age" < 40 or "age" > 60)
+and "firstName" = 'Jennifer'
+order by "lastName" asc
+```
+
 ### Insert queries
 
 Insert queries are created by chaining the [insert](/api/query-builder.html#insert) method to the query. See the [insertGraph](/api/query-builder.html#/api/query-builder.html/#insertgraph) method for inserting object graphs.
@@ -112,7 +132,7 @@ insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 
 ### Update queries
 
-Update queries are created by chaining the [update](/api/query-builder.html#update) or [patch](/api/query-builder.html#patch) method to the query. The [patch](/api/query-builder.html#patch) and [update](/api/query-builder.html#update) methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder.html#updateandfetchbyid). On postgresql you can simply chain [`.returning('*')`](/api/query-builder.html#returning) or take a look at [this recipe] (/recipes/postgresql-quot-returning-quot-tricks) for more ideas.
+Update queries are created by chaining the [update](/api/query-builder.html#update) or [patch](/api/query-builder.html#patch) method to the query. The [patch](/api/query-builder.html#patch) and [update](/api/query-builder.html#update) methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder.html#updateandfetchbyid). On postgresql you can simply chain [`.returning('*')`](/api/query-builder.html#returning) or take a look at [this recipe] (/recipes/postgresql-quot-returning-quot-tricks) for more ideas. See [update](/api/query-builder.html#update) and [patch](/api/query-builder.html#patch) API documentation for discussion about their differences.
 
 #### Examples
 
@@ -253,7 +273,7 @@ See the [API documentation](/api/query-builder.html#unrelate) of `unrelate` meth
 
 You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder.html#eager) method. [eager](/api/query-builder.html#eager) takes a [relation expression](/api/types.html#relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
 
-Because the eager expressions are strings (there's also an optional [object notation](#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to pass expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder.html) has the [allowEager](/api/query-builder.html#alloweager) method. [allowEager](/api/query-builder.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
+Because the eager expressions are strings (there's also an optional [object notation](#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder.html) has the [allowEager](/api/query-builder.html#alloweager) method. [allowEager](/api/query-builder.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
 
 By giving expression `[pets, children.pets]` for [allowEager](/api/query-builder.html#alloweager) the value passed to [eager](/api/query-builder.html#eager) is allowed to be one of:
 
@@ -456,6 +476,14 @@ const people = await Person
   .query()
   .eagerAlgorithm(Model.JoinEagerAlgorithm)
   .eager('[pets, children.pets]');
+```
+
+There are also shortcut methods for each of the eager algoriths:
+
+```js
+const people = await Person
+  .query()
+  .joinEager('[pets, children.pets]');
 ```
 
 ## Graph inserts
