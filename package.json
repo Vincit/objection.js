@@ -79,12 +79,14 @@
     "glob": "^7.1.2",
     "istanbul": "^0.4.5",
     "knex": "0.x",
+    "markdown-it-container": "^2.0.0",
     "mocha": "^5.0.0",
     "mysql": "^2.15.0",
     "pg": "^7.4.1",
     "prettier": "^1.10.2",
     "sqlite3": "^4.0.0",
     "typescript": "^2.7.1",
+    "vue-tabs-component": "^1.4.0",
     "vuepress": "^0.8.4"
   }
 }
