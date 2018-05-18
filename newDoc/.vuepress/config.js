@@ -37,6 +37,7 @@ module.exports = {
         title: 'API Reference',
         collapsable: false,
         children: [
+          'objection',
           'model',
           'query-builder',
           'types'
