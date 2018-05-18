@@ -45,12 +45,11 @@ module.exports = {
       }]
     }
   },
+
   markdown: {
     config: md => {
-      let id = 0;
-      let currentTitle = null;
-      let firstContent = true;
       const regex = /multi-language (.*)/;
+
       md.use(require('markdown-it-container'), 'multi-language', {
         render(tokens, idx) {
           let argString;
@@ -70,25 +69,31 @@ module.exports = {
                 case 'begin': {
                   return `<tabbed-example>`;
                 }
+
                 case 'end': {
                   return `</tabbed-example>`;
                 }
+
                 default: {
                   throw new Error(`Failed to parse line "${tokens[idx].info}"`);
                 }
               }
             }
+
             case 'section': {
               const tabTitle = args[1];
+
               switch (args[2]) {
                 case 'begin': {
                   return `<tab name="${tabTitle}">`;
                 }
+
                 case 'end': {
                   return `
                         </tab>
                   `;
                 }
+
                 default: {
                   throw new Error(`Failed to parse line "${tokens[idx].info}"`);
                 }
