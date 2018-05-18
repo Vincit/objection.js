@@ -80,11 +80,13 @@
     "istanbul": "^0.4.5",
     "knex": "0.x",
     "mocha": "^5.2.0",
+    "markdown-it-container": "^2.0.0",
     "mysql": "^2.15.0",
     "pg": "^7.4.1",
     "prettier": "1.13.6",
     "sqlite3": "^4.0.0",
     "typescript": "^2.7.1",
+    "vue-tabs-component": "^1.4.0",
     "vuepress": "^0.8.4"
   }
 }
