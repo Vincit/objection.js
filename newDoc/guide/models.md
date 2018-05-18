@@ -12,6 +12,9 @@ Each model must have an identifier column. The identifier column name can be set
 
 A working model with minimal amount of code:
 
+::: multi-language example begin
+::: multi-language section ES2015 begin
+
 ```js
 const { Model } = require('objection');
 
@@ -24,7 +27,8 @@ class MinimalModel extends Model {
 module.exports = MinimalModel;
 ```
 
-Using ESNext static properties:
+::: multi-language section ES2015 end
+::: multi-language section ESNext begin
 
 ```js
 import { Model } from 'objection';
@@ -34,7 +38,13 @@ export default class MinimalModel extends Model {
 }
 ```
 
+::: multi-language section ESNext end
+::: multi-language example end
+
 Model with custom methods, json schema validation and relations. This model is used in the examples:
+
+::: multi-language example begin
+::: multi-language section ES2015 begin
 
 ```js
 const { Model } = require('objection');
@@ -156,7 +166,8 @@ class Person extends Model {
 }
 ```
 
-ESNext:
+::: multi-language section ES2015 end
+::: multi-language section ESNext begin
 
 ```js
 import * as path from 'path';
@@ -264,3 +275,6 @@ class Person extends Model {
   };
 }
 ```
+
+::: multi-language section ESNext end
+::: multi-language example end
