@@ -1145,6 +1145,8 @@ Relates an existing model to another model.
 This method doesn't create a new instance but only updates the foreign keys and in
 the case of many-to-many relation, creates a join row to the join table.
 
+It does not affect preexisting relations.
+
 On Postgres multiple models can be related by giving an array of identifiers.
 
 ##### Arguments
