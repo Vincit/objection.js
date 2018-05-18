@@ -1,6 +1,6 @@
 # Relations
 
-We already went through how to create relationships (aka. relations, associations) in the [models](/introduction/models.html) section's examples but here's a list of all the available relation types in a nicely searchable place. See [this](/api/types.html#type-relationmapping) API doc section for full documentation of the relation mapping parameters.
+We already went through how to create relationships (aka. relations, associations) in the [models](/guide/models.html) section's examples but here's a list of all the available relation types in a nicely searchable place. See [this](/api/types.html#type-relationmapping) API doc section for full documentation of the relation mapping parameters.
 
 Relationships are a very basic concept in relational databases and if you aren't familiar with it, you should spend some time googling it first. Basically there are three ways to create a relationship between two tables `A` and `B`:
 
