@@ -1,3 +1,4 @@
+
 # class Model
 
 > Subclasses of this class represent database tables.
@@ -29,9 +30,14 @@ By overriding the lifecycle methods, you can have different layouts for the data
 
 All instance methods of models are prefixed with `$` letter so that they won’t overlap with database properties. All properties that start with `$` are also removed from `database` and `external` layouts.
 
+## Static properties
+
 ### static tableName
 
 <!-- The first simple example before the description -->
+
+::: multi-language example begin
+::: multi-language section ES2015 begin
 ```js
 class Person extends Model {
   static get tableName() {
@@ -39,6 +45,16 @@ class Person extends Model {
   }
 }
 ```
+::: multi-language section ES2015 end
+::: multi-language section ESNext begin
+```js
+class Person extends Model {
+  static tableName = 'persons';
+}
+```
+::: multi-language section ESNext end
+::: multi-language example end
+
 
 Name of the database table for this model.
 
@@ -47,17 +63,140 @@ Each model must set this.
 <!-- Rest of the examples after under #### Examples header -->
 #### Examples
 
-Using ESNext static properties
+##### Using ESNext static properties
+
+
+### static jsonSchema
+
+
+::: multi-language example begin
+::: multi-language section ES2015 begin
 
 ```js
 class Person extends Model {
-  static tableName = 'persons';
+  static get jsonSchema() {
+    return {
+      type: 'object',
+      required: ['name'],
+      properties: {
+        id: {type: 'integer'},
+        name: {type: 'string', minLength: 1, maxLength: 255},
+        age: {type: 'number'}, // optional
+      }
+    };
+  }
+}
+```
+::: multi-language section ES2015 end
+::: multi-language section ESNext begin
+
+```js
+class Person extends Model {
+  static jsonSchema = {
+    type: 'object',
+    required: ['name'],
+    properties: {
+      id: {type: 'integer'},
+      name: {type: 'string', minLength: 1, maxLength: 255},
+      age: {type: 'number'}, // optional
+    }
+  }
+}
+```
+::: multi-language section ESNext end
+::: multi-language example end
+
+The optional schema against which the JSON is validated.
+
+The jsonSchema can be dynamically modified in the [`$beforeValidate`](/TODO/$beforevalidate) method.
+
+Must follow [JSON Schema](http://json-schema.org) specification. If null no validation is done.
+
+#### Read more
+
+* [`$beforeValidate`](/TODO/$beforevalidate)
+* [`$validate`](/TODO/$validate)
+* [`$afterValidate`](/TODO/$aftervalidate)
+* [`jsonAttributes`](/TODO/jsonattributes)
+* [custom validation recipe](/TODO/custom-validation)
+
+#### Examples
+
+##### Person
+
+::: multi-language example begin
+::: multi-language section ES2015 begin
+```js
+class Person extends Model {
+  static get jsonSchema() {
+    return {
+      type: 'object',
+      required: ['firstName', 'lastName'],
+
+      properties: {
+        id: {type: 'integer'},
+        parentId: {type: ['integer', 'null']},
+        firstName: {type: 'string', minLength: 1, maxLength: 255},
+        lastName: {type: 'string', minLength: 1, maxLength: 255},
+        age: {type: 'number'},
+
+        // Properties defined as objects or arrays are
+        // automatically converted to JSON strings when
+        // writing to database and back to objects and arrays
+        // when reading from database. To override this
+        // behaviour, you can override the
+        // Person.jsonAttributes property.
+        address: {
+          type: 'object',
+          properties: {
+            street: {type: 'string'},
+            city: {type: 'string'},
+            zipCode: {type: 'string'}
+          }
+        }
+      }
+    };
+  }
+}
+```
+::: multi-language section ES2015 end
+::: multi-language section ESNext begin
+```js
+class Person extends Model {
+  static jsonSchema = {
+    type: 'object',
+    required: ['firstName', 'lastName'],
+
+    properties: {
+      id: {type: 'integer'},
+      parentId: {type: ['integer', 'null']},
+      firstName: {type: 'string', minLength: 1, maxLength: 255},
+      lastName: {type: 'string', minLength: 1, maxLength: 255},
+      age: {type: 'number'},
+
+      // Properties defined as objects or arrays are
+      // automatically converted to JSON strings when
+      // writing to database and back to objects and arrays
+      // when reading from database. To override this
+      // behaviour, you can override the
+      // Person.jsonAttributes property.
+      address: {
+        type: 'object',
+        properties: {
+          street: {type: 'string'},
+          city: {type: 'string'},
+          zipCode: {type: 'string'}
+        }
+      }
+    }
+  };
 }
 ```
 
-## static relationMappings
+::: multi-language section ESNext end
+::: multi-language example end
 
-## static jsonSchema
+## static relationMappings
 
 <!-- static properties like this -->
 ## static idColumn
