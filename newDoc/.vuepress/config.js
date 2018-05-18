@@ -38,7 +38,8 @@ module.exports = {
         collapsable: false,
         children: [
           'model',
-          'query-builder'
+          'query-builder',
+          'types'
         ]
       }]
     }
