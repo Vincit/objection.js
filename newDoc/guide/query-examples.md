@@ -112,7 +112,7 @@ order by "lastName" asc
 
 ### Insert queries
 
-Insert queries are created by chaining the [insert](/api/query-builder.html#insert) method to the query. See the [insertGraph](/api/query-builder.html#/api/query-builder.html/#insertgraph) method for inserting object graphs.
+Insert queries are created by chaining the [insert](/api/query-builder.html#insert) method to the query. See the [insertGraph](/api/query-builder.html#insertgraph) method for inserting object graphs.
 
 #### Examples
 
@@ -215,7 +215,7 @@ order by "name" asc
 
 ### Insert queries
 
-Chain the [insert](/api/query-builder.html#insert) method to a [$relatedQuery](/api/model.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder.html/api/query-builder.html/#insertgraph) method for an alternative way to insert related models.
+Chain the [insert](/api/query-builder.html#insert) method to a [$relatedQuery](/api/model.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder.html/api/query-builder.html#insertgraph) method for an alternative way to insert related models.
 
 By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model.html#setrelated) and
 [$appendRelated](/api/model.html#appendrelated) helpers.
@@ -488,13 +488,13 @@ const people = await Person
 
 ## Graph inserts
 
-Arbitrary relation graphs can be inserted using the [insertGraph](/api/query-builder.html/#insertgraph) method. This is best explained using examples, so check them out.
+Arbitrary relation graphs can be inserted using the [insertGraph](/api/query-builder.html#insertgraph) method. This is best explained using examples, so check them out.
 
-See the [allowInsert](/api/query-builder.html/#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder.html/#insertgraph) method to avoid security issues. [allowInsert](/api/query-builder.html/#allowinsert) works like [allowEager](/api/query-builder.html/#allowinsert).
+See the [allowInsert](/api/query-builder.html/#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder.html#insertgraph) method to avoid security issues. [allowInsert](/api/query-builder.html/#allowinsert) works like [allowEager](/api/query-builder.html/#allowinsert).
 
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all inserted rows and not just the first or the last one.
 
-[insertGraph](/api/query-builder.html/#insertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
+[insertGraph](/api/query-builder.html#insertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
 
 You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
 
@@ -502,10 +502,10 @@ You can read more about graph inserts from [this blog post](https://www.vincit.f
 #### Examples
 
 ```js
-// The return value of `insertGraph` is the input graph converted into model instances.
-// Inserted objects have ids added to them and related rows have foreign keys set, but
-// no other columns get fetched from the database. You can use `insertGraphAndFetch`
-// for that.
+// The return value of `insertGraph` is the input graph converted into
+// model instances. Inserted objects have ids added to them and related
+// rows have foreign keys set, but no other columns get fetched from
+// the database. You can use `insertGraphAndFetch` for that.
 const graph = await Person
   .query()
   .insertGraph({
@@ -524,7 +524,7 @@ const graph = await Person
   });
 ```
 
-The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined in the [relationMappings](/api/model.html#static-relationmappings) of the models. Technically [insertGraph](/api/query-builder.html/#insertgraph) builds a dependency graph from the object graph and inserts the models that don't depend on any other models until the whole graph is inserted.
+The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined in the [relationMappings](/api/model.html#static-relationmappings) of the models. Technically [insertGraph](/api/query-builder.html#insertgraph) builds a dependency graph from the object graph and inserts the models that don't depend on any other models until the whole graph is inserted.
 
 If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
 
@@ -550,7 +550,7 @@ await Person
   }]);
 ```
 
-The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily [insertGraph](/api/query-builder.html/#insertgraph) detects them and rejects the query with a clear error message.
+The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily [insertGraph](/api/query-builder.html#insertgraph) detects them and rejects the query with a clear error message.
 
 You can refer to the properties of other models anywhere in the graph using expressions of format `#ref{<id>.<property>}` as long as the reference doesn't create a circular dependency. For example:
 
@@ -696,9 +696,10 @@ For the following examples, assume this is the content of the database:
 By default [upsertGraph](/api/query-builder.html#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
 
 ```js
-// The return value of `upsertGraph` is the input graph converted into model instances.
-// Inserted objects have ids added to them related rows have foreign keys set but no other
-// columns get fetched from the database. You can use `upsertGraphAndFetch` for that.
+// The return value of `upsertGraph` is the input graph converted into
+// model instances. Inserted objects have ids added to them related
+// rows have foreign keys set but no other columns get fetched from
+// the database. You can use `upsertGraphAndFetch` for that.
 const graph = await Person
   .query()
   .upsertGraph({
