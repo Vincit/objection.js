@@ -1,25 +1,62 @@
 # Transactions
 
-There are two ways to work with transactions in objection:
+Transactions are atomic and isolated units of work in relational databases. If you are not familiar with transactions, I suggest you read up on them. [The wikipedia article](https://en.wikipedia.org/wiki/Database_transaction) is a good place to start.
 
-1. [Passing around a transaction object](#passing-around-a-transaction-object)
-2. [Binding models to a transaction](#binding-models-to-a-transaction)
+## Creating a transaction
 
-## Passing around a transaction object
+In objection, a transaction can be started by calling the [objection.transaction](/api/objection.html#transaction) function:
 
-A transaction is started by calling [objection.transaction](/api/objection.html#transaction) method. You need to pass a knex instance as the first argument. If you don't have the knex instance otherwise available you can always access it through any [Model](/api/model.html) using [Model.knex()](/api/model.html#static-knex) provided that you have set the knex instance globally using [Model.knex(knex)](/api/model.html#static-knex) at some point.
+```js
+const { transaction } = require('objection');
 
-The second argument is a callback that gets passed a transaction object. The transaction object is actually just a [knex transaction object](http://knexjs.org/#Transactions) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function. You then need to pass the transaction to all queries you want to execute in that transaction. [query](/api/model.html#static-query), [$query](/api/model.html#query) and [$relatedQuery](/api/model.html#relatedquery) accept a transaction as their last argument.
+try {
+  const returnValue = await transaction(Person.knex(), async (trx) => {
+    // Here you can use the transaction.
+
+    // Whatever you return from the transaction callback gets returned
+    // from the `transaction` function.
+    return 'the return value of the transaction';
+  });
+  // Here the transaction has been committed.
+} catch (err) {
+  // Here the transaction has been rolled back.
+}
+```
+
+You need to pass a knex instance as the first argument. If you don't have a knex instance otherwise available you can always access it through any [Model](/api/model.html) using [Model.knex()](/api/model.html#static-knex) provided that you have installed the knex instance globally using [Model.knex(knex)](/api/model.html#static-knex) at some point.
+
+The second argument is a callback that gets called with the transaction object as an argument once the transaction has been successfully started. The transaction object is actually just a [knex transaction object](http://knexjs.org/#Transactions) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function.
 
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise is rejected or an error is thrown inside the callback the transaction is rolled back.
 
-Another way to start a trasnsaction is the [transaction.start](/api/objection.html#transaction-start) function. See the examples.
+An alternative way to start a transaction is to use the [objection.transaction.start](/api/objection.html#transaction-start) method:
 
-Transactions in javascript are a bit of a PITA if you are used to threaded frameworks and languages like java. In those a single chain of operations (for example a single request) is handled in a dedicated thread. Transactions are usually started for the whole thread and every database operation you perform after the start automatically takes part in the transaction because they can access the thread local transaction and the framework can be sure that no other chain of operations (no other request) uses the same transaction.
+```js
+const { transaction } = require('objection');
 
-In javascript there are no threads. We need to explicitly take care that our operations are executed in the correct transaction. Based on our experience the most transparent and least error-prone way to do this is to explicitly pass a transaction object to each operation explicitly.
+let trx;
+try {
+  trx = await transaction.start(Person.knex());
+  // Here you can use the transaction.
 
-#### Examples
+  // If you created the transaction using `transaction.start`, you need
+  // commit or rollback the transaction manually.
+  await trx.commit();
+} catch (err) {
+  await trx.rollback();
+}
+```
+
+## Using a transaction
+
+After you have created a transaction, you need to tell objection which queries should be executed inside that transaction. There are two ways to do that:
+
+1. [By passing the transaction object to each query](#passing-around-a-transaction-object)
+2. [By binding models to the transaction](#binding-models-to-a-transaction)
+
+### Passing around a transaction object
+
+The most straight forwared way to use a transaction is to explicitly give it to each query you start. [query](/api/model.html#static-query), [$query](/api/model.html#query) and [$relatedQuery](/api/model.html#relatedquery) accept a transaction as their last argument.
 
 ```js
 const { transaction } = require('objection');
@@ -37,44 +74,16 @@ try {
       .$relatedQuery('pets', trx)
       .insert({name: 'Scrappy'});
 
-    // The value returned from the transaction becomes the return value
-    // of the transaction function.
     return scrappy;
   });
+
+  console.log('Great success! Both Jennifer and Scrappy were inserted');
 } catch (err) {
   console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
 }
 ```
 
-Alternatively `transaction.start` can be used.
-
-```js
-const { transaction } = require('objection');
-// You can access `knex` instance anywhere you want.
-// One way is to get it through any model.
-const knex = Person.knex();
-
-let trx;
-try {
-  trx = await transaction.start(knex);
-
-  const jennifer = await Person
-    .query(trx)
-    .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
-
-  const scrappy = await jennifer
-    .$relatedQuery('pets', trx)
-    .insert({name: 'Scrappy'});
-
-  await trx.commit();
-} catch (err) {
-  await trx.rollback();
-
-  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
-}
-```
-
-Note that you can pass either a normal knex instance or a transaction to [query](/api/model.html#static-query), [$relatedQuery](/api/model.html#relatedquery) etc. allowing you to build helper functions and services that can be used with or without a transaction. When a transaction is not wanted, just pass in the normal knex instance:
+Note that you can pass either a normal knex instance or a transaction to [query](/api/model.html#static-query), [$relatedQuery](/api/model.html#relatedquery) etc. allowing you to build helper functions and services that can be used with or without a transaction. When a transaction is not wanted, just pass in the normal knex instance (or nothing at all if you have installed the knex object globally using [Model.knex(knex)](/api/model.html#static-knex)):
 
 ```js
 // `db` can be either a transaction or a knex instance or even
@@ -109,13 +118,9 @@ await insertPersonAndPet(person, pet, Person.knex());
 await insertPersonAndPet(person, pet);
 ```
 
-## Binding models to a transaction
+### Binding models to a transaction
 
 The second way to use transactions avoids passing around a transaction object by "binding" model classes to a transaction. You pass all models you want to bind as arguments to the [objection.transaction](/api/objection.html#transaction) method and as the last argument you provide a callback that receives __copies__ of the models that have been bound to a newly started transaction. All queries started through the bound copies take part in the transaction and you don't need to pass around a transaction object. Note that the models passed to the callback are actual copies of the models passed as arguments to [objection.transaction](/api/objection.html#transaction) and starting a query through any other object will __not__ be executed inside a transaction.
-
-Originally we advertised this way of doing transactions as a remedy to the transaction passing plague but it has turned out to be pretty error-prone. This approach is handy for single inline functions that do a handful of operations, but becomes tricky when you have to call services and helper methods that also perform database queries. To get the helpers and service functions to participate in the transaction you need to pass around the bound copies of the model classes. If you `require` the same models in the helpers and start queries through them, they will __not__ be executed in the transaction since the required models are not the bound copies, but the original models from which the copies were taken.
-
-#### Examples
 
 ```js
 const { transaction } = require('objection');
@@ -215,3 +220,5 @@ await transaction(Person, async (Person, trx) => {
   };
 });
 ```
+
+Originally we advertised this way of doing transactions as a remedy to the transaction passing plague but it has turned out to be pretty error-prone. This approach is handy for single inline functions that do a handful of operations, but becomes tricky when you have to call services and helper methods that also perform database queries. To get the helpers and service functions to participate in the transaction you need to pass around the bound copies of the model classes. If you `require` the same models in the helpers and start queries through them, they will __not__ be executed in the transaction since the required models are not the bound copies, but the original models from which the copies were taken.
