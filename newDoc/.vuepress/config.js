@@ -29,7 +29,10 @@ module.exports = {
           'relations',
           'query-examples',
           'transactions',
-          'documents'
+          'validation',
+          'documents',
+          'plugins',
+          'contributing'
         ]
       }],
 

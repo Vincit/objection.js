@@ -337,7 +337,7 @@ class TestSession {
         .then(() => trx('model3').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
-          return Promise.resolve(['Model1', 'model2', 'Model1Model2']).map(table => {
+          return Promise.resolve(['Model1', 'model2', 'model3', 'Model1Model2']).map(table => {
             const idCol = (
               _.find(this.models, it => it.getTableName() === table) || { getIdColumn: () => 'id' }
             ).getIdColumn();
