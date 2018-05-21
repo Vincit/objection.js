@@ -26,25 +26,17 @@ For a pull request to get merged it needs to have the following things:
 
 ## Development setup
 
-1. Fork objection in github
+1. **Fork objection in github**
 
-2. Clone objection
-
-3. Install MySQL and PostgreSQL or alternatively run `docker-compose up` in the repo root
-
-4. Create test users and databases
-
-5. Run `npm test` in objection's root to see if everything works.
-
-6. Run `npm run docs:dev` and goto http://localhost:8080 to see the generated documentation site when you change the markdown files in the `doc` folder.
-
-cloning:
+2. **Clone objection**
 
 ```shell
 git clone git@github.com:<your-account>/objection.js.git objection
 ```
 
-creating users and databases for the tests:
+3. **Install MySQL and PostgreSQL or alternatively run `docker-compose up` in the repo root**
+
+4. **Create test users and databases**
 
 ```shell
 psql -U postgres -c "CREATE USER objection SUPERUSER"
@@ -53,6 +45,10 @@ mysql -u root -e "CREATE USER objection"
 mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO objection"
 mysql -u root -e "CREATE DATABASE objection_test"
 ```
+
+5. **Run `npm test` in objection's root to see if everything works.**
+
+6. **Run `npm run docs:dev` and goto http://localhost:8080 to see the generated documentation site when you change the markdown files in the `doc` folder.**
 
 You can run the tests on a subset of databases by setting the `DATABASES` env variable
 
