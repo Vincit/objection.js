@@ -15,6 +15,11 @@ module.exports = {
       {
         text: 'API Reference',
         link: '/api/model',
+      },
+
+      {
+        text: 'Recipe Book',
+        link: '/recipes/raw-queries',
       }
     ],
 
@@ -44,6 +49,14 @@ module.exports = {
           'model',
           'query-builder',
           'types'
+        ]
+      }],
+
+      '/recipes/': [{
+        title: 'Recipes',
+        collapsable: false,
+        children: [
+          'raw-queries'
         ]
       }]
     }
