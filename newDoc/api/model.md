@@ -38,6 +38,7 @@ All instance methods of models are prefixed with `$` letter so that they won’t
 
 ::: multi-language example begin
 ::: multi-language section ES2015 begin
+
 ```js
 class Person extends Model {
   static get tableName() {
@@ -47,6 +48,7 @@ class Person extends Model {
 ```
 ::: multi-language section ES2015 end
 ::: multi-language section ESNext begin
+
 ```js
 class Person extends Model {
   static tableName = 'persons';

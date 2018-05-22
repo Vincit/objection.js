@@ -56,7 +56,11 @@ module.exports = {
         title: 'Recipes',
         collapsable: false,
         children: [
-          'raw-queries'
+          'raw-queries',
+          'json-queries',
+          'custom-id-column',
+          'custom-validation',
+          'snake-case-to-camel-case-conversion'
         ]
       }]
     }
