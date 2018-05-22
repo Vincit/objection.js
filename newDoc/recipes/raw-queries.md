@@ -27,7 +27,7 @@ const childAgeSums = await Person
 console.log(childAgeSums[0].childAgeSum);
 ```
 
-Raw binding arguments can be other [raw](/api/objection.html#raw) instances, [QueryBuilders](/api/query-builder.html) or pretty much anything you can think of.
+Binding arguments can be other [raw](/api/objection.html#raw) instances, [QueryBuilders](/api/query-builder.html) or pretty much anything you can think of.
 
 ```js
 const { raw, ref } = require('objection');
