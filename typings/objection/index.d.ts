@@ -982,7 +982,6 @@ declare namespace Objection {
     orWhereNot: Where<QM, RM, RV>;
     whereRaw: WhereRaw<QM, RM, RV>;
     orWhereRaw: WhereRaw<QM, RM, RV>;
-    andWhereRaw: WhereRaw<QM, RM, RV>;
     whereWrapped: WhereWrapped<QM, RM, RV>;
     havingWrapped: WhereWrapped<QM, RM, RV>;
     whereExists: WhereExists<QM, RM, RV>;
