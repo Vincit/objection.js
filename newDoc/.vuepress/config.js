@@ -60,7 +60,21 @@ module.exports = {
           'json-queries',
           'custom-id-column',
           'custom-validation',
-          'snake-case-to-camel-case-conversion'
+          'snake-case-to-camel-case-conversion',
+          'paging',
+          'subqueries',
+          'relation-subqueries',
+          'joins',
+          'returning-tricks',
+          'timestamps',
+          'custom-query-builder',
+          'multitenancy-using-multiple-databases',
+          'precedence-and-parentheses',
+          'default-values',
+          'composite-keys',
+          'error-handling',
+          'ternary-relationships',
+          'indexing-postgresql-jsonb-columns'
         ]
       }]
     }

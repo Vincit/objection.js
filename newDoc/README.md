@@ -19,6 +19,7 @@ What objection.js gives you:
  * **A way to [store complex documents](/guide/documents.html) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
  * **Easy to use [transactions](/guide/transactions.html)**
+ * **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**
  * **Optional [JSON schema](/guide/validation.html) validation**
 
 What objection.js **doesn't** give you:

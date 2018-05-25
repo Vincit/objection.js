@@ -2,7 +2,7 @@
 
 You may want to use snake_cased names in database and camelCased names in code. There are two ways to achieve this:
 
-1. _Conversion in knex using [knexSnakeCaseMappers](/api/objection.html#knexsnakecasemappers)_. When the conversion is done on knex level __everything__ is converted to camel case including properties and identifiers in [relationMappings](/api/model.html#static-relationmappings) and queries. When this method is used, objection has no idea the database is defined in snake case. All it ever sees is camel cased properties, identifiers and tables. This is because the conversion is done using knex's `postProcessResponse` and `wrapIdentifier` hooks which are ran in knex before objection receives the data.
+1. _Conversion in knex using [knexSnakeCaseMappers](/api/objection.html#knexsnakecasemappers)_. When the conversion is done on knex level __everything__ is converted to camel case including properties and identifiers in [relationMappings](/api/model.html#static-relationmappings) and queries. When this method is used, objection has no idea the database is defined in snake case. All it ever sees is camel cased properties, identifiers and tables. This is because the conversion is done using knex's `postProcessResponse` and `wrapIdentifier` hooks which are executed by knex before objection receives the data.
 
 2. _Conversion in objection using [snakeCaseMappers](/api/objection.html#snakecasemappers)_. When the conversion is done on objection level only database columns of the returned rows (model instances) are convered to camel case. You still need to use snake case in [relationMappings](/api/model.html#static-relationmappings) and queries. Note that [insert](/api/query-builder.html#insert), [patch](/api/query-builder.html#patch), [update](/api/query-builder.html#update) and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come from the client that also uses camel case.
 
@@ -22,7 +22,7 @@ exports.up = knex => {
 };
 
 exports.down = knex => {
-  return knex.schema.dropTableIfExists('persons');
+  return knex.schema.dropTableIfExists('persons_table');
 };
 ```
 
@@ -47,8 +47,8 @@ const knex = Knex({
 
 ...
 
-// When `knexSnakeCaseMappers` is used, you need to define tables
-// and relation mappings using camel casing.
+// When `knexSnakeCaseMappers` is used, you need to define tables,
+// columns and relation mappings using camelCase.
 class Person extends Model {
   static get tableName() {
     return 'personsTable';
@@ -83,8 +83,8 @@ await Person.query().where('firstName', 'Jennifer');
 ```js
 const { Model, snakeCaseMappers } = require('objection');
 
-// When `snakeCaseMappers` is used, you still define tables
-// and relation mappings using the database casing.
+// When `snakeCaseMappers` is used, you still define tables,
+// columns and relation mappings using snake_case.
 class Person extends Model {
   static get columnNameMappers() {
     return snakeCaseMappers();
