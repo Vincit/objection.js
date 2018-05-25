@@ -271,7 +271,7 @@ See the [API documentation](/api/query-builder.html#unrelate) of `unrelate` meth
 
 ## Eager loading
 
-You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder.html#eager) method. [eager](/api/query-builder.html#eager) takes a [relation expression](/api/types.html#relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
+You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder.html#eager) method. [eager](/api/query-builder.html#eager) takes a [relation expression](/api/types.html#type-relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
 
 Because the eager expressions are strings (there's also an optional [object notation](#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder.html) has the [allowEager](/api/query-builder.html#alloweager) method. [allowEager](/api/query-builder.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
 
@@ -630,7 +630,7 @@ await Person
 
 Arbitrary relation graphs can be upserted (insert + update + delete) using the [upsertGraph](/api/query-builder.html#upsertgraph) method. This is best explained using examples, so check them out.
 
-By default [upsertGraph](/api/query-builder.html#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. This functionality can be modified in many ways by providing [UpsertGraphOptions](/api/types.html#upsertgraphoptions) object as the second argument.
+By default [upsertGraph](/api/query-builder.html#upsertgraph) method updates the objects that have an id, inserts objects that don't have an id and deletes all objects that are not present. This functionality can be modified in many ways by providing [UpsertGraphOptions](/api/types.html#type-upsertgraphoptions) object as the second argument.
 
 The [upsertGraph](/api/query-builder.html#upsertgraph) method works a little different than the other update and patch methods. When using [upsertGraph](/api/query-builder.html#upsertgraph) any `where` or `having` methods are ignored. The models are updated based on the id properties in the graph. This is also clarified in the examples.
 
@@ -812,7 +812,7 @@ await Person
   }, options);
 ```
 
-`relate` and `unrelate` (and all other [options](/api/types.html#upsertgraphoptions) can also be lists of relation paths. In that case the option is only applied for the listed relations.
+`relate` and `unrelate` (and all other [options](/api/types.html#type-upsertgraphoptions) can also be lists of relation paths. In that case the option is only applied for the listed relations.
 
 ```js
 const options = {
@@ -867,4 +867,4 @@ await Person
   }, options);
 ```
 
-You can disable updates, inserts, deletes etc. for the whole [upsertGraph](/api/query-builder.html#upsertgraph) operation or for individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See [UpsertGraphOptions](/api/types.html#upsertgraphoptions) docs for more info.
+You can disable updates, inserts, deletes etc. for the whole [upsertGraph](/api/query-builder.html#upsertgraph) operation or for individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See [UpsertGraphOptions](/api/types.html#type-upsertgraphoptions) docs for more info.

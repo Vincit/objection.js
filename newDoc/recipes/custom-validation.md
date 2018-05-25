@@ -4,7 +4,7 @@ If you want to use the json schema validation but add some custom validation on 
 
 If you need to do validation on insert or update you can throw exceptions from the [$beforeInsert](/api/model.html#beforeinsert) and [$beforeUpdate](/api/model.html#beforeupdate) methods.
 
-If you don't want to use the built-in json schema validation, you can just ignore the [jsonSchema](/api/model.html#jsonschema) property. It is completely optional. If you want to use some other validation library you need to implement a custom [Validator](/api/types.html#validator) (see the example).
+If you don't want to use the built-in json schema validation, you can just ignore the [jsonSchema](/api/model.html#jsonschema) property. It is completely optional. If you want to use some other validation library you need to implement a custom [Validator](/api/types.html#class-validator) (see the example).
 
 ## Examples
 
@@ -46,7 +46,7 @@ class Model {
 }
 ```
 
-Replace JSON schema validation with any other validation scheme by implementing a custom [Validator](/api/types.html#validator):
+Replace JSON schema validation with any other validation scheme by implementing a custom [Validator](/api/types.html#class-validator):
 
 ```js
 // MyCustomValidator.js
