@@ -1,11 +1,14 @@
+---
+sidebarDepth: 2
+---
 
 # class Model
 
-> Subclasses of this class represent database tables.
+Subclasses of this class represent database tables.
 
 ## Overview
 
-#### Model Lifecycle
+### Model Lifecycle
 
 For the purposes of this explanation, let’s define three data layouts:
 
@@ -15,18 +18,18 @@ For the purposes of this explanation, let’s define three data layouts:
 
 Whenever data is converted from one layout to another, converter methods are called:
 
-1. `database` -> [`$parseDatabaseJson`](/TODO/$parseDatabsaeJson) -> `internal`
-1. `internal` -> [`$formatDatabaseJson`](/TODO/$formatDatabaseJson) -> `database`
-1. `external` -> [`$parseJson`](/TODO/$parseJson) -> `internal`
-1. `internal` -> [`$formatJson`](/TODO/$formatJson) -> `external`
+1. `database` -> [$parseDatabaseJson](#parseDatabsaeJson) -> `internal`
+1. `internal` -> [$formatDatabaseJson](#formatDatabaseJson) -> `database`
+1. `external` -> [$parseJson](#parseJson) -> `internal`
+1. `internal` -> [$formatJson](#formatJson) -> `external`
 
-So for example when the results of a query are read from the database the data goes through the [`$parseDatabaseJson`](/TODO/$parseDatabaseJson) method. When data is written to database it goes through the [`$formatDatabaseJson`](/TODO/$formatDatabaseJson) method.
+So for example when the results of a query are read from the database the data goes through the [$parseDatabaseJson](#parseDatabaseJson) method. When data is written to database it goes through the [$formatDatabaseJson](#formatDatabaseJson) method.
 
-Similarly when you give data for a query (for example [`query().insert(req.body))`](/TODO/insert) or create a model explicitly using [`Model.fromJson(obj)`](/TODO/fromjson) the [`$parseJson`](/TODO/$parseJson) method is invoked. When you call [`model.toJSON()`](/TODO/tojson) or [`model.$toJson()`](/TODO/tojson) the [`$formatJson`](/TODO/formatJson) is called.
+Similarly when you give data for a query (for example [query().insert(req.body)](/api/query-builder.html#insert) or create a model explicitly using [Model.fromJson(obj)](#static-fromjson) the [$parseJson](#parseJson) method is invoked. When you call [model.toJSON()](#tojson) or [model.$toJson()](#tojson) the [$formatJson](#formatJson) is called.
 
-Note: Most libraries like [express](http://expressjs.com/en/index.html) automatically call the [`toJSON`](/TODO/tojson/) method when you pass the model to methods like `response.json(model)`. You rarely need to call [`toJSON()`](/TODO/tojson) or [`$toJson()`](/TODO/$tojson) explicitly.
+Note: Most libraries like [express](http://expressjs.com/en/index.html) automatically call the [toJSON](#tojson/) method when you pass the model to methods like `response.json(model)`. You rarely need to call [toJSON()](#tojson) or [$toJson()](#tojson) explicitly.
 
-By overriding the lifecycle methods, you can have different layouts for the data in database and when exposed to the outside world. See [this recipe](/TODO/map-column-names-to-different-property-names) for an example usage of the lifecycle methods.
+By overriding the lifecycle methods, you can have different layouts for the data in database and when exposed to the outside world.
 
 All instance methods of models are prefixed with `$` letter so that they won’t overlap with database properties. All properties that start with `$` are also removed from `database` and `external` layouts.
 
@@ -67,9 +70,7 @@ Each model must set this.
 
 ##### Using ESNext static properties
 
-
 ### static jsonSchema
-
 
 ::: multi-language example begin
 ::: multi-language section ES2015 begin
@@ -89,6 +90,7 @@ class Person extends Model {
   }
 }
 ```
+
 ::: multi-language section ES2015 end
 ::: multi-language section ESNext begin
 
@@ -105,22 +107,23 @@ class Person extends Model {
   }
 }
 ```
+
 ::: multi-language section ESNext end
 ::: multi-language example end
 
 The optional schema against which the JSON is validated.
 
-The jsonSchema can be dynamically modified in the [`$beforeValidate`](/TODO/$beforevalidate) method.
+The jsonSchema can be dynamically modified in the [$beforeValidate](#beforevalidate) method.
 
 Must follow [JSON Schema](http://json-schema.org) specification. If null no validation is done.
 
 #### Read more
 
-* [`$beforeValidate`](/TODO/$beforevalidate)
-* [`$validate`](/TODO/$validate)
-* [`$afterValidate`](/TODO/$aftervalidate)
-* [`jsonAttributes`](/TODO/jsonattributes)
-* [custom validation recipe](/TODO/custom-validation)
+* [$beforeValidate](#beforevalidate)
+* [$validate](#validate)
+* [$afterValidate](#aftervalidate)
+* [jsonAttributes](#static-jsonattributes)
+* [custom validation recipe](/recipes/custom-validation.html)
 
 #### Examples
 
@@ -128,6 +131,7 @@ Must follow [JSON Schema](http://json-schema.org) specification. If null no vali
 
 ::: multi-language example begin
 ::: multi-language section ES2015 begin
+
 ```js
 class Person extends Model {
   static get jsonSchema() {
@@ -163,6 +167,7 @@ class Person extends Model {
 ```
 ::: multi-language section ES2015 end
 ::: multi-language section ESNext begin
+
 ```js
 class Person extends Model {
   static jsonSchema = {
@@ -198,13 +203,12 @@ class Person extends Model {
 ::: multi-language section ESNext end
 ::: multi-language example end
 
-## static relationMappings
+### static relationMappings
 
-<!-- static properties like this -->
-## static idColumn
+### static idColumn
 
-<!-- static methods like this -->
-## static query()
+### static query()
 
-<!-- Instance methods like this -->
-## $relatedQuery()
+## Instance methods
+
+### $relatedQuery()
