@@ -257,6 +257,11 @@ to camel case. You still need to use snake case in `relationMappings` and querie
 and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come
 from the client that also uses camel case.
 
+**NOTE**: Beware of using `knexSnakeCaseMappers` in migrations - Knex does not perform a conversion when using a
+property accessor for `max_batch` - a query result that tells Knex the latest migration batch number. If you use
+`knexSnakeCaseMappers` in migrations as shown in the examples, all of your migrations will default to a single batch.
+**Rolling back will cause your entire database to be rolled back at once.** See [#2644](https://github.com/tgriesser/knex/issues/2644)
+
 ## Paging
 
 ```js
