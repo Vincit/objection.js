@@ -253,7 +253,7 @@ describe('ManyToManyRelation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: join.through.modelClass: /not/a/path/to/a/model is an invalid file path to a model class'
+        "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'"
       );
     });
   });
