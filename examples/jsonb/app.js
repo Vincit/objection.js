@@ -80,8 +80,7 @@ var snakeMountain = {
   ]
 };
 
-db
-  .truncate()
+db.truncate()
   .then(function() {
     return db.Place.query().insertWithRelated([castleGreyskull, snakeMountain]);
   })

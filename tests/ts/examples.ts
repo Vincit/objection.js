@@ -623,8 +623,7 @@ Person.query()
   .insertAndFetch({ firstName: 'Jim' })
   .then((ea: Person) => {
     console.log(`Inserted ${p}`);
-    ea
-      .$loadRelated('movies')
+    ea.$loadRelated('movies')
       .relate<Movie>({ title: 'Total Recall' })
       .then((pWithMovie: Person) => {
         console.log(`Related ${pWithMovie}`);
@@ -886,7 +885,10 @@ const plugin2 = ({} as any) as objection.Plugin;
 };
 
 () => {
-  const plugin = objection.compose(plugin1, plugin2);
+  const plugin = objection.compose(
+    plugin1,
+    plugin2
+  );
   const BaseModel = objection.mixin(objection.Model, plugin);
   takesModelClass(BaseModel);
   takesModelSubclass(new BaseModel());
