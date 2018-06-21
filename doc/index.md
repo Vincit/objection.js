@@ -133,10 +133,14 @@ class Person extends Model {
 async function createSchema() {
   // Create database schema. You should use knex migration files to do this. We
   // create it here for simplicity.
-  await knex.schema.createTableIfNotExists('persons', table => {
-    table.increments('id').primary();
-    table.integer('parentId').references('persons.id');
-    table.string('firstName');
+  await knex.schema.hasTable('persons', (table) => {
+    if (!table) {
+      knex.schema.createTable('persons', (table) => {
+        table.increments('id').primary();
+        table.integer('parentId').references('persons.id');
+        table.string('firstName');
+      });
+    }
   });
 }
 
