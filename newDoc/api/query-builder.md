@@ -1,4 +1,4 @@
-# class QueryBuilder
+# `class` QueryBuilder
 
 ## insert()
 

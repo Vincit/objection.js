@@ -90,7 +90,7 @@
     "sqlite3": "^4.0.0",
     "typescript": "^2.7.1",
     "vue-tabs-component": "^1.4.0",
-    "vuepress": "^0.8.4"
+    "vuepress": "^0.11.0"
   },
   "nyc": {
     "description": "test coverage",
