@@ -681,8 +681,7 @@ Creates an update query.
 The update object is validated against the model's [`jsonSchema`](#jsonschema). If validation fails
 the Promise is rejected with a [`ValidationError`](#validationerror).
 
-This method is meant for updating _whole_ objects with all required properties. If you
-want to update a subset of properties use the [`patch`](#patch) method.
+Use `update` if you need to use the JSON schema's `required` property.  Otherwise, using the [`patch`](#patch) method is recommended.
 
 NOTE: The return value of the query will be the number of affected rows. If you want to update a single row and
 retrieve the updated row as a result, you may want to use the [`updateAndFetchById`](#updateandfetchbyid) method
