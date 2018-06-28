@@ -1184,7 +1184,7 @@ console.log('movie 50 is no longer related to person 123 through `movies` relati
 Removes a connection between two models.
 
 Doesn't delete the models. Only removes the connection. For ManyToMany relations this
-deletes the join column from the join table. For other relation types this sets the
+deletes the join row from the join table. For other relation types this sets the
 join columns to null.
 
 Note that, unlike for `relate`, you shouldn't pass arguments for the `unrelate` method.
