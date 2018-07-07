@@ -1,17 +1,17 @@
-const Knex = require('knex');
-const Model = require('../../').Model;
+const { Model, snakeCaseMappers } = require('../../');
 const sortBy = require('lodash/sortBy');
 const Promise = require('bluebird');
-const knexSnakeCaseMappers = require('../../').knexSnakeCaseMappers;
 const expect = require('chai').expect;
 
 module.exports = session => {
-  describe('knexSnakeCaseMappers', () => {
-    let knex;
-
+  describe('snakeCaseMappers', () => {
     class Person extends Model {
       static get tableName() {
         return 'person';
+      }
+
+      static get columnNameMappers() {
+        return snakeCaseMappers();
       }
 
       static get relationMappings() {
@@ -20,7 +20,7 @@ module.exports = session => {
             relation: Model.BelongsToOneRelation,
             modelClass: Person,
             join: {
-              from: 'person.parentId',
+              from: 'person.parent_id',
               to: 'person.id'
             }
           },
@@ -30,7 +30,7 @@ module.exports = session => {
             modelClass: Animal,
             join: {
               from: 'person.id',
-              to: 'animal.ownerId'
+              to: 'animal.owner_id'
             }
           },
 
@@ -40,8 +40,8 @@ module.exports = session => {
             join: {
               from: 'person.id',
               through: {
-                from: 'personMovie.personId',
-                to: 'personMovie.movieId'
+                from: 'person_movie.person_id',
+                to: 'person_movie.movie_id'
               },
               to: 'movie.id'
             }
@@ -54,17 +54,23 @@ module.exports = session => {
       static get tableName() {
         return 'animal';
       }
+
+      static get columnNameMappers() {
+        return snakeCaseMappers();
+      }
     }
 
     class Movie extends Model {
       static get tableName() {
         return 'movie';
       }
+
+      static get columnNameMappers() {
+        return snakeCaseMappers();
+      }
     }
 
     before(() => {
-      // Create schema with the knex instance that doesn't
-      // have identifier mapping configured.
       return session.knex.schema
         .dropTableIfExists('person_movie')
         .dropTableIfExists('animal')
@@ -90,93 +96,9 @@ module.exports = session => {
         });
     });
 
-    before(() => {
-      const config = Object.assign({}, session.opt.knexConfig, knexSnakeCaseMappers());
-      knex = Knex(config);
-    });
-
-    describe('schema', () => {
-      const table = 'snakeCaseTestTable';
-
-      before(() => {
-        return knex.schema.dropTableIfExists(table);
-      });
-
-      afterEach(() => {
-        return knex.schema.dropTableIfExists(table);
-      });
-
-      after(() => {
-        return knex.schema.dropTableIfExists(table);
-      });
-
-      it('createTable', () => {
-        return knex.schema
-          .createTable(table, table => {
-            table.increments('id');
-            table.string('firstName');
-          })
-          .then(() => {
-            return knex(table).insert({ id: 1, firstName: 'fooBar' });
-          })
-          .then(() => {
-            return knex(table);
-          })
-          .then(rows => {
-            expect(rows).to.eql([{ id: 1, firstName: 'fooBar' }]);
-
-            // Query with a knex without case mapping.
-            return session.knex('snake_case_test_table');
-          })
-          .then(rows => {
-            expect(rows).to.eql([{ id: 1, first_name: 'fooBar' }]);
-          });
-      });
-
-      if (session.isPostgres()) {
-        it('alter', () => {
-          return knex.schema
-            .createTable(table, table => {
-              table.increments('id');
-              table.string('firstName');
-            })
-            .then(() => {
-              return knex.schema.table(table, table => {
-                table.text('firstName').alter();
-              });
-            });
-        });
-      }
-
-      it('dropTable', () => {
-        return knex.schema
-          .createTable(table, table => {
-            table.increments('id');
-          })
-          .dropTableIfExists(table);
-      });
-
-      it('hasTable (true)', () => {
-        return knex.schema
-          .createTable(table, table => {
-            table.increments('id');
-          })
-          .hasTable(table)
-          .then(hasTable => {
-            expect(!!hasTable).to.equal(true);
-          });
-      });
-
-      it('hasTable (false)', () => {
-        return knex.schema.hasTable(table).then(hasTable => {
-          expect(hasTable).to.equal(false);
-        });
-      });
-    });
-
     describe('queries', () => {
       beforeEach(() => {
-        return Person.query(knex).insertGraph({
+        return Person.query(session.knex).insertGraph({
           firstName: 'Seppo',
 
           parent: {
@@ -208,16 +130,16 @@ module.exports = session => {
       });
 
       afterEach(() => {
-        return ['animal', 'personMovie', 'movie', 'person'].reduce((promise, table) => {
-          return promise.then(() => knex(table).delete());
+        return ['animal', 'person_movie', 'movie', 'person'].reduce((promise, table) => {
+          return promise.then(() => session.knex(table).delete());
         }, Promise.resolve());
       });
 
       it('$relatedQuery', () => {
-        return Person.query(knex)
-          .findOne({ firstName: 'Seppo' })
+        return Person.query(session.knex)
+          .findOne({ first_name: 'Seppo' })
           .then(model => {
-            return model.$relatedQuery('pets', knex).orderBy('animalName');
+            return model.$relatedQuery('pets', session.knex).orderBy('animal_name');
           })
           .then(pets => {
             expect(pets).to.containSubset([
@@ -234,13 +156,13 @@ module.exports = session => {
       [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm].forEach(
         eagerAlgo => {
           it(`eager (${eagerAlgo.name})`, () => {
-            return Person.query(knex)
-              .select('person.firstName as rootFirstName')
-              .modifyEager('parent', qb => qb.select('firstName as parentFirstName'))
-              .modifyEager('parent.parent', qb => qb.select('firstName as grandParentFirstName'))
+            return Person.query(session.knex)
+              .select('person.first_name as rootFirstName')
+              .modifyEager('parent', qb => qb.select('first_name as parentFirstName'))
+              .modifyEager('parent.parent', qb => qb.select('first_name as grandParentFirstName'))
               .eager('[parent.parent, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
-              .orderBy('person.firstName')
+              .orderBy('person.first_name')
               .then(people => {
                 expect(people.length).to.equal(3);
                 expect(people).to.containSubset([
@@ -297,18 +219,20 @@ module.exports = session => {
         .dropTableIfExists('movie')
         .dropTableIfExists('person');
     });
-
-    after(() => {
-      return knex.destroy();
-    });
   });
 
-  describe('knexSnakeCaseMappers uppercase = true', () => {
-    let knex;
-
+  describe('snakeCaseMappers uppercase = true', () => {
     class Person extends Model {
       static get tableName() {
-        return 'person';
+        return 'PERSON';
+      }
+
+      static get idColumn() {
+        return 'ID';
+      }
+
+      static get columnNameMappers() {
+        return snakeCaseMappers({ upperCase: true });
       }
 
       static get relationMappings() {
@@ -317,8 +241,8 @@ module.exports = session => {
             relation: Model.BelongsToOneRelation,
             modelClass: Person,
             join: {
-              from: 'person.parentId',
-              to: 'person.id'
+              from: 'PERSON.PARENT_ID',
+              to: 'PERSON.ID'
             }
           },
 
@@ -326,8 +250,8 @@ module.exports = session => {
             relation: Model.HasManyRelation,
             modelClass: Animal,
             join: {
-              from: 'person.id',
-              to: 'animal.ownerId'
+              from: 'PERSON.ID',
+              to: 'ANIMAL.OWNER_ID'
             }
           },
 
@@ -335,12 +259,12 @@ module.exports = session => {
             relation: Model.ManyToManyRelation,
             modelClass: Movie,
             join: {
-              from: 'person.id',
+              from: 'PERSON.ID',
               through: {
-                from: 'personMovie.personId',
-                to: 'personMovie.movieId'
+                from: 'PERSON_MOVIE.PERSON_ID',
+                to: 'PERSON_MOVIE.MOVIE_ID'
               },
-              to: 'movie.id'
+              to: 'MOVIE.ID'
             }
           }
         };
@@ -349,19 +273,33 @@ module.exports = session => {
 
     class Animal extends Model {
       static get tableName() {
-        return 'animal';
+        return 'ANIMAL';
+      }
+
+      static get idColumn() {
+        return 'ID';
+      }
+
+      static get columnNameMappers() {
+        return snakeCaseMappers({ upperCase: true });
       }
     }
 
     class Movie extends Model {
       static get tableName() {
-        return 'movie';
+        return 'MOVIE';
+      }
+
+      static get idColumn() {
+        return 'ID';
+      }
+
+      static get columnNameMappers() {
+        return snakeCaseMappers({ upperCase: true });
       }
     }
 
     before(() => {
-      // Create schema with the knex instance that doesn't
-      // have identifier mapping configured.
       return session.knex.schema
         .dropTableIfExists('PERSON_MOVIE')
         .dropTableIfExists('ANIMAL')
@@ -387,97 +325,9 @@ module.exports = session => {
         });
     });
 
-    before(() => {
-      const config = Object.assign(
-        {},
-        session.opt.knexConfig,
-        knexSnakeCaseMappers({ upperCase: true })
-      );
-      knex = Knex(config);
-    });
-
-    describe('schema', () => {
-      const table = 'snakeCaseTestTable';
-
-      before(() => {
-        return knex.schema.dropTableIfExists(table);
-      });
-
-      afterEach(() => {
-        return knex.schema.dropTableIfExists(table);
-      });
-
-      after(() => {
-        return knex.schema.dropTableIfExists(table);
-      });
-
-      it('createTable', () => {
-        return knex.schema
-          .createTable(table, table => {
-            table.increments('id');
-            table.string('firstName');
-          })
-          .then(() => {
-            return knex(table).insert({ id: 1, firstName: 'fooBar' });
-          })
-          .then(() => {
-            return knex(table);
-          })
-          .then(rows => {
-            expect(rows).to.eql([{ id: 1, firstName: 'fooBar' }]);
-
-            // Query with a knex without case mapping.
-            return session.knex('SNAKE_CASE_TEST_TABLE');
-          })
-          .then(rows => {
-            expect(rows).to.eql([{ ID: 1, FIRST_NAME: 'fooBar' }]);
-          });
-      });
-
-      if (session.isPostgres()) {
-        it('alter', () => {
-          return knex.schema
-            .createTable(table, table => {
-              table.increments('id');
-              table.string('firstName');
-            })
-            .then(() => {
-              return knex.schema.table(table, table => {
-                table.text('firstName').alter();
-              });
-            });
-        });
-      }
-
-      it('dropTable', () => {
-        return knex.schema
-          .createTable(table, table => {
-            table.increments('id');
-          })
-          .dropTableIfExists(table);
-      });
-
-      it('hasTable (true)', () => {
-        return knex.schema
-          .createTable(table, table => {
-            table.increments('id');
-          })
-          .hasTable(table)
-          .then(hasTable => {
-            expect(!!hasTable).to.equal(true);
-          });
-      });
-
-      it('hasTable (false)', () => {
-        return knex.schema.hasTable(table).then(hasTable => {
-          expect(hasTable).to.equal(false);
-        });
-      });
-    });
-
     describe('queries', () => {
       beforeEach(() => {
-        return Person.query(knex).insertGraph({
+        return Person.query(session.knex).insertGraph({
           firstName: 'Seppo',
 
           parent: {
@@ -509,16 +359,16 @@ module.exports = session => {
       });
 
       afterEach(() => {
-        return ['animal', 'personMovie', 'movie', 'person'].reduce((promise, table) => {
-          return promise.then(() => knex(table).delete());
+        return ['ANIMAL', 'PERSON_MOVIE', 'MOVIE', 'PERSON'].reduce((promise, table) => {
+          return promise.then(() => session.knex(table).delete());
         }, Promise.resolve());
       });
 
       it('$relatedQuery', () => {
-        return Person.query(knex)
-          .findOne({ firstName: 'Seppo' })
+        return Person.query(session.knex)
+          .findOne({ FIRST_NAME: 'Seppo' })
           .then(model => {
-            return model.$relatedQuery('pets', knex).orderBy('animalName');
+            return model.$relatedQuery('pets', session.knex).orderBy('ANIMAL_NAME');
           })
           .then(pets => {
             expect(pets).to.containSubset([
@@ -535,13 +385,15 @@ module.exports = session => {
       [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm].forEach(
         eagerAlgo => {
           it(`eager (${eagerAlgo.name})`, () => {
-            return Person.query(knex)
-              .select('person.firstName as rootFirstName')
-              .modifyEager('parent', qb => qb.select('firstName as parentFirstName'))
-              .modifyEager('parent.parent', qb => qb.select('firstName as grandParentFirstName'))
+            return Person.query(session.knex)
+              .select('PERSON.FIRST_NAME as rootFirstName')
+              .modifyEager('parent', qb => qb.select('FIRST_NAME as parentFirstName'))
+              .modifyEager('parent.parent', qb =>
+                qb.select('FIRST_NAME as GRAND_PARENT_FIRST_NAME')
+              )
               .eager('[parent.parent, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
-              .orderBy('person.firstName')
+              .orderBy('PERSON.FIRST_NAME')
               .then(people => {
                 expect(people.length).to.equal(3);
                 expect(people).to.containSubset([
@@ -593,14 +445,10 @@ module.exports = session => {
 
     after(() => {
       return session.knex.schema
-        .dropTableIfExists('person_movie')
-        .dropTableIfExists('animal')
-        .dropTableIfExists('movie')
-        .dropTableIfExists('person');
-    });
-
-    after(() => {
-      return knex.destroy();
+        .dropTableIfExists('PERSON_MOVIe')
+        .dropTableIfExists('ANIMAL')
+        .dropTableIfExists('MOVIE')
+        .dropTableIfExists('PERSON');
     });
   });
 };

@@ -114,6 +114,26 @@ const knex = Knex({
 });
 ```
 
+> If your columns are UPPER_SNAKE_CASE
+
+```js
+const { knexSnakeCaseMappers } = require('objection');
+const Knex = require('knex');
+
+const knex = Knex({
+  client: 'postgres',
+
+  connection: {
+    host: '127.0.0.1',
+    user: 'objection',
+    database: 'objection_test'
+  }
+
+  // Merge `postProcessResponse` and `wrapIdentifier` mappers.
+  ...knexSnakeCaseMappers({ upperCase: true })
+});
+```
+
 > For older nodes:
 
 ```js
@@ -131,7 +151,11 @@ const knex = Knex(Object.assign({
 }, knexSnakeCaseMappers()));
 ```
 
-Documented [here](#snake-case-to-camel-case-conversion).
+Documented [here](#snake-case-to-camel-case-conversion). The `knexSnakeCaseMappers` function accepts an options object `knexSnakeCaseMappers({ upperCase: true })`. The available options are:
+
+Option|Type|Description
+---------|-------|------------------------
+upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
 
 <h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
 
@@ -199,7 +223,7 @@ const knex = Knex({
 
 ```js
 const Knex = require('knex');
-const knexSnakeCaseMappers = require('objection').knexSnakeCaseMappers;
+const knexIdentifierMapping = require('objection').knexIdentifierMapping;
 
 const knex = Knex(Object.assign({
   client: 'postgres',
@@ -243,7 +267,11 @@ class Person extends Model {
 }
 ```
 
-Documented [here](#snake-case-to-camel-case-conversion).
+Documented [here](#snake-case-to-camel-case-conversion). . The `snakeCaseMappers` function accepts an options object `snakeCaseMappers({ upperCase: true })`. The available options are:
+
+Option|Type|Description
+---------|-------|------------------------
+upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
 
 
 
@@ -5324,6 +5352,18 @@ const { Model, snakeCaseMappers } = require('objection');
 class Person extends Model {
   static get columnNameMappers() {
     return snakeCaseMappers();
+  }
+}
+```
+
+> If your columns are UPPER_SNAKE_CASE:
+
+```js
+const { Model, snakeCaseMappers } = require('objection');
+
+class Person extends Model {
+  static get columnNameMappers() {
+    return snakeCaseMappers({ upperCase: true });
   }
 }
 ```

@@ -76,6 +76,7 @@ describe('integration tests', () => {
       require('./viewsAndAliases')(session);
       require('./schema')(session);
       require('./knexSnakeCase')(session);
+      require('./snakeCase')(session);
       require('./knexIdentifierMapping')(session);
 
       if (session.isPostgres()) {
