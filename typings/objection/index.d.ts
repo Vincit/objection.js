@@ -212,10 +212,20 @@ declare namespace Objection {
     // TODO should this be something other than a tagging interface?
   }
 
+  export type JoinOperation = 'join'
+    | 'innerJoin'
+    | 'outerJoin'
+    | 'leftJoin'
+    | 'leftOuterJoin'
+    | 'rightJoin'
+    | 'rightOuterJoin'
+    | 'fullOuterJoin'
+
   export interface EagerOptions {
     minimize?: boolean;
     separator?: string;
-    aliases?: string[];
+    aliases?: { [relation: string]: string }
+    joinOperation?: JoinOperation;
   }
 
   export interface UpsertOptions {
