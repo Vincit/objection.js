@@ -2,7 +2,7 @@
 sidebarDepth: 2
 ---
 
-# class Model
+# `class` Model
 
 Subclasses of this class represent database tables.
 

@@ -41,7 +41,8 @@ const knex = Knex({
     database: 'objection_test'
   }
 
-  // Merge `postProcessResponse` and `wrapIdentifier` mappers.
+  // If your columns are UPPER_SNAKE_CASE you can use
+  // knexSnakeCaseMappers({ upperCase: true })
   ...knexSnakeCaseMappers()
 });
 
@@ -87,6 +88,8 @@ const { Model, snakeCaseMappers } = require('objection');
 // columns and relation mappings using snake_case.
 class Person extends Model {
   static get columnNameMappers() {
+    // If your columns are UPPER_SNAKE_CASE you can
+    // use snakeCaseMappers({ upperCase: true })
     return snakeCaseMappers();
   }
 

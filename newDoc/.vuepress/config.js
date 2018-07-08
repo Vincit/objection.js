@@ -14,7 +14,7 @@ module.exports = {
 
       {
         text: 'API Reference',
-        link: '/api/model',
+        link: '/api/',
       },
 
       {
@@ -77,7 +77,7 @@ module.exports = {
           'indexing-postgresql-jsonb-columns'
         ]
       }]
-    }
+     }
   },
 
   markdown: {

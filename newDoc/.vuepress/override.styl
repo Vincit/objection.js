@@ -1,4 +1,8 @@
-$backgroundColor = #ffffff;
+$backgroundColor = #ffffff
+$accentColor = #3eaf7c
+$textColor = #2c3e50
+$borderColor = #eaecef
+$codeBgColor = #282c34
 
 .tabbed-example
     margin 1em 0
@@ -40,12 +44,10 @@ $backgroundColor = #ffffff;
         border solid 1px $borderColor
         border-radius 3px 3px 0 0
         margin-right .5em
-        transform translateY(2px)
         transition transform .3s ease
         &.is-active
             border-bottom solid 1px $backgroundColor
             z-index 2
-            transform translateY(0)
 
 .tabbed-example-tab-a
     align-items center
