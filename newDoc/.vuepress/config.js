@@ -48,6 +48,7 @@ module.exports = {
           'objection',
           'model',
           'query-builder',
+          'relation',
           'types'
         ]
       }],
