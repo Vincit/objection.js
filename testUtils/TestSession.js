@@ -199,20 +199,28 @@ class TestSession {
       .then(() => knex.schema.dropTableIfExists('Model1Model2'))
       .then(() => knex.schema.dropTableIfExists('Model1Model2One'))
       .then(() => knex.schema.dropTableIfExists('Model2Model3ManyToMany'))
-      .then(() => knex.schema.dropTableIfExists('Model1'))
       .then(() => knex.schema.dropTableIfExists('model2'))
+      .then(() => knex.schema.dropTableIfExists('Model1'))
       .then(() => knex.schema.dropTableIfExists('model3'))
       .then(() => {
         return knex.schema
           .createTable('Model1', table => {
             table.increments('id').primary();
-            table.integer('model1Id').index();
+            table.integer('model1Id')
+              .index()
+              .unsigned()
+              .references('Model1.id')
+              .onDelete('SET NULL');
             table.string('model1Prop1');
             table.integer('model1Prop2');
           })
           .createTable('model2', table => {
             table.increments('id_col').primary();
-            table.integer('model1_id').index();
+            table.integer('model1_id')
+              .index()
+              .unsigned()
+              .references('Model1.id')
+              .onDelete('SET NULL');
             table.string('model2_prop1');
             table.integer('model2_prop2');
           })
@@ -308,8 +316,8 @@ class TestSession {
         .delete()
         .then(() => trx('Model1Model2One').delete())
         .then(() => trx('Model2Model3ManyToMany').delete())
-        .then(() => trx('Model1').delete())
         .then(() => trx('model2').delete())
+        .then(() => trx('Model1').delete())
         .then(() => trx('model3').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {

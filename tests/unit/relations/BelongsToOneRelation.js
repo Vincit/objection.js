@@ -647,9 +647,6 @@ describe('BelongsToOneRelation', () => {
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql({});
-
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
           'delete from "RelatedModel" where "RelatedModel"."rid" in (2)'
         );
@@ -668,9 +665,6 @@ describe('BelongsToOneRelation', () => {
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
         expect(result).to.eql({});
-
-        expect(executedQueries[0]).to.equal(builder.toString());
-        expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
           'delete from "RelatedModel" where ("RelatedModel"."aid", "RelatedModel"."bid") in ((11, 22))'
         );

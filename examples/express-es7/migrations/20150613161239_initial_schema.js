@@ -6,7 +6,8 @@ exports.up = knex => {
         .integer('parentId')
         .unsigned()
         .references('id')
-        .inTable('persons');
+        .inTable('persons')
+        .onDelete('SET NULL');
       table.string('firstName');
       table.string('lastName');
       table.integer('age');
@@ -22,7 +23,8 @@ exports.up = knex => {
         .integer('ownerId')
         .unsigned()
         .references('id')
-        .inTable('persons');
+        .inTable('persons')
+        .onDelete('SET NULL');
       table.string('name');
       table.string('species');
     })

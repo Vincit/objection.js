@@ -17,6 +17,11 @@ describe('integration tests', () => {
       useNullAsDefault: true,
       connection: {
         filename: path.join(os.tmpdir(), 'objection_test.db')
+      },
+      pool: {
+        afterCreate: (conn, cb) => {
+          conn.run('PRAGMA foreign_keys = ON', cb);
+        }
       }
     },
     {

@@ -1843,6 +1843,30 @@ module.exports = session => {
       });
     });
 
+    it('should delete belongsToOne relation and succesfully update parent after that', () => {
+      // This tests that the parent update doesn't try to set
+      // the foreign key back.
+      const upsert = {
+        id: 2,
+        model1Prop1: 'update',
+        model1Relation1: null
+      };
+
+      return Model1.query(session.knex)
+        .upsertGraph(upsert)
+        .then(() => {
+          return Model1.query(session.knex)
+            .findById(2)
+            .eager('model1Relation1');
+        })
+        .then(result => {
+          return Model1.query(session.knex).findById(3);
+        })
+        .then(result => {
+          expect(result).to.equal(undefined);
+        });
+    });
+
     describe('relate with children => upsertGraph recursively called', () => {
       beforeEach(() => {
         population = [
