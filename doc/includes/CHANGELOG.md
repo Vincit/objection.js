@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.11
+
+### What's new
+
+  * fix [#919](https://github.com/Vincit/objection.js/issues/919)
+  * fix [#964](https://github.com/Vincit/objection.js/issues/964)
+  * Add `aliasFor` method to public API
+  * Prevent bluebird warnings
+  * UPPER_SNAKE_CASE support for `snakeCaseMappers` and `knexSnakeCaseMappers`
+
+## 1.1.10
+
+### What's new
+
+  * Nothing! the npm release was somehow borked. This was just a release of 1.1.9.
+
 ## 1.1.9
 
 ### What's new
