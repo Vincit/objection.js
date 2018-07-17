@@ -150,14 +150,18 @@ npm start
   <span class="p">}</span>
 <span class="p">}</span>
 
+
+<span class="c1">// Create database schema. You should use knex migration files to do this.</span>
+<span class="c1">// We create it here for simplicity.</span>
 <span class="nx">async</span> <span class="kd">function</span> <span class="nx">createSchema</span><span class="p">()</span> <span class="p">{</span>
-  <span class="c1">// Create database schema. You should use knex migration files to do this. We</span>
-  <span class="c1">// create it here for simplicity.</span>
-  <span class="nx">await</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTableIfNotExists</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">,</span> <span class="nx">table</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
-    <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">).</span><span class="nx">references</span><span class="p">(</span><span class="s1">'persons.id'</span><span class="p">);</span>
-    <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">);</span>
-  <span class="p">});</span>
+  <span class="kr">const</span> <span class="nx">hasTable</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">hasTable</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">hasTable</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'persons'</span><span class="p">,</span> <span class="p">(</span><span class="nx">table</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">integer</span><span class="p">(</span><span class="s1">'parentId'</span><span class="p">).</span><span class="nx">references</span><span class="p">(</span><span class="s1">'persons.id'</span><span class="p">);</span>
+      <span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="nx">async</span> <span class="kd">function</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
@@ -1609,7 +1613,7 @@ as their last argument.</p>
 <p>The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise
 is rejected or an error is thrown inside the callback the transaction is rolled back.</p>
 
-<p>Another way to start a trasnsaction is the <code class="prettyprint">transaction.start</code> function. See the examples.</p>
+<p>Another way to start a transaction is the <code class="prettyprint">transaction.start</code> function. See the examples.</p>
 
 <p>Transactions in javascript are a bit of a PITA if you are used to threaded frameworks and languages like java. In those
 a single chain of operations (for example a single request) is handled in a dedicated thread. Transactions are usually
@@ -2203,6 +2207,8 @@ It is completely optional. If you want to use some other validation library you 
   <span class="p">}</span>
 
   <span class="c1">// Merge `postProcessResponse` and `wrapIdentifier` mappers.</span>
+  <span class="c1">// If your columns are UPPER_SNAKE_CASE you can use</span>
+  <span class="c1">// knexSnakeCaseMappers({ upperCase: true })</span>
   <span class="p">...</span><span class="nx">knexSnakeCaseMappers</span><span class="p">()</span>
 <span class="p">});</span>
 </code></pre>
@@ -2213,6 +2219,8 @@ It is completely optional. If you want to use some other validation library you 
 
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">columnNameMappers</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// If your columns are UPPER_SNAKE_CASE you can</span>
+    <span class="c1">// use snakeCaseMappers({ upperCase: true })</span>
     <span class="k">return</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -2238,6 +2246,11 @@ to camel case. You still need to use snake case in <code class="prettyprint">rel
 and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come
 from the client that also uses camel case.</p></li>
 </ol>
+
+<p><strong>NOTE</strong>: Beware of using <code class="prettyprint">knexSnakeCaseMappers</code> in migrations - Knex does not perform a conversion when using a
+property accessor for <code class="prettyprint">max_batch</code> - a query result that tells Knex the latest migration batch number. If you use
+<code class="prettyprint">knexSnakeCaseMappers</code> in migrations as shown in the examples, all of your migrations will default to a single batch.
+<strong>Rolling back will cause your entire database to be rolled back at once.</strong> See <a href="https://github.com/tgriesser/knex/issues/2644">#2644</a></p>
 
 <h2 id="paging">Paging</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
@@ -3177,6 +3190,25 @@ documented elsewhere in the API docs.</p>
 <span class="p">});</span>
 </code></pre>
 <blockquote>
+<p>If your columns are UPPER_SNAKE_CASE</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexSnakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+<span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
+
+<span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">({</span>
+  <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
+
+  <span class="na">connection</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">host</span><span class="p">:</span> <span class="s1">'127.0.0.1'</span><span class="p">,</span>
+    <span class="na">user</span><span class="p">:</span> <span class="s1">'objection'</span><span class="p">,</span>
+    <span class="na">database</span><span class="p">:</span> <span class="s1">'objection_test'</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Merge `postProcessResponse` and `wrapIdentifier` mappers.</span>
+  <span class="p">...</span><span class="nx">knexSnakeCaseMappers</span><span class="p">({</span> <span class="na">upperCase</span><span class="p">:</span> <span class="kc">true</span> <span class="p">})</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
 <p>For older nodes:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
@@ -3192,7 +3224,21 @@ documented elsewhere in the API docs.</p>
   <span class="p">}</span>
 <span class="p">},</span> <span class="nx">knexSnakeCaseMappers</span><span class="p">()));</span>
 </code></pre>
-<p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>.</p>
+<p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>. The <code class="prettyprint">knexSnakeCaseMappers</code> function accepts an options object <code class="prettyprint">knexSnakeCaseMappers({ upperCase: true })</code>. The available options are:</p>
+
+<table><thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>upperCase</td>
+<td>boolean</td>
+<td>Set to <code class="prettyprint">true</code> if your columns are UPPER_SNAKE_CASED.</td>
+</tr>
+</tbody></table>
 
 <h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexIdentifierMapping</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
@@ -3256,7 +3302,7 @@ and use that to create the mapping object.</p>
 <p>For older nodes:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
-<span class="kr">const</span> <span class="nx">knexSnakeCaseMappers</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">knexSnakeCaseMappers</span><span class="p">;</span>
+<span class="kr">const</span> <span class="nx">knexIdentifierMapping</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">knexIdentifierMapping</span><span class="p">;</span>
 
 <span class="kr">const</span> <span class="nx">knex</span> <span class="o">=</span> <span class="nx">Knex</span><span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">({</span>
   <span class="na">client</span><span class="p">:</span> <span class="s1">'postgres'</span><span class="p">,</span>
@@ -3295,7 +3341,21 @@ and <code class="prettyprint">anotherProp</code> in the code.</p>
   <span class="kr">static</span> <span class="nx">columnNameMappers</span> <span class="o">=</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
 <span class="p">}</span>
 </code></pre>
-<p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>.</p>
+<p>Documented <a href="#snake-case-to-camel-case-conversion">here</a>. . The <code class="prettyprint">snakeCaseMappers</code> function accepts an options object <code class="prettyprint">snakeCaseMappers({ upperCase: true })</code>. The available options are:</p>
+
+<table><thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>upperCase</td>
+<td>boolean</td>
+<td>Set to <code class="prettyprint">true</code> if your columns are UPPER_SNAKE_CASED.</td>
+</tr>
+</tbody></table>
 
 <h2 id="querybuilder">QueryBuilder</h2>
 
@@ -3743,8 +3803,7 @@ to get the same result without an additional query. See <a href="#postgresql-quo
 <p>The update object is validated against the model&rsquo;s <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a>. If validation fails
 the Promise is rejected with a <a href="#validationerror"><code class="prettyprint">ValidationError</code></a>.</p>
 
-<p>This method is meant for updating <em>whole</em> objects with all required properties. If you
-want to update a subset of properties use the <a href="#patch"><code class="prettyprint">patch</code></a> method.</p>
+<p>Use <code class="prettyprint">update</code> if you need to use the JSON schema&rsquo;s <code class="prettyprint">required</code> property.  Otherwise, using the <a href="#patch"><code class="prettyprint">patch</code></a> method is recommended.</p>
 
 <p>NOTE: The return value of the query will be the number of affected rows. If you want to update a single row and
 retrieve the updated row as a result, you may want to use the <a href="#updateandfetchbyid"><code class="prettyprint">updateAndFetchById</code></a> method
@@ -4279,6 +4338,8 @@ written to the join table. The <code class="prettyprint">someExtra</code> field 
 <p>This method doesn&rsquo;t create a new instance but only updates the foreign keys and in
 the case of many-to-many relation, creates a join row to the join table.</p>
 
+<p>It does not affect preexisting relations.</p>
+
 <p>On Postgres multiple models can be related by giving an array of identifiers.</p>
 
 <h5 id="arguments">Arguments</h5>
@@ -4326,7 +4387,7 @@ the case of many-to-many relation, creates a join row to the join table.</p>
 <p>Removes a connection between two models.</p>
 
 <p>Doesn&rsquo;t delete the models. Only removes the connection. For ManyToMany relations this
-deletes the join column from the join table. For other relation types this sets the
+deletes the join row from the join table. For other relation types this sets the
 join columns to null.</p>
 
 <p>Note that, unlike for <code class="prettyprint">relate</code>, you shouldn&rsquo;t pass arguments for the <code class="prettyprint">unrelate</code> method.
@@ -4369,6 +4430,67 @@ Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">del
 <td>alias</td>
 <td>string</td>
 <td>Table alias for the query.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td><code class="prettyprint">this</code> query builder for chaining.</td>
+</tr>
+</tbody></table>
+
+<h4 id="aliasfor">aliasFor</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">aliasFor</span><span class="p">(</span><span class="nx">tableNameOrModelClass</span><span class="p">,</span> <span class="nx">alias</span><span class="p">);</span>
+</code></pre>
+<p>TODO: Doesn&rsquo;t work with joinRelation
+<code class="prettyprint">js
+// This qurey joinRelation to join a many-to-many relation which also joins
+// the join table `persons_movies`. We specify that the `persons_movies` table
+// should be called `pm` instead of the default `movies_join`.
+await person
+  .query()
+  .aliasFor(&#39;persons_movies&#39;, &#39;pm&#39;)
+  .joinRelation(&#39;movies&#39;)
+  .where(&#39;pm.someProp&#39;, 100)
+</code></p>
+
+<blockquote>
+<p>Model class can be used instead of table name</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">aliasFor</span><span class="p">(</span><span class="nx">Movie</span><span class="p">,</span> <span class="s1">'m'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'movies'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'m.name'</span><span class="p">,</span> <span class="s1">'The Room'</span><span class="p">)</span>
+</code></pre>
+<p>Give an alias for any table in the query.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>tableNameOrModelClass</td>
+<td>strig&#124;ModelClass</td>
+<td>The table to alias.</td>
+</tr>
+<tr>
+<td>alias</td>
+<td>string</td>
+<td>The alias.</td>
 </tr>
 </tbody></table>
 
@@ -9317,6 +9439,17 @@ as single database rows.</p>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
+<p>If your columns are UPPER_SNAKE_CASE:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">columnNameMappers</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">snakeCaseMappers</span><span class="p">({</span> <span class="na">upperCase</span><span class="p">:</span> <span class="kc">true</span> <span class="p">});</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
 <p>ESNext</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
@@ -12677,7 +12810,7 @@ from the outside world, like model instances (or POJOs), relation expressions ob
 <tr>
 <td>update</td>
 <td>boolean&#124;string[]</td>
-<td>If true, update operations are performaed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples <a href="#graph-upserts">here</a>.</td>
+<td>If true, update operations are performed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples <a href="#graph-upserts">here</a>.</td>
 </tr>
 <tr>
 <td>noInsert</td>
@@ -13077,6 +13210,26 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-2-0">1.2.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/919">#919</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/964">#964</a></li>
+<li>Add <code class="prettyprint">aliasFor</code> method to public API</li>
+<li>Prevent bluebird warnings</li>
+<li>UPPER_SNAKE_CASE support for <code class="prettyprint">snakeCaseMappers</code> and <code class="prettyprint">knexSnakeCaseMappers</code></li>
+</ul>
+
+<h2 id="1-1-10">1.1.10</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Nothing! the npm release was somehow borked. This was just a release of 1.1.9.</li>
+</ul>
 
 <h2 id="1-1-9">1.1.9</h2>
 

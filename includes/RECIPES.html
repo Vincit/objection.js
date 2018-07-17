@@ -232,6 +232,8 @@ It is completely optional. If you want to use some other validation library you 
   <span class="p">}</span>
 
   <span class="c1">// Merge `postProcessResponse` and `wrapIdentifier` mappers.</span>
+  <span class="c1">// If your columns are UPPER_SNAKE_CASE you can use</span>
+  <span class="c1">// knexSnakeCaseMappers({ upperCase: true })</span>
   <span class="p">...</span><span class="nx">knexSnakeCaseMappers</span><span class="p">()</span>
 <span class="p">});</span>
 </code></pre>
@@ -242,6 +244,8 @@ It is completely optional. If you want to use some other validation library you 
 
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">columnNameMappers</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// If your columns are UPPER_SNAKE_CASE you can</span>
+    <span class="c1">// use snakeCaseMappers({ upperCase: true })</span>
     <span class="k">return</span> <span class="nx">snakeCaseMappers</span><span class="p">();</span>
   <span class="p">}</span>
 <span class="p">}</span>
@@ -267,6 +271,11 @@ to camel case. You still need to use snake case in <code class="prettyprint">rel
 and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come
 from the client that also uses camel case.</p></li>
 </ol>
+
+<p><strong>NOTE</strong>: Beware of using <code class="prettyprint">knexSnakeCaseMappers</code> in migrations - Knex does not perform a conversion when using a
+property accessor for <code class="prettyprint">max_batch</code> - a query result that tells Knex the latest migration batch number. If you use
+<code class="prettyprint">knexSnakeCaseMappers</code> in migrations as shown in the examples, all of your migrations will default to a single batch.
+<strong>Rolling back will cause your entire database to be rolled back at once.</strong> See <a href="https://github.com/tgriesser/knex/issues/2644">#2644</a></p>
 
 <h2 id="paging">Paging</h2>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
