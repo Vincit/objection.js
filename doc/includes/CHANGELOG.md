@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.11
+## 1.2.0
 
 ### What's new
 
