@@ -36,13 +36,13 @@ describe('BelongsToOneRelation', () => {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = class extends Model {
+    OwnerModel = class OwnerModel extends Model {
       static get tableName() {
         return 'OwnerModel';
       }
     };
 
-    RelatedModel = class extends Model {
+    RelatedModel = class RelatedModel extends Model {
       static get tableName() {
         return 'RelatedModel';
       }
@@ -940,7 +940,7 @@ describe('BelongsToOneRelation', () => {
       });
     });
 
-    it('should throw is a `through` object is given', () => {
+    it('should throw if a `through` object is given', () => {
       expect(() => {
         relation = new BelongsToOneRelation('nameOfOurRelation', OwnerModel);
 

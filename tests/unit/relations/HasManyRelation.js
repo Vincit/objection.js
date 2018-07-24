@@ -36,13 +36,13 @@ describe('HasManyRelation', () => {
     mockKnexQueryResults = [];
     executedQueries = [];
 
-    OwnerModel = class extends Model {
+    OwnerModel = class OwnerModel extends Model {
       static get tableName() {
         return 'OwnerModel';
       }
     };
 
-    RelatedModel = class extends Model {
+    RelatedModel = class RelatedModel extends Model {
       static get tableName() {
         return 'RelatedModel';
       }

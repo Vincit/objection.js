@@ -81,6 +81,28 @@ describe('Relation', () => {
     expect(relation.relatedProp.props).to.eql(['ownerId']);
   });
 
+  it('multiple items in `Model.modelPaths` should work', () => {
+    OwnerModel.modelPaths = [__dirname, __dirname + '/files/'];
+
+    let relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: 'RelatedModel',
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerProp.cols).to.eql(['id']);
+    expect(relation.ownerProp.props).to.eql(['id']);
+    expect(relation.relatedProp.cols).to.eql(['ownerId']);
+    expect(relation.relatedProp.props).to.eql(['ownerId']);
+  });
+
   it('should accept a module with named exports', () => {
     let relation = new Relation('testRelation', OwnerModel);
 
@@ -180,7 +202,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
+        'OwnerModel.relationMappings.testRelation: modelClass: is not a subclass of Model or a file path to a module that exports one. You may be dealing with a require loop. See the documentation section about require loops.'
       );
     });
   });
@@ -199,7 +221,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.match(
-        /OwnerModel\.relationMappings\.testRelation: modelClass path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
+        /OwnerModel\.relationMappings\.testRelation: modelClass: path .*\/tests\/unit\/relations\/files\/InvalidModelManyNamedModels exports multiple models\. Don't know which one to choose\./
       );
     });
   });
@@ -237,7 +259,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        'OwnerModel.relationMappings.testRelation: modelClass: blaa is an invalid file path to a model class'
+        'OwnerModel.relationMappings.testRelation: modelClass: could not resolve blaa using modelPaths'
       );
     });
   });

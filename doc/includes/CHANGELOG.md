@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+### What's new
+
+  * fix [#1009](https://github.com/Vincit/objection.js/issues/1009)
+
 ## 1.2.0
 
 ### What's new
@@ -14,7 +20,7 @@
 
 ### What's new
 
-  * Nothing! the npm release was somehow borked. This was just a release of 1.1.9.
+  * Nothing! the npm release was somehow borked. This was just a rerelease of 1.1.9.
 
 ## 1.1.9
 
