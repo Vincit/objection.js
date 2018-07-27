@@ -686,7 +686,7 @@ describe('QueryBuilder', () => {
       .where('test', '<', 100)
       .update({ a: 1 });
 
-    query
+    return query
       .then(() => {
         expect(executedQueries).to.have.length(1);
         expect(query.toString()).to.equal(executedQueries[0]);
