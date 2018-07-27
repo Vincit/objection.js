@@ -2535,6 +2535,85 @@ module.exports = session => {
           });
       });
     });
+
+    describe('cyclic references', () => {
+      it('should detect cycles in the graph', done => {
+        const upsert = {
+          id: 1,
+
+          model1Relation1: {
+            '#id': 'root',
+
+            model1Relation1: {
+              '#ref': 'root'
+            }
+          }
+        };
+
+        Model1.bindKnex(session.knex)
+          .query()
+          .upsertGraph(upsert)
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.message).to.equal('the object graph contains cyclic references');
+            done();
+          })
+          .catch(done);
+      });
+
+      it('cycle detection should consider already inserted nodes', () => {
+        // There are no cycles in this graph because `id=2` has already
+        // been inserted.
+        const upsert = {
+          id: 2,
+
+          model1Relation1: {
+            id: 3,
+            model1Prop1: 'also updated',
+
+            model1Relation1: {
+              '#ref': '@1'
+            }
+          },
+
+          model1Relation1Inverse: {
+            '#id': '@1',
+            model1Prop1: 'hello'
+          }
+        };
+
+        return Model1.bindKnex(session.knex)
+          .query()
+          .upsertGraph(upsert)
+          .then(() => {
+            return Model1.query(session.knex)
+              .findById(2)
+              .eager({
+                model1Relation1: {
+                  model1Relation1: true
+                },
+                model1Relation1Inverse: true
+              });
+          })
+          .then(result => {
+            const id = result.model1Relation1.model1Relation1.id;
+            chai.expect(result).containSubset({
+              id: 2,
+              model1Relation1: {
+                id: 3,
+                model1Relation1: {
+                  id
+                }
+              },
+              model1Relation1Inverse: {
+                id
+              }
+            });
+          });
+      });
+    });
   });
 
   function omitIrrelevantProps(model) {

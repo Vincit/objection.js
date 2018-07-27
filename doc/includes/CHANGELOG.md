@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2
+
+### What's new
+
+  * Improve reference cycle detection in `upsertGraph`
+
 ## 1.2.1
 
 ### What's new

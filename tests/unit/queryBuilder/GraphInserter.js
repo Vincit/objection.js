@@ -1462,7 +1462,12 @@ describe('GraphInserter', () => {
         insertOpt.allowedRelations = RelationExpression.create(opt.allowedRelations);
       }
 
-      return new GraphInserter(insertOpt);
+      const inserter = new GraphInserter(insertOpt);
+
+      inserter.buildDependencyGraph();
+      inserter.checkForCyclicReferences();
+
+      return inserter;
     }
 
     let inserter;
