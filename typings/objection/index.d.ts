@@ -183,8 +183,23 @@ declare namespace Objection {
     [relationName: string]: RelationMapping;
   }
 
+  interface RelationProperty {
+    size: number;
+    modelClass: Model;
+    props: string[];
+    cols: string[];
+  }
+
   interface Relation {
-    // TODO should this be something other than a tagging interface?
+    name: string;
+    ownerModelClass: Model;
+    relatedModelClass: Model;
+    ownerProp: RelationProperty;
+    relatedProp: RelationProperty;
+    joinModelClass: Function;
+    joinTable: string;
+    joinTableOwnerProp: RelationProperty;
+    joinTableRelatedProp: RelationProperty;
   }
 
   export interface RelationJoin {
@@ -461,6 +476,8 @@ declare namespace Objection {
     static JoinEagerAlgorithm: EagerAlgorithm;
     static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
+
+    static getRelations(): { [key: string]: Relation }
 
     static query<QM extends Model>(
       this: Constructor<QM>,
