@@ -1647,16 +1647,6 @@ module.exports = session => {
           });
         });
 
-        // This doesn't belong here, but there is no better place at the moment.
-        it('should join the related rows', () => {
-          return Model1.getRelation('model1Relation1')
-            .join(Model1.query())
-            .then(models => {
-              expect(models).to.have.length(2);
-              expect(_.map(models, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 3']);
-            });
-        });
-
         describe('knex methods', () => {
           it('.select()', () => {
             return parent1
@@ -1800,24 +1790,6 @@ module.exports = session => {
                 });
               })
           ]);
-        });
-
-        // This doesn't belong here, but there is no better place at the moment.
-        it('should join the related rows', () => {
-          return Model1.getRelation('model1Relation2')
-            .join(Model1.query())
-            .select('model2_prop1')
-            .then(models => {
-              expect(models).to.have.length(6);
-              expect(_.map(models, 'model2_prop1').sort()).to.eql([
-                'text 1',
-                'text 2',
-                'text 3',
-                'text 4',
-                'text 5',
-                'text 6'
-              ]);
-            });
         });
 
         describe('knex methods', () => {
@@ -2077,24 +2049,6 @@ module.exports = session => {
                   aliasedExtra: 'extra 6',
                   $afterGetCalled: 1
                 }
-              ]);
-            });
-        });
-
-        // This doesn't belong here, but there is no better place at the moment.
-        it('should join the related rows', () => {
-          return Model2.getRelation('model2Relation1')
-            .join(Model2.query())
-            .select('model1Prop1')
-            .then(models => {
-              expect(models).to.have.length(6);
-              expect(_.map(models, 'model1Prop1').sort()).to.eql([
-                'blaa 1',
-                'blaa 2',
-                'blaa 3',
-                'blaa 4',
-                'blaa 5',
-                'blaa 6'
               ]);
             });
         });

@@ -21,6 +21,19 @@ module.exports = session => {
                 from: 'public.Person.id',
                 to: 'public.Animal.ownerId'
               }
+            },
+
+            parents: {
+              relation: Model.ManyToManyRelation,
+              modelClass: Person,
+              join: {
+                from: 'public.Person.id',
+                through: {
+                  from: 'public.Relatives.childId',
+                  to: 'public.Relatives.parentId'
+                },
+                to: 'public.Person.id'
+              }
             }
           };
         }
@@ -34,6 +47,7 @@ module.exports = session => {
 
       before(() => {
         return session.knex.schema
+          .dropTableIfExists('Relatives')
           .dropTableIfExists('Animal')
           .dropTableIfExists('Person')
           .createTable('Person', table => {
@@ -44,11 +58,25 @@ module.exports = session => {
             table.increments('id').primary();
             table.string('name');
             table.integer('ownerId').references('Person.id');
+          })
+          .createTable('Relatives', table => {
+            table.increments('id').primary();
+            table
+              .integer('parentId')
+              .references('Person.id')
+              .onDelete('CASCADE');
+            table
+              .integer('childId')
+              .references('Person.id')
+              .onDelete('CASCADE');
           });
       });
 
       after(() => {
-        return session.knex.schema.dropTableIfExists('Animal').dropTableIfExists('Person');
+        return session.knex.schema
+          .dropTableIfExists('Relatives')
+          .dropTableIfExists('Animal')
+          .dropTableIfExists('Person');
       });
 
       beforeEach(() => {
@@ -66,25 +94,50 @@ module.exports = session => {
                 id: 1,
                 name: 'Fluffy'
               }
+            ],
+
+            parents: [
+              {
+                id: 2,
+                name: 'Mom'
+              },
+              {
+                id: 3,
+                name: 'Dad'
+              }
             ]
           });
         })();
       });
 
       it('simple find query', () => {
-        return Person.query(session.knex).then(people => {
-          expect(people).to.eql([
-            {
-              id: 1,
-              name: 'Arnold'
-            }
-          ]);
-        });
+        return Person.query(session.knex)
+          .orderBy('id')
+          .then(people => {
+            expect(people).to.eql([
+              {
+                id: 1,
+                name: 'Arnold'
+              },
+              {
+                id: 2,
+                name: 'Mom'
+              },
+              {
+                id: 3,
+                name: 'Dad'
+              }
+            ]);
+          });
       });
 
       it('join eager', () => {
         return Person.query(session.knex)
-          .joinEager('pets')
+          .where('Person.name', 'Arnold')
+          .joinEager({
+            pets: true,
+            parents: true
+          })
           .then(people => {
             expect(people).to.eql([
               {
@@ -96,6 +149,17 @@ module.exports = session => {
                     id: 1,
                     name: 'Fluffy',
                     ownerId: 1
+                  }
+                ],
+
+                parents: [
+                  {
+                    id: 2,
+                    name: 'Mom'
+                  },
+                  {
+                    id: 3,
+                    name: 'Dad'
                   }
                 ]
               }
@@ -122,6 +186,26 @@ module.exports = session => {
                 defaultValue: null
               }
             });
+          });
+      });
+
+      it('many-to-many $relatedQuery', () => {
+        return Person.query(session.knex)
+          .findOne('name', 'Arnold')
+          .then(arnold => {
+            return arnold.$relatedQuery('parents', session.knex).debug();
+          })
+          .then(parents => {
+            expect(parents).to.eql([
+              {
+                id: 2,
+                name: 'Mom'
+              },
+              {
+                id: 3,
+                name: 'Dad'
+              }
+            ]);
           });
       });
     });
