@@ -185,18 +185,18 @@ declare namespace Objection {
 
   interface RelationProperty {
     size: number;
-    modelClass: Model;
+    modelClass: ModelClass<any>;
     props: string[];
     cols: string[];
   }
 
   interface Relation {
     name: string;
-    ownerModelClass: Model;
-    relatedModelClass: Model;
+    ownerModelClass: ModelClass<any>;
+    relatedModelClass: ModelClass<any>;
     ownerProp: RelationProperty;
     relatedProp: RelationProperty;
-    joinModelClass: Function;
+    joinModelClass: ModelClass<any>;
     joinTable: string;
     joinTableOwnerProp: RelationProperty;
     joinTableRelatedProp: RelationProperty;
