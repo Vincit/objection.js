@@ -879,7 +879,9 @@ module.exports = session => {
         .joinEager('model1Relation111')
         .then(_.noop)
         .catch(err => {
-          expect(err.message).to.equal("Relation 'model1Relation111' does not exist on model.");
+          expect(err.message).to.equal(
+            'unknown relation "model1Relation111" in a relation expression'
+          );
           done();
         });
     });
@@ -1566,7 +1568,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'unknown relation "invalidRelation" in an eager expression'
+              'unknown relation "invalidRelation" in a relation expression'
             );
             done();
           })
@@ -1584,7 +1586,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'unknown relation "invalidRelation" in an eager expression'
+              'unknown relation "invalidRelation" in a relation expression'
             );
             done();
           })
