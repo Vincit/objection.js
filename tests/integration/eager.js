@@ -873,6 +873,17 @@ module.exports = session => {
         });
     });
 
+    it('should fail fast on incorrect table name', function(done) {
+      Model1.query()
+        .findById(1)
+        .joinEager('model1Relation111')
+        .then(_.noop)
+        .catch(err => {
+          expect(err.message).to.equal("Relation 'model1Relation111' does not exist on model.");
+          done();
+        });
+    });
+
     it('mergeJoinEager shorthand', () => {
       return Model1.query()
         .findById(1)
