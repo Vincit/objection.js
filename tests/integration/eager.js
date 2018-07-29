@@ -1568,7 +1568,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'unknown relation "invalidRelation" in a relation expression'
+              'unknown relation "invalidRelation" in an eager expression'
             );
             done();
           })
@@ -1586,7 +1586,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'unknown relation "invalidRelation" in a relation expression'
+              'unknown relation "invalidRelation" in an eager expression'
             );
             done();
           })
