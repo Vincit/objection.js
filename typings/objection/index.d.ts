@@ -213,6 +213,7 @@ declare namespace Objection {
     to: string | Reference | (string | Reference)[];
     modelClass?: ModelClass<any> | string;
     extra?: string[] | object;
+    beforeInsert?: (model: Model, context: QueryContext) => void;
   }
 
   export interface RelationMapping {
