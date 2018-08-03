@@ -844,6 +844,7 @@ module.exports = session => {
               .whereNot('model2.id_col', 1)
               .orWhereNot('model2.id_col', 2)
               .whereRaw('model2.id_col is null')
+              .andWhereRaw('model2.id_col is null')
               .orWhereRaw('model2.id_col is null')
               .whereExists(Model2.query())
               .orWhereExists(Model2.query())
