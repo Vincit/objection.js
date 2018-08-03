@@ -477,7 +477,7 @@ declare namespace Objection {
     static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
 
-    static getRelations(): { [key: string]: Relation }
+    static getRelations(): { [key: string]: Relation };
 
     static query<QM extends Model>(
       this: Constructor<QM>,
