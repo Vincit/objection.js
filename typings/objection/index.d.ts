@@ -1124,6 +1124,7 @@ declare namespace Objection {
       RM,
       RV
     >;
+    (queryBuilder: QueryBuilder<Model>): QueryBuilder<QM, RM, RV>;
   }
 
   interface JoinRaw<QM extends Model, RM, RV> {
