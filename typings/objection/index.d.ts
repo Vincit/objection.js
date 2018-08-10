@@ -657,6 +657,10 @@ declare namespace Objection {
     (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
   }
 
+  type PartialUpdate<QM extends Model> = {
+    [P in keyof QM]?: QM[P] | Raw | Reference | QueryBuilder<any, any[]>
+  }
+
   interface QueryBuilderBase<QM extends Model, RM, RV> extends QueryInterface<QM, RM, RV> {
     modify(func: (builder: this) => void): this;
     modify(namedFilter: string): this;
@@ -685,16 +689,16 @@ declare namespace Objection {
     /**
      * @return a Promise of the number of updated rows
      */
-    update(modelOrObject: Partial<QM>): QueryBuilderYieldingCount<QM, RM>;
-    updateAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
-    updateAndFetchById(id: Id, modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    update(modelOrObject: PartialUpdate<QM>): QueryBuilderYieldingCount<QM, RM>;
+    updateAndFetch(modelOrObject: PartialUpdate<QM>): QueryBuilder<QM, QM>;
+    updateAndFetchById(id: Id, modelOrObject: PartialUpdate<QM>): QueryBuilder<QM, QM>;
 
     /**
      * @return a Promise of the number of patched rows
      */
-    patch(modelOrObject: Partial<QM>): QueryBuilderYieldingCount<QM, RM>;
-    patchAndFetchById(idOrIds: IdOrIds, modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
-    patchAndFetch(modelOrObject: Partial<QM>): QueryBuilder<QM, QM>;
+    patch(modelOrObject: PartialUpdate<QM>): QueryBuilderYieldingCount<QM, RM>;
+    patchAndFetchById(idOrIds: IdOrIds, modelOrObject: PartialUpdate<QM>): QueryBuilder<QM, QM>;
+    patchAndFetch(modelOrObject: PartialUpdate<QM>): QueryBuilder<QM, QM>;
 
     upsertGraph: Upsert<QM>;
     upsertGraphAndFetch: Upsert<QM>;
