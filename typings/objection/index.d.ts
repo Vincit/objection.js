@@ -237,7 +237,7 @@ declare namespace Objection {
     relate?: boolean | string[];
     unrelate?: boolean | string[];
     insertMissing?: boolean | string[];
-    update?: boolean;
+    update?: boolean | string[];
     noInsert?: boolean | string[];
     noUpdate?: boolean | string[];
     noDelete?: boolean | string[];
@@ -246,7 +246,7 @@ declare namespace Objection {
   }
 
   export interface InsertGraphOptions {
-    relate?: boolean;
+    relate?: boolean | string[];
   }
 
   export interface QueryContext {
