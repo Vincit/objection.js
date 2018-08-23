@@ -713,6 +713,47 @@ module.exports = session => {
             });
         });
 
+        if (session.isPostgres()) {
+          it('select subquery as an array', () => {
+            return Model1.query()
+              .select(
+                'Model1.*',
+                raw(
+                  'ARRAY(?) as "model1Ids"',
+                  Model1.relatedQuery('model1Relation2')
+                    .select('id_col')
+                    .orderBy('id_col')
+                )
+              )
+              .orderBy('id')
+              .then(res => {
+                expect(res[0].model1Ids).to.eql([1, 2, 3]);
+                expect(res[1].model1Ids).to.eql([]);
+              });
+          });
+
+          it('select subquery as an array (unbound model)', () => {
+            class TestModel extends Model1 {}
+            TestModel.knex(null);
+
+            return TestModel.query(session.knex)
+              .select(
+                'Model1.*',
+                raw(
+                  'ARRAY(?) as "model1Ids"',
+                  TestModel.relatedQuery('model1Relation2')
+                    .select('id_col')
+                    .orderBy('id_col')
+                )
+              )
+              .orderBy('id')
+              .then(res => {
+                expect(res[0].model1Ids).to.eql([1, 2, 3]);
+                expect(res[1].model1Ids).to.eql([]);
+              });
+          });
+        }
+
         it('.modify()', () => {
           let builder = Model2.query();
 

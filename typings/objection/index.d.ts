@@ -659,7 +659,7 @@ declare namespace Objection {
 
   type PartialUpdate<QM extends Model> = {
     [P in keyof QM]?: QM[P] | Raw | Reference | QueryBuilder<any, any[]>
-  }
+  };
 
   interface QueryBuilderBase<QM extends Model, RM, RV> extends QueryInterface<QM, RM, RV> {
     modify(func: (builder: this) => void): this;
