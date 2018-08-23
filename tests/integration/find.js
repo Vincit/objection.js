@@ -225,8 +225,8 @@ module.exports = session => {
         it('.where() and object with toKnexRaw method', () => {
           return Model2.query()
             .where('model2_prop2', '>', {
-              toKnexRaw(knex) {
-                return knex.raw('?', 15);
+              toKnexRaw(builder) {
+                return builder.knex().raw('?', 15);
               }
             })
             .then(models => {
@@ -238,8 +238,8 @@ module.exports = session => {
           return Model2.query()
             .where({
               model2_prop2: {
-                toKnexRaw(knex) {
-                  return knex.raw('?', 20);
+                toKnexRaw(builder) {
+                  return builder.knex().raw('?', 20);
                 }
               }
             })
@@ -718,6 +718,25 @@ module.exports = session => {
             return Model1.query()
               .select(
                 'Model1.*',
+                raw(
+                  'ARRAY(?) as "model1Ids"',
+                  Model1.relatedQuery('model1Relation2')
+                    .select('id_col')
+                    .orderBy('id_col')
+                )
+              )
+              .orderBy('id')
+              .then(res => {
+                expect(res[0].model1Ids).to.eql([1, 2, 3]);
+                expect(res[1].model1Ids).to.eql([]);
+              });
+          });
+
+          it('select subquery as an array with aliased table', () => {
+            return Model1.query()
+              .alias('m')
+              .select(
+                'm.*',
                 raw(
                   'ARRAY(?) as "model1Ids"',
                   Model1.relatedQuery('model1Relation2')
