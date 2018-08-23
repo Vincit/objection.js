@@ -359,7 +359,8 @@ the <a href="#joinrelation"><code class="prettyprint">joinRelation</code></a> me
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">patch</span><span class="p">({</span><span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jenn'</span><span class="p">,</span> <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">})</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="mi">1234</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">returning</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">first</span><span class="p">();</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">updatedAt</span><span class="p">);</span> <span class="c1">// NOW()-ish</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">jennifer</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// "Jenn"</span>
@@ -648,9 +649,9 @@ class.</p>
 <li><a href="#_s_values"><code class="prettyprint">$values</code></a></li>
 </ul>
 
-<h2 id="getting-count-of-relations">Getting count of relations</h2>
+<h2 id="getting-count-of-related-objects">Getting count of related objects</h2>
 
-<p>Let&rsquo;s say you have a <code class="prettyprint">Tweet</code> model and a <code class="prettyprint">Like</code> model. <code class="prettyprint">Tweet</code> has a <code class="prettyprint">HasManyRelation</code> named <code class="prettyprint">likers</code> to <code class="prettyprint">Like</code> table.
+<p>Let&rsquo;s say you have a <code class="prettyprint">Tweet</code> model and a <code class="prettyprint">Like</code> model. <code class="prettyprint">Tweet</code> has a <code class="prettyprint">HasManyRelation</code> named <code class="prettyprint">likes</code> to <code class="prettyprint">Like</code> table.
 Now let&rsquo;s assume you&rsquo;d like to fetch a list of <code class="prettyprint">Tweet</code>s and get the number of likes for each of them without fetching
 the actual <code class="prettyprint">Like</code> rows. This cannot be easily achieved using <code class="prettyprint">eager</code> because of the way the queries are optimized
 (you can read more <a href="#eager">here</a>). You can leverage SQL&rsquo;s subqueries and the <a href="#relatedquery"><code class="prettyprint">relatedQuery</code></a> helper:</p>
@@ -658,7 +659,7 @@ the actual <code class="prettyprint">Like</code> rows. This cannot be easily ach
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">select</span><span class="p">(</span>
     <span class="s1">'Tweet.*'</span><span class="p">,</span>
-    <span class="nx">Tweet</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'likers'</span><span class="p">).</span><span class="nx">count</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'numberOfLikes'</span><span class="p">)</span>
+    <span class="nx">Tweet</span><span class="p">.</span><span class="nx">relatedQuery</span><span class="p">(</span><span class="s1">'likes'</span><span class="p">).</span><span class="nx">count</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'numberOfLikes'</span><span class="p">)</span>
   <span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">tweets</span><span class="p">[</span><span class="mi">4</span><span class="p">].</span><span class="nx">numberOfLikes</span><span class="p">);</span>
@@ -667,7 +668,7 @@ the actual <code class="prettyprint">Like</code> rows. This cannot be easily ach
 <pre class="highlight sql"><code><span class="k">select</span> <span class="nv">"Tweet"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span> <span class="p">(</span><span class="k">select</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">from</span> <span class="nv">"Like"</span> <span class="k">where</span> <span class="nv">"Like"</span><span class="p">.</span><span class="nv">"tweetId"</span> <span class="o">=</span> <span class="nv">"Tweet"</span><span class="p">.</span><span class="nv">"id"</span><span class="p">)</span> <span class="k">as</span> <span class="nv">"numberOfLikes"</span> <span class="k">from</span> <span class="nv">"Tweet"</span>
 </code></pre>
 <p>Naturally you can add as many subquery selects as you like. For example you could also get the count of retweets
-in the same query. <a href="#relatedquery"><code class="prettyprint">relatedQuery</code></a> method works with all relations and not just <code class="prettyprint">HasManyRelation</code>.</p>
+in the same query. <a href="#relatedquery"><code class="prettyprint">relatedQuery</code></a> method works with all relation types and not just <code class="prettyprint">HasManyRelation</code>.</p>
 
 <h2 id="error-handling">Error handling</h2>
 
