@@ -739,9 +739,13 @@ module.exports = session => {
                 'm.*',
                 raw(
                   'ARRAY(?) as "model1Ids"',
-                  Model1.relatedQuery('model1Relation2')
-                    .select('id_col')
-                    .orderBy('id_col')
+                  // Test doubly nested `raw` for shits and giggles.
+                  raw(
+                    '?',
+                    Model1.relatedQuery('model1Relation2')
+                      .select('id_col')
+                      .orderBy('id_col')
+                  )
                 )
               )
               .orderBy('id')
@@ -772,6 +776,33 @@ module.exports = session => {
               });
           });
         }
+
+        it('select subquery to same table with alias', () => {
+          return Model1.query()
+            .upsertGraph(
+              {
+                id: 1,
+                model1Relation1: {
+                  id: 2
+                }
+              },
+              { relate: true }
+            )
+            .then(() => {
+              return Model1.query()
+                .findById(1)
+                .alias('m1')
+                .select(
+                  'm1.*',
+                  Model1.relatedQuery('model1Relation1')
+                    .select('id')
+                    .as('foo')
+                );
+            })
+            .then(res => {
+              expect(res.foo).to.equal(2);
+            });
+        });
 
         it('.modify()', () => {
           let builder = Model2.query();

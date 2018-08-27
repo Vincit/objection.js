@@ -9,6 +9,16 @@ module.exports = session => {
     let runningQueries = [];
 
     beforeEach(() => {
+      models.Model1Model2 = class Model1Model2 extends Model {
+        static tableName() {
+          return 'Model1Model2';
+        }
+
+        static get concurrency() {
+          return 1;
+        }
+      };
+
       models.Model1 = class Model1 extends Model {
         static get tableName() {
           return 'Model1';
@@ -55,7 +65,8 @@ module.exports = session => {
                 through: {
                   from: 'Model1Model2.model1Id',
                   to: 'Model1Model2.model2Id',
-                  extra: ['extra1', 'extra2']
+                  extra: ['extra1', 'extra2'],
+                  modelClass: models.Model1Model2
                 },
                 to: 'model2.id_col'
               }
