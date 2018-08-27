@@ -653,8 +653,8 @@ declare namespace Objection {
   }
 
   interface InsertGraphAndFetch<QM extends Model> {
-    (modelsOrObjects?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
     (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
   }
 
   type PartialUpdate<QM extends Model> = {
