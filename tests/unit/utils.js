@@ -148,6 +148,29 @@ describe('utils', () => {
       test('fooBar:spamBaz:troloLolo', 'foo_bar:spam_baz:trolo_lolo');
       test('fooBar.spamBaz.troloLolo', 'foo_bar.spam_baz.trolo_lolo');
 
+      testUnderscoreBeforeNumbers('*', '*');
+
+      testUnderscoreBeforeNumbers('foo', 'foo');
+      testUnderscoreBeforeNumbers('fooBar', 'foo_bar');
+      testUnderscoreBeforeNumbers('foo1Bar2', 'foo_1_bar_2');
+      testUnderscoreBeforeNumbers('fooBAR', 'foo_bar', 'fooBar');
+      testUnderscoreBeforeNumbers('fooBaR', 'foo_ba_r');
+
+      testUnderscoreBeforeNumbers('föö', 'föö');
+      testUnderscoreBeforeNumbers('fööBär', 'föö_bär');
+      testUnderscoreBeforeNumbers('föö1Bär2', 'föö_1_bär_2');
+      testUnderscoreBeforeNumbers('föö09Bär90', 'föö_09_bär_90');
+      testUnderscoreBeforeNumbers('fööBÄR', 'föö_bär', 'fööBär');
+      testUnderscoreBeforeNumbers('fööBäR', 'föö_bä_r');
+
+      testUnderscoreBeforeNumbers('foo1bar2', 'foo_1bar_2');
+      testUnderscoreBeforeNumbers('Foo', 'foo', 'foo');
+      testUnderscoreBeforeNumbers('FooBar', 'foo_bar', 'fooBar');
+      testUnderscoreBeforeNumbers('märkäLänttiÄäliö', 'märkä_läntti_ääliö');
+
+      testUnderscoreBeforeNumbers('fooBar:spamBaz:troloLolo', 'foo_bar:spam_baz:trolo_lolo');
+      testUnderscoreBeforeNumbers('fooBar.spamBaz.troloLolo', 'foo_bar.spam_baz.trolo_lolo');
+
       function test(camel, snake, backToCamel) {
         backToCamel = backToCamel || camel;
 
@@ -157,6 +180,16 @@ describe('utils', () => {
 
           expect(camelCase(snakeCase(camel))).to.equal(backToCamel);
           expect(camelCaseKeys(snakeCaseKeys({ [camel]: 'foo' }))).to.eql({ [backToCamel]: 'foo' });
+        });
+      }
+
+      function testUnderscoreBeforeNumbers(camel, snake, backToCamel) {
+        backToCamel = backToCamel || camel;
+        const opt = { underscoreBeforeDigits: true };
+
+        it(`${camel} --> ${snake} --> ${backToCamel}`, () => {
+          expect(snakeCase(camel, opt)).to.equal(snake);
+          expect(camelCase(snakeCase(camel, opt), opt)).to.equal(backToCamel);
         });
       }
     });

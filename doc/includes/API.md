@@ -156,6 +156,7 @@ Documented [here](#snake-case-to-camel-case-conversion). The `knexSnakeCaseMappe
 Option|Type|Description
 ---------|-------|------------------------
 upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
+underscoreBeforeDigits|boolean|Set to `true` if you want underscores before digits. For example `foo1Bar2` --> `foo_1_bar_2`.
 
 <h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
 
@@ -272,6 +273,7 @@ Documented [here](#snake-case-to-camel-case-conversion). . The `snakeCaseMappers
 Option|Type|Description
 ---------|-------|------------------------
 upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
+underscoreBeforeDigits|boolean|Set to `true` if you want underscores before digits. For example `foo1Bar2` --> `foo_1_bar_2`.
 
 
 
