@@ -3239,6 +3239,11 @@ documented elsewhere in the API docs.</p>
 <td>boolean</td>
 <td>Set to <code class="prettyprint">true</code> if your columns are UPPER_SNAKE_CASED.</td>
 </tr>
+<tr>
+<td>underscoreBeforeDigits</td>
+<td>boolean</td>
+<td>Set to <code class="prettyprint">true</code> if you want underscores before digits. For example <code class="prettyprint">foo1Bar2</code> &ndash;&gt; <code class="prettyprint">foo_1_bar_2</code>.</td>
+</tr>
 </tbody></table>
 
 <h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
@@ -3355,6 +3360,11 @@ and <code class="prettyprint">anotherProp</code> in the code.</p>
 <td>upperCase</td>
 <td>boolean</td>
 <td>Set to <code class="prettyprint">true</code> if your columns are UPPER_SNAKE_CASED.</td>
+</tr>
+<tr>
+<td>underscoreBeforeDigits</td>
+<td>boolean</td>
+<td>Set to <code class="prettyprint">true</code> if you want underscores before digits. For example <code class="prettyprint">foo1Bar2</code> &ndash;&gt; <code class="prettyprint">foo_1_bar_2</code>.</td>
 </tr>
 </tbody></table>
 
@@ -4450,19 +4460,15 @@ Use <code class="prettyprint">unrelate</code> like <code class="prettyprint">del
 
 <h4 id="aliasfor">aliasFor</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">aliasFor</span><span class="p">(</span><span class="nx">tableNameOrModelClass</span><span class="p">,</span> <span class="nx">alias</span><span class="p">);</span>
+</code></pre><pre class="highlight javascript"><code><span class="c1">// This query uses joinRelation to join a many-to-many relation which also joins</span>
+<span class="c1">// the join table `persons_movies`. We specify that the `persons_movies` table</span>
+<span class="c1">// should be called `pm` instead of the default `movies_join`.</span>
+<span class="nx">await</span> <span class="nx">person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">aliasFor</span><span class="p">(</span><span class="s1">'persons_movies'</span><span class="p">,</span> <span class="s1">'pm'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">joinRelation</span><span class="p">(</span><span class="s1">'movies'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'pm.someProp'</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 </code></pre>
-<p>TODO: Doesn&rsquo;t work with joinRelation
-<code class="prettyprint">js
-// This qurey joinRelation to join a many-to-many relation which also joins
-// the join table `persons_movies`. We specify that the `persons_movies` table
-// should be called `pm` instead of the default `movies_join`.
-await person
-  .query()
-  .aliasFor(&#39;persons_movies&#39;, &#39;pm&#39;)
-  .joinRelation(&#39;movies&#39;)
-  .where(&#39;pm.someProp&#39;, 100)
-</code></p>
-
 <blockquote>
 <p>Model class can be used instead of table name</p>
 </blockquote>
@@ -4485,7 +4491,7 @@ await person
 </thead><tbody>
 <tr>
 <td>tableNameOrModelClass</td>
-<td>strig&#124;ModelClass</td>
+<td>string&#124;ModelClass</td>
 <td>The table to alias.</td>
 </tr>
 <tr>
