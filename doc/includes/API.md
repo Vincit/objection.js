@@ -1265,9 +1265,8 @@ Type|Description
 const builder = queryBuilder.aliasFor(tableNameOrModelClass, alias);
 ```
 
-TODO: Doesn't work with joinRelation
 ```js
-// This qurey joinRelation to join a many-to-many relation which also joins
+// This query uses joinRelation to join a many-to-many relation which also joins
 // the join table `persons_movies`. We specify that the `persons_movies` table
 // should be called `pm` instead of the default `movies_join`.
 await person
@@ -1293,7 +1292,7 @@ Give an alias for any table in the query.
 
 Argument|Type|Description
 --------|----|--------------------
-tableNameOrModelClass|strig&#124;ModelClass|The table to alias.
+tableNameOrModelClass|string&#124;ModelClass|The table to alias.
 alias|string|The alias.
 
 ##### Return value
