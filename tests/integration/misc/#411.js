@@ -23,7 +23,7 @@ module.exports = session => {
             allErrors: true,
             validateSchema: false,
             ownProperties: true,
-            v5: true,
+            $data: true,
             serialize(value) {
               return 'blaa blaa';
             }
