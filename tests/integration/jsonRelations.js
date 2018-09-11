@@ -3,12 +3,11 @@ const find = require('lodash/find');
 const Model = require('../../').Model;
 const expect = require('expect.js');
 const sortBy = require('lodash/sortBy');
-const mapValues = require('lodash/mapValues');
 
 module.exports = session => {
   describe('JSON relations', () => {
     class BaseModel extends Model {
-      static get namedFilters() {
+      static get modifiers() {
         return ['name', 'id', 'json'].reduce((obj, prop) => {
           obj[prop] = qb => qb.select(prop);
           return obj;

@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { Model } = require('../../../');
 
 module.exports = session => {
-  describe(`namedFilters that have no where or select statements don't work with joinRelation #712`, () => {
+  describe(`modifiers that have no where or select statements don't work with joinRelation #712`, () => {
     let knex = session.knex;
     let Person;
 
@@ -24,7 +24,7 @@ module.exports = session => {
           return 'Person';
         }
 
-        static get namedFilters() {
+        static get modifiers() {
           return {
             notFirstChild: builder => {
               builder.from(subQuery => {

@@ -50,9 +50,9 @@ describe('ManyToManyRelation', () => {
         return 'RelatedModel';
       }
 
-      static get namedFilters() {
+      static get modifiers() {
         return {
-          namedFilter: builder => builder.where('filteredProperty', true)
+          modifier: builder => builder.where('filteredProperty', true)
         };
       }
     };
@@ -618,8 +618,8 @@ describe('ManyToManyRelation', () => {
     });
 
     // TODO expectedResult array is changed in-place and the items in it are replaced with model instances. SHOULD FIX THAT!
-    it('should support named filters', () => {
-      createModifiedRelation('namedFilter');
+    it('should support modifiers', () => {
+      createModifiedRelation('modifier');
 
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];

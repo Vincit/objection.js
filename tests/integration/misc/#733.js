@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { Model } = require('../../../');
 
 module.exports = session => {
-  describe(`select in namedFilter + joinEager #733`, () => {
+  describe(`select in modifier + joinEager #733`, () => {
     let knex = session.knex;
     let Person;
 
@@ -24,7 +24,7 @@ module.exports = session => {
           return 'Person';
         }
 
-        static get namedFilters() {
+        static get modifiers() {
           return {
             aliasedProps: builder => {
               builder.select(['id as aliasedId', 'name as aliasedName']);

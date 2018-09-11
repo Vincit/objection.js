@@ -764,10 +764,10 @@ module.exports = session => {
       ]);
     });
 
-    // This tests the Model.namedFilters feature.
+    // This tests the Model.modifiers feature.
     test(
       `[
-      model1Relation1(select:id, localNamedFilter),
+      model1Relation1(select:id, localModifier),
       model1Relation2.[
         model2Relation1(select:model1Prop1).[
           model1Relation1(select:id, select:model1Prop1, select:model1Prop1Aliased),
@@ -843,7 +843,7 @@ module.exports = session => {
       },
       {
         filters: {
-          localNamedFilter: builder => builder.select('model1Prop2')
+          localModifier: builder => builder.select('model1Prop2')
         }
       }
     );
@@ -1550,7 +1550,7 @@ module.exports = session => {
             expect(err).to.be.a(ValidationError);
             expect(err.type).to.equal('RelationExpression');
             expect(err.message).to.equal(
-              'could not find filter "missingFilter" for relation "model1Relation2"'
+              'could not find modifier "missingFilter" for relation "model1Relation2"'
             );
             done();
           })

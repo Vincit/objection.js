@@ -1559,7 +1559,7 @@ module.exports = session => {
           });
       });
 
-      it('should work with namedFilters', () => {
+      it('should work with modifiers', () => {
         return Model2.query()
           .joinRelation('model2Relation1(idGreaterThan)')
           .select('model2Relation1.id', 'model2.*')
@@ -1572,7 +1572,42 @@ module.exports = session => {
       });
 
       if (session.isPostgres()) {
-        it('should work with raw selects in namedFilters', () => {
+        it('should work with raw selects in modifiers', () => {
+          class TestModel2 extends Model2 {
+            static get modifiers() {
+              return {
+                rawSelect: qb =>
+                  qb.select('*').select(raw(`model2_prop1 || ' ' || model2_prop1 as "rawSelect"`))
+              };
+            }
+          }
+
+          class TestModel1 extends Model1 {
+            static get relationMappings() {
+              return {
+                model1Relation2: {
+                  relation: Model.HasManyRelation,
+                  modelClass: TestModel2,
+                  join: {
+                    from: 'Model1.id',
+                    to: 'model2.model1_id'
+                  }
+                }
+              };
+            }
+          }
+
+          return TestModel1.query()
+            .joinRelation('model1Relation2(rawSelect)')
+            .select('rawSelect')
+            .findById(1)
+            .where('model1Relation2.id_col', 2)
+            .then(model => {
+              expect(model.rawSelect).to.equal('hejsan 2 hejsan 2');
+            });
+        });
+
+        it('namedFilters should work as an alias for modifiers', () => {
           class TestModel2 extends Model2 {
             static get namedFilters() {
               return {

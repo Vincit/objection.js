@@ -116,12 +116,12 @@ describe('QueryBuilder', () => {
     expect(called).to.equal(true);
   });
 
-  it('modify() accept a list of strings and call the corresponding named filters', () => {
+  it('modify() accept a list of strings and call the corresponding modifiers', () => {
     let builder = QueryBuilder.forClass(TestModel);
     let aCalled = false;
     let bCalled = false;
 
-    TestModel.namedFilters = {
+    TestModel.modifiers = {
       a(qb) {
         aCalled = qb === builder;
       },
@@ -137,12 +137,12 @@ describe('QueryBuilder', () => {
     expect(bCalled).to.equal(true);
   });
 
-  it('applyFilter() accept a list of strings and call the corresponding named filters', () => {
+  it('applyFilter() accept a list of strings and call the corresponding modifiers', () => {
     let builder = QueryBuilder.forClass(TestModel);
     let aCalled = false;
     let bCalled = false;
 
-    TestModel.namedFilters = {
+    TestModel.modifiers = {
       a(qb) {
         aCalled = qb === builder;
       },
@@ -1226,12 +1226,12 @@ describe('QueryBuilder', () => {
       .filterEager('a', _.noop);
 
     expect(builder._eagerExpression).to.be.a(RelationExpression);
-    expect(builder._eagerFiltersAtPath).to.have.length(1);
+    expect(builder._eagerModifiersAtPath).to.have.length(1);
 
     builder.clearEager();
 
     expect(builder._eagerExpression).to.equal(null);
-    expect(builder._eagerFiltersAtPath).to.have.length(0);
+    expect(builder._eagerModifiersAtPath).to.have.length(0);
   });
 
   it('clearReject() should clear remove explicit rejection', () => {

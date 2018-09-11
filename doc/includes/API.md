@@ -2397,13 +2397,16 @@ Type|Description
 
 #### modify
 
+Works like `knex`'s [`modify`](http://knexjs.org/#Builder-modify) function but in addition
+you can specify model [`modifiers`](#modifiers) by providing modifier names.
+
 See [knex documentation](http://knexjs.org/#Builder-modify)
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-fn|function&#124;string|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the call is redirected to [`applyFilter`](#applyfilter) instead.
+fn|function&#124;string|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding [modifier](#modifiers) is executed instead.
 *arguments| |The optional arguments passed to the modify function
 
 ##### Return value
@@ -2417,14 +2420,14 @@ Type|Description
 
 #### applyFilter
 
-Applies named filters to the query builder.
+Applies modifiers to the query builder.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-filter|string|The name of the filter, as found in [`namedFilters`](#namedfilters).
-*arguments| |When providing multiple arguments, all provided named filters will be applied.
+modifier|string|The name of the modifier, as found in [`modifiers`](#modifiers).
+*arguments| |When providing multiple arguments, all provided modifiers will be applied.
 
 ##### Return value
 
@@ -3542,7 +3545,7 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-> Relations can be filtered by giving named filter functions as arguments
+> Relations can be filtered by giving modifier functions as arguments
 > to the relations:
 
 ```js
@@ -3564,11 +3567,11 @@ console.log(people[0].children[0].pets[0].name);
 cconsole.log(people[0].children[0].movies[0].id);
 ```
 
-> Reusable named filters can be defined for a model class using [`namedFilters`](#namedfilters)
+> Reusable modifiers can be defined for a model class using [`modifiers`](#modifiers)
 
 ```js
 class Person extends Model {
-  static get namedFilters() {
+  static get modifiers() {
     return {
       orderByAge: (builder) => {
         builder.orderBy('age');
@@ -3578,7 +3581,7 @@ class Person extends Model {
 }
 
 class Animal extends Model {
-  static get namedFilters() {
+  static get modifiers() {
     return {
       orderByName: (builder) => {
         builder.orderBy('name');
@@ -3734,7 +3737,7 @@ cases where performance doesn't matter and when it is the only option to get the
 Argument|Type|Description
 --------|----|--------------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The eager expression
-filters|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The named filter functions for the expression
+modifiers|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The modifier functions for the expression
 
 ##### Return value
 
@@ -3796,7 +3799,7 @@ expression to the existing expression.
 Argument|Type|Description
 --------|----|--------------------
 relationExpression|string&#124;[`RelationExpression`](#relationexpression)|The eager expression
-filters|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The named filter functions for the expression
+modifiers|Object&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|The modifier functions for the expression
 
 ##### Return value
 
@@ -5290,7 +5293,7 @@ Property|Type|Description
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
 modelClass|[`Model`](#model)&#124;string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [`modelPaths`](#modelpaths) that exports a model class.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
-modify|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
+modify|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, modifier with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
 filter|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Alias for modify.
 beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
 
@@ -5693,11 +5696,11 @@ Defaults to `{minimize: false, separator: ':', aliases: {}}`.
 
 
 
-#### namedFilters
+#### modifiers
 
 ```js
 class Movie extends Model {
-  static get namedFilters() {
+  static get modifiers() {
     return {
       goodMovies: (builder) => builder.where('stars', '>', 3),
       orderByName: (builder) => builder.orderBy('name')
@@ -5706,7 +5709,7 @@ class Movie extends Model {
 }
 
 class Animal extends Model {
-  static get namedFilters() {
+  static get modifiers() {
     return {
       dogs: (builder) => builder.where('species', 'dog')
     };
@@ -5714,7 +5717,7 @@ class Animal extends Model {
 }
 ```
 
-> The named filters can be used in any eager query:
+> Modifiers can be used in any eager query:
 
 ```js
 Person
@@ -5722,8 +5725,13 @@ Person
   .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
-Named filters that can be used in any eager query and by the [`applyFilter`](#applyfilter) method.
+Modifiers that can be used in any eager query and by the [`modify`](#modify) method.
 
+
+
+#### namedFilters
+
+An alias for [`modifiers`](#modifiers)
 
 
 
@@ -6333,7 +6341,7 @@ const person1 = people[0];
 const person2 = people[1];
 ```
 
-> Relations can be filtered by giving named filter functions as arguments to the relations:
+> Relations can be filtered by giving modifier functions as arguments to the relations:
 
 ```js
 const people = await Person
@@ -6360,7 +6368,7 @@ Argument|Type|Description
 --------|----|-------------------
 models|Array.&lt;[`Model`](#model)&#124;Object&gt;|
 expression|string&#124;[`RelationExpression`](#relationexpression)|The relation expression
-filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional named filters
+modifiers|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional modifiers
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
 
 ##### Return value
@@ -7433,7 +7441,7 @@ console.log('Jennifer\'s first child has', jennifer.children[0].pets.length, 'pe
 console.log('Jennifer had her first child with', jennifer.children[0].father.name);
 ```
 
-> Relations can be filtered by giving named filter functions as arguments
+> Relations can be filtered by giving modifier functions as arguments
 > to the relations:
 
 ```js
@@ -7460,7 +7468,7 @@ Loads related models using a [`RelationExpression`](#relationexpression) and ass
 Argument|Type|Description
 --------|----|-------------------
 expression|string&#124;[`RelationExpression`](#relationexpression)|The relation expression
-filters|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional named filters
+modifiers|Object.&lt;string, function([`QueryBuilder`](#querybuilder))&gt;|Optional modifiers
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
 
 ##### Return value

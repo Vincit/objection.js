@@ -47,9 +47,9 @@ describe('HasManyRelation', () => {
         return 'RelatedModel';
       }
 
-      static get namedFilters() {
+      static get modifiers() {
         return {
-          namedFilter: builder => builder.where('filteredProperty', true)
+          modifier: builder => builder.where('filteredProperty', true)
         };
       }
     };
@@ -262,8 +262,8 @@ describe('HasManyRelation', () => {
       });
     });
 
-    it('should support named filters', () => {
-      createModifiedRelation('namedFilter');
+    it('should support modifiers', () => {
+      createModifiedRelation('modifier');
 
       let owner = OwnerModel.fromJson({ oid: 666 });
       let expectedResult = [{ a: 1, ownerId: 666 }, { a: 2, ownerId: 666 }];

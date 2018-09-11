@@ -79,7 +79,7 @@ module.exports = session => {
           return 'Movie';
         }
 
-        static get namedFilters() {
+        static get modifiers() {
           return {
             onlyOldActors: builder =>
               builder

@@ -47,9 +47,9 @@ describe('BelongsToOneRelation', () => {
         return 'RelatedModel';
       }
 
-      static get namedFilters() {
+      static get modifiers() {
         return {
-          namedFilter: builder => builder.where('filteredProperty', true)
+          modifier: builder => builder.where('filteredProperty', true)
         };
       }
     };
@@ -244,8 +244,8 @@ describe('BelongsToOneRelation', () => {
       });
     });
 
-    it('should support named filters', () => {
-      createModifiedRelation('namedFilter');
+    it('should support modifiers', () => {
+      createModifiedRelation('modifier');
 
       let owner = OwnerModel.fromJson({ id: 666, relatedId: 1 });
       let expectedResult = [{ id: 1, a: 10, rid: 1 }];
