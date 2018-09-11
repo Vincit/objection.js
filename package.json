@@ -94,7 +94,7 @@
       "lib/utils/clone.js"
     ],
     "reporter": [
-      "text"
+      "text-lcov"
     ],
     "report-dir": "./testCoverage"
   }
