@@ -122,7 +122,7 @@ class Model {
         allErrors: true,
         validateSchema: false,
         ownProperties: true,
-        v5: true
+        $data: true
       }
     });
   }
