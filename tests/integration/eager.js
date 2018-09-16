@@ -1695,6 +1695,44 @@ module.exports = session => {
         );
       });
 
+      it('should accept a modifier name', () => {
+        return Promise.all(
+          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map(eagerAlgo => {
+            return Model1.query()
+              .eagerAlgorithm(eagerAlgo)
+              .where('Model1.id', 1)
+              .eager('model1Relation2.model2Relation1')
+              .modifyEager('model1Relation2.model2Relation1', 'select:model1Prop1')
+              .then(models => {
+                const model2 = models[0].model1Relation2.find(it => it.idCol === 2);
+                expect(Object.keys(model2.model2Relation1[0])).to.eql([
+                  'model1Prop1',
+                  '$afterGetCalled'
+                ]);
+              });
+          })
+        );
+      });
+
+      it('should accept a list of modifier names', () => {
+        return Promise.all(
+          [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map(eagerAlgo => {
+            return Model1.query()
+              .eagerAlgorithm(eagerAlgo)
+              .where('Model1.id', 1)
+              .eager('model1Relation1')
+              .modifyEager('model1Relation1', ['select:id', 'select:model1Prop1'])
+              .then(models => {
+                expect(Object.keys(models[0].model1Relation1)).to.eql([
+                  'id',
+                  'model1Prop1',
+                  '$afterGetCalled'
+                ]);
+              });
+          })
+        );
+      });
+
       it('should implicitly add selects for join columns if they are omitted in filterEager/modifyEager', () => {
         return Promise.all(
           [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm].map(eagerAlgo => {

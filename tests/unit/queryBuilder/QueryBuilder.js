@@ -116,46 +116,57 @@ describe('QueryBuilder', () => {
     expect(called).to.equal(true);
   });
 
-  it('modify() accept a list of strings and call the corresponding modifiers', () => {
-    let builder = QueryBuilder.forClass(TestModel);
-    let aCalled = false;
-    let bCalled = false;
+  ['applyFilter', 'applyModifier', 'modify'].forEach(method => {
+    it(method + ' accept a list of strings and call the corresponding modifiers', () => {
+      const builder = QueryBuilder.forClass(TestModel);
 
-    TestModel.modifiers = {
-      a(qb) {
-        aCalled = qb === builder;
-      },
+      let aCalled = false;
+      let bCalled = false;
 
-      b(qb) {
-        bCalled = qb === builder;
-      }
-    };
+      TestModel.modifiers = {
+        a(qb) {
+          aCalled = qb === builder;
+        },
 
-    builder.modify('a', 'b');
+        b(qb) {
+          bCalled = qb === builder;
+        },
 
-    expect(aCalled).to.equal(true);
-    expect(bCalled).to.equal(true);
-  });
+        c: 'a',
 
-  it('applyFilter() accept a list of strings and call the corresponding modifiers', () => {
-    let builder = QueryBuilder.forClass(TestModel);
-    let aCalled = false;
-    let bCalled = false;
+        d: ['c', 'b']
+      };
 
-    TestModel.modifiers = {
-      a(qb) {
-        aCalled = qb === builder;
-      },
+      aCalled = false;
+      bCalled = false;
+      builder[method]('a');
+      expect(aCalled).to.equal(true);
+      expect(bCalled).to.equal(false);
 
-      b(qb) {
-        bCalled = qb === builder;
-      }
-    };
+      aCalled = false;
+      bCalled = false;
+      builder[method]('b');
+      expect(aCalled).to.equal(false);
+      expect(bCalled).to.equal(true);
 
-    builder.applyFilter('a', 'b');
+      aCalled = false;
+      bCalled = false;
+      builder[method](['a', 'b']);
+      expect(aCalled).to.equal(true);
+      expect(bCalled).to.equal(true);
 
-    expect(aCalled).to.equal(true);
-    expect(bCalled).to.equal(true);
+      aCalled = false;
+      bCalled = false;
+      builder[method]([['a', [[['b']]]]]);
+      expect(aCalled).to.equal(true);
+      expect(bCalled).to.equal(true);
+
+      aCalled = false;
+      bCalled = false;
+      builder[method]('d');
+      expect(aCalled).to.equal(true);
+      expect(bCalled).to.equal(true);
+    });
   });
 
   it('should call the callback passed to .then after execution', done => {

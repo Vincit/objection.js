@@ -2406,7 +2406,7 @@ See [knex documentation](http://knexjs.org/#Builder-modify)
 
 Argument|Type|Description
 --------|----|--------------------
-fn|function&#124;string|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding [modifier](#modifiers) is executed instead.
+modifier|function([`QueryBuilder`](#querybuilder)&#124;string&#124;string[]|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding [modifier](#modifiers) is executed instead.
 *arguments| |The optional arguments passed to the modify function
 
 ##### Return value
@@ -3951,12 +3951,21 @@ Person
   })
 ```
 
+> The modifier can also be a [Model modifier](#modifiers) name, or an array of them:
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .modifyEager('children.movies', 'selectId')
+```
+
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
 pathExpression|string&#124;[`RelationExpression`](#relationexpression)|Expression that specifies the queries for which to give the filter.
-modifier|function([`QueryBuilder`](#querybuilder)|The modifier function.
+modifier|function([`QueryBuilder`](#querybuilder)&#124;string&#124;string[]|A modifier function, [model modifier](#modifiers) name or an array of model modifier names.
 
 ##### Return value
 
@@ -5293,7 +5302,7 @@ Property|Type|Description
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
 modelClass|[`Model`](#model)&#124;string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [`modelPaths`](#modelpaths) that exports a model class.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
-modify|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, modifier with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
+modify|function([`QueryBuilder`](#querybuilder))&#124;string&#124;string[]&#124;object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string (or an array of strings), modifier with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
 filter|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Alias for modify.
 beforeInsert|function([`Model`](#model), [`QueryContext`](#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
 
@@ -5725,7 +5734,17 @@ Person
   .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
-Modifiers that can be used in any eager query and by the [`modify`](#modify) method.
+> Modifiers can be used in any eager query through [modifyEager](#modifyeager):
+
+```js
+Person
+  .query()
+  .eager('[movies.actors, pets]')
+  .modifyEager('movies', ['goodMovies', 'orderByName'])
+  .modifyEager('pets', 'dogs')
+```
+
+Modifiers that can be used in any [eager query](#modifyeager) and by the [`modify`](#modify) method. See the examples.
 
 
 
