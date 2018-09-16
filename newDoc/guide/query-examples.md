@@ -396,13 +396,13 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Reusable named filters can be defined for models using [namedFilters](/api/model.html#static-namedfilters)
+Reusable named filters can be defined for models using [modifiers](/api/model.html#static-modifiers)
 
 ```js
 // Person.js
 
 class Person extends Model {
-  static get namedFilters() {
+  static get modifiers() {
     return {
       orderByAge: (builder) => {
         builder.orderBy('age');
@@ -414,7 +414,7 @@ class Person extends Model {
 // Animal.js
 
 class Animal extends Model {
-  static get namedFilters() {
+  static get modifiers() {
     return {
       orderByName: (builder) => {
         builder.orderBy('name');
