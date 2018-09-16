@@ -459,6 +459,8 @@ using the _exclusive arc table_ pattern discussed [here](https://github.com/Vinc
 
 ## Timestamps
 
+> This example is tested on postgres. You may need to use a different date format on other databases like mysql. See the database client's docs on which formats are supported.
+
 ```js
 class Person extends Model {
   $beforeInsert() {
