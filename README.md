@@ -17,14 +17,13 @@ What objection.js gives you:
  * **A way to [store complex documents](https://vincit.github.io/objection.js/#documents) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
  * **Easy to use [transactions](https://vincit.github.io/objection.js/#transactions)**
- * **Official [TypeScript](https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts) support**
  * **Optional [JSON schema](https://vincit.github.io/objection.js/#validation) validation**
 
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
- This doesn't mean you have to write SQL strings though. A query builder based on [`knex`](http://knexjs.org) is 
-    used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily 
+ This doesn't mean you have to write SQL strings though. A query builder based on [`knex`](http://knexjs.org) is
+    used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
     written using the [raw](http://vincit.github.io/objection.js/#raw) helper function.
  * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
