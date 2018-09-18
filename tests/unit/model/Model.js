@@ -1151,12 +1151,26 @@ describe('Model', () => {
           return _.mapKeys(json, (value, key) => {
             return _.snakeCase(key);
           });
+        },
+        jsonSchema: {
+          properties: {
+            someProperty: { type: 'string' }
+          }
         }
       });
     });
 
     it('should convert a property name to column name', () => {
       expect(Model1.propertyNameToColumnName('someProperty')).to.equal('some_property');
+    });
+
+    it('should return null if column name does not exist', () => {
+      Model1.pickJsonSchemaProperties = true;
+      expect(Model1.propertyNameToColumnName('otherProperty')).to.equal(null);
+    });
+
+    it('should return mapped property name if pickJsonSchemaProperties is true', () => {
+      expect(Model1.propertyNameToColumnName('otherProperty')).to.equal('other_property');
     });
   });
 
