@@ -1921,6 +1921,7 @@ create a pull request or an issue to get it added to this list.
 
  * [objection-filter](https://github.com/tandg-digital/objection-filter) - API filtering on data and related models
  * [objection-graphql](https://github.com/vincit/objection-graphql) - Automatically generates rich graphql schema for objection models
+ * [objection-transactional-tests](https://github.com/smartlyio/objection-transactional-tests) - Wrap Jest or Mocha test cases in transactions
 
 ## Plugin development best practices
 
