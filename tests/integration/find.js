@@ -4,7 +4,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 
 const { TimeoutError } = require('bluebird');
-const { raw, ref, Model, QueryBuilderOperation } = require('../..');
+const { raw, ref, lit, Model, QueryBuilderOperation } = require('../..');
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -1123,6 +1123,15 @@ module.exports = session => {
               { id: 2, relId: null, $afterGetCalled: 1 },
               { id: 3, relId: null, $afterGetCalled: 1 }
             ]);
+          });
+      });
+
+      it('should work in where', () => {
+        return Model1.query()
+          .where(lit(3), Model1.relatedQuery('model1Relation1').select('id'))
+          .first()
+          .then(res => {
+            expect(res.id).to.equal(1);
           });
       });
     });

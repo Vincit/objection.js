@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0
+
+### What's new
+
+  * Use `objection.raw` instead of `knex.raw` in `Model.raw`. [#1077](https://github.com/Vincit/objection.js/issues/1077)
+  * Allow modifiers (namedFilters) to be used in `modifyEager` too.
+  * Add `underscoreBeforeDigits` option for snake case converters. [#1025](https://github.com/Vincit/objection.js/issues/1025)
+  * fix [#1074](https://github.com/Vincit/objection.js/issues/1074)
+  * Typing fixes
+
 ## 1.2.3
 
 ### What's new
