@@ -3,7 +3,6 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const ValidationError = require('../../').ValidationError;
 const mockKnexFactory = require('../../testUtils/mockKnex');
-const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
 
 module.exports = session => {
   const Model1 = session.models.Model1;
@@ -2613,78 +2612,126 @@ module.exports = session => {
     });
 
     if (session.isPostgres()) {
-      it('check JoinEagerAlgorithm generated SQL', () => {
-        let queries = [];
+      describe('generated sql', () => {
+        let sql = [];
+        let mockKnex = null;
 
-        let mockKnex = mockKnexFactory(session.knex, function(mock, then, args) {
-          queries.push(this.toString());
-          return then.apply(this, args);
+        before(() => {
+          mockKnex = mockKnexFactory(session.knex, function(mock, then, args) {
+            sql.push(this.toString());
+            return then.apply(this, args);
+          });
         });
 
-        return Model1.bindKnex(mockKnex)
-          .query()
-          .eagerAlgorithm(Model1.JoinEagerAlgorithm)
-          .eager(
-            '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
-          )
-          .then(() => {
-            expect(_.last(queries).replace(/\s/g, '')).to.equal(
-              `
-              select
-                "Model1"."id" as "id",
-                "Model1"."model1Id" as "model1Id",
-                "Model1"."model1Prop1" as "model1Prop1",
-                "Model1"."model1Prop2" as "model1Prop2",
-                "model1Relation1"."id" as "model1Relation1:id",
-                "model1Relation1"."model1Id" as "model1Relation1:model1Id",
-                "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
-                "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2",
-                "model1Relation1Inverse"."id" as "model1Relation1Inverse:id",
-                "model1Relation1Inverse"."model1Id" as "model1Relation1Inverse:model1Id",
-                "model1Relation1Inverse"."model1Prop1" as "model1Relation1Inverse:model1Prop1",
-                "model1Relation1Inverse"."model1Prop2" as "model1Relation1Inverse:model1Prop2",
-                "model1Relation2"."id_col" as "model1Relation2:id_col",
-                "model1Relation2"."model1_id" as "model1Relation2:model1_id",
-                "model1Relation2"."model2_prop1" as "model1Relation2:model2_prop1",
-                "model1Relation2"."model2_prop2" as "model1Relation2:model2_prop2",
-                "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",
-                "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id",
-                "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1",
-                "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2",
-                "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra",
-                "model1Relation2:model2Relation2"."id" as "model1Relation2:model2Relation2:id",
-                "model1Relation2:model2Relation2"."model1Id" as "model1Relation2:model2Relation2:model1Id",
-                "model1Relation2:model2Relation2"."model1Prop1" as "model1Relation2:model2Relation2:model1Prop1",
-                "model1Relation2:model2Relation2"."model1Prop2" as "model1Relation2:model2Relation2:model1Prop2",
-                "model1Relation3"."id_col" as "model1Relation3:id_col",
-                "model1Relation3"."model1_id" as "model1Relation3:model1_id",
-                "model1Relation3"."model2_prop1" as "model1Relation3:model2_prop1",
-                "model1Relation3"."model2_prop2" as "model1Relation3:model2_prop2",
-                "model1Relation3_join"."extra1" as "model1Relation3:extra1",
-                "model1Relation3_join"."extra2" as "model1Relation3:extra2"
-              from
-                "Model1"
-              left join
-                "Model1" as "model1Relation1" on "model1Relation1"."id" = "Model1"."model1Id"
-              left join
-                "Model1" as "model1Relation1Inverse" on "model1Relation1Inverse"."model1Id" = "Model1"."id"
-              left join
-                "model2" as "model1Relation2" on "model1Relation2"."model1_id" = "Model1"."id"
-              left join
-                "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
-              left join
-                "Model1" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
-              left join
-                "Model1Model2One" as "model1Relation2:model2Relation2_join" on "model1Relation2:model2Relation2_join"."model2Id" = "model1Relation2"."id_col"
-              left join
-                "Model1" as "model1Relation2:model2Relation2" on "model1Relation2:model2Relation2_join"."model1Id" = "model1Relation2:model2Relation2"."id"
-              left join
-                "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "Model1"."id"
-              left join
-                "model2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
-            `.replace(/\s/g, '')
-            );
-          });
+        beforeEach(() => {
+          sql = [];
+        });
+
+        it('check WhereInEageralgorithm generated SQL', () => {
+          return Model1.bindKnex(mockKnex)
+            .query()
+            .eager(
+              '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
+            )
+            .mergeContext({
+              onBuild(builder) {
+                if (builder.modelClass().name === 'Model2') {
+                  builder.orderBy('id_col');
+                } else {
+                  builder.orderBy('id');
+                }
+              }
+            })
+            .then(() => {
+              expect(sql).to.eql([
+                'select "Model1".* from "Model1" order by "id" asc',
+                'select "Model1".* from "Model1" where "Model1"."id" in (2, 3, 4, 7, 9) order by "id" asc',
+                'select "Model1".* from "Model1" where "Model1"."model1Id" in (1, 2, 3, 4, 5, 6, 7, 8, 9) order by "id" asc',
+                'select "model2".* from "model2" where "model2"."model1_id" in (1, 2, 3, 4, 5, 6, 7, 8, 9) order by "id_col" asc',
+                'select "model2".*, "Model1Model2"."extra1" as "extra1", "Model1Model2"."extra2" as "extra2", "Model1Model2"."model1Id" as "objectiontmpjoin0" from "model2" inner join "Model1Model2" on "model2"."id_col" = "Model1Model2"."model2Id" where "Model1Model2"."model1Id" in (1, 2, 3, 4, 5, 6, 7, 8, 9) order by "id_col" asc',
+                'select "Model1".*, "Model1Model2"."extra3" as "aliasedExtra", "Model1Model2"."model2Id" as "objectiontmpjoin0" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2, 3, 4) order by "id" asc',
+                'select "Model1".*, "Model1Model2One"."model2Id" as "objectiontmpjoin0" from "Model1" inner join "Model1Model2One" on "Model1"."id" = "Model1Model2One"."model1Id" where "Model1Model2One"."model2Id" in (1, 2, 3, 4) order by "id" asc'
+              ]);
+            });
+        });
+
+        it('should not execute queries when an empty relation set is encoutered', () => {
+          return Model1.bindKnex(mockKnex)
+            .query()
+            .findById(4)
+            .eager('model1Relation1')
+            .then(res => {
+              expect(sql).to.have.length(1);
+              expect(res.id).to.equal(4);
+            });
+        });
+
+        it('check JoinEagerAlgorithm generated SQL', () => {
+          return Model1.bindKnex(mockKnex)
+            .query()
+            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            .eager(
+              '[model1Relation1, model1Relation1Inverse, model1Relation2.[model2Relation1, model2Relation2], model1Relation3]'
+            )
+            .then(() => {
+              expect(_.last(sql).replace(/\s/g, '')).to.equal(
+                `
+                select
+                  "Model1"."id" as "id",
+                  "Model1"."model1Id" as "model1Id",
+                  "Model1"."model1Prop1" as "model1Prop1",
+                  "Model1"."model1Prop2" as "model1Prop2",
+                  "model1Relation1"."id" as "model1Relation1:id",
+                  "model1Relation1"."model1Id" as "model1Relation1:model1Id",
+                  "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
+                  "model1Relation1"."model1Prop2" as "model1Relation1:model1Prop2",
+                  "model1Relation1Inverse"."id" as "model1Relation1Inverse:id",
+                  "model1Relation1Inverse"."model1Id" as "model1Relation1Inverse:model1Id",
+                  "model1Relation1Inverse"."model1Prop1" as "model1Relation1Inverse:model1Prop1",
+                  "model1Relation1Inverse"."model1Prop2" as "model1Relation1Inverse:model1Prop2",
+                  "model1Relation2"."id_col" as "model1Relation2:id_col",
+                  "model1Relation2"."model1_id" as "model1Relation2:model1_id",
+                  "model1Relation2"."model2_prop1" as "model1Relation2:model2_prop1",
+                  "model1Relation2"."model2_prop2" as "model1Relation2:model2_prop2",
+                  "model1Relation2:model2Relation1"."id" as "model1Relation2:model2Relation1:id",
+                  "model1Relation2:model2Relation1"."model1Id" as "model1Relation2:model2Relation1:model1Id",
+                  "model1Relation2:model2Relation1"."model1Prop1" as "model1Relation2:model2Relation1:model1Prop1",
+                  "model1Relation2:model2Relation1"."model1Prop2" as "model1Relation2:model2Relation1:model1Prop2",
+                  "model1Relation2:model2Relation1_join"."extra3" as "model1Relation2:model2Relation1:aliasedExtra",
+                  "model1Relation2:model2Relation2"."id" as "model1Relation2:model2Relation2:id",
+                  "model1Relation2:model2Relation2"."model1Id" as "model1Relation2:model2Relation2:model1Id",
+                  "model1Relation2:model2Relation2"."model1Prop1" as "model1Relation2:model2Relation2:model1Prop1",
+                  "model1Relation2:model2Relation2"."model1Prop2" as "model1Relation2:model2Relation2:model1Prop2",
+                  "model1Relation3"."id_col" as "model1Relation3:id_col",
+                  "model1Relation3"."model1_id" as "model1Relation3:model1_id",
+                  "model1Relation3"."model2_prop1" as "model1Relation3:model2_prop1",
+                  "model1Relation3"."model2_prop2" as "model1Relation3:model2_prop2",
+                  "model1Relation3_join"."extra1" as "model1Relation3:extra1",
+                  "model1Relation3_join"."extra2" as "model1Relation3:extra2"
+                from
+                  "Model1"
+                left join
+                  "Model1" as "model1Relation1" on "model1Relation1"."id" = "Model1"."model1Id"
+                left join
+                  "Model1" as "model1Relation1Inverse" on "model1Relation1Inverse"."model1Id" = "Model1"."id"
+                left join
+                  "model2" as "model1Relation2" on "model1Relation2"."model1_id" = "Model1"."id"
+                left join
+                  "Model1Model2" as "model1Relation2:model2Relation1_join" on "model1Relation2:model2Relation1_join"."model2Id" = "model1Relation2"."id_col"
+                left join
+                  "Model1" as "model1Relation2:model2Relation1" on "model1Relation2:model2Relation1_join"."model1Id" = "model1Relation2:model2Relation1"."id"
+                left join
+                  "Model1Model2One" as "model1Relation2:model2Relation2_join" on "model1Relation2:model2Relation2_join"."model2Id" = "model1Relation2"."id_col"
+                left join
+                  "Model1" as "model1Relation2:model2Relation2" on "model1Relation2:model2Relation2_join"."model1Id" = "model1Relation2:model2Relation2"."id"
+                left join
+                  "Model1Model2" as "model1Relation3_join" on "model1Relation3_join"."model1Id" = "Model1"."id"
+                left join
+                  "model2" as "model1Relation3" on "model1Relation3_join"."model2Id" = "model1Relation3"."id_col"
+              `.replace(/\s/g, '')
+              );
+            });
+        });
       });
     }
 
