@@ -455,6 +455,10 @@ the first example for how to create relations for this setup ➔</p>
 using the <em>exclusive arc table</em> pattern discussed <a href="https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442">here</a>.</p>
 
 <h2 id="timestamps">Timestamps</h2>
+
+<blockquote>
+<p>This example is tested on postgres. You may need to use a different date format on other databases like mysql. See the database client&rsquo;s docs on which formats are supported.</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">$beforeInsert</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">created_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>

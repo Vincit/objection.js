@@ -977,7 +977,7 @@ can be modified using <a href="#relatedinsertquerymutates"><code class="prettypr
   <span class="p">});</span>
 </code></pre>
 <blockquote>
-<p>Relations can also be filtered using named filters like this:</p>
+<p>Relations can also be filtered using modifier functions like this:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
@@ -997,12 +997,12 @@ can be modified using <a href="#relatedinsertquerymutates"><code class="prettypr
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
 </code></pre>
 <blockquote>
-<p>Reusable named filters can be defined for models using <a href="#namedfilters"><code class="prettyprint">namedFilters</code></a></p>
+<p>Reusable modifiers can be defined for models using <a href="#modifiers"><code class="prettyprint">modifiers</code></a></p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="c1">// Person.js</span>
 
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">orderByAge</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
@@ -1014,7 +1014,7 @@ can be modified using <a href="#relatedinsertquerymutates"><code class="prettypr
 <span class="c1">// Animal.js</span>
 
 <span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
@@ -1731,7 +1731,7 @@ callback are actual copies of the models passed as arguments to <code class="pre
 query through any other object will <strong>not</strong> be executed inside a transaction.</p>
 
 <p>Originally we advertised this way of doing transactions as a remedy to the transaction passing
-plaque but it has turned out to be pretty error-prone. This approach is handy for single inline
+plague but it has turned out to be pretty error-prone. This approach is handy for single inline
 functions that do a handful of operations, but becomes tricky when you have to call services
 and helper methods that also perform database queries. To get the helpers and service functions
 to participate in the transaction you need to pass around the bound copies of the model classes.
@@ -1768,7 +1768,7 @@ models from which the copies were taken.</p>
 objects or arrays in the model&rsquo;s <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> are automatically converted to JSON strings in the database and
 back to objects when read from the database. The database columns for the object properties can be normal
 text columns. Postgresql has the <code class="prettyprint">json</code> and <code class="prettyprint">jsonb</code> data types that can be used instead for better performance
-and possibility to <a href="http://www.postgresql.org/docs/9.4/static/functions-json.html">write queries</a> to the documents.
+and possibility to <a href="http://www.postgresql.org/docs/9.4/static/functions-json.html">write queries</a> for the documents.
 If you don&rsquo;t want to use <code class="prettyprint">jsonSchema</code> you can mark properties as objects using the <a href="#jsonattributes"><code class="prettyprint">jsonAttributes</code></a>
 Model property.</p>
 
@@ -1816,7 +1816,7 @@ Model property.</p>
 <span class="p">}</span>
 </code></pre>
 <p><a href="http://json-schema.org/">JSON schema</a> validation can be enabled by setting the <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> property
-of a model class. The validation is ran each time a <a href="#model"><code class="prettyprint">Model</code></a> instance is created.</p>
+of a model class. The validation is run each time a <a href="#model"><code class="prettyprint">Model</code></a> instance is created.</p>
 
 <p>You rarely need to call <a href="#_s_validate"><code class="prettyprint">$validate</code></a> method explicitly, but you can do it when needed. If validation fails a
 <a href="#validationerror"><code class="prettyprint">ValidationError</code></a> will be thrown. Since we use Promises, this usually means that a promise will be rejected
@@ -1848,6 +1848,7 @@ create a pull request or an issue to get it added to this list.</p>
 <ul>
 <li><a href="https://github.com/tandg-digital/objection-filter">objection-filter</a> - API filtering on data and related models</li>
 <li><a href="https://github.com/vincit/objection-graphql">objection-graphql</a> - Automatically generates rich graphql schema for objection models</li>
+<li><a href="https://github.com/smartlyio/objection-transactional-tests">objection-transactional-tests</a> - Wrap Jest or Mocha test cases in transactions</li>
 </ul>
 
 <h2 id="plugin-development-best-practices">Plugin development best practices</h2>
@@ -2430,6 +2431,10 @@ the first example for how to create relations for this setup ➔</p>
 using the <em>exclusive arc table</em> pattern discussed <a href="https://github.com/Vincit/objection.js/issues/19#issuecomment-291621442">here</a>.</p>
 
 <h2 id="timestamps">Timestamps</h2>
+
+<blockquote>
+<p>This example is tested on postgres. You may need to use a different date format on other databases like mysql. See the database client&rsquo;s docs on which formats are supported.</p>
+</blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="nx">$beforeInsert</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">this</span><span class="p">.</span><span class="nx">created_at</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">toISOString</span><span class="p">();</span>
@@ -5967,6 +5972,9 @@ knex parses table references.</p>
 
 <h4 id="modify">modify</h4>
 
+<p>Works like <code class="prettyprint">knex</code>&rsquo;s <a href="http://knexjs.org/#Builder-modify"><code class="prettyprint">modify</code></a> function but in addition
+you can specify model <a href="#modifiers"><code class="prettyprint">modifiers</code></a> by providing modifier names.</p>
+
 <p>See <a href="http://knexjs.org/#Builder-modify">knex documentation</a></p>
 
 <h5 id="arguments">Arguments</h5>
@@ -5979,9 +5987,9 @@ knex parses table references.</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>fn</td>
-<td>function&#124;string</td>
-<td>The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the call is redirected to <a href="#applyfilter"><code class="prettyprint">applyFilter</code></a> instead.</td>
+<td>modifier</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>&#124;string&#124;string[]</td>
+<td>The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding <a href="#modifiers">modifier</a> is executed instead.</td>
 </tr>
 <tr>
 <td>*arguments</td>
@@ -6006,7 +6014,7 @@ knex parses table references.</p>
 
 <h4 id="applyfilter">applyFilter</h4>
 
-<p>Applies named filters to the query builder.</p>
+<p>Applies modifiers to the query builder.</p>
 
 <h5 id="arguments">Arguments</h5>
 
@@ -6018,14 +6026,14 @@ knex parses table references.</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>filter</td>
+<td>modifier</td>
 <td>string</td>
-<td>The name of the filter, as found in <a href="#namedfilters"><code class="prettyprint">namedFilters</code></a>.</td>
+<td>The name of the modifier, as found in <a href="#modifiers"><code class="prettyprint">modifiers</code></a>.</td>
 </tr>
 <tr>
 <td>*arguments</td>
 <td></td>
-<td>When providing multiple arguments, all provided named filters will be applied.</td>
+<td>When providing multiple arguments, all provided modifiers will be applied.</td>
 </tr>
 </tbody></table>
 
@@ -7344,7 +7352,7 @@ the available algorithms <a href="#eager">here</a>.</p>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
 </code></pre>
 <blockquote>
-<p>Relations can be filtered by giving named filter functions as arguments
+<p>Relations can be filtered by giving modifier functions as arguments
 to the relations:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
@@ -7365,10 +7373,10 @@ to the relations:</p>
 <span class="nx">cconsole</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
 </code></pre>
 <blockquote>
-<p>Reusable named filters can be defined for a model class using <a href="#namedfilters"><code class="prettyprint">namedFilters</code></a></p>
+<p>Reusable modifiers can be defined for a model class using <a href="#modifiers"><code class="prettyprint">modifiers</code></a></p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">orderByAge</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
@@ -7378,7 +7386,7 @@ to the relations:</p>
 <span class="p">}</span>
 
 <span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
@@ -7542,9 +7550,9 @@ cases where performance doesn&rsquo;t matter and when it is the only option to g
 <td>The eager expression</td>
 </tr>
 <tr>
-<td>filters</td>
+<td>modifiers</td>
 <td>Object&lt;string, function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&gt;</td>
-<td>The named filter functions for the expression</td>
+<td>The modifier functions for the expression</td>
 </tr>
 </tbody></table>
 
@@ -7610,9 +7618,9 @@ expression to the existing expression.</p>
 <td>The eager expression</td>
 </tr>
 <tr>
-<td>filters</td>
+<td>modifiers</td>
 <td>Object&lt;string, function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&gt;</td>
-<td>The named filter functions for the expression</td>
+<td>The modifier functions for the expression</td>
 </tr>
 </tbody></table>
 
@@ -7778,6 +7786,14 @@ pets and movies of the children by id:</p>
     <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'like'</span><span class="p">,</span> <span class="s1">'%Predator%'</span><span class="p">);</span>
   <span class="p">})</span>
 </code></pre>
+<blockquote>
+<p>The modifier can also be a <a href="#modifiers">Model modifier</a> name, or an array of them:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.movies'</span><span class="p">,</span> <span class="s1">'selectId'</span><span class="p">)</span>
+</code></pre>
 <h5 id="arguments">Arguments</h5>
 
 <table><thead>
@@ -7794,8 +7810,8 @@ pets and movies of the children by id:</p>
 </tr>
 <tr>
 <td>modifier</td>
-<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td>The modifier function.</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>&#124;string&#124;string[]</td>
+<td>A modifier function, <a href="#modifiers">model modifier</a> name or an array of model modifier names.</td>
 </tr>
 </tbody></table>
 
@@ -9335,8 +9351,8 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 </tr>
 <tr>
 <td>modify</td>
-<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&#124;string&#124;object</td>
-<td>Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: &#39;Jenny&rsquo;} would additionally narrow fetched rows to the ones with the name &#39;Jenny&rsquo;.</td>
+<td>function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&#124;string&#124;string[]&#124;object</td>
+<td>Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string (or an array of strings), modifier with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: &#39;Jenny&rsquo;} would additionally narrow fetched rows to the ones with the name &#39;Jenny&rsquo;.</td>
 </tr>
 <tr>
 <td>filter</td>
@@ -9708,9 +9724,9 @@ fields <a href="#eageroptions">here</a>.</p>
 
 <p>Defaults to <code class="prettyprint">{minimize: false, separator: &#39;:&#39;, aliases: {}}</code>.</p>
 
-<h4 id="namedfilters">namedFilters</h4>
+<h4 id="modifiers">modifiers</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Movie</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">goodMovies</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'stars'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
       <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
@@ -9719,7 +9735,7 @@ fields <a href="#eageroptions">here</a>.</p>
 <span class="p">}</span>
 
 <span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
-  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">namedFilters</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
       <span class="na">dogs</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">)</span>
     <span class="p">};</span>
@@ -9727,13 +9743,26 @@ fields <a href="#eageroptions">here</a>.</p>
 <span class="p">}</span>
 </code></pre>
 <blockquote>
-<p>The named filters can be used in any eager query:</p>
+<p>Modifiers can be used in any eager query:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[movies(goodMovies, orderByName).actors, pets(dogs)]'</span><span class="p">)</span>
 </code></pre>
-<p>Named filters that can be used in any eager query and by the <a href="#applyfilter"><code class="prettyprint">applyFilter</code></a> method.</p>
+<blockquote>
+<p>Modifiers can be used in any eager query through <a href="#modifyeager">modifyEager</a>:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[movies.actors, pets]'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'movies'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'goodMovies'</span><span class="p">,</span> <span class="s1">'orderByName'</span><span class="p">])</span>
+  <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">,</span> <span class="s1">'dogs'</span><span class="p">)</span>
+</code></pre>
+<p>Modifiers that can be used in any <a href="#modifyeager">eager query</a> and by the <a href="#modify"><code class="prettyprint">modify</code></a> method. See the examples.</p>
+
+<h4 id="namedfilters">namedFilters</h4>
+
+<p>An alias for <a href="#modifiers"><code class="prettyprint">modifiers</code></a></p>
 
 <h4 id="uselimitinfirst">useLimitInFirst</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -10368,7 +10397,7 @@ only throws errors created by this function an never catches them.</p>
 <span class="kr">const</span> <span class="nx">person2</span> <span class="o">=</span> <span class="nx">people</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
 </code></pre>
 <blockquote>
-<p>Relations can be filtered by giving named filter functions as arguments to the relations:</p>
+<p>Relations can be filtered by giving modifier functions as arguments to the relations:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">loadRelated</span><span class="p">([</span><span class="nx">person1</span><span class="p">,</span> <span class="nx">person2</span><span class="p">],</span> <span class="s1">'children(orderByAge).[pets(onlyDogs, orderByName), movies]'</span><span class="p">,</span> <span class="p">{</span>
@@ -10407,9 +10436,9 @@ only throws errors created by this function an never catches them.</p>
 <td>The relation expression</td>
 </tr>
 <tr>
-<td>filters</td>
+<td>modifiers</td>
 <td>Object.&lt;string, function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&gt;</td>
-<td>Optional named filters</td>
+<td>Optional modifiers</td>
 </tr>
 <tr>
 <td>transactionOrKnex</td>
@@ -11728,7 +11757,7 @@ and <code class="prettyprint">patch</code> ignores the <code class="prettyprint"
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Jennifer had her first child with'</span><span class="p">,</span> <span class="nx">jennifer</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">father</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
 </code></pre>
 <blockquote>
-<p>Relations can be filtered by giving named filter functions as arguments
+<p>Relations can be filtered by giving modifier functions as arguments
 to the relations:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">jennifer</span>
@@ -11763,9 +11792,9 @@ to the relations:</p>
 <td>The relation expression</td>
 </tr>
 <tr>
-<td>filters</td>
+<td>modifiers</td>
 <td>Object.&lt;string, function(<a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a>)&gt;</td>
-<td>Optional named filters</td>
+<td>Optional modifiers</td>
 </tr>
 <tr>
 <td>transactionOrKnex</td>
@@ -13217,6 +13246,18 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-3-0">1.3.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Use <code class="prettyprint">objection.raw</code> instead of <code class="prettyprint">knex.raw</code> in <code class="prettyprint">Model.raw</code>. <a href="https://github.com/Vincit/objection.js/issues/1077">#1077</a></li>
+<li>Allow modifiers (namedFilters) to be used in <code class="prettyprint">modifyEager</code> too.</li>
+<li>Add <code class="prettyprint">underscoreBeforeDigits</code> option for snake case converters. <a href="https://github.com/Vincit/objection.js/issues/1025">#1025</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1074">#1074</a></li>
+<li>Typing fixes</li>
+</ul>
 
 <h2 id="1-2-3">1.2.3</h2>
 
