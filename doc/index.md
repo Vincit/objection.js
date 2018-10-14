@@ -1163,7 +1163,7 @@ In addition to the [`eager`](#eager) method, relations can be fetched using the 
 
 By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)).
 You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole
-eager tree. You can select which algorithm to use per query using [`eagerAlgorithm`](#eageralgorithm) method or
+eager tree. You can select which algorithm to use per query using the [`eagerAlgorithm`](#eageralgorithm) method or the [`joinEager`](#joineager) shortcut or
 per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. All algorithms
 have their strengths and weaknesses, which are discussed in detail [here](#eager).
 

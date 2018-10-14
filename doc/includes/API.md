@@ -3917,7 +3917,7 @@ Type|Description
 const builder = queryBuilder.modifyEager(pathExpression, modifier);
 ```
 
-Can be used to modify the eager queries.
+Can be used to modify eager queries.
 
 The `pathExpression` is a relation expression that specifies the queries for which the modifier is given.
 
