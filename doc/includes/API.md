@@ -3545,15 +3545,15 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-> Relations can be filtered by giving modifier functions as arguments
+> Relations can be modified by giving modifier functions as arguments
 > to the relations:
 
 ```js
 const people = await Person
   .query()
-  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]', {
-    orderByAge: (builder) => {
-      builder.orderBy('age');
+  .eager('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]', {
+    selectNameAndId: (builder) => {
+      builder.select('name', 'id');
     },
     orderByName: (builder) => {
       builder.orderBy('name');
@@ -3573,7 +3573,11 @@ cconsole.log(people[0].children[0].movies[0].id);
 class Person extends Model {
   static get modifiers() {
     return {
-      orderByAge: (builder) => {
+      defaultSelects(builder) {
+        builder.select('id', 'firstName', 'lastName')
+      },
+
+      orderByAge(builder) {
         builder.orderBy('age');
       }
     };
@@ -3583,10 +3587,11 @@ class Person extends Model {
 class Animal extends Model {
   static get modifiers() {
     return {
-      orderByName: (builder) => {
+      orderByName(builder) {
         builder.orderBy('name');
       },
-      onlyDogs: (builder) => {
+
+      onlyDogs(builder) {
         builder.where('species', 'dog');
       }
     };
@@ -3595,7 +3600,7 @@ class Animal extends Model {
 
 const people = await Person
   .query()
-  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]');
+  .eager('children(defaultSelects, orderByAge).[pets(onlyDogs, orderByName), movies]');
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -3608,8 +3613,8 @@ const people = await Person
   .query()
   .eager('children.[pets, movies]')
   .modifyEager('children', builder => {
-    // Order children by age.
-    builder.orderBy('age');
+    // Order children by age and only select id.
+    builder.orderBy('age').select('id');
   })
   .modifyEager('children.[pets, movies]', builder => {
     // Only select `pets` and `movies` whose id > 10 for the children.

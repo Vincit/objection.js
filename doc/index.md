@@ -1016,26 +1016,27 @@ const people = await Person
 console.log(people[0].children[0].children[0].children[0].firstName);
 ```
 
-> Relations can be filtered using the [`modifyEager`](#modifyeager) method:
+> Relation queries can be modified using the [`modifyEager`](#modifyeager) method:
 
 ```js
 const people = await Person
   .query()
   .eager('[children.[pets, movies], movies]')
   .modifyEager('children.pets', builder => {
-    // Only select pets older than 10 years old for children.
-    builder.where('age', '>', 10);
+    // Only select pets older than 10 years old for children
+    // and only return their names.
+    builder.where('age', '>', 10).select('name');
   });
 ```
 
-> Relations can also be filtered using modifier functions like this:
+> Relations can also be filtered using modifier functions like this (note that you can define [reusable modifiers](#modifiers) for models):
 
 ```js
 const people = await Person
   .query()
-  .eager('[pets(orderByName, onlyDogs), children(orderByAge).[pets, children]]', {
-    orderByName: (builder) => {
-      builder.orderBy('name');
+  .eager('[pets(selectNameAndId, onlyDogs), children(orderByAge).[pets, children]]', {
+    selectNameAndId: (builder) => {
+      builder.select('name', 'id');
     },
     orderByAge: (builder) => {
       builder.orderBy('age');
@@ -1165,6 +1166,8 @@ You can choose to use a join based eager loading algorithm that only performs on
 eager tree. You can select which algorithm to use per query using [`eagerAlgorithm`](#eageralgorithm) method or
 per model by setting the [`defaultEagerAlgorithm`](#defaulteageralgorithm) property. All algorithms
 have their strengths and weaknesses, which are discussed in detail [here](#eager).
+
+You can modify the eager loading queries by using the [`modifyEager`](#modifyeager) method or by defining either [in-place modifiers](#eager) or [model modifiers](#modifiers) and using them in a relation expression (see the examples). Modifiers may call any query building methods like `where`, `select` and `orderBy`. See the limitations when using `limit` and `offset` in the limitations section [here](#eager).
 
 # Graph inserts
 
