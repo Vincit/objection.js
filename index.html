@@ -966,24 +966,25 @@ can be modified using <a href="#relatedinsertquerymutates"><code class="prettypr
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">firstName</span><span class="p">);</span>
 </code></pre>
 <blockquote>
-<p>Relations can be filtered using the <a href="#modifyeager"><code class="prettyprint">modifyEager</code></a> method:</p>
+<p>Relation queries can be modified using the <a href="#modifyeager"><code class="prettyprint">modifyEager</code></a> method:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[children.[pets, movies], movies]'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.pets'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="c1">// Only select pets older than 10 years old for children.</span>
-    <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+    <span class="c1">// Only select pets older than 10 years old for children</span>
+    <span class="c1">// and only return their names.</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="mi">10</span><span class="p">).</span><span class="nx">select</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
   <span class="p">});</span>
 </code></pre>
 <blockquote>
-<p>Relations can also be filtered using modifier functions like this:</p>
+<p>Relations can also be filtered using modifier functions like this (note that you can define <a href="#modifiers">reusable modifiers</a> for models):</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[pets(orderByName, onlyDogs), children(orderByAge).[pets, children]]'</span><span class="p">,</span> <span class="p">{</span>
-    <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'[pets(selectNameAndId, onlyDogs), children(orderByAge).[pets, children]]'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">selectNameAndId</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">builder</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">);</span>
     <span class="p">},</span>
     <span class="na">orderByAge</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
@@ -1112,6 +1113,8 @@ You can choose to use a join based eager loading algorithm that only performs on
 eager tree. You can select which algorithm to use per query using <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method or
 per model by setting the <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> property. All algorithms
 have their strengths and weaknesses, which are discussed in detail <a href="#eager">here</a>.</p>
+
+<p>You can modify the eager loading queries by using the <a href="#modifyeager"><code class="prettyprint">modifyEager</code></a> method or by defining either <a href="#eager">in-place modifiers</a> or <a href="#modifiers">model modifiers</a> and using them in a relation expression (see the examples). Modifiers may call any query building methods like <code class="prettyprint">where</code>, <code class="prettyprint">select</code> and <code class="prettyprint">orderBy</code>. See the limitations when using <code class="prettyprint">limit</code> and <code class="prettyprint">offset</code> in the limitations section <a href="#eager">here</a>.</p>
 
 <h1 id="graph-inserts">Graph inserts</h1>
 <pre class="highlight javascript"><code><span class="c1">// The return value of `insertGraph` is the input graph converted into model instances.</span>
@@ -7352,14 +7355,14 @@ the available algorithms <a href="#eager">here</a>.</p>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
 </code></pre>
 <blockquote>
-<p>Relations can be filtered by giving modifier functions as arguments
+<p>Relations can be modified by giving modifier functions as arguments
 to the relations:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children(orderByAge).[pets(onlyDogs, orderByName), movies]'</span><span class="p">,</span> <span class="p">{</span>
-    <span class="na">orderByAge</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
-      <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children(selectNameAndId).[pets(onlyDogs, orderByName), movies]'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">selectNameAndId</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">builder</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'id'</span><span class="p">);</span>
     <span class="p">},</span>
     <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
       <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
@@ -7378,7 +7381,11 @@ to the relations:</p>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="na">orderByAge</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">defaultSelects</span><span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">builder</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">)</span>
+      <span class="p">},</span>
+
+      <span class="nx">orderByAge</span><span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -7388,10 +7395,11 @@ to the relations:</p>
 <span class="kr">class</span> <span class="nx">Animal</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">get</span> <span class="nx">modifiers</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="p">{</span>
-      <span class="na">orderByName</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="nx">orderByName</span><span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
       <span class="p">},</span>
-      <span class="na">onlyDogs</span><span class="p">:</span> <span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+
+      <span class="nx">onlyDogs</span><span class="p">(</span><span class="nx">builder</span><span class="p">)</span> <span class="p">{</span>
         <span class="nx">builder</span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'species'</span><span class="p">,</span> <span class="s1">'dog'</span><span class="p">);</span>
       <span class="p">}</span>
     <span class="p">};</span>
@@ -7400,7 +7408,7 @@ to the relations:</p>
 
 <span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children(orderByAge).[pets(onlyDogs, orderByName), movies]'</span><span class="p">);</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children(defaultSelects, orderByAge).[pets(onlyDogs, orderByName), movies]'</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">name</span><span class="p">);</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">people</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">movies</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">);</span>
@@ -7412,8 +7420,8 @@ to the relations:</p>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
-    <span class="c1">// Order children by age.</span>
-    <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">);</span>
+    <span class="c1">// Order children by age and only select id.</span>
+    <span class="nx">builder</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'age'</span><span class="p">).</span><span class="nx">select</span><span class="p">(</span><span class="s1">'id'</span><span class="p">);</span>
   <span class="p">})</span>
   <span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="s1">'children.[pets, movies]'</span><span class="p">,</span> <span class="nx">builder</span> <span class="o">=&gt;</span> <span class="p">{</span>
     <span class="c1">// Only select `pets` and `movies` whose id &gt; 10 for the children.</span>
