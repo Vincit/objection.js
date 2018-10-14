@@ -1110,7 +1110,7 @@ to be one of:</p>
 
 <p>By default eager loading is done using multiple separate queries (for details see <a href="https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/">this blog post</a>).
 You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole
-eager tree. You can select which algorithm to use per query using <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method or
+eager tree. You can select which algorithm to use per query using the <a href="#eageralgorithm"><code class="prettyprint">eagerAlgorithm</code></a> method or the <a href="#joineager"><code class="prettyprint">joinEager</code></a> shortcut or
 per model by setting the <a href="#defaulteageralgorithm"><code class="prettyprint">defaultEagerAlgorithm</code></a> property. All algorithms
 have their strengths and weaknesses, which are discussed in detail <a href="#eager">here</a>.</p>
 
@@ -7758,7 +7758,7 @@ parameters of a http request.</p>
 <h4 id="modifyeager">modifyEager</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">modifyEager</span><span class="p">(</span><span class="nx">pathExpression</span><span class="p">,</span> <span class="nx">modifier</span><span class="p">);</span>
 </code></pre>
-<p>Can be used to modify the eager queries.</p>
+<p>Can be used to modify eager queries.</p>
 
 <p>The <code class="prettyprint">pathExpression</code> is a relation expression that specifies the queries for which the modifier is given.</p>
 
