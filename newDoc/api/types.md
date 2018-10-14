@@ -29,6 +29,36 @@ modelClass|string<br>ModelClass|If you have a model class for the join table, yo
 extra|string[]<br>Object|Columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
 beforeInsert|function([Model](/api/model.html),&nbsp;[QueryContext](/api/query-builder.html#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
 
+## `type` ModelOptions
+
+Property|Type|Description
+--------|----|-----------
+patch|boolean|If true the json is treated as a patch and the `required` field of the json schema is ignored in the validation. This allows us to create models with a subset of required properties for patch operations.
+skipValidation|boolean|If true the json schema validation is skipped
+old|object|The old values for methods like `$beforeUpdate` and `$beforeValidate`.
+
+## `type` CloneOptions
+
+Property|Type|Description
+--------|----|-----------
+shallow|boolean|If true, relations are ignored
+
+## `type` ToJsonOptions
+
+Property|Type|Description
+--------|----|-----------
+shallow|boolean|If true, relations are ignored. Default is false.
+virtuals|boolean<br>string[]|If false, virtual attributes are omitted from the output. Default is true. You can also pass an array of property names and only those virtual properties get picked. You can even pass in property/function names that are not included in the static `virtualAttributes` array.
+
+## `type` EagerOptions
+
+Property|Type|Description
+--------|----|-----------
+minimize|boolean|If true the aliases of the joined tables and columns in a join based eager loading are minimized. This is sometimes needed because of identifier length limitations of some database engines. objection throws an exception when a query exceeds the length limit. You need to use this only in those cases.
+separator|string|Separator between relations in nested join based eager query. Defaults to `:`. Dot (`.`) cannot be used at the moment because of the way knex parses the identifiers.
+aliases|Object|Aliases for relations in a join based eager query. Defaults to an empty object.
+joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoin', ...]` or any other knex join method name. Defaults to `leftJoin`.
+
 ## `type` RelationExpression
 
 ## `class` ValidationError

@@ -12,9 +12,6 @@ Each model must have an identifier column. The identifier column name can be set
 
 A working model with minimal amount of code:
 
-::: multi-language example begin
-::: multi-language section ES2015 begin
-
 ```js
 const { Model } = require('objection');
 
@@ -27,24 +24,7 @@ class MinimalModel extends Model {
 module.exports = MinimalModel;
 ```
 
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-import { Model } from 'objection';
-
-export default class MinimalModel extends Model {
-  static tableName = 'someTableName';
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
-
 Model with custom methods, json schema validation and relations. This model is used in the examples:
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
 
 ```js
 const { Model } = require('objection');
@@ -165,116 +145,3 @@ class Person extends Model {
   }
 }
 ```
-
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-import * as path from 'path';
-
-class Person extends Model {
-  // Table name is the only required property.
-  static tableName = 'persons';
-
-  // Each model must have a column (or a set of columns) that uniquely
-  // identifies the rows. The colum(s) can be specified using the `idColumn`
-  // property. `idColumn` returns `id` by default and doesn't need to be
-  // specified unless the model's primary key is something else.
-  static idColumn = 'id';
-
-  // Methods can be defined for model classes just as you would for
-  // any javascript class. If you want to include the result of these
-  // method in the output json, see `virtualAttributes`.
-  fullName() {
-    return this.firstName + ' ' + this.lastName;
-  }
-
-  // Optional JSON schema. This is not the database schema!
-  // No tables or columns are generated based on this. This is only
-  // used for input validation. Whenever a model instance is created
-  // either explicitly or implicitly it is checked against this schema.
-  // See http://json-schema.org/ for more info.
-  static jsonSchema = {
-    type: 'object',
-    required: ['firstName', 'lastName'],
-
-    properties: {
-      id: {type: 'integer'},
-      parentId: {type: ['integer', 'null']},
-      firstName: {type: 'string', minLength: 1, maxLength: 255},
-      lastName: {type: 'string', minLength: 1, maxLength: 255},
-      age: {type: 'number'},
-
-      // Properties defined as objects or arrays are
-      // automatically converted to JSON strings when
-      // writing to database and back to objects and arrays
-      // when reading from database. To override this
-      // behaviour, you can override the
-      // Model.jsonAttributes property.
-      address: {
-        type: 'object',
-        properties: {
-          street: {type: 'string'},
-          city: {type: 'string'},
-          zipCode: {type: 'string'}
-        }
-      }
-    }
-  };
-
-  // This object defines the relations to other models.
-  static relationMappings = {
-    pets: {
-      relation: Model.HasManyRelation,
-      // The related model. This can be either a Model
-      // subclass constructor or an absolute file path
-      // to a module that exports one. We use the file
-      // path version here to prevent require loops.
-      modelClass: path.join(__dirname, 'Animal'),
-      join: {
-        from: 'persons.id',
-        to: 'animals.ownerId'
-      }
-    },
-
-    movies: {
-      relation: Model.ManyToManyRelation,
-      modelClass: path.join(__dirname, 'Movie'),
-      join: {
-        from: 'persons.id',
-        // ManyToMany relation needs the `through` object
-        // to describe the join table.
-        through: {
-          // If you have a model class for the join table
-          // you need to specify it like this:
-          // modelClass: PersonMovie,
-          from: 'persons_movies.personId',
-          to: 'persons_movies.movieId'
-        },
-        to: 'movies.id'
-      }
-    },
-
-    children: {
-      relation: Model.HasManyRelation,
-      modelClass: Person,
-      join: {
-        from: 'persons.id',
-        to: 'persons.parentId'
-      }
-    },
-
-    parent: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: Person,
-      join: {
-        from: 'persons.parentId',
-        to: 'persons.id'
-      }
-    }
-  };
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end

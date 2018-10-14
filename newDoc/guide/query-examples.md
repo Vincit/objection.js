@@ -363,26 +363,27 @@ const people = await Person
 console.log(people[0].children[0].children[0].children[0].firstName);
 ```
 
-Relations can be filtered using the [modifyEager](/api/query-builder.html#modifyeager) method:
+Relations can be modified using the [modifyEager](/api/query-builder.html#modifyeager) method:
 
 ```js
 const people = await Person
   .query()
   .eager('[children.[pets, movies], movies]')
   .modifyEager('children.pets', builder => {
-    // Only select pets older than 10 years old for children.
-    builder.where('age', '>', 10);
+    // Only select pets older than 10 years old for children
+    // and only return their names.
+    builder.where('age', '>', 10).select('name');
   });
 ```
 
-Relations can also be filtered using named filters like this:
+Relations can also be modified using named filters like this:
 
 ```js
 const people = await Person
   .query()
-  .eager('[pets(orderByName, onlyDogs), children(orderByAge).[pets, children]]', {
-    orderByName: (builder) => {
-      builder.orderBy('name');
+  .eager('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]', {
+    selectName: (builder) => {
+      builder.select('name');
     },
     orderByAge: (builder) => {
       builder.orderBy('age');
@@ -404,7 +405,11 @@ Reusable named filters can be defined for models using [modifiers](/api/model.ht
 class Person extends Model {
   static get modifiers() {
     return {
-      orderByAge: (builder) => {
+      defaultSelects(builder) {
+        builder.select('id', 'firstName')
+      },
+
+      orderByAge(builder) {
         builder.orderBy('age');
       }
     };
@@ -416,10 +421,11 @@ class Person extends Model {
 class Animal extends Model {
   static get modifiers() {
     return {
-      orderByName: (builder) => {
+      orderByName(builder) {
         builder.orderBy('name');
       },
-      onlyDogs: (builder) => {
+
+      onlyDogs(builder) {
         builder.where('species', 'dog');
       }
     };
@@ -430,7 +436,12 @@ class Animal extends Model {
 
 const people = await Person
   .query()
-  .eager('children(orderByAge).[pets(onlyDogs, orderByName), movies]');
+  .eager(`
+    children(defaultSelects, orderByAge).[
+      pets(onlyDogs, orderByName),
+      movies
+    ]
+  `);
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);

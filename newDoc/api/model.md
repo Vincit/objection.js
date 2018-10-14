@@ -6,6 +6,8 @@ sidebarDepth: 2
 
 Subclasses of this class represent database tables.
 
+See the [model section](/guide/models.html#examples) of the guide for some simple example models. The API documentation below also contains a bunch of examples.
+
 ## Overview
 
 ### Model data lifecycle
@@ -47,9 +49,6 @@ In addition to these data formatting hooks, Model also has query lifecycle hooks
 
 ### `static` tableName
 
-::: multi-language example begin
-::: multi-language section ES2015 begin
-
 ```js
 class Person extends Model {
   static get tableName() {
@@ -58,27 +57,11 @@ class Person extends Model {
 }
 ```
 
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-class Person extends Model {
-  static tableName = 'persons';
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
-
-
 Name of the database table for this model.
 
 Each model must set this.
 
 ### `static` jsonSchema
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
 
 ```js
 class Person extends Model {
@@ -96,26 +79,6 @@ class Person extends Model {
 }
 ```
 
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-class Person extends Model {
-  static jsonSchema = {
-    type: 'object',
-    required: ['name'],
-    properties: {
-      id: {type: 'integer'},
-      name: {type: 'string', minLength: 1, maxLength: 255},
-      age: {type: 'number'}, // optional
-    }
-  }
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
-
 The optional schema against which the JSON is validated.
 
 The jsonSchema can be dynamically modified in the [$beforeValidate](#beforevalidate) method.
@@ -131,9 +94,6 @@ Must follow [JSON Schema](http://json-schema.org) specification. If null no vali
 * [custom validation recipe](/recipes/custom-validation.html)
 
 #### Examples
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
 
 ```js
 class Person extends Model {
@@ -168,48 +128,8 @@ class Person extends Model {
   }
 }
 ```
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-class Person extends Model {
-  static jsonSchema = {
-    type: 'object',
-    required: ['firstName', 'lastName'],
-
-    properties: {
-      id: {type: 'integer'},
-      parentId: {type: ['integer', 'null']},
-      firstName: {type: 'string', minLength: 1, maxLength: 255},
-      lastName: {type: 'string', minLength: 1, maxLength: 255},
-      age: {type: 'number'},
-
-      // Properties defined as objects or arrays are
-      // automatically converted to JSON strings when
-      // writing to database and back to objects and arrays
-      // when reading from database. To override this
-      // behaviour, you can override the
-      // Person.jsonAttributes property.
-      address: {
-        type: 'object',
-        properties: {
-          street: {type: 'string'},
-          city: {type: 'string'},
-          zipCode: {type: 'string'}
-        }
-      }
-    }
-  };
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
 
 ### `static` idColumn
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
 
 ```js
 class Person extends Model {
@@ -219,18 +139,6 @@ class Person extends Model {
 }
 ```
 
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-class Person extends Model {
-  static idcolumn = 'some_column_name';
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
-
 Name of the primary key column in the database table.
 
 Composite id can be specified by giving an array of column names.
@@ -239,9 +147,6 @@ Defaults to 'id'.
 
 ### `static` modelPaths
 
-::: multi-language example begin
-::: multi-language section ES2015 begin
-
 ```js
 class Person extends Model {
   static get modelPaths() {
@@ -249,18 +154,6 @@ class Person extends Model {
   }
 }
 ```
-
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-class Person extends Model {
-  static modelPaths = [__dirname];
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
 
 A list of paths from which to search for models for relations.
 
@@ -300,6 +193,22 @@ class Person extends BaseModel {
 }
 ```
 
+### `static` concurrency
+
+```js
+class Person extends Model {
+  static get concurrency() {
+    return 10;
+  }
+}
+```
+
+How many queries can be run concurrently per connection.
+
+This doesn't limit the concurrencly of the entire server. It only limits the number of concurrent queries that can be run on a single connection. By default knex connection pool size is 10, which means that the maximum number of concurrent queries started by objection is `Model.concurrency * 10`. You can also easily increase the knex pool size.
+
+The default concurrency is 4 except for mssql, for which the default is 1. The mssql default is needed because of the buggy driver that only allows one query at a time per connection.
+
 ### `static` relationMappings
 
 This property defines the relations to other models.
@@ -319,9 +228,6 @@ Further reading:
  * [RelationMapping](/api/types.html#type-relationmapping)
 
 #### Examples
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
 
 ```js
 const { Model, ref } = require('objection');
@@ -385,74 +291,7 @@ class Person extends Model {
 }
 ```
 
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-import { Model, ref } from 'objection';
-
-class Person extends Model {
-  static tableName = 'persons';
-
-  static relationMappings = {
-    pets: {
-      relation: Model.HasManyRelation,
-      modelClass: Animal,
-      join: {
-        from: 'persons.id',
-        // Any of the `to` and `from` fields can also be
-        // references to nested fields (or arrays of references).
-        // Here the relation is created between `persons.id` and
-        // `animals.json.details.ownerId` properties. The reference
-        // must be casted to the same type as the other key.
-        to: ref('animals.json:details.ownerId').castInt()
-      }
-    },
-
-    father: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: Person,
-      join: {
-        from: 'persons.fatherId',
-        to: 'persons.id'
-      }
-    },
-
-    movies: {
-      relation: Model.ManyToManyRelation,
-      modelClass: Movie,
-      join: {
-        from: 'persons.id',
-        through: {
-          from: 'persons_movies.actorId',
-          to: 'persons_movies.movieId'
-
-          // If you have a model class for the join table
-          // you can specify it like this:
-          //
-          // modelClass: PersonMovie,
-
-          // Columns listed here are automatically joined
-          // to the related models on read and written to
-          // the join table instead of the related table
-          // on insert.
-          //
-          // extra: ['someExtra']
-        },
-        to: 'movies.id'
-      }
-    }
-  };
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
-
 ### `static` jsonAttributes
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
 
 ```js
 class Person extends Model {
@@ -462,28 +301,31 @@ class Person extends Model {
 }
 ```
 
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-class Person extends Model {
-  static jsonAttributes = ['someProp', 'someOtherProp'];
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
-
 Properties that should be saved to database as JSON strings.
 
 The properties listed here are serialized to JSON strings upon insertion/update to the database and parsed back to objects when models are read from the database. Combined with the postgresql's json or jsonb data type, this is a powerful way of representing documents as single database rows.
 
 If this property is left unset all properties declared as objects or arrays in the [jsonSchema](#static-jsonschema) are implicitly added to this list.
 
-### `static` columnNameMappers
+### `static` cloneObjectAttributes
 
-::: multi-language example begin
-::: multi-language section ES2015 begin
+```js
+class Person extends Model {
+  static get cloneObjectAttributes() {
+    return false;
+  }
+}
+```
+
+If true (the default) object attributes (for example jsonb columns) are cloned when `$toDatabaseJson`, `$toJson` or `toJSON` is called. If this is set to false, they are not cloned. Note that nested `Model` instances inside relations etc. are still effectively cloned, because `$toJson` is called for them recursively, but their jsonb columns, again,
+are not :)
+
+Usually you don't need to care about this setting, but if you have large object fields (for example large objects in jsonb columns) cloning the data can become slow and play a significant part in your server's performance. There's rarely a need to to clone this data, but since it has historically been copied, we cannot change the default behaviour
+easily.
+
+TLDR; Set this setting to `false` if you have large jsonb columns and you see that cloning that data takes a significant amount of time **when you profile the code**.
+
+### `static` columnNameMappers
 
 ```js
 const { Model, snakeCaseMappers } = require('objection');
@@ -494,21 +336,6 @@ class Person extends Model {
   }
 }
 ```
-
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-
-```js
-import { Model, snakeCaseMappers } from 'objection';
-
-class Person extends Model {
-  static columnNameMappers = snakeCaseMappers();
-}
-```
-
-::: multi-language section ESNext end
-::: multi-language example end
 
 The mappers to use to convert column names to property names in code.
 
@@ -547,6 +374,241 @@ class Person extends Model {
 }
 ```
 
+### `static` relatedFindQueryMutates
+
+```js
+class Person extends Model {
+  static get relatedFindQueryMutates() {
+    return false;
+  }
+}
+```
+
+If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assign the fetched related models to `foo.bar`. The default is true.
+
+### `static` relatedInsertQueryMutates
+
+```js
+class Person extends Model {
+  static get relatedInsertQueryMutates() {
+    return false;
+  }
+}
+```
+
+If this config is set to false, calling `foo.$relatedQuery('bar').insert(obj)` doesn't append the inserted related model to `foo.bar`. The default is true.
+
+### `static` virtualAttributes
+
+```js
+class Person extends Model {
+  static get virtualAttributes() {
+    return ['fullName', 'isFemale'];
+  }
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  get isFemale() {
+    return this.gender === 'female';
+  }
+}
+
+const person = Person.fromJson({
+  firstName: 'Jennifer',
+  lastName: 'Aniston',
+  gender: 'female'
+});
+
+// Note that `toJSON` is always called automatically
+// when an object is serialized to a JSON string using
+// JSON.stringify. You very rarely need to call `toJSON`
+// explicitly. koa, express and all other frameworks I'm
+// aware of use JSON.stringify to serialize objects to JSON.
+console.log(person.toJSON());
+// --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
+```
+
+Getters and methods listed here are serialized with real properties when `toJSON` is called.
+
+The virtual values are not written to database. Only the "external" JSON format will contain them.
+
+### `static` uidProp
+
+```js
+class Person extends Model {
+  static get uidProp() {
+    return '#id';
+  }
+}
+```
+
+
+Name of the property used to store a temporary non-db identifier for the model.
+
+NOTE: You cannot use any of the model's properties as `uidProp`. For example if your model has a property `id`, you cannot set `uidProp = 'id'`.
+
+Defaults to '#id'.
+
+### `static` uidRefProp
+
+```js
+class Person extends Model {
+  static get uidRefProp() {
+    return '#ref';
+  }
+}
+```
+
+Name of the property used to store a reference to a [uidProp](#static-uidprop)
+
+NOTE: You cannot use any of the model's properties as `uidRefProp`. For example if your model has a property `ref`, you cannot set `uidRefProp = 'ref'`.
+
+Defaults to `'#ref'`.
+
+### `static` dbRefProp
+
+```js
+class Person extends Model {
+  static get dbRefProp() {
+    return '#dbRef';
+  }
+}
+```
+
+Name of the property used to point to an existing database row from an `insertGraph` graph.
+
+NOTE: You cannot use any of the model's properties as `dbRefProp`. For example if your model has a property `id`, you cannot set `dbRefProp = 'id'`.
+
+Defaults to '#dbRef'.
+
+
+### `static` propRefRegex
+
+```js
+class Person extends Model {
+  static get propRefRegex() {
+    return /#ref{([^\.]+)\.([^}]+)}/g;
+  }
+}
+```
+
+Regular expression for parsing a reference to a property.
+
+Defaults to `/#ref{([^\.]+)\.([^}]+)}/g`.
+
+### `static` pickJsonSchemaProperties
+
+```js
+class Person extends Model {
+  static get pickJsonSchemaProperties() {
+    return true;
+  }
+}
+```
+
+If this is true only properties in `jsonSchema` are picked when inserting or updating a row in the database.
+
+Defaults to false.
+
+### `static` defaultEagerAlgorithm
+
+```js
+class Person extends Model {
+  static get defaultEagerAlgorithm() {
+    return Model.WhereInEagerAlgorithm;
+  }
+}
+```
+
+Sets the default eager loading algorithm for this model. Must be either
+`Model.WhereInEagerAlgorithm` or `Model.JoinEagerAlgorithm`.
+
+Defaults to `Model.WhereInEagerAlgorithm`.
+
+### `static` defaultEagerOptions
+
+```js
+class Person extends Model {
+  static get defaultEagerOptions() {
+    return {
+      minimize: true,
+      separator: '->',
+      aliases: {}
+    };
+  }
+}
+```
+
+Sets the default options for eager loading algorithm. See the possible
+fields [here](/api/types.html#type-eageroptions).
+
+Defaults to `{minimize: false, separator: ':', aliases: {}}`.
+
+### `static` modifiers
+
+Reusable query building functions that can be used in any [eager query](#eager), using [`modify`](#modify) method and in many other places.
+
+```js
+class Movie extends Model {
+  static get modifiers() {
+    return {
+      goodMovies(builder) {
+        builder.where('stars', '>', 3);
+      },
+
+      orderByName(builder) {
+        builder.orderBy('name')
+      }
+    };
+  }
+}
+
+class Animal extends Model {
+  static get modifiers() {
+    return {
+      dogs(builder) {
+        builder.where('species', 'dog');
+      }
+    };
+  }
+}
+```
+
+Modifiers can be used in any eager query:
+
+```js
+Person
+  .query()
+  .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
+```
+
+Modifiers can also be used through [modifyEager](#modifyeager):
+
+```js
+Person
+  .query()
+  .eager('[movies.actors, pets]')
+  .modifyEager('movies', ['goodMovies', 'orderByName'])
+  .modifyEager('pets', 'dogs')
+```
+
+### `static` namedFilters
+
+An alias for [`modifiers`](#static-modifiers)
+
+### `static` useLimitInFirst
+
+```js
+class Animal extends Model {
+  static get useLimitInFirst() {
+    return true;
+  }
+}
+```
+
+If true, `limit(1)` is added to the query when `first()` is called. Defaults to `false`.
 
 ## Static methods
 
@@ -555,14 +617,3 @@ class Person extends Model {
 ## Instance methods
 
 ### $relatedQuery()
-
-::: multi-language example begin
-::: multi-language section ES2015 begin
-
-
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-
-::: multi-language section ESNext end
-::: multi-language example end

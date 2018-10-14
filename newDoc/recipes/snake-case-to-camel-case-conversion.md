@@ -6,9 +6,6 @@ You may want to use snake_cased names in database and camelCased names in code. 
 
 2. _Conversion in objection using [snakeCaseMappers](/api/objection.html#snakecasemappers)_. When the conversion is done on objection level only database columns of the returned rows (model instances) are convered to camel case. You still need to use snake case in [relationMappings](/api/model.html#static-relationmappings) and queries. Note that [insert](/api/query-builder.html#insert), [patch](/api/query-builder.html#patch), [update](/api/query-builder.html#update) and their variants still take objects in camel case. The reasoning is that objects passed to those methods usually come from the client that also uses camel case.
 
-::: multi-language example begin
-::: multi-language section ES2015 begin
-
 Let's assume this is our schema:
 
 ```js
@@ -120,36 +117,3 @@ class Person extends Model {
 // Queries need to use the database casing.
 await Person.query().where('first_name', 'Jennifer');
 ```
-
-::: multi-language section ES2015 end
-::: multi-language section ESNext begin
-
-```js
-import { Model, snakeCaseMappers } from 'objection';
-
-// When `snakeCaseMappers` is used, you still define tables
-// and relation mappings using the database casing.
-class Person extends Model {
-  static columnNameMappers = snakeCaseMappers();
-  static tableName = 'persons_table';
-  static idColumn = 'id_column';
-  static relationMappings = {
-    parent: {
-      relation: Model.BelongsToOneRelation,
-      modelClass: Person,
-      join: {
-        from: 'persons_table.parent_id',
-        to: 'persons_table.id_column'
-      }
-    }
-  };
-}
-
-...
-
-// Queries need to use the database casing.
-await Person.query().where('first_name', 'Jennifer');
-```
-
-::: multi-language section ESNext end
-::: multi-language example end

@@ -1,1 +1,1 @@
-* Copy UPPER_SNAKE_CASE docs
+* remove webpack-dev-middleware from package.json. It's there because of this: https://github.com/vuejs/vuepress/issues/1417

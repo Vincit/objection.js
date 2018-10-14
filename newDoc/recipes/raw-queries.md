@@ -8,10 +8,21 @@ There are also some helper methods such as [whereRaw](/api/query-builder.html#wh
 
 ```js
 const { raw } = require('objection');
+const ageToAdd = 10;
+
+await Person
+  .query()
+  .patch({
+    age: raw('age + ?', ageToAdd)
+  })
+```
+
+```js
+const { raw } = require('objection');
 
 const childAgeSums = await Person
   .query()
-  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .select(raw('coalesce(sum(??), 0) as ??', 'age').as('childAgeSum'))
   .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
   .orderBy(raw('random()'));
 

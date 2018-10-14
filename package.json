@@ -85,12 +85,11 @@
     "mysql": "^2.16.0",
     "nyc": "^13.3.0",
     "pg": "^7.6.1",
-    "markdown-it-container": "^2.0.0",
     "prettier": "1.13.6",
     "sqlite3": "^4.0.0",
-    "typescript": "^2.7.1",
-    "vue-tabs-component": "^1.4.0",
-    "vuepress": "^0.11.0"
+    "typescript": "^3.3.3",
+    "vuepress": "^0.14.10",
+    "webpack-dev-middleware": "3.6.0"
   },
   "nyc": {
     "description": "test coverage",

@@ -77,6 +77,16 @@ const result = await Person
 console.log(result[0].ageSum);
 ```
 
+You can use `raw` in insert and update queries too:
+
+```js
+await Person
+  .query()
+  .patch({
+    age: raw('age + ?', 10)
+  })
+```
+
 You can also use named placeholders. `:someName:` for identifiers (column names, aliases etc.) and `:someName` for values.
 
 ```js
@@ -125,7 +135,11 @@ const { lit, ref } = require('objection');
 // Compare json objects
 await Model
   .query()
-  .where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}))
+  .where(
+    ref('Model.jsonColumn:details'),
+    '=',
+    lit({name: 'Jennifer', age: 29})
+  )
 
 // Insert an array literal
 await Model
