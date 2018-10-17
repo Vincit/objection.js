@@ -2178,6 +2178,20 @@ describe('Model', () => {
     expect(Model1.fn()).to.eql({ a: 1 });
   });
 
+  it('fn should be a shortcut to knex.fn', () => {
+    const Model1 = modelClass('Model1');
+    Model1.knex({ fn: { a: 1 } });
+    expect(Model1.fn.a).to.equal(1);
+
+    const Model2 = modelClass('Model2');
+    Model2.knex(knex({ client: 'pg' }));
+
+    const expected = Model2.knex()
+      .fn.now()
+      .toString();
+    expect(Model2.fn.now().toString()).to.equal(expected);
+  });
+
   it('make sure JSON.stringify works with toJSON (#869)', () => {
     class Person extends Model {
       static get idColumn() {
