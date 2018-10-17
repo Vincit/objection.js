@@ -162,6 +162,17 @@ async () => {
   takesMaybePerson(await Person.query().findOne({ lastName }));
 };
 
+// .query().castTo()
+async () => {
+  const animals = await Person
+  .query()
+  .joinRelation('children.children.pets')
+  .select('children:children:pets.*')
+  .castTo(Animal);
+
+  takesAnimals(animals);
+}
+
 // instance methods:
 async () => {
   const person = new Person();
@@ -252,6 +263,12 @@ class Animal extends objection.Model {
     }
   };
 }
+
+const takesAnimal = (animal: Animal) => {
+  animal.species = 'dog';
+};
+const takesMaybeAnimal = (_: Animal | undefined) => 1;
+const takesAnimals = (_: Animal[]) => 1;
 
 class Comment extends objection.Model {
   // prettier-ignore

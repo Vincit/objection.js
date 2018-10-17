@@ -623,6 +623,7 @@ declare namespace Objection {
     extends QueryBuilderBase<QM, RM, RV>,
       Executable<RV> {
     throwIfNotFound(): QueryBuilder<QM, RM>;
+    castTo<T extends typeof Model>(model: T):  QueryBuilder<QM, InstanceType<T>[]>;
   }
 
   export interface QueryBuilderYieldingOne<QM extends Model> extends QueryBuilder<QM, QM, QM> {}
