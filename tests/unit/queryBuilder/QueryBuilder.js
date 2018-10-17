@@ -729,15 +729,16 @@ describe('QueryBuilder', () => {
   });
 
   it('resultSize should create and execute a query that returns the size of the query', done => {
-    mockKnexQueryResults = [[{ count: 123 }]];
+    mockKnexQueryResults = [[{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
+      .limit(10)
+      .offset(100)
       .resultSize()
       .then(res => {
         expect(executedQueries).to.have.length(1);
         expect(res).to.equal(123);
-        // resultSize should cancel the groupBy call since it doesn't affect the outcome.
         expect(executedQueries[0]).to.equal(
           'select count(*) as "count" from (select "Model".* from "Model" where "test" = 100) as "temp"'
         );
@@ -747,7 +748,7 @@ describe('QueryBuilder', () => {
   });
 
   it('range should return a range and the total count', done => {
-    mockKnexQueryResults = [[{ a: 1 }], [{ count: 123 }]];
+    mockKnexQueryResults = [[{ a: '1' }], [{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
@@ -766,7 +767,7 @@ describe('QueryBuilder', () => {
   });
 
   it('page should return a page and the total count', done => {
-    mockKnexQueryResults = [[{ a: 1 }], [{ count: 123 }]];
+    mockKnexQueryResults = [[{ a: '1' }], [{ count: '123' }]];
     QueryBuilder.forClass(TestModel)
       .where('test', 100)
       .orderBy('order')
