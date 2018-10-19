@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const { ValidationError, RelationExpression } = require('../../../');
+const { RelationExpression } = require('../../../');
 
 describe('RelationExpression', () => {
   describe('parse', () => {
@@ -603,6 +603,30 @@ describe('RelationExpression', () => {
           }
         }
       );
+
+      testParse('a(f1).b(^f2, ^f3)', {
+        $name: null,
+        $relation: null,
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false,
+
+        a: {
+          $name: 'a',
+          $relation: 'a',
+          $modify: ['f1'],
+          $recursive: false,
+          $allRecursive: false,
+
+          b: {
+            $name: 'b',
+            $relation: 'b',
+            $modify: ['^f2', '^f3'],
+            $recursive: false,
+            $allRecursive: false,
+          }
+        }
+      })
     });
 
     it('alias', () => {
