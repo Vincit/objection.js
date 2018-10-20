@@ -116,6 +116,20 @@ describe('QueryBuilder', () => {
     expect(called).to.equal(true);
   });
 
+  it('should throw if an unknown modifier is specified', () => {
+    const builder = QueryBuilder.forClass(TestModel);
+
+    TestModel.modifiers = {};
+
+    expect(() => {
+      builder.applyModifier('unknown');
+    }).to.throwException(err => {
+      expect(err.message).to.equal(
+        'Unable to determine modify function from provided value: "unknown".'
+      );
+    });
+  });
+
   ['applyFilter', 'applyModifier', 'modify'].forEach(method => {
     it(method + ' accept a list of strings and call the corresponding modifiers', () => {
       const builder = QueryBuilder.forClass(TestModel);
