@@ -130,6 +130,15 @@ describe('QueryBuilder', () => {
     });
   });
 
+  it('modify() should do nothing when receiving `undefined`', () => {
+    let builder = QueryBuilder.forClass(TestModel);
+    let res;
+    expect(() => {
+      res = builder.modify(undefined);
+    }).to.not.throwException();
+    expect(res === builder).to.equal(true);
+  });
+
   ['applyFilter', 'applyModifier', 'modify'].forEach(method => {
     it(method + ' accept a list of strings and call the corresponding modifiers', () => {
       const builder = QueryBuilder.forClass(TestModel);
