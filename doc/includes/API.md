@@ -2418,7 +2418,7 @@ Type|Description
 
 
 
-#### applyFilter
+#### applyModifier
 
 Applies modifiers to the query builder.
 
@@ -2434,6 +2434,13 @@ modifier|string|The name of the modifier, as found in [`modifiers`](#modifiers).
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining.
+
+
+
+
+#### applyFilter
+
+An alias for [`applyModifier`](#applymodifier)
 
 
 
@@ -6182,6 +6189,40 @@ row|Object|A database row.
 Type|Description
 ----|-----------------------------
 [`Model`](#model)|The created model instance
+
+
+
+
+#### modifierNotFound
+
+```js
+class BaseModel extends Model {
+  static modifierNotFound(builder, modifier) {
+    const { properties } = this.jsonSchema
+    if (properties && modifier in properties) {
+      builder.select(modifier)
+    } else {
+      super.modifierNotFound(builder, modifier)
+    }
+  }
+}
+```
+
+Handles modifiers that are not recognized by the various mechanisms that can specify
+them, such as [`modify`](#modify) and [`applyModifier`](#applymodifier), as well as
+the use of modifiers in eager expressions (see [`RelationExpression`](#relationexpression))
+and in relations (see [`RelationMapping`](#relationmapping).
+
+By default, the static `modifierNotFound()` hook throws a `ModifierNotFoundError` error.
+If a model class overrides the hook, it can decide to handle the modifer through the passed
+`builder` instance, or call the hook's definition in the super class to still throw the error.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+builder|[`QueryBuilder`](#querybuilder)|The query builder on which to apply the modifier.
+modifier|string|The name of the unknown modifier.
 
 
 

@@ -190,6 +190,70 @@ describe('QueryBuilder', () => {
       expect(aCalled).to.equal(true);
       expect(bCalled).to.equal(true);
     });
+
+    it(method + ' calls the modifierNotFound() hook for unknown modifiers', () => {
+      const builder = QueryBuilder.forClass(TestModel);
+
+      let caughtModifiers = [];
+
+      TestModel.modifierNotFound = (qb, modifier) => {
+        if (qb === builder) {
+          caughtModifiers.push(modifier);
+        }
+      };
+
+      TestModel.modifiers = {
+        c: 'a',
+
+        d: ['c', 'b']
+      };
+
+      caughtModifiers = [];
+      builder[method]('a');
+      expect(caughtModifiers).to.eql(['a']);
+
+      caughtModifiers = [];
+      builder[method]('b');
+      expect(caughtModifiers).to.eql(['b']);
+
+      caughtModifiers = [];
+      builder[method]('c');
+      expect(caughtModifiers).to.eql(['a']);
+
+      caughtModifiers = [];
+      builder[method]('d');
+      expect(caughtModifiers).to.eql(['a', 'b']);
+    });
+  });
+
+  it('should still throw if modifierNotFound() delegate to the definition in the super class', () => {
+    const builder = QueryBuilder.forClass(TestModel);
+
+    TestModel.modifierNotFound = function(builder, modifier) {
+      Model.modifierNotFound(builder, modifier);
+    };
+
+    expect(() => {
+      builder.applyModifier('unknown');
+    }).to.throwException(err => {
+      expect(err.message).to.equal(
+        'Unable to determine modify function from provided value: "unknown".'
+      );
+    });
+  });
+
+  it('should not throw if modifierNotFound() handles an unknown modifier', () => {
+    const builder = QueryBuilder.forClass(TestModel);
+
+    let caughtModifier = null;
+    TestModel.modifierNotFound = (builder, modifier) => {
+      caughtModifier = modifier;
+    };
+
+    expect(() => {
+      builder.applyModifier('unknown');
+    }).to.not.throwException();
+    expect(caughtModifier).to.equal('unknown');
   });
 
   it('should call the callback passed to .then after execution', done => {
