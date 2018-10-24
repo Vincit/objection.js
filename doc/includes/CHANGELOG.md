@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+
+### What's new
+
+  * Add `modifierNotFound` hook [#1120](https://github.com/Vincit/objection.js/issues/1120)
+  * fix [#1121](https://github.com/Vincit/objection.js/issues/1121)
+  * fix [#1126](https://github.com/Vincit/objection.js/issues/1126)
+
 ## 1.3.0
 
 ### What's new
