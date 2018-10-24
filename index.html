@@ -6015,7 +6015,7 @@ you can specify model <a href="#modifiers"><code class="prettyprint">modifiers</
 </tr>
 </tbody></table>
 
-<h4 id="applyfilter">applyFilter</h4>
+<h4 id="applymodifier">applyModifier</h4>
 
 <p>Applies modifiers to the query builder.</p>
 
@@ -6053,6 +6053,10 @@ you can specify model <a href="#modifiers"><code class="prettyprint">modifiers</
 <td><code class="prettyprint">this</code> query builder for chaining.</td>
 </tr>
 </tbody></table>
+
+<h4 id="applyfilter">applyFilter</h4>
+
+<p>An alias for <a href="#applymodifier"><code class="prettyprint">applyModifier</code></a></p>
 
 <h4 id="columninfo">columnInfo</h4>
 
@@ -10226,6 +10230,48 @@ a multi-tenant system. See the <a href="#multi-tenancy">multi tenancy recipe</a>
 </tr>
 </tbody></table>
 
+<h4 id="modifiernotfound">modifierNotFound</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">modifierNotFound</span><span class="p">(</span><span class="nx">builder</span><span class="p">,</span> <span class="nx">modifier</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="p">{</span> <span class="nx">properties</span> <span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">jsonSchema</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">properties</span> <span class="o">&amp;&amp;</span> <span class="nx">modifier</span> <span class="k">in</span> <span class="nx">properties</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">builder</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">modifier</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="kr">super</span><span class="p">.</span><span class="nx">modifierNotFound</span><span class="p">(</span><span class="nx">builder</span><span class="p">,</span> <span class="nx">modifier</span><span class="p">)</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<p>Handles modifiers that are not recognized by the various mechanisms that can specify
+them, such as <a href="#modify"><code class="prettyprint">modify</code></a> and <a href="#applymodifier"><code class="prettyprint">applyModifier</code></a>, as well as
+the use of modifiers in eager expressions (see <a href="#relationexpression"><code class="prettyprint">RelationExpression</code></a>)
+and in relations (see <a href="#relationmapping"><code class="prettyprint">RelationMapping</code></a>.</p>
+
+<p>By default, the static <code class="prettyprint">modifierNotFound()</code> hook throws a <code class="prettyprint">ModifierNotFoundError</code> error.
+If a model class overrides the hook, it can decide to handle the modifer through the passed
+<code class="prettyprint">builder</code> instance, or call the hook&rsquo;s definition in the super class to still throw the error.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>builder</td>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td>The query builder on which to apply the modifier.</td>
+</tr>
+<tr>
+<td>modifier</td>
+<td>string</td>
+<td>The name of the unknown modifier.</td>
+</tr>
+</tbody></table>
+
 <h4 id="createvalidator">createValidator</h4>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">BaseModel</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="kr">static</span> <span class="nx">createValidator</span><span class="p">()</span> <span class="p">{</span>
@@ -13254,6 +13300,16 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-4-0">1.4.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Add <code class="prettyprint">modifierNotFound</code> hook <a href="https://github.com/Vincit/objection.js/issues/1120">#1120</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1121">#1121</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1126">#1126</a></li>
+</ul>
 
 <h2 id="1-3-0">1.3.0</h2>
 
