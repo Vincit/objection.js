@@ -623,10 +623,10 @@ describe('RelationExpression', () => {
             $relation: 'b',
             $modify: ['^f2', '^f3'],
             $recursive: false,
-            $allRecursive: false,
+            $allRecursive: false
           }
         }
-      })
+      });
     });
 
     it('alias', () => {

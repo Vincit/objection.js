@@ -322,10 +322,7 @@ module.exports = session => {
 
         it('raw should accept non-string values', () => {
           return Model2.query()
-            .where(
-              'model2_prop2',
-              raw(20)
-            )
+            .where('model2_prop2', raw(20))
             .then(models => {
               expect(_.map(models, 'model2Prop2').sort()).to.eql([20]);
             });

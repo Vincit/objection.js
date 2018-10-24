@@ -164,14 +164,13 @@ async () => {
 
 // .query().castTo()
 async () => {
-  const animals = await Person
-  .query()
-  .joinRelation('children.children.pets')
-  .select('children:children:pets.*')
-  .castTo(Animal);
+  const animals = await Person.query()
+    .joinRelation('children.children.pets')
+    .select('children:children:pets.*')
+    .castTo(Animal);
 
   takesAnimals(animals);
-}
+};
 
 // instance methods:
 async () => {
