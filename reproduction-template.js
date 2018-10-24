@@ -45,6 +45,8 @@ async function main() {
     .eager('pets');
 
   chai.expect(jennifer.pets[0].name).to.equal('Doggo');
+
+  await knex.destroy()
 }
 
 ///////////////////////////////////////////////////////////////
@@ -54,6 +56,7 @@ async function main() {
 const knex = Knex({
   client: 'sqlite3',
   useNullAsDefault: true,
+  debug: true,
   connection: {
     filename: ':memory:'
   }

@@ -210,11 +210,11 @@ module.exports = session => {
         });
       });
 
-      describe.skip('.insert()', () => {
+      describe('.insert()', () => {
         it('should insert nicely', () => {
           // this query actually isnt valid, but I couldn't figure any query where one would actually use ref as value
           // so just testing that refs are converted to raw correctly
-          let query = BoundModel.query().insert({
+          BoundModel.query().insert({
             id: 5,
             name: ref('jsonArray:[0]').castText(),
             jsonObject: ref('name'),
