@@ -3833,6 +3833,56 @@ Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).mergeEager(expr)`.
 
 
 
+#### eagerObject
+
+```js
+const builder = Person.query()
+  .eager('children.pets(onlyId)')
+
+const eagerObject = builder.eagerObject();
+console.log(eagerObject.children.pets.modify);
+// prints ["onlyId"]
+
+eagerObject.children.movies = true
+// You can modify the object and pass it back to the `eager` method.
+builder.eager(eagerObject)
+```
+
+Returns the object representation of the current eager expression.
+
+See [this section](#relationexpression-object-notation) for more examples and information about the structure of the returned object.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+object|Object representation of the current eager expression.
+
+
+
+#### eagerModifiers
+
+```js
+const builder = Person.query()
+  .eager('children.pets(onlyId)', {
+    onlyId: builder.select('id')
+  })
+
+const modifiers = builder.eagerModifiers();
+console.log(modifiers.onlyId.toString());
+// prints 'builder => builder.select("id")'
+```
+
+Returns the current eager modifiers of the query.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+object|Eager modifiers of the query.
+
+
+
 #### allowEager
 
 ```js

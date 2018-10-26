@@ -1832,6 +1832,50 @@ describe('QueryBuilder', () => {
         });
     });
 
+    ity('eagerObject() should return the eager expression as an object', () => {
+      const builder = QueryBuilder.forClass(TestModel).eager('[a, b.c(foo)]');
+
+      expect(builder.eagerObject()).to.eql({
+        $name: null,
+        $relation: null,
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false,
+        a: {
+          $name: 'a',
+          $relation: 'a',
+          $modify: [],
+          $recursive: false,
+          $allRecursive: false
+        },
+        b: {
+          $name: 'b',
+          $relation: 'b',
+          $modify: [],
+          $recursive: false,
+          $allRecursive: false,
+          c: {
+            $name: 'c',
+            $relation: 'c',
+            $modify: ['foo'],
+            $recursive: false,
+            $allRecursive: false
+          }
+        }
+      });
+    });
+
+    it("eagerModifiers() should return the eager expression's modifiers as an object", () => {
+      const foo = builder => builder.where('foo');
+      const builder = QueryBuilder.forClass(TestModel).eager('[a, b.c(foo)]', {
+        foo
+      });
+
+      expect(builder.eagerModifiers()).to.eql({
+        foo
+      });
+    });
+
     it('should use correct query builders', done => {
       class M1QueryBuilder extends QueryBuilder {}
       class M2QueryBuilder extends QueryBuilder {}
