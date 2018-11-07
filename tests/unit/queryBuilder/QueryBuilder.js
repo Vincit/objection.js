@@ -1533,6 +1533,32 @@ describe('QueryBuilder', () => {
     expect(query.tableRefFor(TestModel)).to.equal('Lyl');
   });
 
+  it('should use Model.QueryBuilder in builder methods', () => {
+    class CustomQueryBuilder extends TestModel.QueryBuilder {}
+
+    TestModel.QueryBuilder = CustomQueryBuilder;
+    const checks = [];
+
+    return TestModel.query()
+      .select('*', builder => {
+        checks.push(builder instanceof CustomQueryBuilder);
+      })
+      .where(builder => {
+        checks.push(builder instanceof CustomQueryBuilder);
+
+        builder.where(builder => {
+          checks.push(builder instanceof CustomQueryBuilder);
+        });
+      })
+      .modify(builder => {
+        checks.push(builder instanceof CustomQueryBuilder);
+      })
+      .then(() => {
+        expect(checks).to.have.length(4);
+        expect(checks.every(it => it)).to.equal(true);
+      });
+  });
+
   describe('eager, allowEager, and mergeAllowEager', () => {
     beforeEach(() => {
       const rel = {
