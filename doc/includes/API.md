@@ -3149,6 +3149,26 @@ boolean|true if the query performs an unrelate operation.
 
 
 
+#### isInternal
+
+```js
+const isInternal = queryBuilder.isInternal();
+```
+
+Returns true for internal "helper" queries that are not directly
+part of the operation being executed. For example the `select` queries
+performed by `upsertGraph` to get the current state of the graph are
+internal queries.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an internal helper operation.
+
+
+
+
 #### hasWheres
 
 ```js

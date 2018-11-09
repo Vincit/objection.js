@@ -1886,10 +1886,41 @@ module.exports = session => {
             .eager('model1Relation1');
         })
         .then(result => {
+          expect(result.model1Relation1).to.equal(null);
           return Model1.query(session.knex).findById(3);
         })
         .then(result => {
           expect(result).to.equal(undefined);
+        });
+    });
+
+    it('The internal select queries should return true from `isInternal`', () => {
+      const upsert = Model1.fromJson({
+        id: 2,
+        model1Prop1: 'update',
+        model1Relation1: null
+      });
+
+      let findQueryCount = 0;
+
+      return Model1.query(session.knex)
+        .upsertGraph(upsert)
+        .context({
+          runBefore(_, builder) {
+            if (builder.isFind()) {
+              findQueryCount++;
+              expect(builder.isInternal()).to.equal(true);
+            }
+          }
+        })
+        .then(() => {
+          const fetchQuery = Model1.query(session.knex)
+            .findById(2)
+            .eager('model1Relation1');
+
+          expect(findQueryCount).to.equal(2);
+          expect(fetchQuery.isInternal()).to.equal(false);
+          return fetchQuery;
         });
     });
 
