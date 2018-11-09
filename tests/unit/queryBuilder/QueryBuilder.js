@@ -1832,7 +1832,7 @@ describe('QueryBuilder', () => {
         });
     });
 
-    ity('eagerObject() should return the eager expression as an object', () => {
+    it('eagerObject() should return the eager expression as an object', () => {
       const builder = QueryBuilder.forClass(TestModel).eager('[a, b.c(foo)]');
 
       expect(builder.eagerObject()).to.eql({

@@ -83,186 +83,212 @@ module.exports = session => {
       return session.populate(population);
     });
 
-    it('by default, should insert new, update existing and delete missing', () => {
-      const upsert = {
-        // Nothing is done for the root since it only has an ids.
-        id: 2,
-        model1Id: 3,
+    for (const passthroughMethodCall of [null, 'forUpdate', 'forShare']) {
+      const passthroughMethodCallSql = {
+        null: '',
+        forUpdate: ' for update',
+        forShare: ' for share'
+      };
 
-        // update
-        model1Relation1: {
-          id: 3,
-          model1Prop1: 'updated belongsToOne'
-        },
+      it(
+        'by default, should insert new, update existing and delete missing' +
+          (passthroughMethodCall ? ` (${passthroughMethodCall})` : ''),
+        () => {
+          const upsert = {
+            // Nothing is done for the root since it only has an ids.
+            id: 2,
+            model1Id: 3,
 
-        // update idCol=1
-        // delete idCol=2
-        // and insert one new
-        model1Relation2: [
-          {
-            idCol: 1,
-            model2Prop1: 'updated hasMany 1',
+            // update
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'updated belongsToOne'
+            },
 
-            // update id=4
-            // delete id=5
+            // update idCol=1
+            // delete idCol=2
             // and insert one new
-            model2Relation1: [
+            model1Relation2: [
               {
-                // This is a string instead of a number on purpose to test
-                // that no id update is generated even if they only match
-                // non-strictly.
-                id: '4',
-                model1Prop1: 'updated manyToMany 1'
+                idCol: 1,
+                model2Prop1: 'updated hasMany 1',
+
+                // update id=4
+                // delete id=5
+                // and insert one new
+                model2Relation1: [
+                  {
+                    // This is a string instead of a number on purpose to test
+                    // that no id update is generated even if they only match
+                    // non-strictly.
+                    id: '4',
+                    model1Prop1: 'updated manyToMany 1'
+                  },
+                  {
+                    // This is the new row.
+                    model1Prop1: 'inserted manyToMany'
+                  }
+                ]
               },
               {
                 // This is the new row.
-                model1Prop1: 'inserted manyToMany'
+                model2Prop1: 'inserted hasMany'
               }
             ]
-          },
-          {
-            // This is the new row.
-            model2Prop1: 'inserted hasMany'
-          }
-        ]
-      };
+          };
 
-      return transaction(session.knex, trx => {
-        const sql = [];
+          return transaction(session.knex, trx => {
+            const sql = [];
 
-        // Wrap the transaction to catch the executed sql.
-        trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
-          sql.push(this.toString());
-          return oldImpl.apply(this, args);
-        });
+            // Wrap the transaction to catch the executed sql.
+            trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
+              sql.push(this.toString());
+              return oldImpl.apply(this, args);
+            });
 
-        return (
-          Model1.query(trx)
-            .upsertGraph(upsert)
-            // Sort all result by id to make the SQL we test below consistent.
-            .mergeContext({
-              onBuild(builder) {
-                if (!builder.isFind()) {
-                  return;
-                }
+            return (
+              Model1.query(trx)
+                .upsertGraph(upsert)
+                .modify(builder => {
+                  if (passthroughMethodCall) {
+                    builder[passthroughMethodCall]();
+                  }
+                })
+                // Sort all result by id to make the SQL we test below consistent.
+                .mergeContext({
+                  onBuild(builder) {
+                    if (!builder.isFind()) {
+                      return;
+                    }
 
-                if (builder.modelClass().getTableName() === 'Model1') {
-                  builder.orderBy('Model1.id');
-                } else if (builder.modelClass().getTableName() === 'model2') {
-                  builder.orderBy('model2.id_col');
-                }
-              }
-            })
-            .then(result => {
-              expect(sql.length).to.equal(12);
+                    if (builder.modelClass().getTableName() === 'Model1') {
+                      builder.orderBy('Model1.id');
+                    } else if (builder.modelClass().getTableName() === 'model2') {
+                      builder.orderBy('model2.id_col');
+                    }
+                  }
+                })
+                .then(result => {
+                  expect(sql.length).to.equal(12);
 
-              if (session.isPostgres()) {
-                chai
-                  .expect(sql)
-                  .to.containSubset([
-                    'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc',
-                    'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
-                    'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
-                    'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
+                  if (session.isPostgres()) {
+                    chai
+                      .expect(sql)
+                      .to.containSubset([
+                        'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc' +
+                          passthroughMethodCallSql[passthroughMethodCall],
+                        'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                        'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
+                        'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
 
-                    'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
-                    'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
+                        'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
+                        'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
 
-                    'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
-                    'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
-                    'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
+                        'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                        'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
+                        'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
 
-                    'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
-                    'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
-                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)'
-                  ]);
-              }
+                        'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
+                        'update "model2" set "model2_prop1" = \'updated hasMany 1\', "model1_id" = 2 where "model2"."id_col" = 1 and "model2"."model1_id" in (2)',
+                        'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)'
+                      ]);
+                  }
 
-              expect(result.$beforeUpdateCalled).to.equal(undefined);
-              expect(result.$afterUpdateCalled).to.equal(undefined);
+                  expect(result.$beforeUpdateCalled).to.equal(undefined);
+                  expect(result.$afterUpdateCalled).to.equal(undefined);
 
-              expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
-              expect(result.model1Relation1.$afterUpdateCalled).to.equal(1);
+                  expect(result.model1Relation1.$beforeUpdateCalled).to.equal(1);
+                  expect(result.model1Relation1.$afterUpdateCalled).to.equal(1);
 
-              expect(result.model1Relation2[0].$beforeUpdateCalled).to.equal(1);
-              expect(result.model1Relation2[0].$afterUpdateCalled).to.equal(1);
+                  expect(result.model1Relation2[0].$beforeUpdateCalled).to.equal(1);
+                  expect(result.model1Relation2[0].$afterUpdateCalled).to.equal(1);
 
-              expect(result.model1Relation2[1].$beforeUpdateCalled).to.equal(undefined);
-              expect(result.model1Relation2[1].$afterUpdateCalled).to.equal(undefined);
+                  expect(result.model1Relation2[1].$beforeUpdateCalled).to.equal(undefined);
+                  expect(result.model1Relation2[1].$afterUpdateCalled).to.equal(undefined);
 
-              expect(result.model1Relation2[1].$beforeInsertCalled).to.equal(1);
-              expect(result.model1Relation2[1].$afterInsertCalled).to.equal(1);
+                  expect(result.model1Relation2[1].$beforeInsertCalled).to.equal(1);
+                  expect(result.model1Relation2[1].$afterInsertCalled).to.equal(1);
 
-              expect(result.model1Relation2[0].model2Relation1[0].$beforeUpdateCalled).to.equal(1);
-              expect(result.model1Relation2[0].model2Relation1[0].$afterUpdateCalled).to.equal(1);
+                  expect(result.model1Relation2[0].model2Relation1[0].$beforeUpdateCalled).to.equal(
+                    1
+                  );
+                  expect(result.model1Relation2[0].model2Relation1[0].$afterUpdateCalled).to.equal(
+                    1
+                  );
 
-              expect(result.model1Relation2[0].model2Relation1[1].$beforeInsertCalled).to.equal(1);
-              expect(result.model1Relation2[0].model2Relation1[1].$afterInsertCalled).to.equal(1);
+                  expect(result.model1Relation2[0].model2Relation1[1].$beforeInsertCalled).to.equal(
+                    1
+                  );
+                  expect(result.model1Relation2[0].model2Relation1[1].$afterInsertCalled).to.equal(
+                    1
+                  );
 
-              // Fetch the graph from the database.
-              return Model1.query(trx)
-                .findById(2)
-                .eager('[model1Relation1, model1Relation2.model2Relation1]')
-                .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-                .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
-            })
-            .then(omitIrrelevantProps)
-            .then(result => {
-              expect(result).to.eql({
-                id: 2,
-                model1Id: 3,
-                model1Prop1: 'root 2',
+                  // Fetch the graph from the database.
+                  return Model1.query(trx)
+                    .findById(2)
+                    .eager('[model1Relation1, model1Relation2.model2Relation1]')
+                    .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
+                    .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+                })
+                .then(omitIrrelevantProps)
+                .then(result => {
+                  expect(result).to.eql({
+                    id: 2,
+                    model1Id: 3,
+                    model1Prop1: 'root 2',
 
-                model1Relation1: {
-                  id: 3,
-                  model1Id: null,
-                  model1Prop1: 'updated belongsToOne'
-                },
+                    model1Relation1: {
+                      id: 3,
+                      model1Id: null,
+                      model1Prop1: 'updated belongsToOne'
+                    },
 
-                model1Relation2: [
-                  {
-                    idCol: 1,
-                    model1Id: 2,
-                    model2Prop1: 'updated hasMany 1',
-
-                    model2Relation1: [
+                    model1Relation2: [
                       {
-                        id: 4,
-                        model1Id: null,
-                        model1Prop1: 'updated manyToMany 1'
+                        idCol: 1,
+                        model1Id: 2,
+                        model2Prop1: 'updated hasMany 1',
+
+                        model2Relation1: [
+                          {
+                            id: 4,
+                            model1Id: null,
+                            model1Prop1: 'updated manyToMany 1'
+                          },
+                          {
+                            id: 8,
+                            model1Id: null,
+                            model1Prop1: 'inserted manyToMany'
+                          }
+                        ]
                       },
                       {
-                        id: 8,
-                        model1Id: null,
-                        model1Prop1: 'inserted manyToMany'
+                        idCol: 3,
+                        model1Id: 2,
+                        model2Prop1: 'inserted hasMany',
+                        model2Relation1: []
                       }
                     ]
-                  },
-                  {
-                    idCol: 3,
-                    model1Id: 2,
-                    model2Prop1: 'inserted hasMany',
-                    model2Relation1: []
-                  }
-                ]
-              });
+                  });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
-                  // Row 5 should be deleted.
-                  expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
-                  // Row 6 should NOT be deleted even thought its parent is.
-                  expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
-                  // Row 7 should NOT be deleted  even thought its parent is.
-                  expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
-                  // Row 2 should be deleted.
-                  expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
-                }
-              );
-            })
-        );
-      });
-    });
+                  return Promise.all([trx('Model1'), trx('model2')]).spread(
+                    (model1Rows, model2Rows) => {
+                      // Row 5 should be deleted.
+                      expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
+                      // Row 6 should NOT be deleted even thought its parent is.
+                      expect(model1Rows.find(it => it.id == 6)).to.be.an(Object);
+                      // Row 7 should NOT be deleted  even thought its parent is.
+                      expect(model1Rows.find(it => it.id == 7)).to.be.an(Object);
+                      // Row 2 should be deleted.
+                      expect(model2Rows.find(it => it.id_col == 2)).to.equal(undefined);
+                    }
+                  );
+                })
+            );
+          });
+        }
+      );
+    }
 
     it('should respect noDelete, noInsert and noUpdate flags', () => {
       const upsert = {
