@@ -2173,13 +2173,13 @@ describe('QueryBuilder', () => {
       expect(builder2.context().transaction === mockKnex).to.equal(true);
     });
 
-    it('calling `childQueryOf(builder, true)` should copy the context', () => {
+    it('calling `childQueryOf(builder, { fork: true })` should copy the context', () => {
       const builder = TestModel.query();
       const origContext = { a: 1 };
 
       builder.context(origContext);
 
-      const builder2 = TestModel.query().childQueryOf(builder, true);
+      const builder2 = TestModel.query().childQueryOf(builder, { fork: true });
       builder2.mergeContext({ b: 2 });
 
       expect(builder.context()).to.eql({
