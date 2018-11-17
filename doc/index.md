@@ -1379,7 +1379,7 @@ You can read more about graph inserts from [this blog post](https://www.vincit.f
 ```
 
 > By default `upsertGraph` method updates the objects that have an id, inserts objects that don't have an id and deletes
-> all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
+> all objects that are not present. Of course the delete only applies to relations and not the root. Here's a basic example:
 
 ```js
 // The return value of `upsertGraph` is the input graph converted into model instances.
