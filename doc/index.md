@@ -1555,6 +1555,8 @@ await Person
   }, options);
 ```
 
+> Note that `upsertGraph` does not support the parameter `#dbRef` (which is supported by `insertGraph`). Use `relate` option and pass an id as depicted above instead.
+
 > You can disable updates, inserts, deletes etc. for the whole `upsertGraph` operation or for
 > individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See
 > [`UpsertGraphOptions`](#upsertgraphoptions) docs for more info.

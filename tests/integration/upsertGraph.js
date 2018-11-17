@@ -1,10 +1,13 @@
 const raw = require('../../').raw;
 const expect = require('expect.js');
 const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
 const ValidationError = require('../../').ValidationError;
 const mockKnexFactory = require('../../testUtils/mockKnex');
+
+chai.use(chaiAsPromised);
 
 module.exports = session => {
   const Model1 = session.unboundModels.Model1;
@@ -543,6 +546,31 @@ module.exports = session => {
             expect(upserted.$toJson()).to.eql(fetched.$toJson());
           });
       });
+    });
+
+    it('does not support #dbref for upserts', () => {
+      const upsert = {
+        id: 2,
+        model1Id: 3,
+        model1Relation2: [
+          {
+            '#dbRef': 1,
+            model2Prop1: 'updated hasMany 1'
+          },
+          {
+            model2Prop1: 'inserted hasMany'
+          }
+        ]
+      };
+      return chai
+        .expect(
+          transaction(session.knex, trx => {
+            return Model1.query(trx).upsertGraphAndFetch(upsert);
+          })
+        )
+        .to.be.rejectedWith(
+          /You cannot relate HasManyRelation or HasOneRelation using insertGraph, because those require update operations. Consider using upsertGraph instead/
+        );
     });
 
     it('should insert new, update existing relate unrelated and unrelate missing if `unrelate` and `relate` options are true', () => {
