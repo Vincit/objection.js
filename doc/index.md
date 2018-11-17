@@ -1289,7 +1289,7 @@ await Person
   });
 ```
 
-> If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef`
+> If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef` that explicitly points to an id of an entity which already exists in the database. Model `idColumn` of a related entity is used for the `#dbRef`.
 
 ```js
 await Person
@@ -1299,6 +1299,7 @@ await Person
     lastName: 'Lawrence',
 
     movies: [{
+      // This will relate to an existing movie with id 2636
       "#dbRef": 2636
     }, {
       // This will be inserted with an id.
