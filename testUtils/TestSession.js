@@ -1,10 +1,8 @@
 const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
-const Model = require('../').Model;
 const knexUtils = require('../lib/utils/knexUtils');
-const transaction = require('../').transaction;
-const snakeCaseMappers = require('../').snakeCaseMappers;
+const { Model, transaction, snakeCaseMappers, ref } = require('../');
 
 const chai = require('chai');
 chai.use(require('chai-subset'));
@@ -46,7 +44,7 @@ class TestSession {
 
       static get namedFilters() {
         return {
-          'select:id': builder => builder.select('id'),
+          'select:id': builder => builder.select(this.ref('id')),
           'select:model1Prop1': builder => builder.select('model1Prop1'),
           'select:model1Prop1Aliased': builder => builder.select('model1Prop1 as aliasedInFilter'),
           'orderBy:model1Prop1': builder => builder.orderBy('model1Prop1'),

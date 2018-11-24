@@ -454,6 +454,8 @@ const [person1, person2] = await Person.query().findByIds([1, 2]);
 const [person1, person2] = await Person.query().findByIds([[1, '10'], [2, '10']]);
 ```
 
+Finds a list of items. The order of the returned items is not guaranteed to be the same as the order of the inputs.
+
 ##### Arguments
 
 Argument|Type|Description

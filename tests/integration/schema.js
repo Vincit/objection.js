@@ -193,7 +193,7 @@ module.exports = session => {
         return Person.query(session.knex)
           .findOne('name', 'Arnold')
           .then(arnold => {
-            return arnold.$relatedQuery('parents', session.knex).debug();
+            return arnold.$relatedQuery('parents', session.knex);
           })
           .then(parents => {
             expect(parents).to.eql([

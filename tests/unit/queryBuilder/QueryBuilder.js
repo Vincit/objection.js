@@ -1559,6 +1559,151 @@ describe('QueryBuilder', () => {
       });
   });
 
+  it('hasSelection', () => {
+    expect(TestModel.query().hasSelection('foo')).to.equal(true);
+    expect(TestModel.query().hasSelection(ref('foo'))).to.equal(true);
+    expect(TestModel.query().hasSelection('Model.foo')).to.equal(true);
+    expect(TestModel.query().hasSelection(ref('Model.foo'))).to.equal(true);
+    expect(TestModel.query().hasSelection('DifferentTable.foo')).to.equal(false);
+    expect(TestModel.query().hasSelection(ref('DifferentTable.foo'))).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select('*')
+        .hasSelection('DifferentTable.anything')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select(ref('*'))
+        .hasSelection(ref('DifferentTable.anything'))
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('foo')
+        .hasSelection('foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select(ref('foo'))
+        .hasSelection(ref('foo'))
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('foo')
+        .hasSelection('Model.foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select(ref('foo'))
+        .hasSelection(ref('Model.foo'))
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('foo')
+        .hasSelection('DifferentTable.foo')
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select(ref('foo'))
+        .hasSelection(ref('DifferentTable.foo'))
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select('foo')
+        .hasSelection('bar')
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select(ref('foo'))
+        .hasSelection(ref('bar'))
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select('Model.foo')
+        .hasSelection('foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select(ref('Model.foo'))
+        .hasSelection(ref('foo'))
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('Model.foo')
+        .hasSelection('Model.foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select(ref('Model.foo'))
+        .hasSelection(ref('Model.foo'))
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('Model.foo')
+        .hasSelection('NotTestModel.foo')
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select(ref('Model.foo'))
+        .hasSelection(ref('NotTestModel.foo'))
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select('Model.foo')
+        .hasSelection('bar')
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select(ref('Model.foo'))
+        .hasSelection(ref('bar'))
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .alias('t')
+        .select('foo')
+        .hasSelection('t.foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .alias('t')
+        .select('t.foo')
+        .hasSelection('foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .alias('t')
+        .select('t.foo')
+        .hasSelection('t.foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .alias('t')
+        .select('foo')
+        .hasSelection('Model.foo')
+    ).to.equal(false);
+  });
+
   describe('eager, allowEager, and mergeAllowEager', () => {
     beforeEach(() => {
       const rel = {
