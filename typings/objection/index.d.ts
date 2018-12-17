@@ -8,6 +8,7 @@
 // * Drew R. <https://github.com/drew-r>
 // * Karl Blomster <https://github.com/kblomster>
 // * And many others: See <https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts>
+// TypeScript Version: 2.8
 
 // PLEASE NOTE, the generic type symbols in this file follow this definition:
 //   QM - queried model
@@ -235,7 +236,7 @@ declare namespace Objection {
     aliases?: string[];
   }
 
-  export interface UpsertOptions {
+  export interface UpsertGraphOptions {
     relate?: boolean | string[];
     unrelate?: boolean | string[];
     insertMissing?: boolean | string[];
@@ -246,6 +247,30 @@ declare namespace Objection {
     noRelate?: boolean | string[];
     noUnrelate?: boolean | string[];
   }
+
+  type GraphModel<T> =
+    | ({'#id'?: string; '#ref'?: never; '#dbRef'?: never} & T)
+    | ({'#id'?: never; '#ref': string; '#dbRef'?: never} & {
+        [P in keyof T]?: never
+      })
+    | ({'#id'?: never; '#ref'?: never; '#dbRef': number} & {
+        [P in keyof T]?: never
+      });
+
+  type NonFunctionPropertyNames<T> = {
+    [K in keyof T]: T[K] extends Function ? never : K
+  }[keyof T];
+
+  interface DeepPartialGraphArray<T> extends Array<DeepPartialGraph<T>> {}
+
+  type DeepPartialGraphModel<T> =
+    | GraphModel<{[P in NonFunctionPropertyNames<T>]?: DeepPartialGraph<T[P]>}>
+    | Partial<T>;
+
+  type DeepPartialGraph<T> =
+    T extends (any[] | ReadonlyArray<any>) ? DeepPartialGraphArray<T[number]> :
+    T extends Model ? DeepPartialGraphModel<T> :
+    T;
 
   export interface InsertGraphOptions {
     relate?: boolean | string[];
@@ -645,19 +670,24 @@ declare namespace Objection {
   }
 
   interface InsertGraph<QM extends Model> {
-    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
-    (modelOrObject?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: DeepPartialGraph<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
     (): this;
   }
 
-  interface Upsert<QM extends Model> {
-    (modelsOrObjects?: Partial<QM>[], options?: UpsertOptions): QueryBuilder<QM, QM[]>;
-    (modelOrObject?: Partial<QM>, options?: UpsertOptions): QueryBuilder<QM, QM>;
+  interface InsertGraphAndFetch<QM extends Model> {
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: DeepPartialGraph<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
   }
 
-  interface InsertGraphAndFetch<QM extends Model> {
-    (modelsOrObjects?: Partial<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
-    (modelOrObject?: Partial<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
+  interface UpsertGraph<QM extends Model> {
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: UpsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: DeepPartialGraph<QM>, options?: UpsertGraphOptions): QueryBuilder<QM, QM>;
+  }
+
+  interface UpsertGraphAndFetch<QM extends Model> {
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: UpsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelOrObject?: DeepPartialGraph<QM>, options?: UpsertGraphOptions): QueryBuilder<QM, QM>;
   }
 
   type PartialUpdate<QM extends Model> = {
@@ -703,8 +733,8 @@ declare namespace Objection {
     patchAndFetchById(idOrIds: IdOrIds, modelOrObject: PartialUpdate<QM>): QueryBuilder<QM, QM>;
     patchAndFetch(modelOrObject: PartialUpdate<QM>): QueryBuilder<QM, QM>;
 
-    upsertGraph: Upsert<QM>;
-    upsertGraphAndFetch: Upsert<QM>;
+    upsertGraph: UpsertGraph<QM>;
+    upsertGraphAndFetch: UpsertGraphAndFetch<QM>;
 
     /**
      * @return a Promise of the number of deleted rows
