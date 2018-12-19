@@ -221,7 +221,8 @@ declare namespace Objection {
     modelClass: ModelClass<any> | string;
     join: RelationJoin;
     modify?: (queryBuilder: QueryBuilder<any>) => QueryBuilder<any>;
-    filter?: (queryBuilder: QueryBuilder<any>) => QueryBuilder<any>;
+    filter?: ((queryBuilder: QueryBuilder<any>) => QueryBuilder<any>) | string | object;
+    beforeInsert?: (model: Model, context: QueryContext) => Promise<void> | void;
   }
 
   export interface EagerAlgorithm {
