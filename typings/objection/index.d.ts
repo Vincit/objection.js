@@ -1080,8 +1080,8 @@ declare namespace Objection {
     sumDistinct(columnName: string): this;
     avg(columnName: string): this;
     avgDistinct(columnName: string): this;
-    increment(columnName: string, amount?: number): this;
-    decrement(columnName: string, amount?: number): this;
+    increment(columnName: string, amount: number): this;
+    decrement(columnName: string, amount: number): this;
 
     debug(enabled?: boolean): this;
     pluck(column: string): this;
