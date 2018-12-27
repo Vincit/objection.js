@@ -1705,7 +1705,8 @@ module.exports = session => {
             });
         });
 
-        it('namedFilters should work as an alias for modifiers', () => {
+        // No need for this test since the test models use both `modifiers` and `namedFilters`.
+        it.skip('namedFilters should work as an alias for modifiers', () => {
           class TestModel2 extends Model2 {
             static get namedFilters() {
               return {

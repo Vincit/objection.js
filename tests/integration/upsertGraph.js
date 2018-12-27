@@ -729,7 +729,8 @@ module.exports = session => {
       const upsert = {
         id: 1,
 
-        // Should relate these.
+        // relate 1, 2
+        // insert 'new'
         model1Relation2: [
           {
             idCol: 1,
@@ -737,6 +738,9 @@ module.exports = session => {
           },
           {
             idCol: 2
+          },
+          {
+            model2Prop1: 'new'
           }
         ]
       };
@@ -749,7 +753,8 @@ module.exports = session => {
             .eager('model1Relation2');
         })
         .then(result => {
-          expect(result.model1Relation2).to.have.length(2);
+          expect(result.model1Relation2).to.have.length(3);
+
           chai.expect(result).to.containSubset({
             id: 1,
             model1Id: null,
@@ -764,6 +769,10 @@ module.exports = session => {
                 idCol: 2,
                 model1Id: 1,
                 model2Prop1: 'hasMany 2'
+              },
+              {
+                model1Id: 1,
+                model2Prop1: 'new'
               }
             ]
           });
@@ -2698,19 +2707,114 @@ module.exports = session => {
       });
     });
 
-    // describe.skip('HasMany relates', () => {});
+    describe('manytoManyRelation extra properties', () => {
+      it('insert', () => {
+        const upsert = {
+          idCol: 2,
 
-    describe.skip('manytoManyRelation extra properties', () => {
-      it('test inserts', () => {
-        throw new Error();
+          model2Relation1: [
+            // Do nothing.
+            {
+              id: 6
+            },
+            // Do nothing.
+            {
+              id: 7
+            },
+            // Insert.
+            {
+              aliasedExtra: 'foo'
+            }
+          ]
+        };
+
+        return transaction(session.knex, trx => {
+          return Model2.query(trx)
+            .upsertGraph(upsert)
+            .then(result => {
+              expect(result.model2Relation1[2].aliasedExtra).to.equal('foo');
+            });
+        })
+          .then(() => {
+            return Model2.query(session.knex)
+              .findById(2)
+              .eager('model2Relation1(orderById)');
+          })
+          .then(model => {
+            expect(model.model2Relation1[2].aliasedExtra).to.equal('foo');
+          });
       });
 
-      it('test relates', () => {
-        throw new Error();
+      it('relate', () => {
+        const upsert = {
+          idCol: 2,
+
+          // delete 6
+          model2Relation1: [
+            // relate
+            {
+              id: 5,
+              aliasedExtra: 'foo'
+            },
+            // do nothing.
+            {
+              id: 7
+            }
+          ]
+        };
+
+        return transaction(session.knex, trx => {
+          return Model2.query(trx)
+            .upsertGraph(upsert, { relate: true })
+            .then(result => {
+              expect(result.model2Relation1[0].id).to.equal(5);
+              expect(result.model2Relation1[0].aliasedExtra).to.equal('foo');
+            });
+        })
+          .then(() => {
+            return Model2.query(session.knex)
+              .findById(2)
+              .eager('model2Relation1(orderById)');
+          })
+          .then(model => {
+            expect(model.model2Relation1[0].id).to.equal(5);
+            expect(model.model2Relation1[0].aliasedExtra).to.equal('foo');
+          });
       });
 
-      it('test updates', () => {
-        throw new Error();
+      it('update', () => {
+        const upsert = {
+          idCol: 2,
+
+          model2Relation1: [
+            {
+              id: 6,
+              aliasedExtra: 'hello extra 1'
+            },
+            {
+              id: 7,
+              aliasedExtra: 'hello extra 2'
+            }
+          ]
+        };
+
+        return transaction(session.knex, trx => {
+          return Model2.query(trx)
+            .upsertGraph(upsert)
+            .then(result => {
+              expect(result.model2Relation1[0].aliasedExtra).to.equal('hello extra 1');
+              expect(result.model2Relation1[1].aliasedExtra).to.equal('hello extra 2');
+            });
+        })
+          .then(() => {
+            return Model2.query(session.knex)
+              .findById(2)
+              .eager('model2Relation1(orderById)');
+          })
+          .then(model => {
+            expect(model.model2Relation1[0].aliasedExtra).to.equal('hello extra 1');
+            expect(model.model2Relation1[1].aliasedExtra).to.equal('hello extra 2');
+          });
       });
     });
   });
