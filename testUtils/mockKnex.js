@@ -23,7 +23,7 @@ module.exports = function mockKnex(knex, mockExecutor) {
     }
   });
 
-  const keys = [...Object.keys(knex), 'client'];
+  const keys = _.uniqBy([...Object.keys(knex), 'client']);
 
   // Mock all other methods and properties.
   keys.forEach(key => {
