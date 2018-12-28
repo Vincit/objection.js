@@ -2548,7 +2548,7 @@ function createInsertOperation(builder, mergeWithModel) {
 function createUpdateOperation(builder, mergeWithModel) {
   const operation = operationBuilder._updateOperationFactory(builder);
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
   operation.onAdd = function(builder, args) {
     this.models = [args[0]];
@@ -2564,7 +2564,7 @@ function createUpdateOperation(builder, mergeWithModel) {
 }
 
 function createDeleteOperation(builder, whereObj) {
-  const operation = operationBuilder._updateOperationFactory(builder);
+  const operation = operationBuilder._deleteOperationFactory(builder);
 
   operation.onBefore2 = operation.onAfter2 = () => {};
 
