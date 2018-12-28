@@ -226,9 +226,7 @@ module.exports = session => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)
                     .findById(2)
-                    .eager('[model1Relation1, model1Relation2.model2Relation1]')
-                    .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-                    .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+                    .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
                 })
                 .then(omitIrrelevantProps)
                 .then(result => {
@@ -342,9 +340,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation1, model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -645,9 +641,7 @@ module.exports = session => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1, model1Relation2.model2Relation1]')
-                .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-                .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]')
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -827,9 +821,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -898,9 +890,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -954,9 +944,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -1039,9 +1027,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation1, model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -1181,9 +1167,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation1, model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -1604,9 +1588,7 @@ module.exports = session => {
           // Fetch the graph from the database.
           return Model1.query(session.knex)
             .findById(2)
-            .eager('model1Relation2.model2Relation1')
-            .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-            .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+            .eager('model1Relation2(orderById).model2Relation1(orderById)');
         })
         .then(omitIrrelevantProps)
         .then(result => {
@@ -1822,9 +1804,7 @@ module.exports = session => {
           // Fetch the graph from the database.
           return Model1.query(session.knex)
             .findById(2)
-            .eager('[model1Relation1, model1Relation2.model2Relation1]')
-            .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-            .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+            .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
         })
         .then(omitIrrelevantProps)
         .then(result => {
@@ -1957,9 +1937,7 @@ module.exports = session => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
-              .eager('[model1Relation1, model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(omitIrrelevantProps)
           .then(result => {
@@ -2174,9 +2152,7 @@ module.exports = session => {
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1.[model1Relation3.model2Relation3]]')
-                .modifyEager('model1Relation3', qb => qb.orderBy('id_col'))
-                .modifyEager('model1Relation3.model2Relation1', qb => qb.orderBy('id'));
+                .eager('[model1Relation1.[model1Relation3(orderById).model2Relation3(orderById)]]')
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -2238,9 +2214,7 @@ module.exports = session => {
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation3.[model2Relation2.model1Relation1]]')
-                .modifyEager('model1Relation3', qb => qb.orderBy('id_col'))
-                .modifyEager('model1Relation3.model2Relation1', qb => qb.orderBy('id'));
+                .eager('[model1Relation3(orderById).[model2Relation2(orderById).model1Relation1]]');
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -2306,9 +2280,7 @@ module.exports = session => {
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation2.[model2Relation2.model1Relation1]]')
-                .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-                .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+                .eager('[model1Relation2(orderById).[model2Relation2(orderById).model1Relation1]]');
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -2368,9 +2340,7 @@ module.exports = session => {
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation3.[model2Relation3]]')
-                .modifyEager('model1Relation3', qb => qb.orderBy('id_col'))
-                .modifyEager('model1Relation3.model2Relation3', qb => qb.orderBy('id'));
+                .eager('model1Relation3(orderById).model2Relation3(orderById)');
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -2589,9 +2559,7 @@ module.exports = session => {
             return Model1.query(session.knex)
               .orderBy('id')
               .whereIn('id', [1, 2])
-              .eager('[model1Relation1, model1Relation2.model2Relation1]')
-              .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-              .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+              .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
           })
           .then(db => {
             // Check that the transactions worked and the database was in no way modified.
@@ -2604,9 +2572,7 @@ module.exports = session => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)
                     .findById(2)
-                    .eager('[model1Relation1, model1Relation2.model2Relation1]')
-                    .modifyEager('model1Relation2', qb => qb.orderBy('id_col'))
-                    .modifyEager('model1Relation2.model2Relation1', qb => qb.orderBy('id'));
+                    .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
                 })
                 .then(omitIrrelevantProps)
                 .then(omitIds)

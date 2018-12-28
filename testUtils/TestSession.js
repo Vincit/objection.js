@@ -173,6 +173,12 @@ class TestSession {
       static get idColumn() {
         return 'id';
       }
+
+      static get modifiers() {
+        return {
+          orderById: builder => builder.orderBy('model3.id')
+        };
+      }
     }
 
     [
