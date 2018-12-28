@@ -145,11 +145,30 @@ module.exports = session => {
         });
 
         it('.findByIds()', () => {
-          return Model2.query()
-            .findByIds([1, 2])
+          return session.knex
+            .transaction(trx => {
+              return Model2.query(trx)
+                .findByIds([1, 2])
+                .patch({ model2Prop1: 'what' })
+                .then(() => {
+                  return Model2.query(trx)
+                    .findByIds([1, 2])
+                    .orderBy('id_col');
+                })
+                .then(models => {
+                  expect(models.map(it => it.model2Prop1)).to.eql(['what', 'what']);
+                })
+                .then(() => {
+                  throw new Error();
+                });
+            })
+            .catch(() => {
+              return Model2.query()
+                .findByIds([1, 2])
+                .orderBy('id_col');
+            })
             .then(models => {
-              expect(models[0].model2Prop1).to.eql('hejsan 1');
-              expect(models[1].model2Prop1).to.eql('hejsan 2');
+              expect(models.map(it => it.model2Prop1)).to.eql(['hejsan 1', 'hejsan 2']);
             });
         });
 
