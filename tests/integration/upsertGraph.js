@@ -226,7 +226,9 @@ module.exports = session => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)
                     .findById(2)
-                    .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                    .eager(
+                      '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                    );
                 })
                 .then(omitIrrelevantProps)
                 .then(result => {
@@ -641,7 +643,7 @@ module.exports = session => {
               // Fetch the graph from the database.
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]')
+                .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -2152,7 +2154,7 @@ module.exports = session => {
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
-                .eager('[model1Relation1.[model1Relation3(orderById).model2Relation3(orderById)]]')
+                .eager('[model1Relation1.[model1Relation3(orderById).model2Relation3(orderById)]]');
             })
             .then(omitIrrelevantProps)
             .then(result => {
@@ -2572,7 +2574,9 @@ module.exports = session => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)
                     .findById(2)
-                    .eager('[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]');
+                    .eager(
+                      '[model1Relation1, model1Relation2(orderById).model2Relation1(orderById)]'
+                    );
                 })
                 .then(omitIrrelevantProps)
                 .then(omitIds)
@@ -2921,6 +2925,130 @@ module.exports = session => {
           });
       });
     });
+
+    if (session.isPostgres()) {
+      describe('returning', () => {
+        it('should propagate returning(*) to all update an insert operations', () => {
+          const upsert = {
+            // Nothing is done for the root since it only has an ids.
+            id: 2,
+            model1Id: 3,
+
+            // This should get updated.
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'updated belongsToOne'
+            },
+
+            // update idCol=1
+            // delete idCol=2
+            // and insert one new
+            model1Relation2: [
+              {
+                idCol: 1,
+                model2Prop1: 'updated hasMany 1',
+
+                // update id=4
+                // delete id=5
+                // insert new row
+                model2Relation1: [
+                  {
+                    id: 4,
+                    model1Prop1: 'updated manyToMany 1',
+
+                    // relate id=1
+                    model1Relation1: {
+                      id: 1
+                    }
+                  },
+                  {
+                    // This is the new row.
+                    model1Prop1: 'inserted manyToMany'
+                  }
+                ]
+              },
+              {
+                // This is the new row.
+                model2Prop1: 'inserted hasMany'
+              }
+            ]
+          };
+
+          return Model1.query(session.knex)
+            .upsertGraph(upsert, {
+              relate: ['model1Relation2.model2Relation1.model1Relation1']
+            })
+            .returning('*')
+            .then(result => {
+              chai.expect(result).to.containSubset({
+                id: 2,
+                model1Id: 3,
+                $afterGetCalled: 2,
+
+                model1Relation1: {
+                  id: 3,
+                  model1Prop1: 'updated belongsToOne',
+                  $afterGetCalled: 1,
+                  $beforeUpdateCalled: 1,
+                  $beforeUpdateOptions: { patch: true },
+                  $afterUpdateCalled: 1,
+                  $afterUpdateOptions: { patch: true },
+                  model1Id: null,
+                  model1Prop2: null
+                },
+
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'updated hasMany 1',
+
+                    model2Relation1: [
+                      {
+                        id: 4,
+                        model1Prop1: 'updated manyToMany 1',
+                        model1Relation1: { id: 1 },
+                        model1Id: 1,
+                        $afterGetCalled: 1,
+                        $beforeUpdateCalled: 1,
+                        $beforeUpdateOptions: { patch: true },
+                        $afterUpdateCalled: 1,
+                        $afterUpdateOptions: { patch: true },
+                        model1Prop2: null
+                      },
+
+                      {
+                        model1Prop1: 'inserted manyToMany',
+                        $beforeInsertCalled: 1,
+                        id: 8,
+                        model1Id: null,
+                        model1Prop2: null,
+                        $afterInsertCalled: 1
+                      }
+                    ],
+
+                    model1Id: 2,
+                    $afterGetCalled: 1,
+                    $beforeUpdateCalled: 1,
+                    $beforeUpdateOptions: { patch: true },
+                    $afterUpdateCalled: 1,
+                    $afterUpdateOptions: { patch: true },
+                    model2Prop2: null
+                  },
+
+                  {
+                    model2Prop1: 'inserted hasMany',
+                    model1Id: 2,
+                    $beforeInsertCalled: 1,
+                    idCol: 3,
+                    model2Prop2: null,
+                    $afterInsertCalled: 1
+                  }
+                ]
+              });
+            });
+        });
+      });
+    }
   });
 
   function omitIrrelevantProps(model) {
