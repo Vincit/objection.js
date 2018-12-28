@@ -1420,9 +1420,147 @@ module.exports = session => {
       });
     });
 
-    it.skip('should not update other properties than the related ones when belongsToOneRelation is inserted but the parent has noDelete: true', () => {});
+    it('should not update other than the relation properties when belongsToOneRelation is inserted but the parent has noUpdate: true', () => {
+      const upsert = {
+        id: 2,
 
-    it.skip('should not update other properties than the related ones when belongsToOneRelation is deleted but the parent has noDelete: true', () => {});
+        model1Relation1: {
+          id: 3,
+          model1Prop1: 'this should not be written to db',
+
+          // This should cause the id=3 to be updated with the new
+          // model1Id property.
+          model1Relation1: {
+            model1Prop1: 'inserted'
+          }
+        }
+      };
+
+      return Model1.query(session.knex)
+        .upsertGraph(upsert, {
+          noUpdate: ['model1Relation1']
+        })
+        .then(() => {
+          // Fetch the graph from the database.
+          return Model1.query(session.knex)
+            .findById(2)
+            .eager('model1Relation1.model1Relation1');
+        })
+        .then(result => {
+          chai.expect(result).to.containSubset({
+            id: 2,
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'belongsToOne',
+
+              model1Relation1: {
+                model1Prop1: 'inserted'
+              }
+            }
+          });
+        });
+    });
+
+    it('should not update other than the relation properties when belongsToOneRelation is related but the parent has noUpdate: true', () => {
+      const upsert = {
+        id: 2,
+
+        model1Relation1: {
+          id: 3,
+          model1Prop1: 'this should not be written to db',
+
+          // This should cause the id=3 to be updated with the new
+          // model1Id property.
+          model1Relation1: {
+            id: 1
+          }
+        }
+      };
+
+      return Model1.query(session.knex)
+        .upsertGraph(upsert, {
+          noUpdate: ['model1Relation1'],
+          relate: ['model1Relation1.model1Relation1']
+        })
+        .then(() => {
+          // Fetch the graph from the database.
+          return Model1.query(session.knex)
+            .findById(2)
+            .eager('model1Relation1.model1Relation1');
+        })
+        .then(result => {
+          chai.expect(result).to.containSubset({
+            id: 2,
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'belongsToOne',
+
+              model1Relation1: {
+                id: 1,
+                model1Prop1: 'root 1'
+              }
+            }
+          });
+        });
+    });
+
+    it('should not update other than the relation properties when belongsToOneRelation is unrelated but the parent has noUpdate: true', () => {
+      const upsert1 = {
+        id: 2,
+
+        model1Relation1: {
+          id: 3,
+
+          model1Relation1: {
+            id: 1
+          }
+        }
+      };
+
+      const upsert2 = {
+        id: 2,
+
+        model1Relation1: {
+          id: 3,
+          model1Prop1: 'this should not be written to db',
+
+          model1Relation1: null
+        }
+      };
+
+      return Model1.query(session.knex)
+        .upsertGraph(upsert1, {
+          noUpdate: ['model1Relation1'],
+          relate: ['model1Relation1.model1Relation1']
+        })
+        .then(() => {
+          return Model1.query(session.knex).upsertGraph(upsert2, {
+            noUpdate: ['model1Relation1'],
+            unrelate: ['model1Relation1.model1Relation1']
+          });
+        })
+        .then(() => {
+          // Fetch the graph from the database.
+          return Model1.query(session.knex)
+            .findById(2)
+            .eager('model1Relation1.model1Relation1');
+        })
+        .then(result => {
+          chai.expect(result).to.containSubset({
+            id: 2,
+
+            model1Relation1: {
+              id: 3,
+              model1Prop1: 'belongsToOne',
+
+              model1Id: null,
+              model1Relation1: null
+            }
+          });
+        });
+    });
 
     it('should insert with an id instead of throwing an error if `insertMissing` option is true', () => {
       const upsert = {
@@ -1462,7 +1600,7 @@ module.exports = session => {
       return transaction(session.knex, trx => {
         return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
       })
-        .then(result => {
+        .then(() => {
           // Fetch the graph from the database.
           return Model1.query(session.knex)
             .findById(2)
