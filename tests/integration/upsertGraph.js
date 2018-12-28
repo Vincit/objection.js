@@ -1689,9 +1689,11 @@ module.exports = session => {
           done(new Error('should not get here'));
         })
         .catch(err => {
+          expect(err instanceof Model1.NotFoundError).to.equal(true);
           expect(err.message).to.equal(
             'root model (id=1000) does not exist. If you want to insert it with an id, use the insertMissing option'
           );
+          expect(err.data.dataPath).to.eql([]);
           return session
             .knex('Model1')
             .whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
@@ -1722,9 +1724,11 @@ module.exports = session => {
           done(new Error('should not get here'));
         })
         .catch(err => {
+          expect(err instanceof Model1.NotFoundError).to.equal(true);
           expect(err.message).to.equal(
             'model (id=1000) is not a child of model (id=2). If you want to relate it, use the relate option. If you want to insert it with an id, use the insertMissing option'
           );
+          expect(err.data.dataPath).to.eql(['model1Relation1']);
           return session
             .knex('Model1')
             .whereIn('model1Prop1', ['updated root 2', 'inserted belongsToOne']);
