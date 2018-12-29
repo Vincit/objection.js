@@ -1343,7 +1343,6 @@ describe('QueryBuilder', () => {
     expect(builder._explicitRejectValue).to.equal(null);
   });
 
-  // Temporarily disable for 1.5.0-rc.2
   it('joinRelation should add join clause to correct place', done => {
     class M1 extends Model {
       static get tableName() {
