@@ -1344,7 +1344,7 @@ describe('QueryBuilder', () => {
   });
 
   // Temporarily disable for 1.5.0-rc.2
-  it.skip('joinRelation should add join clause to correct place', done => {
+  it('joinRelation should add join clause to correct place', done => {
     class M1 extends Model {
       static get tableName() {
         return 'M1';
