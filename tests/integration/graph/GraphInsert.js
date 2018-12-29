@@ -5,6 +5,7 @@ const { Model, raw } = require('../../../');
 const { ModelGraph } = require('../../../lib/model/graph/ModelGraph');
 const { GraphInsert } = require('../../../lib/queryBuilder/graph/insert/GraphInsert');
 const { GraphOptions } = require('../../../lib/queryBuilder/graph/GraphOptions');
+const { asArray } = require('../../../lib/utils/objectUtils');
 
 module.exports = session => {
   const ID_NOT_IN_DB = 1000000;
@@ -1030,7 +1031,7 @@ module.exports = session => {
           numExecutedQueries = 0;
 
           const graphOptions = new GraphOptions(rawGraphOptions);
-          const graph = ModelGraph.create(modelClass, models);
+          const graph = assignDbRefsAsRelateProps(ModelGraph.create(modelClass, models));
           const graphInsert = new GraphInsert({ graph, currentGraph, graphOptions });
           const actions = graphInsert.createActions();
           let promise = Promise.resolve();
@@ -1054,6 +1055,18 @@ module.exports = session => {
             check(result);
           }
         });
+    }
+
+    function assignDbRefsAsRelateProps(graph) {
+      for (const node of graph.nodes) {
+        if (!node.parentEdge || !node.parentEdge.relation || !node.isDbReference) {
+          continue;
+        }
+
+        node.parentEdge.relation.setRelateProp(node.obj, asArray(node.dbReference));
+      }
+
+      return graph;
     }
 
     function createSchema() {

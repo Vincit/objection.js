@@ -775,6 +775,62 @@ module.exports = session => {
         });
     });
 
+    it('should relate a HasManyRelation if #dbRef is used', () => {
+      const BoundModel1 = Model1.bindKnex(session.knex);
+
+      const upsert = {
+        id: 1,
+
+        // relate 1, 2
+        // insert 'new'
+        model1Relation2: [
+          {
+            '#dbRef': 1,
+            model2Prop1: 'also update'
+          },
+          {
+            '#dbRef': 2
+          },
+          {
+            model2Prop1: 'new'
+          }
+        ]
+      };
+
+      return BoundModel1.query()
+        .upsertGraph(upsert)
+        .then(() => {
+          return BoundModel1.query()
+            .findById(1)
+            .eager('model1Relation2');
+        })
+        .then(result => {
+          expect(result.model1Relation2).to.have.length(3);
+
+          chai.expect(result).to.containSubset({
+            id: 1,
+            model1Id: null,
+            model1Prop1: 'root 1',
+            model1Relation2: [
+              {
+                idCol: 1,
+                model1Id: 1,
+                model2Prop1: 'also update'
+              },
+              {
+                idCol: 2,
+                model1Id: 1,
+                model2Prop1: 'hasMany 2'
+              },
+              {
+                model1Id: 1,
+                model2Prop1: 'new'
+              }
+            ]
+          });
+        });
+    });
+
     it('should also update if relate model has other properties than id', () => {
       const upsert = {
         id: 2,
