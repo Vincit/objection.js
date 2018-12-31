@@ -962,7 +962,12 @@ module.exports = session => {
                     {
                       id: 3,
                       model1Prop1: 'blaa 1',
-                      model1Prop2: 6
+                      model1Prop2: 6,
+
+                      model1Relation1: {
+                        id: 9,
+                        model1Prop1: 'hoot'
+                      }
                     },
                     {
                       id: 4,
@@ -1081,7 +1086,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1090,6 +1095,7 @@ module.exports = session => {
               expectPartEql(rows[5], { id: 6, model1Prop1: 'blaa 4' });
               expectPartEql(rows[6], { id: 7, model1Prop1: 'blaa 5' });
               expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });
+              expectPartEql(rows[8], { id: 9, model1Prop1: 'hoot' });
             });
         });
 
@@ -1259,7 +1265,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1282,7 +1288,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1304,7 +1310,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1315,6 +1321,28 @@ module.exports = session => {
               expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });
             });
         });
+
+        it('should be able to use `joinRelation`', () => {
+          return parent1
+            .$relatedQuery('model2Relation1')
+            .innerJoinRelation('model1Relation1')
+            .patch({ model1Prop1: 'updated text', model1Prop2: 123 })
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(9);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'updated text', model1Prop2: 123 });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 5, model1Prop1: 'blaa 3' });
+              expectPartEql(rows[5], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[6], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        })
       });
 
       describe('has one through relation', () => {

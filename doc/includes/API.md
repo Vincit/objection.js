@@ -3785,6 +3785,8 @@ Type|Description
 
 Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).eager(expr)`.
 
+When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
+
 
 
 #### naiveEager
