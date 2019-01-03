@@ -4,7 +4,6 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
 const ValidationError = require('../../').ValidationError;
-const inheritModel = require('../../lib/model/inheritModel').inheritModel;
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -420,7 +419,7 @@ module.exports = session => {
               relate: true
             }
           )
-          .then(model => done(new Error('should not get here')))
+          .then(() => done(new Error('should not get here')))
           .catch(err => {
             expect(err.message).to.equal(
               'You cannot relate HasManyRelation or HasOneRelation using insertGraph, because those require update operations. Consider using upsertGraph instead.'
@@ -638,7 +637,7 @@ module.exports = session => {
           .catch(err => {
             expect(err instanceof ValidationError).to.equal(true);
             expect(err.type).to.equal('UnallowedRelation');
-            expect(err.message).to.eql('trying to insert an unallowed relation');
+            expect(err.message).to.eql('trying to upsert an unallowed relation');
             done();
           })
           .catch(done);

@@ -1,10 +1,8 @@
 const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
-const Model = require('../').Model;
 const knexUtils = require('../lib/utils/knexUtils');
-const transaction = require('../').transaction;
-const snakeCaseMappers = require('../').snakeCaseMappers;
+const { Model, transaction, snakeCaseMappers, ref } = require('../');
 
 const chai = require('chai');
 chai.use(require('chai-subset'));
@@ -46,7 +44,8 @@ class TestSession {
 
       static get namedFilters() {
         return {
-          'select:id': builder => builder.select('id'),
+          'orderById': builder => builder.orderBy('Model1.id'),
+          'select:id': builder => builder.select(this.ref('id')),
           'select:model1Prop1': builder => builder.select('model1Prop1'),
           'select:model1Prop1Aliased': builder => builder.select('model1Prop1 as aliasedInFilter'),
           'orderBy:model1Prop1': builder => builder.orderBy('model1Prop1'),
@@ -114,6 +113,12 @@ class TestSession {
         return snakeCaseMappers();
       }
 
+      static get modifiers() {
+        return {
+          orderById: builder => builder.orderBy('model2.id_col')
+        };
+      }
+
       static get relationMappings() {
         return {
           model2Relation1: {
@@ -167,6 +172,12 @@ class TestSession {
 
       static get idColumn() {
         return 'id';
+      }
+
+      static get modifiers() {
+        return {
+          orderById: builder => builder.orderBy('model3.id')
+        };
       }
     }
 

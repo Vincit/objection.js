@@ -45,8 +45,8 @@ What objection.js **doesn't** give you:
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
 
-Objection.js uses Promises and coding practices that make it ready for the future. We use Well known
-[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques and ES2015 classes and inheritance
+Objection.js uses Promises and coding practices that make it ready for the future. We use well known
+[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques, ES2015 classes, and inheritance
 in the codebase. You can use things like [async/await](http://jakearchibald.com/2014/es7-async-functions/)
 using node ">=7.6.0" or alternatively with a transpiler such as [Babel](https://babeljs.io/). Check out our [ES2015](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
 and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
@@ -1555,7 +1555,7 @@ await Person
   }, options);
 ```
 
-> Note that `upsertGraph` does not support the parameter `#dbRef` (which is supported by `insertGraph`). Use `relate` option and pass an id as depicted above instead.
+> You can use `upsertGraph` with `#dbRef` (same way as when using `insertGraph`). Alternatively, you can use `relate` option and pass an id as depicted above.
 
 > You can disable updates, inserts, deletes etc. for the whole `upsertGraph` operation or for
 > individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See

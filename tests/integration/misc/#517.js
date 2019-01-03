@@ -79,7 +79,7 @@ module.exports = session => {
       ];
 
       return Users.query()
-        .upsertGraph({ id: 1, preferences })
+        .upsertGraph({ id: 1, preferences }, { insertMissing: true })
         .then(() => {
           return Users.query()
             .eager('preferences')

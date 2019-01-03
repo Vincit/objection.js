@@ -454,6 +454,8 @@ const [person1, person2] = await Person.query().findByIds([1, 2]);
 const [person1, person2] = await Person.query().findByIds([[1, '10'], [2, '10']]);
 ```
 
+Finds a list of items. The order of the returned items is not guaranteed to be the same as the order of the inputs.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -1169,7 +1171,7 @@ const numRelatedRows = await someMovie
 console.log(`${numRelatedRows} rows were related`);
 ```
 
-Relates an existing model to another model.
+Relate (attach) an existing model to another model.
 
 This method doesn't create a new instance but only updates the foreign keys and in
 the case of many-to-many relation, creates a join row to the join table.
@@ -1211,9 +1213,9 @@ const numUnrelatedRows = await person.$relatedQuery('movies')
 console.log('movie 50 is no longer related to person 123 through `movies` relation');
 ```
 
-Removes a connection between two models.
+Remove (detach) a connection between two rows.
 
-Doesn't delete the models. Only removes the connection. For ManyToMany relations this
+Doesn't delete the rows. Only removes the connection. For ManyToMany relations this
 deletes the join row from the join table. For other relation types this sets the
 join columns to null.
 

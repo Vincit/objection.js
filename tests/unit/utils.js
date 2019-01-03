@@ -2,8 +2,6 @@ const util = require('util');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const classUtils = require('../../lib/utils/classUtils');
-const UpsertNode = require('../../lib/queryBuilder/graphUpserter/UpsertNode');
-const getOptionsWithRelPathFromRoot = require('../../lib/utils/transformOptionsFromPath');
 
 const {
   snakeCase,
@@ -192,48 +190,6 @@ describe('utils', () => {
           expect(camelCase(snakeCase(camel, opt), opt)).to.equal(backToCamel);
         });
       }
-    });
-  });
-
-  describe('getOptionsWithRelPathFromRoot', () => {
-    it('should return true for options set to true', () => {
-      const opt = {
-        [UpsertNode.OptionType.Relate]: true,
-        [UpsertNode.OptionType.Unrelate]: true
-      };
-
-      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'bogus.path');
-
-      expect(optTransformed).to.eql(opt);
-    });
-
-    it('should remove option for options set to unknown path', () => {
-      const opt = {
-        [UpsertNode.OptionType.Relate]: ['begins.with.this.path'],
-        [UpsertNode.OptionType.Unrelate]: true
-      };
-
-      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'begins.with.different.path');
-
-      expect(optTransformed).to.eql({
-        [UpsertNode.OptionType.Unrelate]: true
-      });
-    });
-
-    it('should remove equal and update longer paths', () => {
-      const opt = {
-        [UpsertNode.OptionType.Relate]: ['begins'],
-        [UpsertNode.OptionType.Unrelate]: ['begins.with'],
-        [UpsertNode.OptionType.InsertMissing]: ['begins.with.this', 'begins.with.also.this'],
-        [UpsertNode.OptionType.Update]: ['begins.with.this.path']
-      };
-
-      const optTransformed = getOptionsWithRelPathFromRoot(opt, 'begins.with');
-
-      expect(optTransformed).to.eql({
-        [UpsertNode.OptionType.InsertMissing]: ['this', 'also.this'],
-        [UpsertNode.OptionType.Update]: ['this.path']
-      });
     });
   });
 
