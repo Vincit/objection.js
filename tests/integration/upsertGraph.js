@@ -1,13 +1,10 @@
 const raw = require('../../').raw;
 const expect = require('expect.js');
 const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
 const Promise = require('bluebird');
 const transaction = require('../../').transaction;
 const ValidationError = require('../../').ValidationError;
 const mockKnexFactory = require('../../testUtils/mockKnex');
-
-chai.use(chaiAsPromised);
 
 module.exports = session => {
   const Model1 = session.unboundModels.Model1;
@@ -540,51 +537,6 @@ module.exports = session => {
           .findById(upserted.id)
           .then(fetched => {
             expect(upserted.$toJson()).to.eql(fetched.$toJson());
-          });
-      });
-    });
-
-    it('supports #dbref for upserts', () => {
-      const upsert = {
-        id: 2,
-        model1Id: 3,
-        model1Relation2: [
-          {
-            '#dbRef': 1,
-            model2Prop1: 'updated hasMany 1'
-          },
-          {
-            model2Prop1: 'inserted hasMany'
-          }
-        ]
-      };
-      return transaction(session.knex, trx => {
-        return Model1.query(trx)
-          .upsertGraphAndFetch(upsert)
-          .then(model => {
-            expect(model).to.eql({
-              id: 2,
-              model1Id: 3,
-              model1Prop1: 'root 2',
-              model1Prop2: null,
-              model1Relation2: [
-                {
-                  idCol: 1,
-                  model1Id: 2,
-                  model2Prop1: 'updated hasMany 1',
-                  model2Prop2: null,
-                  $afterGetCalled: 1
-                },
-                {
-                  idCol: 3,
-                  model1Id: 2,
-                  model2Prop1: 'inserted hasMany',
-                  model2Prop2: null,
-                  $afterGetCalled: 1
-                }
-              ],
-              $afterGetCalled: 1
-            });
           });
       });
     });
