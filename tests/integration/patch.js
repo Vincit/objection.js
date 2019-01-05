@@ -1342,7 +1342,7 @@ module.exports = session => {
               expectPartEql(rows[6], { id: 7, model1Prop1: 'blaa 5' });
               expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });
             });
-        })
+        });
       });
 
       describe('has one through relation', () => {

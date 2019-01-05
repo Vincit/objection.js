@@ -76,10 +76,11 @@ module.exports = session => {
             return Model1.query()
               .findById(3)
               .then(model => {
-                return model.$relatedQuery('model1Relation1')
+                return model
+                  .$relatedQuery('model1Relation1')
                   .unrelate()
                   .innerJoinRelation('model1Relation2 as m1r2')
-                  .where('m1r2.model2_prop1', 'bar')
+                  .where('m1r2.model2_prop1', 'bar');
               })
               .then(numUpdated => {
                 expect(numUpdated).to.equal(0);
@@ -87,13 +88,14 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows.map(it => it.model1Id)).to.eql([2, null, 4, null]);
-                return Model1.query().findById(3)
+                return Model1.query().findById(3);
               })
               .then(model => {
-                return model.$relatedQuery('model1Relation1')
+                return model
+                  .$relatedQuery('model1Relation1')
                   .unrelate()
                   .innerJoinRelation('model1Relation2 as m1r2')
-                  .where('m1r2.model2_prop1', 'foo')
+                  .where('m1r2.model2_prop1', 'foo');
               })
               .then(numUpdated => {
                 expect(numUpdated).to.equal(1);
@@ -101,7 +103,7 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows.map(it => it.model1Id)).to.eql([2, null, null, null]);
-              })
+              });
           });
         }
 
