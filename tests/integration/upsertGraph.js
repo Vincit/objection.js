@@ -1397,6 +1397,87 @@ module.exports = session => {
       });
     });
 
+    it("should insert belongsToOneRelation if it's an array", () => {
+      const upsert = {
+        id: 2,
+
+        // The model with id 3 should get deleted and this new one inserted.
+        model1Relation1: [
+          {
+            model1Prop1: 'inserted belongsToOne'
+          }
+        ]
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1.query(trx)
+          .upsertGraph(upsert)
+          .then(() => {
+            // Fetch the graph from the database.
+            return Model1.query(trx)
+              .findById(2)
+              .eager('model1Relation1');
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            chai.expect(result).to.containSubset({
+              id: 2,
+
+              model1Relation1: {
+                model1Prop1: 'inserted belongsToOne'
+              }
+            });
+
+            return Promise.all([trx('Model1'), trx('model2')]).spread((model1Rows, model2Rows) => {
+              // Row 3 should be deleted.
+              expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
+            });
+          });
+      });
+    });
+
+    it("should insert hasManyRelation if it's not an array", () => {
+      const upsert = {
+        id: 2,
+
+        // Should delete idCol = 2
+        // Should update idCol = 1
+        model1Relation2: {
+          idCol: 1,
+          model2Prop1: 'updated'
+        }
+      };
+
+      return transaction(session.knex, trx => {
+        return Model1.query(trx)
+          .upsertGraph(upsert)
+          .then(() => {
+            // Fetch the graph from the database.
+            return Model1.query(trx)
+              .findById(2)
+              .eager('model1Relation2');
+          })
+          .then(omitIrrelevantProps)
+          .then(result => {
+            chai.expect(result).to.containSubset({
+              id: 2,
+
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'updated'
+                }
+              ]
+            });
+
+            return trx('model2').then(model2Rows => {
+              // Row 2 should be deleted.
+              expect(model2Rows.find(it => it.idCol == 2)).to.equal(undefined);
+            });
+          });
+      });
+    });
+
     it('should unrelate and relate belongsToOneRelation', () => {
       const upsert = {
         id: 2,

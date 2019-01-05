@@ -418,7 +418,6 @@ module.exports = session => {
               .then(arnold => {
                 return arnold
                   .$relatedQuery('movies')
-                  .debug()
                   .context(modifyManyToMany(qb => qb.where('name', 'Terminator').select('name')))
                   .update({ name: 'Updated' });
               })
