@@ -88,7 +88,7 @@ module.exports = session => {
         Model1.query(session.knex).upsertGraph([]),
         Model1.query(session.knex).upsertGraphAndFetch([])
       ]);
-    })
+    });
 
     for (const passthroughMethodCall of [null, 'forUpdate', 'forShare']) {
       const passthroughMethodCallSql = {
