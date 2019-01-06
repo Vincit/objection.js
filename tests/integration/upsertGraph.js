@@ -2199,6 +2199,61 @@ module.exports = session => {
         });
     });
 
+    it('should throw a sensible error if a non-object is passed in as the root', done => {
+      Model1.bindKnex(session.knex)
+        .query()
+        .upsertGraph('not a model')
+        .then(() => {
+          throw new Error('should not get here');
+        })
+        .catch(err => {
+          expect(err.type).to.equal('InvalidGraph');
+          expect(err.message).to.equal('expected value "not a model" to be an instance of Model1');
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should throw a sensible error if a non-object is passed in a belongs to one relation', done => {
+      Model1.bindKnex(session.knex)
+        .query()
+        .upsertGraph({
+          id: 1,
+          model1Relation1: 'not an object'
+        })
+        .then(() => {
+          throw new Error('should not get here');
+        })
+        .catch(err => {
+          expect(err.type).to.equal('InvalidGraph');
+          expect(err.message).to.equal(
+            'expected value "not an object" to be an instance of Model1'
+          );
+          done();
+        })
+        .catch(done);
+    });
+
+    it('should throw a sensible error if a non-object is passed in a has many relation', done => {
+      Model1.bindKnex(session.knex)
+        .query()
+        .upsertGraph({
+          id: 1,
+          model1Relation2: ['not an object']
+        })
+        .then(() => {
+          throw new Error('should not get here');
+        })
+        .catch(err => {
+          expect(err.type).to.equal('InvalidGraph');
+          expect(err.message).to.equal(
+            'expected value "not an object" to be an instance of Model2'
+          );
+          done();
+        })
+        .catch(done);
+    });
+
     describe('relate with children => upsertGraph recursively called', () => {
       beforeEach(() => {
         population = [
