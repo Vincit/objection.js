@@ -83,6 +83,13 @@ module.exports = session => {
       return session.populate(population);
     });
 
+    it('should do nothing if an empty array is given', () => {
+      return Promise.all([
+        Model1.query(session.knex).upsertGraph([]),
+        Model1.query(session.knex).upsertGraphAndFetch([])
+      ]);
+    })
+
     for (const passthroughMethodCall of [null, 'forUpdate', 'forShare']) {
       const passthroughMethodCallSql = {
         null: '',

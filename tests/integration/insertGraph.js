@@ -80,6 +80,10 @@ module.exports = session => {
         return session.populate(population);
       });
 
+      it('should do nothing if an empty array is provided', () => {
+        return Model1.query().insertGraph([]);
+      })
+
       it('should insert a model with relations', () => {
         return Model1.query()
           .insertGraph(insertion)
@@ -551,6 +555,10 @@ module.exports = session => {
       beforeEach(() => {
         return session.populate(population);
       });
+
+      it('should do nothing if an empty array is provided', () => {
+        return Model1.query().insertGraphAndFetch([]);
+      })
 
       it('should insert a model with relations and fetch the inserted graph', () => {
         return Model1.query()
