@@ -1704,6 +1704,37 @@ describe('QueryBuilder', () => {
     ).to.equal(false);
   });
 
+  it('parseRelationExpression', () => {
+    expect(QueryBuilder.parseRelationExpression('[foo, bar.baz]')).to.eql({
+      $name: null,
+      $relation: null,
+      $modify: [],
+      $recursive: false,
+      $allRecursive: false,
+      foo: {
+        $name: 'foo',
+        $relation: 'foo',
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false
+      },
+      bar: {
+        $name: 'bar',
+        $relation: 'bar',
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false,
+        baz: {
+          $name: 'baz',
+          $relation: 'baz',
+          $modify: [],
+          $recursive: false,
+          $allRecursive: false
+        }
+      }
+    });
+  });
+
   describe('eager, allowEager, and mergeAllowEager', () => {
     beforeEach(() => {
       const rel = {

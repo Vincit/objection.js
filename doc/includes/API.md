@@ -306,7 +306,7 @@ The query is executed when one of its promise methods [`then()`](#then), [`catch
 #### forClass
 
 ```js
-var builder = QueryBuilder.forClass(modelClass);
+const builder = QueryBuilder.forClass(modelClass);
 ```
 
 Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the
@@ -323,6 +323,29 @@ modelClass|[`Model`](#model)|A Model class constructor
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|The created query builder
+
+
+
+
+#### parseRelationExpression
+
+```js
+const exprObj = QueryBuilder.parseRelationExpression(expr);
+```
+
+Parses a string relation expression into the [object notation](#relationexpression-object-notation).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+expr|string|A string relation expression.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+object|The relation expression in object notation.
 
 
 
