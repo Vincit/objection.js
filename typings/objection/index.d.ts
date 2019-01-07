@@ -249,28 +249,21 @@ declare namespace Objection {
   }
 
   type GraphModel<T> =
-    | ({'#id'?: string; '#ref'?: never; '#dbRef'?: never} & T)
-    | ({'#id'?: never; '#ref': string; '#dbRef'?: never} & {
-        [P in keyof T]?: never
-      })
-    | ({'#id'?: never; '#ref'?: never; '#dbRef': number} & {
-        [P in keyof T]?: never
-      });
+    | ({ '#id'?: string; '#ref'?: never; '#dbRef'?: never } & T)
+    | ({ '#id'?: never; '#ref': string; '#dbRef'?: never } & { [P in keyof T]?: never })
+    | ({ '#id'?: never; '#ref'?: never; '#dbRef': number } & { [P in keyof T]?: never });
 
-  type NonFunctionPropertyNames<T> = {
-    [K in keyof T]: T[K] extends Function ? never : K
-  }[keyof T];
+  type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 
   interface DeepPartialGraphArray<T> extends Array<DeepPartialGraph<T>> {}
 
   type DeepPartialGraphModel<T> =
-    | GraphModel<{[P in NonFunctionPropertyNames<T>]?: DeepPartialGraph<T[P]>}>
+    | GraphModel<{ [P in NonFunctionPropertyNames<T>]?: DeepPartialGraph<T[P]> }>
     | Partial<T>;
 
-  type DeepPartialGraph<T> =
-    T extends (any[] | ReadonlyArray<any>) ? DeepPartialGraphArray<T[number]> :
-    T extends Model ? DeepPartialGraphModel<T> :
-    T;
+  type DeepPartialGraph<T> = T extends (any[] | ReadonlyArray<any>)
+    ? DeepPartialGraphArray<T[number]>
+    : T extends Model ? DeepPartialGraphModel<T> : T;
 
   export interface InsertGraphOptions {
     relate?: boolean | string[];
@@ -670,23 +663,35 @@ declare namespace Objection {
   }
 
   interface InsertGraph<QM extends Model> {
-    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: InsertGraphOptions): QueryBuilder<
+      QM,
+      QM[]
+    >;
     (modelOrObject?: DeepPartialGraph<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
     (): this;
   }
 
   interface InsertGraphAndFetch<QM extends Model> {
-    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: InsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: InsertGraphOptions): QueryBuilder<
+      QM,
+      QM[]
+    >;
     (modelOrObject?: DeepPartialGraph<QM>, options?: InsertGraphOptions): QueryBuilder<QM, QM>;
   }
 
   interface UpsertGraph<QM extends Model> {
-    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: UpsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: UpsertGraphOptions): QueryBuilder<
+      QM,
+      QM[]
+    >;
     (modelOrObject?: DeepPartialGraph<QM>, options?: UpsertGraphOptions): QueryBuilder<QM, QM>;
   }
 
   interface UpsertGraphAndFetch<QM extends Model> {
-    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: UpsertGraphOptions): QueryBuilder<QM, QM[]>;
+    (modelsOrObjects?: DeepPartialGraph<QM>[], options?: UpsertGraphOptions): QueryBuilder<
+      QM,
+      QM[]
+    >;
     (modelOrObject?: DeepPartialGraph<QM>, options?: UpsertGraphOptions): QueryBuilder<QM, QM>;
   }
 
