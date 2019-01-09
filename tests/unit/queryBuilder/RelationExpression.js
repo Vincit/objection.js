@@ -883,6 +883,40 @@ describe('RelationExpression', () => {
     });
   });
 
+  it('clone', () => {
+    testClone('[aaa as a . bbb as b.^, c(f)]', {
+      $name: null,
+      $relation: null,
+      $modify: [],
+      $recursive: false,
+      $allRecursive: false,
+
+      a: {
+        $name: 'a',
+        $relation: 'aaa',
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false,
+
+        b: {
+          $name: 'b',
+          $relation: 'bbb',
+          $modify: [],
+          $recursive: true,
+          $allRecursive: false
+        }
+      },
+
+      c: {
+        $name: 'c',
+        $relation: 'c',
+        $modify: ['f'],
+        $recursive: false,
+        $allRecursive: false
+      }
+    });
+  });
+
   describe('#expressionsAtPath', () => {
     it('a from a', () => {
       testPath('a', 'a', [
@@ -1377,6 +1411,10 @@ describe('RelationExpression', () => {
 
   function testParse(str, parsed) {
     expect(RelationExpression.create(str)).to.eql(parsed);
+  }
+
+  function testClone(expr, cloned) {
+    expect(RelationExpression.create(expr).clone()).to.eql(cloned);
   }
 
   function testMerge(str1, str2, parsed) {

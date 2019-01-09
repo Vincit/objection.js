@@ -2548,60 +2548,97 @@ const operationBuilder = QueryBuilder.forClass(Model);
 
 function createFindOperation(builder, whereObj) {
   const operation = operationBuilder._findOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onBuildKnex = knexBuilder => {
-    knexBuilder.where(whereObj);
-  };
+    operation.onBefore2 = operation.onAfter2 = () => {};
 
-  return operation;
+    operation.onBuildKnex = knexBuilder => {
+      knexBuilder.where(whereObj);
+    };
+
+    operation.clone = clone;
+
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
 
 function createInsertOperation(builder, mergeWithModel) {
   const operation = operationBuilder._insertOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onAdd = function(builder, args) {
-    this.models = [args[0]];
-    return true;
-  };
+    operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
-  operation.onBuildKnex = function(knexBuilder) {
-    let json = _.merge(this.models[0], mergeWithModel);
-    knexBuilder.insert(json);
-  };
+    operation.onAdd = function(_, args) {
+      this.models = [args[0]];
+      return true;
+    };
 
-  return operation;
+    operation.onBuildKnex = function(knexBuilder) {
+      let json = _.merge(this.models[0], mergeWithModel);
+      knexBuilder.insert(json);
+    };
+
+    operation.clone = clone;
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
 
 function createUpdateOperation(builder, mergeWithModel) {
   const operation = operationBuilder._updateOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onAdd = function(builder, args) {
-    this.models = [args[0]];
-    return true;
-  };
+    operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
-  operation.onBuildKnex = function(knexBuilder) {
-    let json = _.merge(this.models[0], mergeWithModel);
-    knexBuilder.update(json);
-  };
+    operation.onAdd = function(_, args) {
+      this.model = args[0];
+      return true;
+    };
 
-  return operation;
+    operation.onBuildKnex = function(knexBuilder) {
+      let json = _.merge(this.model, mergeWithModel);
+      knexBuilder.update(json);
+    };
+
+    operation.clone = clone;
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
 
 function createDeleteOperation(builder, whereObj) {
   const operation = operationBuilder._deleteOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onBuildKnex = knexBuilder => {
-    knexBuilder.delete().where(whereObj);
-  };
+    operation.onBefore2 = operation.onAfter2 = () => {};
 
-  return operation;
+    operation.onBuildKnex = knexBuilder => {
+      knexBuilder.delete().where(whereObj);
+    };
+
+    operation.clone = clone;
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
