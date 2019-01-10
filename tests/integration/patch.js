@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const raw = require('../../').raw;
+const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const inheritModel = require('../../lib/model/inheritModel').inheritModel;
@@ -185,6 +186,32 @@ module.exports = session => {
             expectPartEql(rows[2], { id: 3, model1Prop1: 'hello 3' });
           });
       });
+
+      if (session.isPostgres()) {
+        it('should patch multiple and return updated rows if returning is useed', () => {
+          return Model1.query()
+            .patch({ model1Prop1: 'updated text' })
+            .where('model1Prop1', '<', 'hello 3')
+            .returning('*')
+            .then(updatedRows => {
+              expect(updatedRows).to.have.length(2);
+              chai.expect(updatedRows).to.containSubset([
+                {
+                  id: 1,
+                  model1Id: null,
+                  model1Prop1: 'updated text',
+                  model1Prop2: null
+                },
+                {
+                  id: 2,
+                  model1Id: null,
+                  model1Prop1: 'updated text',
+                  model1Prop2: null
+                }
+              ]);
+            });
+        });
+      }
 
       it('increment should create patch', () => {
         return Model2.query()
