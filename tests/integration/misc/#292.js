@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const expect = require('expect.js');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 
 module.exports = session => {
   describe('Eagerly loaded empty relations seem to short-circuit conversion to internal structure #292', () => {

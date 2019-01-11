@@ -1,14 +1,11 @@
 const _ = require('lodash');
-const raw = require('../../').raw;
 const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const inheritModel = require('../../lib/model/inheritModel').inheritModel;
-const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
-const ValidationError = require('../../').ValidationError;
-const Model = require('../../').Model;
-const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
-const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
+const { inheritModel } = require('../../lib/model/inheritModel');
+const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
+const { Model, ValidationError, raw } = require('../../');
+const { isPostgres, isSqlite } = require('../../lib/utils/knexUtils');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {

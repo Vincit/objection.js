@@ -1,6 +1,6 @@
 'use strict';
 
-const Model = require('objection').Model;
+const { Model } = require('objection');
 
 class Animal extends Model {
   // Table name is the only required property.

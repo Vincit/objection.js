@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 
 module.exports = session => {
   describe('Default values not set with .insertGraph() in 0.7.2 #325', () => {

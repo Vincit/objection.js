@@ -1,6 +1,6 @@
 'use strict';
 
-const Model = require('objection').Model;
+const { Model } = require('objection');
 const Animal = require('./Animal');
 const Movie = require('./Movie');
 

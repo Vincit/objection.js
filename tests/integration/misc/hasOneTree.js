@@ -1,5 +1,4 @@
-const expect = require('expect.js');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 
 module.exports = session => {
   describe('has one relation tree', () => {

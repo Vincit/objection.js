@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 const mockKnexFactory = require('../../../testUtils/mockKnex');
 
 module.exports = session => {

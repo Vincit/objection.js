@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const knex = require('knex');
 const expect = require('expect.js');
-const Model = require('../../../').Model;
-const QueryBuilder = require('../../../').QueryBuilder;
-const ValidationError = require('../../../').ValidationError;
+const { Model, QueryBuilder, ValidationError } = require('../../../');
 
 describe('Model', () => {
   describe('fromJson', () => {

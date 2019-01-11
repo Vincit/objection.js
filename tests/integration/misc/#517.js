@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 
 module.exports = session => {
   describe('upsertGraph with compound key in relation #517', () => {

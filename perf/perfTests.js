@@ -2,7 +2,6 @@
 
 const _ = require('lodash')
   , Knex = require('knex')
-  , expect = require('expect.js')
   , Promise = require('bluebird')
   , knexMocker = require('../testUtils/mockKnex')
   , mockMochaFactory = require('./mockMocha')
@@ -683,5 +682,3 @@ describe('Performance tests', () => {
 if (global.mockMocha) {
   global.mockMocha.run();
 }
-
-

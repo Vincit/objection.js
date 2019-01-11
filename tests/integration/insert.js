@@ -1,8 +1,8 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const inheritModel = require('../../lib/model/inheritModel').inheritModel;
-const ValidationError = require('../../').ValidationError;
+const { inheritModel } = require('../../lib/model/inheritModel');
+const { ValidationError } = require('../../');
 
 module.exports = session => {
   let Model1 = session.models.Model1;

@@ -2,7 +2,7 @@ const _ = require('lodash');
 const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const ValidationError = require('../../').ValidationError;
+const { ValidationError } = require('../../');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {

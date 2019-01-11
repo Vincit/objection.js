@@ -2,8 +2,7 @@ const _ = require('lodash');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const transaction = require('../../').transaction;
-const ValidationError = require('../../').ValidationError;
+const { transaction, ValidationError } = require('../../');
 
 module.exports = session => {
   let Model1 = session.models.Model1;

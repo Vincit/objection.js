@@ -1,9 +1,7 @@
-const raw = require('../../').raw;
 const expect = require('expect.js');
 const chai = require('chai');
 const Promise = require('bluebird');
-const transaction = require('../../').transaction;
-const ValidationError = require('../../').ValidationError;
+const { raw, transaction, ValidationError } = require('../../');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {

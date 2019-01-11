@@ -1,6 +1,5 @@
-const expect = require('chai').expect;
-const Model = require('../../../').Model;
-const snakeCaseMappers = require('../../../').snakeCaseMappers;
+const { expect } = require('chai');
+const { Model, snakeCaseMappers } = require('../../../');
 
 module.exports = session => {
   describe('relation hooks', () => {

@@ -1,4 +1,4 @@
-const Model = require('../../../../').Model;
+const { Model } = require('../../../../');
 
 class RelatedModel1 extends Model {
   static get tableName() {

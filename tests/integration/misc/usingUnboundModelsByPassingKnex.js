@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const expect = require('expect.js');
-const Model = require('../../../').Model;
 const Promise = require('bluebird');
 
 module.exports = session => {
