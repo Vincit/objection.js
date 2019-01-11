@@ -923,7 +923,7 @@ describe('HasManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
-          'update "RelatedModel" set "ownerAId" = NULL, "ownerBId" = NULL where "code" in (55, 66, 77) and "RelatedModel"."ownerAId" = 11 and "RelatedModel"."ownerBId" = 22'
+          'update "RelatedModel" set "ownerAId" = NULL, "ownerBId" = NULL where "code" in (55, 66, 77) and ("RelatedModel"."ownerAId" = 11 and "RelatedModel"."ownerBId" = 22)'
         );
       });
     });

@@ -420,7 +420,7 @@ describe('QueryBuilder', () => {
         .whereComposite(['A.a', 'B.b'], '>', [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "A"."a" > 1 and "B"."b" > 2'
+            'select "Model".* from "Model" where ("A"."a" > 1 and "B"."b" > 2)'
           ]);
         });
     });
@@ -440,7 +440,7 @@ describe('QueryBuilder', () => {
         .whereComposite(['A.a', 'B.b'], [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "A"."a" = 1 and "B"."b" = 2'
+            'select "Model".* from "Model" where ("A"."a" = 1 and "B"."b" = 2)'
           ]);
         });
     });
