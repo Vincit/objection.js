@@ -1289,7 +1289,7 @@ await Person
   });
 ```
 
-> If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef`
+> If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef` that explicitly points to an id of an entity which already exists in the database. Model `idColumn` of a related entity is used for the `#dbRef`.
 
 ```js
 await Person
@@ -1299,6 +1299,7 @@ await Person
     lastName: 'Lawrence',
 
     movies: [{
+      // This will relate to an existing movie with id 2636
       "#dbRef": 2636
     }, {
       // This will be inserted with an id.
@@ -1378,7 +1379,7 @@ You can read more about graph inserts from [this blog post](https://www.vincit.f
 ```
 
 > By default `upsertGraph` method updates the objects that have an id, inserts objects that don't have an id and deletes
-> all objects that are not present. Off course the delete only applies to relations and not the root. Here's a basic example:
+> all objects that are not present. Of course the delete only applies to relations and not the root. Here's a basic example:
 
 ```js
 // The return value of `upsertGraph` is the input graph converted into model instances.
@@ -1553,6 +1554,8 @@ await Person
     }]
   }, options);
 ```
+
+> You can use `upsertGraph` with `#dbRef` (same way as when using `insertGraph`). Alternatively, you can use `relate` option and pass an id as depicted above.
 
 > You can disable updates, inserts, deletes etc. for the whole `upsertGraph` operation or for
 > individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See
