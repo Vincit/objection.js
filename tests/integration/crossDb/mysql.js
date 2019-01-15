@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Knex = require('knex');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 

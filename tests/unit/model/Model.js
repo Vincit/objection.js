@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const knex = require('knex');
 const expect = require('expect.js');
-const Model = require('../../../').Model;
-const QueryBuilder = require('../../../').QueryBuilder;
-const ValidationError = require('../../../').ValidationError;
+const { Model, QueryBuilder, ValidationError } = require('../../../');
 
 describe('Model', () => {
   describe('fromJson', () => {
@@ -1405,21 +1403,27 @@ describe('Model', () => {
         }
       }
 
-      expect(
-        Model1.fromJson({
-          a: 10,
-          b: 100,
-          bar: 1000,
-          foo: 200,
-          baz: 300
-        }).toJSON()
-      ).to.eql({
+      const model = Model1.fromJson({
+        a: 10,
+        b: 100,
+        bar: 1000,
+        foo: 200,
+        baz: 300
+      });
+
+      expect(model.toJSON()).to.eql({
         a: 10,
         b: 100,
         c: 1000,
         foo: 110,
         bar: 1000,
         baz: 20
+      });
+
+      expect(model.$toDatabaseJson()).to.eql({
+        a: 10,
+        b: 100,
+        c: 1000
       });
     });
   });

@@ -2,8 +2,7 @@ const _ = require('lodash');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const transaction = require('../../').transaction;
-const ValidationError = require('../../').ValidationError;
+const { transaction, ValidationError } = require('../../');
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -78,6 +77,10 @@ module.exports = session => {
     describe('.query().insertGraph()', () => {
       beforeEach(() => {
         return session.populate(population);
+      });
+
+      it('should do nothing if an empty array is provided', () => {
+        return Model1.query().insertGraph([]);
       });
 
       it('should insert a model with relations', () => {
@@ -550,6 +553,10 @@ module.exports = session => {
     describe('.query().insertGraphAndFetch()', () => {
       beforeEach(() => {
         return session.populate(population);
+      });
+
+      it('should do nothing if an empty array is provided', () => {
+        return Model1.query().insertGraphAndFetch([]);
       });
 
       it('should insert a model with relations and fetch the inserted graph', () => {

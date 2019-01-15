@@ -27,6 +27,7 @@ module.exports = session => {
             {
               id: 1,
               model1Prop1: 'hello 1',
+
               model1Relation1: {
                 id: 2,
                 model1Prop1: 'hello 2'
@@ -35,10 +36,18 @@ module.exports = session => {
             {
               id: 3,
               model1Prop1: 'hello 3',
+
               model1Relation1: {
                 id: 4,
                 model1Prop1: 'hello 4'
-              }
+              },
+
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'foo'
+                }
+              ]
             }
           ]);
         });
@@ -62,13 +71,49 @@ module.exports = session => {
             });
         });
 
+        if (session.isMySql()) {
+          it('should be able to use `joinRelation`', () => {
+            return Model1.query()
+              .findById(3)
+              .then(model => {
+                return model
+                  .$relatedQuery('model1Relation1')
+                  .unrelate()
+                  .innerJoinRelation('model1Relation2 as m1r2')
+                  .where('m1r2.model2_prop1', 'bar');
+              })
+              .then(numUpdated => {
+                expect(numUpdated).to.equal(0);
+                return session.knex(Model1.getTableName()).orderBy('id');
+              })
+              .then(rows => {
+                expect(rows.map(it => it.model1Id)).to.eql([2, null, 4, null]);
+                return Model1.query().findById(3);
+              })
+              .then(model => {
+                return model
+                  .$relatedQuery('model1Relation1')
+                  .unrelate()
+                  .innerJoinRelation('model1Relation2 as m1r2')
+                  .where('m1r2.model2_prop1', 'foo');
+              })
+              .then(numUpdated => {
+                expect(numUpdated).to.equal(1);
+                return session.knex(Model1.getTableName()).orderBy('id');
+              })
+              .then(rows => {
+                expect(rows.map(it => it.model1Id)).to.eql([2, null, null, null]);
+              });
+          });
+        }
+
         it('should fail if arguments are given', done => {
           Model1.query()
             .findById(1)
             .then(model => {
               return model.$relatedQuery('model1Relation1').unrelate(1);
             })
-            .then(numUpdated => {
+            .then(() => {
               done(new Error('should not get here'));
             })
             .catch(err => {

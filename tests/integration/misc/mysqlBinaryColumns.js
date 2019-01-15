@@ -1,6 +1,5 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
-const utils = require('../../../lib/utils/knexUtils');
+const { Model } = require('../../../');
 
 module.exports = session => {
   if (session.isMySql()) {

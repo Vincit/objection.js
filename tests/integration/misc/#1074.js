@@ -64,8 +64,8 @@ module.exports = session => {
     });
 
     beforeEach(() => Person.query().delete());
-    beforeEach(() =>
-      Person.query().insertGraph({
+    beforeEach(() => {
+      return Person.query().insertGraph({
         name: 'Matti',
 
         parent: {
@@ -80,7 +80,8 @@ module.exports = session => {
             name: 'Taakko'
           }
         ]
-      }));
+      });
+    });
 
     it('test', () => {
       return Person.query()

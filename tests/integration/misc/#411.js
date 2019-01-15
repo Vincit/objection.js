@@ -1,6 +1,5 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
-const AjvValidator = require('../../../').AjvValidator;
+const { AjvValidator, Model } = require('../../../');
 
 module.exports = session => {
   describe('leverage ajv cache and serialize function #411', () => {

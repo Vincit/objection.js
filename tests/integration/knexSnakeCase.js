@@ -1,9 +1,7 @@
 const Knex = require('knex');
-const Model = require('../../').Model;
-const sortBy = require('lodash/sortBy');
 const Promise = require('bluebird');
-const knexSnakeCaseMappers = require('../../').knexSnakeCaseMappers;
-const expect = require('chai').expect;
+const { Model, knexSnakeCaseMappers } = require('../../');
+const { expect } = require('chai');
 
 module.exports = session => {
   describe('knexSnakeCaseMappers', () => {

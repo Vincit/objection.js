@@ -1,5 +1,5 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
+const { Model } = require('../../../');
 
 module.exports = session => {
   describe('zero value in relation column', () => {

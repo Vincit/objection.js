@@ -1,7 +1,6 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
 const utils = require('../../../lib/utils/knexUtils');
-const ref = require('../../../').ref;
+const { Model, ref } = require('../../../');
 
 module.exports = session => {
   if (utils.isPostgres(session.knex)) {

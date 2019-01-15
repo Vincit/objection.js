@@ -67,6 +67,43 @@ module.exports = session => {
           });
       });
 
+      it('should delete a model using deleteById', () => {
+        return Model1.query()
+          .deleteById(2)
+          .then(numDeleted => {
+            expect(numDeleted).to.equal(1);
+            return session.knex('Model1').orderBy('id');
+          })
+          .then(rows => {
+            expect(rows).to.have.length(2);
+            expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+            expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
+          });
+      });
+
+      if (session.isPostgres()) {
+        it('should delete a model using deleteById and return the deleted column when `returning` is used', () => {
+          return Model1.query()
+            .deleteById(2)
+            .returning('*')
+            .then(deletedRow => {
+              expect(deletedRow).to.eql({
+                id: 2,
+                model1Id: null,
+                model1Prop1: 'hello 2',
+                model1Prop2: null
+              });
+
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(2);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
+            });
+        });
+      }
+
       it('should delete multiple', () => {
         return Model1.query()
           .delete()
@@ -585,6 +622,55 @@ module.exports = session => {
               expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
             });
         });
+
+        it('should delete a related object using deleteById', () => {
+          return parent1
+            .$relatedQuery('model2Relation1')
+            .deleteById(5)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(7);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        });
+
+        if (session.isPostgres()) {
+          it('should delete a related object using deleteById and return the deleted row when `returning` is used', () => {
+            return parent1
+              .$relatedQuery('model2Relation1')
+              .returning('*')
+              .deleteById(5)
+              .then(deletedRow => {
+                expect(deletedRow).to.eql({
+                  id: 5,
+                  model1Id: null,
+                  model1Prop1: 'blaa 3',
+                  model1Prop2: 4
+                });
+
+                return session.knex('Model1').orderBy('Model1.id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(7);
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+                expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+                expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+                expectPartEql(rows[4], { id: 6, model1Prop1: 'blaa 4' });
+                expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+                expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
+              });
+          });
+        }
 
         it('should delete multiple objects (1)', () => {
           return parent2

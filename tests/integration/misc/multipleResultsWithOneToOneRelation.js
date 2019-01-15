@@ -1,5 +1,4 @@
 const expect = require('expect.js');
-const Model = require('../../../').Model;
 
 module.exports = session => {
   describe('multiple results with a one-to-one relation', () => {

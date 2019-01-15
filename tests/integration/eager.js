@@ -1,7 +1,8 @@
 const _ = require('lodash');
+const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const ValidationError = require('../../').ValidationError;
+const { ValidationError } = require('../../');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {
@@ -2435,6 +2436,84 @@ module.exports = session => {
                   {
                     model1Prop1: 'hello 8',
                     $afterGetCalled: 1
+                  }
+                ]
+              }
+            ]);
+          });
+      });
+    });
+
+    describe('Same ManyToMany child for multiple parents + extras', () => {
+      beforeEach(() => {
+        return Model2.query().insertGraph([
+          {
+            idCol: 100,
+            model2Prop1: 'hejsan 1',
+
+            model2Relation1: [
+              {
+                id: 500,
+                model1Prop1: 'hello 5'
+              },
+              {
+                '#id': 'shared',
+                id: 600,
+                model1Prop1: 'hello 6',
+                aliasedExtra: 'lol1'
+              }
+            ]
+          },
+          {
+            idCol: 200,
+            model2Prop1: 'hejsan 2',
+
+            model2Relation1: [
+              {
+                '#ref': 'shared',
+                aliasedExtra: 'lol2'
+              },
+              {
+                id: 700,
+                model1Prop1: 'hello 7'
+              }
+            ]
+          }
+        ]);
+      });
+
+      it('test', () => {
+        return Model2.query()
+          .whereIn('id_col', [100, 200])
+          .orderBy('id_col')
+          .eager('model2Relation1(orderById)')
+          .then(result => {
+            chai.expect(result).to.containSubset([
+              {
+                idCol: 100,
+
+                model2Relation1: [
+                  {
+                    id: 500,
+                    aliasedExtra: null
+                  },
+                  {
+                    id: 600,
+                    aliasedExtra: 'lol1'
+                  }
+                ]
+              },
+              {
+                idCol: 200,
+
+                model2Relation1: [
+                  {
+                    id: 600,
+                    aliasedExtra: 'lol2'
+                  },
+                  {
+                    id: 700,
+                    aliasedExtra: null
                   }
                 ]
               }

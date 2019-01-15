@@ -1,11 +1,7 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const Model = require('../../').Model;
-
-const ref = require('../../').ref;
-const lit = require('../../').lit;
-const raw = require('../../').raw;
+const { Model, ref, lit, raw } = require('../../');
 
 function expectIdsEqual(resultArray, expectedIds) {
   expectArraysEqual(

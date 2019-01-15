@@ -1,13 +1,11 @@
 const _ = require('lodash');
-const raw = require('../../').raw;
+const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const inheritModel = require('../../lib/model/inheritModel').inheritModel;
-const expectPartEql = require('./../../testUtils/testUtils').expectPartialEqual;
-const ValidationError = require('../../').ValidationError;
-const Model = require('../../').Model;
-const isPostgres = require('../../lib/utils/knexUtils').isPostgres;
-const isSqlite = require('../../lib/utils/knexUtils').isSqlite;
+const { inheritModel } = require('../../lib/model/inheritModel');
+const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
+const { Model, ValidationError, raw } = require('../../');
+const { isPostgres, isSqlite } = require('../../lib/utils/knexUtils');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {
@@ -185,6 +183,32 @@ module.exports = session => {
             expectPartEql(rows[2], { id: 3, model1Prop1: 'hello 3' });
           });
       });
+
+      if (session.isPostgres()) {
+        it('should patch multiple and return updated rows if returning is useed', () => {
+          return Model1.query()
+            .patch({ model1Prop1: 'updated text' })
+            .where('model1Prop1', '<', 'hello 3')
+            .returning('*')
+            .then(updatedRows => {
+              expect(updatedRows).to.have.length(2);
+              chai.expect(updatedRows).to.containSubset([
+                {
+                  id: 1,
+                  model1Id: null,
+                  model1Prop1: 'updated text',
+                  model1Prop2: null
+                },
+                {
+                  id: 2,
+                  model1Id: null,
+                  model1Prop1: 'updated text',
+                  model1Prop2: null
+                }
+              ]);
+            });
+        });
+      }
 
       it('increment should create patch', () => {
         return Model2.query()
@@ -962,7 +986,12 @@ module.exports = session => {
                     {
                       id: 3,
                       model1Prop1: 'blaa 1',
-                      model1Prop2: 6
+                      model1Prop2: 6,
+
+                      model1Relation1: {
+                        id: 9,
+                        model1Prop1: 'hoot'
+                      }
                     },
                     {
                       id: 4,
@@ -1081,7 +1110,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1090,6 +1119,7 @@ module.exports = session => {
               expectPartEql(rows[5], { id: 6, model1Prop1: 'blaa 4' });
               expectPartEql(rows[6], { id: 7, model1Prop1: 'blaa 5' });
               expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });
+              expectPartEql(rows[8], { id: 9, model1Prop1: 'hoot' });
             });
         });
 
@@ -1259,7 +1289,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1282,7 +1312,7 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
@@ -1304,12 +1334,34 @@ module.exports = session => {
               return session.knex('Model1').orderBy('Model1.id');
             })
             .then(rows => {
-              expect(rows).to.have.length(8);
+              expect(rows).to.have.length(9);
               expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
               expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
               expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
               expectPartEql(rows[3], { id: 4, model1Prop1: 'updated text', model1Prop2: 123 });
               expectPartEql(rows[4], { id: 5, model1Prop1: 'updated text', model1Prop2: 123 });
+              expectPartEql(rows[5], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[6], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        });
+
+        it('should be able to use `joinRelation`', () => {
+          return parent1
+            .$relatedQuery('model2Relation1')
+            .innerJoinRelation('model1Relation1')
+            .patch({ model1Prop1: 'updated text', model1Prop2: 123 })
+            .then(numUpdated => {
+              expect(numUpdated).to.equal(1);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(9);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'updated text', model1Prop2: 123 });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 5, model1Prop1: 'blaa 3' });
               expectPartEql(rows[5], { id: 6, model1Prop1: 'blaa 4' });
               expectPartEql(rows[6], { id: 7, model1Prop1: 'blaa 5' });
               expectPartEql(rows[7], { id: 8, model1Prop1: 'blaa 6' });

@@ -1,6 +1,5 @@
-const ref = require('../../').ref;
+const { Model, ref } = require('../../');
 const find = require('lodash/find');
-const Model = require('../../').Model;
 const expect = require('expect.js');
 const sortBy = require('lodash/sortBy');
 

@@ -420,7 +420,7 @@ describe('QueryBuilder', () => {
         .whereComposite(['A.a', 'B.b'], '>', [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "A"."a" > 1 and "B"."b" > 2'
+            'select "Model".* from "Model" where ("A"."a" > 1 and "B"."b" > 2)'
           ]);
         });
     });
@@ -440,7 +440,7 @@ describe('QueryBuilder', () => {
         .whereComposite(['A.a', 'B.b'], [1, 2])
         .then(() => {
           expect(executedQueries).to.eql([
-            'select "Model".* from "Model" where "A"."a" = 1 and "B"."b" = 2'
+            'select "Model".* from "Model" where ("A"."a" = 1 and "B"."b" = 2)'
           ]);
         });
     });
@@ -1704,6 +1704,37 @@ describe('QueryBuilder', () => {
     ).to.equal(false);
   });
 
+  it('parseRelationExpression', () => {
+    expect(QueryBuilder.parseRelationExpression('[foo, bar.baz]')).to.eql({
+      $name: null,
+      $relation: null,
+      $modify: [],
+      $recursive: false,
+      $allRecursive: false,
+      foo: {
+        $name: 'foo',
+        $relation: 'foo',
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false
+      },
+      bar: {
+        $name: 'bar',
+        $relation: 'bar',
+        $modify: [],
+        $recursive: false,
+        $allRecursive: false,
+        baz: {
+          $name: 'baz',
+          $relation: 'baz',
+          $modify: [],
+          $recursive: false,
+          $allRecursive: false
+        }
+      }
+    });
+  });
+
   describe('eager, allowEager, and mergeAllowEager', () => {
     beforeEach(() => {
       const rel = {
@@ -2363,153 +2394,6 @@ describe('QueryBuilder', () => {
           expect(foo).to.equal(100);
         });
     });
-
-    describe('executeOnBuild', () => {
-      it('should move added operations right after the adding operation (push)', () => {
-        const builder = QueryBuilder.forClass(TestModel);
-        const calls = [];
-
-        builder._operations = [
-          op(builder => {
-            calls.push(0);
-          }),
-
-          op(builder => {
-            calls.push(1);
-
-            // This should be called next even though we add it to the end.
-            builder._operations.push(
-              op(() => {
-                calls.push(2);
-              })
-            );
-          }),
-
-          op(builder => {
-            calls.push(3);
-          })
-        ];
-
-        builder.executeOnBuild();
-        expect(calls).to.eql([0, 1, 2, 3]);
-      });
-
-      it('should move added operations right after the adding operation (concat)', () => {
-        const builder = QueryBuilder.forClass(TestModel);
-        const calls = [];
-
-        builder._operations = [
-          op(builder => {
-            calls.push(0);
-          }),
-
-          op(builder => {
-            calls.push(1);
-
-            // This should be called next even though we add it to the end.
-            builder._operations = builder._operations.concat(
-              op(() => {
-                calls.push(2);
-              })
-            );
-          }),
-
-          op(builder => {
-            calls.push(3);
-          })
-        ];
-
-        builder.executeOnBuild();
-        expect(calls).to.eql([0, 1, 2, 3]);
-      });
-
-      it('should work if an operation removes a bunch of other operations', () => {
-        const builder = QueryBuilder.forClass(TestModel);
-        const calls = [];
-
-        builder._operations = [
-          op(builder => {
-            calls.push(0);
-          }),
-
-          op(builder => {
-            calls.push(1);
-          }),
-
-          op(builder => {
-            calls.push(2);
-          }),
-
-          op(builder => {
-            calls.push(3);
-
-            builder._operations = [builder._operations[3], builder._operations[5]];
-          }),
-
-          op(builder => {
-            calls.push(4);
-          }),
-
-          op(builder => {
-            calls.push(5);
-          })
-        ];
-
-        builder.executeOnBuild();
-        expect(calls).to.eql([0, 1, 2, 3, 5]);
-      });
-
-      it('should work if an operation removes and adds a bunch of other operations', () => {
-        const builder = QueryBuilder.forClass(TestModel);
-        const calls = [];
-
-        builder._operations = [
-          op(builder => {
-            calls.push(0);
-          }),
-
-          op(builder => {
-            calls.push(1);
-          }),
-
-          op(builder => {
-            calls.push(2);
-          }),
-
-          op(builder => {
-            calls.push(3);
-
-            builder._operations = [
-              builder._operations[3],
-              builder._operations[5],
-
-              op(builder => {
-                calls.push(4);
-              }),
-
-              op(builder => {
-                calls.push(5);
-              })
-            ];
-          }),
-
-          op(builder => {
-            calls.push(6);
-          }),
-
-          op(builder => {
-            calls.push(7);
-          })
-        ];
-
-        builder.executeOnBuild();
-        expect(calls).to.eql([0, 1, 2, 3, 4, 5, 7]);
-      });
-
-      function op(onBuild) {
-        return { onBuild };
-      }
-    });
   });
 });
 
@@ -2517,60 +2401,97 @@ const operationBuilder = QueryBuilder.forClass(Model);
 
 function createFindOperation(builder, whereObj) {
   const operation = operationBuilder._findOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onBuildKnex = knexBuilder => {
-    knexBuilder.where(whereObj);
-  };
+    operation.onBefore2 = operation.onAfter2 = () => {};
 
-  return operation;
+    operation.onBuildKnex = knexBuilder => {
+      knexBuilder.where(whereObj);
+    };
+
+    operation.clone = clone;
+
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
 
 function createInsertOperation(builder, mergeWithModel) {
   const operation = operationBuilder._insertOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onAdd = function(builder, args) {
-    this.models = [args[0]];
-    return true;
-  };
+    operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
-  operation.onBuildKnex = function(knexBuilder) {
-    let json = _.merge(this.models[0], mergeWithModel);
-    knexBuilder.insert(json);
-  };
+    operation.onAdd = function(_, args) {
+      this.models = [args[0]];
+      return true;
+    };
 
-  return operation;
+    operation.onBuildKnex = function(knexBuilder) {
+      let json = _.merge(this.models[0], mergeWithModel);
+      knexBuilder.insert(json);
+    };
+
+    operation.clone = clone;
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
 
 function createUpdateOperation(builder, mergeWithModel) {
   const operation = operationBuilder._updateOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onAdd = function(builder, args) {
-    this.models = [args[0]];
-    return true;
-  };
+    operation.onBefore2 = operation.onBefore3 = operation.onAfter2 = () => {};
 
-  operation.onBuildKnex = function(knexBuilder) {
-    let json = _.merge(this.models[0], mergeWithModel);
-    knexBuilder.update(json);
-  };
+    operation.onAdd = function(_, args) {
+      this.model = args[0];
+      return true;
+    };
 
-  return operation;
+    operation.onBuildKnex = function(knexBuilder) {
+      let json = _.merge(this.model, mergeWithModel);
+      knexBuilder.update(json);
+    };
+
+    operation.clone = clone;
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }
 
 function createDeleteOperation(builder, whereObj) {
   const operation = operationBuilder._deleteOperationFactory(builder);
+  const origClone = operation.clone;
 
-  operation.onBefore2 = operation.onAfter2 = () => {};
+  function clone() {
+    const operation = origClone.call(this);
 
-  operation.onBuildKnex = knexBuilder => {
-    knexBuilder.delete().where(whereObj);
-  };
+    operation.onBefore2 = operation.onAfter2 = () => {};
 
-  return operation;
+    operation.onBuildKnex = knexBuilder => {
+      knexBuilder.delete().where(whereObj);
+    };
+
+    operation.clone = clone;
+    return operation;
+  }
+
+  operation.clone = clone;
+  return operation.clone();
 }

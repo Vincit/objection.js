@@ -1,6 +1,6 @@
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const Model = require('../../').Model;
+const { Model } = require('../../');
 
 module.exports = session => {
   // TODO igor PR test

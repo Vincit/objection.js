@@ -1,4 +1,4 @@
-const Model = require('../../../../').Model;
+const { Model } = require('../../../../');
 
 throw new Error('some random error');
 class TestModel extends Model {

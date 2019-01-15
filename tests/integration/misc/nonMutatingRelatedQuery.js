@@ -1,7 +1,4 @@
-const _ = require('lodash');
-const expect = require('chai').expect;
-const Model = require('../../../').Model;
-const Promise = require('bluebird');
+const { expect } = require('chai');
 
 module.exports = session => {
   describe('non-mutating related query', () => {
