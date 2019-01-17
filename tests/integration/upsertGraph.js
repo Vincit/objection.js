@@ -2596,11 +2596,23 @@ module.exports = session => {
             model1Prop2: { type: ['integer', 'null'] }
           }
         };
+
+        Model2.$$jsonSchema = {
+          type: 'object',
+          required: ['model2Prop1'],
+
+          properties: {
+            model2Prop1: { type: ['string', 'null'] }
+          }
+        };
       });
 
       after(() => {
         delete Model1.$$jsonSchema;
         delete Model1.$$validator;
+
+        delete Model2.$$jsonSchema;
+        delete Model2.$$validator;
       });
 
       it('should validate (also tests transactions)', () => {
@@ -2830,6 +2842,205 @@ module.exports = session => {
                 });
             });
           });
+      });
+
+      it('should always patch-validate #dbRef reference objects (ignore required)', () => {
+        const upsert = [
+          {
+            id: 1000,
+            model1Prop1: 'foo',
+            model1Prop2: 1,
+
+            model1Relation2: [
+              {
+                '#dbRef': 1
+              }
+            ]
+          },
+          {
+            id: 1001,
+            model1Prop1: 'bar',
+            model1Prop2: 2,
+
+            model1Relation1: {
+              '#dbRef': 2
+            },
+
+            model1Relation3: [
+              {
+                '#dbRef': 2
+              }
+            ]
+          }
+        ];
+
+        const options = {
+          // Insert missing from the root.
+          insertMissing: ['']
+        };
+
+        return Model1.query(session.knex)
+          .upsertGraph(upsert, options)
+          .then(() => {
+            return Model1.query(session.knex)
+              .findByIds([1000, 1001])
+              .eager('[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]');
+          })
+          .then(result => {
+            chai.expect(result).to.containSubset([
+              {
+                id: 1000,
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'hasMany 1'
+                  }
+                ]
+              },
+              {
+                id: 1001,
+
+                model1Relation1: {
+                  id: 2,
+                  model1Prop1: 'root 2'
+                },
+
+                model1Relation3: [
+                  {
+                    idCol: 2,
+                    model2Prop1: 'hasMany 2'
+                  }
+                ]
+              }
+            ]);
+          });
+      });
+
+      it('should always patch-validate #dbRef reference objects (does update)', () => {
+        const upsert = [
+          {
+            id: 1000,
+            model1Prop1: 'foo',
+            model1Prop2: 1,
+
+            model1Relation2: [
+              {
+                '#dbRef': 1,
+                model2Prop1: 'updated 1'
+              }
+            ]
+          },
+          {
+            id: 1001,
+            model1Prop1: 'bar',
+            model1Prop2: 2,
+
+            model1Relation1: {
+              '#dbRef': 2,
+              model1Prop1: 'updated 2'
+            },
+
+            model1Relation3: [
+              {
+                '#dbRef': 2,
+                model2Prop1: 'updated 3'
+              }
+            ]
+          }
+        ];
+
+        const options = {
+          // Insert missing from the root.
+          insertMissing: ['']
+        };
+
+        return Model1.query(session.knex)
+          .upsertGraph(upsert, options)
+          .then(() => {
+            return Model1.query(session.knex)
+              .findByIds([1000, 1001])
+              .eager('[model1Relation1, model1Relation2(orderById), model1Relation3(orderById)]');
+          })
+          .then(result => {
+            chai.expect(result).to.containSubset([
+              {
+                id: 1000,
+                model1Relation2: [
+                  {
+                    idCol: 1,
+                    model2Prop1: 'updated 1'
+                  }
+                ]
+              },
+              {
+                id: 1001,
+
+                model1Relation1: {
+                  id: 2,
+                  model1Prop1: 'updated 2'
+                },
+
+                model1Relation3: [
+                  {
+                    idCol: 2,
+                    model2Prop1: 'updated 3'
+                  }
+                ]
+              }
+            ]);
+          });
+      });
+
+      it('should always patch-validate #dbRef reference objects (does validate)', done => {
+        const upsert = [
+          {
+            id: 1000,
+            model1Prop1: 'foo',
+            model1Prop2: 1,
+
+            model1Relation2: [
+              {
+                '#dbRef': 1,
+                model2Prop1: 1
+              }
+            ]
+          },
+          {
+            id: 1001,
+            model1Prop1: 'bar',
+            model1Prop2: 2,
+
+            model1Relation1: {
+              '#dbRef': 2,
+              model2Prop1: 'updated 2'
+            },
+
+            model1Relation3: [
+              {
+                '#dbRef': 2,
+                model2Prop1: 'updated 3'
+              }
+            ]
+          }
+        ];
+
+        const options = {
+          // Insert missing from the root.
+          insertMissing: ['']
+        };
+
+        Model1.query(session.knex)
+          .upsertGraph(upsert, options)
+          .then(() => {
+            done(new Error('should not get here'));
+          })
+          .catch(err => {
+            expect(err.data['model1Relation2[0].model2Prop1'][0].message).to.equal(
+              'should be string,null'
+            );
+            done();
+          })
+          .catch(done);
       });
     });
 
