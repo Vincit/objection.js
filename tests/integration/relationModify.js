@@ -151,7 +151,7 @@ module.exports = session => {
                 .$relatedQuery('parent')
                 .context(modifyBelongsToOne(qb => qb.select('name')));
             })
-            .then(gustav => expect(gustav).to.eql({ name: 'Gustav' }));
+            .then(gustav => expect(gustav.name).to.eql('Gustav'));
         });
 
         it('update', () => {
@@ -245,7 +245,7 @@ module.exports = session => {
                 .$relatedQuery('pets')
                 .context(modifyHasMany(qb => qb.select('name').orderBy('name')));
             })
-            .then(pets => expect(pets).to.eql([{ name: 'Freud' }, { name: 'Stalin' }]));
+            .then(pets => expect(pets.map(it => it.name)).to.eql(['Freud', 'Stalin']));
         });
 
         it('update', () => {
@@ -381,7 +381,7 @@ module.exports = session => {
                 .context(modifyManyToMany(qb => qb.select('name').orderBy('name')));
             })
             .then(movies =>
-              expect(movies).to.eql([{ name: 'Terminator' }, { name: 'Terminator 2' }])
+              expect(movies.map(it => it.name)).to.eql(['Terminator', 'Terminator 2'])
             );
         });
 

@@ -1,4 +1,3 @@
-const util = require('util');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const classUtils = require('../../lib/utils/classUtils');
@@ -12,20 +11,15 @@ const {
 
 const { range } = require('lodash');
 const { compose, mixin } = require('../../lib/utils/mixin');
-const { get } = require('../../lib/utils/objectUtils');
 const { map } = require('../../lib/utils/promiseUtils');
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
-    function A() {}
-    function B() {}
-    function C() {}
-
-    util.inherits(B, A);
-    util.inherits(C, B);
+    class A {}
+    class B extends A {}
+    class C extends B {}
 
     it('should return true for subclass constructor', () => {
-      expect(classUtils.isSubclassOf(A, Object)).to.equal(true);
       expect(classUtils.isSubclassOf(B, A)).to.equal(true);
       expect(classUtils.isSubclassOf(C, B)).to.equal(true);
       expect(classUtils.isSubclassOf(C, A)).to.equal(true);

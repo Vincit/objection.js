@@ -543,28 +543,28 @@ describe('QueryBuilder', () => {
 
     QueryBuilder.forClass(TestModel)
       .runBefore(function(result, builder) {
-        expect(builder).to.be.a(QueryBuilder);
+        expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'a';
       })
       .onBuild(function(builder) {
-        expect(builder).to.be.a(QueryBuilder);
+        expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'b';
       })
       .onBuildKnex(function(knexBuilder, builder) {
-        expect(builder).to.be.a(QueryBuilder);
+        expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(knexUtils.isKnexQueryBuilder(knexBuilder)).to.equal(true);
         expect(this).to.equal(knexBuilder);
         text += 'c';
       })
       .runAfter(function(data, builder) {
-        expect(builder).to.be.a(QueryBuilder);
+        expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'd';
       })
       .runAfter(function(data, builder) {
-        expect(builder).to.be.a(QueryBuilder);
+        expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         text += 'e';
       })
@@ -572,7 +572,7 @@ describe('QueryBuilder', () => {
         throw new Error('abort');
       })
       .onError(function(err, builder) {
-        expect(builder).to.be.a(QueryBuilder);
+        expect(builder.constructor.name).to.equal('QueryBuilder');
         expect(this).to.equal(builder);
         expect(err.message).to.equal('abort');
         text += 'f';
