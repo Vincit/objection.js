@@ -30,6 +30,22 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="1-5-0">1.5.0</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1131">#1131</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1114">#1114</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1185">#1185</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1109">#1109</a></li>
+<li>fix <a href="https://github.com/Vincit/objection.js/issues/1110">#1110</a></li>
+<li>add eagerObject and eagerModifiers accessors to QueryBuilder.</li>
+<li>complete rewrite of <code class="prettyprint">insertGraph</code> and <code class="prettyprint">upsertGraph</code> code. The rewrite brought a bunch of small performance optimizations and makes future development easier. No breaking changes.</li>
+<li>Chaining <code class="prettyprint">returning(&#39;*&#39;)</code> to <code class="prettyprint">insertGraph</code> or <code class="prettyprint">upsertGraph</code> now propagates the call to all insert, update and delete operations.</li>
+<li>Code using objectio can now be transpilsed to ES5. No need to add babel workarounds anymore.</li>
+</ul>
+
 <h2 id="1-4-0">1.4.0</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>

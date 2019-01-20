@@ -301,7 +301,7 @@ a normal promise would.</p>
 <h3 id="static-methods">Static methods</h3>
 
 <h4 id="forclass">forClass</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">forClass</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">forClass</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">);</span>
 </code></pre>
 <p>Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the
 <a href="#query"><code class="prettyprint">Model.query()</code></a> and other query methods.</p>
@@ -333,6 +333,41 @@ a normal promise would.</p>
 <tr>
 <td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
 <td>The created query builder</td>
+</tr>
+</tbody></table>
+
+<h4 id="parserelationexpression">parseRelationExpression</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">exprObj</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">parseRelationExpression</span><span class="p">(</span><span class="nx">expr</span><span class="p">);</span>
+</code></pre>
+<p>Parses a string relation expression into the <a href="#relationexpression-object-notation">object notation</a>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>expr</td>
+<td>string</td>
+<td>A string relation expression.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>object</td>
+<td>The relation expression in object notation.</td>
 </tr>
 </tbody></table>
 
@@ -437,6 +472,8 @@ converted to knex raw instances lazily when the query is executed.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">[</span><span class="nx">person1</span><span class="p">,</span> <span class="nx">person2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findByIds</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">'10'</span><span class="p">]]);</span>
 </code></pre>
+<p>Finds a list of items. The order of the returned items is not guaranteed to be the same as the order of the inputs.</p>
+
 <h5 id="arguments">Arguments</h5>
 
 <table><thead>
@@ -1259,7 +1296,7 @@ written to the join table. The <code class="prettyprint">someExtra</code> field 
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">numRelatedRows</span><span class="p">}</span><span class="s2"> rows were related`</span><span class="p">);</span>
 </code></pre>
-<p>Relates an existing model to another model.</p>
+<p>Relate (attach) an existing model to another model.</p>
 
 <p>This method doesn&rsquo;t create a new instance but only updates the foreign keys and in
 the case of many-to-many relation, creates a join row to the join table.</p>
@@ -1310,9 +1347,9 @@ the case of many-to-many relation, creates a join row to the join table.</p>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'movie 50 is no longer related to person 123 through `movies` relation'</span><span class="p">);</span>
 </code></pre>
-<p>Removes a connection between two models.</p>
+<p>Remove (detach) a connection between two rows.</p>
 
-<p>Doesn&rsquo;t delete the models. Only removes the connection. For ManyToMany relations this
+<p>Doesn&rsquo;t delete the rows. Only removes the connection. For ManyToMany relations this
 deletes the join row from the join table. For other relation types this sets the
 join columns to null.</p>
 
@@ -3783,6 +3820,28 @@ value for example in case an alias has been given.</p>
 </tr>
 </tbody></table>
 
+<h4 id="isinternal">isInternal</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">isInternal</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">isInternal</span><span class="p">();</span>
+</code></pre>
+<p>Returns true for internal &ldquo;helper&rdquo; queries that are not directly
+part of the operation being executed. For example the <code class="prettyprint">select</code> queries
+performed by <code class="prettyprint">upsertGraph</code> to get the current state of the graph are
+internal queries.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>boolean</td>
+<td>true if the query performs an internal helper operation.</td>
+</tr>
+</tbody></table>
+
 <h4 id="haswheres">hasWheres</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">hasWheres</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">hasWheres</span><span class="p">();</span>
 </code></pre>
@@ -4493,6 +4552,8 @@ cases where performance doesn&rsquo;t matter and when it is the only option to g
 
 <p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.JoinEagerAlgorithm).eager(expr)</code>.</p>
 
+<p>When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.</p>
+
 <h4 id="naiveeager">naiveEager</h4>
 
 <p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.NaiveEagerAlgorithm).eager(expr)</code>.</p>
@@ -4564,6 +4625,62 @@ expression to the existing expression.</p>
 <h4 id="mergenaiveeager">mergeNaiveEager</h4>
 
 <p>Shorthand for <code class="prettyprint">eagerAlgorithm(Model.NaiveEagerAlgorithm).mergeEager(expr)</code>.</p>
+
+<h4 id="eagerobject">eagerObject</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.pets(onlyId)'</span><span class="p">)</span>
+
+<span class="kr">const</span> <span class="nx">eagerObject</span> <span class="o">=</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">eagerObject</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">eagerObject</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">pets</span><span class="p">.</span><span class="nx">modify</span><span class="p">);</span>
+<span class="c1">// prints ["onlyId"]</span>
+
+<span class="nx">eagerObject</span><span class="p">.</span><span class="nx">children</span><span class="p">.</span><span class="nx">movies</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="c1">// You can modify the object and pass it back to the `eager` method.</span>
+<span class="nx">builder</span><span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="nx">eagerObject</span><span class="p">)</span>
+</code></pre>
+<p>Returns the object representation of the current eager expression.</p>
+
+<p>See <a href="#relationexpression-object-notation">this section</a> for more examples and information about the structure of the returned object.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>object</td>
+<td>Object representation of the current eager expression.</td>
+</tr>
+</tbody></table>
+
+<h4 id="eagermodifiers">eagerModifiers</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'children.pets(onlyId)'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">onlyId</span><span class="p">:</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span>
+  <span class="p">})</span>
+
+<span class="kr">const</span> <span class="nx">modifiers</span> <span class="o">=</span> <span class="nx">builder</span><span class="p">.</span><span class="nx">eagerModifiers</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">modifiers</span><span class="p">.</span><span class="nx">onlyId</span><span class="p">.</span><span class="nx">toString</span><span class="p">());</span>
+<span class="c1">// prints 'builder =&gt; builder.select("id")'</span>
+</code></pre>
+<p>Returns the current eager modifiers of the query.</p>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>object</td>
+<td>Eager modifiers of the query.</td>
+</tr>
+</tbody></table>
 
 <h4 id="alloweager">allowEager</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">allowEager</span><span class="p">(</span><span class="nx">relationExpression</span><span class="p">);</span>
