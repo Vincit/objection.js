@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.0
+
+### What's new
+
+  * fix [#1131](https://github.com/Vincit/objection.js/issues/1131)
+  * fix [#1114](https://github.com/Vincit/objection.js/issues/1114)
+  * fix [#1185](https://github.com/Vincit/objection.js/issues/1185)
+  * fix [#1109](https://github.com/Vincit/objection.js/issues/1109)
+  * fix [#1110](https://github.com/Vincit/objection.js/issues/1110)
+  * add eagerObject and eagerModifiers accessors to QueryBuilder.
+  * complete rewrite of `insertGraph` and `upsertGraph` code. The rewrite brought a bunch of small performance optimizations and makes future development easier. No breaking changes.
+  * Chaining `returning('*')` to `insertGraph` or `upsertGraph` now propagates the call to all insert, update and delete operations.
+  * Code using objectio can now be transpilsed to ES5. No need to add babel workarounds anymore.
+
 ## 1.4.0
 
 ### What's new
