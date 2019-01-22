@@ -9470,8 +9470,8 @@ case of ManyToManyRelation also the join table needs to be defined. This is done
 </tr>
 <tr>
 <td>modelClass</td>
-<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;string</td>
-<td>Constructor of the related model class, an absolute path to a module that exports one or a path relative to <a href="#modelpaths"><code class="prettyprint">modelPaths</code></a> that exports a model class.</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;function&#124;string</td>
+<td>Defines the related model class. This value can be one of the four following things: 1. Constructor of the related model class. 2. a function that returns such constructor. 3. An absolute path to a module that exports a model class. 4. A path relative to <a href="#modelpaths"><code class="prettyprint">modelPaths</code></a> that exports a model class.</td>
 </tr>
 <tr>
 <td>join</td>
@@ -13417,6 +13417,15 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-5-1">1.5.1</h2>
+
+<h3 id="what-39-s-new">What&rsquo;s new</h3>
+
+<ul>
+<li>Relations are now loaded lazily <a href="https://github.com/Vincit/objection.js/issues/1202">#1202</a></li>
+<li><code class="prettyprint">relationMappings.modelClass</code> can now be a function that returns a model class.</li>
+</ul>
 
 <h2 id="1-5-0">1.5.0</h2>
 
