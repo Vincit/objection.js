@@ -40,6 +40,26 @@ describe('Relation', () => {
     expect(relation.relatedProp.props).to.eql(['ownerId']);
   });
 
+  it('should accept a function returning Model subclass as modelClass', () => {
+    let relation = new Relation('testRelation', OwnerModel);
+
+    relation.setMapping({
+      relation: Relation,
+      modelClass: () => RelatedModel,
+      join: {
+        from: 'OwnerModel.id',
+        to: 'RelatedModel.ownerId'
+      }
+    });
+
+    expect(relation.ownerModelClass).to.equal(OwnerModel);
+    expect(relation.relatedModelClass).to.equal(RelatedModel);
+    expect(relation.ownerProp.cols).to.eql(['id']);
+    expect(relation.ownerProp.props).to.eql(['id']);
+    expect(relation.relatedProp.cols).to.eql(['ownerId']);
+    expect(relation.relatedProp.props).to.eql(['ownerId']);
+  });
+
   it('should accept a path to a Model subclass as modelClass', () => {
     let relation = new Relation('testRelation', OwnerModel);
 

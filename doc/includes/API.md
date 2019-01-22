@@ -5409,7 +5409,7 @@ See [`RelationMapping`](#relationmapping)
 Property|Type|Description
 --------|----|-----------
 relation|function|The relation type. One of `Model.BelongsToOneRelation`, `Model.HasOneRelation`, `Model.HasManyRelation` and `Model.ManyToManyRelation`.
-modelClass|[`Model`](#model)&#124;string|Constructor of the related model class, an absolute path to a module that exports one or a path relative to [`modelPaths`](#modelpaths) that exports a model class.
+modelClass|[`Model`](#model)&#124;function&#124;string|Defines the related model class. This value can be one of the four following things: 1. Constructor of the related model class. 2. a function that returns such constructor. 3. An absolute path to a module that exports a model class. 4. A path relative to [`modelPaths`](#modelpaths) that exports a model class.
 join|[`RelationJoin`](#relationjoin)|Describes how the models are related to each other. See [`RelationJoin`](#relationjoin).
 modify|function([`QueryBuilder`](#querybuilder))&#124;string&#124;string[]&#124;object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string (or an array of strings), modifier with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
 filter|function([`QueryBuilder`](#querybuilder))&#124;string&#124;object|Alias for modify.

@@ -1335,7 +1335,17 @@ describe('RelationExpression', () => {
       const expr = RelationExpression.create('[a, b.c, d]');
       const items = [];
 
-      expr.forEachChildExpression({ a: 'aa', b: 'bb', d: 'dd' }, (expr, relation) => {
+      const fakeModel = {
+        getRelationNames() {
+          return ['a', 'b', 'd'];
+        },
+
+        getRelationUnsafe(name) {
+          return name + name;
+        }
+      };
+
+      expr.forEachChildExpression(fakeModel, (expr, relation) => {
         items.push({ exprName: expr.$name, relation });
       });
 
@@ -1350,13 +1360,23 @@ describe('RelationExpression', () => {
       const expr = RelationExpression.create('a.^');
       const items = [];
 
-      expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+      const fakeModel = {
+        getRelationNames() {
+          return ['a'];
+        },
+
+        getRelationUnsafe(name) {
+          return name + name;
+        }
+      };
+
+      expr.forEachChildExpression(fakeModel, (expr, relation) => {
         items.push({ exprName: expr.$name, relation });
 
-        expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+        expr.forEachChildExpression(fakeModel, (expr, relation) => {
           items.push({ exprName: expr.$name, relation });
 
-          expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+          expr.forEachChildExpression(fakeModel, (expr, relation) => {
             items.push({ exprName: expr.$name, relation });
           });
         });
@@ -1373,13 +1393,23 @@ describe('RelationExpression', () => {
       const expr = RelationExpression.create('a.^2');
       const items = [];
 
-      expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+      const fakeModel = {
+        getRelationNames() {
+          return ['a'];
+        },
+
+        getRelationUnsafe(name) {
+          return name + name;
+        }
+      };
+
+      expr.forEachChildExpression(fakeModel, (expr, relation) => {
         items.push({ exprName: expr.$name, relation });
 
-        expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+        expr.forEachChildExpression(fakeModel, (expr, relation) => {
           items.push({ exprName: expr.$name, relation });
 
-          expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+          expr.forEachChildExpression(fakeModel, (expr, relation) => {
             items.push({ exprName: expr.$name, relation });
           });
         });
@@ -1392,10 +1422,30 @@ describe('RelationExpression', () => {
       const expr = RelationExpression.create('a.*');
       const items = [];
 
-      expr.forEachChildExpression({ a: 'aa' }, (expr, relation) => {
+      const fakeModel1 = {
+        getRelationNames() {
+          return ['a'];
+        },
+
+        getRelationUnsafe(name) {
+          return name + name;
+        }
+      };
+
+      const fakeModel2 = {
+        getRelationNames() {
+          return ['b', 'c', 'd'];
+        },
+
+        getRelationUnsafe(name) {
+          return name + name;
+        }
+      };
+
+      expr.forEachChildExpression(fakeModel1, (expr, relation) => {
         items.push({ exprName: expr.$name, relation });
 
-        expr.forEachChildExpression({ b: 'bb', c: 'cc', d: 'dd' }, (expr, relation) => {
+        expr.forEachChildExpression(fakeModel2, (expr, relation) => {
           items.push({ exprName: expr.$name, relation });
         });
       });
