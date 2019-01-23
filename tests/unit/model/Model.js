@@ -1380,10 +1380,15 @@ describe('Model', () => {
       });
     });
 
-    it('should not try to set readonly virtuals', () => {
+    it('should not try to set readonly properties', () => {
       class Model1 extends Model {
         get foo() {
           return this.a + this.b;
+        }
+
+        // Should ignore all getter-only properties. Not only virtual.
+        get notEvenVirtual() {
+          return 'imNotVirtual';
         }
 
         get bar() {
@@ -1408,7 +1413,8 @@ describe('Model', () => {
         b: 100,
         bar: 1000,
         foo: 200,
-        baz: 300
+        baz: 300,
+        notEvenVirtual: 2000
       });
 
       expect(model.toJSON()).to.eql({
