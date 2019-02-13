@@ -998,6 +998,21 @@ module.exports = session => {
             });
         });
 
+        if (!session.isMySql()) {
+          it('with', () => {
+            return Model1.query()
+              .with('subquery1', Model1.query().unionAll(Model1.query()))
+              .with('subquery2', Model1.query())
+              .count('* as count')
+              .from('subquery1')
+              .first()
+              .debug()
+              .then(result => {
+                expect(result.count).to.eql(4);
+              });
+          });
+        }
+
         if (session.isPostgres()) {
           it('timeout should throw a TimeOutError', done => {
             const knexQuery = Model1.query()
@@ -1154,6 +1169,10 @@ module.exports = session => {
           .select([
             'id',
 
+            Model1.relatedQuery('model1Relation1')
+              .count()
+              .as('rel1Count'),
+
             Model1.relatedQuery('model1Relation2')
               .count()
               .as('rel2Count'),
@@ -1165,9 +1184,9 @@ module.exports = session => {
           .orderBy('id')
           .then(res => {
             expect(res).to.eql([
-              { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
-              { id: 3, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+              { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
+              { id: 2, rel1Count: 0, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
+              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
             ]);
           });
       });
@@ -1176,7 +1195,11 @@ module.exports = session => {
         return Model1.query()
           .alias('m')
           .select([
-            'm.id',
+            'id',
+
+            Model1.relatedQuery('model1Relation1')
+              .count()
+              .as('rel1Count'),
 
             Model1.relatedQuery('model1Relation2')
               .count()
@@ -1189,9 +1212,9 @@ module.exports = session => {
           .orderBy('id')
           .then(res => {
             expect(res).to.eql([
-              { id: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
-              { id: 3, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+              { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
+              { id: 2, rel1Count: 0, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
+              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
             ]);
           });
       });
