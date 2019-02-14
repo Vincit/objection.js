@@ -1006,7 +1006,6 @@ module.exports = session => {
               .count('* as count')
               .from('subquery1')
               .first()
-              .debug()
               .then(result => {
                 expect(result.count).to.eql(4);
               });

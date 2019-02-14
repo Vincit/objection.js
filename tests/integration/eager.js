@@ -853,7 +853,7 @@ module.exports = session => {
         .findById(1)
         .joinEager('model1Relation1')
         .modify(builder => {
-          expect(builder.eagerOperationFactory()).to.equal(Model1.JoinEagerAlgorithm);
+          expect(builder.findOperation('eager').constructor.name).to.equal('JoinEagerOperation');
         })
         .then(model => {
           expect(model).to.eql({
@@ -891,7 +891,7 @@ module.exports = session => {
         .findById(1)
         .mergeJoinEager('model1Relation1')
         .modify(builder => {
-          expect(builder.eagerOperationFactory()).to.equal(Model1.JoinEagerAlgorithm);
+          expect(builder.findOperation('eager').constructor.name).to.equal('JoinEagerOperation');
         })
         .then(model => {
           expect(model).to.eql({
@@ -916,7 +916,7 @@ module.exports = session => {
         .findById(1)
         .naiveEager('model1Relation1')
         .modify(builder => {
-          expect(builder.eagerOperationFactory()).to.equal(Model1.NaiveEagerAlgorithm);
+          expect(builder.findOperation('eager').constructor.name).to.equal('NaiveEagerOperation');
         })
         .then(model => {
           expect(model).to.eql({
@@ -941,7 +941,7 @@ module.exports = session => {
         .findById(1)
         .mergeNaiveEager('model1Relation1')
         .modify(builder => {
-          expect(builder.eagerOperationFactory()).to.equal(Model1.NaiveEagerAlgorithm);
+          expect(builder.findOperation('eager').constructor.name).to.equal('NaiveEagerOperation');
         })
         .then(model => {
           expect(model).to.eql({
@@ -1113,6 +1113,62 @@ module.exports = session => {
         .range(0, 0)
         .then(res => {
           expect(res.results[0].model1Relation1.id).to.equal(2);
+        });
+    });
+
+    it('eager should not blow up');
+
+    it('should be able to call eager from runBefore hook', () => {
+      return Model1.query()
+        .runBefore((_, builder) => {
+          builder.eager('model1Relation1');
+        })
+        .findOne({ model1Prop1: 'hello 1' })
+        .then(result => {
+          chai.expect(result).to.containSubset({
+            model1Prop1: 'hello 1',
+
+            model1Relation1: {
+              model1Prop1: 'hello 2'
+            }
+          });
+        });
+    });
+
+    it('should be able to call joinEager from runBefore hook', () => {
+      return Model1.query()
+        .runBefore((_, builder) => {
+          builder.joinEager('model1Relation1');
+        })
+        .where('Model1.model1Prop1', 'hello 1')
+        .first()
+        .then(result => {
+          chai.expect(result).to.containSubset({
+            model1Prop1: 'hello 1',
+
+            model1Relation1: {
+              model1Prop1: 'hello 2'
+            }
+          });
+        });
+    });
+
+    it('eager should not blow up with an empty eager operation', () => {
+      return Model1.query()
+        .modifyEager('foo', () => {})
+        .findOne({ model1Prop1: 'hello 1' })
+        .then(result => {
+          expect(result.model1Prop1).to.equal('hello 1');
+        });
+    });
+
+    it('joinEager should not blow up with an empty eager operation', () => {
+      return Model1.query()
+        .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+        .modifyEager('foo', () => {})
+        .findOne({ model1Prop1: 'hello 1' })
+        .then(result => {
+          expect(result.model1Prop1).to.equal('hello 1');
         });
     });
 
