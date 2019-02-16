@@ -39,6 +39,69 @@
 
 <h1 id="introduction">Introduction</h1>
 
+<blockquote>
+<p>Some example queries to whet your appetite</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="c1">// Find an item by id.</span>
+<span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">// Insert an item.</span>
+<span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">().</span><span class="nx">insert</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span> <span class="p">})</span>
+
+<span class="c1">// Update a bunch of items. The `query` method returns a query</span>
+<span class="c1">// builder. You can build any SQL query using it.</span>
+<span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span> <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span> <span class="p">})</span>
+  <span class="p">.</span><span class="nx">whereIn</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+
+<span class="c1">// Load an item with related objects.</span>
+<span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">findById</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">eager</span><span class="p">({</span>
+    <span class="na">children</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">pets</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="na">children</span><span class="p">:</span> <span class="kc">true</span>
+    <span class="p">}</span>
+  <span class="p">})</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">name</span><span class="p">)</span>
+
+<span class="c1">// Using SQL in all its glory is easy. This finds people</span>
+<span class="c1">// with last name `Doe` that have a pet called `Fluffy'</span>
+<span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'lastName'</span><span class="p">,</span> <span class="s1">'Doe'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">whereExists</span><span class="p">(</span>
+    <span class="c1">// Subquery.</span>
+    <span class="nx">Pet</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+      <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'ownerId'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'people.id'</span><span class="p">))</span>
+      <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="s1">'Fluffy'</span><span class="p">)</span>
+  <span class="p">)</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="s1">'firstName'</span><span class="p">)</span>
+
+<span class="c1">// Insert an item with related objects.</span>
+<span class="kr">const</span> <span class="nx">insertedGraph</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">insertGraph</span><span class="p">({</span>
+    <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span>
+    <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Doe'</span><span class="p">,</span>
+
+    <span class="na">children</span><span class="p">:</span> <span class="p">[</span>
+     <span class="p">{</span>
+       <span class="na">firstName</span><span class="p">:</span> <span class="s1">'Jack'</span><span class="p">,</span>
+       <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Doe'</span><span class="p">,</span>
+
+       <span class="na">pets</span><span class="p">:</span> <span class="p">[</span>
+         <span class="p">{</span>
+           <span class="na">name</span><span class="p">:</span> <span class="s1">'Fluffy'</span>
+         <span class="p">}</span>
+       <span class="p">}</span>
+     <span class="p">}</span>
+   <span class="p">]</span>
+  <span class="p">})</span>
+</code></pre>
 <p><a href="https://travis-ci.org/Vincit/objection.js"><img alt="Build Status" src="https://travis-ci.org/Vincit/objection.js.svg?branch=master" /></a> <a href="https://coveralls.io/github/Vincit/objection.js?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/Vincit/objection.js/badge.svg?branch=master&amp;service=github" /></a> <a href="https://gitter.im/Vincit/objection.js?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img alt="Join the chat at https://gitter.im/Vincit/objection.js" src="https://badges.gitter.im/Vincit/objection.js.svg" /></a></p>
 
 <p>Objection.js is an <a href="https://en.wikipedia.org/wiki/Object-relational_mapping">ORM</a> for <a href="https://nodejs.org/">Node.js</a>
@@ -63,19 +126,16 @@ are supported by objection.js. <strong>SQLite3</strong>, <strong>Postgres</stron
 <p>What objection.js <strong>doesn&rsquo;t</strong> give you:</p>
 
 <ul>
-<li><strong>A custom query DSL. SQL is used as a query language.</strong></li>
+<li><strong>A custom query DSL. SQL is used as a query language.</strong>
+This doesn&rsquo;t mean you have to write SQL strings though. A query builder based on <a href="http://knexjs.org"><code class="prettyprint">knex</code></a> is
+used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
+written using the <a href="http://vincit.github.io/objection.js/#raw">raw</a> helper function.</li>
 <li><strong>Automatic database schema creation and migration from model definitions.</strong>
 For simple things it is useful that the database schema is automatically generated from the model definitions,
 but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
 to you. knex has a great <a href="http://knexjs.org/#Migrations">migration tool</a> that we recommend for this job. Check
 out the <a href="https://github.com/Vincit/objection.js/tree/master/examples/express-es6">example project</a>.</li>
 </ul>
-
-<p>Objection.js uses Promises and coding practices that make it ready for the future. We use well known
-<a href="https://en.wikipedia.org/wiki/Object-oriented_programming">OOP</a> techniques, ES2015 classes, and inheritance
-in the codebase. You can use things like <a href="http://jakearchibald.com/2014/es7-async-functions/">async/await</a>
-using node &ldquo;&gt;=7.6.0&rdquo; or alternatively with a transpiler such as <a href="https://babeljs.io/">Babel</a>. Check out our <a href="https://github.com/Vincit/objection.js/tree/master/examples/express-es6">ES2015</a>
-and <a href="https://github.com/Vincit/objection.js/tree/master/examples/express-es7">ESNext</a> example projects.</p>
 
 <h1 id="installation">Installation</h1>
 <pre class="highlight shell"><code>npm install knex objection
