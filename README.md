@@ -6,6 +6,68 @@
 for [Node.js](https://nodejs.org/) that aims to stay out of your way and make it as easy as possible to use the full
 power of SQL and the underlying database engine while keeping magic to a minimum.
 
+```js
+// Find an item by id.
+const person = await Person.query().findById(1)
+
+// Insert an item.
+await Person.query().insert({ firstName: 'Jennifer' })
+
+// Update a bunch of items. The `query` method returns a query
+// builder. You can build any SQL query using it.
+await Person
+  .query()
+  .patch({ firstName: 'Jennifer' })
+  .whereIn('id', [1, 2, 3, 4])
+
+// Load an item with related objects.
+const person = await Person
+  .query()
+  .findById(1)
+  .eager({
+    children: {
+      pets: true,
+      children: true
+    }
+  })
+
+console.log(person.children[0].pets[1].name)
+
+// Using SQL in all its glory is easy. This finds people
+// with last name `Doe` that have a pet called `Fluffy'
+const people = await Person
+  .query()
+  .where('lastName', 'Doe')
+  .whereExists(
+    // Subquery.
+    Pet.query()
+      .where('ownerId', ref('people.id'))
+      .where('name', 'Fluffy')
+  )
+  .orderBy('firstName')
+  
+// Insert an item with related objects.
+const insertedGraph = await Person
+  .query()
+  .insertGraph({
+    firstName: 'Jennifer',
+    lastName: 'Doe',
+    
+    children: [
+     {
+       firstName: 'Jack',
+       lastName: 'Doe',
+       
+       pets: [
+         {
+           name: 'Fluffy'
+         }
+       }
+     }
+   ]
+  })
+```
+
 Objection.js is built on an SQL query builder called [knex](http://knexjs.org). All databases supported by knex
 are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thoroughly tested](https://travis-ci.org/Vincit/objection.js).
 
@@ -31,14 +93,9 @@ What objection.js **doesn't** give you:
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
 
-Objection.js uses Promises and coding practices that make it ready for the future. We use Well known
-[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques and ES2015 classes and inheritance
-in the codebase. You can use things like [async/await](http://jakearchibald.com/2014/es7-async-functions/)
-using node ">=7.6.0" or alternatively with a transpiler such as [Babel](https://babeljs.io/). Check out our [ES2015](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
-and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
-
 Shortcuts:
  * [API reference](https://vincit.github.io/objection.js/#api-reference)
+ * [Example projects](https://github.com/Vincit/objection.js/tree/master/examples)
  * [Changelog](https://vincit.github.io/objection.js/#changelog)
  * [Contribution guide](https://vincit.github.io/objection.js/#contribution-guide)
  * [Plugins](https://vincit.github.io/objection.js/#plugins)
