@@ -1230,7 +1230,7 @@ all models in the graph that have an identifier get related. <code class="pretty
   <span class="p">});</span>
 </code></pre>
 <blockquote>
-<p>If you need to mix inserts and relates inside a single relation, you can use the special property <code class="prettyprint">#dbRef</code></p>
+<p>If you need to mix inserts and relates inside a single relation, you can use the special property <code class="prettyprint">#dbRef</code> that explicitly points to an id of an entity which already exists in the database. Model <code class="prettyprint">idColumn</code> of a related entity is used for the <code class="prettyprint">#dbRef</code>.</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
@@ -1239,6 +1239,7 @@ all models in the graph that have an identifier get related. <code class="pretty
     <span class="na">lastName</span><span class="p">:</span> <span class="s1">'Lawrence'</span><span class="p">,</span>
 
     <span class="na">movies</span><span class="p">:</span> <span class="p">[{</span>
+      <span class="c1">// This will relate to an existing movie with id 2636</span>
       <span class="s2">"#dbRef"</span><span class="p">:</span> <span class="mi">2636</span>
     <span class="p">},</span> <span class="p">{</span>
       <span class="c1">// This will be inserted with an id.</span>
@@ -1317,7 +1318,7 @@ of the supported ways. See the section about <a href="#transactions">transaction
 </code></pre>
 <blockquote>
 <p>By default <code class="prettyprint">upsertGraph</code> method updates the objects that have an id, inserts objects that don&rsquo;t have an id and deletes
-all objects that are not present. Off course the delete only applies to relations and not the root. Here&rsquo;s a basic example:</p>
+all objects that are not present. Of course the delete only applies to relations and not the root. Here&rsquo;s a basic example:</p>
 </blockquote>
 <pre class="highlight javascript"><code><span class="c1">// The return value of `upsertGraph` is the input graph converted into model instances.</span>
 <span class="c1">// Inserted objects have ids added to them related rows have foreign keys set but no other</span>
@@ -1490,6 +1491,8 @@ case the option is only applied for the listed relations.</p>
   <span class="p">},</span> <span class="nx">options</span><span class="p">);</span>
 </code></pre>
 <blockquote>
+<p>You can use <code class="prettyprint">upsertGraph</code> with <code class="prettyprint">#dbRef</code> (same way as when using <code class="prettyprint">insertGraph</code>). Alternatively, you can use <code class="prettyprint">relate</code> option and pass an id as depicted above.</p>
+
 <p>You can disable updates, inserts, deletes etc. for the whole <code class="prettyprint">upsertGraph</code> operation or for
 individual relations by using the <code class="prettyprint">noUpdate</code>, <code class="prettyprint">noInsert</code>, <code class="prettyprint">noDelete</code> etc. options. See
 <a href="#upsertgraphoptions"><code class="prettyprint">UpsertGraphOptions</code></a> docs for more info.</p>
@@ -8810,7 +8813,7 @@ behaviour.</p>
 </tbody></table>
 
 <h4 id="traverse">traverse</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">,</span> <span class="nx">traverser</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">,</span> <span class="nx">traverser</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
@@ -9312,6 +9315,31 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <p>You probably don&rsquo;t want to define <code class="prettyprint">modelPaths</code> property for each model. Once again we
 recommend that you create a <code class="prettyprint">BaseModel</code> super class for all your models and define
 shared configuration such as this there.</p>
+
+<h4 id="concurrency">concurrency</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">concurrency</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">10</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">concurrency</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>How many queries can be run concurrently per connection.</p>
+
+<p>This doesn&rsquo;t limit the concurrencly of the entire server. It only limits the number of
+concurrent queries that can be run on a single connection. By default knex connection
+pool size is 10, which means that the maximum number of concurrent queries started by
+objection is <code class="prettyprint">Model.concurrency * 10</code>. You can also easily increase the knex pool size.</p>
+
+<p>The default concurrency is 4 except for mssql, for which the default is 1. The
+mssql default is needed because of the buggy driver that only allows one query
+at a time per connection.</p>
 
 <h4 id="relationmappings">relationMappings</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
@@ -10632,21 +10660,91 @@ only throws errors created by this function an never catches them.</p>
 </tr>
 </tbody></table>
 
-<h4 id="traverse">traverse</h4>
+<h4 id="traverse-model">traverse</h4>
 
 <blockquote>
 <p>There are two ways to call this method:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">models</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">SomeModel</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">doSomething</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
+<blockquote>
 <p>and</p>
-<pre class="highlight javascript"><code><span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">Person</span><span class="p">,</span> <span class="nx">models</span><span class="p">,</span> <span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">persons</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">Person</span><span class="p">,</span> <span class="nx">persons</span><span class="p">,</span> <span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">doSomethingForPerson</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
-<p>Traverses the relation tree of a list of models.</p>
+<p>Traverses the relation tree of a model instance (or a list of model instances).</p>
+
+<p>Calls the callback for each related model recursively. The callback is called
+also for the input models themselves.</p>
+
+<p>In the second example the traverser function is only called for <code class="prettyprint">Person</code> instances.</p>
+
+<p>This method is not async. If you have an asynchronous traverse, you can use <code class="prettyprint">traverseAsync</code>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>filterConstructor</td>
+<td>function</td>
+<td>If this optional constructor is given, the <code class="prettyprint">traverser</code> is only called for models for which <code class="prettyprint">model instanceof filterConstructor</code> returns true.</td>
+</tr>
+<tr>
+<td>models</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;<a href="#model"><code class="prettyprint">Model</code></a>[]</td>
+<td>The model(s) whose relation trees to traverse.</td>
+</tr>
+<tr>
+<td>traverser</td>
+<td>function(<a href="#model"><code class="prettyprint">Model</code></a>, string, string)</td>
+<td>The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="traverseasync">traverseAsync</h4>
+
+<blockquote>
+<p>There are two ways to call this method:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">models</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">SomeModel</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">await</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">traverseAsync</span><span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doSomething</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>and</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">persons</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">traverseAsync</span><span class="p">(</span><span class="nx">Person</span><span class="p">,</span> <span class="nx">persons</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doSomethingForPerson</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>Also works with a single model instance</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">traverseAsync</span><span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doSomething</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+<p>Traverses the relation tree of a model instance (or a list of model instances).</p>
 
 <p>Calls the callback for each related model recursively. The callback is called
 also for the input models themselves.</p>
@@ -11990,7 +12088,11 @@ to the relations:</p>
 
 <h4 id="traverse">$traverse</h4>
 
-<p>Shortcut for <a href="#traverse-2212"><code class="prettyprint">Model.traverse(filterConstructor, this, callback)</code></a>.</p>
+<p>Shortcut for <a href="#traverse-model"><code class="prettyprint">Model.traverse(filterConstructor, this, callback)</code></a>.</p>
+
+<h4 id="traverseasync">$traverseAsync</h4>
+
+<p>Shortcut for <a href="#traverseasync"><code class="prettyprint">Model.traverseAsync(filterConstructor, this, callback)</code></a>.</p>
 
 <h4 id="knex">$knex</h4>
 
@@ -13417,6 +13519,15 @@ cast type for object values.</p>
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-6-0">1.6.0</h2>
+
+<ul>
+<li><p>Add <code class="prettyprint">Model.traverseAsync</code> and <code class="prettyprint">modelInstance.$traverseAsync</code> methods.</p></li>
+<li><p>Fixes: <a href="https://github.com/Vincit/objection.js/issues/842">#842</a> and <a href="https://github.com/Vincit/objection.js/issues/1205">#1205</a>. This bug is about subqueries &ldquo;inheriting&rdquo; parent query table name and alias. This bug has been around a long time and there is a small chance that people have started accidentally or on purpose use it as a feature. If you get weird reference errors from subqueries (relation not found, table not found etc.) you may need to explicitly give an alias or use <code class="prettyprint">from</code> in your subqueries after this update. This is a borderline breaking change, but since 2.0 is still pretty far away, I wanted to get this out faster. If I&rsquo;m wrong and people are heavily depending on this bug, I&rsquo;ll revert the change.</p></li>
+<li><p>Fixes: <a href="https://github.com/Vincit/objection.js/issues/1215">#1215</a></p></li>
+<li><p>Fixes: <a href="https://github.com/Vincit/objection.js/issues/1206">#1206</a></p></li>
+</ul>
 
 <h2 id="1-5-3">1.5.3</h2>
 

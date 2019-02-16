@@ -5717,7 +5717,7 @@ behaviour.</p>
 </tbody></table>
 
 <h4 id="traverse">traverse</h4>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">,</span> <span class="nx">traverser</span><span class="p">);</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">queryBuilder</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">,</span> <span class="nx">traverser</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">eager</span><span class="p">(</span><span class="s1">'pets'</span><span class="p">)</span>
@@ -6219,6 +6219,31 @@ properties. All properties that start with <code class="prettyprint">$</code> ar
 <p>You probably don&rsquo;t want to define <code class="prettyprint">modelPaths</code> property for each model. Once again we
 recommend that you create a <code class="prettyprint">BaseModel</code> super class for all your models and define
 shared configuration such as this there.</p>
+
+<h4 id="concurrency">concurrency</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">concurrency</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">10</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">concurrency</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>How many queries can be run concurrently per connection.</p>
+
+<p>This doesn&rsquo;t limit the concurrencly of the entire server. It only limits the number of
+concurrent queries that can be run on a single connection. By default knex connection
+pool size is 10, which means that the maximum number of concurrent queries started by
+objection is <code class="prettyprint">Model.concurrency * 10</code>. You can also easily increase the knex pool size.</p>
+
+<p>The default concurrency is 4 except for mssql, for which the default is 1. The
+mssql default is needed because of the buggy driver that only allows one query
+at a time per connection.</p>
 
 <h4 id="relationmappings">relationMappings</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
@@ -7539,21 +7564,91 @@ only throws errors created by this function an never catches them.</p>
 </tr>
 </tbody></table>
 
-<h4 id="traverse">traverse</h4>
+<h4 id="traverse-model">traverse</h4>
 
 <blockquote>
 <p>There are two ways to call this method:</p>
 </blockquote>
-<pre class="highlight javascript"><code><span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">models</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">SomeModel</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">doSomething</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
+<blockquote>
 <p>and</p>
-<pre class="highlight javascript"><code><span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">Person</span><span class="p">,</span> <span class="nx">models</span><span class="p">,</span> <span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">persons</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">traverse</span><span class="p">(</span><span class="nx">Person</span><span class="p">,</span> <span class="nx">persons</span><span class="p">,</span> <span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
   <span class="nx">doSomethingForPerson</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
 <span class="p">});</span>
 </code></pre>
-<p>Traverses the relation tree of a list of models.</p>
+<p>Traverses the relation tree of a model instance (or a list of model instances).</p>
+
+<p>Calls the callback for each related model recursively. The callback is called
+also for the input models themselves.</p>
+
+<p>In the second example the traverser function is only called for <code class="prettyprint">Person</code> instances.</p>
+
+<p>This method is not async. If you have an asynchronous traverse, you can use <code class="prettyprint">traverseAsync</code>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>filterConstructor</td>
+<td>function</td>
+<td>If this optional constructor is given, the <code class="prettyprint">traverser</code> is only called for models for which <code class="prettyprint">model instanceof filterConstructor</code> returns true.</td>
+</tr>
+<tr>
+<td>models</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a>&#124;<a href="#model"><code class="prettyprint">Model</code></a>[]</td>
+<td>The model(s) whose relation trees to traverse.</td>
+</tr>
+<tr>
+<td>traverser</td>
+<td>function(<a href="#model"><code class="prettyprint">Model</code></a>, string, string)</td>
+<td>The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.</td>
+</tr>
+</tbody></table>
+
+<h4 id="traverseasync">traverseAsync</h4>
+
+<blockquote>
+<p>There are two ways to call this method:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">models</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">SomeModel</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">await</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">traverseAsync</span><span class="p">(</span><span class="nx">models</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doSomething</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>and</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">persons</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">traverseAsync</span><span class="p">(</span><span class="nx">Person</span><span class="p">,</span> <span class="nx">persons</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doSomethingForPerson</span><span class="p">(</span><span class="nx">person</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+<blockquote>
+<p>Also works with a single model instance</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">person</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">query</span><span class="p">();</span>
+
+<span class="nx">await</span> <span class="nx">Person</span><span class="p">.</span><span class="nx">traverseAsync</span><span class="p">(</span><span class="nx">person</span><span class="p">,</span> <span class="nx">async</span> <span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">parentModel</span><span class="p">,</span> <span class="nx">relationName</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">await</span> <span class="nx">doSomething</span><span class="p">(</span><span class="nx">model</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre>
+<p>Traverses the relation tree of a model instance (or a list of model instances).</p>
 
 <p>Calls the callback for each related model recursively. The callback is called
 also for the input models themselves.</p>
@@ -8897,7 +8992,11 @@ to the relations:</p>
 
 <h4 id="traverse">$traverse</h4>
 
-<p>Shortcut for <a href="#traverse-2212"><code class="prettyprint">Model.traverse(filterConstructor, this, callback)</code></a>.</p>
+<p>Shortcut for <a href="#traverse-model"><code class="prettyprint">Model.traverse(filterConstructor, this, callback)</code></a>.</p>
+
+<h4 id="traverseasync">$traverseAsync</h4>
+
+<p>Shortcut for <a href="#traverseasync"><code class="prettyprint">Model.traverseAsync(filterConstructor, this, callback)</code></a>.</p>
 
 <h4 id="knex">$knex</h4>
 

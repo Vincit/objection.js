@@ -30,6 +30,15 @@
       <div class="content">
         <h1 id="changelog">Changelog</h1>
 
+<h2 id="1-6-0">1.6.0</h2>
+
+<ul>
+<li><p>Add <code class="prettyprint">Model.traverseAsync</code> and <code class="prettyprint">modelInstance.$traverseAsync</code> methods.</p></li>
+<li><p>Fixes: <a href="https://github.com/Vincit/objection.js/issues/842">#842</a> and <a href="https://github.com/Vincit/objection.js/issues/1205">#1205</a>. This bug is about subqueries &ldquo;inheriting&rdquo; parent query table name and alias. This bug has been around a long time and there is a small chance that people have started accidentally or on purpose use it as a feature. If you get weird reference errors from subqueries (relation not found, table not found etc.) you may need to explicitly give an alias or use <code class="prettyprint">from</code> in your subqueries after this update. This is a borderline breaking change, but since 2.0 is still pretty far away, I wanted to get this out faster. If I&rsquo;m wrong and people are heavily depending on this bug, I&rsquo;ll revert the change.</p></li>
+<li><p>Fixes: <a href="https://github.com/Vincit/objection.js/issues/1215">#1215</a></p></li>
+<li><p>Fixes: <a href="https://github.com/Vincit/objection.js/issues/1206">#1206</a></p></li>
+</ul>
+
 <h2 id="1-5-3">1.5.3</h2>
 
 <h3 id="what-39-s-new">What&rsquo;s new</h3>
