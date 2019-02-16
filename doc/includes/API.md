@@ -4772,7 +4772,7 @@ Type|Description
 #### traverse
 
 ```js
-var builder = queryBuilder.traverse(modelClass, traverser);
+const builder = queryBuilder.traverse(modelClass, traverser);
 ```
 
 ```js
@@ -5258,8 +5258,34 @@ You probably don't want to define `modelPaths` property for each model. Once aga
 recommend that you create a `BaseModel` super class for all your models and define
 shared configuration such as this there.
 
+#### concurrency
 
+```js
+class Person extends Model {
+  static get concurrency() {
+    return 10;
+  }
+}
+```
 
+> ESNext:
+
+```js
+class Person extends Model {
+  static concurrency = 10;
+}
+```
+
+How many queries can be run concurrently per connection.
+
+This doesn't limit the concurrencly of the entire server. It only limits the number of
+concurrent queries that can be run on a single connection. By default knex connection
+pool size is 10, which means that the maximum number of concurrent queries started by
+objection is `Model.concurrency * 10`. You can also easily increase the knex pool size.
+
+The default concurrency is 4 except for mssql, for which the default is 1. The
+mssql default is needed because of the buggy driver that only allows one query
+at a time per connection.
 
 #### relationMappings
 
@@ -6542,25 +6568,82 @@ Type|Description
 
 
 
-#### traverse
+<h4 id="traverse-model">traverse</h4>
 
 > There are two ways to call this method:
 
 ```js
+const models = await SomeModel.query();
+
 Model.traverse(models, (model, parentModel, relationName) => {
   doSomething(model);
 });
 ```
 
-and
+> and
 
 ```js
-Model.traverse(Person, models, (person, parentModel, relationName) => {
+const persons = await Person.query()
+
+Model.traverse(Person, persons, (person, parentModel, relationName) => {
   doSomethingForPerson(person);
 });
 ```
 
-Traverses the relation tree of a list of models.
+Traverses the relation tree of a model instance (or a list of model instances).
+
+Calls the callback for each related model recursively. The callback is called
+also for the input models themselves.
+
+In the second example the traverser function is only called for `Person` instances.
+
+This method is not async. If you have an asynchronous traverse, you can use `traverseAsync`.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+filterConstructor|function|If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.
+models|[`Model`](#model)&#124;[`Model`](#model)[]|The model(s) whose relation trees to traverse.
+traverser|function([`Model`](#model), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+
+
+
+
+
+#### traverseAsync
+
+> There are two ways to call this method:
+
+```js
+const models = await SomeModel.query();
+
+await Model.traverseAsync(models, async (model, parentModel, relationName) => {
+  await doSomething(model);
+});
+```
+
+> and
+
+```js
+const persons = await Person.query()
+
+Model.traverseAsync(Person, persons, async (person, parentModel, relationName) => {
+  await doSomethingForPerson(person);
+});
+```
+
+> Also works with a single model instance
+
+```js
+const person = await Person.query();
+
+await Person.traverseAsync(person, async (model, parentModel, relationName) => {
+  await doSomething(model);
+});
+```
+
+Traverses the relation tree of a model instance (or a list of model instances).
 
 Calls the callback for each related model recursively. The callback is called
 also for the input models themselves.
@@ -6574,6 +6657,7 @@ Argument|Type|Description
 filterConstructor|function|If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.
 models|[`Model`](#model)&#124;[`Model`](#model)[]|The model(s) whose relation trees to traverse.
 traverser|function([`Model`](#model), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+
 
 
 
@@ -7644,7 +7728,14 @@ Type|Description
 
 #### $traverse
 
-Shortcut for [`Model.traverse(filterConstructor, this, callback)`](#traverse-2212).
+Shortcut for [`Model.traverse(filterConstructor, this, callback)`](#traverse-model).
+
+
+
+
+#### $traverseAsync
+
+Shortcut for [`Model.traverseAsync(filterConstructor, this, callback)`](#traverseasync).
 
 
 
