@@ -69,7 +69,7 @@
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">children</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">pets</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nx">name</span><span class="p">)</span>
 
 <span class="c1">// Using SQL in all its glory is easy. This finds people</span>
-<span class="c1">// with last name `Doe` that have a pet called `Fluffy'</span>
+<span class="c1">// with last name `Doe` that have a pet called 'Fluffy'</span>
 <span class="kr">const</span> <span class="nx">people</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
   <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
   <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'lastName'</span><span class="p">,</span> <span class="s1">'Doe'</span><span class="p">)</span>
