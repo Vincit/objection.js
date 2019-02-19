@@ -195,7 +195,7 @@ module.exports = session => {
 
                         'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
                         'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)',
-                        'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1 and "model2"."model1_id" in (2)'
+                        'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
                       ]);
                   }
 
@@ -641,7 +641,7 @@ module.exports = session => {
 
                     'update "Model1" set "model1Prop1" = \'updated root 2\', "model1Id" = NULL where "Model1"."id" = 2',
                     'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = 4 order by "Model1"."id" asc)',
-                    'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1 and "model2"."model1_id" in (2)'
+                    'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
                   ]);
               }
 

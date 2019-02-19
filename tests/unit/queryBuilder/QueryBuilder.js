@@ -1560,33 +1560,47 @@ describe('QueryBuilder', () => {
     expect(TestModel.query().hasSelectionAs('foo', 'bar')).to.equal(false);
 
     expect(
-      TestModel
-        .query()
+      TestModel.query()
         .select('foo as bar')
         .hasSelectionAs('foo', 'bar')
     ).to.equal(true);
 
     expect(
-      TestModel
-        .query()
+      TestModel.query()
         .select('foo')
         .hasSelectionAs('foo', 'bar')
     ).to.equal(false);
 
     expect(
-      TestModel
-        .query()
+      TestModel.query()
         .select('*')
         .hasSelectionAs('foo', 'foo')
     ).to.equal(true);
 
     expect(
-      TestModel
-        .query()
+      TestModel.query()
         .select('*')
         .hasSelectionAs('foo', 'bar')
     ).to.equal(false);
-  })
+
+    expect(
+      TestModel.query()
+        .select('foo.*')
+        .hasSelectionAs('foo.anything', 'anything')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('foo.*')
+        .hasSelectionAs('foo.anything', 'somethingElse')
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select('foo.*')
+        .hasSelectionAs('bar.anything', 'anything')
+    ).to.equal(false);
+  });
 
   it('hasSelection', () => {
     expect(TestModel.query().hasSelection('foo')).to.equal(true);
@@ -1600,6 +1614,18 @@ describe('QueryBuilder', () => {
       TestModel.query()
         .select('*')
         .hasSelection('DifferentTable.anything')
+    ).to.equal(true);
+
+    expect(
+      TestModel.query()
+        .select('foo.*')
+        .hasSelection('bar.anything')
+    ).to.equal(false);
+
+    expect(
+      TestModel.query()
+        .select('foo.*')
+        .hasSelection('foo.anything')
     ).to.equal(true);
 
     expect(
