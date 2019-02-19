@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 // This is another one of those features that need a separate test suite
@@ -15,7 +14,6 @@ module.exports = session => {
   });
 
   const Model1 = session.unboundModels.Model1.bindKnex(knex);
-  const Model2 = session.unboundModels.Model2.bindKnex(knex);
 
   describe('views and aliases', () => {
     let fullEager;
@@ -305,10 +303,10 @@ module.exports = session => {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "someAlias"."id" as "id",
-                  "someAlias"."model1Id" as "model1Id",
-                  "someAlias"."model1Prop1" as "model1Prop1",
-                  "someAlias"."model1Prop2" as "model1Prop2",
+                  "someAlias"."id",
+                  "someAlias"."model1Id",
+                  "someAlias"."model1Prop1",
+                  "someAlias"."model1Prop2",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
@@ -516,11 +514,11 @@ module.exports = session => {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "someView"."id" as "id",
-                  "someView"."model1Id" as "model1Id",
-                  "someView"."model1Prop1" as "model1Prop1",
-                  "someView"."model1Prop2" as "model1Prop2",
-                  "someView"."viewProp" as "viewProp",
+                  "someView"."id",
+                  "someView"."model1Id",
+                  "someView"."model1Prop1",
+                  "someView"."model1Prop2",
+                  "someView"."viewProp",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
@@ -662,16 +660,16 @@ module.exports = session => {
               builder.select('someView.id')
             )
             .then(sortEager)
-            .then(model => {
+            .then(() => {
               expect(queries.length).to.equal(1);
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "someView"."id" as "id",
-                  "someView"."model1Id" as "model1Id",
-                  "someView"."model1Prop1" as "model1Prop1",
-                  "someView"."model1Prop2" as "model1Prop2",
-                  "someView"."viewProp" as "viewProp",
+                  "someView"."id",
+                  "someView"."model1Id",
+                  "someView"."model1Prop1",
+                  "someView"."model1Prop2",
+                  "someView"."viewProp",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation2"."id_col" as "model1Relation2:id_col",
                   "model1Relation2"."model1_id" as "model1Relation2:model1_id",
@@ -690,7 +688,7 @@ module.exports = session => {
                 from
                   "someView"
                 left join
-                  (select "someView"."id", "someView"."model1Id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
+                  (select "someView"."id" from "someView") as "model1Relation1" on "model1Relation1"."id" = "someView"."model1Id"
                 left join
                   "model2" as "model1Relation2" on "model1Relation2"."model1_id" = "someView"."id"
                 left join

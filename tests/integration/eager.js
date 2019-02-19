@@ -2812,10 +2812,10 @@ module.exports = session => {
               expect(_.last(sql).replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "Model1"."id" as "id",
-                  "Model1"."model1Id" as "model1Id",
-                  "Model1"."model1Prop1" as "model1Prop1",
-                  "Model1"."model1Prop2" as "model1Prop2",
+                  "Model1"."id",
+                  "Model1"."model1Id",
+                  "Model1"."model1Prop1",
+                  "Model1"."model1Prop2",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
