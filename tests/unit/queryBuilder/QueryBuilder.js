@@ -1555,6 +1555,39 @@ describe('QueryBuilder', () => {
       });
   });
 
+  it('hasSelectionAs', () => {
+    expect(TestModel.query().hasSelectionAs('foo', 'foo')).to.equal(true);
+    expect(TestModel.query().hasSelectionAs('foo', 'bar')).to.equal(false);
+
+    expect(
+      TestModel
+        .query()
+        .select('foo as bar')
+        .hasSelectionAs('foo', 'bar')
+    ).to.equal(true);
+
+    expect(
+      TestModel
+        .query()
+        .select('foo')
+        .hasSelectionAs('foo', 'bar')
+    ).to.equal(false);
+
+    expect(
+      TestModel
+        .query()
+        .select('*')
+        .hasSelectionAs('foo', 'foo')
+    ).to.equal(true);
+
+    expect(
+      TestModel
+        .query()
+        .select('*')
+        .hasSelectionAs('foo', 'bar')
+    ).to.equal(false);
+  })
+
   it('hasSelection', () => {
     expect(TestModel.query().hasSelection('foo')).to.equal(true);
     expect(TestModel.query().hasSelection(ref('foo'))).to.equal(true);
