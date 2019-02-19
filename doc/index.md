@@ -12,9 +12,74 @@ includes:
 search: true
 ---
 
+
 <a href="https://github.com/Vincit/objection.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
 
 # Introduction
+
+> Some example queries to whet your appetite
+
+```js
+// Find an item by id.
+const person = await Person.query().findById(1)
+
+// Insert an item.
+const person = await Person.query().insert({ firstName: 'Jennifer' })
+
+// Update a bunch of items. The `query` method returns a query
+// builder. You can build any SQL query using it.
+await Person
+  .query()
+  .patch({ firstName: 'Jennifer' })
+  .whereIn('id', [1, 2, 3, 4])
+
+// Load an item with related objects.
+const person = await Person
+  .query()
+  .findById(1)
+  .eager({
+    children: {
+      pets: true,
+      children: true
+    }
+  })
+
+console.log(person.children[0].pets[1].name)
+
+// Using SQL in all its glory is easy. This finds people
+// with last name `Doe` that have a pet called 'Fluffy'
+const people = await Person
+  .query()
+  .where('lastName', 'Doe')
+  .whereExists(
+    // Subquery.
+    Pet.query()
+      .where('ownerId', ref('people.id'))
+      .where('name', 'Fluffy')
+  )
+  .orderBy('firstName')
+
+// Insert an item with related objects.
+const insertedGraph = await Person
+  .query()
+  .insertGraph({
+    firstName: 'Jennifer',
+    lastName: 'Doe',
+
+    children: [
+     {
+       firstName: 'Jack',
+       lastName: 'Doe',
+
+       pets: [
+         {
+           name: 'Fluffy'
+         }
+       }
+     }
+   ]
+  })
+```
 
 [![Build Status](https://travis-ci.org/Vincit/objection.js.svg?branch=master)](https://travis-ci.org/Vincit/objection.js) [![Coverage Status](https://coveralls.io/repos/Vincit/objection.js/badge.svg?branch=master&service=github)](https://coveralls.io/github/Vincit/objection.js?branch=master) [![Join the chat at https://gitter.im/Vincit/objection.js](https://badges.gitter.im/Vincit/objection.js.svg)](https://gitter.im/Vincit/objection.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -39,17 +104,14 @@ What objection.js gives you:
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
+ This doesn't mean you have to write SQL strings though. A query builder based on [`knex`](http://knexjs.org) is
+    used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
+    written using the [raw](http://vincit.github.io/objection.js/#raw) helper function.
  * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
     but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
-
-Objection.js uses Promises and coding practices that make it ready for the future. We use well known
-[OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques, ES2015 classes, and inheritance
-in the codebase. You can use things like [async/await](http://jakearchibald.com/2014/es7-async-functions/)
-using node ">=7.6.0" or alternatively with a transpiler such as [Babel](https://babeljs.io/). Check out our [ES2015](https://github.com/Vincit/objection.js/tree/master/examples/express-es6)
-and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
 
 # Installation
 
