@@ -8976,7 +8976,7 @@ An instance of this is returned from the [`raw`](#raw) helper function.
 
 #### as
 
-Gives an alias for the reference `.select(raw('concat(foo, bar)').as('fooBar'))`.
+Gives an alias for the raw expression `.select(raw('concat(foo, bar)').as('fooBar'))`.
 
 You should use this instead of inserting the alias to the SQL to give objection
 more information about the query. Some edge cases, like using `raw` in `select`
