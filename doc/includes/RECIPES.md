@@ -4,21 +4,48 @@
 
 ```js
 const { raw } = require('objection');
+const ageToAdd = 10
+
+await Person
+  .query()
+  .patch({
+    age: raw('age + ?', ageToAdd)
+  })
+
+console.log(childAgeSums[0].childAgeSum);
+```
+
+```js
+const { raw } = require('objection');
 
 const childAgeSums = await Person
   .query()
-  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
+  .select(raw('coalesce(sum(??), 0)', 'age').as('childAgeSum'))
   .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
   .orderBy(raw('random()'));
 
 console.log(childAgeSums[0].childAgeSum);
 ```
 
+> `raw` can be nested with other `raw`, `lit` and `ref` instances. Here's a contrived example.
+
 ```js
+const { raw } = require('objection');
+
 const childAgeSums = await Person
   .query()
-  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
-  .groupBy('parentId');
+  .select(
+    raw('coalesce(sum(?), ?)', ref('age'), lit(0)).as('childAgeSum')
+  )
+  .where(
+    raw(
+      `? || ' ' || ?`,
+      raw('??', 'firstName'),
+      raw('??', 'lastName')
+    ),
+    'Arnold Schwarzenegger'
+  )
+  .orderBy(raw('random()'));
 
 console.log(childAgeSums[0].childAgeSum);
 ```

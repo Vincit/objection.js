@@ -20,9 +20,7 @@ documented elsewhere in the API docs.
 
 
 
-### Properties
-
-<h4 id="objection-model">Model</h4>
+<h3 id="objection-model">Model</h3>
 
 ```js
 const { Model } = require('objection');
@@ -30,7 +28,7 @@ const { Model } = require('objection');
 
 [The model base class.](#model)
 
-<h4 id="objection-transaction">transaction</h4>
+<h3 id="objection-transaction">transaction</h3>
 
 ```js
 const { transaction } = require('objection');
@@ -38,31 +36,70 @@ const { transaction } = require('objection');
 
 [The transaction function.](#transactions)
 
-<h4 id="objection-ref">ref</h4>
+### ref
 
 ```js
 const { ref } = require('objection');
+
+await Model.query()
+  .select([
+    'id',
+    ref('Model.jsonColumn:details.name').castText().as('name'),
+    ref('Model.jsonColumn:details.age').castInt().as('age')
+  ])
+  .join('OtherModel', ref('Model.jsonColumn:details.name').castText(), '=', ref('OtherModel.name'))
+  .where('age', '>', ref('OtherModel.ageLimit'));
 ```
 
-[The ref helper function.](#ref)
+Factory function that returns a [`ReferenceBuilder`](#referencebuilder) instance, that makes it easier to refer
+to tables, columns, json attributes etc. `ReferenceBuilder` can also be used to type cast and alias the references.
 
-<h4 id="objection-raw">raw</h4>
+See [`FieldExpression`](#fieldexpression) for more information about how to refer to json fields.
+
+### raw
 
 ```js
 const { raw } = require('objection');
+
+const childAgeSums = await Person
+  .query()
+  .select(raw('coalesce(sum(??), 0)', 'age').as('childAgeSum'))
+  .where(raw(`?? || ' ' || ??`, ['firstName', 'lastName']), 'Arnold Schwarzenegger')
+  .orderBy(raw('random()'));
+
+console.log(childAgeSums[0].childAgeSum);
+
+await Person
+  .query()
+  .patch({
+    age: raw('age + ?', 10)
+  })
 ```
 
-[The raw helper function.](#raw)
+Factory function that returns a [`RawBuilder`](#rawbuilder) instance. `RawBuilder` is a
+wrapper for knex raw query that doesn't depend on knex. Instances of `RawBuilder` are
+converted to knex raw instances lazily when the query is executed.
 
-<h4 id="objection-lit">lit</h4>
+### lit
 
 ```js
-const { lit } = require('objection');
+const { lit, ref } = require('objection');
+
+await Model
+  .query()
+  .where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}))
+
+await Model
+  .query()
+  .insert({
+    numbers: lit([1, 2, 3]).asArray().castTo('real[]')
+  })
 ```
 
-[The lit helper function.](#lit)
+Factory function that returns a [`LiteralBuilder`](#literalbuilder) instance. `LiteralBuilder`
+helps build literals of different types.
 
-<h4 id="objection-mixin">mixin</h4>
+<h3 id="objection-mixin">mixin</h3>
 
 ```js
 const { mixin } = require('objection');
@@ -70,7 +107,7 @@ const { mixin } = require('objection');
 
 [The mixin helper](#plugins) for applying plugins. See the examples behind this link.
 
-<h4 id="objection-compose">compose</h4>
+<h3 id="objection-compose">compose</h3>
 
 ```js
 const { compose } = require('objection');
@@ -78,7 +115,7 @@ const { compose } = require('objection');
 
 [The compose helper](#plugins) for applying plugins. See the examples behind this link.
 
-<h4 id="objection-lodash">lodash</h4>
+<h3 id="objection-lodash">lodash</h3>
 
 ```js
 const { lodash } = require('objection');
@@ -86,7 +123,7 @@ const { lodash } = require('objection');
 
 [Lodash utility library](https://lodash.com/) used internally by objection.
 
-<h4 id="objection-promise">Promise</h4>
+<h3 id="objection-promise">Promise</h3>
 
 ```js
 const { Promise } = require('objection');
@@ -94,7 +131,7 @@ const { Promise } = require('objection');
 
 [Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used internally by objection.
 
-<h4 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h4>
+<h3 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h3>
 
 ```js
 const { knexSnakeCaseMappers } = require('objection');
@@ -158,7 +195,7 @@ Option|Type|Description
 upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
 underscoreBeforeDigits|boolean|Set to `true` if you want underscores before digits. For example `foo1Bar2` --> `foo_1_bar_2`.
 
-<h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
+<h3 id="objection-knexidentifiermapping">knexIdentifierMapping</h3>
 
 ```js
 const { knexIdentifierMapping } = require('objection');
@@ -246,7 +283,7 @@ static mapping between column names and property names. In the examples, you wou
 `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop`
 and `anotherProp` in the code.
 
-<h4 id="objection-snakecasemappers">snakeCaseMappers</h4>
+<h3 id="objection-snakecasemappers">snakeCaseMappers</h3>
 
 ```js
 const { Model, snakeCaseMappers } = require('objection');
@@ -294,133 +331,6 @@ a normal promise would.
 
 The query is executed when one of its promise methods [`then()`](#then), [`catch()`](#catch), [`map()`](#map),
 [`bind()`](#bind) or [`return()`](#return) is called.
-
-
-
-
-### Static methods
-
-
-
-
-#### forClass
-
-```js
-const builder = QueryBuilder.forClass(modelClass);
-```
-
-Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the
-[`Model.query()`](#query) and other query methods.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-modelClass|[`Model`](#model)|A Model class constructor
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[`QueryBuilder`](#querybuilder)|The created query builder
-
-
-
-
-#### parseRelationExpression
-
-```js
-const exprObj = QueryBuilder.parseRelationExpression(expr);
-```
-
-Parses a string relation expression into the [object notation](#relationexpression-object-notation).
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-expr|string|A string relation expression.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-object|The relation expression in object notation.
-
-
-
-
-### Global query building helpers
-
-
-
-
-#### ref
-
-```js
-const ref = require('objection').ref;
-```
-
-```js
-import { ref } from 'objection';
-
-await Model.query()
-  .select([
-    'id',
-    ref('Model.jsonColumn:details.name').castText().as('name'),
-    ref('Model.jsonColumn:details.age').castInt().as('age')
-  ])
-  .join('OtherModel', ref('Model.jsonColumn:details.name').castText(), '=', ref('OtherModel.name'))
-  .where('age', '>', ref('OtherModel.ageLimit'));
-```
-
-Factory function that returns a [`ReferenceBuilder`](#referencebuilder) instance, that makes it easier to refer
-to tables, columns, json attributes etc. `ReferenceBuilder` can also be used to type cast and alias the references.
-
-See [`FieldExpression`](#fieldexpression) for more information about how to refer to json fields.
-
-
-
-
-#### lit
-
-```js
-import { lit, ref } from 'objection';
-
-await Model
-  .query()
-  .where(ref('Model.jsonColumn:details'), '=', lit({name: 'Jennifer', age: 29}))
-
-await Model
-  .query()
-  .insert({
-    numbers: lit([1, 2, 3]).asArray().castTo('real[]')
-  })
-```
-
-Factory function that returns a [`LiteralBuilder`](#literalbuilder) instance. `LiteralBuilder`
-helps build literals of different types.
-
-
-
-
-#### raw
-
-```js
-const { raw } = require('objection');
-
-const childAgeSums = await Person
-  .query()
-  .select(raw('coalesce(sum(??), 0) as ??', ['age', 'childAgeSum']))
-  .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
-  .orderBy(raw('random()'));
-
-console.log(childAgeSums[0].childAgeSum);
-```
-
-Factory function that returns a [`RawBuilder`](#rawbuilder) instance. `RawBuilder` is a
-wrapper for knex raw query that doesn't depend on knex. Instances of `RawBuilder` are
-converted to knex raw instances lazily when the query is executed.
 
 
 
@@ -4913,6 +4823,59 @@ properties|string[]|The properties to omit
 Type|Description
 ----|-----------------------------
 [`QueryBuilder`](#querybuilder)|`this` query builder for chaining
+
+
+
+
+
+### Static methods
+
+
+
+
+#### forClass
+
+```js
+const builder = QueryBuilder.forClass(modelClass);
+```
+
+Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the
+[`Model.query()`](#query) and other query methods.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelClass|[`Model`](#model)|A Model class constructor
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[`QueryBuilder`](#querybuilder)|The created query builder
+
+
+
+
+#### parseRelationExpression
+
+```js
+const exprObj = QueryBuilder.parseRelationExpression(expr);
+```
+
+Parses a string relation expression into the [object notation](#relationexpression-object-notation).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+expr|string|A string relation expression.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+object|The relation expression in object notation.
 
 
 
