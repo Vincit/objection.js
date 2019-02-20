@@ -41,54 +41,91 @@ patch versions. Public API described here follows <a href="https://semver.org/">
 <p>The main module is what you get when you import objection. It has a bunch of properties that are all
 documented elsewhere in the API docs.</p>
 
-<h3 id="properties">Properties</h3>
-
-<h4 id="objection-model">Model</h4>
+<h3 id="objection-model">Model</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
 <p><a href="#model">The model base class.</a></p>
 
-<h4 id="objection-transaction">transaction</h4>
+<h3 id="objection-transaction">transaction</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">transaction</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
 <p><a href="#transactions">The transaction function.</a></p>
 
-<h4 id="objection-ref">ref</h4>
+<h3 id="ref">ref</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
-</code></pre>
-<p><a href="#ref">The ref helper function.</a></p>
 
-<h4 id="objection-raw">raw</h4>
+<span class="nx">await</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
+    <span class="s1">'id'</span><span class="p">,</span>
+    <span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
+    <span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details.age'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
+  <span class="p">])</span>
+  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'OtherModel'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'OtherModel.name'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'OtherModel.ageLimit'</span><span class="p">));</span>
+</code></pre>
+<p>Factory function that returns a <a href="#referencebuilder"><code class="prettyprint">ReferenceBuilder</code></a> instance, that makes it easier to refer
+to tables, columns, json attributes etc. <code class="prettyprint">ReferenceBuilder</code> can also be used to type cast and alias the references.</p>
+
+<p>See <a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a> for more information about how to refer to json fields.</p>
+
+<h3 id="raw">raw</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
-</code></pre>
-<p><a href="#raw">The raw helper function.</a></p>
 
-<h4 id="objection-lit">lit</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">lit</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
-</code></pre>
-<p><a href="#lit">The lit helper function.</a></p>
+<span class="kr">const</span> <span class="nx">childAgeSums</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0)'</span><span class="p">,</span> <span class="s1">'age'</span><span class="p">).</span><span class="nx">as</span><span class="p">(</span><span class="s1">'childAgeSum'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s2">`?? || ' ' || ??`</span><span class="p">,</span> <span class="p">[</span><span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">]),</span> <span class="s1">'Arnold Schwarzenegger'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random()'</span><span class="p">));</span>
 
-<h4 id="objection-mixin">mixin</h4>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">Person</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">patch</span><span class="p">({</span>
+    <span class="na">age</span><span class="p">:</span> <span class="nx">raw</span><span class="p">(</span><span class="s1">'age + ?'</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+  <span class="p">})</span>
+</code></pre>
+<p>Factory function that returns a <a href="#rawbuilder"><code class="prettyprint">RawBuilder</code></a> instance. <code class="prettyprint">RawBuilder</code> is a
+wrapper for knex raw query that doesn&rsquo;t depend on knex. Instances of <code class="prettyprint">RawBuilder</code> are
+converted to knex raw instances lazily when the query is executed.</p>
+
+<h3 id="lit">lit</h3>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">lit</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
+
+<span class="nx">await</span> <span class="nx">Model</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details'</span><span class="p">),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">lit</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">age</span><span class="p">:</span> <span class="mi">29</span><span class="p">}))</span>
+
+<span class="nx">await</span> <span class="nx">Model</span>
+  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
+    <span class="na">numbers</span><span class="p">:</span> <span class="nx">lit</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]).</span><span class="nx">asArray</span><span class="p">().</span><span class="nx">castTo</span><span class="p">(</span><span class="s1">'real[]'</span><span class="p">)</span>
+  <span class="p">})</span>
+</code></pre>
+<p>Factory function that returns a <a href="#literalbuilder"><code class="prettyprint">LiteralBuilder</code></a> instance. <code class="prettyprint">LiteralBuilder</code>
+helps build literals of different types.</p>
+
+<h3 id="objection-mixin">mixin</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">mixin</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
 <p><a href="#plugins">The mixin helper</a> for applying plugins. See the examples behind this link.</p>
 
-<h4 id="objection-compose">compose</h4>
+<h3 id="objection-compose">compose</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">compose</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
 <p><a href="#plugins">The compose helper</a> for applying plugins. See the examples behind this link.</p>
 
-<h4 id="objection-lodash">lodash</h4>
+<h3 id="objection-lodash">lodash</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">lodash</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
 <p><a href="https://lodash.com/">Lodash utility library</a> used internally by objection.</p>
 
-<h4 id="objection-promise">Promise</h4>
+<h3 id="objection-promise">Promise</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Promise</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
 <p><a href="http://bluebirdjs.com/docs/getting-started.html">Bluebird promise library</a> used internally by objection.</p>
 
-<h4 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h4>
+<h3 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexSnakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
 
@@ -161,7 +198,7 @@ documented elsewhere in the API docs.</p>
 </tr>
 </tbody></table>
 
-<h4 id="objection-knexidentifiermapping">knexIdentifierMapping</h4>
+<h3 id="objection-knexidentifiermapping">knexIdentifierMapping</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">knexIdentifierMapping</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 <span class="kr">const</span> <span class="nx">Knex</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">);</span>
 
@@ -244,7 +281,7 @@ static mapping between column names and property names. In the examples, you wou
 <code class="prettyprint">MyId</code>, <code class="prettyprint">MyProp</code> and <code class="prettyprint">MyAnotherProp</code> in the database and you would like to map them into <code class="prettyprint">id</code>, <code class="prettyprint">prop</code>
 and <code class="prettyprint">anotherProp</code> in the code.</p>
 
-<h4 id="objection-snakecasemappers">snakeCaseMappers</h4>
+<h3 id="objection-snakecasemappers">snakeCaseMappers</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 
 <span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
@@ -297,130 +334,6 @@ a normal promise would.</p>
 
 <p>The query is executed when one of its promise methods <a href="#then"><code class="prettyprint">then()</code></a>, <a href="#catch"><code class="prettyprint">catch()</code></a>, <a href="#map"><code class="prettyprint">map()</code></a>,
 <a href="#bind"><code class="prettyprint">bind()</code></a> or <a href="#return"><code class="prettyprint">return()</code></a> is called.</p>
-
-<h3 id="static-methods">Static methods</h3>
-
-<h4 id="forclass">forClass</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">forClass</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">);</span>
-</code></pre>
-<p>Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the
-<a href="#query"><code class="prettyprint">Model.query()</code></a> and other query methods.</p>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>modelClass</td>
-<td><a href="#model"><code class="prettyprint">Model</code></a></td>
-<td>A Model class constructor</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
-<td>The created query builder</td>
-</tr>
-</tbody></table>
-
-<h4 id="parserelationexpression">parseRelationExpression</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">exprObj</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">parseRelationExpression</span><span class="p">(</span><span class="nx">expr</span><span class="p">);</span>
-</code></pre>
-<p>Parses a string relation expression into the <a href="#relationexpression-object-notation">object notation</a>.</p>
-
-<h5 id="arguments">Arguments</h5>
-
-<table><thead>
-<tr>
-<th>Argument</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>expr</td>
-<td>string</td>
-<td>A string relation expression.</td>
-</tr>
-</tbody></table>
-
-<h5 id="return-value">Return value</h5>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>object</td>
-<td>The relation expression in object notation.</td>
-</tr>
-</tbody></table>
-
-<h3 id="global-query-building-helpers">Global query building helpers</h3>
-
-<h4 id="ref">ref</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">ref</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">).</span><span class="nx">ref</span><span class="p">;</span>
-</code></pre><pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">ref</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
-
-<span class="nx">await</span> <span class="nx">Model</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">([</span>
-    <span class="s1">'id'</span><span class="p">,</span>
-    <span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'name'</span><span class="p">),</span>
-    <span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details.age'</span><span class="p">).</span><span class="nx">castInt</span><span class="p">().</span><span class="nx">as</span><span class="p">(</span><span class="s1">'age'</span><span class="p">)</span>
-  <span class="p">])</span>
-  <span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'OtherModel'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details.name'</span><span class="p">).</span><span class="nx">castText</span><span class="p">(),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'OtherModel.name'</span><span class="p">))</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'&gt;'</span><span class="p">,</span> <span class="nx">ref</span><span class="p">(</span><span class="s1">'OtherModel.ageLimit'</span><span class="p">));</span>
-</code></pre>
-<p>Factory function that returns a <a href="#referencebuilder"><code class="prettyprint">ReferenceBuilder</code></a> instance, that makes it easier to refer
-to tables, columns, json attributes etc. <code class="prettyprint">ReferenceBuilder</code> can also be used to type cast and alias the references.</p>
-
-<p>See <a href="#fieldexpression"><code class="prettyprint">FieldExpression</code></a> for more information about how to refer to json fields.</p>
-
-<h4 id="lit">lit</h4>
-<pre class="highlight javascript"><code><span class="kr">import</span> <span class="p">{</span> <span class="nx">lit</span><span class="p">,</span> <span class="nx">ref</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">'objection'</span><span class="p">;</span>
-
-<span class="nx">await</span> <span class="nx">Model</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">ref</span><span class="p">(</span><span class="s1">'Model.jsonColumn:details'</span><span class="p">),</span> <span class="s1">'='</span><span class="p">,</span> <span class="nx">lit</span><span class="p">({</span><span class="na">name</span><span class="p">:</span> <span class="s1">'Jennifer'</span><span class="p">,</span> <span class="na">age</span><span class="p">:</span> <span class="mi">29</span><span class="p">}))</span>
-
-<span class="nx">await</span> <span class="nx">Model</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">insert</span><span class="p">({</span>
-    <span class="na">numbers</span><span class="p">:</span> <span class="nx">lit</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]).</span><span class="nx">asArray</span><span class="p">().</span><span class="nx">castTo</span><span class="p">(</span><span class="s1">'real[]'</span><span class="p">)</span>
-  <span class="p">})</span>
-</code></pre>
-<p>Factory function that returns a <a href="#literalbuilder"><code class="prettyprint">LiteralBuilder</code></a> instance. <code class="prettyprint">LiteralBuilder</code>
-helps build literals of different types.</p>
-
-<h4 id="raw">raw</h4>
-<pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">raw</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
-
-<span class="kr">const</span> <span class="nx">childAgeSums</span> <span class="o">=</span> <span class="nx">await</span> <span class="nx">Person</span>
-  <span class="p">.</span><span class="nx">query</span><span class="p">()</span>
-  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'coalesce(sum(??), 0) as ??'</span><span class="p">,</span> <span class="p">[</span><span class="s1">'age'</span><span class="p">,</span> <span class="s1">'childAgeSum'</span><span class="p">]))</span>
-  <span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s2">`?? || ' ' || ??`</span><span class="p">,</span> <span class="s1">'firstName'</span><span class="p">,</span> <span class="s1">'lastName'</span><span class="p">),</span> <span class="s1">'Arnold Schwarzenegger'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="nx">raw</span><span class="p">(</span><span class="s1">'random()'</span><span class="p">));</span>
-
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">childAgeSums</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">childAgeSum</span><span class="p">);</span>
-</code></pre>
-<p>Factory function that returns a <a href="#rawbuilder"><code class="prettyprint">RawBuilder</code></a> instance. <code class="prettyprint">RawBuilder</code> is a
-wrapper for knex raw query that doesn&rsquo;t depend on knex. Instances of <code class="prettyprint">RawBuilder</code> are
-converted to knex raw instances lazily when the query is executed.</p>
 
 <h3 id="query-building-methods">Query building methods</h3>
 
@@ -5901,6 +5814,79 @@ and <code class="prettyprint">species</code> properties of all <code class="pret
 </tr>
 </tbody></table>
 
+<h3 id="static-methods">Static methods</h3>
+
+<h4 id="forclass">forClass</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">builder</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">forClass</span><span class="p">(</span><span class="nx">modelClass</span><span class="p">);</span>
+</code></pre>
+<p>Create QueryBuilder for a Model subclass. You rarely need to call this. Query builders are created using the
+<a href="#query"><code class="prettyprint">Model.query()</code></a> and other query methods.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>modelClass</td>
+<td><a href="#model"><code class="prettyprint">Model</code></a></td>
+<td>A Model class constructor</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#querybuilder"><code class="prettyprint">QueryBuilder</code></a></td>
+<td>The created query builder</td>
+</tr>
+</tbody></table>
+
+<h4 id="parserelationexpression">parseRelationExpression</h4>
+<pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">exprObj</span> <span class="o">=</span> <span class="nx">QueryBuilder</span><span class="p">.</span><span class="nx">parseRelationExpression</span><span class="p">(</span><span class="nx">expr</span><span class="p">);</span>
+</code></pre>
+<p>Parses a string relation expression into the <a href="#relationexpression-object-notation">object notation</a>.</p>
+
+<h5 id="arguments">Arguments</h5>
+
+<table><thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>expr</td>
+<td>string</td>
+<td>A string relation expression.</td>
+</tr>
+</tbody></table>
+
+<h5 id="return-value">Return value</h5>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>object</td>
+<td>The relation expression in object notation.</td>
+</tr>
+</tbody></table>
+
 <h2 id="model">Model</h2>
 <pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
   <span class="c1">// Table name is the only required property.</span>
@@ -10421,6 +10407,20 @@ cast type for object values.</p>
 <h4 id="as">as</h4>
 
 <p>Gives an alias for the reference <code class="prettyprint">.select(ref(&#39;age&#39;).as(&#39;yougness&#39;))</code></p>
+
+<h2 id="rawbuilder">RawBuilder</h2>
+
+<p>An instance of this is returned from the <a href="#raw"><code class="prettyprint">raw</code></a> helper function.</p>
+
+<h3 id="methods">Methods</h3>
+
+<h4 id="as">as</h4>
+
+<p>Gives an alias for the raw expression <code class="prettyprint">.select(raw(&#39;concat(foo, bar)&#39;).as(&#39;fooBar&#39;))</code>.</p>
+
+<p>You should use this instead of inserting the alias to the SQL to give objection
+more information about the query. Some edge cases, like using <code class="prettyprint">raw</code> in <code class="prettyprint">select</code>
+inside a <code class="prettyprint">joinEager</code> modifier won&rsquo;t work unless you use this method.</p>
 
       </div>
       <div class="dark-box">
