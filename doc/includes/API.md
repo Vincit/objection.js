@@ -8964,3 +8964,20 @@ Can be used in conjuction with `castTo`.
 #### as
 
 Gives an alias for the reference `.select(ref('age').as('yougness'))`
+
+
+
+
+## RawBuilder
+
+An instance of this is returned from the [`raw`](#raw) helper function.
+
+### Methods
+
+#### as
+
+Gives an alias for the reference `.select(raw('concat(foo, bar)').as('fooBar'))`.
+
+You should use this instead of inserting the alias to the SQL to give objection
+more information about the query. Some edge cases, like using `raw` in `select`
+inside a `joinEager` modifier won't work unless you use this method.

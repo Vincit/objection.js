@@ -2,7 +2,7 @@ const _ = require('lodash');
 const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const { ValidationError } = require('../../');
+const { ValidationError, raw } = require('../../');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {
@@ -1231,6 +1231,112 @@ module.exports = session => {
             ]);
           });
       });
+
+      // Disabled for sqlite because it doesn't have `concat` function :)
+      if (!session.isSqlite()) {
+        it('select * + raw should work', () => {
+          return Model1.query()
+            .select(
+              'Model1.*',
+              raw(`concat(??, ' - ', ??) as "rawThingy"`, 'Model1.model1Prop1', 'Model1.id')
+            )
+            .where('Model1.id', 1)
+            .where('model1Relation2.id_col', 2)
+            .where('model1Relation2:model2Relation1.id', 6)
+            .eager('[model1Relation1, model1Relation2.model2Relation1]')
+            .eagerAlgorithm(Model1.JoinEagerAlgorithm)
+            .then(models => {
+              expect(models).to.eql([
+                {
+                  id: 1,
+                  model1Prop1: 'hello 1',
+                  model1Prop2: null,
+                  model1Id: 2,
+                  rawThingy: 'hello 1 - 1',
+                  $afterGetCalled: 1,
+
+                  model1Relation1: {
+                    id: 2,
+                    model1Id: 3,
+                    model1Prop1: 'hello 2',
+                    model1Prop2: null,
+                    $afterGetCalled: 1
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: 2,
+                      model1Id: 1,
+                      model2Prop1: 'hejsan 2',
+                      model2Prop2: null,
+                      $afterGetCalled: 1,
+
+                      model2Relation1: [
+                        {
+                          id: 6,
+                          model1Id: 7,
+                          model1Prop1: 'hello 6',
+                          model1Prop2: null,
+                          aliasedExtra: 'extra 6',
+                          $afterGetCalled: 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]);
+            });
+        });
+
+        it('raw select should work in modifier', () => {
+          return Model1.query()
+            .select('Model1.id')
+            .where('Model1.id', 1)
+            .where('model1Relation2.id_col', 2)
+            .where('model1Relation2:model2Relation1.id', 6)
+            .joinEager('[model1Relation1(rawStuff), model1Relation2.model2Relation1]', {
+              rawStuff(builder) {
+                builder.select(
+                  raw(`concat(??, ' - ', ?? * 2)`, 'model1Prop1', 'id').as('rawThingy')
+                );
+              }
+            })
+            .then(models => {
+              expect(models).to.eql([
+                {
+                  id: 1,
+                  $afterGetCalled: 1,
+
+                  model1Relation1: {
+                    rawThingy: 'hello 2 - 4',
+                    $afterGetCalled: 1
+                  },
+
+                  model1Relation2: [
+                    {
+                      idCol: 2,
+                      model1Id: 1,
+                      model2Prop1: 'hejsan 2',
+                      model2Prop2: null,
+                      $afterGetCalled: 1,
+
+                      model2Relation1: [
+                        {
+                          id: 6,
+                          model1Id: 7,
+                          model1Prop1: 'hello 6',
+                          model1Prop2: null,
+                          aliasedExtra: 'extra 6',
+                          $afterGetCalled: 1
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]);
+            });
+        });
+      }
 
       it('select should work with alias', () => {
         return Model1.query()

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.2
+
+  * Add `as` method for `raw` making it possible to use `raw` expressions in `joinEager` modifiers (as long as you give names to your raw expressions using `as`).
+
+## 1.6.1
+
+  * Fix some very rare upsertGraph edge cases.
+
 ## 1.6.0
 
   * Add `Model.traverseAsync` and `modelInstance.$traverseAsync` methods.
