@@ -318,6 +318,41 @@ module.exports = session => {
     });
 
     test(
+      {
+        aliased1: {
+          $relation: 'model1Relation1',
+          $recursive: 2
+        }
+      },
+      models => {
+        expect(models).to.eql([
+          {
+            id: 1,
+            model1Id: 2,
+            model1Prop1: 'hello 1',
+            model1Prop2: null,
+            $afterGetCalled: 1,
+
+            aliased1: {
+              id: 2,
+              model1Id: 3,
+              model1Prop1: 'hello 2',
+              model1Prop2: null,
+              $afterGetCalled: 1,
+              aliased1: {
+                id: 3,
+                model1Id: 4,
+                model1Prop1: 'hello 3',
+                model1Prop2: null,
+                $afterGetCalled: 1
+              }
+            }
+          }
+        ]);
+      }
+    );
+
+    test(
       'model1Relation1(selectId).^',
       models => {
         expect(models).to.eql([
