@@ -1062,6 +1062,12 @@ declare namespace Objection {
     whereNotBetween: WhereBetween<QM, RM, RV>;
     orWhereNotBetween: WhereBetween<QM, RM, RV>;
     andWhereNotBetween: WhereBetween<QM, RM, RV>;
+    whereColumn: Where<QM, RM, RV>;
+    andWhereColumn: Where<QM, RM, RV>;
+    orWhereColumn: Where<QM, RM, RV>;
+    whereNotColumn: Where<QM, RM, RV>;
+    andWhereNotColumn: Where<QM, RM, RV>;
+    orWhereNotColumn: Where<QM, RM, RV>;
 
     // Group by
     groupBy: GroupBy<QM, RM, RV>;
