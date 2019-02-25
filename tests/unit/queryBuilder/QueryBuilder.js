@@ -938,7 +938,13 @@ describe('QueryBuilder', () => {
       'whereNotBetween',
       'andWhereNotBetween',
       'orWhereBetween',
-      'orWhereNotBetween'
+      'orWhereNotBetween',
+      'whereColumn',
+      'andWhereColumn',
+      'orWhereColumn',
+      'whereNotColumn',
+      'andWhereNotColumn',
+      'orWhereNotColumn'
     ];
 
     for (let i = 0; i < wheres.length; i++) {
