@@ -1265,9 +1265,9 @@ declare namespace Objection {
   }
 
   interface Union<QM extends Model> {
-    (callback: () => void, wrap?: boolean): QueryBuilder<QM, QM[]>;
-    (callbacks: (() => void)[], wrap?: boolean): QueryBuilder<QM, QM[]>;
-    (...callbacks: (() => void)[]): QueryBuilder<QM, QM[]>;
+    (callback: (queryBuilder: QueryBuilder<QM, QM[]>) => void, wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (callbacks: ((queryBuilder: QueryBuilder<QM, QM[]>) => void)[], wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (...callbacks: ((queryBuilder: QueryBuilder<QM, QM[]>) => void)[]): QueryBuilder<QM, QM[]>;
   }
 
   // commons
