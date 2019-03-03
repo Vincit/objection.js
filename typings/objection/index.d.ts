@@ -404,7 +404,7 @@ declare namespace Objection {
     dbRefProp: string;
     propRefRegex: RegExp;
     pickJsonSchemaProperties: boolean;
-    useLimitInFirst: boolean;
+    useLimitInFirst?: boolean;
     defaultEagerAlgorithm?: EagerAlgorithm;
     defaultEagerOptions?: EagerOptions;
     QueryBuilder: typeof QueryBuilder;
