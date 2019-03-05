@@ -887,6 +887,7 @@ declare namespace Objection {
     resultSize(): Promise<number>;
 
     page(page: number, pageSize: number): QueryBuilder<QM, Page<QM>>;
+    range(): QueryBuilder<QM, Page<QM>>;
     range(start: number, end: number): QueryBuilder<QM, Page<QM>>;
     pluck(propertyName: string): this;
     first(): QueryBuilderYieldingOneOrNone<QM>;
