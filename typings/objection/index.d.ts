@@ -142,6 +142,10 @@ declare namespace Objection {
     shallow?: boolean;
   }
 
+  export interface ToJsonOptions extends CloneOptions {
+    virtuals?: boolean;
+  }
+
   export class NotFoundError extends Error {
     statusCode: number;
     data?: any;
@@ -560,8 +564,8 @@ declare namespace Objection {
     $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $toDatabaseJson(): object;
-    $toJson(opt?: CloneOptions): object;
-    toJSON(opt?: CloneOptions): object;
+    $toJson(opt?: ToJsonOptions): object;
+    toJSON(opt?: ToJsonOptions): object;
     $parseDatabaseJson(json: Pojo): Pojo;
     $formatDatabaseJson(json: Pojo): Pojo;
     $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
