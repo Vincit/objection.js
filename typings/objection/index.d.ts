@@ -1113,7 +1113,7 @@ declare namespace Objection {
     limit(limit: number): this;
 
     // Aggregation
-    count(columnName?: string): this;
+    count: ColumnNamesMethod<QM, RM, RV>;
     countDistinct(columnName?: string): this;
     min(columnName: string): this;
     max(columnName: string): this;
