@@ -143,7 +143,7 @@ declare namespace Objection {
   }
 
   export interface ToJsonOptions extends CloneOptions {
-    virtuals?: boolean;
+    virtuals?: boolean | Array<string>;
   }
 
   export class NotFoundError extends Error {
@@ -379,7 +379,10 @@ declare namespace Objection {
   }
 
   interface Filters<QM extends Model> {
-    [filterName: string]: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void;
+    [filterName: string]: (
+      this: QueryBuilder<QM, QM[]>,
+      queryBuilder: QueryBuilder<QM, QM[]>
+    ) => void;
   }
 
   interface Properties {
@@ -1145,7 +1148,9 @@ declare namespace Objection {
 
   interface Table<QM extends Model, RM, RV> {
     (tableName: TableName): QueryBuilder<QM, RM, RV>;
-    (callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilder<QM, RM, RV>;
   }
 
   interface Distinct<QM extends Model, RM, RV> extends ColumnNamesMethod<QM, RM, RV> {}
@@ -1191,7 +1196,9 @@ declare namespace Objection {
   }
 
   interface Where<QM extends Model, RM, RV> extends WhereRaw<QM, RM, RV> {
-    (callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilder<QM, RM, RV>;
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilder<QM, RM, RV>;
     (object: object): QueryBuilder<QM, RM, RV>;
     (
       column: keyof QM | ColumnRef,
@@ -1210,7 +1217,9 @@ declare namespace Objection {
 
   interface FindOne<QM extends Model> {
     (condition: boolean): QueryBuilderYieldingOneOrNone<QM>;
-    (callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void): QueryBuilderYieldingOneOrNone<QM>;
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
+    ): QueryBuilderYieldingOneOrNone<QM>;
     (object: object): QueryBuilderYieldingOneOrNone<QM>;
     (sql: string, ...bindings: any[]): QueryBuilderYieldingOneOrNone<QM>;
     (sql: string, bindings: any): QueryBuilderYieldingOneOrNone<QM>;
@@ -1271,9 +1280,17 @@ declare namespace Objection {
   }
 
   interface Union<QM extends Model> {
-    (callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void, wrap?: boolean): QueryBuilder<QM, QM[]>;
-    (callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[], wrap?: boolean): QueryBuilder<QM, QM[]>;
-    (...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]): QueryBuilder<QM, QM[]>;
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[],
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
+    ): QueryBuilder<QM, QM[]>;
   }
 
   // commons

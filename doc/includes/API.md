@@ -6904,6 +6904,10 @@ const jsonObj = modelInstance.$toJson(opt);
 const shallowObj = modelInstance.$toJson({shallow: true, virtuals: true});
 ```
 
+```js
+const onlySomeVirtuals = modelInstance.toJSON({virtuals: ['fullName']});
+```
+
 Exports this model as a JSON object.
 
 ##### Arguments
@@ -6929,6 +6933,10 @@ const jsonObj = modelInstance.toJSON(opt);
 
 ```js
 const shallowObj = modelInstance.toJSON({shallow: true, virtuals: true});
+```
+
+```js
+const onlySomeVirtuals = modelInstance.toJSON({virtuals: ['fullName']});
 ```
 
 Exports this model as a JSON object.
@@ -8609,7 +8617,7 @@ shallow|boolean|If true, relations are ignored
 Property|Type|Description
 --------|----|-----------
 shallow|boolean|If true, relations are ignored. Default is false.
-virtuals|boolean|If false, virtual attributes are omitted from the output. Default is true.
+virtuals|boolean&#124;string[]|If false, virtual attributes are omitted from the output. Default is true. You can also pass an array of property names and only those virtual properties get picked. You can even pass in property/function names that are not included in the static `virtualAttributes` array.
 
 
 
