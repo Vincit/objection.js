@@ -68,6 +68,7 @@
     "knex": "0.x"
   },
   "devDependencies": {
+    "@babel/polyfill": "^7.2.5",
     "@types/node": "^10.0.6",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",
