@@ -1083,6 +1083,7 @@ declare namespace Objection {
     // Union
     union: Union<QM>;
     unionAll(callback: () => void): this;
+    intersect(callback: () => void): this;
 
     // Having
     having: Where<QM, RM, RV>;
