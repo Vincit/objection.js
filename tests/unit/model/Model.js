@@ -1358,6 +1358,45 @@ describe('Model', () => {
       });
     });
 
+    it('should pick a set of virtuals if array is passed to in `virtuals` option', () => {
+      class Model1 extends Model {
+        get foo() {
+          return this.a + this.b;
+        }
+
+        get bar() {
+          return this.a * this.b;
+        }
+
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+      }
+
+      expect(
+        Model1.fromJson({
+          a: 100,
+          b: 10,
+          rel1: Model1.fromJson({ a: 101, b: 11 }),
+          rel2: [Model1.fromJson({ a: 102, b: 12 }), Model1.fromJson({ a: 103, b: 13 })]
+        }).$toJson({ virtuals: ['foo', 'bar'] })
+      ).to.eql({
+        a: 100,
+        b: 10,
+        foo: 110,
+        bar: 1000,
+
+        rel1: {
+          a: 101,
+          b: 11,
+          foo: 112,
+          bar: 1111
+        },
+
+        rel2: [{ a: 102, b: 12, foo: 114, bar: 1224 }, { a: 103, b: 13, foo: 116, bar: 1339 }]
+      });
+    });
+
     it('should include methods', () => {
       class Model1 extends Model {
         foo() {

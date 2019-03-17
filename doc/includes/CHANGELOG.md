@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.3
+
+  * Fixes: [#1227](https://github.com/Vincit/objection.js/issues/1227)
+
 ## 1.6.2
 
   * Add `as` method for `raw` making it possible to use `raw` expressions in `joinEager` modifiers (as long as you give names to your raw expressions using `as`).

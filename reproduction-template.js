@@ -45,8 +45,6 @@ async function main() {
     .eager('pets');
 
   chai.expect(jennifer.pets[0].name).to.equal('Doggo');
-
-  await knex.destroy()
 }
 
 ///////////////////////////////////////////////////////////////
@@ -56,7 +54,7 @@ async function main() {
 const knex = Knex({
   client: 'sqlite3',
   useNullAsDefault: true,
-  debug: true,
+  debug: false,
   connection: {
     filename: ':memory:'
   }
@@ -266,5 +264,11 @@ async function createSchema() {
 }
 
 main()
-  .then(() => console.log('success'))
-  .catch(console.error);
+  .then(() => {
+    console.log('success')
+    return knex.destroy()
+  })
+  .catch(err => {
+    console.error(err)
+    return knex.destroy()
+  });

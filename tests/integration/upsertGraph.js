@@ -446,6 +446,52 @@ module.exports = session => {
         });
     });
 
+    it('should work with an empty object in belongsToOne relation', () => {
+      const upsert = {
+        model1Relation1: {}
+      };
+
+      return transaction(session.knex, trx => Model1.query(trx).upsertGraph(upsert))
+        .then(inserted =>
+          Model1.query(session.knex)
+            .findById(inserted.id)
+            .eager('model1Relation1')
+        )
+        .then(model => {
+          chai.expect(model).to.containSubset({
+            model1Prop1: null,
+            model1Prop2: null,
+            model1Relation1: {
+              model1Prop1: null,
+              model1Prop2: null
+            }
+          });
+        });
+    });
+
+    it('should work with an empty object in hasOne relation', () => {
+      const upsert = {
+        model1Relation1Inverse: {}
+      };
+
+      return transaction(session.knex, trx => Model1.query(trx).upsertGraph(upsert))
+        .then(inserted =>
+          Model1.query(session.knex)
+            .findById(inserted.id)
+            .eager('model1Relation1Inverse')
+        )
+        .then(model => {
+          chai.expect(model).to.containSubset({
+            model1Prop1: null,
+            model1Prop2: null,
+            model1Relation1Inverse: {
+              model1Prop1: null,
+              model1Prop2: null
+            }
+          });
+        });
+    });
+
     it('should update model if the model changes and a belongsToOne relation changes', () => {
       const upsert = {
         id: 1,
