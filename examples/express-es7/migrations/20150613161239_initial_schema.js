@@ -7,7 +7,8 @@ exports.up = knex => {
         .unsigned()
         .references('id')
         .inTable('persons')
-        .onDelete('SET NULL');
+        .onDelete('SET NULL')
+        .index();
       table.string('firstName');
       table.string('lastName');
       table.integer('age');
@@ -24,7 +25,8 @@ exports.up = knex => {
         .unsigned()
         .references('id')
         .inTable('persons')
-        .onDelete('SET NULL');
+        .onDelete('SET NULL')
+        .index();
       table.string('name');
       table.string('species');
     })
@@ -35,13 +37,15 @@ exports.up = knex => {
         .unsigned()
         .references('id')
         .inTable('persons')
-        .onDelete('CASCADE');
+        .onDelete('CASCADE')
+        .index();
       table
         .integer('movieId')
         .unsigned()
         .references('id')
         .inTable('movies')
-        .onDelete('CASCADE');
+        .onDelete('CASCADE')
+        .index();
     });
 };
 
