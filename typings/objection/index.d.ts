@@ -223,7 +223,7 @@ declare namespace Objection {
 
   export interface RelationMapping {
     relation: Relation;
-    modelClass: ModelClass<any> | string;
+    modelClass: (() => ModelClass<any>) | ModelClass<any> | string;
     join: RelationJoin;
     modify?: ((queryBuilder: QueryBuilder<any>) => QueryBuilder<any>) | string | object;
     filter?: ((queryBuilder: QueryBuilder<any>) => QueryBuilder<any>) | string | object;
@@ -1083,6 +1083,7 @@ declare namespace Objection {
     // Union
     union: Union<QM>;
     unionAll(callback: () => void): this;
+    intersect(callback: () => void): this;
 
     // Having
     having: Where<QM, RM, RV>;
