@@ -121,6 +121,8 @@ const { compose } = require('objection');
 const { lodash } = require('objection');
 ```
 
+**DEPRECATED! Will be removed in 2.0**
+
 [Lodash utility library](https://lodash.com/) used internally by objection.
 
 <h3 id="objection-promise">Promise</h3>
@@ -128,6 +130,8 @@ const { lodash } = require('objection');
 ```js
 const { Promise } = require('objection');
 ```
+
+**DEPRECATED! Will be removed in 2.0**
 
 [Bluebird promise library](http://bluebirdjs.com/docs/getting-started.html) used internally by objection.
 
