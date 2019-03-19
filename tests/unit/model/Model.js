@@ -1473,6 +1473,77 @@ describe('Model', () => {
     });
   });
 
+  describe('cloneObjectAttributes', () => {
+    it('should clone object attributes by default when calling $toJson or $toDatabaseJson', () => {
+      class Person extends Model {}
+
+      const obj = {
+        foo: {
+          bar: 1
+        }
+      };
+
+      const person = Person.fromDatabaseJson({
+        objectField: obj
+      });
+
+      expect(person.objectField).to.equal(obj);
+
+      let json = person.$toDatabaseJson();
+
+      expect(person.objectField).to.equal(obj);
+      expect(json.objectField).to.eql(obj);
+      expect(json.objectField).to.not.equal(obj);
+
+      json = person.$toJson();
+
+      expect(person.objectField).to.equal(obj);
+      expect(json.objectField).to.eql(obj);
+      expect(json.objectField).to.not.equal(obj);
+
+      json = person.toJSON();
+
+      expect(person.objectField).to.equal(obj);
+      expect(json.objectField).to.eql(obj);
+      expect(json.objectField).to.not.equal(obj);
+    });
+
+    it('should NOT clone object attributes when calling $toJson or $toDatabaseJson if Model.cloneObjectAttributes = false', () => {
+      class Person extends Model {
+        static get cloneObjectAttributes() {
+          return false;
+        }
+      }
+
+      const obj = {
+        foo: {
+          bar: 1
+        }
+      };
+
+      const person = Person.fromDatabaseJson({
+        objectField: obj
+      });
+
+      expect(person.objectField).to.equal(obj);
+
+      let json = person.$toDatabaseJson();
+
+      expect(person.objectField).to.equal(obj);
+      expect(json.objectField).to.equal(obj);
+
+      json = person.$toJson();
+
+      expect(person.objectField).to.equal(obj);
+      expect(json.objectField).to.equal(obj);
+
+      json = person.toJSON();
+
+      expect(person.objectField).to.equal(obj);
+      expect(json.objectField).to.equal(obj);
+    });
+  });
+
   it('relationMappings can be a function', () => {
     let Model1 = modelClass('Model1');
     let Model2 = modelClass('Model2');
