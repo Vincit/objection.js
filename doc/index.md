@@ -113,6 +113,8 @@ What objection.js **doesn't** give you:
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
 
+Check out [this issue](https://github.com/Vincit/objection.js/issues/1069) to see who is using objection and what they think about it.
+
 # Installation
 
 ```shell

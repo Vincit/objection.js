@@ -32,6 +32,7 @@ What objection.js **doesn't** give you:
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
 
 Shortcuts:
+ * [Who uses objection.js](https://github.com/Vincit/objection.js/issues/1069)
  * [API reference](https://vincit.github.io/objection.js/#api-reference)
  * [Example projects](https://github.com/Vincit/objection.js/tree/master/examples)
  * [Changelog](https://vincit.github.io/objection.js/#changelog)
