@@ -174,6 +174,10 @@ class TestSession {
         return 'id';
       }
 
+      static get jsonAttributes() {
+        return ['model3JsonProp'];
+      }
+
       static get modifiers() {
         return {
           orderById: builder => builder.orderBy('model3.id')
@@ -238,6 +242,7 @@ class TestSession {
           .createTable('model3', table => {
             table.increments('id').primary();
             table.string('model3Prop1');
+            table.text('model3JsonProp');
           })
           .createTable('Model1Model2', table => {
             table.increments('id').primary();

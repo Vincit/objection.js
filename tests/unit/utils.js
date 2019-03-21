@@ -12,6 +12,7 @@ const {
 const { range } = require('lodash');
 const { compose, mixin } = require('../../lib/utils/mixin');
 const { map } = require('../../lib/utils/promiseUtils');
+const { jsonEquals } = require('../../lib/utils/objectUtils');
 
 describe('utils', () => {
   describe('isSubclassOf', () => {
@@ -290,5 +291,113 @@ describe('utils', () => {
         });
       });
     });
+  });
+
+  describe('jsonEquals', () => {
+    it('should work with primitives', () => {
+      expect(jsonEquals(1, 1)).to.equal(true);
+      expect(jsonEquals('foo', 'foo')).to.equal(true);
+      expect(jsonEquals(false, false)).to.equal(true);
+      expect(jsonEquals(true, true)).to.equal(true);
+      const date = new Date();
+      expect(jsonEquals(date, date)).to.equal(true);
+      expect(jsonEquals(date, new Date(date))).to.equal(true);
+      expect(jsonEquals(new Date(date), date)).to.equal(true);
+
+      expect(jsonEquals(1, 2)).to.equal(false);
+      expect(jsonEquals('foo', 'bar')).to.equal(false);
+      expect(jsonEquals(true, false)).to.equal(false);
+      expect(jsonEquals(0, false)).to.equal(false);
+      expect(jsonEquals(false, 0)).to.equal(false);
+      expect(jsonEquals('1', 1)).to.equal(false);
+      expect(jsonEquals(1, '1')).to.equal(false);
+      expect(jsonEquals(true, false)).to.equal(false);
+      expect(jsonEquals('true', true)).to.equal(false);
+      expect(jsonEquals(true, 'true')).to.equal(false);
+      expect(jsonEquals(new Date(), new Date(Date.now() + 1))).to.equal(false);
+    });
+
+    it('should work with arrays', () => {
+      expect(jsonEquals([], [])).to.equal(true);
+      expect(jsonEquals([1], [1])).to.equal(true);
+      expect(jsonEquals([1, 2], [1, 2])).to.equal(true);
+      expect(jsonEquals(['foo', 'bar'], ['foo', 'bar'])).to.equal(true);
+
+      expect(jsonEquals(['1', 2], [1, '2'])).to.equal(false);
+      expect(jsonEquals([1], 1)).to.equal(false);
+      expect(jsonEquals(2, [2])).to.equal(false);
+      expect(jsonEquals([0], [])).to.equal(false);
+      expect(jsonEquals([], [0])).to.equal(false);
+      expect(jsonEquals([1], [2])).to.equal(false);
+      expect(jsonEquals([1, 2], [2, 1])).to.equal(false);
+      expect(jsonEquals([1, 2], [1, 2, 3])).to.equal(false);
+      expect(jsonEquals([1, 2, 3], [1, 2])).to.equal(false);
+      expect(jsonEquals(['2', 2], [1, '2'])).to.equal(false);
+    });
+
+    it('should work with objects', () => {
+      expect(jsonEquals({}, {})).to.equal(true);
+      expect(jsonEquals({ a: 1, b: 2 }, { b: 2, a: 1 })).to.equal(true);
+      expect(jsonEquals({ a: 1, b: 2 }, { b: 2, a: 2 })).to.equal(false);
+      expect(jsonEquals({ a: 1, b: 2 }, { a: 1, b: 2, c: 3})).to.equal(false);
+      expect(jsonEquals({ a: 1, b: 2, c: 3 }, { a: 1, b: 2})).to.equal(false);
+    });
+
+    it('should work with nested stuff', () => {
+      expect(
+        jsonEquals(
+          {
+            a: [1, { b: 'foo' }, false]
+          },
+          {
+            a: [1, { b: 'foo' }, false]
+          }
+        )
+      ).to.equal(true)
+
+      expect(
+        jsonEquals(
+          {
+            a: [1, { b: 'foo' }, false]
+          },
+          {
+            a: [1, { b: 'bar' }, false]
+          }
+        )
+      ).to.equal(false)
+
+      expect(
+        jsonEquals(
+          {
+            a: [1, { b: 'foo' }, false]
+          },
+          {
+            a: [1, { b: 'foo' }, true]
+          }
+        )
+      ).to.equal(false)
+
+      expect(
+        jsonEquals(
+          [{
+            a: [1, { b: 'foo' }, false]
+          }, 1],
+          [{
+            a: [1, { b: 'foo' }, false]
+          }, 1]
+        )
+      ).to.equal(true)
+
+      expect(
+        jsonEquals(
+          [{
+            a: [1, { b: 'foo' }, false]
+          }, 1],
+          [{
+            a: ['1', { b: 'foo' }, false]
+          }, 1]
+        )
+      ).to.equal(false)
+    })
   });
 });

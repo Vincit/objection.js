@@ -211,6 +211,17 @@ module.exports = session => {
         }, Promise.resolve());
       });
 
+      if (session.isPostgres()) {
+        it('returning', () => {
+          return Person.query(knex)
+            .insert({ firstName: 'Arto' })
+            .returning('*')
+            .then(res => {
+              expect(res).to.containSubset({ firstName: 'Arto', parentId: null });
+            });
+        });
+      }
+
       it('$relatedQuery', () => {
         return Person.query(knex)
           .findOne({ firstName: 'Seppo' })

@@ -1025,13 +1025,13 @@ module.exports = session => {
       const builder = modelClass.query();
       const models = modelClass.ensureModelArray(graphIn, { skipValidation: true });
       rawGraphOptions = Object.assign({}, rawGraphOptions, { insertMissing: true });
+      const graphOptions = new GraphOptions(rawGraphOptions);
+      const graph = assignDbRefsAsRelateProps(ModelGraph.create(modelClass, models));
 
-      return GraphInsert.fetchCurrentGraph({ builder, obj: models })
+      return GraphInsert.fetchCurrentGraph({ builder, graph, graphOptions })
         .then(currentGraph => {
           numExecutedQueries = 0;
 
-          const graphOptions = new GraphOptions(rawGraphOptions);
-          const graph = assignDbRefsAsRelateProps(ModelGraph.create(modelClass, models));
           const graphInsert = new GraphInsert({ graph, currentGraph, graphOptions });
           const actions = graphInsert.createActions();
           let promise = Promise.resolve();

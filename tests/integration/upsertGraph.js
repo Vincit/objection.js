@@ -2,6 +2,7 @@ const expect = require('expect.js');
 const chai = require('chai');
 const Promise = require('bluebird');
 const { raw, transaction, ValidationError } = require('../../');
+const { FetchStrategy } = require('../../lib/queryBuilder/graph/GraphOptions');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
 module.exports = session => {
@@ -9,7 +10,9 @@ module.exports = session => {
   const Model2 = session.unboundModels.Model2;
   const NONEXISTENT_ID = 1000;
 
-  describe('upsertGraph', () => {
+  for (const fetchStrategy of Object.keys(FetchStrategy)) {
+
+  describe(`upsertGraph (fetchStrategy: ${fetchStrategy})`, () => {
     let population;
 
     beforeEach(() => {
@@ -153,7 +156,7 @@ module.exports = session => {
 
             return (
               Model1.query(trx)
-                .upsertGraph(upsert)
+                .upsertGraph(upsert, { fetchStrategy })
                 .modify(builder => {
                   if (passthroughMethodCall) {
                     builder[passthroughMethodCall]();
@@ -177,26 +180,70 @@ module.exports = session => {
                   expect(sql.length).to.equal(12);
 
                   if (session.isPostgres()) {
-                    chai
-                      .expect(sql)
-                      .to.containSubset([
-                        'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc' +
+                    if (fetchStrategy === FetchStrategy.OnlyIdentifiers) {
+                      chai
+                        .expect(sql)
+                        .to.containSubset([
+                          'select "Model1"."id", "Model1"."model1Id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc' +
+                            passthroughMethodCallSql[passthroughMethodCall],
+                          'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                          'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
+                          'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
+
+                          'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
+                          'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
+
+                          'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                          'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
+                          'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
+
+                          'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
+                          'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)',
+                          'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
+                        ]);
+                    } else if (fetchStrategy === FetchStrategy.Everything) {
+                      chai
+                        .expect(sql)
+                        .to.containSubset([
+                          'select "Model1".* from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc' +
+                            passthroughMethodCallSql[passthroughMethodCall],
+                          'select "Model1".* from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                          'select "model2".* from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
+                          'select "Model1".*, "Model1Model2"."extra3" as "aliasedExtra", "Model1Model2"."model2Id" as "objectiontmpjoin0" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
+
+                          'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
+                          'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
+
+                          'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                          'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
+                          'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
+
+                          'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
+                          'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)',
+                          'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
+                        ]);
+                    } else if (fetchStrategy === FetchStrategy.OnlyNeeded) {
+                      chai
+                        .expect(sql)
+                        .to.containSubset([
+                          'select "Model1"."id", "Model1"."model1Id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc' +
                           passthroughMethodCallSql[passthroughMethodCall],
-                        'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
-                        'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
-                        'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
+                          'select "Model1"."id", "Model1"."model1Prop1" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                          'select "model2"."model1_id", "model2"."id_col", "model2"."model2_prop1" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
+                          'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id", "Model1"."model1Prop1" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
 
-                        'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
-                        'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
+                          'delete from "model2" where "model2"."id_col" in (2) and "model2"."model1_id" in (2)',
+                          'delete from "Model1" where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc)',
 
-                        'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
-                        'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
-                        'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
+                          'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                          'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
+                          'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1) returning "model1Id"',
 
-                        'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
-                        'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)',
-                        'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
-                      ]);
+                          'update "Model1" set "model1Prop1" = \'updated belongsToOne\' where "Model1"."id" = 3 and "Model1"."id" in (3)',
+                          'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = \'4\' order by "Model1"."id" asc)',
+                          'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
+                        ]);
+                    }
                   }
 
                   expect(result.$beforeUpdateCalled).to.equal(undefined);
@@ -339,6 +386,7 @@ module.exports = session => {
       return transaction(session.knex, trx => {
         return Model1.query(trx)
           .upsertGraph(upsert, {
+            fetchStrategy,
             noUpdate: ['model1Relation1'],
             noDelete: ['model1Relation2'],
             noInsert: ['model1Relation2.model2Relation1']
@@ -429,7 +477,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, { relate: true })
+          .upsertGraph(upsert, { relate: true, fetchStrategy })
           .then(result => {
             expect(result.$beforeUpdateCalled).to.equal(1);
             expect(result.$afterUpdateCalled).to.equal(1);
@@ -451,7 +499,7 @@ module.exports = session => {
         model1Relation1: {}
       };
 
-      return transaction(session.knex, trx => Model1.query(trx).upsertGraph(upsert))
+      return transaction(session.knex, trx => Model1.query(trx).upsertGraph(upsert, { fetchStrategy }))
         .then(inserted =>
           Model1.query(session.knex)
             .findById(inserted.id)
@@ -474,7 +522,7 @@ module.exports = session => {
         model1Relation1Inverse: {}
       };
 
-      return transaction(session.knex, trx => Model1.query(trx).upsertGraph(upsert))
+      return transaction(session.knex, trx => Model1.query(trx).upsertGraph(upsert, { fetchStrategy }))
         .then(inserted =>
           Model1.query(session.knex)
             .findById(inserted.id)
@@ -503,7 +551,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, { relate: true })
+          .upsertGraph(upsert, { relate: true, fetchStrategy })
           .then(result => {
             expect(result.$beforeUpdateCalled).to.equal(1);
             expect(result.$afterUpdateCalled).to.equal(1);
@@ -532,7 +580,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert)
+          .upsertGraph(upsert, { fetchStrategy })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -581,7 +629,7 @@ module.exports = session => {
         ]
       };
       return transaction(session.knex, trx => {
-        return Model1.query(trx).upsertGraphAndFetch(upsert);
+        return Model1.query(trx).upsertGraphAndFetch(upsert, { fetchStrategy });
       }).then(upserted => {
         return Model1.query(session.knex)
           .eager('[model1Relation1, model1Relation2.model2Relation1]')
@@ -647,7 +695,7 @@ module.exports = session => {
 
         return (
           Model1.query(trx)
-            .upsertGraph(upsert, { unrelate: true, relate: true })
+            .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
             // Sort all result by id to make the SQL we test below consistent.
             .mergeContext({
               onBuild(builder) {
@@ -670,25 +718,27 @@ module.exports = session => {
               if (session.isPostgres()) {
                 expect(sql.length).to.equal(12);
 
-                chai
-                  .expect(sql)
-                  .to.containSubset([
-                    'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc',
-                    'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
-                    'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
-                    'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
+                if (fetchStrategy === FetchStrategy.OnlyIdentifiers) {
+                  chai
+                    .expect(sql)
+                    .to.containSubset([
+                      'select "Model1"."id", "Model1"."model1Id" from "Model1" where "Model1"."id" in (2) order by "Model1"."id" asc',
+                      'select "Model1"."id" from "Model1" where "Model1"."id" in (3) order by "Model1"."id" asc',
+                      'select "model2"."model1_id", "model2"."id_col" from "model2" where "model2"."model1_id" in (2) order by "model2"."id_col" asc',
+                      'select "Model1Model2"."model2Id" as "objectiontmpjoin0", "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1, 2) order by "Model1"."id" asc',
 
-                    'delete from "Model1Model2" where "Model1Model2"."model1Id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc) and "Model1Model2"."model2Id" = 1',
-                    'update "model2" set "model1_id" = NULL where "model2"."id_col" in (2) and "model2"."model1_id" = 2',
+                      'delete from "Model1Model2" where "Model1Model2"."model1Id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" in (5) order by "Model1"."id" asc) and "Model1Model2"."model2Id" = 1',
+                      'update "model2" set "model1_id" = NULL where "model2"."id_col" in (2) and "model2"."model1_id" = 2',
 
-                    'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
-                    'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
-                    'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
+                      'insert into "Model1" ("model1Prop1") values (\'inserted manyToMany\') returning "id"',
+                      'insert into "model2" ("model1_id", "model2_prop1") values (2, \'inserted hasMany\') returning "id_col"',
+                      'insert into "Model1Model2" ("model1Id", "model2Id") values (8, 1), (6, 1) returning "model1Id"',
 
-                    'update "Model1" set "model1Prop1" = \'updated root 2\', "model1Id" = NULL where "Model1"."id" = 2',
-                    'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = 4 order by "Model1"."id" asc)',
-                    'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
-                  ]);
+                      'update "Model1" set "model1Prop1" = \'updated root 2\', "model1Id" = NULL where "Model1"."id" = 2',
+                      'update "Model1" set "model1Prop1" = \'updated manyToMany 1\' where "Model1"."id" in (select "Model1"."id" from "Model1" inner join "Model1Model2" on "Model1"."id" = "Model1Model2"."model1Id" where "Model1Model2"."model2Id" in (1) and "Model1"."id" = 4 order by "Model1"."id" asc)',
+                      'update "model2" set "model2_prop1" = \'updated hasMany 1\' where "model2"."id_col" = 1'
+                    ]);
+                }
               }
 
               // Fetch the graph from the database.
@@ -793,7 +843,7 @@ module.exports = session => {
       };
 
       return BoundModel1.query()
-        .upsertGraph(upsert, { relate: true })
+        .upsertGraph(upsert, { relate: true, fetchStrategy })
         .then(() => {
           return BoundModel1.query()
             .findById(1)
@@ -849,7 +899,7 @@ module.exports = session => {
       };
 
       return BoundModel1.query()
-        .upsertGraph(upsert)
+        .upsertGraph(upsert, { fetchStrategy })
         .then(() => {
           return BoundModel1.query()
             .findById(1)
@@ -923,7 +973,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, { unrelate: true, relate: true })
+          .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
           .then(result => {
             expect(result.model1Relation2[0].model2Relation1[2].$beforeUpdateCalled).to.equal(1);
 
@@ -994,7 +1044,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, { unrelate: true, relate: true })
+          .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1048,7 +1098,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(parent, { unrelate: true, relate: true })
+          .upsertGraph(parent, { unrelate: true, relate: true, fetchStrategy })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1127,6 +1177,7 @@ module.exports = session => {
       return transaction(session.knex, trx => {
         return Model1.query(trx)
           .upsertGraph(upsert, {
+            fetchStrategy,
             unrelate: true,
             relate: true,
             noUnrelate: ['model1Relation2'],
@@ -1269,6 +1320,7 @@ module.exports = session => {
       return transaction(session.knex, trx => {
         return Model1.query(trx)
           .upsertGraph(upsert, {
+            fetchStrategy,
             unrelate: ['model1Relation1', 'model1Relation2.model2Relation1'],
             relate: ['model1Relation2.model2Relation1']
           })
@@ -1353,7 +1405,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, { relate: true, unrelate: true })
+          .upsertGraph(upsert, { relate: true, unrelate: true, fetchStrategy })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1384,7 +1436,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert, { relate: true, unrelate: true })
+          .upsertGraph(upsert, { relate: true, unrelate: true, fetchStrategy })
           .then(result => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1419,8 +1471,8 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert)
-          .then(result => {
+          .upsertGraph(upsert, { fetchStrategy })
+          .then(() => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
@@ -1462,7 +1514,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert)
+          .upsertGraph(upsert, { fetchStrategy })
           .then(() => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1501,7 +1553,7 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert)
+          .upsertGraph(upsert, { fetchStrategy })
           .then(() => {
             // Fetch the graph from the database.
             return Model1.query(trx)
@@ -1540,6 +1592,7 @@ module.exports = session => {
       };
 
       const options = {
+        fetchStrategy,
         unrelate: true,
         relate: true
       };
@@ -1556,15 +1609,19 @@ module.exports = session => {
         return Model1.query(trx)
           .upsertGraph(upsert, options)
           .then(() => {
-            expect(sql.length).to.equal(3);
+            if (fetchStrategy === FetchStrategy.OnlyIdentifiers) {
+              expect(sql.length).to.equal(3);
+            }
 
             if (session.isPostgres()) {
-              chai.expect(sql).to.containSubset([
-                'select "Model1"."model1Id", "Model1"."id" from "Model1" where "Model1"."id" in (2)',
-                'select "Model1"."id" from "Model1" where "Model1"."id" in (3)',
-                // There should only be one `model1Id` update here. If you see two, something is broken.
-                'update "Model1" set "model1Id" = 4 where "Model1"."id" = 2'
-              ]);
+              if (fetchStrategy === FetchStrategy.OnlyIdentifiers) {
+                chai.expect(sql).to.containSubset([
+                  'select "Model1"."id", "Model1"."model1Id" from "Model1" where "Model1"."id" in (2)',
+                  'select "Model1"."id" from "Model1" where "Model1"."id" in (3)',
+                  // There should only be one `model1Id` update here. If you see two, something is broken.
+                  'update "Model1" set "model1Id" = 4 where "Model1"."id" = 2'
+                ]);
+              }
             }
 
             // Fetch the graph from the database.
@@ -1612,6 +1669,7 @@ module.exports = session => {
 
       return Model1.query(session.knex)
         .upsertGraph(upsert, {
+          fetchStrategy,
           noUpdate: ['model1Relation1']
         })
         .then(() => {
@@ -1654,6 +1712,7 @@ module.exports = session => {
 
       return Model1.query(session.knex)
         .upsertGraph(upsert, {
+          fetchStrategy,
           noUpdate: ['model1Relation1'],
           relate: ['model1Relation1.model1Relation1']
         })
@@ -1706,11 +1765,13 @@ module.exports = session => {
 
       return Model1.query(session.knex)
         .upsertGraph(upsert1, {
+          fetchStrategy,
           noUpdate: ['model1Relation1'],
           relate: ['model1Relation1.model1Relation1']
         })
         .then(() => {
           return Model1.query(session.knex).upsertGraph(upsert2, {
+            fetchStrategy,
             noUpdate: ['model1Relation1'],
             unrelate: ['model1Relation1.model1Relation1']
           });
@@ -1772,7 +1833,7 @@ module.exports = session => {
       };
 
       return transaction(session.knex, trx => {
-        return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
+        return Model1.query(trx).upsertGraph(upsert, { insertMissing: true, fetchStrategy });
       })
         .then(() => {
           // Fetch the graph from the database.
@@ -1830,7 +1891,7 @@ module.exports = session => {
 
       const upsertAndCompare = () => {
         return transaction(session.knex, trx => {
-          return Model1.query(trx).upsertGraph(upsert, { insertMissing: true });
+          return Model1.query(trx).upsertGraph(upsert, { insertMissing: true, fetchStrategy });
         })
           .then(result => {
             // Fetch the graph from the database.
@@ -1871,7 +1932,7 @@ module.exports = session => {
       };
 
       transaction(session.knex, trx => {
-        return Model1.query(trx).upsertGraph(upsert);
+        return Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
       })
         .then(() => {
           done(new Error('should not get here'));
@@ -1906,7 +1967,7 @@ module.exports = session => {
       };
 
       transaction(session.knex, trx => {
-        return Model1.query(trx).upsertGraph(upsert);
+        return Model1.query(trx).upsertGraph(upsert, { fetchStrategy });
       })
         .then(() => {
           done(new Error('should not get here'));
@@ -1976,14 +2037,14 @@ module.exports = session => {
 
       // This should fail.
       return Model1.query(session.knex)
-        .upsertGraph(upsert, { unrelate: true, relate: true })
+        .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
         .allowUpsert('[model1Relation1, model1Relation2]')
         .catch(err => {
           errors.push(err);
 
           // This should also fail.
           return Model1.query(session.knex)
-            .upsertGraph(upsert, { unrelate: true, relate: true })
+            .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
             .allowUpsert('[model1Relation2.model2Relation1]');
         })
         .catch(err => {
@@ -1991,7 +2052,7 @@ module.exports = session => {
 
           // This should succeed.
           return Model1.query(session.knex)
-            .upsertGraph(upsert, { unrelate: true, relate: true })
+            .upsertGraph(upsert, { unrelate: true, relate: true, fetchStrategy })
             .allowUpsert('[model1Relation1, model1Relation2.model2Relation1]');
         })
         .then(() => {
@@ -2126,8 +2187,8 @@ module.exports = session => {
 
       return transaction(session.knex, trx => {
         return Model1.query(trx)
-          .upsertGraph(upsert)
-          .then(result => {
+          .upsertGraph(upsert, { fetchStrategy })
+          .then(() => {
             // Fetch the graph from the database.
             return Model1.query(trx)
               .findById(2)
@@ -2198,7 +2259,7 @@ module.exports = session => {
       };
 
       return Model1.query(session.knex)
-        .upsertGraph(upsert)
+        .upsertGraph(upsert, { fetchStrategy })
         .then(() => {
           return Model1.query(session.knex)
             .findById(2)
@@ -2223,7 +2284,7 @@ module.exports = session => {
       let findQueryCount = 0;
 
       return Model1.query(session.knex)
-        .upsertGraph(upsert)
+        .upsertGraph(upsert, { fetchStrategy })
         .context({
           runBefore(_, builder) {
             if (builder.isFind() && builder.isExecutable()) {
@@ -2264,6 +2325,8 @@ module.exports = session => {
         .upsertGraph({
           id: 1,
           model1Relation1: 'not an object'
+        }, {
+          fetchStrategy
         })
         .then(() => {
           throw new Error('should not get here');
@@ -2284,6 +2347,8 @@ module.exports = session => {
         .upsertGraph({
           id: 1,
           model1Relation2: ['not an object']
+        }, {
+          fetchStrategy
         })
         .then(() => {
           throw new Error('should not get here');
@@ -2297,6 +2362,140 @@ module.exports = session => {
         })
         .catch(done);
     });
+
+    if (fetchStrategy !== FetchStrategy.OnlyIdentifiers) {
+      describe('fetchStrategy != OnlyIdentifiers', () => {
+        it('should fetch all properties and avoid useless update operations if fetchStrategy != OnlyIdentifiers', () => {
+          // This is exactly the current graph, except for the couple of commented changes.
+          const graph = {
+            id: 2,
+            model1Id: 3,
+            model1Prop1: 'root 2',
+
+            model1Relation1: {
+              id: 3,
+              model1Id: null,
+              model1Prop1: 'belongsToOne'
+            },
+
+            model1Relation2: [
+              {
+                idCol: 1,
+                model1Id: 2,
+                model2Prop1: 'hasMany 1',
+
+                model2Relation1: [
+                  {
+                    id: 4,
+                    model1Id: null,
+                    model1Prop1: 'manyToMany 1'
+                  },
+                  {
+                    id: 5,
+                    model1Id: null,
+                    model1Prop1: 'manyToMany 2',
+                    aliasedExtra: null
+                  }
+                ],
+
+                // This should get inserted.
+                model2Relation3: [
+                  {
+                    model3Prop1: 'hello',
+                    model3JsonProp: {
+                      foo: 'heps',
+                      bar: [
+                        {
+                          spam: true
+                        },
+                        {
+                          spam: false
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                idCol: 2,
+                model1Id: 2,
+                model2Prop1: 'hasMany 2',
+
+                model2Relation1: [
+                  // This should get updated.
+                  {
+                    id: 6,
+                    model1Id: null,
+                    model1Prop1: 'manyToMany 33'
+                  },
+                  {
+                    id: 7,
+                    model1Id: null,
+                    model1Prop1: 'manyToMany 4'
+                  }
+                ]
+              }
+            ]
+          };
+
+          return transaction(session.knex, trx => {
+            let sql = [];
+
+            // Wrap the transaction to catch the executed sql.
+            trx = mockKnexFactory(trx, function(mock, oldImpl, args) {
+              sql.push(this.toString());
+              return oldImpl.apply(this, args);
+            });
+
+            return Model1.query(trx)
+              .upsertGraph(graph, {
+                fetchStrategy
+              })
+              .then(() => {
+                // There should only be the selects, one update and a m2m insert.
+                // 5 selects, 1 update, 2 inserts (row and pivot row).
+                expect(sql.length).to.equal(8)
+
+                return Model1.query(trx).findById(2).eager({
+                  model1Relation1: true,
+                  model1Relation2: {
+                    model2Relation1: true,
+                    model2Relation3: true
+                  }
+                })
+              })
+              .then(fetchedGraph => {
+                sql = []
+                return Model1.query(trx).upsertGraph(fetchedGraph, { fetchStrategy });
+              })
+              .then(() => {
+                // There should only be the selects since we patched using
+                // the current state.
+                expect(sql.length).to.equal(5)
+
+                return Model1.query(trx).findById(2).eager({
+                  model1Relation1: true,
+                  model1Relation2: {
+                    model2Relation1: true,
+                    model2Relation3: true
+                  }
+                })
+                .then(fetchedGraph => {
+                  sql = []
+                  const model2 = fetchedGraph.model1Relation2.find(it => it.model2Relation3.length > 0);
+                  const model3 = model2.model2Relation3[0]
+                  model3.model3JsonProp.bar[1].spam = true
+                  return Model1.query(trx).upsertGraph(fetchedGraph, { fetchStrategy });
+                })
+                .then(() => {
+                  // There should only be the selects and the json field update.
+                  expect(sql.length).to.equal(6)
+                });
+              });
+            });
+        });
+      })
+    }
 
     describe('relate with children => upsertGraph recursively called', () => {
       beforeEach(() => {
@@ -2397,7 +2596,7 @@ module.exports = session => {
 
         return transaction(session.knex, trx => {
           return Model1.query(trx)
-            .upsertGraph(upsert, { relate: true, unrelate: true })
+            .upsertGraph(upsert, { relate: true, unrelate: true, fetchStrategy })
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
@@ -2421,7 +2620,7 @@ module.exports = session => {
                       idCol: 2,
                       model1Id: null,
                       model2Prop1: 'manyToMany 2',
-                      model2Relation3: [{ id: 1, model3Prop1: 'model3Prop1 1' }]
+                      model2Relation3: [{ id: 1, model3Prop1: 'model3Prop1 1', model3JsonProp: null }]
                     }
                   ]
                 },
@@ -2459,7 +2658,7 @@ module.exports = session => {
 
         return transaction(session.knex, trx => {
           return Model1.query(trx)
-            .upsertGraph(upsert, { relate: true, unrelate: true })
+            .upsertGraph(upsert, { relate: true, unrelate: true, fetchStrategy })
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
@@ -2525,7 +2724,7 @@ module.exports = session => {
 
         return transaction(session.knex, trx => {
           return Model1.query(trx)
-            .upsertGraph(upsert, { relate: true, unrelate: true })
+            .upsertGraph(upsert, { relate: true, unrelate: true, fetchStrategy })
             .then(() => {
               return Model1.query(trx)
                 .findById(2)
@@ -2582,6 +2781,7 @@ module.exports = session => {
         return transaction(session.knex, trx => {
           return Model1.query(trx)
             .upsertGraph(upsert, {
+              fetchStrategy,
               relate: ['model1Relation3', 'model1Relation3.model2Relation3'],
               noUnrelate: ['model1Relation3.model2Relation3'],
               noDelete: ['model1Relation3.model2Relation3']
@@ -2610,17 +2810,20 @@ module.exports = session => {
                       // Existing, but not removed
                       {
                         id: 1,
-                        model3Prop1: 'model3Prop1 1'
+                        model3Prop1: 'model3Prop1 1',
+                        model3JsonProp: null
                       },
                       // Related
                       {
                         id: 2,
-                        model3Prop1: 'model3Prop1 2'
+                        model3Prop1: 'model3Prop1 2',
+                        model3JsonProp: null
                       },
                       // Existing, but not removed
                       {
                         id: 3,
-                        model3Prop1: 'model3Prop1 3'
+                        model3Prop1: 'model3Prop1 3',
+                        model3JsonProp: null
                       }
                     ]
                   }
@@ -2806,7 +3009,7 @@ module.exports = session => {
         ];
 
         return Promise.map(fails, fail => {
-          return transaction(session.knex, trx => Model1.query(trx).upsertGraph(fail)).reflect();
+          return transaction(session.knex, trx => Model1.query(trx).upsertGraph(fail, { fetchStrategy })).reflect();
         })
           .then(results => {
             // Check that all transactions have failed because of a validation error.
@@ -2828,7 +3031,7 @@ module.exports = session => {
 
             return transaction(session.knex, trx => {
               return Model1.query(trx)
-                .upsertGraph(success)
+                .upsertGraph(success, { fetchStrategy })
                 .then(() => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)
@@ -2922,7 +3125,8 @@ module.exports = session => {
 
         const options = {
           // Insert missing from the root.
-          insertMissing: ['']
+          insertMissing: [''],
+          fetchStrategy
         };
 
         return Model1.query(session.knex)
@@ -2997,7 +3201,8 @@ module.exports = session => {
 
         const options = {
           // Insert missing from the root.
-          insertMissing: ['']
+          insertMissing: [''],
+          fetchStrategy
         };
 
         return Model1.query(session.knex)
@@ -3072,7 +3277,8 @@ module.exports = session => {
 
         const options = {
           // Insert missing from the root.
-          insertMissing: ['']
+          insertMissing: [''],
+          fetchStrategy
         };
 
         Model1.query(session.knex)
@@ -3154,7 +3360,7 @@ module.exports = session => {
 
         return Promise.map(fails, fail => {
           return transaction(session.knex, trx =>
-            Model1.query(trx).upsertGraph(fail, { update: true })
+            Model1.query(trx).upsertGraph(fail, { update: true, fetchStrategy })
           ).reflect();
         })
           .then(results => {
@@ -3169,7 +3375,7 @@ module.exports = session => {
           .then(() => {
             return transaction(session.knex, trx => {
               return Model1.query(trx)
-                .upsertGraph(success, { update: true })
+                .upsertGraph(success, { update: true, fetchStrategy })
                 .then(result => {
                   // Fetch the graph from the database.
                   return Model1.query(trx)
@@ -3210,7 +3416,7 @@ module.exports = session => {
 
         Model1.bindKnex(session.knex)
           .query()
-          .upsertGraph(upsert)
+          .upsertGraph(upsert, { fetchStrategy })
           .then(() => {
             done(new Error('should not get here'));
           })
@@ -3244,7 +3450,7 @@ module.exports = session => {
 
         return Model1.bindKnex(session.knex)
           .query()
-          .upsertGraph(upsert)
+          .upsertGraph(upsert, { fetchStrategy })
           .then(() => {
             return Model1.query(session.knex)
               .findById(2)
@@ -3296,7 +3502,7 @@ module.exports = session => {
 
         return transaction(session.knex, trx => {
           return Model2.query(trx)
-            .upsertGraph(upsert)
+            .upsertGraph(upsert, { fetchStrategy })
             .then(result => {
               expect(result.model2Relation1[2].aliasedExtra).to.equal('foo');
             });
@@ -3331,7 +3537,7 @@ module.exports = session => {
 
         return transaction(session.knex, trx => {
           return Model2.query(trx)
-            .upsertGraph(upsert, { relate: true })
+            .upsertGraph(upsert, { relate: true, fetchStrategy })
             .then(result => {
               expect(result.model2Relation1[0].id).to.equal(5);
               expect(result.model2Relation1[0].aliasedExtra).to.equal('foo');
@@ -3366,7 +3572,7 @@ module.exports = session => {
 
         return transaction(session.knex, trx => {
           return Model2.query(trx)
-            .upsertGraph(upsert)
+            .upsertGraph(upsert, { fetchStrategy })
             .then(result => {
               expect(result.model2Relation1[0].aliasedExtra).to.equal('hello extra 1');
               expect(result.model2Relation1[1].aliasedExtra).to.equal('hello extra 2');
@@ -3434,6 +3640,7 @@ module.exports = session => {
 
           return Model1.query(session.knex)
             .upsertGraph(upsert, {
+              fetchStrategy,
               relate: ['model1Relation2.model2Relation1.model1Relation1']
             })
             .returning('*')
@@ -3441,12 +3648,11 @@ module.exports = session => {
               chai.expect(result).to.containSubset({
                 id: 2,
                 model1Id: 3,
-                $afterGetCalled: 2,
+                $afterGetCalled: 1,
 
                 model1Relation1: {
                   id: 3,
                   model1Prop1: 'updated belongsToOne',
-                  $afterGetCalled: 1,
                   $beforeUpdateCalled: 1,
                   $beforeUpdateOptions: { patch: true },
                   $afterUpdateCalled: 1,
@@ -3466,7 +3672,6 @@ module.exports = session => {
                         model1Prop1: 'updated manyToMany 1',
                         model1Relation1: { id: 1 },
                         model1Id: 1,
-                        $afterGetCalled: 1,
                         $beforeUpdateCalled: 1,
                         $beforeUpdateOptions: { patch: true },
                         $afterUpdateCalled: 1,
@@ -3485,7 +3690,6 @@ module.exports = session => {
                     ],
 
                     model1Id: 2,
-                    $afterGetCalled: 1,
                     $beforeUpdateCalled: 1,
                     $beforeUpdateOptions: { patch: true },
                     $afterUpdateCalled: 1,
@@ -3508,6 +3712,7 @@ module.exports = session => {
       });
     }
   });
+}
 
   function omitIrrelevantProps(model) {
     const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
