@@ -137,6 +137,8 @@ to you. knex has a great <a href="http://knexjs.org/#Migrations">migration tool<
 out the <a href="https://github.com/Vincit/objection.js/tree/master/examples/express-es6">example project</a>.</li>
 </ul>
 
+<p>Check out <a href="https://github.com/Vincit/objection.js/issues/1069">this issue</a> to see who is using objection and what they think about it.</p>
+
 <h1 id="installation">Installation</h1>
 <pre class="highlight shell"><code>npm install knex objection
 </code></pre>
@@ -3299,11 +3301,15 @@ helps build literals of different types.</p>
 <h3 id="objection-lodash">lodash</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">lodash</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
+<p><strong>DEPRECATED! Will be removed in 2.0</strong></p>
+
 <p><a href="https://lodash.com/">Lodash utility library</a> used internally by objection.</p>
 
 <h3 id="objection-promise">Promise</h3>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Promise</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 </code></pre>
+<p><strong>DEPRECATED! Will be removed in 2.0</strong></p>
+
 <p><a href="http://bluebirdjs.com/docs/getting-started.html">Bluebird promise library</a> used internally by objection.</p>
 
 <h3 id="objection-knexsnakecasemappers">knexSnakeCaseMappers</h3>
@@ -9680,6 +9686,35 @@ as single database rows.</p>
 <p>If this property is left unset all properties declared as objects or arrays in the
 <a href="#jsonschema"><code class="prettyprint">jsonSchema</code></a> are implicitly added to this list.</p>
 
+<h4 id="cloneobjectattributes">cloneObjectAttributes</h4>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">get</span> <span class="nx">cloneObjectAttributes</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+<blockquote>
+<p>ESNext:</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="kr">class</span> <span class="nx">Person</span> <span class="kr">extends</span> <span class="nx">Model</span> <span class="p">{</span>
+  <span class="kr">static</span> <span class="nx">cloneObjectAttributes</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+<p>If true (the default) object attributes (for example jsonb columns) are cloned when
+<code class="prettyprint">$toDatabaseJson</code>, <code class="prettyprint">$toJson</code> or <code class="prettyprint">toJSON</code> is called. If this is set to false, they are
+not cloned. Note that nested <code class="prettyprint">Model</code> instances inside relations etc. are still effectively
+cloned, because <code class="prettyprint">$toJson</code> is called for them recursively, but their jsonb columns, again,
+are not :)</p>
+
+<p>Usually you don&rsquo;t need to care about this setting, but if you have large object fields
+(for example large objects in jsonb columns) cloning the data can become slow and play
+a significant part in your server&rsquo;s performance. There&rsquo;s rarely a need to to clone this
+data, but since it has historically been copied, we cannot change the default behaviour
+easily.</p>
+
+<p>TLDR; Set this setting to <code class="prettyprint">false</code> if you have large jsonb columns and you see that
+cloning that data takes a significant amount of time <strong>when you profile the code</strong>.</p>
+
 <h4 id="columnnamemappers">columnNameMappers</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="p">{</span> <span class="nx">Model</span><span class="p">,</span> <span class="nx">snakeCaseMappers</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span>
 
@@ -11174,6 +11209,7 @@ called explicitly when needed.</p>
 <h4 id="tojson">$toJson</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">$toJson</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">virtuals</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">onlySomeVirtuals</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">({</span><span class="na">virtuals</span><span class="p">:</span> <span class="p">[</span><span class="s1">'fullName'</span><span class="p">]});</span>
 </code></pre>
 <p>Exports this model as a JSON object.</p>
 
@@ -11210,6 +11246,7 @@ called explicitly when needed.</p>
 <h4 id="tojson">toJSON</h4>
 <pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">jsonObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">(</span><span class="nx">opt</span><span class="p">);</span>
 </code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">shallowObj</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">({</span><span class="na">shallow</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">virtuals</span><span class="p">:</span> <span class="kc">true</span><span class="p">});</span>
+</code></pre><pre class="highlight javascript"><code><span class="kr">const</span> <span class="nx">onlySomeVirtuals</span> <span class="o">=</span> <span class="nx">modelInstance</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">({</span><span class="na">virtuals</span><span class="p">:</span> <span class="p">[</span><span class="s1">'fullName'</span><span class="p">]});</span>
 </code></pre>
 <p>Exports this model as a JSON object.</p>
 
@@ -13127,8 +13164,8 @@ from the outside world, like model instances (or POJOs), relation expressions ob
 </tr>
 <tr>
 <td>virtuals</td>
-<td>boolean</td>
-<td>If false, virtual attributes are omitted from the output. Default is true.</td>
+<td>boolean&#124;string[]</td>
+<td>If false, virtual attributes are omitted from the output. Default is true. You can also pass an array of property names and only those virtual properties get picked. You can even pass in property/function names that are not included in the static <code class="prettyprint">virtualAttributes</code> array.</td>
 </tr>
 </tbody></table>
 
@@ -13604,6 +13641,12 @@ more information about the query. Some edge cases, like using <code class="prett
 inside a <code class="prettyprint">joinEager</code> modifier won&rsquo;t work unless you use this method.</p>
 
           <h1 id="changelog">Changelog</h1>
+
+<h2 id="1-6-3">1.6.3</h2>
+
+<ul>
+<li>Fixes: <a href="https://github.com/Vincit/objection.js/issues/1227">#1227</a></li>
+</ul>
 
 <h2 id="1-6-2">1.6.2</h2>
 
