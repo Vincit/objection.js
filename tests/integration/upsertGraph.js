@@ -1503,12 +1503,10 @@ module.exports = session => {
                 }
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
-                  // Row 3 should be deleted.
-                  expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
-                }
-              );
+              return Promise.all([trx('Model1'), trx('model2')]).spread(model1Rows => {
+                // Row 3 should be deleted.
+                expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
+              });
             });
         });
       });
