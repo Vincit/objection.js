@@ -339,8 +339,8 @@ describe('utils', () => {
       expect(jsonEquals({}, {})).to.equal(true);
       expect(jsonEquals({ a: 1, b: 2 }, { b: 2, a: 1 })).to.equal(true);
       expect(jsonEquals({ a: 1, b: 2 }, { b: 2, a: 2 })).to.equal(false);
-      expect(jsonEquals({ a: 1, b: 2 }, { a: 1, b: 2, c: 3})).to.equal(false);
-      expect(jsonEquals({ a: 1, b: 2, c: 3 }, { a: 1, b: 2})).to.equal(false);
+      expect(jsonEquals({ a: 1, b: 2 }, { a: 1, b: 2, c: 3 })).to.equal(false);
+      expect(jsonEquals({ a: 1, b: 2, c: 3 }, { a: 1, b: 2 })).to.equal(false);
     });
 
     it('should work with nested stuff', () => {
@@ -353,7 +353,7 @@ describe('utils', () => {
             a: [1, { b: 'foo' }, false]
           }
         )
-      ).to.equal(true)
+      ).to.equal(true);
 
       expect(
         jsonEquals(
@@ -364,7 +364,7 @@ describe('utils', () => {
             a: [1, { b: 'bar' }, false]
           }
         )
-      ).to.equal(false)
+      ).to.equal(false);
 
       expect(
         jsonEquals(
@@ -375,29 +375,41 @@ describe('utils', () => {
             a: [1, { b: 'foo' }, true]
           }
         )
-      ).to.equal(false)
+      ).to.equal(false);
 
       expect(
         jsonEquals(
-          [{
-            a: [1, { b: 'foo' }, false]
-          }, 1],
-          [{
-            a: [1, { b: 'foo' }, false]
-          }, 1]
+          [
+            {
+              a: [1, { b: 'foo' }, false]
+            },
+            1
+          ],
+          [
+            {
+              a: [1, { b: 'foo' }, false]
+            },
+            1
+          ]
         )
-      ).to.equal(true)
+      ).to.equal(true);
 
       expect(
         jsonEquals(
-          [{
-            a: [1, { b: 'foo' }, false]
-          }, 1],
-          [{
-            a: ['1', { b: 'foo' }, false]
-          }, 1]
+          [
+            {
+              a: [1, { b: 'foo' }, false]
+            },
+            1
+          ],
+          [
+            {
+              a: ['1', { b: 'foo' }, false]
+            },
+            1
+          ]
         )
-      ).to.equal(false)
-    })
+      ).to.equal(false);
+    });
   });
 });
