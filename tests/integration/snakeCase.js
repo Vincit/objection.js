@@ -1,5 +1,4 @@
 const { Model, snakeCaseMappers } = require('../../');
-const sortBy = require('lodash/sortBy');
 const Promise = require('bluebird');
 const expect = require('chai').expect;
 
@@ -14,9 +13,13 @@ module.exports = session => {
         return snakeCaseMappers();
       }
 
+      static get jsonAttributes() {
+        return ['address'];
+      }
+
       static get relationMappings() {
         return {
-          parent: {
+          parentPerson: {
             relation: Model.BelongsToOneRelation,
             modelClass: Person,
             join: {
@@ -80,6 +83,10 @@ module.exports = session => {
           table.increments('id').primary();
           table.string('first_name');
           table.integer('parent_id');
+
+          if (session.isPostgres()) {
+            table.jsonb('person_address');
+          }
         })
         .createTable('animal', table => {
           table.increments('id').primary();
@@ -98,15 +105,33 @@ module.exports = session => {
 
     describe('queries', () => {
       beforeEach(() => {
+        function maybeWithAddress(obj, address) {
+          if (session.isPostgres()) {
+            obj.personAddress = address;
+          }
+
+          return obj;
+        }
+
         return Person.query(session.knex).insertGraph({
           firstName: 'Seppo',
 
-          parent: {
+          parentPerson: {
             firstName: 'Teppo',
 
-            parent: {
-              firstName: 'Matti'
-            }
+            parentPerson: maybeWithAddress(
+              {
+                firstName: 'Matti'
+              },
+              {
+                personCity: 'Jalasjärvi',
+
+                cityCoordinates: {
+                  latitudeCoordinate: 61,
+                  longitudeCoordinate: 23
+                }
+              }
+            )
           },
 
           pets: [
@@ -153,14 +178,51 @@ module.exports = session => {
           });
       });
 
+      it('joinRelation', () => {
+        return Person.query(session.knex)
+          .joinRelation('parentPerson.parentPerson')
+          .select('parentPerson:parentPerson.first_name as nestedRef')
+          .then(result => {
+            expect(result).to.eql([{ nestedRef: 'Matti' }]);
+          });
+      });
+
+      if (session.isPostgres()) {
+        it('update with json references', () => {
+          return Person.query(session.knex)
+            .where('first_name', 'Matti')
+            .patch({
+              'person_address:cityCoordinates.latitudeCoordinate': 30
+            })
+            .returning('*')
+            .then(result => {
+              expect(result).to.containSubset([
+                {
+                  firstName: 'Matti',
+                  parentId: null,
+                  personAddress: {
+                    personCity: 'Jalasjärvi',
+                    cityCoordinates: {
+                      latitudeCoordinate: 30,
+                      longitudeCoordinate: 23
+                    }
+                  }
+                }
+              ]);
+            });
+        });
+      }
+
       [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm].forEach(
         eagerAlgo => {
-          it(`eager (${eagerAlgo.name})`, () => {
+          it(`eager (${eagerAlgo})`, () => {
             return Person.query(session.knex)
               .select('person.first_name as rootFirstName')
-              .modifyEager('parent', qb => qb.select('first_name as parentFirstName'))
-              .modifyEager('parent.parent', qb => qb.select('first_name as grandParentFirstName'))
-              .eager('[parent.parent, pets, movies]')
+              .modifyEager('parentPerson', qb => qb.select('first_name as parentFirstName'))
+              .modifyEager('parentPerson.parentPerson', qb =>
+                qb.select('first_name as grandParentFirstName')
+              )
+              .eager('[parentPerson.parentPerson, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
               .orderBy('person.first_name')
               .then(people => {
@@ -169,10 +231,10 @@ module.exports = session => {
                   {
                     rootFirstName: 'Seppo',
 
-                    parent: {
+                    parentPerson: {
                       parentFirstName: 'Teppo',
 
-                      parent: {
+                      parentPerson: {
                         grandParentFirstName: 'Matti'
                       }
                     },
@@ -198,7 +260,7 @@ module.exports = session => {
                   {
                     rootFirstName: 'Teppo',
 
-                    parent: {
+                    parentPerson: {
                       parentFirstName: 'Matti'
                     }
                   },
@@ -237,7 +299,7 @@ module.exports = session => {
 
       static get relationMappings() {
         return {
-          parent: {
+          parentPerson: {
             relation: Model.BelongsToOneRelation,
             modelClass: Person,
             join: {
@@ -330,10 +392,10 @@ module.exports = session => {
         return Person.query(session.knex).insertGraph({
           firstName: 'Seppo',
 
-          parent: {
+          parentPerson: {
             firstName: 'Teppo',
 
-            parent: {
+            parentPerson: {
               firstName: 'Matti'
             }
           },
@@ -384,14 +446,14 @@ module.exports = session => {
 
       [Model.WhereInEagerAlgorithm, Model.JoinEagerAlgorithm, Model.NaiveEagerAlgorithm].forEach(
         eagerAlgo => {
-          it(`eager (${eagerAlgo.name})`, () => {
+          it(`eager (${eagerAlgo})`, () => {
             return Person.query(session.knex)
               .select('PERSON.FIRST_NAME as rootFirstName')
-              .modifyEager('parent', qb => qb.select('FIRST_NAME as parentFirstName'))
-              .modifyEager('parent.parent', qb =>
+              .modifyEager('parentPerson', qb => qb.select('FIRST_NAME as parentFirstName'))
+              .modifyEager('parentPerson.parentPerson', qb =>
                 qb.select('FIRST_NAME as GRAND_PARENT_FIRST_NAME')
               )
-              .eager('[parent.parent, pets, movies]')
+              .eager('[parentPerson.parentPerson, pets, movies]')
               .eagerAlgorithm(eagerAlgo)
               .orderBy('PERSON.FIRST_NAME')
               .then(people => {
@@ -400,10 +462,10 @@ module.exports = session => {
                   {
                     rootFirstName: 'Seppo',
 
-                    parent: {
+                    parentPerson: {
                       parentFirstName: 'Teppo',
 
-                      parent: {
+                      parentPerson: {
                         grandParentFirstName: 'Matti'
                       }
                     },
@@ -429,7 +491,7 @@ module.exports = session => {
                   {
                     rootFirstName: 'Teppo',
 
-                    parent: {
+                    parentPerson: {
                       parentFirstName: 'Matti'
                     }
                   },
