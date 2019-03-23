@@ -253,7 +253,7 @@ module.exports = session => {
           .joinRelation('parentPerson.parentPerson')
           .select('parentPerson:parentPerson.firstName as nestedRef')
           .then(result => {
-            expect(result).to.eql([{ nestedRef: 'Matti' }]);
+            expect(result).to.containSubset([{ nestedRef: 'Matti' }]);
           });
       });
 
