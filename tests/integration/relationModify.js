@@ -292,7 +292,7 @@ module.exports = session => {
               // The filter should not affect inserts.
               return arnold
                 .$relatedQuery('pets')
-                .context(modifyBelongsToOne(qb => qb.where('name', 'None of the pets')))
+                .context(modifyHasMany(qb => qb.where('name', 'None of the pets')))
                 .insert({ name: 'Cat' });
             })
             .then(findArnold)

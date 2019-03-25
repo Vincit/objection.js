@@ -85,6 +85,7 @@ describe('integration tests', () => {
       require('./knexIdentifierMapping')(session);
       require('./graph/GraphInsert')(session);
       require('./relationModify')(session);
+      require('./nonPrimaryKeyRelations')(session);
 
       if (session.isPostgres()) {
         require('./jsonQueries')(session);
