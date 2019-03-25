@@ -26,7 +26,7 @@ module.exports = options => {
     // If your plugin extends the QueryBuilder, you need to extend `Model.QueryBuilder`
     // since it may have already been extended by other plugins.
     class SessionQueryBuilder extends Model.QueryBuilder {
-      // A custom method that stores a session object to the query context. In this example
+      // Add a custom method that stores a session object to the query context. In this example
       // plugin a session represents the logged-in user as in passport.js session.
       session(session) {
         // Save the session to the query context so that it will be available in all

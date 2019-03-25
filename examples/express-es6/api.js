@@ -33,33 +33,6 @@ module.exports = router => {
     res.send(person);
   });
 
-  // Patch a person and upsert its relations.
-  router.patch('/persons/:id/upsert', async (req, res) => {
-    const graph = req.body;
-
-    // Make sure only one person was sent.
-    if (Array.isArray(graph)) {
-      throw createStatusCodeError(400);
-    }
-
-    // Make sure the person has the correct id because `upsertGraph` uses the id fields
-    // to determine which models need to be updated and which inserted.
-    graph.id = parseInt(req.params.id, 10);
-
-    // It's a good idea to wrap `upsertGraph` call in a transaction since it
-    // may create multiple queries.
-    const upsertedGraph = await transaction(Person.knex(), trx => {
-      return (
-        Person.query(trx)
-          // For security reasons, limit the relations that can be upserted.
-          .allowUpsert('[pets, children.[pets, movies], movies, parent]')
-          .upsertGraph(graph)
-      );
-    });
-
-    res.send(upsertedGraph);
-  });
-
   // Get multiple Persons. The result can be filtered using query parameters
   // `minAge`, `maxAge` and `firstName`. Relations can be fetched eagerly
   // by giving a relation expression as the `eager` query parameter.
@@ -176,6 +149,33 @@ module.exports = router => {
 
     const actors = await movie.$relatedQuery('actors');
     res.send(actors);
+  });
+
+  // Patch a person and upsert its relations.
+  router.patch('/persons/:id/upsert', async (req, res) => {
+    const graph = req.body;
+
+    // Make sure only one person was sent.
+    if (Array.isArray(graph)) {
+      throw createStatusCodeError(400);
+    }
+
+    // Make sure the person has the correct id because `upsertGraph` uses the id fields
+    // to determine which models need to be updated and which inserted.
+    graph.id = parseInt(req.params.id, 10);
+
+    // It's a good idea to wrap `upsertGraph` call in a transaction since it
+    // may create multiple queries.
+    const upsertedGraph = await transaction(Person.knex(), trx => {
+      return (
+        Person.query(trx)
+          // For security reasons, limit the relations that can be upserted.
+          .allowUpsert('[pets, children.[pets, movies], movies, parent]')
+          .upsertGraph(graph)
+      );
+    });
+
+    res.send(upsertedGraph);
   });
 };
 
