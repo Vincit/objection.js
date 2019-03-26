@@ -35,6 +35,7 @@ module.exports = session => {
             join: {
               from: 'person.name',
               through: {
+                modelClass: PersonMovie,
                 from: 'personMovie.personName',
                 to: 'personMovie.movieName'
               },
@@ -60,6 +61,14 @@ module.exports = session => {
     class PersonMovie extends Model {
       static get tableName() {
         return 'personMovie';
+      }
+
+      static get idColumn() {
+        return ['personName', 'movieName'];
+      }
+
+      static uniqueTag() {
+        return 'personMovie_nonPrimaryKeys';
       }
     }
 
