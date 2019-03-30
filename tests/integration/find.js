@@ -389,7 +389,7 @@ module.exports = session => {
                 Model2.query()
                   .select('id_col')
                   .where('model2_prop2', 20)
-                  .build()
+                  .toKnexQuery()
               )
             )
             .then(models => {
@@ -420,7 +420,7 @@ module.exports = session => {
                 Model2.query()
                   .select('id_col')
                   .where('model2_prop2', 20)
-                  .build()
+                  .toKnexQuery()
               ])
             )
             .then(models => {
@@ -1016,7 +1016,7 @@ module.exports = session => {
           it('timeout should throw a TimeOutError', done => {
             const knexQuery = Model1.query()
               .timeout(50)
-              .build();
+              .toKnexQuery();
 
             // Now the tricky part. We add `pg_sleep` as another source table so that the query
             // takes a long time.

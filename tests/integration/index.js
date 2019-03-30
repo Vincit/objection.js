@@ -86,6 +86,7 @@ describe('integration tests', () => {
       require('./graph/GraphInsert')(session);
       require('./relationModify')(session);
       require('./nonPrimaryKeyRelations')(session);
+      require('./staticHooks')(session);
 
       if (session.isPostgres()) {
         require('./jsonQueries')(session);
