@@ -9,17 +9,34 @@ module.exports = {
     nav: [
       {
         text: 'Guide',
-        link: '/guide/installation'
+        link: '/guide/'
       },
 
       {
         text: 'API Reference',
-        link: '/api/'
+        items: [
+          {
+            text: 'Main Module',
+            link: '/api/objection/'
+          },
+          {
+            text: 'Model',
+            link: '/api/model/'
+          },
+          {
+            text: 'Query Builder',
+            link: '/api/query-builder/'
+          },
+          {
+            text: 'Types',
+            link: '/api/types/'
+          }
+        ]
       },
 
       {
         text: 'Recipe Book',
-        link: '/recipes/raw-queries'
+        link: '/recipes/'
       }
     ],
 
@@ -43,11 +60,26 @@ module.exports = {
         }
       ],
 
-      '/api/': [
+      '/api/model/': [
         {
-          title: 'API Reference',
+          title: 'Model API Reference',
           collapsable: false,
-          children: ['objection', 'model', 'query-builder', 'types']
+          children: ['overview', 'static-properties', 'static-methods', 'instance-methods']
+        }
+      ],
+
+      '/api/objection/': [
+        {
+          title: 'Objection API Reference',
+          collapsable: false
+        }
+      ],
+
+      '/api/query-builder/': [
+        {
+          title: 'Query Builder API Reference',
+          collapsable: false,
+          children: ['static-methods', 'instance-methods']
         }
       ],
 

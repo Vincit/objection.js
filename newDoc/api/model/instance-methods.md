@@ -1,0 +1,5 @@
+# Instance Methods
+
+## $query()
+
+Hello

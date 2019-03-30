@@ -1,4 +1,4 @@
-# `class` QueryBuilder
+# Instance Methods
 
 ## insert()
 
@@ -8,33 +8,33 @@ const builder = queryBuilder.insert(modelsOrObjects);
 
 Creates an insert query.
 
-The inserted objects are validated against the model's [jsonSchema](/api/model.html#static-jsonschema). If validation fails
+The inserted objects are validated against the model's [jsonSchema](/api/model/static-properties.html#static-jsonschema). If validation fails
 the Promise is rejected with a [ValidationError](/api/objection.html#objection-validationerror).
 
 NOTE: The return value of the insert query _only_ contains the properties given to the insert
 method plus the identifier. This is because we don't make an additional fetch query after
-the insert. Using postgres you can chain [returning('*')](/api/query-builder.html#returning) to the query to get all
-properties - see [this recipe](/recipes/postgresql-quot-returning-quot-tricks.html) for some examples. If you use
+the insert. Using postgres you can chain [returning('*')](/api/query-builder/instance-methods.html#returning) to the query to get all
+properties - see [this recipe](/recipes/returning-tricks.html) for some examples. If you use
 `returning(['only', 'some', 'props'])` note that the result object will still contain the input properies
-__plus__ the properties listed in `returning`. On other databases you can use the [insertAndFetch](/api/query-builder.html#insertandfetch) method.
+__plus__ the properties listed in `returning`. On other databases you can use the [insertAndFetch](/api/query-builder/instance-methods.html#insertandfetch) method.
 
 Batch inserts only work on Postgres because Postgres is the only database engine
 that returns the identifiers of _all_ inserted rows. knex supports batch inserts on
 other databases also, but you only get the id of the first (or last) inserted object
 as a result. If you need batch insert on other databases you can use knex directly
-through [knexQuery](/api/model.html#static-knexquery).
+through [knexQuery](/api/model/static-methods.html#static-knexquery).
 
 #### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modelsOrObjects|Object&#124;[Model](/api/model.html)&#124;Object[]&#124;[Model](/api/model.html)[];|Objects to insert
+modelsOrObjects|Object&#124;[Model](/api/model/)&#124;Object[]&#124;[Model](/api/model/)[];|Objects to insert
 
 #### Return value
 
 Type|Description
 ----|-----------------------------
-[QueryBuilder](/api/query-builder.html)|`this` query builder for chaining.
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
 
 #### Examples
 
@@ -73,7 +73,7 @@ await Person
   });
 ```
 
-Fields marked as `extras` for many-to-many relations in [`relationMappings`](/api/model.html#static-relationmappings) are automatically
+Fields marked as `extras` for many-to-many relations in [relationMappings](/api/model/static-properties.html#static-relationmappings) are automatically
 written to the join table instead of the target table. The `someExtra` field in the following example is written
 to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
 

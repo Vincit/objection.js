@@ -1,6 +1,6 @@
 # Relations
 
-We already went through how to create relationships (aka. relations, associations) in the [models](/guide/models.html) section's examples but here's a list of all the available relation types in a nicely searchable place. See [this](/api/types.html#type-relationmapping) API doc section for full documentation of the relation mapping parameters.
+We already went through how to create relationships (aka. relations, associations) in the [models](/guide/models.html) section's examples but here's a list of all the available relation types in a nicely searchable place. See [this](/api/types/#type-relationmapping) API doc section for full documentation of the relation mapping parameters.
 
 Relationships are a very basic concept in relational databases and if you aren't familiar with it, you should spend some time googling it first. Basically there are three ways to create a relationship between two tables `A` and `B`:
 
@@ -16,7 +16,7 @@ Relationships are a very basic concept in relational databases and if you aren't
 
 While relations are usually created between the primary key of one table and a foreign key reference of another table, objection has no such limitations. You can create relationship using any two columns (or any sets of columns). You can even create relation using values nested deep inside json columns.
 
-If you've used other ORMs you may notice that objection's [relationMappings](/api/model.html#static-relationmappings) are pretty verbose. There are couple of reasons for that:
+If you've used other ORMs you may notice that objection's [relationMappings](/api/model/static-properties.html#static-relationmappings) are pretty verbose. There are couple of reasons for that:
 
 1. For a new user, this style underlines what is happening, and which columns and tables are involved.
 

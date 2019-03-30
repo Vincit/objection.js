@@ -1,6 +1,6 @@
 # Custom query builder
 
-You can extend the [QueryBuilder](/api/query-builder.html) returned by [query()](/api/model.html#static-query), [$relatedQuery()](/api/model.html#relatedquery) and [$query()](/api/model.html#query) methods (and all other methods that create a [QueryBuilder](/api/query-builder.html)) by setting the model class's static [QueryBuilder](/api/model.html#static-querybuilder) property.
+You can extend the [QueryBuilder](/api/query-builder/) returned by [query()](/api/model/static-methods.html#static-query), [$relatedQuery()](/api/model/instance-methods.html#relatedquery) and [$query()](/api/model/instance-methods.html#query) methods (and all other methods that create a [QueryBuilder](/api/query-builder/)) by setting the model class's static [QueryBuilder](/api/model/static-methods.html#static-querybuilder) property.
 
 ```js
 // MyQueryBuilder.js
@@ -33,7 +33,7 @@ Now you can do this:
 await Person.query().upsert(person);
 ```
 
-If you want to set the custom query builder for all model classes you can just set the [QueryBuilder](/api/model.html#static-querybuilder) property of the [Model](/api/model.html) base class. A cleaner option would be to create your own Model subclass, set its [QueryBuilder](/api/query-builder.html) property and inherit all your models from the custom Model class.
+If you want to set the custom query builder for all model classes you can just set the [QueryBuilder](/api/model/static-methods.html#static-querybuilder) property of the [Model](/api/model/) base class. A cleaner option would be to create your own Model subclass, set its [QueryBuilder](/api/query-builder/) property and inherit all your models from the custom Model class.
 
 
 ```js
@@ -53,7 +53,7 @@ const { BaseModel } = require('./BaseModel');
 class Person extends BaseModel {}
 ```
 
-Whenever a [QueryBuilder](/api/query-builder.html) instance is created it is done by calling the static [query()](/api/model.html#static-query) method. If you don't need to add methods, but simply modify the query, you can override the [query()](/api/model.html#static-query).
+Whenever a [QueryBuilder](/api/query-builder/) instance is created it is done by calling the static [query()](/api/model/static-methods.html#static-query) method. If you don't need to add methods, but simply modify the query, you can override the [query()](/api/model/static-methods.html#static-query).
 
 ```js
 class BaseModel extends Model {

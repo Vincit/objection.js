@@ -1,6 +1,6 @@
 # Precedence and parentheses
 
-You can add parentheses to queries by passing a function to any of the the [where*](/api/query-builder.html#where) methods.
+You can add parentheses to queries by passing a function to any of the the [where*](/api/query-builder/instance-methods.html#where) methods.
 
 ```js
 await Person

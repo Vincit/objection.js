@@ -1,10 +1,10 @@
 # Custom validation
 
-If you want to use the json schema validation but add some custom validation on top of it you can override the [$beforeValidate](/api/model.html#beforevalidate) or [$afterValidate](/api/model.html#aftervalidate) method.
+If you want to use the json schema validation but add some custom validation on top of it you can override the [$beforeValidate](/api/model/instance-methods.html#beforevalidate) or [$afterValidate](/api/model/instance-methods.html#aftervalidate) method.
 
-If you need to do validation on insert or update you can throw exceptions from the [$beforeInsert](/api/model.html#beforeinsert) and [$beforeUpdate](/api/model.html#beforeupdate) methods.
+If you need to do validation on insert or update you can throw exceptions from the [$beforeInsert](/api/model/instance-methods.html#beforeinsert) and [$beforeUpdate](/api/model/instance-methods.html#beforeupdate) methods.
 
-If you don't want to use the built-in json schema validation, you can just ignore the [jsonSchema](/api/model.html#jsonschema) property. It is completely optional. If you want to use some other validation library you need to implement a custom [Validator](/api/types.html#class-validator) (see the example).
+If you don't want to use the built-in json schema validation, you can just ignore the [jsonSchema](/api/model/instance-methods.html#jsonschema) property. It is completely optional. If you want to use some other validation library you need to implement a custom [Validator](/api/types.html#class-validator) (see the example).
 
 ## Examples
 

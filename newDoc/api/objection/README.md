@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # `module` objection
 
 ```js
@@ -13,7 +17,7 @@ The objection module is what you get when you import objection. It has a bunch o
 const { Model } = require('objection');
 ```
 
-[The model class](/api/model.html)
+[The model class](/api/model/)
 
 ## transaction
 
@@ -28,9 +32,9 @@ const { transaction } = require('objection');
 const { ref } = require('objection');
 ```
 
-Factory function that returns a [ReferenceBuilder](/api/types.html#referencebuilder) instance, that makes it easier to refer to tables, columns, json attributes etc. [ReferenceBuilder](/api/types.html#referencebuilder) can also be used to type cast and alias the references.
+Factory function that returns a [ReferenceBuilder](/api/types/#class-referencebuilder) instance, that makes it easier to refer to tables, columns, json attributes etc. [ReferenceBuilder](/api/types/#class-referencebuilder) can also be used to type cast and alias the references.
 
-See [FieldExpression](/api/types.html#fieldexpression) for more information about how to refer to json fields.
+See [FieldExpression](/api/types/#type-fieldexpression) for more information about how to refer to json fields.
 
 #### Examples
 
@@ -58,7 +62,7 @@ await Model.query()
 const { raw } = require('objection');
 ```
 
-Factory function that returns a [RawBuilder](/api/types.html#rawbuilder) instance. [RawBuilder](/api/types.html#rawbuilder) is a wrapper for knex raw method that doesn't depend on knex. Instances of [RawBuilder](/api/types.html#rawbuilder) are converted to knex raw instances lazily when the query is executed.
+Factory function that returns a [RawBuilder](/api/types/#class-rawbuilder) instance. [RawBuilder](/api/types/#class-rawbuilder) is a wrapper for knex raw method that doesn't depend on knex. Instances of [RawBuilder](/api/types/#class-rawbuilder) are converted to knex raw instances lazily when the query is executed.
 
 #### Examples
 
@@ -125,7 +129,7 @@ await Person
 const { lit } = require('objection')
 ```
 
-Factory function that returns a [LiteralBuilder](/api/types.html#literalbuilder) instance. [LiteralBuilder](/api/types.html#literalbuilder) helps build literals of different types.
+Factory function that returns a [LiteralBuilder](/api/types/#class-literalbuilder) instance. [LiteralBuilder](/api/types/#class-literalbuilder) helps build literals of different types.
 
 #### Examples
 
@@ -308,7 +312,7 @@ const knex = Knex(Object.assign({
 const { knexIdentifierMapping } = require('objection');
 ```
 
-Like [knexSnakeCaseMappers](#nexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
+Like [knexSnakeCaseMappers](#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
 
 #### Examples
 

@@ -1,8 +1,8 @@
 # Validation
 
-[JSON schema](http://json-schema.org/) validation can be enabled by setting the [jsonSchema](/api/model.html#static-jsonschema) property of a model class. The validation is ran each time a [Model](/api/model.html) instance is created.
+[JSON schema](http://json-schema.org/) validation can be enabled by setting the [jsonSchema](/api/model/static-properties.html#static-jsonschema) property of a model class. The validation is ran each time a [Model](/api/model/) instance is created.
 
-You rarely need to call [$validate](/api/model.html#validate) method explicitly, but you can do it when needed. If validation fails a [ValidationError](/api/types.html#type-validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of [ValidationError](/api/types.html#type-validationerror).
+You rarely need to call [$validate](/api/model/instance-methods.html#validate) method explicitly, but you can do it when needed. If validation fails a [ValidationError](/api/types/#class-validationerror) will be thrown. Since we use Promises, this usually means that a promise will be rejected with an instance of [ValidationError](/api/types/#class-validationerror).
 
 See [the recipe book](/recipes/custom-validation.html) for instructions if you want to use some other validation library.
 
@@ -46,7 +46,7 @@ try {
 }
 ```
 
-Error parameters returned by [ValidationError](/api/types.html#type-validationerror) could be used to provide custom error messages:
+Error parameters returned by [ValidationError](/api/types/#class-validationerror) could be used to provide custom error messages:
 
 ```js
 try {

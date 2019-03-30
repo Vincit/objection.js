@@ -18,7 +18,8 @@
     "perf-opt": "mocha --slow 60000 --timeout 60000 --reporter spec --recursive perf --trace_opt --trace_deopt",
     "prettier": "prettier --write \"{examples,lib,tests,typings}/**/*.{js,ts}\"",
     "eslint": "eslint --format codeframe \"examples/**/*.js\" \"lib/**/*.js\" \"tests/**/*.js\"",
-    "docs:dev": "vuepress dev newDoc"
+    "docs:dev": "vuepress dev newDoc",
+    "docs:build": "vuepress build newDoc"
   },
   "publishConfig": {
     "tag": "next"
@@ -88,7 +89,7 @@
     "prettier": "1.13.6",
     "sqlite3": "^4.0.0",
     "typescript": "^3.3.3",
-    "vuepress": "^0.14.10",
+    "vuepress": "next",
     "webpack-dev-middleware": "3.6.0"
   },
   "nyc": {

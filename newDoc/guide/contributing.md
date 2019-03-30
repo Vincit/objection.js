@@ -30,7 +30,7 @@ For a pull request to get merged it needs to have the following things:
 
 2. **Clone objection**
 
-```shell
+```sh
 git clone git@github.com:<your-account>/objection.js.git objection
 ```
 
@@ -38,7 +38,7 @@ git clone git@github.com:<your-account>/objection.js.git objection
 
 4. **Create test users and databases**
 
-```shell
+```sh
 psql -U postgres -c "CREATE USER objection SUPERUSER"
 psql -U postgres -c "CREATE DATABASE objection_test"
 mysql -u root -e "CREATE USER objection"
@@ -52,7 +52,7 @@ mysql -u root -e "CREATE DATABASE objection_test"
 
 You can run the tests on a subset of databases by setting the `DATABASES` env variable
 
-```shell
+```sh
 # Only run tests on sqlite. No need for postgres and mysql setup.
 DATABASES=sqlite3 npm test
 ```

@@ -1,6 +1,6 @@
 # PostgreSQL "returning" tricks
 
-Because PostgreSQL (and some others) support [returning('*')](/api/query-builder.html#returning) chaining, you can actually `insert` a row, or `update` / `patch` / `delete` existing rows, __and__ receive the affected rows as Model instances in a single query, thus improving efficiency. See the examples for more clarity.
+Because PostgreSQL (and some others) support [returning('*')](/api/query-builder/instance-methods.html#returning) chaining, you can actually `insert` a row, or `update` / `patch` / `delete` existing rows, __and__ receive the affected rows as Model instances in a single query, thus improving efficiency. See the examples for more clarity.
 
 # Examples
 

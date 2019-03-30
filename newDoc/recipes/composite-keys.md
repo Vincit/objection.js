@@ -4,15 +4,15 @@ Composite (compound) keys are fully supported. Just give an array of columns whe
 
 Here's a list of methods that may help working with composite keys:
 
- * [whereComposite](/api/query-builder.html#wherecomposite)
- * [whereInComposite](/api/query-builder.html#whereincomposite)
- * [findById](/api/query-builder.html#findbyid)
- * [findByIds](/api/query-builder.html#findbyids)
- * [deleteById](/api/query-builder.html#deletebyid)
- * [updateAndFetchById](/api/query-builder.html#updateandfetchbyid)
- * [patchAndFetchById](/api/query-builder.html#patchandfetchbyid)
- * [$id](/api/model.html#id)
- * [$values](/api/model.html#values)
+ * [whereComposite](/api/query-builder/instance-methods.html#wherecomposite)
+ * [whereInComposite](/api/query-builder/instance-methods.html#whereincomposite)
+ * [findById](/api/query-builder/instance-methods.html#findbyid)
+ * [findByIds](/api/query-builder/instance-methods.html#findbyids)
+ * [deleteById](/api/query-builder/instance-methods.html#deletebyid)
+ * [updateAndFetchById](/api/query-builder/instance-methods.html#updateandfetchbyid)
+ * [patchAndFetchById](/api/query-builder/instance-methods.html#patchandfetchbyid)
+ * [$id](/api/model/instance-methods.html#id)
+ * [$values](/api/model/instance-methods.html#values)
 
 ## Examples
 
@@ -57,7 +57,7 @@ class Person extends Model {
 };
 ```
 
-[findById](/api/query-builder.html#findbyid):
+[findById](/api/query-builder/instance-methods.html#findbyid):
 
 ```js
 await Person
@@ -66,7 +66,7 @@ await Person
 ```
 
 
-[whereComposite](/api/query-builder.html#wherecomposite):
+[whereComposite](/api/query-builder/instance-methods.html#wherecomposite):
 
 ```js
 await Person
@@ -74,7 +74,7 @@ await Person
   .whereComposite(['foo', 'bar'], [1, 'barValue']);
 ```
 
-[whereInComposite](/api/query-builder.html#whereincomposite):
+[whereInComposite](/api/query-builder/instance-methods.html#whereincomposite):
 
 ```js
 await Person

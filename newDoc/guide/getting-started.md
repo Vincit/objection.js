@@ -1,6 +1,6 @@
 # Getting started
 
-To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the created object to objection.js using [Model.knex(knex)](/api/model.html#static-knex). Doing this installs the knex instance globally for all models (even the ones that have not been created yet). If you need to use multiple databases check out our [multi-tenancy recipe](/recipes/multitenancy-using-multiple-databases.html).
+To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the created object to objection.js using [Model.knex(knex)](/api/model/static-methods.html#static-knex). Doing this installs the knex instance globally for all models (even the ones that have not been created yet). If you need to use multiple databases check out our [multi-tenancy recipe](/recipes/multitenancy-using-multiple-databases.html).
 
 The next step is to create some migrations and models and start using objection.js. The best way to get started is to
 check out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6). The `express`
@@ -18,7 +18,7 @@ npm start
 
 We also have an [ESNext version of the example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) that uses [Babel](https://babeljs.io/) for ESNext --> ES2015 transpiling and a [typescript version](https://github.com/Vincit/objection.js/tree/master/examples/express-ts).
 
-Also check out our [API reference](/api/) and [recipe book](/recipes/raw-queries.html).
+Also check out our [API reference](/api/query-builder/) and [recipe book](/recipes/raw-queries.html).
 
 If installing the example project seems like too much work, here is a simple standalone example. Just copy this into a file and run it:
 

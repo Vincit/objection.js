@@ -1,6 +1,6 @@
 # Paging
 
-Most of the queriescan be paged using the [page](/api/query-builder.html#page) or [range](/api/query-builder.html#range) method.
+Most of the queriescan be paged using the [page](/api/query-builder/instance-methods.html#page) or [range](/api/query-builder/instance-methods.html#range) method.
 
 ```js
 const result = await Person
@@ -12,9 +12,9 @@ console.log(result.results.length); // --> 100
 console.log(result.total); // --> 3341
 ```
 
-There are some cases where [page](/api/query-builder.html#page) and [range](/api/query-builder.html#range) don't work.
+There are some cases where [page](/api/query-builder/instance-methods.html#page) and [range](/api/query-builder/instance-methods.html#range) don't work.
 
-1. In [modifyEager](/api/query-builder.html#modifyeager) or named filters:
+1. In [modifyEager](/api/query-builder/instance-methods.html#modifyeager) or named filters:
 
 ```js
 // This doesn't work because the query `qb` fetches the

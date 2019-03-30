@@ -4,7 +4,7 @@ Transactions are atomic and isolated units of work in relational databases. If y
 
 ## Creating a transaction
 
-In objection, a transaction can be started by calling the [objection.transaction](/api/objection.html#transaction) function:
+In objection, a transaction can be started by calling the [objection.transaction](/api/objection/#transaction) function:
 
 ```js
 const { transaction } = require('objection');
@@ -23,7 +23,7 @@ try {
 }
 ```
 
-You need to pass a knex instance as the first argument. If you don't have a knex instance otherwise available you can always access it through any [Model](/api/model.html) using [Model.knex()](/api/model.html#static-knex) provided that you have installed the knex instance globally using [Model.knex(knex)](/api/model.html#static-knex) at some point.
+You need to pass a knex instance as the first argument. If you don't have a knex instance otherwise available you can always access it through any [Model](/api/model/) using [Model.knex()](/api/model/static-methods.html#static-knex) provided that you have installed the knex instance globally using [Model.knex(knex)](/api/model/static-methods.html#static-knex) at some point.
 
 The second argument is a callback that gets called with the transaction object as an argument once the transaction has been successfully started. The transaction object is actually just a [knex transaction object](http://knexjs.org/#Transactions) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function.
 
@@ -56,7 +56,7 @@ After you have created a transaction, you need to tell objection which queries s
 
 ### Passing around a transaction object
 
-The most straight forwared way to use a transaction is to explicitly give it to each query you start. [query](/api/model.html#static-query), [$query](/api/model.html#query) and [$relatedQuery](/api/model.html#relatedquery) accept a transaction as their last argument.
+The most straight forwared way to use a transaction is to explicitly give it to each query you start. [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query) and [$relatedQuery](/api/model/instance-methods.html#relatedquery) accept a transaction as their last argument.
 
 ```js
 const { transaction } = require('objection');
@@ -83,7 +83,7 @@ try {
 }
 ```
 
-Note that you can pass either a normal knex instance or a transaction to [query](/api/model.html#static-query), [$relatedQuery](/api/model.html#relatedquery) etc. allowing you to build helper functions and services that can be used with or without a transaction. When a transaction is not wanted, just pass in the normal knex instance (or nothing at all if you have installed the knex object globally using [Model.knex(knex)](/api/model.html#static-knex)):
+Note that you can pass either a normal knex instance or a transaction to [query](/api/model/static-methods.html#static-query), [$relatedQuery](/api/model/instance-methods.html#relatedquery) etc. allowing you to build helper functions and services that can be used with or without a transaction. When a transaction is not wanted, just pass in the normal knex instance (or nothing at all if you have installed the knex object globally using [Model.knex(knex)](/api/model/static-methods.html#static-knex)):
 
 ```js
 // `db` can be either a transaction or a knex instance or even
@@ -120,7 +120,7 @@ await insertPersonAndPet(person, pet);
 
 ### Binding models to a transaction
 
-The second way to use transactions avoids passing around a transaction object by "binding" model classes to a transaction. You pass all models you want to bind as arguments to the [objection.transaction](/api/objection.html#transaction) method and as the last argument you provide a callback that receives __copies__ of the models that have been bound to a newly started transaction. All queries started through the bound copies take part in the transaction and you don't need to pass around a transaction object. Note that the models passed to the callback are actual copies of the models passed as arguments to [objection.transaction](/api/objection.html#transaction) and starting a query through any other object will __not__ be executed inside a transaction.
+The second way to use transactions avoids passing around a transaction object by "binding" model classes to a transaction. You pass all models you want to bind as arguments to the [objection.transaction](/api/objection/#transaction) method and as the last argument you provide a callback that receives __copies__ of the models that have been bound to a newly started transaction. All queries started through the bound copies take part in the transaction and you don't need to pass around a transaction object. Note that the models passed to the callback are actual copies of the models passed as arguments to [objection.transaction](/api/objection/#transaction) and starting a query through any other object will __not__ be executed inside a transaction.
 
 ```js
 const { transaction } = require('objection');
@@ -147,7 +147,7 @@ try {
 }
 ```
 
-You only need to give the [objection.transaction](/api/objection.html#transaction) function the model classes you use explicitly. All the related model classes are implicitly bound to the same transaction:
+You only need to give the [objection.transaction](/api/objection/#transaction) function the model classes you use explicitly. All the related model classes are implicitly bound to the same transaction:
 
 ```js
 const { transaction } = require('objection');

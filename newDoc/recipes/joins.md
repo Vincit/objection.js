@@ -11,7 +11,7 @@ const people = await Person
 console.log(people[0].parentName);
 ```
 
-Objection also has helpers like the [joinRelation](/api/query-builder.html#joinrelation) method family:
+Objection also has helpers like the [joinRelation](/api/query-builder/instance-methods.html#joinrelation) method family:
 
 ```js
 const people = await Person

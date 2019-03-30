@@ -1,6 +1,6 @@
 # Subqueries
 
-Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places you would expect. You can also pass [QueryBuilder](/api/query-builder.html) instances or knex queries instead of functions.
+Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places you would expect. You can also pass [QueryBuilder](/api/query-builder/) instances or knex queries instead of functions.
 
 You can use a function:
 
@@ -14,7 +14,7 @@ const peopleOlderThanAverage = await Person
 console.log(peopleOlderThanAverage);
 ```
 
-Or a [QueryBuilder](/api/query-builder.html):
+Or a [QueryBuilder](/api/query-builder/):
 
 ```js
 const peopleOlderThanAverage = await Person
@@ -39,7 +39,7 @@ const peopleWithPetCount = await Person
 console.log(peopleWithPetCount[4].petCount);
 ```
 
-The above query can also be written using the [relatedQuery](/api/model.html#static-relatedquery) (assuming a relation `pets` has been defined for `Person`):
+The above query can also be written using the [relatedQuery](/api/model/static-properties.html#static-relatedquery) (assuming a relation `pets` has been defined for `Person`):
 
 ```js
 

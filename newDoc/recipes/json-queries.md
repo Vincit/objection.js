@@ -1,8 +1,8 @@
 # JSON queries
 
-You can use the [ref](/api/objection.html#ref) function from the main module to refer to json columns in queries. There is also a bunch of query building methods that have `Json` in their names. Check them out too.
+You can use the [ref](/api/objection/#ref) function from the main module to refer to json columns in queries. There is also a bunch of query building methods that have `Json` in their names. Check them out too.
 
-See [FieldExpression](/api/types.html#type-fieldexpression) for more information about how to refer to json fields.
+See [FieldExpression](/api/types/#type-fieldexpression) for more information about how to refer to json fields.
 
 Json queries currently only work with postgres.
 
