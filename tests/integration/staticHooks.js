@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const expect = require('expect.js');
 const { Model } = require('../../');
 
 module.exports = session => {
