@@ -1,18 +1,24 @@
 # Getting started
 
-To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the created object to objection.js using [Model.knex(knex)](/api/model/static-methods.html#static-knex). Doing this installs the knex instance globally for all models (even the ones that have not been created yet). If you need to use multiple databases check out our [multi-tenancy recipe](/recipes/multitenancy-using-multiple-databases.html).
+To use objection.js all you need to do is [initialize knex](http://knexjs.org/#Installation-node) and give the created knex instance to objection.js using [Model.knex(knex)](/api/model/static-methods.html#static-knex). Doing this installs the knex instance globally for all models (even the ones that have not been created yet). If you need to use multiple databases check out our [multi-tenancy recipe](/recipes/multitenancy-using-multiple-databases.html).
 
-The next step is to create some migrations and models and start using objection.js. The best way to get started is to
-check out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6). The `express`
-example project is a simple express server. The `client.js` file contains a bunch of http requests for you to
-start playing with the REST API.
+The next step is to create some migrations and models and start using objection.js. The best way to get started is to check out one of our example projects:
 
-```bash
+* [The minimal example](https://github.com/Vincit/objection.js/tree/master/examples/minimal) contains the bare minimum for you to start testing out things with objection.
+
+```sh
+git clone git@github.com:Vincit/objection.js.git objection
+cd objection/examples/minimal
+npm install
+npm start
+```
+
+* [The express example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6) is a simple [express](https://expressjs.com/) server. The `client.js` file contains a bunch of http requests for you to start playing with the REST API.
+
+```sh
 git clone git@github.com:Vincit/objection.js.git objection
 cd objection/examples/express-es6
-
 npm install
-# Runs migrations and starts the server
 npm start
 ```
 
@@ -38,7 +44,7 @@ const knex = Knex({
   }
 });
 
-// Give the knex object to objection.
+// Give the knex instance to objection.
 Model.knex(knex);
 
 // Person model.
@@ -62,9 +68,13 @@ class Person extends Model {
 }
 
 async function createSchema() {
-  // Create database schema. You should use knex migration files to do this. We
-  // create it here for simplicity.
-  await knex.schema.createTableIfNotExists('persons', table => {
+  if (await knex.schema.hasTable('persons')) {
+    return;
+  }
+
+  // Create database schema. You should use knex migration files
+  // to do this. We create it here for simplicity.
+  await knex.schema.createTable('persons', table => {
     table.increments('id').primary();
     table.integer('parentId').references('persons.id');
     table.string('firstName');
@@ -98,5 +108,11 @@ async function main() {
   console.log('sylvesters:', sylvesters);
 }
 
-createSchema().then(() => main()).catch(console.error);
+createSchema()
+  .then(() => main())
+  .then(() => knex.destroy())
+  .catch(err => {
+    console.error(err);
+    return knex.destroy();
+  });
 ```

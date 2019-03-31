@@ -2,7 +2,7 @@
 
 Subqueries can be written just like in knex: by passing a function in place of a value. A bunch of query building methods accept a function. See the knex.js documentation or just try it out. A function is accepted in most places you would expect. You can also pass [QueryBuilder](/api/query-builder/) instances or knex queries instead of functions.
 
-You can use a function:
+Using a function:
 
 ```js
 const peopleOlderThanAverage = await Person
@@ -14,7 +14,7 @@ const peopleOlderThanAverage = await Person
 console.log(peopleOlderThanAverage);
 ```
 
-Or a [QueryBuilder](/api/query-builder/):
+Using a [QueryBuilder](/api/query-builder/):
 
 ```js
 const peopleOlderThanAverage = await Person

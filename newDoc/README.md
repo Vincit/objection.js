@@ -25,10 +25,15 @@ What objection.js gives you:
 What objection.js **doesn't** give you:
 
  * **A custom query DSL. SQL is used as a query language.**
+  This doesn't mean you have to write SQL strings though. A query builder based on [knex](http://knexjs.org) is
+    used to build the SQL. However, if the query builder fails you for some reason, raw SQL strings can be easily
+    written using the [raw](/api/objection.html#raw) helper function.
  * **Automatic database schema creation and migration from model definitions.**
     For simple things it is useful that the database schema is automatically generated from the model definitions,
     but usually just gets in your way when doing anything non-trivial. Objection.js leaves the schema related things
     to you. knex has a great [migration tool](http://knexjs.org/#Migrations) that we recommend for this job. Check
     out the [example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6).
 
-Objection.js uses Promises and coding practices that make it ready for the future. We use Well known [OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) techniques and ES2015 classes and inheritance in the codebase. You can use things like [async/await](http://jakearchibald.com/2014/es7-async-functions/) using node ">=7.6.0" or alternatively with a transpiler such as [Babel](https://babeljs.io/). Check out our [ES2015](https://github.com/Vincit/objection.js/tree/master/examples/express-es6) and [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) example projects.
+The best way to get started is to clone our [ES2015](https://github.com/Vincit/objection.js/tree/master/examples/express-es6), [ESNext](https://github.com/Vincit/objection.js/tree/master/examples/express-es7) or [typescript](https://github.com/Vincit/objection.js/tree/master/examples/express-ts) example projects.
+
+ Check out [this issue](https://github.com/Vincit/objection.js/issues/1069) to see who is using objection and what they think about it.

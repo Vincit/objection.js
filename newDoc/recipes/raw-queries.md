@@ -1,8 +1,10 @@
 # Raw queries
 
-To mix raw SQL with queries, use the [raw](/api/objection/#raw) function from the main module or the [Model.raw()](/api/model/static-properties.html#static-raw) method of any [Model](/api/model/) subclass. The only difference between these two is that the [raw](/api/objection/#raw) function from the main module doesn't depend on knex where as [Model.raw()](/api/model/static-properties.html#static-raw) will throw if the model doesn't have a knex instance installed. Both of these functions work just like the [knex's raw method](http://knexjs.org/#Raw). And of course you can just use [knex.raw()](http://knexjs.org/#Raw).
+To mix raw SQL with queries, use the [raw](/api/objection/#raw) function from the main module. [raw](/api/objection/#raw) works just like the [knex's raw method](http://knexjs.org/#Raw) but in addition, supports objection queries, [raw](/api/objection/#raw), [ref](/api/objection/#ref), [lit](/api/objection/#lit) and all other objection types. You can also use [knex.raw()](http://knexjs.org/#Raw).
 
-There are also some helper methods such as [whereRaw](/api/query-builder/instance-methods.html#whereraw) in the [QueryBuilder](/api/query-builder/).
+[raw](/api/objection/#raw) is handy when you want to mix SQL in objection queries, but if you want to fire off a completely custom query, you need to use [knex.raw](http://knexjs.org/#Raw).
+
+There are also some helper methods such as [whereRaw](/api/query-builder/instance-methods.html#whereraw) and [selectRaw](/api/query-builder/instance-methods.html#selectraw) in the [QueryBuilder](/api/query-builder/instance-methods.html).
 
 ## Examples
 
@@ -49,6 +51,13 @@ const childAgeSums = await Person
   .select(raw('array(?) as childIds', [
     Person.query()
       .select('id')
-      .where('id', ref('p.parentId')).
+      .where('id', ref('p.parentId'))
   ]);
+```
+
+Completely custom raw query using knex:
+
+```js
+const knex = Person.knex();
+await knex.raw('SELECT 1');
 ```

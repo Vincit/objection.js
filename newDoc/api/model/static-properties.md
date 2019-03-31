@@ -192,6 +192,28 @@ class Person extends Model {
     return this.gender === 'female';
   }
 }
+```
+
+Getters and methods listed here are serialized with real properties when [toJSON](/api/model/instance-methods.html#tojson) is called. Virtual attribute methods and getters must be synchronous.
+
+The virtual values are not written to database. Only the "external" JSON format will contain them.
+
+#### Examples
+
+```js
+class Person extends Model {
+  static get virtualAttributes() {
+    return ['fullName', 'isFemale'];
+  }
+
+  fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  get isFemale() {
+    return this.gender === 'female';
+  }
+}
 
 const person = Person.fromJson({
   firstName: 'Jennifer',
@@ -204,13 +226,69 @@ const person = Person.fromJson({
 // JSON.stringify. You very rarely need to call `toJSON`
 // explicitly. koa, express and all other frameworks I'm
 // aware of use JSON.stringify to serialize objects to JSON.
-console.log(person.toJSON());
-// --> {"firstName": "Jennifer", "lastName": "Aniston", "isFemale": true, "fullName": "Jennifer Aniston"}
+const pojo = person.toJSON();
+
+console.log(pojo.fullName) // --> 'Jennifer Aniston'
+console.log(pojo.isFemale) // --> true
 ```
 
-Getters and methods listed here are serialized with real properties when `toJSON` is called.
+You can also pass options to [toJSON](/api/model/instance-methods.html#tojson) to only serialize a subset of virtual attributes. In fact, when the `virtuals` option is used, the attributes don't even need to be listed in `virtualAttributes`.
 
-The virtual values are not written to database. Only the "external" JSON format will contain them.
+```js
+const pojo = person.toJSON({ virtuals: ['fullName'] })
+```
+
+## `static` modifiers
+
+Reusable query building functions that can be used in any [eager query](/api/query-builder/instance-methods.html#eager), using [modify](/api/query-builder/instance-methods.html#modify) method and in many other places.
+
+```js
+class Movie extends Model {
+  static get modifiers() {
+    return {
+      goodMovies(builder) {
+        builder.where('stars', '>', 3);
+      },
+
+      orderByName(builder) {
+        builder.orderBy('name')
+      }
+    };
+  }
+}
+
+class Animal extends Model {
+  static get modifiers() {
+    return {
+      dogs(builder) {
+        builder.where('species', 'dog');
+      }
+    };
+  }
+}
+```
+
+Modifiers can be used in any eager query:
+
+```js
+Person
+  .query()
+  .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
+```
+
+Modifiers can also be used through [modifyEager](/api/query-builder/instance-methods.html#modifyeager):
+
+```js
+Person
+  .query()
+  .eager('[movies.actors, pets]')
+  .modifyEager('movies', ['goodMovies', 'orderByName'])
+  .modifyEager('pets', 'dogs')
+```
+
+## `static` namedFilters
+
+An alias for [modifiers](#static-modifiers)
 
 ## `static` modelPaths
 
@@ -275,58 +353,6 @@ How many queries can be run concurrently per connection.
 This doesn't limit the concurrencly of the entire server. It only limits the number of concurrent queries that can be run on a single connection. By default knex connection pool size is 10, which means that the maximum number of concurrent queries started by objection is `Model.concurrency * 10`. You can also easily increase the knex pool size.
 
 The default concurrency is 4 except for mssql, for which the default is 1. The mssql default is needed because of the buggy driver that only allows one query at a time per connection.
-
-## `static` modifiers
-
-Reusable query building functions that can be used in any [eager query](/api/query-builder/instance-methods.html#eager), using [modify](/api/query-builder/instance-methods.html#modify) method and in many other places.
-
-```js
-class Movie extends Model {
-  static get modifiers() {
-    return {
-      goodMovies(builder) {
-        builder.where('stars', '>', 3);
-      },
-
-      orderByName(builder) {
-        builder.orderBy('name')
-      }
-    };
-  }
-}
-
-class Animal extends Model {
-  static get modifiers() {
-    return {
-      dogs(builder) {
-        builder.where('species', 'dog');
-      }
-    };
-  }
-}
-```
-
-Modifiers can be used in any eager query:
-
-```js
-Person
-  .query()
-  .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
-```
-
-Modifiers can also be used through [modifyEager](/api/query-builder/instance-methods.html#modifyeager):
-
-```js
-Person
-  .query()
-  .eager('[movies.actors, pets]')
-  .modifyEager('movies', ['goodMovies', 'orderByName'])
-  .modifyEager('pets', 'dogs')
-```
-
-## `static` namedFilters
-
-An alias for [modifiers](#static-modifiers)
 
 ## `static` jsonAttributes
 
