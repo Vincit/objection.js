@@ -1,0 +1,81 @@
+$bgColor = #1E1E1E;
+$mediumBgColor = #252525;
+$lightBgColor = #383838;
+
+html, body {
+  background-color: $bgColor !important;
+}
+
+a:focus, button:focus  {
+  // Remove ugly mozilla outline.
+  outline: none;
+}
+
+.theme-container {
+  background-color: $bgColor;
+
+  h2 {
+    padding-bottom: 1rem;
+  }
+
+  h5 {
+    font-size: 14px;
+  }
+
+  .page {
+    background-color: $bgColor;
+  }
+
+  .navbar {
+    background-color: $mediumBgColor;
+
+    .links {
+      background-color: $mediumBgColor;
+
+      .search-box {
+        input {
+          background-color: $lightBgColor;
+        }
+
+        .suggestions {
+          background-color: $mediumBgColor;
+          border-color: $lightBgColor;
+
+          .suggestion.focused {
+            background-color: $lightBgColor;
+          }
+        }
+      }
+    }
+  }
+
+  .content {
+    code {
+      background-color: lighten($bgColor, 6%);
+    }
+  }
+
+  .sidebar {
+    background-color: $mediumBgColor;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .dropdown-wrapper {
+    .nav-dropdown {
+      background-color: $mediumBgColor;
+      border-color: $lightBgColor;
+    }
+  }
+
+  th, td {
+    border-color: #666666;
+  }
+
+  tr:nth-child(2n) {
+    background-color: lighten($bgColor, 2%);
+  }
+}

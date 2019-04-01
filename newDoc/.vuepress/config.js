@@ -1,6 +1,7 @@
 module.exports = {
   title: 'Objection.js',
   description: 'An SQL friendly ORM for node.js',
+  base: '/objection.js/new-docs/',
 
   themeConfig: {
     repo: 'vincit/objection.js',

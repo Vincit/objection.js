@@ -11,19 +11,19 @@ All query builders are created using this function, including `$query`, `$relate
 
 See the [query examples](/guide/query-examples.html) section for more examples.
 
-### Arguments
+#### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
 transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. for a query. Falsy values are ignored.
 
-### Return value
+#### Return value
 
 Type|Description
 ----|-----------------------------
 [QueryBuilder](/api/query-builder/)|The created query builder
 
-### Examples
+#### Examples
 
 Read models from the database:
 
@@ -147,7 +147,7 @@ Type|Description
 ----|-----------------------------
 [QueryBuilder](/api/query-builder/)|The created query builder
 
-#### Examples
+##### Examples
 
 Select count of a relation and the maximum value of another one:
 
@@ -183,7 +183,13 @@ const peopleThatHavePets = await Person
 Generates something like this:
 
 ```sql
-select "persons".* from "persons" where exists (select "pets".* from "animals" as "pets" where "pets"."ownerId" = "persons"."id")
+select "persons".*
+from "persons"
+where exists (
+  select "pets".*
+  from "animals" as "pets"
+  where "pets"."ownerId" = "persons"."id"
+)
 ```
 
 ## `static` knex()
@@ -194,7 +200,7 @@ Subclasses inherit the connection. A system-wide knex instance can thus be set b
 
 If you want to use multiple databases, you can instead pass the knex instance to each individual query or use the [bindKnex](/api/model/static-methods.html#static-bindknex) method.
 
-#### Examples
+##### Examples
 
 Set a knex instance:
 
@@ -239,7 +245,7 @@ Type|Description
 ----|-----------------------------
 Constructor<? extends Model>|The created model subclass constructor
 
-#### Examples
+##### Examples
 
 ```js
 const knex1 = require('knex')({
@@ -281,7 +287,7 @@ console.log(models[0] instanceof BoundModel2); // --> true
 
 Alias for [bindKnex](/api/model/static-methods.html#static-bindknex).
 
-#### Examples
+##### Examples
 
 ```js
 const { transaction } = require('objection');
@@ -344,7 +350,7 @@ Type|Description
 ----|-----------------------------
 [Model](/api/model/)|The created model instance
 
-#### Examples
+##### Examples
 
 Create a model instance:
 
@@ -428,7 +434,7 @@ If you want to use the default json schema based [AjvValidator](/api/types/#clas
 
 If you want to share the same validator instance between multiple models, that's completely fine too. Simply implement `createValidator` so that it always returns the same object instead of creating a new one.
 
-#### Examples
+##### Examples
 
 Sharing the same validator between model classes is also possible:
 
@@ -489,7 +495,7 @@ Type|Description
 ----|-----------------------------
 `Error`|The created error. [NotFoundError](/api/model/static-properties.html#static-notfounderror) by default.
 
-#### Examples
+##### Examples
 
 The default implementation:
 
@@ -547,7 +553,7 @@ Type|Description
 ----|-----------------------------
 [QueryBuilder](/api/query-builder/)|The created query builder
 
-#### Examples
+##### Examples
 
 ```js
 const people = await Person.loadRelated([person1, person2], 'children.pets');
@@ -598,7 +604,7 @@ filterConstructor|function|If this optional constructor is given, the `traverser
 models|[Model](/api/model/)&#124;[Model](/api/model/)[]|The model(s) whose relation trees to traverse.
 traverser|function([Model](/api/model/), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
 
-#### Examples
+##### Examples
 
 There are two ways to call this method:
 
@@ -666,7 +672,7 @@ Type|Description
 ----|-----------------------------
 string|The property name
 
-#### Examples
+##### Examples
 
 If you have defined `columnNameMappers = snakeCaseMappers()` for your model:
 
@@ -694,7 +700,7 @@ Type|Description
 ----|-----------------------------
 string|The column name
 
-#### Examples
+##### Examples
 
 If you have defined `columnNameMappers = snakeCaseMappers()` for your model:
 
@@ -757,7 +763,7 @@ Type|Description
 
 
 
-#### Examples
+##### Examples
 
 A custom override that uses the property information in `jsonSchema`.
 

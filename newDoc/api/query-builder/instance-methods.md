@@ -36,7 +36,7 @@ Type|Description
 ----|-----------------------------
 [QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
 
-#### Examples
+##### Examples
 
 ```js
 const jennifer = await Person

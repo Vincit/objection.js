@@ -32,7 +32,7 @@ Further reading:
  * [the relation guide](/guide/relations.html)
  * [RelationMapping](/api/types/#type-relationmapping)
 
-#### Examples
+##### Examples
 
 ```js
 const { Model, ref } = require('objection');
@@ -134,13 +134,13 @@ The optional schema against which the model is validated.
 
 Must follow [JSON Schema](http://json-schema.org) specification. If null no validation is done.
 
-### Read more
+##### Read more
 
 * [$validate](/api/model/instance-methods.html#validate)
 * [jsonAttributes](/api/model/static-properties.html#static-jsonattributes)
 * [custom validation recipe](/recipes/custom-validation.html)
 
-#### Examples
+##### Examples
 
 ```js
 class Person extends Model {
@@ -198,7 +198,7 @@ Getters and methods listed here are serialized with real properties when [toJSON
 
 The virtual values are not written to database. Only the "external" JSON format will contain them.
 
-#### Examples
+##### Examples
 
 ```js
 class Person extends Model {
@@ -312,7 +312,7 @@ You probably don't want to define `modelPaths` property for each model. Once aga
 recommend that you create a `BaseModel` super class for all your models and define
 shared configuration such as this there.
 
-#### Examples
+##### Examples
 
 Using a shared `BaseModel` superclass:
 
@@ -407,7 +407,7 @@ Further reading:
  * [snakeCaseMappers](/api/objection/#snakecasemappers)
  * [snake_case to camelCase conversion recipe](/recipes/snake-case-to-camel-case-conversion.html)
 
-#### Examples
+##### Examples
 
 If your columns are UPPER_SNAKE_CASE:
 

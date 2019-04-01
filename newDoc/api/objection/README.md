@@ -36,7 +36,7 @@ Factory function that returns a [ReferenceBuilder](/api/types/#class-referencebu
 
 See [FieldExpression](/api/types/#type-fieldexpression) for more information about how to refer to json fields.
 
-#### Examples
+##### Examples
 
 ```js
 const { ref } = require('objection');
@@ -64,7 +64,7 @@ const { raw } = require('objection');
 
 Factory function that returns a [RawBuilder](/api/types/#class-rawbuilder) instance. [RawBuilder](/api/types/#class-rawbuilder) is a wrapper for knex raw method that doesn't depend on knex. Instances of [RawBuilder](/api/types/#class-rawbuilder) are converted to knex raw instances lazily when the query is executed.
 
-#### Examples
+##### Examples
 
 When using raw SQL segments in queries, it's a good idea to use placeholders instead of  adding user input directly to the SQL to avoid injection errors. Placeholders are sent to the database engine which then takes care of interpolating the SQL safely.
 
@@ -131,7 +131,7 @@ const { lit } = require('objection')
 
 Factory function that returns a [LiteralBuilder](/api/types/#class-literalbuilder) instance. [LiteralBuilder](/api/types/#class-literalbuilder) helps build literals of different types.
 
-#### Examples
+##### Examples
 
 ```js
 const { lit, ref } = require('objection');
@@ -161,7 +161,7 @@ const { mixin } = require('objection');
 
 The mixin helper for applying multiple [plugins](/guide/plugins.html).
 
-#### Examples
+##### Examples
 
 ```js
 const { mixin, Model } = require('objection');
@@ -185,7 +185,7 @@ const { compose } = require('objection');
 
 The compose helper for applying multiple [plugins](/guide/plugins.html).
 
-#### Examples
+##### Examples
 
 ```js
 const { compose, Model } = require('objection');
@@ -215,7 +215,7 @@ Option|Type|Description
 ---------|-------|------------------------
 upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
 
-#### Examples
+##### Examples
 
 ```js
 const { Model, snakeCaseMappers } = require('objection');
@@ -251,7 +251,7 @@ Option|Type|Description
 ---------|-------|------------------------
 upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
 
-#### Examples
+##### Examples
 
 ```js
 const { knexSnakeCaseMappers } = require('objection');
@@ -314,7 +314,7 @@ const { knexIdentifierMapping } = require('objection');
 
 Like [knexSnakeCaseMappers](#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
 
-#### Examples
+##### Examples
 
 ```js
 const { knexIdentifierMapping } = require('objection');

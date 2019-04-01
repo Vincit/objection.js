@@ -12,7 +12,7 @@ Find queries can be created simply by calling [Model.query()](/api/model/static-
 [QueryBuilder](/api/query-builder/) instance. The query is executed by calling the [then](/api/query-builder/instance-methods.html#then) method, which converts the query
 into a Promise.
 
-#### Examples
+##### Examples
 
 Fetch all people from the database:
 
@@ -114,7 +114,7 @@ order by "lastName" asc
 
 Insert queries are created by chaining the [insert](/api/query-builder/instance-methods.html#insert) method to the query. See the [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method for inserting object graphs.
 
-#### Examples
+##### Examples
 
 ```js
 const jennifer = await Person
@@ -134,7 +134,7 @@ insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 
 Update queries are created by chaining the [update](/api/query-builder/instance-methods.html#update) or [patch](/api/query-builder/instance-methods.html#patch) method to the query. The [patch](/api/query-builder/instance-methods.html#patch) and [update](/api/query-builder/instance-methods.html#update) methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder/instance-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/instance-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/instance-methods.html#returning) or take a look at [this recipe] (/recipes/returning-tricks) for more ideas. See [update](/api/query-builder/instance-methods.html#update) and [patch](/api/query-builder/instance-methods.html#patch) API documentation for discussion about their differences.
 
-#### Examples
+##### Examples
 
 ```js
 const numUpdated = await Person.query()
@@ -168,7 +168,7 @@ Delete queries are created by chaining the [delete](/api/query-builder/instance-
 
 NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](/recipes/returning-tricks) if you'd like the deleted rows to be returned as Model instances*.
 
-#### Examples
+##### Examples
 
 ```js
 const numDeleted = await Person
@@ -193,7 +193,7 @@ Simply call [$relatedQuery('relationName')](/api/model/instance-methods.html#rel
 
 By default the fetched related models are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [$setRelated](/api/model/instance-methods.html#setrelated) and [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
 
-#### Examples
+##### Examples
 
 ```js
 // `person` is an instance of `Person` model.
@@ -220,7 +220,7 @@ Chain the [insert](/api/query-builder/instance-methods.html#insert) method to a 
 By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model/instance-methods.html#setrelated) and
 [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
 
-#### Examples
+##### Examples
 
 Add a pet for a person:
 
@@ -295,7 +295,7 @@ In addition to the [eager](/api/query-builder/instance-methods.html#eager) metho
 
 By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)). You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole eager tree. You can select which algorithm to use per query using [eagerAlgorithm](/api/query-builder/instance-methods.html#eageralgorithm) method or per model by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property. All algorithms have their strengths and weaknesses, which are discussed in detail [here](/api/query-builder/instance-methods.html#eager).
 
-#### Examples
+##### Examples
 
 Fetch the `pets` relation for all results of a query:
 
@@ -510,7 +510,7 @@ If you are using Postgres the inserts are done in batches for maximum performanc
 You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
 
 
-#### Examples
+##### Examples
 
 ```js
 // The return value of `insertGraph` is the input graph converted into
@@ -651,7 +651,7 @@ The [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph) method w
 
 See the [allowUpsert](/api/query-builder/instance-methods.html#allowupsert) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph) method to avoid security issues. [allowUpsert](/api/query-builder/instance-methods.html#allowupsert) works like [allowInsert](/api/query-builder.html#allowinsert).
 
-#### Examples
+##### Examples
 
 For the following examples, assume this is the content of the database:
 
