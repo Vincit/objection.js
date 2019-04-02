@@ -1450,6 +1450,59 @@ describe('Model', () => {
       });
     });
 
+    it('should default to virtuals = true even when an options object with no `virtuals` property is passed', () => {
+      class Model1 extends modelClass('Model1') {
+        static get virtualAttributes() {
+          return ['foo'];
+        }
+
+        get foo() {
+          return 'foo';
+        }
+      }
+
+      class Model2 extends modelClass('Model2') {
+        static get virtualAttributes() {
+          return ['bar'];
+        }
+
+        static get relationMappings() {
+          return {
+            model1: {
+              relation: Model.BelongsToOneRelation,
+              modelClass: Model1,
+              join: {
+                from: 'Model2.model1Id',
+                to: 'Model1.id'
+              }
+            }
+          };
+        }
+
+        get bar() {
+          return 'bar';
+        }
+      }
+
+      let model2 = Model2.fromJson({
+        a: 'a',
+        model1: {
+          b: 'b',
+          c: 'c'
+        }
+      });
+
+      expect(model2.toJSON({})).to.eql({
+        a: 'a',
+        bar: 'bar',
+        model1: {
+          b: 'b',
+          c: 'c',
+          foo: 'foo'
+        }
+      });
+    });
+
     it('should include methods', () => {
       class Model1 extends Model {
         foo() {
