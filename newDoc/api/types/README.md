@@ -63,7 +63,234 @@ separator|string|Separator between relations in nested join based eager query. D
 aliases|Object|Aliases for relations in a join based eager query. Defaults to an empty object.
 joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoin', ...]` or any other knex join method name. Defaults to `leftJoin`.
 
+## `type` FieldExpression
+
+Field expressions are strings that allow you to refer to JSONB fields inside columns.
+
+Syntax: `<column reference>[:<json field reference>]`
+
+e.g. `persons.jsonColumnName:details.names[1]` would refer to value `'Second'` in column `persons.jsonColumnName` which has
+`{ details: { names: ['First', 'Second', 'Last'] } }` object stored in it.
+
+First part `<column reference>` is compatible with column references used in knex e.g. `MyFancyTable.tributeToThBestColumnNameEver`.
+
+Second part describes a path to an attribute inside the referred column. It is optional and it always starts with colon which follows directly with first path element. e.g. `Table.jsonObjectColumnName:jsonFieldName` or `Table.jsonArrayColumn:[321]`.
+
+Syntax supports `[<key or index>]` and `.<key or index>` flavors of reference to json keys / array indexes:
+
+e.g. both `Table.myColumn:[1][3]` and `Table.myColumn:1.3` would access correctly both of the following objects `[null, [null,null,null, "I was accessed"]]` and `{ "1": { "3" : "I was accessed" } }`
+
+Caveats when using special characters in keys:
+
+1. `objectColumn.key` This is the most common syntax, good if you are not using dots or square brackets `[]` in your json object key name.
+2. Keys containing dots `objectColumn:[keywith.dots]` Column `{ "keywith.dots" : "I was referred" }`
+3. Keys containing square brackets `column['[]']` `{ "[]" : "This is getting ridiculous..." }`
+4. Keys containing square brackets and quotes `objectColumn:['Double."Quote".[]']` and `objectColumn:["Sinlge.'Quote'.[]"]` Column `{ "Double.\"Quote\".[]" : "I was referred",  "Sinlge.'Quote'.[]" : "Mee too!" }`
+99. Keys containing dots, square brackets, single quotes and double quotes in one json key is not currently supported
+
+There are some special methods that accept `FieldExpression` strings directly, like [whereJsonSupersetOf](/api/query-builder/instance-methods.html#wherejsonsupersetof) but you can use `FieldExpressions` anywhere with [ref](/api/objection/#ref). Here's an example:
+
+```js
+const { ref } = require('objection');
+
+await Person.query()
+  .select([
+    'id',
+    ref('persons.jsonColumn:details.name').castText().as('name'),
+    ref('persons.jsonColumn:details.age').castInt().as('age')
+  ])
+  .join(
+    'someTable',
+    ref('persons.jsonColumn:details.name').castText(),
+    '=',
+    ref('someTable.name')
+  )
+  .where('age', '>', ref('someTable.ageLimit'));
+```
+
+In the above example, we assume `persons` table has a column named `jsonColumn` of type `jsonb` (only works on postgres).
+
 ## `type` RelationExpression
+
+Relation expression is a simple DSL for expressing relation trees.
+
+These strings are all valid relation expressions:
+
+ * `children`
+ * `children.movies`
+ * `[children, pets]`
+ * `[children.movies, pets]`
+ * `[children.[movies, pets], pets]`
+ * `[children.[movies.actors.[children, pets], pets], pets]`
+ * `[children as kids, pets(filterDogs) as dogs]`
+
+There are two tokens that have special meaning: `*` and `^`. `*` means "all relations recursively" and `^` means "this relation recursively".
+
+For example `children.*` means "relation `children` and all its relations, and all their relations and ...".
+
+::: warning
+The * token must be used with caution or you will end up fetching your entire database.
+:::
+
+Expression `parent.^` is equivalent to `parent.parent.parent.parent...` up to the point a relation no longer has results for the `parent` relation. The recursion can be limited to certain depth by giving the depth after the `^` character. For example `parent.^3` is equal to `parent.parent.parent`.
+
+Relations can be aliased using the `as` keyword.
+
+For example the expression `children.[movies.actors.[pets, children], pets]` represents a tree:
+
+```
+              children
+              (Person)
+                 |
+         -----------------
+         |               |
+       movies           pets
+      (Movie)         (Animal)
+         |
+       actors
+      (Person)
+         |
+    -----------
+    |         |
+   pets    children
+ (Animal)  (Person)
+
+```
+
+The model classes are shown in parenthesis. When given to `eager` method, this expression would fetch all relations as shown in the tree above:
+
+```js
+const people = await Person
+  .query()
+  .eager('children.[movies.actors.[pets, children], pets]');
+
+// All persons have the given relation tree fetched.
+console.log(people[0].children[0].movies[0].actors[0].pets[0].name);
+```
+
+Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](/api/model/static-properties.html#static-modifiers) or [local](/api/query-builder/instance-methods.html#eager)). Arguments are listed in parenthesis after the relation names like this:
+
+```js
+Person
+  .query()
+  .eager(`children(arg1, arg2).[movies.actors(arg3), pets]`)
+```
+
+You can spread eager expressions to multiple lines and add whitespace:
+
+```js
+Person
+  .query()
+  .eager(`[
+    children.[
+      pets,
+      movies.actors.[
+        pets,
+        children
+      ]
+    ]
+  ]`)
+```
+
+Eager expressions can be aliased using `as` keyword:
+
+```js
+Person
+  .query()
+  .eager(`[
+    children as kids.[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats,
+
+      movies.actors.[
+        pets,
+        children as kids
+      ]
+    ]
+  ]`)
+```
+
+### RelationExpression object notation
+
+In addition to the string expressions, a more verbose object notation can also be used.
+
+The string expression in the comment is equivalent to the object expression below it:
+
+```js
+// `children`
+{
+  children: true
+}
+```
+
+```js
+// `children.movies`
+{
+  children: {
+    movies: true
+  }
+}
+```
+
+```js
+// `[children, pets]`
+{
+  children: true
+  pets: true
+}
+```
+
+```js
+// `[children.[movies, pets], pets]`
+{
+  children: {
+    movies: true,
+    pets: true
+  }
+  pets: true
+}
+```
+
+```js
+// `parent.^`
+{
+  parent: {
+    $recursive: true
+  }
+}
+```
+
+```js
+// `parent.^5`
+{
+  parent: {
+    $recursive: 5
+  }
+}
+```
+
+```js
+// `parent.*`
+{
+  parent: {
+    $allRecursive: true
+  }
+}
+```
+
+```js
+// `[children as kids, pets(filterDogs) as dogs]`
+{
+  kids: {
+    $relation: 'children'
+  },
+
+  dogs: {
+    $relation: 'pets',
+    $modify: ['filterDogs']
+  }
+}
+```
 
 ## `class` ValidationError
 

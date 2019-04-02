@@ -63,8 +63,12 @@ console.log(people[0].grandParentName)
 ```sql
 select "parent:parent"."firstName" as "grandParentName"
 from "persons"
-inner join "persons" as "parent" on "parent"."id" = "persons"."parentId"
-inner join "persons" as "parent:parent" on "parent:parent"."id" = "parent"."parentId"
+inner join "persons"
+  as "parent"
+  on "parent"."id" = "persons"."parentId"
+inner join "persons"
+  as "parent:parent"
+  on "parent:parent"."id" = "parent"."parentId"
 ```
 
 The next example shows how easy it is to build complex queries:
@@ -84,9 +88,18 @@ console.log(people[0].parentFirstName);
 ```sql
 select "persons".*, "parent"."firstName" as "parentFirstName"
 from "persons"
-inner join "persons" as "parent" on "persons"."parentId" = "parent"."id"
-where "persons"."age" < (select avg("persons"."age") from "persons")
-and exists (select 1 from "animals" where "persons"."id" = "animals"."ownerId")
+inner join "persons"
+  as "parent"
+  on "persons"."parentId" = "parent"."id"
+where "persons"."age" < (
+  select avg("persons"."age")
+  from "persons"
+)
+and exists (
+  select 1
+  from "animals"
+  where "persons"."id" = "animals"."ownerId"
+)
 order by "persons"."lastName" asc
 ```
 
@@ -249,8 +262,11 @@ console.log('best movie ever was added');
 ```
 
 ```sql
-insert into "movies" ("name") values ('The room')
-insert into "persons_movies" ("movieId", "personId", "awesomeness") values (14, 25, 9001)
+insert into "movies" ("name")
+values ('The room')
+
+insert into "persons_movies" ("movieId", "personId", "awesomeness")
+values (14, 25, 9001)
 ```
 
 ### Update queries
@@ -273,7 +289,7 @@ See the [API documentation](/api/query-builder/instance-methods.html#unrelate) o
 
 You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder/instance-methods.html#eager) method. [eager](/api/query-builder/instance-methods.html#eager) takes a [relation expression](/api/types/#type-relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
 
-Because the eager expressions are strings (there's also an optional [object notation](#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowEager](/api/query-builder/instance-methods.html#alloweager) method. [allowEager](/api/query-builder/instance-methods.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
+Because the eager expressions are strings (there's also an optional [object notation](/api/types/#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowEager](/api/query-builder/instance-methods.html#alloweager) method. [allowEager](/api/query-builder/instance-methods.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
 
 By giving expression `[pets, children.pets]` for [allowEager](/api/query-builder/instance-methods.html#alloweager) the value passed to [eager](/api/query-builder/instance-methods.html#eager) is allowed to be one of:
 
@@ -326,7 +342,7 @@ console.log(people[1].children[2].pets[1].name);
 console.log(people[1].children[2].children[0].name);
 ```
 
-Here's the previous query using the optional [object notation](/api/types.html#relationexpression-object-notation)
+Here's the previous query using the optional [object notation](/api/types/#relationexpression-object-notation)
 
 ```js
 const people = await Person
@@ -569,12 +585,12 @@ You can refer to the properties of other models anywhere in the graph using expr
 await Person
   .query()
   .insertGraph([{
-    "#id": 'jenniLaw',
+    "#id": 'jenni',
     firstName: 'Jennifer',
     lastName: 'Lawrence',
 
     pets: [{
-      name: "I am the dog of #ref{jenniLaw.firstName} whose id is #ref{jenniLaw.id}",
+      name: "I am the dog of #ref{jenni.firstName} whose id is #ref{jenni.id}",
       species: 'dog'
     }]
   }]);
