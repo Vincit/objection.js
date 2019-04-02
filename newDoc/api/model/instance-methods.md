@@ -419,11 +419,151 @@ Person
 ```
 
 
+## $beforeDelete()
 
+```js
+class Person extends Model {
+  async $beforeDelete(queryContext) {
+    await super.$beforeDelete(queryContext);
+    await doPossiblyAsyncStuff();
+  }
+}
+```
 
+Called before a model is deleted.
 
+You can return a promise from this function if you need to do asynchronous stuff.
 
+::: warning
+This method is only called for instance deletes started with [$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
+:::
 
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+
+##### Examples
+
+The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  async $beforeDelete(queryContext) {
+    await super.$beforeDelete(queryContext);
+    // This can always be done even if there is no running transaction.
+    // In that case `queryContext.transaction` returns the normal knex
+    // instance. This makes sure that the query is not executed outside
+    // the original query's transaction.
+    await SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
+## $afterDelete()
+
+```js
+class Person extends Model {
+  async $afterDelete(queryContext) {
+    await super.$afterDelete(queryContext);
+    await doPossiblyAsyncStuff();
+  }
+}
+```
+
+Called after a model is deleted.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+::: warning
+This method is only called for instance deletes started with [$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
+:::
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+
+##### Examples
+
+The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  async $afterDelete(queryContext) {
+    await super.$afterDelete(queryContext);
+    // This can always be done even if there is no running transaction. In that
+    // case `queryContext.transaction` returns the normal knex instance. This
+    // makes sure that the query is not executed outside the original query's
+    // transaction.
+    await SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
+
+## $afterGet()
+
+```js
+class Person extends Model {
+  $afterGet(queryContext) {
+    return doPossiblyAsyncStuff();
+  }
+}
+```
+
+Called after a model is fetched.
+
+This method is _not_ called for insert, update or delete operations.
+
+You can return a promise from this function if you need to do asynchronous stuff.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+
+##### Examples
+
+The current query's transaction/knex instance can always be accessed through `queryContext.transaction`.
+
+```js
+class Person extends Model {
+  $afterGet(queryContext) {
+    // This can always be done even if there is no running transaction.
+    // In that case `queryContext.transaction` returns the normal knex
+    // instance. This makes sure that the query is not executed outside
+    // the original query's transaction.
+    return SomeModel
+      .query(queryContext.transaction)
+      .insert(whatever);
+  }
+}
+```
 
 ## $clone()
 
@@ -782,7 +922,7 @@ child1 = person.children[person.children.length - 1];
 child2 = person.children[person.children.length - 2];
 ```
 
-#### $loadRelated()
+## $loadRelated()
 
 ```js
 const builder = person.$loadRelated(

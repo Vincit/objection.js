@@ -89,7 +89,7 @@
     "prettier": "1.13.6",
     "sqlite3": "^4.0.0",
     "typescript": "^3.3.3",
-    "vuepress": "next",
+    "vuepress": "0.14.10",
     "webpack-dev-middleware": "3.6.0"
   },
   "nyc": {

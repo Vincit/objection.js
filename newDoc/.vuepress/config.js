@@ -1,15 +1,7 @@
-const path = require('path');
-
 module.exports = {
   title: 'Objection.js',
   description: 'An SQL friendly ORM for node.js',
   base: '/objection.js/new-docs/',
-
-  plugins: [
-    {
-      clientRootMixin: path.resolve(__dirname, 'clientRootMixin.js')
-    }
-  ],
 
   themeConfig: {
     repo: 'vincit/objection.js',
@@ -29,12 +21,12 @@ module.exports = {
             link: '/api/objection/'
           },
           {
-            text: 'Model',
-            link: '/api/model/'
-          },
-          {
             text: 'Query Builder',
             link: '/api/query-builder/'
+          },
+          {
+            text: 'Model',
+            link: '/api/model/'
           },
           {
             text: 'Types',
