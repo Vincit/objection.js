@@ -393,3 +393,19 @@ const knex = Knex(Object.assign({
   MyAnotherProp: 'anotherProp'
 })));
 ```
+
+## ValidationError
+
+```js
+const { ValidationError } = require('objection');
+```
+
+The [ValidationError](/api/types/#class-validationerror) class.
+
+## NotFoundError
+
+```js
+const { NotFoundError } = require('objection');
+```
+
+The [NotFoundError](/api/types/#class-notfounderror) class.

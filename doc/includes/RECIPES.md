@@ -699,7 +699,6 @@ Here's a list of methods that may help working with composite keys:
  * [`updateAndFetchById`](#updateandfetchbyid)
  * [`patchAndFetchById`](#patchandfetchbyid)
  * [`$id`](#_s_id)
- * [`$values`](#_s_values)
 
 ## Getting count of related objects
 

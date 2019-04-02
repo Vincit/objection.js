@@ -51,8 +51,8 @@ try {
 
 After you have created a transaction, you need to tell objection which queries should be executed inside that transaction. There are two ways to do that:
 
-1. [By passing the transaction object to each query](#passing-around-a-transaction-object)
-2. [By binding models to the transaction](#binding-models-to-a-transaction)
+1. [By passing the transaction object to each query](/guide/transactions.html#passing-around-a-transaction-object)
+2. [By binding models to the transaction](/guide/transactions.html#binding-models-to-a-transaction)
 
 ### Passing around a transaction object
 

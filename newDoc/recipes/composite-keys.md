@@ -12,7 +12,6 @@ Here's a list of methods that may help working with composite keys:
  * [updateAndFetchById](/api/query-builder/instance-methods.html#updateandfetchbyid)
  * [patchAndFetchById](/api/query-builder/instance-methods.html#patchandfetchbyid)
  * [$id](/api/model/instance-methods.html#id)
- * [$values](/api/model/instance-methods.html#values)
 
 ## Examples
 

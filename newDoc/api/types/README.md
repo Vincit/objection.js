@@ -4,6 +4,11 @@ sidebar: auto
 
 # Types
 
+This page contains the documentation of all other types and classes than [Model](/api/model/) and [QueryBuilder](/api/query-builder/). There are two types of items on this page:
+
+1. `type`: A type is just a POJO (plain old javascript object) with a set of properties.
+2. `class`: A class is a javascript class with properties and methods.
+
 ## `type` RelationMapping
 
 Property|Type|Description
@@ -62,6 +67,46 @@ minimize|boolean|If true the aliases of the joined tables and columns in a join 
 separator|string|Separator between relations in nested join based eager query. Defaults to `:`. Dot (`.`) cannot be used at the moment because of the way knex parses the identifiers.
 aliases|Object|Aliases for relations in a join based eager query. Defaults to an empty object.
 joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoin', ...]` or any other knex join method name. Defaults to `leftJoin`.
+
+## `type` UpsertGraphOptions
+
+Property|Type|Description
+--------|----|-----------
+relate|boolean<br>string[]|If true, relations are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+unrelate|boolean<br>string[]|If true, relations are unrelated instead of deleted. Unrelate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+insertMissing|boolean<br>string[]|If true, models that have identifiers _and_ are not found, are inserted. By default this is false and an error is thrown. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+update|boolean<br>string[]|If true, update operations are performed instead of patch when altering existing models, affecting the way the data is validated. With update operations, all required fields need to be present in the data provided. This functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+noInsert|boolean<br>string[]|If true, no inserts are performed. Inserts can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+noUpdate|boolean<br>string[]|If true, no updates are performed. Updates can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+noDelete|boolean<br>string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+noRelate|boolean<br>string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+noUnrelate|boolean<br>string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+
+## `type` InsertGraphOptions
+
+Property|Type|Description
+--------|----|-----------
+relate|boolean<br>string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-inserts).
+
+## `type` TableMetadataFetchOptions
+
+Property|Type|Description
+--------|----|-----------
+table|string|A custom table name. If not given, Model.tableName is used.
+knex|knex<br>Transaction|A knex instance or a transaction
+
+## `type` TableMetadataOptions
+
+Property|Type|Description
+--------|----|-----------
+table|string|A custom table name. If not given, Model.tableName is used.
+
+
+## `type` TableMetadata
+
+Property|Type|Description
+--------|----|-----------
+columns|string[]|Names of all the columns in a table.
 
 ## `type` FieldExpression
 
@@ -292,6 +337,455 @@ The string expression in the comment is equivalent to the object expression belo
 }
 ```
 
+## `type` TransactionObject
+
+This is nothing more than a knex transaction object. It can be used as a knex query builder, it can be [passed to objection queries](/guide/transactions.html#passing-around-a-transaction-object) and [models can be bound to it](/guide/transactions.html#binding-models-to-a-transaction)
+
+See the section about [transactions](/guide/transactions.html) for more info and examples.
+
+### Instance Methods
+
+#### commit()
+
+```js
+const promise = trx.commit();
+```
+
+Call this method to commit the transaction. This only needs to be called if you use `transaction.start()` method.
+
+#### rollback()
+
+```js
+const promise = trx.rollback(error);
+```
+
+Call this method to rollback the transaction. This only needs to be called if you use `transaction.start()` method. You need to pass the error to the method as the only argument.
+
+
 ## `class` ValidationError
 
+```js
+const { ValidationError } = require('objection');
+
+throw new ValidationError({type, message, data});
+```
+
+For each `key`, a list of errors is given. Each error contains the default `message` (as returned by the validator), an optional `keyword` string to identify the validation rule which didn't pass and a `param` object which optionally contains more details about the context of the validation error.
+
+If `type` is anything else but `"ModelValidation"`, `data` can be any object that describes the error.
+
+Error of this class is thrown by default if validation of any input fails. By input we mean any data that can come from the outside world, like model instances (or POJOs), relation expressions object graphs etc.
+
+You can replace this error by overriding [Model.createValidationError()](/api/model/static-methods.html#static-createvalidationerror) method.
+
+See the [error handling recipe](/recipes/error-handling.html) for more info.
+
+Property|Type|Description
+--------|----|-----------
+statusCode|number|HTTP status code for interop with express error handlers and other libraries that search for status code from errors.
+type|string|One of "ModelValidation", "RelationExpression", "UnallowedRelation" and "InvalidGraph". This can be any string for your own custom errors. The listed values are used internally by objection.
+data|object|The content of this property is documented below for "ModelValidation" errors. For other types, this can be any data.
+
+If `type` is `"ModelValidation"` then `data` object should follow this pattern:
+
+```js
+{
+  key1: [{
+    message: '...',
+    keyword: 'required',
+    params: null
+  }, {
+    message: '...',
+    keyword: '...',
+    params: {
+      ...
+    }
+  }, ...],
+
+  key2: [{
+    message: '...',
+    keyword: 'minLength',
+    params: {
+      limit: 1,
+      ...
+    }
+  }, ...],
+
+  ...
+}
+```
+
 ## `class` NotFoundError
+
+```js
+const { NotFoundError } = require('objection');
+
+throw new NotFoundError(data);
+```
+
+Error of this class is thrown by default by [throwIfNotFound()](/api/query-builder/instance-methods.html#throwifnotfound)
+
+You can replace this error by overriding [Model.createNotFoundError()](/api/model/static-methods.html#static-createnotfounderror) method.
+
+See the [error handling recipe](/recipes/error-handling.html) for more info.
+
+## `class` Relation
+
+`Relation` is a parsed and normalized instance of a [RelationMapping](/api/types/#type-relationmapping). `Relation`s can be accessed using the [getRelations](/api/model/static-methods.html#static-getrelations) method.
+
+`Relation` holds a [RelationProperty](/api/types/#class-relationproperty) instance for each property that is used to create the relationship between two tables.
+
+`Relation` is actually a base class for all relation types `BelongsToOneRelation`, `HasManyRelation` etc. You can use `instanceof` to determine the type of the relations (see the example on the right). Note that `HasOneRelation` is a subclass of `HasManyRelation` and `HasOneThroughRelation` is a subclass of `ManyToManyRelation`. Arrange your `instanceof` checks accordingly.
+
+Property|Type|Description
+--------|----|-----------
+name|string|Name of the relation. For example `pets` or `children`.
+ownerModelClass|function|The model class that has defined the relation.
+relatedModelClass|function|The model class of the related objects.
+ownerProp|[RelationProperty](/api/types/#class-relationproperty)|The relation property in the `ownerModelClass`.
+relatedProp|[RelationProperty](/api/types/#class-relationproperty)|The relation property in the `relatedModelClass`.
+joinModelClass|function|The model class representing the join table. This class is automatically generated by Objection if none is provided in the `join.through.modelClass` setting of the relation mapping, see [RelationThrough](/api/types/#type-relationthrough).
+joinTable|string|The name of the join table (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableOwnerProp|[RelationProperty](/api/types/#class-relationproperty)|The join table property pointing to `ownerProp` (only for `ManyToMany` and `HasOneThrough` relations).
+joinTableRelatedProp|[RelationProperty](/api/types/#class-relationproperty)|The join table property pointing to `relatedProp` (only for `ManyToMany` and `HasOneThrough` relations).
+
+Note that `Relation` instances are actually instances of the relation classes used in `relationMappings`. For example:
+
+```js
+class Person extends Model {
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'persons.id',
+          to: 'animals.ownerId'
+        }
+      }
+    };
+  }
+}
+
+const relations = Person.getRelations();
+
+console.log(relations.pets instanceof Model.HasManyRelation); // --> true
+console.log(relations.pets.name); // --> pets
+console.log(relations.pets.ownerProp.cols); // --> ['id']
+console.log(relations.pets.relatedProp.cols); // --> ['ownerId']
+```
+
+## `class` RelationProperty
+
+Represents a property that is used to create relationship between two tables. A single `RelationProperty` instance can represent
+composite key. In addition to a table column, A `RelationProperty` can represent a nested field inside a column (for example a jsonb column).
+
+### Properties
+
+Property|Type|Description
+--------|----|-----------
+size|number|The number of columns. In case of composite key, this is greater than one.
+modelClass|function|The model class that owns the property.
+props|string[]|The column names converted to "external" format. For example if `modelClass` defines a snake_case to camelCase conversion, these names are in camelCase. Note that a `RelationProperty` may actually point to a sub-properties of the columns in case they are of json or some other non-scalar type. This array always contains only the converted column names. Use `getProp(obj, idx)` method to get the actual value from an object.
+cols|string[]|The column names in the database format. For example if `modelClass` defines a snake_case to camelCase conversion, these names are in snake_case. Note that a `RelationProperty` may actually point to a sub-properties of the columns in case they are of json or some other non-scalar type. This array always contains only the column names.
+
+### Methods
+
+#### getProp()
+
+```js
+const value = property.getProp(obj, index);
+```
+
+Gets this property's index:th value from an object. For example if the property represents a composite key `[a, b.d.e, c]`
+and obj is `{a: 1, b: {d: {e: 2}}, c: 3}` then `getProp(obj, 1)` would return `2`.
+
+#### setProp()
+
+```js
+property.setProp(obj, index, value);
+```
+
+Sets this property's index:th value in an object. For example if the property represents a composite key `[a, b.d.e, c]`
+and obj is `{a: 1, b: {d: {e: 2}}, c: 3}` then `setProp(obj, 1, 'foo')` would mutate `obj` into `{a: 1, b: {d: {e: 'foo'}}, c: 3}`.
+
+#### fullCol()
+
+```js
+const col = property.fullCol(builder, index);
+```
+
+Returns the property's index:th column name with the correct table reference. Something like `"Table.column"`.
+The first argument must be an objection [`QueryBuilder`](#querybuilder) instance.
+
+#### ref()
+
+```js
+const ref = property.ref(builder, index);
+```
+
+Allows you to do things like this:
+
+```js
+const builder = Person.query();
+const ref = property.ref(builder, 0);
+builder.where(ref, '>', 10);
+```
+
+Returns a [`ReferenceBuilder`](#ref) instance that points to the index:th column.
+
+#### patch()
+
+```js
+property.patch(patchObj, index, value);
+```
+
+Allows you to do things like this:
+
+```js
+const builder = Person.query();
+const patch = {};
+property.patch(patch, 0, 'foo');
+builder.patch(patch);
+```
+
+Appends an update operation for the index:th column into `patchObj` object.
+
+## `class` ReferenceBuilder
+
+An instance of this is returned from the [ref](/api/objection/#ref) helper function.
+
+### Instance Methods
+
+#### castText()
+
+Cast reference to sql type `text`.
+
+#### castInt()
+
+Cast reference to sql type `integer`.
+
+#### castBigInt()
+
+Cast reference to sql type `bigint`.
+
+#### castFloat()
+
+Cast reference to sql type `float`.
+
+#### castDecimal()
+
+Cast reference to sql type `decimal`.
+
+#### castReal()
+
+Cast reference to sql type `real`.
+
+#### castBool()
+
+Cast reference to sql type `boolean`.
+
+#### castType()
+
+Give custom type to which referenced value is casted to.
+
+**DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
+
+`.castType('mytype') --> CAST(?? as mytype)`
+
+#### castTo()
+
+Give custom type to which referenced value is casted to.
+
+`.castTo('mytype') --> CAST(?? as mytype)`
+
+#### castJson()
+
+In addition to other casts wrap reference to_jsonb() function so that final value
+reference will be json type.
+
+#### as()
+
+Gives an alias for the reference `.select(ref('age').as('yougness'))`
+
+## `class` LiteralBuilder
+
+An instance of this is returned from the [lit](/api/objection/#lit) helper function. If an object
+is given as a value, it is casted to json by default.
+
+### Instance Methods
+
+#### castText()
+
+Cast to sql type `text`.
+
+#### castInt()
+
+Cast to sql type `integer`.
+
+#### castBigInt()
+
+Cast to sql type `bigint`.
+
+#### castFloat()
+
+Cast to sql type `float`.
+
+#### castDecimal()
+
+Cast to sql type `decimal`.
+
+#### castReal()
+
+Cast to sql type `real`.
+
+#### castBool()
+
+Cast to sql type `boolean`.
+
+#### castType()
+
+Give custom type to which referenced value is casted to.
+
+**DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
+
+`.castType('mytype') --> CAST(?? as mytype)`
+
+#### castTo()
+
+Give custom type to which referenced value is casted to.
+
+`.castTo('mytype') --> CAST(?? as mytype)`
+
+#### castJson()
+
+Converts the value to json (jsonb in case of postgresql). The default
+cast type for object values.
+
+#### castArray
+
+Converts the value to an array literal.
+
+**DEPRECATED:** Use `asArray` instead. `castArray` Will be removed in 2.0.
+
+#### asArray()
+
+Converts the value to an array literal.
+
+`lit([1, 2, 3]).asArray() --> ARRAY[?, ?, ?]`
+
+Can be used in conjuction with `castTo`.
+
+`lit([1, 2, 3]).asArray().castTo('real[]') -> CAST(ARRAY[?, ?, ?] AS real[])`
+
+#### as()
+
+Gives an alias for the reference `.select(ref('age').as('yougness'))`
+
+## `class` RawBuilder
+
+An instance of this is returned from the [raw](/api/objection/#raw) helper function.
+
+### Instance Methods
+
+#### as()
+
+Gives an alias for the raw expression `.select(raw('concat(foo, bar)').as('fooBar'))`.
+
+You should use this instead of inserting the alias to the SQL to give objection more information about the query. Some edge cases, like using `raw` in `select` inside a `joinEager` modifier won't work unless you use this method.
+
+## `class` Validator
+
+```js
+const { Validator } = require('objection');
+```
+
+Abstract class from which model validators must be inherited. See the example for explanation. Also check out the [createValidator](/api/model/static-methods.html#static-createvalidator) method.
+
+#### Examples
+
+```js
+const { Validator } = require('objection');
+
+class MyCustomValidator extends Validator {
+  validate(args) {
+    // The model instance. May be empty at this point.
+    const model = args.model;
+
+    // The properties to validate. After validation these values will
+    // be merged into `model` by objection.
+    const json = args.json;
+
+    // `ModelOptions` object. If your custom validator sets default
+    // values, you need to check the `opt.patch` boolean. If it is true
+    // we are validating a patch object and the defaults should not be set.
+    const opt = args.options;
+
+    // A context object shared between the validation methods. A new
+    // object is created for each validation operation. You can store
+    // any data here.
+    const ctx = args.ctx;
+
+    // Do your validation here and throw any exception if the
+    // validation fails.
+    doSomeValidationAndThrowIfFails(json);
+
+    // You need to return the (possibly modified) json.
+    return json;
+  }
+
+  beforeValidate(args) {
+    // Takes the same arguments as `validate`. Usually there is no need
+    // to override this.
+    return super.beforeValidate(args);
+  }
+
+  afterValidate(args) {
+    // Takes the same arguments as `validate`. Usually there is no need
+    // to override this.
+    return super.afterValidate(args);
+  }
+}
+
+const { Model } = require('objection');
+
+// Override the `createValidator` method of a `Model` to use the
+// custom validator.
+class BaseModel extends Model {
+  static createValidator() {
+    return new MyCustomValidator();
+  }
+}
+```
+
+## `class` AjvValidator
+
+```js
+const { AjvValidator } = require('objection');
+```
+
+The default [Ajv](https://github.com/epoberezkin/ajv) based json schema
+validator. You can override the [createValidator](/api/model/static-methods.html#static-createvalidator)
+method of [Model](/api/model/) like in the example to modify the validator.
+
+#### Examples
+
+```js
+const { Model, AjvValidator } = require('objection');
+
+class BaseModel extends Model {
+  static createValidator() {
+    return new AjvValidator({
+      onCreateAjv: (ajv) => {
+        // Here you can modify the `Ajv` instance.
+      },
+      options: {
+        allErrors: true,
+        validateSchema: false,
+        ownProperties: true,
+        v5: true
+      }
+    });
+  }
+}
+```

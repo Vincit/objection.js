@@ -493,7 +493,7 @@ queryContext|Object|The context object of query that produced the empty result. 
 
 Type|Description
 ----|-----------------------------
-`Error`|The created error. [NotFoundError](/api/model/static-properties.html#static-notfounderror) by default.
+`Error`|The created error. [NotFoundError](/api/types/#class-notfounderror) by default.
 
 ##### Examples
 
@@ -523,7 +523,7 @@ Creates an error thrown when validation fails for a model. You can override this
 
 Type|Description
 ----|-----------------------------
-`Error`|The created error. [ValidationError](/api/model/static-properties.html#static-validationerror) by default.
+`Error`|The created error. [ValidationError](/api/types/#class-validationerror) by default.
 
 ## `static` loadRelated()
 
