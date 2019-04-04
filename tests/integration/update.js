@@ -3,7 +3,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
-const { ValidationError } = require('../../');
+const { ValidationError, raw } = require('../../');
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -141,7 +141,7 @@ module.exports = session => {
           });
       });
 
-      it('should validate (1)', done => {
+      it('should validate', done => {
         let ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           properties: {
@@ -179,7 +179,7 @@ module.exports = session => {
           .catch(done);
       });
 
-      it('should validate (2)', done => {
+      it('should validate required properties', done => {
         let ModelWithSchema = subClassWithSchema(Model1, {
           type: 'object',
           required: ['model1Prop2'],
@@ -204,6 +204,28 @@ module.exports = session => {
             done();
           })
           .catch(done);
+      });
+
+      it.skip('should pass validation if query properties are passed in for required', () => {
+        const ModelWithSchema = subClassWithSchema(Model1, {
+          type: 'object',
+          required: ['model1Prop1'],
+          properties: {
+            id: { type: ['number', 'null'] },
+            model1Prop1: { type: 'string' },
+            model1Prop2: { type: 'number' }
+          }
+        });
+
+        return ModelWithSchema.query()
+          .update({ model1Prop1: raw(`'text'`) })
+          .where('model1Prop1', 'hello 2')
+          .then(() => {
+            return session.knex(Model1.getTableName());
+          })
+          .then(rows => {
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
+          });
       });
 
       it('should use `Model.createValidationError` to create the error', done => {

@@ -1,8 +1,12 @@
+---
+sidebarDepth: 3
+---
+
 # Query examples
 
 The `Person` model used in the examples is defined [here](/guide/models.html#examples).
 
-All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder).
+All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
 
 ## Basic queries
 
@@ -11,6 +15,11 @@ All queries are started with one of the [Model](/api/model/) methods [query](/ap
 Find queries can be created simply by calling [Model.query()](/api/model/static-methods.html#static-query) and chaining query builder methods for the returned
 [QueryBuilder](/api/query-builder/) instance. The query is executed by calling the [then](/api/query-builder/instance-methods.html#then) method, which converts the query
 into a Promise.
+
+In addition to the examples here, you can find more examples behind these links.
+
+* [subqueries](/recipes/subqueries.html)
+* [raw queries](/recipes/raw-queries.html)
 
 ##### Examples
 
@@ -127,12 +136,17 @@ order by "lastName" asc
 
 Insert queries are created by chaining the [insert](/api/query-builder/instance-methods.html#insert) method to the query. See the [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method for inserting object graphs.
 
+In addition to the examples here, you can find more examples behind these links.
+
+* [insert API reference](/api/query-builder/instance-methods.html#insert)
+* [graph inserts](/guide/query-examples.html#graph-inserts)
+
 ##### Examples
 
 ```js
 const jennifer = await Person
   .query()
-  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+  .insert({ firstName: 'Jennifer', lastName: 'Lawrence' })
 
 console.log(jennifer instanceof Person); // --> true
 console.log(jennifer.firstName); // --> 'Jennifer'
@@ -145,13 +159,18 @@ insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 
 ### Update queries
 
-Update queries are created by chaining the [update](/api/query-builder/instance-methods.html#update) or [patch](/api/query-builder/instance-methods.html#patch) method to the query. The [patch](/api/query-builder/instance-methods.html#patch) and [update](/api/query-builder/instance-methods.html#update) methods return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder/instance-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/instance-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/instance-methods.html#returning) or take a look at [this recipe] (/recipes/returning-tricks) for more ideas. See [update](/api/query-builder/instance-methods.html#update) and [patch](/api/query-builder/instance-methods.html#patch) API documentation for discussion about their differences.
+Update queries are created by chaining the [update](/api/query-builder/instance-methods.html#update) or [patch](/api/query-builder/instance-methods.html#patch) method to the query. [patch](/api/query-builder/instance-methods.html#patch) and [update](/api/query-builder/instance-methods.html#update) return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder/instance-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/instance-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/instance-methods.html#returning) or take a look at [this recipe](/recipes/returning-tricks.html) for more ideas. See [update](/api/query-builder/instance-methods.html#update) and [patch](/api/query-builder/instance-methods.html#patch) API documentation for discussion about their differences.
+
+In addition to the examples here, you can find more examples behind these links.
+
+* [patch API reference](/api/query-builder/instance-methods.html#patch)
+* [raw queries](/recipes/raw-queries.html)
 
 ##### Examples
 
 ```js
 const numUpdated = await Person.query()
-  .patch({lastName: 'Dinosaur'})
+  .patch({ lastName: 'Dinosaur' })
   .where('age', '>', 60)
 
 console.log('all people over 60 years old are now dinosaurs');
@@ -179,7 +198,7 @@ select "persons".* from "persons" where "id" = 246
 
 Delete queries are created by chaining the [delete](/api/query-builder/instance-methods.html#delete) method to the query.
 
-NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](/recipes/returning-tricks) if you'd like the deleted rows to be returned as Model instances*.
+NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](/recipes/returning-tricks.html) if you'd like the deleted rows to be returned as Model instances*.
 
 ##### Examples
 
@@ -194,6 +213,52 @@ console.log(numDeleted, 'people were deleted');
 
 ```sql
 delete from "persons" where lower("firstName") like '%ennif%'
+```
+
+You can always use [subqueries](/recipes/subqueries.html), [raw](/api/objection/#raw), [ref](/api/objection/#ref), [lit](/api/objection/#lit) and all query building methods with [delete](/api/query-builder/instance-methods.html#delete) queries, just like with every query in objection. With some databases, you cannot use joins with deletes (db restriction, not objection). You can replace joins with subqueries like this:
+
+```js
+// This query deletes all people that have a pet named "Fluffy".
+await Person
+  .query()
+  .delete()
+  .whereIn(
+    'id',
+    Person.query()
+      .select('persons.id')
+      .joinRelation('pets')
+      .where('pets.name', 'Fluffy')
+  );
+```
+
+```sql
+delete from "persons"
+where "id" in (
+  select "persons.id"
+  from "persons"
+  join "pets" on "pets.ownerId" = "persons.id"
+  where "pets.name" = 'Fluffy'
+)
+```
+
+```js
+// This is another way to implement the previous query.
+await Person
+  .query()
+  .delete()
+  .whereExists(
+    Person.relatedQuery('pets').where('pets.name', 'Fluffy')
+  );
+```
+
+```sql
+delete from "persons"
+where exists (
+  select "pets".*
+  from "pets"
+  where "pets.ownerId" = "persons.id"
+  and "pets.name" = 'Fluffy'
+)
 ```
 
 ## Relation queries
@@ -525,7 +590,6 @@ If you are using Postgres the inserts are done in batches for maximum performanc
 
 You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
 
-
 ##### Examples
 
 ```js
@@ -630,6 +694,30 @@ await Person
   }], {
     relate: [
       'movies'
+    ]
+  });
+```
+
+The `relate` option can also contain nested relations:
+
+```js
+await Person
+  .query()
+  .insertGraph([{
+    firstName: 'Jennifer',
+    lastName: 'Lawrence',
+
+    movies: [{
+      name: 'Silver Linings Playbook',
+      duration: 122,
+
+      actors: [{
+        id: 2516
+      }]
+    }]
+  }], {
+    relate: [
+      'movies.actors'
     ]
   });
 ```

@@ -191,7 +191,7 @@ console.log('jennifer just got all her dogs vaccinated');
 class Person extends Model {
   async $beforeInsert(queryContext) {
     await super.$beforeInsert(queryContext);
-    await doPossiblyAsyncStuff();
+    await this.doPossiblyAsyncStuff();
   }
 }
 ```
@@ -240,7 +240,7 @@ class Person extends Model {
 class Person extends Model {
   async $afterInsert(queryContext) {
     await super.$afterInsert(queryContext);
-    await doPossiblyAsyncStuff();
+    await this.doPossiblyAsyncStuff();
   }
 }
 ```
@@ -286,7 +286,7 @@ class Person extends Model {
 class Person extends Model {
   async $beforeUpdate(opt, queryContext) {
     await super.$beforeUpdate(opt, queryContext);
-    await doPossiblyAsyncStuff();
+    await this.doPossiblyAsyncStuff();
   }
 }
 ```
@@ -298,7 +298,7 @@ you need to do update specific validation.
 
 This method is also called before a model is patched. Therefore all the model's properties may not exist. You can check if the update operation is a patch by checking the `opt.patch` boolean.
 
-`opt.old` object contains the old values while `this` contains the updated values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
+Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
 
 ##### Arguments
 
@@ -356,7 +356,7 @@ Person
 class Person extends Model {
   async $afterUpdate(opt, queryContext) {
     await super.$afterUpdate(opt, queryContext);
-    await doPossiblyAsyncStuff();
+    await this.doPossiblyAsyncStuff();
   }
 }
 ```
@@ -367,7 +367,7 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 This method is also called after a model is patched. Therefore all the model's properties may not exist. You can check if the update operation is a patch by checking the `opt.patch` boolean.
 
-`opt.old` object contains the old values while `this` contains the updated values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
+Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
 
 ##### Arguments
 
@@ -475,7 +475,7 @@ class Person extends Model {
 class Person extends Model {
   async $afterDelete(queryContext) {
     await super.$afterDelete(queryContext);
-    await doPossiblyAsyncStuff();
+    await this.doPossiblyAsyncStuff();
   }
 }
 ```
