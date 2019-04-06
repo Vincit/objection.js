@@ -1,6 +1,6 @@
 # Composite keys
 
-Composite (compound) keys are fully supported. Just give an array of columns where you would normally give a single column name. Composite primary key can be specified by setting an array of column names to the [idColumn](/api/model.html#statoc-idcolumn) of a model class.
+Composite (compound) keys are fully supported. Just give an array of columns where you would normally give a single column name. Composite primary key can be specified by setting an array of column names to the [idColumn](/api/model/static-properties.html#static-idcolumn) of a model class.
 
 Here's a list of methods that may help working with composite keys:
 

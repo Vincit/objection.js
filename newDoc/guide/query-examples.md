@@ -12,14 +12,15 @@ All queries are started with one of the [Model](/api/model/) methods [query](/ap
 
 ### Find queries
 
-Find queries can be created simply by calling [Model.query()](/api/model/static-methods.html#static-query) and chaining query builder methods for the returned
-[QueryBuilder](/api/query-builder/) instance. The query is executed by calling the [then](/api/query-builder/instance-methods.html#then) method, which converts the query
-into a Promise.
+Find queries can be created by calling [Model.query()](/api/model/static-methods.html#static-query) and chaining query builder methods for the returned
+[QueryBuilder](/api/query-builder/) instance.
 
 In addition to the examples here, you can find more examples behind these links.
 
 * [subqueries](/recipes/subqueries.html)
 * [raw queries](/recipes/raw-queries.html)
+
+ There's also a large amount of examples in the [API documentation](/api/query-builder/).
 
 ##### Examples
 
@@ -36,7 +37,7 @@ console.log('there are', people.length, 'People in total');
 select "people".* from "people"
 ```
 
-The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has. Here is a simple example that uses some of them:
+The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
 
 ```js
 const middleAgedJennifers = await Person
@@ -56,6 +57,40 @@ where "age" > 40
 and "age" < 60
 and "firstName" = 'Jennifer'
 order by "lastName" asc
+```
+
+The next example shows how easy it is to build complex queries:
+
+```js
+const people = await Person
+  .query()
+  .select('persons.*', 'Parent.firstName as parentFirstName')
+  .join('persons as parent', 'persons.parentId', 'parent.id')
+  .where('persons.age', '<', Person.query().avg('persons.age'))
+  .whereExists(
+    Animal.query().select(1).whereColumn('persons.id', 'animals.ownerId')
+  )
+  .orderBy('persons.lastName');
+
+console.log(people[0].parentFirstName);
+```
+
+```sql
+select "persons".*, "parent"."firstName" as "parentFirstName"
+from "persons"
+inner join "persons"
+  as "parent"
+  on "persons"."parentId" = "parent"."id"
+where "persons"."age" < (
+  select avg("persons"."age")
+  from "persons"
+)
+and exists (
+  select 1
+  from "animals"
+  where "persons"."id" = "animals"."ownerId"
+)
+order by "persons"."lastName" asc
 ```
 
 In addition to knex methods, the [QueryBuilder](/api/query-builder/) has a lot of helpers for dealing with relations like the [joinRelation](/api/query-builder/instance-methods.html#joinrelation) method:
@@ -78,38 +113,6 @@ inner join "persons"
 inner join "persons"
   as "parent:parent"
   on "parent:parent"."id" = "parent"."parentId"
-```
-
-The next example shows how easy it is to build complex queries:
-
-```js
-const people = await Person
-  .query()
-  .select('persons.*', 'Parent.firstName as parentFirstName')
-  .join('persons as parent', 'persons.parentId', 'parent.id')
-  .where('persons.age', '<', Person.query().avg('persons.age'))
-  .whereExists(Animal.query().select(1).where('persons.id', ref('animals.ownerId')))
-  .orderBy('persons.lastName');
-
-console.log(people[0].parentFirstName);
-```
-
-```sql
-select "persons".*, "parent"."firstName" as "parentFirstName"
-from "persons"
-inner join "persons"
-  as "parent"
-  on "persons"."parentId" = "parent"."id"
-where "persons"."age" < (
-  select avg("persons"."age")
-  from "persons"
-)
-and exists (
-  select 1
-  from "animals"
-  where "persons"."id" = "animals"."ownerId"
-)
-order by "persons"."lastName" asc
 ```
 
 Objection allows a bit more modern syntax with groupings and subqueries. Where knex requires you to use an old fashioned `function` an `this`, with objection you can use arrow functions:
@@ -293,7 +296,7 @@ order by "name" asc
 
 ### Insert queries
 
-Chain the [insert](/api/query-builder/instance-methods.html#insert) method to a [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder.html/api/query-builder.html#insertgraph) method for an alternative way to insert related models.
+Chain the [insert](/api/query-builder/instance-methods.html#insert) method to a [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method for an alternative way to insert related models.
 
 By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model/instance-methods.html#setrelated) and
 [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
@@ -582,7 +585,7 @@ const people = await Person
 
 Arbitrary relation graphs can be inserted using the [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method. This is best explained using examples, so check them out.
 
-See the [allowInsert](/api/query-builder.html#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method to avoid security issues. [allowInsert](/api/query-builder.html#allowinsert) works like [allowEager](/api/query-builder.html#allowinsert).
+See the [allowInsert](/api/query-builder/instance-methods.html#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method to avoid security issues. [allowInsert](/api/query-builder/instance-methods.html#allowinsert) works like [allowEager](/api/query-builder/instance-methods.html#allowinsert).
 
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all inserted rows and not just the first or the last one.
 
@@ -753,7 +756,7 @@ The [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph) method w
 
 [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
 
-See the [allowUpsert](/api/query-builder/instance-methods.html#allowupsert) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph) method to avoid security issues. [allowUpsert](/api/query-builder/instance-methods.html#allowupsert) works like [allowInsert](/api/query-builder.html#allowinsert).
+See the [allowUpsert](/api/query-builder/instance-methods.html#allowupsert) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph) method to avoid security issues. [allowUpsert](/api/query-builder/instance-methods.html#allowupsert) works like [allowInsert](/api/query-builder/instance-methods.html#allowinsert).
 
 ##### Examples
 

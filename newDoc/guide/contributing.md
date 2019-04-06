@@ -22,7 +22,7 @@ For a pull request to get merged it needs to have the following things:
 
 2. **Tests that verify the fix/feature.** It's possible to create a PR without tests and ask for someone else to write them but in that case it may take a long time or forever until someone finds time to do it. *Untested code will never get merged!*
 
-3. **For features you also need to write documentation. See the [development setup](#development-setup) section for instructions on how to write documentation.**
+3. **For features you also need to write documentation.** See the [development setup](/guide/contributing.html#development-setup) section for instructions on how to write documentation.
 
 ## Development setup
 
@@ -30,21 +30,13 @@ For a pull request to get merged it needs to have the following things:
 
 2. **Clone objection**
 
-```sh
+```bash
 git clone git@github.com:<your-account>/objection.js.git objection
 ```
 
-3. **Install MySQL and PostgreSQL or alternatively run `docker-compose up` in the repo root**
+3. **Run `docker-compose up` in the repo root**
 
-4. **Create test users and databases**
-
-```sh
-psql -U postgres -c "CREATE USER objection SUPERUSER"
-psql -U postgres -c "CREATE DATABASE objection_test"
-mysql -u root -e "CREATE USER objection"
-mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO objection"
-mysql -u root -e "CREATE DATABASE objection_test"
-```
+4. **Create test users and databases by running `node setup-test-db` in the repo root**
 
 5. **Run `npm test` in objection's root to see if everything works.**
 
@@ -52,9 +44,11 @@ mysql -u root -e "CREATE DATABASE objection_test"
 
 You can run the tests on a subset of databases by setting the `DATABASES` env variable
 
-```sh
-# Only run tests on sqlite. No need for postgres and mysql setup.
+```bash
+# Only run tests on sqlite. No need for docker-compose.
 DATABASES=sqlite3 npm test
 ```
 
-Code and tests need to be written in ES2015 subset supported by node 6.0.0. The best way to make sure of this is to develop with the correct node version. [nvm](https://github.com/creationix/nvm) is a great tool for swapping between node versions. `prettier` is used to format the code. Remember to run `npm run prettier` before committing code.
+Code and tests need to be written in ES2015 subset supported by node 6.0.0. The best way to make sure of this is to develop with the correct node version. [nvm](https://github.com/creationix/nvm) is a great tool for swapping between node versions.
+
+[prettier](https://prettier.io/) is used to format the code. Remember to run `npm run prettier` before committing code.

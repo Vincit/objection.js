@@ -64,6 +64,8 @@ const { raw } = require('objection');
 
 Factory function that returns a [RawBuilder](/api/types/#class-rawbuilder) instance. [RawBuilder](/api/types/#class-rawbuilder) is a wrapper for knex raw method that doesn't depend on knex. Instances of [RawBuilder](/api/types/#class-rawbuilder) are converted to knex raw instances lazily when the query is executed.
 
+Also see [the raw query recipe](/recipes/raw-queries.html).
+
 ##### Examples
 
 When using raw SQL segments in queries, it's a good idea to use placeholders instead of  adding user input directly to the SQL to avoid injection errors. Placeholders are sent to the database engine which then takes care of interpolating the SQL safely.
@@ -312,7 +314,7 @@ const knex = Knex(Object.assign({
 const { knexIdentifierMapping } = require('objection');
 ```
 
-Like [knexSnakeCaseMappers](#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
+Like [knexSnakeCaseMappers](/api/objection/#knexsnakecasemappers), but can be used to make an arbitrary static mapping between column names and property names. In the examples, you would have identifiers `MyId`, `MyProp` and `MyAnotherProp` in the database and you would like to map them into `id`, `prop` and `anotherProp` in the code.
 
 ##### Examples
 

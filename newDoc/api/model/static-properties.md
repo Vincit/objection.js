@@ -288,7 +288,7 @@ Person
 
 ## `static` namedFilters
 
-An alias for [modifiers](#static-modifiers)
+An alias for [modifiers](/api/model/static-properties.html#static-modifiers)
 
 ## `static` modelPaths
 

@@ -1,6 +1,6 @@
 # Default values
 
-You can set the default values for properties using the `default` property in [jsonSchema](/api/models.html#static-jsonschema).
+You can set the default values for properties using the `default` property in [jsonSchema](/api/model/static-properties.html#static-jsonschema).
 
 
 ```js

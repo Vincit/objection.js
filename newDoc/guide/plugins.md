@@ -1,6 +1,6 @@
 # Plugins
 
-A curated list of plugins and modules for objection. Only plugins that follow [the best practices](#plugin-development-best-practices) are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best practices are an exception to this rule. If you are a developer of or otherwise know of a good plugin/module for objection, please create a pull request or an issue to get it added to this list.
+A curated list of plugins and modules for objection. Only plugins that follow [the best practices](/guide/contributing.html#plugin-development-best-practices) are accepted on this list. Other modules like plugins for other frameworks and things that cannot be implemented following the best practices are an exception to this rule. If you are a developer of or otherwise know of a good plugin/module for objection, please create a pull request or an issue to get it added to this list.
 
 ## 3rd party plugins
 

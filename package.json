@@ -26,11 +26,11 @@
   },
   "author": {
     "name": "Sami Koskimäki",
-    "email": "sami.koskimaki@vincit.com",
+    "email": "sami@jakso.me",
     "url": "https://github.com/koskimas"
   },
   "contributors": [
-    "Sami Koskimäki <sami.koskimaki@vincit.com> (https://github.com/koskimas)",
+    "Sami Koskimäki <sami@jakso.me> (https://github.com/koskimas)",
     "Mikael Lepistö <mikael.lepisto@vincit.com> (https://github.com/elhigu)",
     "Matthew McEachen <matthew-objection@photostructure.com> (https://github.com/mceachen)",
     "Jürg Lehni <juerg@scratchdisk.com> (https://github.com/lehni)",
@@ -89,8 +89,7 @@
     "prettier": "1.13.6",
     "sqlite3": "^4.0.0",
     "typescript": "^3.3.3",
-    "vuepress": "0.14.10",
-    "webpack-dev-middleware": "3.6.0"
+    "vuepress": "0.14.10"
   },
   "nyc": {
     "description": "test coverage",

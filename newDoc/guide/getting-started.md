@@ -6,7 +6,7 @@ The next step is to create some migrations and models and start using objection.
 
 * [The minimal example](https://github.com/Vincit/objection.js/tree/master/examples/minimal) contains the bare minimum for you to start testing out things with objection.
 
-```sh
+```bash
 git clone git@github.com:Vincit/objection.js.git objection
 cd objection/examples/minimal
 npm install
@@ -15,7 +15,7 @@ npm start
 
 * [The express example project](https://github.com/Vincit/objection.js/tree/master/examples/express-es6) is a simple [express](https://expressjs.com/) server. The `client.js` file contains a bunch of http requests for you to start playing with the REST API.
 
-```sh
+```bash
 git clone git@github.com:Vincit/objection.js.git objection
 cd objection/examples/express-es6
 npm install
