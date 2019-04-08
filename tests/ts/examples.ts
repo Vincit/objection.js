@@ -94,6 +94,14 @@ class Person extends objection.Model {
     const itemMessage: string = errorItem.message;
     return new CustomValidationError('my custom error: ' + message + ' ' + itemMessage);
   }
+
+  static get modifiers() {
+    return {
+      myFilter(builder: objection.QueryBuilder<Person>) {
+        return builder.orderBy('date');
+      }
+    };
+  }
 }
 
 function takesModelSubclass<M extends objection.Model>(m: M) {}
