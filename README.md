@@ -11,9 +11,9 @@ are supported by objection.js. **SQLite3**, **Postgres** and **MySQL** are [thor
 
 What objection.js gives you:
 
- * **An easy declarative way of [defining models](https://vincit.github.io/objection.js/#models) and relationships between them**
- * **Simple and fun way to [fetch, insert, update and delete](https://vincit.github.io/objection.js/#query-examples) objects using the full power of SQL**
- * **Powerful mechanisms for [eager loading](https://vincit.github.io/objection.js/#eager-loading), [inserting](https://vincit.github.io/objection.js/#graph-inserts) and [upserting](https://vincit.github.io/objection.js/#graph-upserts) object graphs**
+ * **An easy declarative way of [defining models](https://vincit.github.io/objection.js/api/model/) and relationships between them**
+ * **Simple and fun way to [fetch, insert, update and delete](https://vincit.github.io/objection.js/guide/query-examples.html) objects using the full power of SQL**
+ * **Powerful mechanisms for [eager loading](https://vincit.github.io/objection.js/guide/query-examples.html#eager-loading), [inserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-inserts) and [upserting](https://vincit.github.io/objection.js/guide/query-examples.html#graph-upserts) object graphs**
  * **A way to [store complex documents](https://vincit.github.io/objection.js/#documents) as single rows**
  * **Completely [Promise](https://github.com/petkaantonov/bluebird) based API**
  * **Easy to use [transactions](https://vincit.github.io/objection.js/#transactions)**
