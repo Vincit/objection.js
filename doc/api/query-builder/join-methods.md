@@ -1,105 +1,5 @@
 # Join Methods
 
-## join()
-
-See [knex documentation](http://knexjs.org/#Builder-join)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## joinRaw()
-
-See [knex documentation](http://knexjs.org/#Builder-joinRaw)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## innerJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-innerJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## leftJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-leftJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## leftOuterJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-leftOuterJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## rightJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-rightJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## rightOuterJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-rightOuterJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## outerJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-outerJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## fullOuterJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-fullOuterJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-## crossJoin()
-
-See [knex documentation](http://knexjs.org/#Builder-crossJoin)
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
 ## joinRelation()
 
 ```js
@@ -216,3 +116,103 @@ Left outer join version of the [joinRelation](/api/query-builder/join-methods.ht
 ## fullOuterJoinRelation()
 
 Full outer join version of the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method.
+
+## join()
+
+See [knex documentation](http://knexjs.org/#Builder-join)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## joinRaw()
+
+See [knex documentation](http://knexjs.org/#Builder-joinRaw)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## innerJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-innerJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## leftJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-leftJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## leftOuterJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-leftOuterJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## rightJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-rightJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## rightOuterJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-rightOuterJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## outerJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-outerJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## fullOuterJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-fullOuterJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+## crossJoin()
+
+See [knex documentation](http://knexjs.org/#Builder-crossJoin)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
