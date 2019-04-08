@@ -314,6 +314,10 @@ declare namespace Objection {
     (relationExpression: RelationExpression): QueryBuilder<QM, RM, RV>;
   }
 
+  export interface Modifiers {
+    [name: string]: (builder: QueryBuilder<any>) => void;
+  }
+
   interface TraverserFunction {
     /**
      * Called if model is in a relation of some other model.
@@ -418,6 +422,7 @@ declare namespace Objection {
     columnNameMappers: ColumnNameMappers;
     relatedFindQueryMutates: boolean;
     relatedInsertQueryMutates: boolean;
+    modifiers: Modifiers;
 
     raw: knex.RawBuilder;
     fn: knex.FunctionHelper;
@@ -491,6 +496,7 @@ declare namespace Objection {
     static columnNameMappers: ColumnNameMappers;
     static relatedFindQueryMutates: boolean;
     static relatedInsertQueryMutates: boolean;
+    static modifiers: Modifiers;
 
     static raw: knex.RawBuilder;
     static fn: knex.FunctionHelper;
