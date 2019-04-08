@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Relations | Objection.js</title>
+    <meta name="description" content="An SQL friendly ORM for node.js">
+    
+    
+    <link rel="preload" href="/objection.js/assets/css/0.styles.2afd088d.css" as="style"><link rel="preload" href="/objection.js/assets/js/app.09a9c1ac.js" as="script"><link rel="preload" href="/objection.js/assets/js/27.a090e14b.js" as="script"><link rel="prefetch" href="/objection.js/assets/js/1.28eec30a.js"><link rel="prefetch" href="/objection.js/assets/js/10.f5cf3816.js"><link rel="prefetch" href="/objection.js/assets/js/11.36960472.js"><link rel="prefetch" href="/objection.js/assets/js/12.73516485.js"><link rel="prefetch" href="/objection.js/assets/js/13.89a34f4a.js"><link rel="prefetch" href="/objection.js/assets/js/14.645852a5.js"><link rel="prefetch" href="/objection.js/assets/js/15.5521877e.js"><link rel="prefetch" href="/objection.js/assets/js/16.db3d89e6.js"><link rel="prefetch" href="/objection.js/assets/js/17.18746bc9.js"><link rel="prefetch" href="/objection.js/assets/js/18.2da6277b.js"><link rel="prefetch" href="/objection.js/assets/js/19.3fa85d79.js"><link rel="prefetch" href="/objection.js/assets/js/2.6ba45699.js"><link rel="prefetch" href="/objection.js/assets/js/20.2bb4cef1.js"><link rel="prefetch" href="/objection.js/assets/js/21.1abc6802.js"><link rel="prefetch" href="/objection.js/assets/js/22.48f5b052.js"><link rel="prefetch" href="/objection.js/assets/js/23.a9ab0d4a.js"><link rel="prefetch" href="/objection.js/assets/js/24.1b3fbeb3.js"><link rel="prefetch" href="/objection.js/assets/js/25.4e24f7f3.js"><link rel="prefetch" href="/objection.js/assets/js/26.9bc6ecba.js"><link rel="prefetch" href="/objection.js/assets/js/28.bb19bf61.js"><link rel="prefetch" href="/objection.js/assets/js/29.27dab098.js"><link rel="prefetch" href="/objection.js/assets/js/3.f78320b5.js"><link rel="prefetch" href="/objection.js/assets/js/30.e66d337e.js"><link rel="prefetch" href="/objection.js/assets/js/31.d800d99d.js"><link rel="prefetch" href="/objection.js/assets/js/32.4b43ac21.js"><link rel="prefetch" href="/objection.js/assets/js/33.8a8eb71e.js"><link rel="prefetch" href="/objection.js/assets/js/34.85a184d3.js"><link rel="prefetch" href="/objection.js/assets/js/35.0793d24c.js"><link rel="prefetch" href="/objection.js/assets/js/36.e79b9272.js"><link rel="prefetch" href="/objection.js/assets/js/37.e20e8fc1.js"><link rel="prefetch" href="/objection.js/assets/js/38.734d87e0.js"><link rel="prefetch" href="/objection.js/assets/js/39.09b1fbbb.js"><link rel="prefetch" href="/objection.js/assets/js/40.eb852455.js"><link rel="prefetch" href="/objection.js/assets/js/41.0da04eb8.js"><link rel="prefetch" href="/objection.js/assets/js/42.eff36de2.js"><link rel="prefetch" href="/objection.js/assets/js/43.929bc9ec.js"><link rel="prefetch" href="/objection.js/assets/js/44.cc7cf3e7.js"><link rel="prefetch" href="/objection.js/assets/js/45.1934024c.js"><link rel="prefetch" href="/objection.js/assets/js/46.307b8f99.js"><link rel="prefetch" href="/objection.js/assets/js/47.dbef30b6.js"><link rel="prefetch" href="/objection.js/assets/js/48.efe7b71f.js"><link rel="prefetch" href="/objection.js/assets/js/5.0ae1e31b.js"><link rel="prefetch" href="/objection.js/assets/js/6.eb2d487d.js"><link rel="prefetch" href="/objection.js/assets/js/7.87d1f15c.js"><link rel="prefetch" href="/objection.js/assets/js/8.2d5853cf.js"><link rel="prefetch" href="/objection.js/assets/js/9.684ab9cc.js">
+    <link rel="stylesheet" href="/objection.js/assets/css/0.styles.2afd088d.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/objection.js/" class="home-link router-link-active"><!----> <span class="site-name">Objection.js</span></a> <div class="links" style="max-width:nullpx;"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link router-link-active">Guide</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">Main Module</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">Query Builder</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">Model</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">Types</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link">Recipe Book</a></div><div class="nav-item"><a href="/objection.js/changelog/" class="nav-link">Changelog</a></div> <a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="repo-link">
+    Github
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header> <div class="sidebar-mask"></div> <div class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/objection.js/guide/" class="nav-link router-link-active">Guide</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title">API Reference</span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/objection.js/api/objection/" class="nav-link">Main Module</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/query-builder/" class="nav-link">Query Builder</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/model/" class="nav-link">Model</a></li><li class="dropdown-item"><!----> <a href="/objection.js/api/types/" class="nav-link">Types</a></li></ul></div></div><div class="nav-item"><a href="/objection.js/recipes/" class="nav-link">Recipe Book</a></div><div class="nav-item"><a href="/objection.js/changelog/" class="nav-link">Changelog</a></div> <a href="https://github.com/vincit/objection.js" target="_blank" rel="noopener noreferrer" class="repo-link">
+    Github
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav>  <ul class="sidebar-links"><li><div class="sidebar-group first"><p class="sidebar-heading open"><span>Guide</span> <!----></p> <ul class="sidebar-group-items"><li><a href="/objection.js/guide/installation.html" class="sidebar-link">Installation</a></li><li><a href="/objection.js/guide/getting-started.html" class="sidebar-link">Getting started</a></li><li><a href="/objection.js/guide/models.html" class="sidebar-link">Models</a></li><li><a href="/objection.js/guide/relations.html" class="active sidebar-link">Relations</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/objection.js/guide/relations.html#examples" class="sidebar-link">Examples</a></li><li class="sidebar-sub-header"><a href="/objection.js/guide/relations.html#require-loops" class="sidebar-link">Require loops</a></li></ul></li><li><a href="/objection.js/guide/query-examples.html" class="sidebar-link">Query examples</a></li><li><a href="/objection.js/guide/transactions.html" class="sidebar-link">Transactions</a></li><li><a href="/objection.js/guide/validation.html" class="sidebar-link">Validation</a></li><li><a href="/objection.js/guide/documents.html" class="sidebar-link">Documents</a></li><li><a href="/objection.js/guide/plugins.html" class="sidebar-link">Plugins</a></li><li><a href="/objection.js/guide/contributing.html" class="sidebar-link">Contribution guide</a></li></ul></div></li></ul> </div> <div class="page"> <div class="content"><h1 id="relations"><a href="#relations" aria-hidden="true" class="header-anchor">#</a> Relations</h1> <p>We already went through how to create relationships (aka. relations, associations) in the <a href="/objection.js/guide/models.html">models</a> section's examples but here's a list of all the available relation types in a nicely searchable place. See <a href="/objection.js/api/types/#type-relationmapping">this</a> API doc section for full documentation of the relation mapping parameters.</p> <p>Relationships are a very basic concept in relational databases and if you aren't familiar with it, you should spend some time googling it first. Basically there are three ways to create a relationship between two tables <code>A</code> and <code>B</code>:</p> <ol><li><p>Table <code>A</code> has a column that holds table <code>B</code>'s id. This relationship is called a <code>BelongsToOneRelation</code> in objection.
+We can say that <code>A</code> belongs to one <code>B</code>.</p></li> <li><p>Table <code>B</code> has a column that holds table <code>A</code>'s id. This relationship is called a <code>HasManyRelation</code> in objection.
+We can say that <code>A</code> has many <code>B</code>'s.</p></li> <li><p>Table <code>C</code> has columns for both <code>A</code> and <code>B</code> tables' identifiers. This relationship is called <code>ManyToManyRelation</code> in objection.
+Each row in <code>C</code> joins one <code>A</code> with one <code>B</code>. Therefore an <code>A</code> row can be related to multiple <code>B</code> rows and a <code>B</code> row can be related to
+multiple <code>A</code> rows through table <code>C</code>.</p></li></ol> <p>While relations are usually created between the primary key of one table and a foreign key reference of another table, objection has no such limitations. You can create relationship using any two columns (or any sets of columns). You can even create relation using values nested deep inside json columns.</p> <p>If you've used other ORMs you may notice that objection's <a href="/objection.js/api/model/static-properties.html#static-relationmappings">relationMappings</a> are pretty verbose. There are couple of reasons for that:</p> <ol><li><p>For a new user, this style underlines what is happening, and which columns and tables are involved.</p></li> <li><p>You only need to define relations once. Writing a couple of lines more for clarity shouldn't impact your productivity.</p></li></ol> <h2 id="examples"><a href="#examples" aria-hidden="true" class="header-anchor">#</a> Examples</h2> <p>Vocabulary for the relation descriptions:</p> <ul><li>source model: The model for which you are writing the <code>relationMapping</code> for.</li> <li>related model: The model at the other end of the relation.</li></ul> <p><code>BelongsToOneRelation</code>: Use this relation when the source model has the foreign key</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">Animal</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> tableName <span class="token operator">=</span> <span class="token string">'animals'</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">static</span> relationMappings <span class="token operator">=</span> <span class="token punctuation">{</span>
+    owner<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>BelongsToOneRelation<span class="token punctuation">,</span>
+      modelClass<span class="token punctuation">:</span> Person<span class="token punctuation">,</span>
+      join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'animals.ownerId'</span><span class="token punctuation">,</span>
+        to<span class="token punctuation">:</span> <span class="token string">'persons.id'</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p><code>HasManyRelation</code>: Use this relation when the related model has the foreign key</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> tableName <span class="token operator">=</span> <span class="token string">'persons'</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">static</span> relationMappings <span class="token operator">=</span> <span class="token punctuation">{</span>
+    animals<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>HasManyRelation<span class="token punctuation">,</span>
+      modelClass<span class="token punctuation">:</span> Animal<span class="token punctuation">,</span>
+      join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+        to<span class="token punctuation">:</span> <span class="token string">'animals.ownerId'</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p><code>HasOneRelation</code>: Just like <code>HasManyRelation</code> but for one related row</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> tableName <span class="token operator">=</span> <span class="token string">'persons'</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">static</span> relationMappings <span class="token operator">=</span> <span class="token punctuation">{</span>
+    animal<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>HasOneRelation<span class="token punctuation">,</span>
+      modelClass<span class="token punctuation">:</span> Animal<span class="token punctuation">,</span>
+      join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+        to<span class="token punctuation">:</span> <span class="token string">'animals.ownerId'</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p><code>ManyToManyRelation</code>: Use this relation when the model is related to a list of other models through a join table</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> tableName <span class="token operator">=</span> <span class="token string">'persons'</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">static</span> relationMappings <span class="token operator">=</span> <span class="token punctuation">{</span>
+    movies<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+      modelClass<span class="token punctuation">:</span> Movie<span class="token punctuation">,</span>
+      join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+        through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token comment">// persons_movies is the join table.</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons_movies.personId'</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'persons_movies.movieId'</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        to<span class="token punctuation">:</span> <span class="token string">'movies.id'</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p><code>HasOneThroughRelation</code>: Use this relation when the model is related to a single model through a join table</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> tableName <span class="token operator">=</span> <span class="token string">'persons'</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">static</span> relationMappings <span class="token operator">=</span> <span class="token punctuation">{</span>
+    movie<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+      relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>HasOneThroughRelation<span class="token punctuation">,</span>
+      modelClass<span class="token punctuation">:</span> Movie<span class="token punctuation">,</span>
+      join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+        through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token comment">// persons_movies is the join table.</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons_movies.personId'</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'persons_movies.movieId'</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        to<span class="token punctuation">:</span> <span class="token string">'movies.id'</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="require-loops"><a href="#require-loops" aria-hidden="true" class="header-anchor">#</a> Require loops</h2> <p>Require loops (circular dependencies, circular requires) are a very common problem when defining relations. Whenever a module <code>A</code> imports module <code>B</code> that immediately (synchronously) imports module <code>A</code>, you create a require loop that node.js or objection cannot solve automatically. A require loop usually leads to the other imported value to be an empty object which causes all kinds of problems. Objection attempts to detect these situations and mention the words <code>require loop</code> in the thrown error. Objection offers multiple solutions to this problem. See the circular dependency solutions examples in this section. In addition to objection's solutions, you can always organize your code so that such loops are not created.</p> <p>Solutions to require loops</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token keyword">extends</span> <span class="token class-name">Model</span> <span class="token punctuation">{</span>
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">tableName</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">'persons'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">static</span> <span class="token keyword">get</span> <span class="token function">relationMappings</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Solution 1:</span>
+    <span class="token comment">//</span>
+    <span class="token comment">// relationMappings getter is accessed lazily when you execute</span>
+    <span class="token comment">// your first query that needs it. Therefore if you `require`</span>
+    <span class="token comment">// your models inside the getter, you don't end up with a require loop.</span>
+    <span class="token comment">// Note that only one end of the relation needs to be required like</span>
+    <span class="token comment">// this, not both. `relationMappings` can also be a method or</span>
+    <span class="token comment">// a thunk if you prefer those instead of getters.</span>
+    <span class="token keyword">const</span> Animal <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./Animal'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">{</span>
+      pets<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>HasManyRelation<span class="token punctuation">,</span>
+        modelClass<span class="token punctuation">:</span> Animal<span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'animals.ownerId'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      movies<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        <span class="token comment">// Solution 2:</span>
+        <span class="token comment">//</span>
+        <span class="token comment">// Absolute file path to a module that exports the model class.</span>
+        <span class="token comment">// This is similar to solution 1, but objection calls `require`</span>
+        <span class="token comment">// under the hood. The downside here is that you need to give</span>
+        <span class="token comment">// an absolute file path because of the way `require` works.</span>
+        modelClass<span class="token punctuation">:</span> path<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span>__dirname<span class="token punctuation">,</span> <span class="token string">'Movie'</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token comment">// persons_movies is the join table.</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons_movies.personId'</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'persons_movies.movieId'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'movies.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+      movies<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        relation<span class="token punctuation">:</span> Model<span class="token punctuation">.</span>ManyToManyRelation<span class="token punctuation">,</span>
+        <span class="token comment">// Solution 3:</span>
+        <span class="token comment">//</span>
+        <span class="token comment">// Use only a module name and define a `modelPaths` property</span>
+        <span class="token comment">// for your model (or a superclass of your model). Search for</span>
+        <span class="token comment">// `modelPaths` from the docs for more info.</span>
+        modelClass<span class="token punctuation">:</span> <span class="token string">'Movie'</span><span class="token punctuation">,</span>
+        join<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+          <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons.id'</span><span class="token punctuation">,</span>
+          through<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> <span class="token string">'persons_movies.personId'</span><span class="token punctuation">,</span>
+            to<span class="token punctuation">:</span> <span class="token string">'persons_movies.movieId'</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          to<span class="token punctuation">:</span> <span class="token string">'movies.id'</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div></div> <div class="page-edit"><!----> <!----></div> <div class="page-nav"><p class="inner"><span class="prev">
+        ←
+        <a href="/objection.js/guide/models.html" class="prev">
+          Models
+        </a></span> <span class="next"><a href="/objection.js/guide/query-examples.html">
+          Query examples
+        </a>
+        →
+      </span></p></div> </div> <!----></div></div>
+    <script src="/objection.js/assets/js/app.09a9c1ac.js" defer></script><script src="/objection.js/assets/js/27.a090e14b.js" defer></script>
+  </body>
+</html>
