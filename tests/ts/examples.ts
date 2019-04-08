@@ -521,7 +521,9 @@ const children: Promise<Person[]> = Person.query()
 const childrenAndPets: Promise<Person[]> = Person.query()
   .eager('children')
   .where('age', '>=', 42)
-  .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'));
+  .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'))
+  .modifyEager('[pets, children.pets]', 'orderByName')
+  .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
 const rowsPage: Promise<{
   total: number;
