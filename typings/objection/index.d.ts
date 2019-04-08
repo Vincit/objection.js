@@ -368,6 +368,10 @@ declare namespace Objection {
       relationExpression: RelationExpression,
       modifier: (builder: QueryBuilder<QM2, QM2[]>) => void
     ): QueryBuilder<QM1, RM1, RV1>;
+    <QM2 extends Model>(
+      relationExpression: RelationExpression,
+      modifier: string | string[]
+    ): QueryBuilder<QM1, RM1, RV1>;
   }
 
   interface BluebirdMapper<T, Result> {
