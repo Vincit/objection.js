@@ -1217,7 +1217,7 @@ Left outer join version of the [joinRelation](/api/query-builder/instance-method
 
 Full outer join version of the [joinRelation](/api/query-builder/instance-methods.html#joinrelation) method.
 
-### where
+### where()
 
 See [knex documentation](http://knexjs.org/#Builder-where)
 
@@ -1798,7 +1798,7 @@ Type|Description
 
 An alias for [applyModifier](/api/query-builder/instance-methods.html#applymodifier)
 
-#### columnInfo
+### columnInfo()
 
 See [knex documentation](http://knexjs.org/#Builder-columnInfo)
 
@@ -1994,7 +1994,7 @@ See [whereJsonSubsetOf](/api/query-builder/instance-methods.html#wherejsonsubset
 ### whereJsonIsArray()
 
 ```js
-const builder = queryBuilder.whereJsonIsArray(fieldExpression);
+queryBuilder = queryBuilder.whereJsonIsArray(fieldExpression);
 ```
 
 Where json field reference is an array.
@@ -2013,20 +2013,20 @@ Type|Description
 
 ### orWhereJsonIsArray()
 
-See [`whereJsonIsArray`](/api/query-builder/instance-methods.html#wherejsonisarray)
+See [whereJsonIsArray](/api/query-builder/instance-methods.html#wherejsonisarray)
 
 ### whereJsonNotArray()
 
-See [`whereJsonIsArray`](/api/query-builder/instance-methods.html#wherejsonisarray)
+See [whereJsonIsArray](/api/query-builder/instance-methods.html#wherejsonisarray)
 
 ### orWhereJsonNotArray()
 
-See [`whereJsonIsArray`](/api/query-builder/instance-methods.html#wherejsonisarray)
+See [whereJsonIsArray](/api/query-builder/instance-methods.html#wherejsonisarray)
 
 ### whereJsonIsObject()
 
 ```js
-const builder = queryBuilder.whereJsonIsObject(fieldExpression);
+queryBuilder = queryBuilder.whereJsonIsObject(fieldExpression);
 ```
 
 Where json field reference is an object.
@@ -2045,15 +2045,15 @@ Type|Description
 
 ### orWhereJsonIsObject()
 
-See [`whereJsonIsObject`](/api/query-builder/instance-methods.html#wherejsonisobject)
+See [whereJsonIsObject](/api/query-builder/instance-methods.html#wherejsonisobject)
 
 ### whereJsonNotObject()
 
-See [`whereJsonIsObject`](/api/query-builder/instance-methods.html#wherejsonisobject)
+See [whereJsonIsObject](/api/query-builder/instance-methods.html#wherejsonisobject)
 
 ### orWhereJsonNotObject()
 
-See [`whereJsonIsObject`](/api/query-builder/instance-methods.html#wherejsonisobject)
+See [whereJsonIsObject](/api/query-builder/instance-methods.html#wherejsonisobject)
 
 ### whereJsonHasAny()
 
@@ -2104,3 +2104,1852 @@ Type|Description
 ### orWhereJsonHasAll()
 
 See [whereJsonHasAll](/api/query-builder/instance-methods.html#wherejsonhasall)
+
+## Other instance methods
+
+### context()
+
+```js
+queryBuilder = queryBuilder.context(queryContext);
+```
+
+Sets/gets the query context.
+
+Some query builder methods create more than one query. The query context is an object that is shared with all queries started by a query builder.
+
+The context is also passed to [$beforeInsert](/api/model/instance-methods.html#beforeinsert), [$afterInsert](/api/model/instance-methods.html#afterinsert), [$beforeUpdate](/api/model/instance-methods.html#beforeupdate), [$afterUpdate](/api/model/instance-methods.html#afterupdate), [$beforeDelete](/api/model/instance-methods.html#beforedelete), [$afterDelete](/api/model/instance-methods.html#afterdelete) and [$afterGet](/api/model/instance-methods.html#afterget) calls that the query creates.
+
+In addition to properties added using this method (and [mergeContext](/api/query-builder/instance-methods.html#mergecontext)) the query context object always has a `transaction` property that holds the active transaction. If there is no active transaction the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere where a transaction object can be passed so you never need to check for the existence of the `transaction` property.
+
+See the methods [runBefore](/api/query-builder/instance-methods.html#runbefore), [onBuild](/api/query-builder/instance-methods.html#onbuild) and [runAfter](/api/query-builder/instance-methods.html#runafter)
+for more information about the hooks.
+
+::: tip
+Most of the time, you should be using [mergeContext](/api/query-builder/instance-methods.html#mergecontext) instead of this method. This method replaces the whole context, while `mergeContext` merges the values with the current ones.
+:::
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+queryContext|Object|The query context object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+You can set the context like this:
+
+```js
+await Person
+  .query()
+  .context({something: 'hello'});
+```
+
+and access the context like this:
+
+```js
+const context = builder.context();
+```
+
+You can set any data to the context object. You can also register QueryBuilder lifecycle methods for _all_ queries that share the context:
+
+```js
+Person
+  .query()
+  .context({
+    runBefore(result, builder) {
+      return result;
+    },
+    runAfter(result, builder) {
+      return result;
+    },
+    onBuild(builder) {}
+  });
+```
+
+For example the `eager` method causes multiple queries to be executed from a single query builder. If you wanted to make all of them use the same schema you could write this:
+
+```js
+Person
+  .query()
+  .eager('[movies, children.movies]')
+  .context({
+    onBuild(builder) {
+      builder.withSchema('someSchema');
+    }
+  });
+```
+
+### mergeContext()
+
+```js
+queryBuilder = queryBuilder.mergeContext(queryContext);
+```
+
+Merges values into the query context.
+
+This method is like [context](/api/query-builder/instance-methods.html#context) but instead of replacing the whole context this method merges the objects.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+queryContext|Object|The object to merge into the query context.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+### tableNameFor()
+
+```js
+const tableName = queryBuilder.tableNameFor(modelClass);
+```
+
+Returns the table name for a given model class in the query. Usually the table name can be fetched through `Model.tableName` but if the source table has been changed for example using the [QueryBuilder#table](/api/query-builder/instance-methods.html#table) method `tableNameFor` will return the correct value.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelClass|function|A model class.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The source table (or view) name for `modelClass`.
+
+### tableRefFor()
+
+```js
+const tableRef = queryBuilder.tableRefFor(modelClass);
+```
+
+Returns the name that should be used to refer to the `modelClass`'s table in the query.
+Usually a table can be referred to using its name, but `tableRefFor` can return a different
+value for example in case an alias has been given.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelClass|function|A model class.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The name that should be used to refer to a table in the query.
+
+### reject()
+
+```js
+queryBuilder = queryBuilder.reject(reason);
+```
+
+Skips the database query and "fakes" an error result.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+reson| |The rejection reason
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+### resolve()
+
+```js
+queryBuilder = queryBuilder.resolve(value);
+```
+
+Skips the database query and "fakes" a result.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+value| |The resolve value
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+### isExecutable()
+
+```js
+const isExecutable = queryBuilder.isExecutable();
+```
+
+Returns false if this query will never be executed.
+
+This may be true in multiple cases:
+
+1. The query is explicitly resolved or rejected using the [resolve](/api/query-builder/instance-methods.html#resolve) or [reject](/api/query-builder/instance-methods.html#reject) methods.
+2. The query starts a different query when it is executed.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|false if the query will never be executed.
+
+### isFind()
+
+```js
+const isFind = queryBuilder.isFind();
+```
+
+Returns true if the query is read-only.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query is read-only.
+
+### isInsert()
+
+```js
+const isInsert = queryBuilder.isInsert();
+```
+
+Returns true if the query performs an insert operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an insert operation.
+
+### isUpdate()
+
+```js
+const isUpdate = queryBuilder.isUpdate();
+```
+
+Returns true if the query performs an update or patch operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an update or patch operation.
+
+### isDelete()
+
+```js
+const isDelete = queryBuilder.isDelete();
+```
+
+Returns true if the query performs a delete operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs a delete operation.
+
+### isRelate()
+
+```js
+const isRelate = queryBuilder.isRelate();
+```
+
+Returns true if the query performs a relate operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs a relate operation.
+
+### isUnrelate()
+
+```js
+const isUnrelate = queryBuilder.isUnrelate();
+```
+
+Returns true if the query performs an unrelate operation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an unrelate operation.
+
+### isInternal()
+
+```js
+const isInternal = queryBuilder.isInternal();
+```
+
+Returns true for internal "helper" queries that are not directly
+part of the operation being executed. For example the `select` queries
+performed by `upsertGraph` to get the current state of the graph are
+internal queries.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query performs an internal helper operation.
+
+### hasWheres()
+
+```js
+const hasWheres = queryBuilder.hasWheres();
+```
+
+Returns true if the query contains where statements.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query contains where statements.
+
+### hasSelects()
+
+```js
+const hasSelects = queryBuilder.hasSelects();
+```
+
+Returns true if the query contains any specific select staments, such as:
+`'select'`, `'columns'`, `'column'`, `'distinct'`, `'count'`, `'countDistinct'`, `'min'`, `'max'`, `'sum'`, `'sumDistinct'`, `'avg'`, `'avgDistinct'`
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query contains any specific select staments.
+
+### hasEager()
+
+```js
+const hasEager = queryBuilder.hasEager();
+```
+
+Returns true if the query defines any eager expressions.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query defines any eager expressions.
+
+### has()
+
+```js
+const has = queryBuilder.has(selector);
+```
+
+```js
+console.log(Person.query().range(0, 4).has('range'));
+```
+
+Returns true if the query defines an operation that matches the given selector.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+selector|string&nbsp;&#124;&nbsp;RegExp|A name or regular expression to match all defined operations against.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+boolean|true if the query defines an operation that matches the given selector.
+
+### clear()
+
+```js
+queryBuilder = queryBuilder.clear(selector);
+```
+
+Removes all operations in the query that match the given selector.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+selector|string&nbsp;&#124;&nbsp;regexp|A name or regular expression to match all operations that are to be removed against.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+console.log(Person.query().orderBy('firstName').clear('orderBy').has('orderBy'));
+```
+
+### runBefore()
+
+```js
+queryBuilder = queryBuilder.runBefore(runBefore);
+```
+
+Registers a function to be called before just the database query when the builder is executed. Multiple functions can be chained like `then` methods of a promise.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+runBefore|function(result,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const query = Person.query();
+
+query
+  .runBefore(async result => {
+    console.log('hello 1');
+
+    await Promise.delay(10);
+
+    console.log('hello 2');
+    return result
+  })
+  .runBefore(result => {
+    console.log('hello 3');
+    return result
+  });
+
+await query;
+// --> hello 1
+// --> hello 2
+// --> hello 3
+```
+
+### onBuild()
+
+```js
+queryBuilder = queryBuilder.onBuild(onBuild);
+```
+
+Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [runBefore](/api/query-builder/instance-methods.html#runbefore) methods but before [runAfter](/api/query-builder/instance-methods.html#runafter) methods.
+
+If you need to modify the SQL query at query build time, this is the place to do it. You shouldn't modify the query in any of the `run` methods.
+
+Unlike the `run` methods (`runAfter`, `runBefore` etc.) these must be synchronous. Also you should not register any `run` methods from these. You should _only_ call the query building methods of the builder provided as a parameter.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+onBuild|function([QueryBuilder](/api/query-builder/))|The **synchronous** function to be executed.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Eamples
+
+```js
+const query = Person.query();
+
+query
+ .onBuild(builder => {
+   builder.where('id', 1);
+ })
+ .onBuild(builder => {
+   builder.orWhere('id', 2);
+ });
+```
+
+### onBuildKnex()
+
+```js
+queryBuilder = queryBuilder.onBuildKnex(onBuildKnex);
+```
+
+Functions registered with this method are called each time the query is built into an SQL string. This method is ran after [onBuild](/api/query-builder/instance-methods.html#onbuild) methods but before [runAfter](/api/query-builder/instance-methods.html#runafter) methods.
+
+If you need to modify the SQL query at query build time, this is the place to do it in addition to `onBuild`. The only difference between `onBuildKnex` and `onBuild` is that in `onBuild` you can modify the objection's query builder. In `onBuildKnex` the objection builder has been compiled into a knex query builder and any modifications to the objection builder will be ignored.
+
+Unlike the `run`  methods (`runAfter`, `runBefore` etc.) these must be synchronous. Also you should not register any `run` methods from these. You should _only_ call the query building methods of the __knexBuilder__ provided as a parameter.
+
+::: warning
+You should never call any query building (or any other mutating) method on the `objectionBuilder` in this function. If you do, those calls will get ignored. At this point the query builder has been compiled into a knex query builder and you should only modify that. You can call non mutating methods like `hasSelects`, `hasWheres` etc. on the objection builder.
+:::
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+onBuildKnex|function(`KnexQueryBuilder`,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const query = Person.query();
+
+query
+ .onBuildKnex((knexBuilder, objectionBuilder) => {
+   knexBuilder.where('id', 1);
+ });
+```
+
+### runAfter()
+
+```js
+queryBuilder = queryBuilder.runAfter(runAfter);
+```
+
+Registers a function to be called when the builder is executed.
+
+These functions are executed as the last thing before any promise handlers registered using the [then](/api/query-builder/instance-methods.html#then) method. Multiple functions can be chained like [then](/api/query-builder/instance-methods.html#then)  methods of a promise.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+runAfter|function(result,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed. This function can be async. Note that it needs to return the result used for further processing in the chain of calls.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const query = Person.query();
+
+query
+ .runAfter(async (models, queryBuilder) => {
+   return models;
+ })
+ .runAfter(async (models, queryBuilder) => {
+   models.push(Person.fromJson({firstName: 'Jennifer'}));
+   return models;
+ });
+
+const models = await query;
+```
+
+### onError()
+
+```js
+queryBuilder = queryBuilder.onError(onError);
+```
+
+Registers an error handler. Just like `catch` but doesn't execute the query.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+onError|function(Error,&nbsp;[QueryBuilder](/api/query-builder/))|The function to be executed on error.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const query = Person.query();
+
+query
+ .onError(async (error, queryBuilder) => {
+   // Handle `SomeError` but let other errors go through.
+   if (error instanceof SomeError) {
+     // This will cause the query to be resolved with an object
+     // instead of throwing an error.
+     return {error: 'some error occurred'};
+   } else {
+     return Promise.reject(error);
+   }
+ })
+ .where('age', > 30);
+```
+
+### eagerAlgorithm()
+
+```js
+queryBuilder = queryBuilder.eagerAlgorithm(algo);
+```
+
+Select the eager loading algorithm for the query. See comparison between
+the available algorithms [here](/api/query-builder/instance-methods.html#eager).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+algo|EagerAlgorithm|The eager loading algorithm to use. One of `Model.JoinEagerAlgorithm`, `Model.WhereInEagerAlgorithm` and `Model.NaiveEagerAlgorithm`.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const people = await Person
+  .query()
+  .eagerAlgorithm(Person.JoinEagerAlgorithm)
+  .eager('[pets, children]')
+```
+
+### eagerOptions()
+
+```js
+queryBuilder = queryBuilder.eagerOptions(options);
+```
+
+Sets [options](/api/types/#type-eageroptions) for the eager query.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+options|[EagerOptions](/api/types/#type-eageroptions)|Options to set.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const people = await Person
+  .query()
+  .eagerOptions({joinOperation: 'innerJoin'})
+  .eager('[pets, children]')
+```
+
+### eager()
+
+```js
+queryBuilder = queryBuilder.eager(relationExpression, filters);
+```
+
+Fetch relations eagerly for the result rows.
+
+See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info on the relation expression language.
+
+You can choose the way objection performs the eager loading by using [eagerAlgorithm](/api/query-builder/instance-methods.html#eageralgorithm) method on a query builder or by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property of a model. The three algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) `Model.JoinEagerAlgorithm` and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main differences below. You can always see the executed SQL by calling the [debug](/api/query-builder/instance-methods.html#debug) method for the query builder.
+
+<b>WhereInEagerAlgorithm</b>
+
+This algorithm uses multiple queries to fetch the related objects. Objection performs one query per level in the eager tree. For example only two additional queries will be created for eager expression `children.children` no matter how many children the model has or how many children each of the children have. This algorithm is explained in detail in [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
+
+Limitations:
+
+ * Relations cannot be referred in the query because they are not joined.
+ * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyEager`, because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
+
+<b>JoinEagerAlgorithm</b>
+
+This algorithm uses joins to fetch the whole eager tree using one single query. This allows you to reference the relations in the root query (see the last example). The related tables can be referred using the relation name. Nested relations must be separated by `:` character (dot is not used because of the way knex parses identifiers).
+
+When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
+
+Limitations:
+
+ * `limit` and `page` methods will work incorrectly because they will limit the result set that contains all the result rows in a flattened format. For example the result set of the eager expression `children.children` will have `10 * 10 * 10` rows assuming the you fetched 10 models that all had 10 children that all had 10 children.
+
+<b>NaiveEagerAlgorithm</b>
+
+This algorithm naively fetches the relations using a separate query for each model. For example relation expression `children.children` will cause 111 queries to be performed assuming a result set of 10 each having 10 children each having 10 children. For small result sets this doesn't matter. The clear benefit of this algorithm is that there are no limitations. You can use `offset`, `limit`, `min`, `max` etc. in `modifyEager`. You can for example fetch only the youngest child for each parent.
+
+<b>Performance differences</b>
+
+`WhereInEagerAlgorithm` performs more queries than `JoinEagerAlgorithm` which can cause a significant delay especially if the round trip time to the database server is significant. On the other hand the result from `WhereInEagerAlgorithm` is trivial to parse into a tree structure while the result of `JoinEagerAlgorithm` needs some complex parsing which can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment. You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured real-life problem. Don't optimize prematurely! `NaiveEagerAlgorithm` is by far the slowest. It should only be used for
+cases where performance doesn't matter and when it is the only option to get the job done.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The eager expression
+modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|The modifier functions for the expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+// Fetch `children` relation for each result Person and `pets` and `movies`
+// relations for all the children.
+const people = await Person
+  .query()
+  .eager('children.[pets, movies]');
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
+```
+
+Relations can be modified by giving modifier functions as arguments to the relations:
+
+```js
+const people = await Person
+  .query()
+  .eager('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]', {
+    selectNameAndId: (builder) => {
+      builder.select('name', 'id');
+    },
+    orderByName: (builder) => {
+      builder.orderBy('name');
+    },
+    onlyDogs: (builder) => {
+      builder.where('species', 'dog');
+    }
+  });
+
+console.log(people[0].children[0].pets[0].name);
+cconsole.log(people[0].children[0].movies[0].id);
+```
+
+Reusable modifiers can be defined for a model class using [modifiers](/api/model/static-properties.html#static-modifiers)
+
+```js
+class Person extends Model {
+  static get modifiers() {
+    return {
+      defaultSelects(builder) {
+        builder.select('id', 'firstName', 'lastName')
+      },
+
+      orderByAge(builder) {
+        builder.orderBy('age');
+      }
+    };
+  }
+}
+
+class Animal extends Model {
+  static get modifiers() {
+    return {
+      orderByName(builder) {
+        builder.orderBy('name');
+      },
+
+      onlyDogs(builder) {
+        builder.where('species', 'dog');
+      }
+    };
+  }
+}
+
+const people = await Person
+  .query()
+  .eager('children(defaultSelects, orderByAge).[pets(onlyDogs, orderByName), movies]');
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
+```
+
+Filters can also be registered using the [modifyEager](/api/query-builder/instance-methods.html#modifyeager) method:
+
+```js
+const people = await Person
+  .query()
+  .eager('children.[pets, movies]')
+  .modifyEager('children', builder => {
+    // Order children by age and only select id.
+    builder.orderBy('age').select('id');
+  })
+  .modifyEager('children.[pets, movies]', builder => {
+    // Only select `pets` and `movies` whose id > 10 for the children.
+    builder.where('id', '>', 10);
+  })
+  .modifyEager('children.movies]', builder => {
+    // Only select 100 first movies for the children.
+    builder.limit(100);
+  });
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
+```
+
+Relations can be given aliases using the `as` keyword:
+
+```js
+const people = await Person
+  .query()
+  .eager(`[
+    children(orderByAge) as kids .[
+      pets(filterDogs) as dogs,
+      pets(filterCats) as cats
+
+      movies.[
+        actors
+      ]
+    ]
+  ]`);
+
+console.log(people[0].kids[0].dogs[0].name);
+console.log(people[0].kids[0].movies[0].id);
+```
+
+The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
+
+```js
+const people = await Person
+  .query()
+  .where('id', 1)
+  .eager('children.children');
+
+console.log(people[0].children.length); // --> 10
+console.log(people[0].children[9].children.length); // --> 10
+```
+
+The person has 10 children and they all have 10 children. The query above will return 100 database rows but will generate only three database queries when using `WhereInEagerAlgorithm` and only one query when using `JoinEagerAlgorithm`.
+
+The loading algorithm can be changed using the [eagerAlgorithm](/api/query-builder/instance-methods.html#eageralgorithm) method:
+
+```js
+const people = await Person
+  .query()
+  .where('id', 1)
+  .eagerAlgorithm(Person.JoinEagerAlgorithm)
+  .eager('[movies, children.pets]')
+  .where('movies.name', 'like', '%terminator%')
+  .where('children:pets.species', 'dog');
+
+console.log(people);
+```
+
+### joinEager()
+
+Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).eager(expr)`.
+
+When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
+
+### naiveEager()
+
+Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).eager(expr)`.
+
+### mergeEager()
+
+Just like [eager](/api/query-builder/instance-methods.html#eager) but instead of replacing query builder's eager expression this method merges the given expression to the existing expression.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The eager expression
+modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|The modifier functions for the expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+The following queries are equivalent
+
+```js
+Person
+  .query()
+  .eager('[children.pets, movies]')
+```
+
+```js
+Person
+  .query()
+  .eager('children')
+  .mergeEager('children.pets')
+  .mergeEager('movies')
+```
+
+```js
+Person
+  .query()
+  .eager('children.pets')
+  .mergeEager('movies')
+```
+
+```js
+Person
+  .query()
+  .mergeEager('children.pets')
+  .mergeEager('movies')
+```
+
+### mergeJoinEager()
+
+Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).mergeEager(expr)`.
+
+### mergeNaiveEager()
+
+Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).mergeEager(expr)`.
+
+### eagerObject()
+
+```js
+const builder = Person.query()
+  .eager('children.pets(onlyId)')
+
+const eagerObject = builder.eagerObject();
+console.log(eagerObject.children.pets.modify);
+// prints ["onlyId"]
+
+eagerObject.children.movies = true
+// You can modify the object and pass it back to the `eager` method.
+builder.eager(eagerObject)
+```
+
+Returns the object representation of the current eager expression.
+
+See [this section](/api/types/#relationexpression-object-notation) for more examples and information about the structure of the returned object.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+object|Object representation of the current eager expression.
+
+### eagerModifiers()
+
+```js
+const builder = Person.query()
+  .eager('children.pets(onlyId)', {
+    onlyId: builder.select('id')
+  })
+
+const modifiers = builder.eagerModifiers();
+console.log(modifiers.onlyId.toString());
+// prints 'builder => builder.select("id")'
+```
+
+Returns the current eager modifiers of the query.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+object|Eager modifiers of the query.
+
+### allowEager()
+
+```js
+queryBuilder = queryBuilder.allowEager(relationExpression);
+```
+
+Sets the allowed eager expression.
+
+Any subset of the allowed expression is accepted by [eager](/api/query-builder/instance-methods.html#eager) method. For example setting the allowed expression to `a.b.c` expressions `a`, `a.b` and `a.b.c` are accepted by [eager](/api/query-builder/instance-methods.html#eager) method. Setting any other expression will reject the query and cause the promise error handlers to be called.
+
+This method is useful when the eager expression comes from an untrusted source like query parameters of a http request.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+Person
+  .query()
+  .allowEager('[children.pets, movies]')
+  .eager(req.query.eager)
+```
+
+### mergeAllowEager()
+
+Just like [allowEager](/api/query-builder/instance-methods.html#alloweager) but instead of replacing query builder's allowEager expression this method merges the given expression to the existing expression.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+The following queries are equivalent
+
+```js
+Person
+  .query()
+  .allowEager('[children.pets, movies]')
+```
+
+```js
+Person
+  .query()
+  .allowEager('children')
+  .mergeAllowEager('children.pets')
+  .mergeAllowEager('movies')
+```
+
+```js
+Person
+  .query()
+  .allowEager('children.pets')
+  .mergeAllowEager('movies')
+```
+
+```js
+Person
+  .query()
+  .mergeAllowEager('children.pets')
+  .mergeAllowEager('movies')
+```
+
+### modifyEager()
+
+```js
+queryBuilder = queryBuilder.modifyEager(pathExpression, modifier);
+```
+
+Can be used to modify eager queries.
+
+The `pathExpression` is a relation expression that specifies the queries for which the modifier is given.
+
+The following query would filter out the children's pets that are <= 10 years old:
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+pathExpression|[RelationExpression](/api/types/#type-relationexpression)|Expression that specifies the queries for which to give the filter.
+modifier|function([QueryBuilder](/api/query-builder/)&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|A modifier function, [model modifier](/api/model/static-properties.html#static-modifiers) name or an array of model modifier names.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .modifyEager('children.pets', builder => {
+    builder.where('age', '>', 10);
+  })
+```
+
+The path expression can have multiple targets. The next example sorts both the pets and movies of the children by id:
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .modifyEager('children.[pets, movies]', builder => {
+    builder.orderBy('id');
+  })
+```
+
+This example only selects movies whose name contains the word 'Predator':
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .modifyEager('[children.movies, movies]', builder => {
+    builder.where('name', 'like', '%Predator%');
+  })
+```
+
+The modifier can also be a [Model modifier](/api/model/static-properties.html#static-modifiers) name, or an array of them:
+
+```js
+Person
+  .query()
+  .eager('[children.[pets, movies], movies]')
+  .modifyEager('children.movies', 'selectId')
+```
+
+### filterEager()
+
+Alias for [modifyEager](/api/query-builder/instance-methods.html#modifyeager).
+
+### allowInsert()
+
+```js
+queryBuilder = queryBuilder.allowInsert(relationExpression);
+```
+
+Sets the allowed tree of relations to insert using [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method.
+
+If the model tree given to the [insertGraph](/api/query-builder/instance-methods.html#insertgraph) method isn't a subtree of the given expression, the query is rejected.
+
+See methods [eager](/api/query-builder/instance-methods.html#eager), [allowEager](/api/query-builder/instance-methods.html#alloweager), [RelationExpression](/api/types/#type-relationexpression) and the guide section about [eager loading](/guide/query-examples.html#eager-loading) for more information on relation expressions.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const insertedPerson = await Person
+  .query()
+  .allowInsert('[children.pets, movies]')
+  .insertGraph({
+    firstName: 'Sylvester',
+    children: [{
+      firstName: 'Sage',
+      pets: [{
+        name: 'Fluffy'
+        species: 'dog'
+      }, {
+        name: 'Scrappy',
+        species: 'dog'
+      }]
+    }]
+  })
+```
+
+### allowUpsert()
+
+Just like [allowInsert](/api/query-builder/instance-methods.html#allowinsert) but this one works with [upsertGraph](/api/query-builder/instance-methods.html#upsertgraph).
+
+### castTo()
+
+```js
+queryBuilder = queryBuilder.castTo(ModelClass);
+```
+
+Sets the model class of the result rows.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[ModelClass](/api/model/)|The model class of the result rows.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+The following example creates a query through `Person`, joins a bunch of relations, selects
+only the related `Animal`'s columns and returns the results as `Animal` instances instead
+of `Person` instances.
+
+```js
+const animals = await Person
+  .query()
+  .joinRelation('children.children.pets')
+  .select('children:children:pets.*')
+  .castTo(Animal);
+```
+
+If your result rows represent no actual model, you can use `objection.Model`
+
+```js
+const { Model } = require('objection');
+
+const models = await Person
+  .query()
+  .joinRelation('children.pets')
+  .select([
+    'children:pets.id as animalId',
+    'children.firstName as childFirstName'
+  ])
+  .castTo(Model);
+```
+
+### modelClass()
+
+```js
+const modelClass = queryBuilder.modelClass();
+```
+
+Gets the Model subclass this builder is bound to.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[Model](/api/model/)|The Model subclass this builder is bound to
+
+### toString()
+
+```js
+const sql = queryBuilder.toString();
+```
+
+Returns the SQL string suitable for logging input _but not for execution_, via Knex's `toString()`. This method should not be used to create queries for database execution because it makes no guarantees about escaping bindings properly.
+
+Note: In the current release, if the query builder attempts to execute multiple queries or throw any exception whatsoever, **no error will throw** and instead the following string is returned:
+
+```
+This query cannot be built synchronously. Consider using debug() method instead.
+```
+
+Later versions of Objection may introduce a native way to retrieve an executable SQL statement, or handle this behavior differently. If you need executable SQL, you can consider the unstable/private API `this.build().toSQL()`, which is the native Knex method that can [provide formatted bindings](http://knexjs.org/#Interfaces-toSQL).
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The SQL this query builder will build, or `This query cannot be built synchronously. Consider using debug() method instead.` if an exception is thrown
+
+### toSql()
+
+```js
+const sql = queryBuilder.toSql();
+```
+
+An alias for `toSql()`.
+
+Note: The behavior of Objection's `toSql()` is different from Knex's `toSql()` (see above). This method may be deprecated soon.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+string|The SQL this query builder will build, or `This query cannot be built synchronously. Consider using debug() method instead.` if an exception is thrown
+
+### skipUndefined()
+
+```js
+queryBuilder = queryBuilder.skipUndefined();
+```
+
+If this method is called for a builder then undefined values passed to the query builder methods don't cause an exception but are ignored instead.
+
+For example the following query will return all `Person` rows if `req.query.firstName` is `undefined`.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+```js
+Person
+  .query()
+  .skipUndefined()
+  .where('firstName', req.query.firstName)
+```
+
+### transacting()
+
+```js
+queryBuilder = queryBuilder.transacting(transaction);
+```
+
+Sets the transaction for a query.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+transaction|object|A transaction object
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+### clone()
+
+```js
+const clone = queryBuilder.clone();
+```
+
+Create a clone of this builder.
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|Clone of the query builder
+
+### execute()
+
+```js
+const promise = queryBuilder.execute();
+```
+
+Executes the query and returns a Promise.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### then()
+
+```js
+const promise = queryBuilder.then(successHandler, errorHandler);
+```
+
+Executes the query and returns a Promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+successHandler|function|identity|Promise success handler
+errorHandler|function|identity|Promise error handler
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### map()
+
+```js
+const promise = queryBuilder.map(mapper);
+```
+
+Executes the query and calls `map(mapper)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+mapper|function|identity|Mapper function
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### reduce()
+
+```js
+const promise = queryBuilder.reduce(reducer, initialValue);
+```
+
+Executes the query and calls `reduce(reducer, initialValue)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+reducer|function|undefined|Reducer function
+initialValue|any|first element of the reduced collection|First arg for the
+reducer function
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### catch()
+
+```js
+const promise = queryBuilder.catch(errorHandler);
+```
+
+Executes the query and calls `catch(errorHandler)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+errorHandler|function|identity|Error handler
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### return()
+
+```js
+const promise = queryBuilder.return(returnValue);
+```
+
+Executes the query and calls `return(returnValue)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+returnValue| |undefined|Return value
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### bind()
+
+```js
+const promise = queryBuilder.bind(returnValue);
+```
+
+Executes the query and calls `bind(context)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+context| |undefined|Bind context
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### asCallback()
+
+```js
+const promise = queryBuilder.asCallback(callback);
+```
+
+Executes the query and calls `asCallback(callback)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+callback|function|undefined|Node style callback
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### nodeify()
+
+```js
+const promise = queryBuilder.nodeify(callback);
+```
+
+Executes the query and calls `nodeify(callback)` for the returned promise.
+
+##### Arguments
+
+Argument|Type|Default|Description
+--------|----|-------|------------
+callback|function|undefined|Node style callback
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result of the query.
+
+### resultSize()
+
+```js
+const promise = queryBuilder.resultSize();
+```
+
+Returns the amount of rows the current query would produce without [limit](/api/query-builder/instance-methods.html#limit) and [offset](/api/query-builder/instance-methods.html#offset) applied. Note that this executes a query (not the one we are building) and returns a Promise.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+`Promise`|Promise the will be resolved with the result size.
+
+##### Examples
+
+```js
+const query = Person
+  .query()
+  .where('age', '>', 20);
+
+const [total, models] = await Promise.all([
+  query.resultSize(),
+  query.offset(100).limit(50)
+]);
+```
+
+### page()
+
+```js
+queryBuilder = queryBuilder.page(page, pageSize);
+```
+
+```js
+const result = await Person
+  .query()
+  .where('age', '>', 20)
+  .page(5, 100);
+
+console.log(result.results.length); // --> 100
+console.log(result.total); // --> 3341
+```
+
+Two queries are performed by this method: the actual query and a query to get the `total` count.
+
+Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse than just executing a separate count query.
+
+Postgresql has window functions that can be used to get the total count like this `select count(*) over () as total`. The problem with this is that if the result set is empty, we don't get the total count either. (If someone can figure out a way around this, a PR is very welcome).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+page|number|The index of the page to return. The index of the first page is 0.
+pageSize|number|The page size
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+### range()
+
+```js
+queryBuilder = queryBuilder.range(start, end);
+```
+
+Only returns the given range of results.
+
+Two queries are performed by this method: the actual query and a query to get the `total` count.
+
+Mysql has the `SQL_CALC_FOUND_ROWS` option and `FOUND_ROWS()` function that can be used to calculate the result size, but according to my tests and [the interwebs](http://www.google.com/search?q=SQL_CALC_FOUND_ROWS+performance) the performance is significantly worse than just executing a separate count query.
+
+Postgresql has window functions that can be used to get the total count like this `select count(*) over () as total`. The problem with this is that if the result set is empty, we don't get the total count either. (If someone can figure out a way around this, a PR is very welcome).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+start|number|The index of the first result (inclusive)
+end|number|The index of the last result (inclusive)
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+```js
+const result = await Person
+  .query()
+  .where('age', '>', 20)
+  .range(0, 100);
+
+console.log(result.results.length); // --> 101
+console.log(result.total); // --> 3341
+```
+
+`range` can be called without arguments if you want to specify the limit and offset explicitly:
+
+```js
+const result = await Person
+  .query()
+  .where('age', '>', 20)
+  .limit(10)
+  .range();
+
+console.log(result.results.length); // --> 101
+console.log(result.total); // --> 3341
+```
+
+### pluck()
+
+```js
+queryBuilder = queryBuilder.pluck(propertyName);
+```
+
+If the result is an array, plucks a property from each object.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+propertyName|string|The name of the property to pluck
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+```js
+const firstNames = await Person
+  .query()
+  .where('age', '>', 20)
+  .pluck('firstName');
+
+console.log(typeof firstNames[0]); // --> string
+```
+
+### first()
+
+```js
+queryBuilder = queryBuilder.first();
+```
+
+If the result is an array, selects the first item.
+
+NOTE: This doesn't add `limit 1` to the query by default. You can override the [Model.useLimitInFirst](/api/model/static-properties.html#static-uselimitinfirst) property to change this behaviour.
+
+Also see [findById](/api/query-builder/instance-methods.html#findbyid) and [findOne](/api/query-builder/instance-methods.html#findone) shorthand methods.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+```js
+const firstPerson = await Person
+  .query()
+  .first()
+
+console.log(firstPerson.age);
+```
+
+### throwIfNotFound()
+
+```js
+queryBuilder = queryBuilder.throwIfNotFound();
+```
+
+Causes a [Model.NotFoundError](/api/types/#class-notfounderror) to be thrown if the query result is empty.
+
+You can replace `Model.NotFoundError` with your own error by implementing the static [Model.createNotFoundError(ctx)](/api/model/static-methods.html#static-createnotfounderror) method.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+```js
+try {
+  await Language
+    .query()
+    .where('name', 'Java')
+    .andWhere('isModern', true)
+    .throwIfNotFound()
+} catch (err) {
+  // No results found.
+  console.log(err instanceof Language.NotFoundError); // --> true
+}
+```
+
+### traverse()
+
+```js
+queryBuilder = queryBuilder.traverse(modelClass, traverser);
+```
+
+Traverses through all models in the result, including the eagerly loaded relations.
+
+The optional first parameter can be a constructor. If given, the traverser function is only called for the models of that class.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelClass|[Model](/api/model/)|The optional model class filter. If given, the traverser function is only called for models of this class.
+traverser|function([Model](/api/model/), [Model](/api/model/), string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+```js
+const people = await Person
+  .query()
+  .eager('pets')
+  .traverse((model, parentModel, relationName) => {
+    delete model.id;
+  });
+
+console.log(people[0].id); // --> undefined
+console.log(people[0].pets[0].id); // --> undefined
+```
+
+```js
+const persons = await Person
+  .query()
+  .eager('pets')
+  .traverse(Animal, (animal, parentModel, relationName) => {
+    delete animal.id;
+  });
+
+console.log(persons[0].id); // --> 1
+console.log(persons[0].pets[0].id); // --> undefined
+```
+
+### pick()
+
+```js
+queryBuilder = queryBuilder.pick(modelClass, properties);
+```
+
+Pick properties from result models.
+
+The first example goes through all models (including relations) and discards all
+properties but `id` and `name`. The second example also traverses the whole model
+tree and discards all but `id` and `firstName` properties of all `Person`
+instances and `id` and `name` properties of all `Animal` instances.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelClass|[Model](/api/model/)|The optional model class filter
+properties|string[]|The properties to pick
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+There are two ways to call this methods:
+
+```js
+Person
+  .query()
+  .eager('pets').
+  .pick(['id', 'name']);
+```
+
+and
+
+```js
+Person
+  .query()
+  .eager('pets')
+  .pick(Person, ['id', 'firstName'])
+  .pick(Animal, ['id', 'name']);
+```
+
+### omit()
+
+```js
+queryBuilder = queryBuilder.omit(modelClass, properties);
+```
+
+Omit properties of result models.
+
+The first example goes through all models (including relations) and omits the properties
+`parentId` and `ownerId`. The second example also traverses the whole model tree and
+omits the properties `parentId` and `age` from all `Person` instances and `ownerId`
+and `species` properties of all `Animal` instances.
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+modelClass|[Model](/api/model/)|The optional model class filter
+properties|string[]|The properties to omit
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining
+
+##### Examples
+
+There are two ways to call this methods:
+
+```js
+Person
+  .query()
+  .eager('pets').
+  .omit(['parentId', 'ownerId']);
+```
+
+and
+
+```js
+Person
+  .query()
+  .eager('pets')
+  .omit(Person, ['parentId', 'age'])
+  .omit(Animal, ['ownerId', 'species']);
+```
