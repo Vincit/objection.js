@@ -1,5 +1,6 @@
 # Transactions
 
+
 Transactions are atomic and isolated units of work in relational databases. If you are not familiar with transactions, I suggest you read up on them. [The wikipedia article](https://en.wikipedia.org/wiki/Database_transaction) is a good place to start.
 
 ## Creating a transaction
@@ -29,7 +30,7 @@ The second argument is a callback that gets called with the transaction object a
 
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise is rejected or an error is thrown inside the callback the transaction is rolled back.
 
-An alternative way to start a transaction is to use the [objection.transaction.start](/api/objection.html#transaction-start) method:
+An alternative way to start a transaction is to use the `objection.transaction.start` method:
 
 ```js
 const { transaction } = require('objection');

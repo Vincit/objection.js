@@ -206,7 +206,7 @@ If you start a query from this hook, make sure you specify `queryContext.transac
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the insert query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the insert query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -253,7 +253,7 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the insert query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the insert query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -305,7 +305,7 @@ Inside the hook, `this` contains the values to be updated. If (and only if) the 
 Argument|Type|Description
 --------|----|-------------------
 opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -374,7 +374,7 @@ Inside the hook, `this` contains the values to be updated. If (and only if) the 
 Argument|Type|Description
 --------|----|-------------------
 opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -442,7 +442,7 @@ This method is only called for instance deletes started with [$query()](/api/mod
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -492,7 +492,7 @@ This method is only called for instance deletes started with [$query()](/api/mod
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -539,7 +539,7 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 

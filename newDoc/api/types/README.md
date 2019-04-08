@@ -18,7 +18,7 @@ modelClass|[Model](/api/model/)<br>string|Constructor of the related model class
 join|[RelationJoin](/api/types/#type-relationjoin)|Describes how the models are related to each other. See [RelationJoin](/api/types/#type-relationjoin).
 modify|function([QueryBuilder](/api/query-builder/))<br>string<br>object|Optional modifier for the relation query. If specified as a function, it will be called each time before fetching the relation. If specified as a string, named filter with specified name will be applied each time when fetching the relation. If specified as an object, it will be used as an additional query parameter - e. g. passing {name: 'Jenny'} would additionally narrow fetched rows to the ones with the name 'Jenny'.
 filter|function([QueryBuilder](/api/query-builder/))<br>string<br>object|Alias for modify.
-beforeInsert|function([Model](/api/model/),&nbsp;[QueryContext](/api/query-builder/instance-methods.html#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
+beforeInsert|function([Model](/api/model/),&nbsp;[QueryContext](/api/query-builder/other-methods.html#context))|Optional insert hook that is called for each inserted model instance. This function can be async.
 
 ## `type` RelationJoin
 
@@ -36,7 +36,7 @@ from|string<br>[ReferenceBuilder](/api/objection/#ref)<br>Array|The column that 
 to|string<br>[ReferenceBuilder](/api/objection/#ref)<br>Array|The column that is joined to `to` property of the `RelationJoin`. For example `Person_movies.movieId` where `Person_movies` is the join table. Composite key can be specified using an array of columns e.g. `['persons_movies.a', 'persons_movies.b']`. You can join nested json fields using the [ref](/api/objection/#ref) helper.
 modelClass|string<br>ModelClass|If you have a model class for the join table, you should specify it here. This is optional so you don't need to create a model class if you don't want to.
 extra|string[]<br>Object|Join table columns listed here are automatically joined to the related objects when they are fetched and automatically written to the join table instead of the related table on insert. The values can be aliased by providing an object `{propertyName: 'columnName', otherPropertyName: 'otherColumnName'} instead of array`
-beforeInsert|function([Model](/api/model/),&nbsp;[QueryContext](/api/query-builder/instance-methods.html#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
+beforeInsert|function([Model](/api/model/),&nbsp;[QueryContext](/api/query-builder/other-methods.html#context))|Optional insert hook that is called for each inserted join table model instance. This function can be async.
 
 ## `type` ModelOptions
 
@@ -133,7 +133,7 @@ Caveats when using special characters in keys:
 4. Keys containing square brackets and quotes `objectColumn:['Double."Quote".[]']` and `objectColumn:["Sinlge.'Quote'.[]"]` Column `{ "Double.\"Quote\".[]" : "I was referred",  "Sinlge.'Quote'.[]" : "Mee too!" }`
 99. Keys containing dots, square brackets, single quotes and double quotes in one json key is not currently supported
 
-There are some special methods that accept `FieldExpression` strings directly, like [whereJsonSupersetOf](/api/query-builder/instance-methods.html#wherejsonsupersetof) but you can use `FieldExpressions` anywhere with [ref](/api/objection/#ref). Here's an example:
+There are some special methods that accept `FieldExpression` strings directly, like [whereJsonSupersetOf](/api/query-builder/find-methods.html#wherejsonsupersetof) but you can use `FieldExpressions` anywhere with [ref](/api/objection/#ref). Here's an example:
 
 ```js
 const { ref } = require('objection');
@@ -213,7 +213,7 @@ const people = await Person
 console.log(people[0].children[0].movies[0].actors[0].pets[0].name);
 ```
 
-Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](/api/model/static-properties.html#static-modifiers) or [local](/api/query-builder/instance-methods.html#eager)). Arguments are listed in parenthesis after the relation names like this:
+Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](/api/model/static-properties.html#static-modifiers) or [local](/api/query-builder/eager-methods.html#eager)). Arguments are listed in parenthesis after the relation names like this:
 
 ```js
 Person
@@ -423,7 +423,7 @@ const { NotFoundError } = require('objection');
 throw new NotFoundError(data);
 ```
 
-Error of this class is thrown by default by [throwIfNotFound()](/api/query-builder/instance-methods.html#throwifnotfound)
+Error of this class is thrown by default by [throwIfNotFound()](/api/query-builder/other-methods.html#throwifnotfound)
 
 You can replace this error by overriding [Model.createNotFoundError()](/api/model/static-methods.html#static-createnotfounderror) method.
 

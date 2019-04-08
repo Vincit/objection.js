@@ -80,7 +80,14 @@ module.exports = {
         {
           title: 'Query Builder API Reference',
           collapsable: false,
-          children: ['static-methods', 'instance-methods']
+          children: [
+            'find-methods',
+            'eager-methods',
+            'mutate-methods',
+            'join-methods',
+            'other-methods',
+            'static-methods'
+          ]
         }
       ],
 

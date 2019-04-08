@@ -240,7 +240,7 @@ const pojo = person.toJSON({ virtuals: ['fullName'] })
 
 ## `static` modifiers
 
-Reusable query building functions that can be used in any [eager query](/api/query-builder/instance-methods.html#eager), using [modify](/api/query-builder/instance-methods.html#modify) method and in many other places.
+Reusable query building functions that can be used in any [eager query](/api/query-builder/eager-methods.html#eager), using [modify](/api/query-builder/other-methods.html#modify) method and in many other places.
 
 ```js
 class Movie extends Model {
@@ -276,7 +276,7 @@ Person
   .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
-Modifiers can also be used through [modifyEager](/api/query-builder/instance-methods.html#modifyeager):
+Modifiers can also be used through [modifyEager](/api/query-builder/other-methods.html#modifyeager):
 
 ```js
 Person

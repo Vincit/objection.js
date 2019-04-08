@@ -405,7 +405,7 @@ class BaseModel extends Model {
 ```
 
 Handles modifiers that are not recognized by the various mechanisms that can specify
-them, such as [modify](/api/query-builder/instance-methods.html#modify) and [applyModifier](/api/query-builder/instance-methods.html#applyModifier), as well as the use of modifiers in eager expressions (see [RelationExpression](/api/types/#type-relationexpression)) and in relations (see [RelationMapping](/api/types/#type-relationmapping)).
+them, such as [modify](/api/query-builder/other-methods.html#modify) and [applyModifier](/api/query-builder/other-methods.html#applymodifier), as well as the use of modifiers in eager expressions (see [RelationExpression](/api/types/#type-relationexpression)) and in relations (see [RelationMapping](/api/types/#type-relationmapping)).
 
 By default, the static `modifierNotFound()` hook throws a `ModifierNotFoundError` error. If a model class overrides the hook, it can decide to handle the modifer through the passed `builder` instance, or call the hook's definition in the super class to still throw the error.
 
@@ -480,14 +480,14 @@ class BaseModel extends Model {
 }
 ```
 
-Creates an error thrown by [throwIfNotFound](/api/query-builder/instance-methods.html#throwifnotfound) method. You can override this
+Creates an error thrown by [throwIfNotFound](/api/query-builder/other-methods.html#throwifnotfound) method. You can override this
 to throw any error you want.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|-------------------
-queryContext|Object|The context object of query that produced the empty result. See [context](/api/query-builder/instance-methods.html#context).
+queryContext|Object|The context object of query that produced the empty result. See [context](/api/query-builder/other-methods.html#context).
 
 ##### Return value
 
@@ -717,7 +717,7 @@ const metadata = await Person.fetchTableMetadata(opt);
 
 Fetches and caches the table metadata.
 
-Most of the time objection doesn't need this metadata, but some methods like [joinEager](/api/query-builder/instance-methods.html#joineager) do. This method is called by objection when the metadata is needed. The result is cached and after the first call the cached promise is returned and no queries are executed.
+Most of the time objection doesn't need this metadata, but some methods like [joinEager](/api/query-builder/eager-methods.html#joineager) do. This method is called by objection when the metadata is needed. The result is cached and after the first call the cached promise is returned and no queries are executed.
 
 Because objection uses this on demand, the first query that needs this information can have unpredicable performance. If that's a problem, you can call this method for each of your models during your app's startup.
 

@@ -6,7 +6,7 @@ Objection throws four kinds of errors:
     include model instances and POJOs, eager expressions object graphs etc. [ValidationError](/api/types/#class-validationerror) has
     a `type` property that can be used to distinguish between the different error types.
 
-2. [NotFoundError](/api/types/#class-notfounderror) when [throwIfNotFound](/api/query-builder/instance-methods.html#throwifnotfound) was called for a query and no
+2. [NotFoundError](/api/types/#class-notfounderror) when [throwIfNotFound](/api/query-builder/other-methods.html#throwifnotfound) was called for a query and no
     results were found.
 
 3. Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the

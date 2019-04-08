@@ -4,7 +4,7 @@ To mix raw SQL with queries, use the [raw](/api/objection/#raw) function from th
 
 [raw](/api/objection/#raw) is handy when you want to mix SQL in objection queries, but if you want to fire off a completely custom query, you need to use [knex.raw](http://knexjs.org/#Raw).
 
-There are also some helper methods such as [whereRaw](/api/query-builder/instance-methods.html#whereraw) and [selectRaw](/api/query-builder/instance-methods.html#selectraw) in the [QueryBuilder](/api/query-builder/instance-methods.html).
+There are also some helper methods such as [whereRaw](/api/query-builder/find-methods.html#whereraw) and [selectRaw](/api/query-builder/find-methods.html#selectraw) in the [QueryBuilder](/api/query-builder/).
 
 ## Examples
 
