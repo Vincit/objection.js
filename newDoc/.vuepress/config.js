@@ -1,7 +1,7 @@
 module.exports = {
   title: 'Objection.js',
   description: 'An SQL friendly ORM for node.js',
-  base: '/objection.js/new-docs/',
+  base: '/objection.js/',
 
   themeConfig: {
     repo: 'vincit/objection.js',
@@ -38,6 +38,11 @@ module.exports = {
       {
         text: 'Recipe Book',
         link: '/recipes/'
+      },
+
+      {
+        text: 'Changelog',
+        link: '/changelog/'
       }
     ],
 
@@ -82,8 +87,8 @@ module.exports = {
           collapsable: false,
           children: [
             'find-methods',
-            'eager-methods',
             'mutate-methods',
+            'eager-methods',
             'join-methods',
             'other-methods',
             'static-methods'

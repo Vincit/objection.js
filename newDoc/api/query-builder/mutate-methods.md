@@ -1,4 +1,4 @@
-# Mutate methods
+# Mutating Methods
 
 ## insert()
 
