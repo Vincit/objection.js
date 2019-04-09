@@ -1,3 +1,5 @@
+'use strict';
+
 exports.up = knex => {
   return knex.schema.createTable('persons', table => {
     table.increments('id').primary();

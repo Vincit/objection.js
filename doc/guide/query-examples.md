@@ -268,7 +268,7 @@ where exists (
 
 While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [$relatedQuery](/api/model/instance-methods.html#relatedquery) method can be used to query a single relation. [$relatedQuery](/api/model/instance-methods.html#relatedquery) returns an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
 
-### Fetch queries
+### Find queries
 
 Simply call [$relatedQuery('relationName')](/api/model/instance-methods.html#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](/guide/query-examples.html#eager-loading) to fetch relations. [$relatedQuery](/api/model/instance-methods.html#relatedquery) is better when you only need one relation and you need to filter the query extensively.
 
