@@ -39,7 +39,7 @@ const peopleWithPetCount = await Person
 console.log(peopleWithPetCount[4].petCount);
 ```
 
-The above query can also be written using the [relatedQuery](/api/model/static-properties.html#static-relatedquery) (assuming a relation `pets` has been defined for `Person`):
+The above query can also be written using the [relatedQuery](/api/model/static-methods.html#static-relatedquery) (assuming a relation `pets` has been defined for `Person`):
 
 ```js
 

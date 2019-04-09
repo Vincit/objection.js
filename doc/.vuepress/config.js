@@ -7,6 +7,11 @@ module.exports = {
     repo: 'vincit/objection.js',
     repoLabel: 'Github',
 
+    algolia: {
+      apiKey: '8b9b4ac9f68d11c702e8102479760861',
+      indexName: 'vincit_objectionjs'
+    },
+
     nav: [
       {
         text: 'Guide',

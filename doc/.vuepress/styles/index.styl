@@ -1,6 +1,9 @@
 $bgColor = #1E1E1E;
 $mediumBgColor = #252525;
 $lightBgColor = #383838;
+$accentColor = #e0b24d;
+$textColor = #DDDDDD;
+$borderColor = #383838;
 
 html, body {
   background-color: $bgColor !important;
@@ -72,7 +75,7 @@ a:focus, button:focus  {
   }
 
   .custom-block {
-    color: #DDDDDD;
+    color: $textColor;
 
     &.tip {
       background-color: $lightBgColor;
@@ -91,5 +94,50 @@ a:focus, button:focus  {
 
   tr:nth-child(2n) {
     background-color: lighten($bgColor, 2%);
+  }
+
+  .algolia-search-wrapper .algolia-autocomplete .ds-dropdown-menu {
+    background-color: $bgColor;
+    border-color: $lightBgColor;
+
+    .algolia-docsearch-suggestion--category-header {
+      background-color: $bgColor;
+      color: $textColor;
+      border: none;
+      border-radius: unset;
+    }
+
+    .algolia-docsearch-suggestion--content:before {
+      background-color: $lightBgColor;
+    }
+
+    [class*=ds-dataset-] {
+      background-color: $bgColor;
+    }
+
+    .algolia-docsearch-suggestion {
+      background-color: $borderColor;
+    }
+
+    .algolia-docsearch-suggestion--subcategory-column {
+      background-color: lighten($bgColor, 2%);
+    }
+
+    .algolia-docsearch-suggestion--content {
+      background-color: lighten($bgColor, 2%);
+    }
+
+    .algolia-docsearch-suggestion--highlight {
+      color: $accentColor;
+      background-color: initial;
+    }
+  }
+
+  .algolia-search-wrapper .algolia-autocomplete .ds-dropdown-menu .ds-cursor .algolia-docsearch-suggestion--content {
+    background-color: $lightBgColor !important;
+  }
+
+  .algolia-autocomplete .ds-dropdown-menu:before {
+    display: none;
   }
 }
