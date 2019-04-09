@@ -14,7 +14,10 @@ Here's how you could create your models:
 const { Model } = require("objection");
 
 class User extends Model {
-  static get tableName() { return "user"; }
+  static get tableName() {
+    return "user";
+  }
+
   static get relationMappings() {
     return {
       groups: {
@@ -30,6 +33,7 @@ class User extends Model {
           to: "group.id"
         }
       },
+
       permissions: {
         relation: Model.ManyToManyRelation,
         modelClass: require("./Permission"),
@@ -55,7 +59,10 @@ module.exports = User;
 const { Model } = require("objection");
 
 class Group extends Model {
-  static get tableName() { return "group"; }
+  static get tableName() {
+    return "group";
+  }
+
   static get relationMappings() {
     return {
       users: {
@@ -71,6 +78,7 @@ class Group extends Model {
           to: "user.id"
         }
       },
+
       permissions: {
         relation: Model.ManyToManyRelation,
         modelClass: require("./Permission"),
@@ -96,7 +104,10 @@ module.exports = Group;
 const { Model } = require("objection");
 
 class Permission extends Model {
-  static get tableName() { return "permission"; }
+  static get tableName() {
+    return "permission";
+  }
+
   static get relationMappings() {
     return {
       users: {
@@ -112,6 +123,7 @@ class Permission extends Model {
           to: "user.id"
         }
       },
+
       groups: {
         relation: Model.ManyToManyRelation,
         modelClass: require("./Group"),
@@ -137,8 +149,14 @@ module.exports = Permission;
 const { Model } = require("objection");
 
 class UserGroupPermission extends Model {
-  static get tableName() { return "user_group_permission"; }
-  static get idColumn() { return ["user_id", "group_id", "permission_id"]; }
+  static get tableName() {
+    return "user_group_permission";
+  }
+
+  static get idColumn() {
+    return ["user_id", "group_id", "permission_id"];
+  }
+
   static get relationMappings() {
     return {
       user: {
@@ -146,25 +164,24 @@ class UserGroupPermission extends Model {
         modelClass: require("./User"),
         join: {
           from: "user_group_permission.user_id",
-          extra: ["extra_attribute"],
           to: "user.id"
         }
       },
+
       group: {
         relation: Model.BelongsToOneRelation,
         modelClass: require("./Group"),
         join: {
           from: "user_group_permission.group_id",
-          extra: ["extra_attribute"],
           to: "group.id"
         }
       },
+
       permission: {
         relation: Model.BelongsToOneRelation,
         modelClass: require("./Permission"),
         join: {
           from: "user_group_permission.permission_id",
-          extra: ["extra_attribute"],
           to: "permission.id"
         }
       }
