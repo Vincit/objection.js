@@ -75,7 +75,7 @@ await Person
 
 Fields marked as `extras` for many-to-many relations in [relationMappings](/api/model/static-properties.html#static-relationmappings) are automatically
 written to the join table instead of the target table. The `someExtra` field in the following example is written
-to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
+to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`. See [this recipe](/recipes/extra-properties.html) for more info.
 
 ```js
 const jennifer = await someMovie
@@ -547,7 +547,7 @@ await Person
   );
 ```
 
-Delete can of course be used in with [$relatedQuery](/api/model/instance-methods.html#relatedquery) and [$query](/api/model/instance-methods.html#query).
+Delete can of course be used with [$relatedQuery](/api/model/instance-methods.html#relatedquery) and [$query](/api/model/instance-methods.html#query) too.
 
 ```js
 const person = await Person.query().findById(personId);

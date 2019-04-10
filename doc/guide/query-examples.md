@@ -24,6 +24,19 @@ In addition to the examples here, you can find more examples behind these links.
 
 ##### Examples
 
+Fetch an item by id:
+
+```js
+const person = await Person.query().findById(1);
+
+console.log(person.firstName)
+console.log(person instanceof Person); // --> true
+```
+
+```sql
+select "people".* from "people" where id = 1
+```
+
 Fetch all people from the database:
 
 ```js
@@ -171,6 +184,22 @@ In addition to the examples here, you can find more examples behind these links.
 
 ##### Examples
 
+Update an item by id:
+
+```js
+const numUpdated = await Person.query()
+  .findById(1)
+  .patch({
+    firstName: 'Jennifer'
+  })
+```
+
+```sql
+update "persons" set "firstName" = 'Jennifer' where "id" = 1
+```
+
+Update multiple items:
+
 ```js
 const numUpdated = await Person.query()
   .patch({ lastName: 'Dinosaur' })
@@ -183,6 +212,8 @@ console.log(numUpdated, 'people were updated');
 ```sql
 update "persons" set "lastName" = 'Dinosaur' where "age" > 60
 ```
+
+Update and fetch an item:
 
 ```js
 const updatedPerson = await Person
@@ -204,6 +235,20 @@ Delete queries are created by chaining the [delete](/api/query-builder/mutate-me
 NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](/recipes/returning-tricks.html) if you'd like the deleted rows to be returned as Model instances*.
 
 ##### Examples
+
+Delete an item by id:
+
+```js
+const numDeleted = await Person
+  .query()
+  .deleteById(1)
+```
+
+```sql
+delete from "persons" where id = 1
+```
+
+Delete multiple items:
 
 ```js
 const numDeleted = await Person
@@ -336,6 +381,8 @@ values ('The room')
 insert into "persons_movies" ("movieId", "personId", "awesomeness")
 values (14, 25, 9001)
 ```
+
+See [this recipe](/recipes/extra-properties.html) for more information about `extra` properties.
 
 ### Update queries
 

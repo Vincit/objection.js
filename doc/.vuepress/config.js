@@ -114,6 +114,7 @@ module.exports = {
             'composite-keys',
             'json-queries',
             'custom-id-column',
+            'extra-properties',
             'custom-validation',
             'snake-case-to-camel-case-conversion',
             'paging',

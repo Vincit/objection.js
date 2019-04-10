@@ -3,7 +3,7 @@
 ## eager()
 
 ```js
-queryBuilder = queryBuilder.eager(relationExpression, filters);
+queryBuilder = queryBuilder.eager(relationExpression, modifiers);
 ```
 
 Fetch relations eagerly for the result rows.
