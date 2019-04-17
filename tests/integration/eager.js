@@ -1207,6 +1207,14 @@ module.exports = session => {
         });
     });
 
+    it('should be able to order by ambiguous column (issue #1287 regression)', () => {
+      return Model1.query()
+        .findOne('Model1.model1Prop1', 'hello 1')
+        .joinEager('model1Relation1')
+        .orderBy('id')
+        .execute();
+    });
+
     // TODO: enable for v2.0.
     it.skip('should fail with a clear error when a duplicate relation is detected', () => {
       expect(() => {
@@ -2953,10 +2961,10 @@ module.exports = session => {
               expect(_.last(sql).replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "Model1"."id",
-                  "Model1"."model1Id",
-                  "Model1"."model1Prop1",
-                  "Model1"."model1Prop2",
+                  "Model1"."id" as "id",
+                  "Model1"."model1Id" as "model1Id",
+                  "Model1"."model1Prop1" as "model1Prop1",
+                  "Model1"."model1Prop2" as "model1Prop2",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",

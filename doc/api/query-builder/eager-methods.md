@@ -263,13 +263,33 @@ const people = await Person
 
 ## joinEager()
 
-Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).eager(expr)`.
+```js
+queryBuilder = queryBuilder.joinEager(expr, modifiers)
+```
+
+Shorthand for
+
+```js
+queryBuilder
+  .eagerAlgorithm(Model.JoinEagerAlgorithm)
+  .eager(expr, modifiers)
+```
 
 When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
 
 ## naiveEager()
 
-Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).eager(expr)`.
+```js
+queryBuilder = queryBuilder.naiveEager(expr, modifiers)
+```
+
+Shorthand for
+
+```js
+queryBuilder
+  .eagerAlgorithm(Model.NaiveEagerAlgorithm)
+  .eager(expr, modifiers)
+```
 
 ## mergeEager()
 

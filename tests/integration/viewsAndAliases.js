@@ -303,10 +303,10 @@ module.exports = session => {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "someAlias"."id",
-                  "someAlias"."model1Id",
-                  "someAlias"."model1Prop1",
-                  "someAlias"."model1Prop2",
+                  "someAlias"."id" as "id",
+                  "someAlias"."model1Id" as "model1Id",
+                  "someAlias"."model1Prop1" as "model1Prop1",
+                  "someAlias"."model1Prop2" as "model1Prop2",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
@@ -514,11 +514,11 @@ module.exports = session => {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "someView"."id",
-                  "someView"."model1Id",
-                  "someView"."model1Prop1",
-                  "someView"."model1Prop2",
-                  "someView"."viewProp",
+                  "someView"."id" as "id",
+                  "someView"."model1Id" as "model1Id",
+                  "someView"."model1Prop1" as "model1Prop1",
+                  "someView"."model1Prop2" as "model1Prop2",
+                  "someView"."viewProp" as "viewProp",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation1"."model1Id" as "model1Relation1:model1Id",
                   "model1Relation1"."model1Prop1" as "model1Relation1:model1Prop1",
@@ -665,11 +665,11 @@ module.exports = session => {
               expect(queries[0].replace(/\s/g, '')).to.equal(
                 `
                 select
-                  "someView"."id",
-                  "someView"."model1Id",
-                  "someView"."model1Prop1",
-                  "someView"."model1Prop2",
-                  "someView"."viewProp",
+                  "someView"."id" as "id",
+                  "someView"."model1Id" as "model1Id",
+                  "someView"."model1Prop1" as "model1Prop1",
+                  "someView"."model1Prop2" as "model1Prop2",
+                  "someView"."viewProp" as "viewProp",
                   "model1Relation1"."id" as "model1Relation1:id",
                   "model1Relation2"."id_col" as "model1Relation2:id_col",
                   "model1Relation2"."model1_id" as "model1Relation2:model1_id",
