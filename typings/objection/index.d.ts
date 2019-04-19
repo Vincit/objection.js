@@ -886,7 +886,7 @@ declare namespace Objection {
 
     skipUndefined(): this;
 
-    transacting(transation: Transaction): this;
+    transacting(transaction: Transaction): this;
 
     clone(): this;
 
