@@ -24,7 +24,7 @@ exports.up = knex => {
 };
 ```
 
-I this schema, `characterName` is the `extra` property. When we fetch movies for an actor, we want the movie objects to contain the `characterName` in addition to normal movie properties.
+In this schema, `characterName` is the `extra` property. When we fetch movies for an actor, we want the movie objects to contain the `characterName` in addition to normal movie properties.
 
 You can define your [relationMapping](/api/model/static-properties.html#static-relationmappings) like this:
 
@@ -55,6 +55,18 @@ const linda = await Actor
   .query()
   .findOne({ name: 'Linda Hamilton' });
 
+// Fetch a movie.
+const someMovie = await linda
+  .$relatedQuery('movies')
+  .first()
+
+console.log(
+  "Linda's character's name in the movie",
+  someMovie.name,
+  'is',
+  someMovie.characterName
+)
+
 // Insert a movie with a `characterName`.
 await linda
   .$relatedQuery('movies')
@@ -78,4 +90,4 @@ await linda
   .where('movies.name', 'Curvature')
 ```
 
-`extra` properties also work with [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).
+`extra` properties also work with [eager](/api/query-builder/eager-methods.html#eager) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).

@@ -1076,7 +1076,11 @@ See [whereJsonIsObject](/api/query-builder/find-methods.html#wherejsonisobject)
 queryBuilder = queryBuilder.whereJsonHasAny(fieldExpression, keys);
 ```
 
-Where any of given strings is found from json object key(s) or array items.
+Where any of given strings is found from json object keys.
+
+::: tip
+This doesn't work for arrays. If you want to check if an array contains an item, see [this](https://github.com/Vincit/objection.js/issues/415) and [this](https://github.com/Vincit/objection.js/issues/1133) issue.
+:::
 
 ##### Arguments
 
@@ -1101,7 +1105,11 @@ See [whereJsonHasAny](/api/query-builder/find-methods.html#wherejsonhasany)
 queryBuilder= queryBuilder.whereJsonHasAll(fieldExpression, keys);
 ```
 
-Where all of given strings are found from json object key(s) or array items.
+Where all of given strings are found from json object keys.
+
+::: tip
+This doesn't work for arrays. If you want to check if an array contains an item, see [this](https://github.com/Vincit/objection.js/issues/415) and [this](https://github.com/Vincit/objection.js/issues/1133) issue.
+:::
 
 ##### Arguments
 
