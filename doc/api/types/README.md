@@ -7,7 +7,7 @@ sidebar: auto
 This page contains the documentation of all other types and classes than [Model](/api/model/) and [QueryBuilder](/api/query-builder/). There are two types of items on this page:
 
 1. `type`: A type is just a POJO (Plain Old Javascript Object) with a set of properties.
-2. `class`: A class is a javascript class with properties and methods.
+2. `class`: A class is a JavaScript class with properties and methods.
 
 ## `type` RelationMapping
 
@@ -587,7 +587,7 @@ Cast reference to sql type `boolean`.
 
 #### castType()
 
-Give custom type to which referenced value is casted to.
+Give custom type to which referenced value is cast to.
 
 **DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
 
@@ -595,7 +595,7 @@ Give custom type to which referenced value is casted to.
 
 #### castTo()
 
-Give custom type to which referenced value is casted to.
+Give custom type to which referenced value is cast to.
 
 `.castTo('mytype') --> CAST(?? as mytype)`
 
@@ -611,7 +611,7 @@ Gives an alias for the reference `.select(ref('age').as('yougness'))`
 ## `class` LiteralBuilder
 
 An instance of this is returned from the [lit](/api/objection/#lit) helper function. If an object
-is given as a value, it is casted to json by default.
+is given as a value, it is cast to json by default.
 
 ### Instance Methods
 
@@ -645,7 +645,7 @@ Cast to sql type `boolean`.
 
 #### castType()
 
-Give custom type to which referenced value is casted to.
+Give custom type to which referenced value is cast to.
 
 **DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
 
@@ -653,7 +653,7 @@ Give custom type to which referenced value is casted to.
 
 #### castTo()
 
-Give custom type to which referenced value is casted to.
+Give custom type to which referenced value is cast to.
 
 `.castTo('mytype') --> CAST(?? as mytype)`
 

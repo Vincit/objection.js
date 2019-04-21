@@ -913,7 +913,7 @@ const people = await Person
   .whereJsonSupersetOf('additionalData:myDogs', 'additionalData:dogsAtHome');
 
 // These people have all or some of their dogs at home. Person might have some
-// additional dogs in their custody since myDogs is supreset of dogsAtHome.
+// additional dogs in their custody since myDogs is superset of dogsAtHome.
 
 const people = await Person
   .query()

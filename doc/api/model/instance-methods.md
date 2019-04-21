@@ -340,7 +340,7 @@ somePerson
   .update(newValues);
 ```
 
-For the following query `opt.old` is `undefined` because there is no old object in the javascript side. objection.js doesn't fetch the old values even if they existed in the database
+For the following query `opt.old` is `undefined` because there is no old object in the JavaScript side. objection.js doesn't fetch the old values even if they existed in the database
 for performance and simplicity reasons.
 
 ```js
@@ -409,7 +409,7 @@ somePerson
   .update(newValues);
 ```
 
-For the following query `opt.old` is `undefined` because there is no old object in the javascript side. objection.js doesn't fetch the old values even if they existed in the database for performance and simplicity reasons.
+For the following query `opt.old` is `undefined` because there is no old object in the JavaScript side. objection.js doesn't fetch the old values even if they existed in the database for performance and simplicity reasons.
 
 ```js
 Person
@@ -666,9 +666,9 @@ You can override this method to carry out whatever conversions you want for the 
 
 There are a couple of requirements for the implementation:
 
-1. This function must be pure. It should't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
+1. This function must be pure. It shouldn't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
 
-2. This function must be able to handle any subset of model's properties coming in.You cannot assume that some column is present in the `json` object as it depends on the select statement. There can also be additional columns because of joins, aliases etc. This method must also be prepared for null values in _any_ property of the `json` object.
+2. This function must be able to handle any subset of the model's properties coming in.You cannot assume that some column is present in the `json` object as it depends on the select statement. There can also be additional columns because of joins, aliases etc. This method must also be prepared for null values in _any_ property of the `json` object.
 
 ##### Arguments
 
@@ -701,9 +701,9 @@ You can override this method to carry out whatever conversions you want for the 
 
 There are a couple of requirements for the implementation:
 
-1. This function must be pure. It should't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
+1. This function must be pure. It shouldn't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
 
-2. This function must be able to handle any subset of model's properties coming in. You cannot assume that some property is present in the `json` object. There can also be additional properties. This method must also be prepared for null values in _any_ property of the `json` object.
+2. This function must be able to handle any subset of the model's properties coming in. You cannot assume that some property is present in the `json` object. There can also be additional properties. This method must also be prepared for null values in _any_ property of the `json` object.
 
 ##### Arguments
 
@@ -736,9 +736,9 @@ You can override this method to carry out whatever conversions you want for the 
 
 There are a couple of requirements for the implementation:
 
-1. This function must be pure. It should't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
+1. This function must be pure. It shouldn't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
 
-2. This function must be able to handle any subset of model's properties coming in. You cannot assume that some property is present in the `json` object. There can also be additional properties. This method must also be prepared for null values in _any_ property of the `json` object.
+2. This function must be able to handle any subset of the model's properties coming in. You cannot assume that some property is present in the `json` object. There can also be additional properties. This method must also be prepared for null values in _any_ property of the `json` object.
 
 ##### Arguments
 
@@ -772,9 +772,9 @@ You can override this method to carry out whatever conversions you want for the 
 
 There are a couple of requirements for the implementation:
 
-1. This function must be pure. It should't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
+1. This function must be pure. It shouldn't have any side effects because it is called from "unexpected" places (for example to determine if your model somehow transforms column names between db and code).
 
-2. This function must be able to handle any subset of model's properties coming in. You cannot assume that some column is present in the `json` object as it depends on the select statement. There can also be additional columns because of joins, aliases etc. This method must also be prepared for null values in _any_ property of the `json` object.
+2. This function must be able to handle any subset of the model's properties coming in. You cannot assume that some column is present in the `json` object as it depends on the select statement. There can also be additional columns because of joins, aliases etc. This method must also be prepared for null values in _any_ property of the `json` object.
 
 ##### Arguments
 
@@ -1033,7 +1033,7 @@ class Person extends Model {
 
 This is called after successful validation.
 
-You can do further validation here and throw a an error if something goes wrong.
+You can do further validation here and throw an error if something goes wrong.
 
 `opt.old` object contains the old values while `json` contains the new values if validation is being done for an existing object.
 
