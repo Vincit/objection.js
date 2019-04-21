@@ -1,6 +1,6 @@
 # Paging
 
-Most of the queriescan be paged using the [page](/api/query-builder/other-methods.html#page) or [range](/api/query-builder/other-methods.html#range) method.
+Most of the queries can be paged using the [page](/api/query-builder/other-methods.html#page) or [range](/api/query-builder/other-methods.html#range) method.
 
 ```js
 const result = await Person

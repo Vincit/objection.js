@@ -12,7 +12,7 @@ Objection throws four kinds of errors:
 3. Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the
     library. You can use the [objection-db-errors](https://github.com/Vincit/objection-db-errors) plugin to handle these.
 
-4. A basic javascript `Error` when a programming or logic error is detected. In these cases there is nothing the users
+4. A basic JavaScript `Error` when a programming or logic error is detected. In these cases there is nothing the users
     can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
 
 ## Examples

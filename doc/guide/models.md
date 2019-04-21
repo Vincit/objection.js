@@ -47,7 +47,7 @@ class Person extends Model {
   }
 
   // Methods can be defined for model classes just as you would for
-  // any javascript class. If you want to include the result of these
+  // any JavaScript class. If you want to include the result of these
   // method in the output json, see `virtualAttributes`.
   fullName() {
     return this.firstName + ' ' + this.lastName;

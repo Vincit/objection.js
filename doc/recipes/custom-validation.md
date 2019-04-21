@@ -24,7 +24,7 @@ class Person extends Model {
 }
 ```
 
-Modifying the [Ajv](https://github.com/epoberezkin/ajv) bases JSON schema validation:
+Modifying the [Ajv](https://github.com/epoberezkin/ajv) based JSON schema validation:
 
 ```js
 const AjvValidator = require('objection').AjvValidator;
