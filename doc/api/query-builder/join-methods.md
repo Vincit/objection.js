@@ -64,7 +64,7 @@ await Person
   .where('parent.name', 'Arnold');
 ```
 
-Join two multiple and nested relations. Note that when referring to nested relations `:` must be used as a separator instead of `.`. This limitation comes from the way knex parses table references.
+Join multiple nested relations. Note that when referring to nested relations `:` must be used as a separator instead of `.`. This limitation comes from the way knex parses table references.
 
 ```js
 await Person
@@ -86,6 +86,16 @@ await Person
       pets: 'pt'
     }
   })
+  .where('pr:pt.species', 'dog');
+```
+
+You can also give aliases using the eager expression:
+
+```js
+await Person
+  .query()
+  .select('persons.id', 'pr:pr.name as grandParentName')
+  .joinRelation('[pets as pt, parent as pr.[pets as pt, parent as pr]]')
   .where('pr:pt.species', 'dog');
 ```
 

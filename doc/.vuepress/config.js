@@ -48,6 +48,11 @@ module.exports = {
       {
         text: 'Changelog',
         link: '/changelog/'
+      },
+
+      {
+        text: '⭐ Star',
+        link: 'https://github.com/vincit/objection.js'
       }
     ],
 
@@ -112,6 +117,7 @@ module.exports = {
             'relation-subqueries',
             'joins',
             'composite-keys',
+            'polymorphic-associations',
             'json-queries',
             'custom-id-column',
             'extra-properties',

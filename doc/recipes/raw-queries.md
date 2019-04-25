@@ -45,7 +45,7 @@ Binding arguments can be other [raw](/api/objection/#raw) instances, [QueryBuild
 ```js
 const { raw, ref } = require('objection');
 
-const childAgeSums = await Person
+const people = await Person
   .query()
   .alias('p')
   .select(raw('array(?) as childIds', [
@@ -53,6 +53,8 @@ const childAgeSums = await Person
       .select('id')
       .where('id', ref('p.parentId'))
   ]);
+
+console.log('child identifiers:', people[0].childIds)
 ```
 
 Completely custom raw query using knex:
