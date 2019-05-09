@@ -910,6 +910,7 @@ declare namespace Objection {
     first(): QueryBuilderYieldingOneOrNone<QM>;
 
     alias(alias: string): this;
+    aliasFor(modelClassOrTableName: string | ModelClass<any>, alias:string): this;
     tableRefFor(modelClass: ModelClass<any>): string;
     tableNameFor(modelClass: ModelClass<any>): string;
 
