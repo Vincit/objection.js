@@ -1127,6 +1127,7 @@ declare namespace Objection {
 
     // Clear
     clearSelect(): this;
+    clearOrder(): this;
     clearWhere(): this;
 
     // Paging
