@@ -802,7 +802,7 @@ declare namespace Objection {
       operator: string,
       value: Value[] | QueryBuilder<any, any[]>
     ): this;
-    whereInComposite(column: ColumnRef, values: Value[] | QueryBuilder<any, any[]>): this;
+    whereInComposite(column: ColumnRef | ColumnRef[], values: Value[] | QueryBuilder<any, any[]>): this;
 
     whereJsonSupersetOf: WhereJson<QM, RM, RV>;
     orWhereJsonSupersetOf: WhereJson<QM, RM, RV>;
@@ -1271,12 +1271,12 @@ declare namespace Objection {
   }
 
   interface WhereIn<QM extends Model, RM, RV> {
-    (column: ColumnRef, values: Value[]): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef | ColumnRef[], values: Value[]): QueryBuilder<QM, RM, RV>;
     (
-      column: ColumnRef,
+      column: ColumnRef | ColumnRef[],
       callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void
     ): QueryBuilder<QM, RM, RV>;
-    (column: ColumnRef, query: QueryBuilder<any, any[]>): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef | ColumnRef[], query: QueryBuilder<any, any[]>): QueryBuilder<QM, RM, RV>;
   }
 
   interface WhereBetween<QM extends Model, RM, RV> {
