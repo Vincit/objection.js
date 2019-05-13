@@ -731,6 +731,7 @@ objection.transaction.start(Person).then(trx => {
 const whereSubQuery = Movie.query().select('name');
 
 Person.query().whereIn('firstName', whereSubQuery);
+Person.query().whereIn(['firstName', 'lastName'], whereSubQuery);
 Person.query().where('foo', whereSubQuery);
 Person.query().whereExists(whereSubQuery);
 Person.query().whereExists(Person.relatedQuery('pets'));
