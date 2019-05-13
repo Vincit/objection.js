@@ -110,6 +110,7 @@ declare namespace Objection {
   export interface ModelOptions {
     patch?: boolean;
     skipValidation?: boolean;
+    old?: object;
   }
 
   export interface ValidatorContext {
