@@ -1101,7 +1101,7 @@ declare namespace Objection {
     // Union
     union: Union<QM>;
     unionAll(callback: () => void): this;
-    intersect(callback: () => void): this;
+    intersect: Intersect<QM>;
 
     // Having
     having: Where<QM, RM, RV>;
@@ -1300,6 +1300,20 @@ declare namespace Objection {
   }
 
   interface Union<QM extends Model> {
+    (
+      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[],
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
+    ): QueryBuilder<QM, QM[]>;
+  }
+
+  interface Intersect<QM extends Model> {
     (
       callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
       wrap?: boolean
