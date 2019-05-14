@@ -1099,9 +1099,9 @@ declare namespace Objection {
     orderByRaw: RawMethod<QM, RM, RV>;
 
     // Union
-    union: Union<QM>;
-    unionAll(callback: () => void): this;
-    intersect: Intersect<QM>;
+    union: SetOperations<QM>;
+    unionAll: SetOperations<QM>;
+    intersect: SetOperations<QM>;
 
     // Having
     having: Where<QM, RM, RV>;
@@ -1299,21 +1299,7 @@ declare namespace Objection {
     (column: ColumnRef, direction?: string): QueryBuilder<QM, RM, RV>;
   }
 
-  interface Union<QM extends Model> {
-    (
-      callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
-      wrap?: boolean
-    ): QueryBuilder<QM, QM[]>;
-    (
-      callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[],
-      wrap?: boolean
-    ): QueryBuilder<QM, QM[]>;
-    (
-      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
-    ): QueryBuilder<QM, QM[]>;
-  }
-
-  interface Intersect<QM extends Model> {
+  interface SetOperations<QM extends Model> {
     (
       callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
       wrap?: boolean
