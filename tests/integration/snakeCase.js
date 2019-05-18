@@ -5,6 +5,12 @@ const expect = require('chai').expect;
 module.exports = session => {
   describe('snakeCaseMappers', () => {
     class Person extends Model {
+      $formatDatabaseJson(json) {
+        json = super.$formatDatabaseJson(json);
+        delete json.id;
+        return json;
+      }
+
       static get tableName() {
         return 'person';
       }
