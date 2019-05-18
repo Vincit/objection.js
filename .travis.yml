@@ -8,12 +8,11 @@ cache:
   - 'node_modules'
 
 node_js:
-  - '6'
-  - '7'
   - '8'
   - '9'
   - '10'
   - '11'
+  - '12'
 
 before_script:
   - psql -U postgres -c "CREATE USER objection SUPERUSER"
