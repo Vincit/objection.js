@@ -1313,16 +1313,46 @@ Type|Description
 
 ## modify()
 
-Works like `knex`'s [modify](http://knexjs.org/#Builder-modify) function but in addition you can specify model [modifier](/api/model/static-properties.html#static-modifiers) by providing modifier names.
+Works like `knex`'s [modify](http://knexjs.org/#Builder-modify) function but in addition you can specify a [modifier](/api/model/static-properties.html#static-modifiers) by providing modifier names.
 
-See [knex documentation](http://knexjs.org/#Builder-modify)
+See the [modifier](/recipes/modifiers.html) recipe for examples of the things you can do with modifiers.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-modifier|function([QueryBuilder](/api/query-builder/))&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string is provided, the corresponding [modifier](/api/model/static-properties.html#static-modifiers) is executed instead.
+modifier|function([QueryBuilder](/api/query-builder/))&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|The modify callback function, receiving the builder as its first argument, followed by the optional arguments. If a string or an array of strings is provided, the corresponding [modifier](/api/model/static-properties.html#static-modifiers) is executed instead.
 *arguments|...any|The optional arguments passed to the modify function
+
+##### Examples
+
+The first argument can be a name of a [model modifier](/api/model/static-properties.html#static-modifiers). The rest of the arguments are passed as arguments to the modifier.
+
+```js
+Person
+  .query()
+  .modify('someModifier', 'foo', 1)
+```
+
+You can also pass an array of modifier names:
+
+```js
+Person
+  .query()
+  .modify(['someModifier', 'someOtherModifier'], 'foo', 1)
+```
+
+The first argument can be a function:
+
+```js
+function modifierFunc(query, arg1, arg2) {
+  query.where(arg1, arg2)
+}
+
+Person
+  .query()
+  .modify(modifierFunc, 'foo', 1)
+```
 
 ##### Return value
 
@@ -1331,6 +1361,10 @@ Type|Description
 [QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
 
 ## applyModifier()
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/other-methods.html#modify) instead.
+:::
 
 Applies modifiers to the query builder.
 
@@ -1348,5 +1382,9 @@ Type|Description
 [QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
 
 ## applyFilter()
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/other-methods.html#modify) instead.
+:::
 
 An alias for [applyModifier](/api/query-builder/other-methods.html#applymodifier)

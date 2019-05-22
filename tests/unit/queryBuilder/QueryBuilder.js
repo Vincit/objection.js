@@ -115,6 +115,88 @@ describe('QueryBuilder', () => {
     expect(called).to.equal(true);
   });
 
+  it('should be able to pass arguments to modify', () => {
+    let builder = QueryBuilder.forClass(TestModel);
+    let called1 = false;
+    let called2 = false;
+
+    // Should accept a single function.
+    builder.modify(
+      (query, arg1, arg2) => {
+        called1 = true;
+        expect(query === builder).to.equal(true);
+        expect(arg1).to.equal('foo');
+        expect(arg2).to.equal(1);
+      },
+      'foo',
+      1
+    );
+
+    expect(called1).to.equal(true);
+    lcalled1 = false;
+    called2 = false;
+
+    // Should accept an array of functions.
+    builder.modify(
+      [
+        (query, arg1, arg2) => {
+          called1 = true;
+          expect(query === builder).to.equal(true);
+          expect(arg1).to.equal('foo');
+          expect(arg2).to.equal(1);
+        },
+
+        (query, arg1, arg2) => {
+          called2 = true;
+          expect(query === builder).to.equal(true);
+          expect(arg1).to.equal('foo');
+          expect(arg2).to.equal(1);
+        }
+      ],
+      'foo',
+      1
+    );
+
+    expect(called1).to.equal(true);
+    expect(called2).to.equal(true);
+  });
+
+  it('should be able to pass arguments to modify when using named modifiers', () => {
+    let builder = QueryBuilder.forClass(TestModel);
+
+    let called1 = false;
+    let called2 = false;
+
+    TestModel.modifiers = {
+      modifier1: (query, arg1, arg2) => {
+        called1 = true;
+        expect(query === builder).to.equal(true);
+        expect(arg1).to.equal('foo');
+        expect(arg2).to.equal(1);
+      },
+
+      modifier2: (query, arg1, arg2) => {
+        called2 = true;
+        expect(query === builder).to.equal(true);
+        expect(arg1).to.equal('foo');
+        expect(arg2).to.equal(1);
+      }
+    };
+
+    // Should accept a single modifier.
+    builder.modify('modifier1', 'foo', 1);
+    expect(called1).to.equal(true);
+
+    lcalled1 = false;
+    called2 = false;
+
+    // Should accept an array of modifiers.
+    builder.modify(['modifier1', 'modifier2'], 'foo', 1);
+
+    expect(called1).to.equal(true);
+    expect(called2).to.equal(true);
+  });
+
   it('should throw if an unknown modifier is specified', () => {
     const builder = QueryBuilder.forClass(TestModel);
 
