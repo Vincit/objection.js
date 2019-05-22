@@ -116,6 +116,7 @@ module.exports = {
             'subqueries',
             'relation-subqueries',
             'joins',
+            'modifiers',
             'composite-keys',
             'polymorphic-associations',
             'json-queries',

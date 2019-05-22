@@ -507,7 +507,7 @@ const people = await Person
   });
 ```
 
-Relations can also be modified using named filters like this:
+Relations can also be modified using modifiers like this:
 
 ```js
 const people = await Person
@@ -528,7 +528,7 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Reusable named filters can be defined for models using [modifiers](/api/model/static-properties.html#static-modifiers)
+Reusable modifiers can be defined for models using [modifiers](/api/model/static-properties.html#static-modifiers)
 
 ```js
 // Person.js

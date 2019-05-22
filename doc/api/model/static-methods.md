@@ -404,8 +404,7 @@ class BaseModel extends Model {
 }
 ```
 
-Handles modifiers that are not recognized by the various mechanisms that can specify
-them, such as [modify](/api/query-builder/other-methods.html#modify) and [applyModifier](/api/query-builder/other-methods.html#applymodifier), as well as the use of modifiers in eager expressions (see [RelationExpression](/api/types/#type-relationexpression)) and in relations (see [RelationMapping](/api/types/#type-relationmapping)).
+This method is called when an unknown modifier is used somewhere.
 
 By default, the static `modifierNotFound()` hook throws a `ModifierNotFoundError` error. If a model class overrides the hook, it can decide to handle the modifer through the passed `builder` instance, or call the hook's definition in the super class to still throw the error.
 
@@ -780,6 +779,41 @@ class Person extends Model {
 ## `static` raw()
 
 Shortcut for `Person.knex().raw(...args)`
+
+## `static` ref()
+
+Returns a [ReferenceBuilder](/api/types/#class-referencebuilder) instance that is bound to the model class. Any reference created using it will add the correct table name to the reference.
+
+```js
+const { ref } = Person
+await Person.query().where(ref('firstName'), 'Jennifer')
+```
+
+```sql
+select "persons".* from "persons" where "persons"."firstName" = 'Jennifer'
+```
+
+`ref` uses the correct table name even when alias has been specified.
+
+```js
+const { ref } = Person
+await Person.query().alias('p').where(ref('firstName'), 'Jennifer')
+```
+
+```sql
+select "p".* from "persons" as "p" where "p"."firstName" = 'Jennifer'
+```
+
+Note that the following two ways to use `Model.ref` are completely equivalent:
+
+```js
+const { ref } = Person
+await Person.query().where(ref('firstName'), 'Jennifer')
+```
+
+```js
+await Person.query().where(Person.ref('firstName'), 'Jennifer')
+```
 
 ## `static` fn()
 

@@ -14,7 +14,7 @@ console.log(result.total); // --> 3341
 
 There are some cases where [page](/api/query-builder/other-methods.html#page) and [range](/api/query-builder/other-methods.html#range) don't work.
 
-1. In [modifyEager](/api/query-builder/other-methods.html#modifyeager) or named filters:
+1. In [modifyEager](/api/query-builder/other-methods.html#modifyeager) or modifiers:
 
 ```js
 // This doesn't work because the query `qb` fetches the
