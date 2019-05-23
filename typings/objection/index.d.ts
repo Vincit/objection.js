@@ -29,8 +29,13 @@ declare namespace Objection {
   const compose: Compose;
   const mixin: Mixin;
 
-  const snakeCaseMappers: (opt?: any) => ColumnNameMappers;
-  const knexSnakeCaseMappers: (opt?: any) => KnexMappers;
+  const snakeCaseMappers: (opt?: SnakeCaseMappersOptions) => ColumnNameMappers;
+  const knexSnakeCaseMappers: (opt?: SnakeCaseMappersOptions) => KnexMappers;
+
+  export interface SnakeCaseMappersOptions {
+    upperCase?: boolean;
+    underscoreBeforeDigits?: boolean;
+  }
 
   interface LiteralObject {
     [key: string]: Value;
