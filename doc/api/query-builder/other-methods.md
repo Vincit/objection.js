@@ -1388,3 +1388,31 @@ Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/othe
 :::
 
 An alias for [applyModifier](/api/query-builder/other-methods.html#applymodifier)
+
+## modifiers()
+
+Registers modifiers for the query.
+
+See the [modifier recipe](/recipes/modifiers.html) for more info and examples.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+```js
+const people = await Person
+  .query()
+  .modifiers({
+    selectFields: query => query.select('id', 'name'),
+    // In the following modifier, `filterGender` is a modifier
+    // registered in Person.modifiers object. Query modifiers
+    // can be used to bind arguments to model modifiers like this.
+    filterWomen: query => query.modify('filterGender', 'female')
+  })
+  .modify('selectFields')
+  .eager('children(selectFields, filterWomen)')
+```

@@ -162,7 +162,8 @@ module.exports = session => {
     it('eager', async () => {
       const arnold = await Person.query()
         .findOne('name', 'Arnold')
-        .eager('[movies(goodMovies), pets(onlyDictators)]', {
+        .eager('[movies(goodMovies), pets(onlyDictators)]')
+        .modifiers({
           goodMovies(query) {
             query.modify('atLeastStars', 3);
           },
@@ -182,7 +183,8 @@ module.exports = session => {
     it('joinEager', async () => {
       const arnold = await Person.query()
         .findOne('person.name', 'Arnold')
-        .joinEager('[movies(goodMovies), pets(onlyDictators)]', {
+        .joinEager('[movies(goodMovies), pets(onlyDictators)]')
+        .modifiers({
           goodMovies(query) {
             query.modify('atLeastStars', 3);
           },
@@ -199,8 +201,25 @@ module.exports = session => {
       expect(arnold.pets[0].name).to.equal('Stalin');
     });
 
-    it('joinRelation', () => {
-      // TODO
+    it('joinRelation', async () => {
+      const result = await Person.query()
+        .where('person.name', 'Arnold')
+        .select('person.name', 'movies.name as movieName', 'pets.name as petName')
+        .joinRelation('[movies(goodMovies), pets(onlyDictators)]')
+        .modifiers({
+          goodMovies(query) {
+            query.modify('atLeastStars', 3);
+          },
+          onlyDictators(query) {
+            query.modify('filterByName', 'Stalin');
+          }
+        })
+        .orderBy(['person.name', 'movies.name', 'pets.name']);
+
+      expect(result).to.eql([
+        { name: 'Arnold', movieName: 'Terminator', petName: 'Stalin' },
+        { name: 'Arnold', movieName: 'Terminator 2', petName: 'Stalin' }
+      ]);
     });
 
     after(() => {
@@ -210,17 +229,5 @@ module.exports = session => {
         .dropTableIfExists('movie')
         .dropTableIfExists('person');
     });
-
-    function findArnold() {
-      return Person.query().findOne('name', 'Arnold');
-    }
-
-    function findMeinhard() {
-      return Person.query().findOne('name', 'Meinhard');
-    }
-
-    function findRuffus() {
-      return Animal.query().findOne('name', 'Ruffus');
-    }
   });
 };

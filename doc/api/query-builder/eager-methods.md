@@ -71,23 +71,24 @@ Relations can be modified by giving modifier functions as arguments to the relat
 ```js
 const people = await Person
   .query()
-  .eager('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]', {
-    selectNameAndId: (builder) => {
+  .eager('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]')
+  .modifiers({
+    selectNameAndId(builder) {
       builder.select('name', 'id');
     },
-    orderByName: (builder) => {
+    orderByName(builder) {
       builder.orderBy('name');
     },
-    onlyDogs: (builder) => {
+    onlyDogs(builder) {
       builder.where('species', 'dog');
     }
   });
 
 console.log(people[0].children[0].pets[0].name);
-cconsole.log(people[0].children[0].movies[0].id);
+console.log(people[0].children[0].movies[0].id);
 ```
 
-Reusable modifiers can be defined for a model class using [modifiers](/api/model/static-properties.html#static-modifiers)
+Reusable modifiers can be defined for a model class using [modifiers](/api/model/static-properties.html#static-modifiers). Also see the [modifiers](/recipes/modifiers.md) recipe.
 
 ```js
 class Person extends Model {

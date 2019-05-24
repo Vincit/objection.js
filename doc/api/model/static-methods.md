@@ -793,7 +793,7 @@ await Person.query().where(ref('firstName'), 'Jennifer')
 select "persons".* from "persons" where "persons"."firstName" = 'Jennifer'
 ```
 
-`ref` uses the correct table name even when alias has been specified.
+`ref` uses the correct table name even when an alias has been given to the table.
 
 ```js
 const { ref } = Person

@@ -512,7 +512,8 @@ Relations can also be modified using modifiers like this:
 ```js
 const people = await Person
   .query()
-  .eager('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]', {
+  .eager('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]')
+  .modifiers({
     selectName: (builder) => {
       builder.select('name');
     },

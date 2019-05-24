@@ -1,6 +1,6 @@
 # Modifiers
 
-Modifiers allow you to easily reuse snippets of query logic. A modifier is simply a function that takes a [QueryBuilder](/api/query-builder/) as the first argument and optionally any number of arguments after that. Modifier functions can mutate the query passed in, but they must always be synchronous. Here's a contrived example:
+Modifiers allow you to easily reuse snippets of query logic. A modifier is simply a function that takes a [QueryBuilder](/api/query-builder/) as the first argument and optionally any number of arguments after that. Modifier functions can then mutate the query passed in, but they must always be synchronous. Here's a contrived example:
 
 ```js
 function filterGender(query, gender) {
@@ -39,6 +39,8 @@ const women = await Person
 
 ## Usage in an eager query
 
+You can pass modifier names as "arguments" to the relation names in [relation expressions] (/api/types/#type-relationexpression). See the [eager](/api/query-builder/eager-methods.html#eager) method's docs for more info and examples.
+
 ```js
 const people = await Person
   .query()
@@ -53,12 +55,13 @@ const people = await Person
   .eager('[children(defaultSelects), pets(onlyDogs)]')
 ```
 
-The [eager](/api/query-builder/eager-methods.html#eager) method takes an additional modifier object as the second argument. You can use it to create temporary modifiers for the specific eager query. You can also use this object to bind arguments to modifiers specified for the model class.
+You can register new modifiers for a query using the [modifiers](/api/query-builder/other-methods.md#modifiers) query builder method. This also allows you to bind arguments to existing modifiers like this
 
 ```js
 const people = await Person
   .query()
-  .eager('children(defaultSelects, filterWomen)', {
+  .eager('children(defaultSelects, filterWomen)')
+  .modifiers({
     filterWomen: query => query.modify('filterGender', 'female')
   })
 ```
@@ -71,9 +74,11 @@ const women = await Person
   .joinRelation('children(defaultSelects)')
 ```
 
+Query builder [modifiers](/api/query-builder/other-methods.md#modifiers) can also be used with `joinRelation` just like with `eager`.
+
 ## Other usages
 
-* Relation mappings' [modify](/api/types/#type-relationmapping) property
+* Relation mappings' [modify](/api/types/#type-relationmapping) properties.
 
 ## Modifier best practices
 
