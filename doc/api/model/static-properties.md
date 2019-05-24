@@ -242,6 +242,8 @@ const pojo = person.toJSON({ virtuals: ['fullName'] })
 
 Reusable query building functions that can be used in any [eager query](/api/query-builder/eager-methods.html#eager), using [modify](/api/query-builder/other-methods.html#modify) method and in many other places.
 
+Also see the [modifier recipe](/recipes/modifiers.html) for more info and examples.
+
 ```js
 class Movie extends Model {
   static get modifiers() {
