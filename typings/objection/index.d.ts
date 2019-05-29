@@ -273,7 +273,9 @@ declare namespace Objection {
 
   type DeepPartialGraph<T> = T extends (any[] | ReadonlyArray<any>)
     ? DeepPartialGraphArray<T[number]>
-    : T extends Model ? DeepPartialGraphModel<T> : T;
+    : T extends Model
+    ? DeepPartialGraphModel<T>
+    : T;
 
   export interface InsertGraphOptions {
     relate?: boolean | string[];
@@ -807,7 +809,10 @@ declare namespace Objection {
       operator: string,
       value: Value[] | QueryBuilder<any, any[]>
     ): this;
-    whereInComposite(column: ColumnRef | ColumnRef[], values: Value[] | QueryBuilder<any, any[]>): this;
+    whereInComposite(
+      column: ColumnRef | ColumnRef[],
+      values: Value[] | QueryBuilder<any, any[]>
+    ): this;
 
     whereJsonSupersetOf: WhereJson<QM, RM, RV>;
     orWhereJsonSupersetOf: WhereJson<QM, RM, RV>;
@@ -916,7 +921,7 @@ declare namespace Objection {
     first(): QueryBuilderYieldingOneOrNone<QM>;
 
     alias(alias: string): this;
-    aliasFor(modelClassOrTableName: string | ModelClass<any>, alias:string): this;
+    aliasFor(modelClassOrTableName: string | ModelClass<any>, alias: string): this;
     tableRefFor(modelClass: ModelClass<any>): string;
     tableNameFor(modelClass: ModelClass<any>): string;
 
