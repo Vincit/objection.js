@@ -1306,7 +1306,8 @@ declare namespace Objection {
       ColumnNamesMethod<QM, RM, RV> {}
 
   interface OrderBy<QM extends Model, RM, RV> {
-    (column: ColumnRef, direction?: string): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef, order?: string): QueryBuilder<QM, RM, RV>;
+    (columns: ({ column: ColumnRef; order?: string } | string)[]): QueryBuilder<QM, RM, RV>;
   }
 
   interface SetOperations<QM extends Model> {

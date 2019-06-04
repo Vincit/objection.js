@@ -886,6 +886,13 @@ const whereDelRetFirstWhere: Promise<Person | undefined> = qb
   .first()
   .where({ firstName: 'Mo' });
 
+const orderByColumn: Promise<Person[]> = qb.orderBy('firstName', 'asc');
+const orderByColumns: Promise<Person[]> = qb.orderBy([
+  'email',
+  { column: 'firstName', order: 'asc' },
+  { column: 'lastName' }
+]);
+
 // Verify that Model.query() and model.$query() return the same type of query builder.
 // Confirming this prevent us from having to duplicate the tests for each.
 
