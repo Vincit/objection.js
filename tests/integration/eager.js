@@ -2601,9 +2601,10 @@ module.exports = session => {
         return Model2.query()
           .whereIn('id_col', [100, 200])
           .eagerAlgorithm(Model2.JoinEagerAlgorithm)
-          .eager('model2Relation1(select)', {
+          .modifiers({
             select: b => b.select('model1Prop1')
           })
+          .eager('model2Relation1(select)')
           .map(model => {
             model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
             return model;

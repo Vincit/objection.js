@@ -134,48 +134,9 @@ Type|Description
 
 ## allowInsert()
 
-```js
-queryBuilder = queryBuilder.allowInsert(relationExpression);
-```
-
-Sets the allowed tree of relations to insert using [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method.
-
-If the model tree given to the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method isn't a subtree of the given expression, the query is rejected.
-
-See methods [eager](/api/query-builder/eager-methods.html#eager), [allowEager](/api/query-builder/eager-methods.html#alloweager), [RelationExpression](/api/types/#type-relationexpression) and the guide section about [eager loading](/guide/query-examples.html#eager-loading) for more information on relation expressions.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-##### Examples
-
-```js
-const insertedPerson = await Person
-  .query()
-  .allowInsert('[children.pets, movies]')
-  .insertGraph({
-    firstName: 'Sylvester',
-    children: [{
-      firstName: 'Sage',
-      pets: [{
-        name: 'Fluffy'
-        species: 'dog'
-      }, {
-        name: 'Scrappy',
-        species: 'dog'
-      }]
-    }]
-  })
-```
+::: warning
+Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowInsert` cleared any old expressions automatically, while `allowGraph` merges them.
+:::
 
 ## insertGraphAndFetch()
 
@@ -487,7 +448,10 @@ Type|Description
 
 ## allowUpsert()
 
-Just like [allowInsert](/api/query-builder/mutate-methods.html#allowinsert) but this one works with [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).
+::: warning
+Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowUpsert` cleared any old expressions automatically, while `allowGraph` merges them.
+:::
+
 
 ## upsertGraphAndFetch()
 

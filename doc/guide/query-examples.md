@@ -404,9 +404,9 @@ See the [API documentation](/api/query-builder/mutate-methods.html#unrelate) of 
 
 You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder/eager-methods.html#eager) method. [eager](/api/query-builder/eager-methods.html#eager) takes a [relation expression](/api/types/#type-relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
 
-Because the eager expressions are strings (there's also an optional [object notation](/api/types/#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowEager](/api/query-builder/eager-methods.html#alloweager) method. [allowEager](/api/query-builder/eager-methods.html#alloweager) can be used to  limit the allowed eager expression to a certain subset.
+Because the eager expressions are strings (there's also an optional [object notation](/api/types/#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method. [allowGraph](/api/query-builder/eager-methods.html#allowgraph) can be used to  limit the allowed eager expression to a certain subset.
 
-By giving expression `[pets, children.pets]` for [allowEager](/api/query-builder/eager-methods.html#alloweager) the value passed to [eager](/api/query-builder/eager-methods.html#eager) is allowed to be one of:
+By giving the expression `[pets, children.pets]` for [allowGraph](/api/query-builder/eager-methods.html#allowgraph) the value passed to [eager](/api/query-builder/eager-methods.html#eager) is allowed to be one of:
 
  * `'pets'`
  * `'children'`
@@ -414,7 +414,7 @@ By giving expression `[pets, children.pets]` for [allowEager](/api/query-builder
  * `'[pets, children]'`
  * `'[pets, children.pets]'`
 
-Examples of expressions that would cause the query to be rejected:
+Examples of expressions that would cause an error:
 
  * `'movies'`
  * `'children.children'`
@@ -424,7 +424,7 @@ Examples of expressions that would cause the query to be rejected:
 In addition to the [eager](/api/query-builder/eager-methods.html#eager) method, relations can be fetched using the [loadRelated](/api/model/static-properties.html#static-loadrelated) and
 [$loadRelated](/api/model/instance-methods.html#loadrelated) methods.
 
-By default eager loading is done using multiple separate queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)). You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole eager tree. You can select which algorithm to use per query using [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method or per model by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property. All algorithms have their strengths and weaknesses, which are discussed in detail [here](/api/query-builder/eager-methods.html#eager).
+By default eager loading is done using multiple queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)). You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole eager tree. You can select which algorithm to use per query using [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method or per model by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property. All algorithms have their strengths and weaknesses, which are discussed in detail [here](/api/query-builder/eager-methods.html#eager).
 
 ##### Examples
 
@@ -599,13 +599,13 @@ console.log(people[0].kids[0].dogs[0].name);
 console.log(people[0].kids[0].movies[0].id);
 ```
 
-Example usage for [allowEager](/api/query-builder/eager-methods.html#alloweager) in an express route:
+Example usage for [allowGraph](/api/query-builder/eager-methods.html#allowgraph) in an express route:
 
 ```js
 expressApp.get('/people', async (req, res, next) => {
   const people = await Person
     .query()
-    .allowEager('[pets, children.pets]')
+    .allowGraph('[pets, children.pets]')
     .eager(req.query.eager);
 
   res.send(people);
@@ -633,7 +633,7 @@ const people = await Person
 
 Arbitrary relation graphs can be inserted using the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method. This is best explained using examples, so check them out.
 
-See the [allowInsert](/api/query-builder/mutate-methods.html#allowinsert) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method to avoid security issues. [allowInsert](/api/query-builder/mutate-methods.html#allowinsert) works like [allowEager](/api/query-builder/mutate-methods.html#allowinsert).
+See the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method if you need to limit which relations can be inserted using [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method to avoid security issues.
 
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all inserted rows and not just the first or the last one.
 
@@ -804,7 +804,7 @@ The [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method wor
 
 [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
 
-See the [allowUpsert](/api/query-builder/mutate-methods.html#allowupsert) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method to avoid security issues. [allowUpsert](/api/query-builder/mutate-methods.html#allowupsert) works like [allowInsert](/api/query-builder/mutate-methods.html#allowinsert).
+See the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method to avoid security issues.
 
 ##### Examples
 

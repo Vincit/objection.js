@@ -395,23 +395,25 @@ Type|Description
 ----|-----------------------------
 object|Eager modifiers of the query.
 
-## allowEager()
+## allowGraph()
 
 ```js
-queryBuilder = queryBuilder.allowEager(relationExpression);
+queryBuilder = queryBuilder.allowGraph(relationExpression);
 ```
 
-Sets the allowed eager expression.
+Sets the allowed tree of relations to fetch, insert or upsert using [eager](/api/query-builder/eager-methods.html#eager) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) or [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) methods.
 
-Any subset of the allowed expression is accepted by [eager](/api/query-builder/eager-methods.html#eager) method. For example setting the allowed expression to `a.b.c` expressions `a`, `a.b` and `a.b.c` are accepted by [eager](/api/query-builder/eager-methods.html#eager) method. Setting any other expression will reject the query and cause the promise error handlers to be called.
+When using [eager](/api/query-builder/eager-methods.html#eager) (or any of its variants) the query is rejected if the [expression](/api/types/#type-relationexpression) passed to [eager](/api/query-builder/eager-methods.html#eager) is not a subset of the [expression](/api/types/#type-relationexpression) passed to `allowGraph`. This method is useful when the eager expression comes from an untrusted source like query parameters of a http request.
 
-This method is useful when the eager expression comes from an untrusted source like query parameters of a http request.
+If the model tree given to the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) or the [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method isn't a subtree of the given [expression](/api/types/#type-relationexpression), the query is rejected.
+
+See the examples.
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed relation expression
 
 ##### Return value
 
@@ -421,60 +423,92 @@ Type|Description
 
 ##### Examples
 
+This will throw because `actors` is not allowed.
+
 ```js
-Person
+await Person
   .query()
-  .allowEager('[children.pets, movies]')
+  .allowGraph('[children.pets, movies]')
+  .eager('movies.actors')
+```
+
+This will not throw:
+
+```js
+await Person
+  .query()
+  .allowGraph('[children.pets, movies]')
+  .eager('children.pets')
+```
+
+Calling `allowGraph` multiple times merges the expressions. The following is equivalent to the previous example:
+
+```js
+await Person
+  .query()
+  .allowGraph('children.pets')
+  .allowGraph('movies')
   .eager(req.query.eager)
 ```
 
+Usage in `insertGraph` and `upsertGraph` works the same way. The following will not throw.
+
+```js
+const insertedPerson = await Person
+  .query()
+  .allowGraph('[children.pets, movies]')
+  .insertGraph({
+    firstName: 'Sylvester',
+    children: [{
+      firstName: 'Sage',
+      pets: [{
+        name: 'Fluffy'
+        species: 'dog'
+      }, {
+        name: 'Scrappy',
+        species: 'dog'
+      }]
+    }]
+  })
+```
+
+This will throw because `cousins` is not allowed:
+
+```js
+const insertedPerson = await Person
+  .query()
+  .allowGraph('[children.pets, movies]')
+  .upsertGraph({
+    firstName: 'Sylvester',
+
+    children: [{
+      firstName: 'Sage',
+      pets: [{
+        name: 'Fluffy'
+        species: 'dog'
+      }, {
+        name: 'Scrappy',
+        species: 'dog'
+      }]
+    }],
+
+    cousins: [sylvestersCousin]
+  })
+```
+
+You can use [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) to clear any previous calls to `allowGraph`.
+
+## allowEager()
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowEager` cleared any old expressions automatically, while `allowGraph` merges them.
+:::
+
 ## mergeAllowEager()
 
-Just like [allowEager](/api/query-builder/eager-methods.html#alloweager) but instead of replacing query builder's allowEager expression this method merges the given expression to the existing expression.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed eager expression
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-##### Examples
-
-The following queries are equivalent
-
-```js
-Person
-  .query()
-  .allowEager('[children.pets, movies]')
-```
-
-```js
-Person
-  .query()
-  .allowEager('children')
-  .mergeAllowEager('children.pets')
-  .mergeAllowEager('movies')
-```
-
-```js
-Person
-  .query()
-  .allowEager('children.pets')
-  .mergeAllowEager('movies')
-```
-
-```js
-Person
-  .query()
-  .mergeAllowEager('children.pets')
-  .mergeAllowEager('movies')
-```
+::: warning
+Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead.
+:::
 
 ## modifyEager()
 
