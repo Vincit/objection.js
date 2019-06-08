@@ -620,7 +620,7 @@ module.exports = session => {
       });
     });
 
-    describe('.query().insertGraph().allowRelated()', () => {
+    describe('.query().insertGraph().allowInsert()', () => {
       beforeEach(() => {
         return session.populate(population);
       });
