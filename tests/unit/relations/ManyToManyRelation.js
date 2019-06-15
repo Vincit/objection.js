@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const Knex = require('knex');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const objection = require('../../../');
 const classUtils = require('../../../lib/utils/classUtils');
 const knexMocker = require('../../../testUtils/mockKnex');

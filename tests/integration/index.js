@@ -1,10 +1,6 @@
 const os = require('os');
 const path = require('path');
 const TestSession = require('./../../testUtils/TestSession');
-const Bluebird = require('bluebird');
-
-// Helps debugging.
-Bluebird.longStackTraces();
 
 // DATABASES environment variable can contain a comma separated list
 // of databases to test.

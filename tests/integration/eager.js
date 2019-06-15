@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const chai = require('chai');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const { ValidationError, raw } = require('../../');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 

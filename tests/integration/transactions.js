@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const transaction = require('../../').transaction;
 const knexUtils = require('../../lib/utils/knexUtils');
 
@@ -608,7 +607,7 @@ module.exports = session => {
 
       it(
         'commit should work with yield (and thus async/await)',
-        Promise.coroutine(function*() {
+        coroutine(function*() {
           const trx = yield transaction.start(Model1.knex());
 
           yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
@@ -629,7 +628,7 @@ module.exports = session => {
 
       it(
         'rollback should work with yield (and thus async/await)',
-        Promise.coroutine(function*() {
+        coroutine(function*() {
           const trx = yield transaction.start(Model1.knex());
 
           yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
@@ -806,3 +805,13 @@ module.exports = session => {
     });
   });
 };
+
+function coroutine(generatorFn) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      resolve(await generatorFn());
+    } catch (error) {
+      reject(error);
+    }
+  });
+}

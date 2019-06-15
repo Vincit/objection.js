@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { ValidationError } = require('../../');
 

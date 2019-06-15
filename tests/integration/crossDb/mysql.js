@@ -2,7 +2,6 @@ const _ = require('lodash');
 const Knex = require('knex');
 const { Model } = require('../../../');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 
 module.exports = session => {
   describe('mysql', () => {
@@ -10,38 +9,36 @@ module.exports = session => {
     let T1;
     let T2;
 
-    before(
-      Promise.coroutine(function*() {
-        yield session.knex.raw('CREATE DATABASE IF NOT EXISTS objection_test_2');
+    before(async function() {
+      await session.knex.raw('CREATE DATABASE IF NOT EXISTS objection_test_2');
 
-        const db2Config = _.cloneDeep(session.opt.knexConfig);
-        db2Config.connection.database = 'objection_test_2';
-        db2Knex = Knex(db2Config);
+      const db2Config = _.cloneDeep(session.opt.knexConfig);
+      db2Config.connection.database = 'objection_test_2';
+      db2Knex = Knex(db2Config);
 
-        yield db2Knex.schema.dropTableIfExists('t2');
-        yield db2Knex.schema.dropTableIfExists('t1');
+      await db2Knex.schema.dropTableIfExists('t2');
+      await db2Knex.schema.dropTableIfExists('t1');
 
-        yield db2Knex.schema.createTable('t1', table => {
-          table.integer('id').primary();
-          table.integer('foo');
-        });
+      await db2Knex.schema.createTable('t1', table => {
+        table.integer('id').primary();
+        table.integer('foo');
+      });
 
-        yield db2Knex.schema.createTable('t2', table => {
-          table.integer('id').primary();
-          table.integer('t1_id').references('t1.id');
-          table.integer('bar');
-        });
-      })
-    );
+      await db2Knex.schema.createTable('t2', table => {
+        table.integer('id').primary();
+        table.integer('t1_id').references('t1.id');
+        table.integer('bar');
+      });
+    });
 
-    after(
-      Promise.coroutine(function*() {
-        yield db2Knex.schema.dropTableIfExists('t2');
-        yield db2Knex.schema.dropTableIfExists('t1');
-        yield db2Knex.destroy();
-        yield session.knex.raw('DROP DATABASE IF EXISTS objection_test_2');
-      })
-    );
+    // after(
+    //   async function() {
+    //     await db2Knex.schema.dropTableIfExists('t2');
+    //     await db2Knex.schema.dropTableIfExists('t1');
+    //     await db2Knex.destroy();
+    //     await session.knex.raw('DROP DATABASE IF EXISTS objection_test_2');
+    //   }
+    // );
 
     beforeEach(() => {
       class T1Model extends Model {
@@ -84,12 +81,10 @@ module.exports = session => {
       T2 = T2Model.bindKnex(session.knex);
     });
 
-    beforeEach(
-      Promise.coroutine(function*() {
-        yield db2Knex('t2').delete();
-        yield db2Knex('t1').delete();
-      })
-    );
+    beforeEach(async function() {
+      await db2Knex('t2').delete();
+      await db2Knex('t1').delete();
+    });
 
     it('should be able to insert to another database', () => {
       return T1.query()

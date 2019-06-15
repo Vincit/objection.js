@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const chai = require('chai');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
 const { Model, ValidationError, raw } = require('../../');

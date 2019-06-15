@@ -1,5 +1,4 @@
 const { Model, snakeCaseMappers } = require('../../');
-const Promise = require('bluebird');
 const expect = require('chai').expect;
 
 module.exports = session => {

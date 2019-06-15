@@ -1,5 +1,4 @@
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const { Model } = require('../../');
 
 module.exports = session => {
@@ -82,10 +81,10 @@ module.exports = session => {
       beforeEach(() => {
         const knex = session.knex;
 
-        return Promise.coroutine(function*() {
-          yield Animal.query(knex).delete();
-          yield Person.query(knex).delete();
-          yield Person.query(knex).insertGraph({
+        return async function() {
+          await Animal.query(knex).delete();
+          await Person.query(knex).delete();
+          await Person.query(knex).insertGraph({
             id: 1,
             name: 'Arnold',
 
@@ -107,7 +106,7 @@ module.exports = session => {
               }
             ]
           });
-        })();
+        };
       });
 
       it('simple find query', () => {
@@ -297,10 +296,10 @@ module.exports = session => {
       beforeEach(() => {
         const knex = session.knex;
 
-        return Promise.coroutine(function*() {
-          yield Animal.query(knex).delete();
-          yield Person.query(knex).delete();
-          yield Person.query(knex).insertGraph({
+        return async function() {
+          await Animal.query(knex).delete();
+          await Person.query(knex).delete();
+          await Person.query(knex).insertGraph({
             id: 1,
             name: 'Arnold',
 
@@ -311,7 +310,7 @@ module.exports = session => {
               }
             ]
           });
-        })();
+        };
       });
 
       it('simple find query (parent)', () => {

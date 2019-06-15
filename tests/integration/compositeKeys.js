@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const { Model } = require('../../');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 
 module.exports = session => {
   describe('Composite keys', () => {

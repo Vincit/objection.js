@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const Promise = require('bluebird');
 
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');

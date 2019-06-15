@@ -1,4 +1,3 @@
-const Promise = require('bluebird');
 const expect = require('expect.js');
 
 module.exports = session => {

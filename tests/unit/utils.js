@@ -1,5 +1,4 @@
 const expect = require('expect.js');
-const Promise = require('bluebird');
 const classUtils = require('../../lib/utils/classUtils');
 
 const {

@@ -1,5 +1,4 @@
 const Knex = require('knex');
-const Promise = require('bluebird');
 const { Model, knexSnakeCaseMappers } = require('../../');
 const { expect } = require('chai');
 

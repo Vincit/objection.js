@@ -1,11 +1,10 @@
 'use strict';
 
-const _ = require('lodash')
-  , Knex = require('knex')
-  , Promise = require('bluebird')
-  , knexMocker = require('../testUtils/mockKnex')
-  , mockMochaFactory = require('./mockMocha')
-  , Model = require('../').Model;
+const _ = require('lodash'),
+  Knex = require('knex'),
+  knexMocker = require('../testUtils/mockKnex'),
+  mockMochaFactory = require('./mockMocha'),
+  Model = require('../').Model;
 
 if (typeof describe == 'undefined') {
   global.mockMocha = mockMochaFactory();

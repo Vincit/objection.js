@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const expect = require('expect.js');
-const Promise = require('bluebird');
 
 module.exports = session => {
   describe('using unbound models by passing a knex to query', () => {

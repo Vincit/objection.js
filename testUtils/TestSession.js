@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const path = require('path');
-const Promise = require('bluebird');
 const knexUtils = require('../lib/utils/knexUtils');
 const { Model, transaction, snakeCaseMappers, ref } = require('../');
 

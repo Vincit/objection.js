@@ -1,6 +1,5 @@
 const expect = require('expect.js');
 const chai = require('chai');
-const Promise = require('bluebird');
 const { raw, transaction, ValidationError } = require('../../');
 const { FetchStrategy } = require('../../lib/queryBuilder/graph/GraphOptions');
 const mockKnexFactory = require('../../testUtils/mockKnex');
