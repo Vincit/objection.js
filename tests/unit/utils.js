@@ -1,4 +1,5 @@
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 const classUtils = require('../../lib/utils/classUtils');
 
 const {
@@ -200,7 +201,7 @@ describe('utils', () => {
           running++;
           maxRunning = Math.max(maxRunning, running);
 
-          return Promise.delay(Math.round(Math.random() * 10))
+          return Bluebird.delay(Math.round(Math.random() * 10))
             .return(2 * item)
             .then(result => {
               --running;
@@ -224,7 +225,7 @@ describe('utils', () => {
             callbackCalledAfterError = true;
           }
 
-          return Promise.delay(Math.round(Math.random() * 10)).then(() => {
+          return Bluebird.delay(Math.round(Math.random() * 10)).then(() => {
             if (index === 10) {
               errorThrown = true;
               throw new Error('fail');
@@ -258,7 +259,7 @@ describe('utils', () => {
             running++;
             expect(running).to.be.lessThan(concurrency + 1);
 
-            return Promise.delay(Math.round(Math.random() * 10))
+            return Bluebird.delay(Math.round(Math.random() * 10))
               .return(2 * item)
               .then(result => {
                 --running;

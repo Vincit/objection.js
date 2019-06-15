@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const path = require('path');
+const Bluebird = require('bluebird');
 const knexUtils = require('../lib/utils/knexUtils');
 const { Model, transaction, snakeCaseMappers, ref } = require('../');
 
@@ -12,6 +13,7 @@ class TestSession {
       return;
     }
 
+    // TODO: deregister?
     registerUnhandledRejectionHandler();
 
     this.staticInitCalled = true;
@@ -336,7 +338,7 @@ class TestSession {
         .then(() => trx('model3').delete())
         .then(() => this.models.Model1.query(trx).insertGraph(data))
         .then(() => {
-          return Promise.resolve(['Model1', 'model2', 'model3', 'Model1Model2']).map(table => {
+          return Bluebird.resolve(['Model1', 'model2', 'model3', 'Model1Model2']).map(table => {
             const idCol = (
               _.find(this.models, it => it.getTableName() === table) || { getIdColumn: () => 'id' }
             ).getIdColumn();
@@ -417,7 +419,7 @@ function createHook(name, delay, extraAction) {
     if (TestSession.hookCounter++ % 2 === 0) {
       return hook(this, args);
     } else {
-      return Promise.delay(delay).then(() => hook(this, args));
+      return Bluebird.delay(delay).then(() => hook(this, args));
     }
   };
 }
@@ -431,7 +433,7 @@ function inc(obj, key) {
 }
 
 function registerUnhandledRejectionHandler() {
-  Promise.onPossiblyUnhandledRejection(error => {
+  process.on('unhandledRejection', error => {
     if (_.isEmpty(TestSession.unhandledRejectionHandlers)) {
       console.error(error.stack);
     }

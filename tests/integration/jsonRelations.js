@@ -412,7 +412,7 @@ module.exports = session => {
           return Animal.query()
             .findOne({ name: 'Fluffy' })
             .then(it => [it, Person.query().findOne({ name: 'Brad' })])
-            .spread((fluffy, brad) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
+            .then(([fluffy, brad]) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
             .then(() =>
               Animal.query()
                 .findOne({ name: 'Fluffy' })
@@ -435,7 +435,7 @@ module.exports = session => {
           return Animal.query()
             .findOne({ name: 'Fluffy' })
             .then(it => [it, Person.query().findOne({ name: 'Brad' })])
-            .spread((fluffy, brad) =>
+            .then(([fluffy, brad]) =>
               fluffy
                 .$relatedQuery('peopleWhoseFavoriteIAm')
                 .relate(brad)
@@ -547,7 +547,7 @@ module.exports = session => {
           return Person.query()
             .findOne({ name: 'Arnold' })
             .then(it => [it, Movie.query().findOne({ name: 'Inglorious bastards' })])
-            .spread((arnold, bastards) => arnold.$relatedQuery('movies').relate(bastards.id))
+            .then(([arnold, bastards]) => arnold.$relatedQuery('movies').relate(bastards.id))
             .then(() =>
               Person.query()
                 .select('name')
@@ -574,7 +574,7 @@ module.exports = session => {
           return Person.query()
             .findOne({ name: 'Arnold' })
             .then(it => [it, Movie.query().findOne({ name: 'Inglorious bastards' })])
-            .spread((arnold, bastards) =>
+            .then(([arnold, bastards]) =>
               arnold
                 .$relatedQuery('movies')
                 .relate(bastards.id)

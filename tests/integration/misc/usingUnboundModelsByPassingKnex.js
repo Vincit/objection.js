@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 
 module.exports = session => {
   describe('using unbound models by passing a knex to query', () => {
@@ -412,7 +413,7 @@ module.exports = session => {
 
     it('should fail with a descriptive error message if knex is not provided', () => {
       return Promise.all([
-        Promise.try(() => {
+        Bluebird.try(() => {
           return Model1.query()
             .findById(1)
             .eager(
@@ -420,7 +421,7 @@ module.exports = session => {
             );
         }).reflect(),
 
-        Promise.try(() => {
+        Bluebird.try(() => {
           return Model1.query()
             .findById(1)
             .eagerAlgorithm(Model1.JoinEagerAlgorithm)
@@ -429,52 +430,57 @@ module.exports = session => {
             );
         }).reflect(),
 
-        Promise.try(() => {
+        Bluebird.try(() => {
           return Model1.query();
         }).reflect(),
 
-        Promise.try(() => {
+        Bluebird.try(() => {
           return Model1.query().where('id', 1);
         }).reflect(),
 
-        Promise.try(() => {
+        Bluebird.try(() => {
           return Model1.query().joinRelation('model1Relation1');
         }).reflect(),
 
-        Model1.query(session.knex)
-          .findById(1)
-          .then(model => {
-            return model.$relatedQuery('model1Relation1');
-          })
-          .reflect(),
+        Bluebird.resolve(
+          Model1.query(session.knex)
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation1');
+            })
+        ).reflect(),
 
-        Model1.query(session.knex)
-          .findById(2)
-          .then(model => {
-            return model.$relatedQuery('model1Relation1Inverse');
-          })
-          .reflect(),
+        Bluebird.resolve(
+          Model1.query(session.knex)
+            .findById(2)
+            .then(model => {
+              return model.$relatedQuery('model1Relation1Inverse');
+            })
+        ).reflect(),
 
-        Model1.query(session.knex)
-          .findById(1)
-          .then(model => {
-            return model.$relatedQuery('model1Relation2');
-          })
-          .reflect(),
+        Bluebird.resolve(
+          Model1.query(session.knex)
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation2');
+            })
+        ).reflect(),
 
-        Model2.query(session.knex)
-          .findById(2)
-          .then(model => {
-            return model.$relatedQuery('model2Relation1');
-          })
-          .reflect(),
+        Bluebird.resolve(
+          Model2.query(session.knex)
+            .findById(2)
+            .then(model => {
+              return model.$relatedQuery('model2Relation1');
+            })
+        ).reflect(),
 
-        Model1.query(session.knex)
-          .findById(1)
-          .then(model => {
-            return model.$query();
-          })
-          .reflect()
+        Bluebird.resolve(
+          Model1.query(session.knex)
+            .findById(1)
+            .then(model => {
+              return model.$query();
+            })
+        ).reflect()
       ]).then(results => {
         results.forEach(result => {
           expect(result.isRejected()).to.equal(true);

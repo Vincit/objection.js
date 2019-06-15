@@ -1,8 +1,9 @@
 const _ = require('lodash');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 
-// const { TimeoutError } = require('bluebird');
+const { TimeoutError } = require('bluebird');
 const { raw, ref, lit, Model, QueryBuilderOperation } = require('../..');
 
 module.exports = session => {
@@ -1012,27 +1013,26 @@ module.exports = session => {
         }
 
         if (session.isPostgres()) {
-          // TODO: don't think there is a native promise equivalent?
-          // it('timeout should throw a TimeOutError', done => {
-          //   const knexQuery = Model1.query()
-          //     .timeout(50)
-          //     .toKnexQuery();
+          it('timeout should throw a TimeOutError', done => {
+            const knexQuery = Bluebird.resolve(Model1.query())
+              .timeout(50)
+              .toKnexQuery();
 
-          //   // Now the tricky part. We add `pg_sleep` as another source table so that the query
-          //   // takes a long time.
-          //   knexQuery.from({
-          //     sleep: session.knex.raw('pg_sleep(0.1)'),
-          //     Model1: 'Model1'
-          //   });
+            // Now the tricky part. We add `pg_sleep` as another source table so that the query
+            // takes a long time.
+            knexQuery.from({
+              sleep: session.knex.raw('pg_sleep(0.1)'),
+              Model1: 'Model1'
+            });
 
-          //   knexQuery
-          //     .then(() => done(new Error('should not get here')))
-          //     .catch(err => {
-          //       expect(err).to.be.a(TimeoutError);
-          //       done();
-          //     })
-          //     .catch(done);
-          // });
+            knexQuery
+              .then(() => done(new Error('should not get here')))
+              .catch(err => {
+                expect(err).to.be.a(TimeoutError);
+                done();
+              })
+              .catch(done);
+          });
 
           it('smoke test for various methods', () => {
             // This test doesn't actually test that the methods work. Knex has tests

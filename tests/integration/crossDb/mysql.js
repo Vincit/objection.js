@@ -31,14 +31,12 @@ module.exports = session => {
       });
     });
 
-    // after(
-    //   async function() {
-    //     await db2Knex.schema.dropTableIfExists('t2');
-    //     await db2Knex.schema.dropTableIfExists('t1');
-    //     await db2Knex.destroy();
-    //     await session.knex.raw('DROP DATABASE IF EXISTS objection_test_2');
-    //   }
-    // );
+    after(async function() {
+      await db2Knex.schema.dropTableIfExists('t2');
+      await db2Knex.schema.dropTableIfExists('t1');
+      await db2Knex.destroy();
+      await session.knex.raw('DROP DATABASE IF EXISTS objection_test_2');
+    });
 
     beforeEach(() => {
       class T1Model extends Model {

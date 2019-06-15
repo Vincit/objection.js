@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 const transaction = require('../../').transaction;
 const knexUtils = require('../../lib/utils/knexUtils');
 
@@ -117,13 +118,13 @@ module.exports = session => {
         ]);
       })
         .then(() => {
-          return [
+          return Promise.all([
             session.knex('Model1').orderBy('model1Prop1'),
             session.knex('model2'),
             session.knex('Model1Model2')
-          ];
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(3);
           expect(_.map(rows1, 'model1Prop1')).to.eql(['a', 'b', 'd']);
           expect(rows2).to.have.length(1);
@@ -157,13 +158,13 @@ module.exports = session => {
           ]);
         })
         .then(() => {
-          return [
+          return Promise.all([
             session.knex('Model1').orderBy('model1Prop1'),
             session.knex('model2'),
             session.knex('Model1Model2')
-          ];
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(3);
           expect(_.map(rows1, 'model1Prop1')).to.eql(['a', 'b', 'd']);
           expect(rows2).to.have.length(1);
@@ -257,9 +258,13 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
           expect(rows2).to.have.length(0);
           expect(rows3).to.have.length(0);
@@ -291,24 +296,25 @@ module.exports = session => {
               }
             ])
             .then(models => {
-              return models[0]
-                .$relatedQuery('model1Relation2', trx)
-                .insert({ model2Prop1: 'e' })
-                .return(models);
+              return Bluebird.resolve(
+                models[0].$relatedQuery('model1Relation2', trx).insert({ model2Prop1: 'e' })
+              ).return(models);
             })
             .then(models => {
-              return models[0]
-                .$relatedQuery('model1Relation2')
-                .transacting(trx)
-                .insert({ model2Prop1: 'f' })
-                .return(models);
+              return Bluebird.resolve(
+                models[0]
+                  .$relatedQuery('model1Relation2')
+                  .transacting(trx)
+                  .insert({ model2Prop1: 'f' })
+              ).return(models);
             })
             .then(models => {
-              return Model1.query(trx)
-                .findById(models[0].id)
-                .then(it => it.$loadRelated('model1Relation1', null, trx))
-                .then(it => expect(it.model1Relation1.model1Prop1).to.equal('b'))
-                .return(models);
+              return Bluebird.resolve(
+                Model1.query(trx)
+                  .findById(models[0].id)
+                  .then(it => it.$loadRelated('model1Relation1', null, trx))
+                  .then(it => expect(it.model1Relation1.model1Prop1).to.equal('b'))
+              ).return(models);
             })
             .then(models => {
               expect(models[0].$query(trx).knex() === trx);
@@ -320,9 +326,13 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
           expect(rows2).to.have.length(0);
           expect(rows3).to.have.length(0);
@@ -353,24 +363,25 @@ module.exports = session => {
             }
           ])
           .then(models => {
-            return models[0]
-              .$relatedQuery('model1Relation2', trx)
-              .insert({ model2Prop1: 'e' })
-              .return(models);
+            return Bluebird.resolve(
+              models[0].$relatedQuery('model1Relation2', trx).insert({ model2Prop1: 'e' })
+            ).return(models);
           })
           .then(models => {
-            return models[0]
-              .$relatedQuery('model1Relation2')
-              .transacting(trx)
-              .insert({ model2Prop1: 'f' })
-              .return(models);
+            return Bluebird.resolve(
+              models[0]
+                .$relatedQuery('model1Relation2')
+                .transacting(trx)
+                .insert({ model2Prop1: 'f' })
+            ).return(models);
           })
           .then(models => {
-            return Model1.query(trx)
-              .findById(models[0].id)
-              .then(it => it.$loadRelated('model1Relation1', null, trx))
-              .then(it => expect(it.model1Relation1.model1Prop1).to.equal('b'))
-              .return(models);
+            return Bluebird.resolve(
+              Model1.query(trx)
+                .findById(models[0].id)
+                .then(it => it.$loadRelated('model1Relation1', null, trx))
+                .then(it => expect(it.model1Relation1.model1Prop1).to.equal('b'))
+            ).return(models);
           })
           .then(models => {
             expect(models[0].$query(trx).knex() === trx);
@@ -382,9 +393,13 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
           expect(rows2).to.have.length(0);
           expect(rows3).to.have.length(0);
@@ -415,17 +430,17 @@ module.exports = session => {
             }
           ])
           .then(models => {
-            return models[0]
-              .$relatedQuery('model1Relation2', trx)
-              .insert({ model2Prop1: 'e' })
-              .return(models);
+            return Bluebird.resolve(
+              models[0].$relatedQuery('model1Relation2', trx).insert({ model2Prop1: 'e' })
+            ).return(models);
           })
           .then(models => {
-            return models[0]
-              .$relatedQuery('model1Relation2')
-              .transacting(trx)
-              .insert({ model2Prop1: 'f' })
-              .return(models);
+            return Bluebird.resolve(
+              models[0]
+                .$relatedQuery('model1Relation2')
+                .transacting(trx)
+                .insert({ model2Prop1: 'f' })
+            ).return(models);
           })
           .then(models => {
             expect(models[0].$query(trx).knex() === trx);
@@ -437,9 +452,13 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
           expect(rows2).to.have.length(0);
           expect(rows3).to.have.length(0);
@@ -477,9 +496,13 @@ module.exports = session => {
         .catch(err => {
           expect(err.message).to.equal('whoops');
 
-          return [session.knex('Model1'), session.knex('model2'), session.knex('Model1Model2')];
+          return Promise.all([
+            session.knex('Model1'),
+            session.knex('model2'),
+            session.knex('Model1Model2')
+          ]);
         })
-        .spread((rows1, rows2, rows3) => {
+        .then(([rows1, rows2, rows3]) => {
           expect(rows1).to.have.length(0);
           expect(rows2).to.have.length(0);
           expect(rows3).to.have.length(0);
@@ -507,7 +530,7 @@ module.exports = session => {
           });
       })
         .catch(() => {
-          return Promise.delay(5).then(() => {
+          return Bluebird.delay(5).then(() => {
             return session.knex('Model1');
           });
         })
@@ -607,7 +630,7 @@ module.exports = session => {
 
       it(
         'commit should work with yield (and thus async/await)',
-        coroutine(function*() {
+        Bluebird.coroutine(function*() {
           const trx = yield transaction.start(Model1.knex());
 
           yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
@@ -628,7 +651,7 @@ module.exports = session => {
 
       it(
         'rollback should work with yield (and thus async/await)',
-        coroutine(function*() {
+        Bluebird.coroutine(function*() {
           const trx = yield transaction.start(Model1.knex());
 
           yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
@@ -805,13 +828,3 @@ module.exports = session => {
     });
   });
 };
-
-function coroutine(generatorFn) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      resolve(await generatorFn());
-    } catch (error) {
-      reject(error);
-    }
-  });
-}

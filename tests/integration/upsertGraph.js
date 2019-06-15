@@ -1,5 +1,6 @@
 const expect = require('expect.js');
 const chai = require('chai');
+const Bluebird = require('bluebird');
 const { raw, transaction, ValidationError } = require('../../');
 const { FetchStrategy } = require('../../lib/queryBuilder/graph/GraphOptions');
 const mockKnexFactory = require('../../testUtils/mockKnex');
@@ -321,8 +322,8 @@ module.exports = session => {
                       ]
                     });
 
-                    return Promise.all([trx('Model1'), trx('model2')]).spread(
-                      (model1Rows, model2Rows) => {
+                    return Promise.all([trx('Model1'), trx('model2')]).then(
+                      ([model1Rows, model2Rows]) => {
                         // Row 5 should be deleted.
                         expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
                         // Row 6 should NOT be deleted even thought its parent is.
@@ -451,8 +452,8 @@ module.exports = session => {
                 ]
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
                   // Row 5 should be deleted.
                   expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
                   // Row 6 should NOT be deleted even thought its parent is.
@@ -794,8 +795,8 @@ module.exports = session => {
                   ]
                 });
 
-                return Promise.all([trx('Model1'), trx('model2')]).spread(
-                  (model1Rows, model2Rows) => {
+                return Promise.all([trx('Model1'), trx('model2')]).then(
+                  ([model1Rows, model2Rows]) => {
                     // Row 3 should NOT be deleted.
                     expect(model1Rows.find(it => it.id == 3)).to.eql({
                       id: 3,
@@ -1250,8 +1251,8 @@ module.exports = session => {
                 ]
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
                   // Row 3 should NOT be deleted.
                   expect(model1Rows.find(it => it.id == 3)).to.eql({
                     id: 3,
@@ -1380,8 +1381,8 @@ module.exports = session => {
                 ]
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
                   // Row 3 should NOT be deleted.
                   expect(model1Rows.find(it => it.id == 3)).to.eql({
                     id: 3,
@@ -1502,7 +1503,7 @@ module.exports = session => {
                 }
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(model1Rows => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(([model1Rows]) => {
                 // Row 3 should be deleted.
                 expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
               });
@@ -1541,8 +1542,8 @@ module.exports = session => {
                 }
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
                   // Row 3 should be deleted.
                   expect(model1Rows.find(it => it.id == 3)).to.equal(undefined);
                 }
@@ -1655,8 +1656,8 @@ module.exports = session => {
                 }
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
                   // Row 3 should not be deleted.
                   expect(model1Rows.find(it => it.id == 3)).to.not.equal(undefined);
                 }
@@ -2125,8 +2126,8 @@ module.exports = session => {
               ]
             });
 
-            return Promise.all([session.knex('Model1'), session.knex('model2')]).spread(
-              (model1Rows, model2Rows) => {
+            return Promise.all([session.knex('Model1'), session.knex('model2')]).then(
+              ([model1Rows, model2Rows]) => {
                 // Row 3 should NOT be deleted.
                 expect(model1Rows.find(it => it.id == 3)).to.eql({
                   id: 3,
@@ -2249,8 +2250,8 @@ module.exports = session => {
                 ]
               });
 
-              return Promise.all([trx('Model1'), trx('model2')]).spread(
-                (model1Rows, model2Rows) => {
+              return Promise.all([trx('Model1'), trx('model2')]).then(
+                ([model1Rows, model2Rows]) => {
                   // Row 5 should be deleted.
                   expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
                   // Row 6 should NOT be deleted even thought its parent is.
@@ -3069,9 +3070,11 @@ module.exports = session => {
             'model1Relation2[0].model2Relation1[1].model1Prop1'
           ];
 
-          return Promise.map(fails, fail => {
-            return transaction(session.knex, trx =>
-              Model1.query(trx).upsertGraph(fail, { fetchStrategy })
+          return Bluebird.map(fails, fail => {
+            return Bluebird.resolve(
+              transaction(session.knex, trx =>
+                Model1.query(trx).upsertGraph(fail, { fetchStrategy })
+              )
             ).reflect();
           })
             .then(results => {
@@ -3139,8 +3142,8 @@ module.exports = session => {
                       ]
                     });
 
-                    return Promise.all([trx('Model1'), trx('model2')]).spread(
-                      (model1Rows, model2Rows) => {
+                    return Promise.all([trx('Model1'), trx('model2')]).then(
+                      ([model1Rows, model2Rows]) => {
                         // Row 5 should be deleted.
                         expect(model1Rows.find(it => it.id == 5)).to.equal(undefined);
                         // Row 6 should NOT be deleted even thought its parent is.
@@ -3421,9 +3424,11 @@ module.exports = session => {
 
           const errorKeys = ['model1Prop2', 'model1Relation1.model1Prop2'];
 
-          return Promise.map(fails, fail => {
-            return transaction(session.knex, trx =>
-              Model1.query(trx).upsertGraph(fail, { update: true, fetchStrategy })
+          return Bluebird.map(fails, fail => {
+            return Bluebird.resolve(
+              transaction(session.knex, trx =>
+                Model1.query(trx).upsertGraph(fail, { update: true, fetchStrategy })
+              )
             ).reflect();
           })
             .then(results => {

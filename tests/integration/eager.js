@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const chai = require('chai');
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 const { ValidationError, raw } = require('../../');
 const mockKnexFactory = require('../../testUtils/mockKnex');
 
@@ -1059,7 +1060,7 @@ module.exports = session => {
     });
 
     it('should work with zero id', () => {
-      return Promise.map(
+      return Bluebird.map(
         [Model1.JoinEagerAlgorithm, Model1.NaiveEagerAlgorithm, Model1.WhereInEagerAlgorithm],
         algo => {
           return session
@@ -2526,7 +2527,7 @@ module.exports = session => {
 
     describe('QueryBuilder.orderBy', () => {
       it('orderBy should work for the root query', () => {
-        return Promise.map(
+        return Bluebird.map(
           [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm],
           eagerAlgorithm => {
             return Model1.query()
@@ -2792,7 +2793,7 @@ module.exports = session => {
 
     describe('aliases', () => {
       it('aliases in eager expressions should work', () => {
-        return Promise.map(
+        return Bluebird.map(
           [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm],
           eagerAlgo => {
             return Model1.query()
@@ -2930,7 +2931,7 @@ module.exports = session => {
       });
 
       it('alias method should work', () => {
-        return Promise.map(
+        return Bluebird.map(
           [Model1.WhereInEagerAlgorithm, Model1.JoinEagerAlgorithm],
           eagerAlgo => {
             return Model1.query()
@@ -3143,7 +3144,7 @@ module.exports = session => {
         it('should work with a lot of data', function() {
           this.timeout(30000);
 
-          return Promise.map(
+          return Bluebird.map(
             [/*Model1.WhereInEagerAlgorithm*/ Model1.JoinEagerAlgorithm],
             eagerAlgorithm => {
               let t1 = Date.now();

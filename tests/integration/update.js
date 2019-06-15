@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { expectPartialEqual: expectPartEql } = require('./../../testUtils/testUtils');
 const { ValidationError, raw } = require('../../');
@@ -452,7 +453,7 @@ module.exports = session => {
 
         model.$beforeUpdate = function() {
           let self = this;
-          return Promise.delay(1).then(() => {
+          return Bluebird.delay(1).then(() => {
             self.model1Prop1 = 'updated text';
           });
         };

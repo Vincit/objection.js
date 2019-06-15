@@ -2,6 +2,7 @@
 
 const _ = require('lodash'),
   Knex = require('knex'),
+  Bluebird = require('bluebird'),
   knexMocker = require('../testUtils/mockKnex'),
   mockMochaFactory = require('./mockMocha'),
   Model = require('../').Model;
@@ -672,7 +673,7 @@ describe('Performance tests', () => {
   }
 
   function runTest(opt, ctx) {
-    return Promise.map(_.range(opt.runCount), () => {
+    return Bluebird.map(_.range(opt.runCount), () => {
       return opt.test(ctx);
     }, {concurrency: 1});
   }

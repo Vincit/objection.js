@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const expect = require('expect.js');
+const Bluebird = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
 const { ValidationError } = require('../../');
 
@@ -520,7 +521,7 @@ module.exports = session => {
 
         model.$beforeInsert = function() {
           let self = this;
-          return Promise.delay(1).then(() => {
+          return Bluebird.delay(1).then(() => {
             self.model1Prop1 = 'hello 3';
           });
         };
