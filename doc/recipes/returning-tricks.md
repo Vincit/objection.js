@@ -50,7 +50,7 @@ const deletedJennifers = await Person
   .where({firstName: 'Jennifer'})
   .returning('*');
 
-console.log(deletedJennifers.length); // However many Jennifers there were
+console.log(deletedJennifers.length); // How many Jennifers there were
 console.log(deletedJennifers[0].lastName); // Maybe "Lawrence"
 ```
 
@@ -63,6 +63,6 @@ const jennsDeletedDogs = await jennifer
   .where({'species': 'dog'})
   .returning('*');
 
-console.log(jennsDeletedDogs.length); // However many dogs Jennifer had
+console.log(jennsDeletedDogs.length); // How many dogs Jennifer had
 console.log(jennsDeletedDogs[0].name); // Maybe "Fido"
 ```
