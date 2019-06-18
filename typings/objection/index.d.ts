@@ -1109,8 +1109,8 @@ declare namespace Objection {
     orderByRaw: RawMethod<QM, RM, RV>;
 
     // Union
-    union: SetOperations<QM>;
-    unionAll: SetOperations<QM>;
+    union: Union<QM>;
+    unionAll: Union<QM>;
     intersect: SetOperations<QM>;
 
     // Having
@@ -1310,7 +1310,71 @@ declare namespace Objection {
     (columns: ({ column: ColumnRef; order?: string } | string)[]): QueryBuilder<QM, RM, RV>;
   }
 
-  interface SetOperations<QM extends Model> {
+  type QBOrCallback<QM extends Model> = QueryBuilder<QM, QM[]> |
+    ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void);
+
+  interface Union<QM extends Model> extends BaseSetOperations<QM> {
+    (
+      ...args: QBOrCallback<QM>[]
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      arg5: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      arg5: QBOrCallback<QM>,
+      arg6: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      arg5: QBOrCallback<QM>,
+      arg6: QBOrCallback<QM>,
+      arg7: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+  }
+
+  interface SetOperations<QM extends Model> extends BaseSetOperations<QM> {
+    (
+      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
+    ): QueryBuilder<QM, QM[]>;
+  }
+
+  interface BaseSetOperations<QM extends Model> {
     (
       callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
       wrap?: boolean
@@ -1318,9 +1382,6 @@ declare namespace Objection {
     (
       callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[],
       wrap?: boolean
-    ): QueryBuilder<QM, QM[]>;
-    (
-      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
     ): QueryBuilder<QM, QM[]>;
   }
 
