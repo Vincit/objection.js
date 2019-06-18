@@ -1310,22 +1310,14 @@ declare namespace Objection {
     (columns: ({ column: ColumnRef; order?: string } | string)[]): QueryBuilder<QM, RM, RV>;
   }
 
-  type QBOrCallback<QM extends Model> = QueryBuilder<QM, QM[]> |
-    ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void);
+  type QBOrCallback<QM extends Model> =
+    | QueryBuilder<QM, QM[]>
+    | ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void);
 
   interface Union<QM extends Model> extends BaseSetOperations<QM> {
-    (
-      ...args: QBOrCallback<QM>[]
-    ): QueryBuilder<QM, QM[]>;
-    (
-      arg1: QBOrCallback<QM>,
-      wrap?: boolean
-    ): QueryBuilder<QM, QM[]>;
-    (
-      arg1: QBOrCallback<QM>,
-      arg2: QBOrCallback<QM>,
-      wrap?: boolean
-    ): QueryBuilder<QM, QM[]>;
+    (...args: QBOrCallback<QM>[]): QueryBuilder<QM, QM[]>;
+    (arg1: QBOrCallback<QM>, wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (arg1: QBOrCallback<QM>, arg2: QBOrCallback<QM>, wrap?: boolean): QueryBuilder<QM, QM[]>;
     (
       arg1: QBOrCallback<QM>,
       arg2: QBOrCallback<QM>,
