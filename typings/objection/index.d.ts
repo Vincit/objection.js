@@ -1396,7 +1396,26 @@ declare namespace Objection {
     rollback<QM>(error?: Error): Promise<QM>;
   }
 
-  // The following is from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
+  type JsonSchemaFormatType =
+    | 'date-time'
+    | 'time'
+    | 'date'
+    | 'email'
+    | 'idn-email'
+    | 'hostname'
+    | 'idn-hostname'
+    | 'ipv4'
+    | 'ipv6'
+    | 'uri'
+    | 'uri-reference'
+    | 'iri'
+    | 'iri-reference'
+    | 'uri-template'
+    | 'json-pointer'
+    | 'relative-json-pointer'
+    | 'regex';
+
+  // The following is extended version of interface from https://gist.github.com/enriched/c84a2a99f886654149908091a3183e15
 
   /*
    * MIT License
@@ -1537,7 +1556,11 @@ declare namespace Objection {
      * or an array of the acceptable types
      */
     type?: string | string[];
-
+    /**
+     * fallback raw string for custom formats, 
+     * or formats that aren't in the standard yet
+     */
+    format?: JsonSchemaFormatType | string;
     /////////////////////////////////////////////////
     // Combining Schemas
     /////////////////////////////////////////////////
