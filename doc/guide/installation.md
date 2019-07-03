@@ -12,6 +12,7 @@ You also need to install one of the following depending on the database you want
 ```bash
 npm install pg
 npm install sqlite3
+npm install mariadb
 npm install mysql
 npm install mysql2
 ```
