@@ -347,7 +347,11 @@ declare namespace Objection {
   }
 
   interface JoinRelation {
-    <QM extends Model>(relationName: string, opt?: RelationOptions): QueryBuilder<QM, QM[]>;
+    <TBase extends Model, QM extends TBase>(
+      this: QueryBuilder<TBase>,
+      relationName: string,
+      opt?: RelationOptions
+    ): QueryBuilder<QM, QM[]>;
   }
 
   type JsonObjectOrFieldExpression = object | object[] | FieldExpression;

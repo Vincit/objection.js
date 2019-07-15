@@ -134,6 +134,13 @@ const lastName = 'Lawrence';
 
 takesPersonQueryBuilder(Person.query());
 
+// ensure `joinRelation` and friends returns the correct QueryBuilder types
+takesPersonQueryBuilder(
+  Person.query()
+    .where({ lastName })
+    .joinRelation('children')
+);
+
 async () => {
   takesPeople(await Person.query().where('lastName', lastName));
   takesPeople(await Person.query().where({ lastName }));
