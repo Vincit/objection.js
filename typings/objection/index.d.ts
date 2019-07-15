@@ -22,6 +22,8 @@ import * as ajv from 'ajv';
 
 export = Objection;
 
+type DeriveModelType<T> = T extends Array<unknown> ? T[number] : T;
+
 declare namespace Objection {
   const lit: LiteralBuilder;
   const raw: knex.RawBuilder;
@@ -615,14 +617,15 @@ declare namespace Objection {
      * If you add fields to your model, you get $relatedQuery typings for
      * free.
      *
-     * Note that if you make any chained calls to the QueryBuilder,
-     * though, you should apply a cast, which will make your code use not this
-     * signatue, but the following signature.
+     * Chained calls to QueryBuilder can now use this version of $relatedQuery,
+     * without having to force cast a Type anymore. These typings also work properly
+     * in cases where the relation type is an array (this will derive individual
+     * type from within the array type).
      */
-    $relatedQuery<K extends keyof this, V extends this[K] & Model>(
+    $relatedQuery<K extends keyof this, V extends this[K], R = DeriveModelType<V>>(
       relationName: K,
       trxOrKnex?: Transaction | knex
-    ): QueryBuilder<V, V, V>;
+    ): R extends Model ? QueryBuilder<R, V> : never;
 
     /**
      * Builds a query that only affects the models related to this instance

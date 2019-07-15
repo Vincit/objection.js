@@ -58,7 +58,7 @@ class Person extends objection.Model {
   }
 
   fetchMom(): Promise<Person | undefined> {
-    return this.$relatedQuery<Person>('mom').first();
+    return this.$relatedQuery('mom').first();
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -107,6 +107,7 @@ class Person extends objection.Model {
 function takesModelSubclass<M extends objection.Model>(m: M) {}
 function takesModel(m: objection.Model) {}
 function takesModelClass(m: objection.ModelClass<any>) {}
+function takesNever(a: never) {}
 
 const takesPerson = (person: Person) => {
   person.examplePersonMethod('');
@@ -119,7 +120,15 @@ async function takesPersonClass(PersonClass: typeof Person) {
   takesMaybePerson(await PersonClass.query().findById(123));
 }
 
-function takesPersonQueryBuilder(qb: objection.QueryBuilder<Person>): Promise<Person[]> {
+function takesPersonQueryBuilder(
+  qb: objection.QueryBuilder<Person, Person, Person>
+): Promise<Person> {
+  return qb.execute();
+}
+
+function takesPeopleQueryBuilder(
+  qb: objection.QueryBuilder<Person, Person[], Person[]>
+): Promise<Person[]> {
   return qb.execute();
 }
 
@@ -132,7 +141,7 @@ const lastName = 'Lawrence';
 // It also seems that Promise types are not as rigorously asserted as their
 // resolved types, hence these async/await blocks:
 
-takesPersonQueryBuilder(Person.query());
+takesPeopleQueryBuilder(Person.query());
 
 async () => {
   takesPeople(await Person.query().where('lastName', lastName));
@@ -243,6 +252,11 @@ async () => {
   );
 };
 
+class RowWithID extends objection.Model {
+  // prettier-ignore
+  id!: number;
+}
+
 class Movie extends objection.Model {
   // prettier-ignore
   title!: string;
@@ -250,6 +264,8 @@ class Movie extends objection.Model {
   actors!: Person[];
   // prettier-ignore
   director!: Person;
+  // prettier-ignore
+  rowsWithIDs!: RowWithID[];
 
   /**
    * This static field instructs Objection how to hydrate and persist
@@ -288,17 +304,33 @@ function takesMovie(m: Movie) {
   m.title = '';
 }
 
+takesPeopleQueryBuilder(new Movie().$relatedQuery('actors'));
+takesPersonQueryBuilder(new Movie().$relatedQuery('director'));
+
 async () => {
   // Another example of strongly-typed $relatedQuery without a cast:
   takesPeople(await new Movie().$relatedQuery('actors'));
   takesPerson(await new Movie().$relatedQuery('director'));
 
-  // If you need to do subsequent changes to $relatedQuery, though, you need
-  // to cast: :\
-  takesMaybePerson(await new Movie().$relatedQuery<Person>('actors').first());
-  takesMaybePerson(
-    await new Movie().$relatedQuery<Person, Person>('director').where('age', '>', 32)
-  );
+  // Test included for issue: https://github.com/Vincit/objection.js/issues/856
+  await new Movie().$relatedQuery('rowsWithIDs').insert([
+    {
+      id: 4
+    }
+  ]);
+
+  // properties which do not extend Model return `never`, as they're not valid relationships.
+  // The error which would be thrown on run-time is if a relationship with this
+  // name is not defined. Using the `$relatedQuery` which utilises types from the model,
+  // the assumption is that the model will have those relationships defined as properties typed
+  // correctly.
+  takesNever(new Movie().$relatedQuery('title'));
+
+  // Situations no longer needing casting to work successfully (Before
+  // issue https://github.com/Vincit/objection.js/issues/856 was resolved, these
+  // $relatedQuery calls needed type generics provided to work.)
+  takesMaybePerson(await new Movie().$relatedQuery('actors').first());
+  takesMaybePerson(await new Movie().$relatedQuery('director').where('age', '>', 32));
 };
 
 const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
