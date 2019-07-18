@@ -1,8 +1,8 @@
 import * as ajv from 'ajv';
 import * as knex from 'knex';
 
-import * as objection from '../../typings/objection';
-import { lit, raw, ref, RelationMappings } from '../../typings/objection';
+import * as objection from '../../';
+import { lit, raw, ref, RelationMappings, RelationMapping } from '../../';
 
 // This file exercises the Objection.js typings.
 
@@ -58,7 +58,7 @@ class Person extends objection.Model {
   }
 
   fetchMom(): Promise<Person | undefined> {
-    return this.$relatedQuery<Person>('mom').first();
+    return this.$relatedQuery('mom');
   }
 
   async $beforeInsert(queryContext: objection.QueryContext) {
@@ -145,7 +145,7 @@ async () => {
 async () => {
   takesMaybePerson(
     await Person.query()
-      .where('raw SQL constraint')
+      .where(raw('raw SQL constraint'))
       .first()
   );
   takesMaybePerson(
@@ -164,7 +164,7 @@ async () => {
       .first()
   );
 
-  takesMaybePerson(await Person.query().findOne('raw SQL constraint'));
+  takesMaybePerson(await Person.query().findOne(raw('raw SQL constraint')));
   takesMaybePerson(await Person.query().findOne('lastName', lastName));
   takesMaybePerson(await Person.query().findOne('lastName', '>', lastName));
   takesMaybePerson(await Person.query().findOne({ lastName }));
@@ -293,12 +293,8 @@ async () => {
   takesPeople(await new Movie().$relatedQuery('actors'));
   takesPerson(await new Movie().$relatedQuery('director'));
 
-  // If you need to do subsequent changes to $relatedQuery, though, you need
-  // to cast: :\
-  takesMaybePerson(await new Movie().$relatedQuery<Person>('actors').first());
-  takesMaybePerson(
-    await new Movie().$relatedQuery<Person, Person>('director').where('age', '>', 32)
-  );
+  takesMaybePerson(await new Movie().$relatedQuery('actors').first());
+  takesMaybePerson(await new Movie().$relatedQuery('director').where('age', '>', 32));
 };
 
 const relatedPersons: Promise<Person[]> = new Person().$relatedQuery('children');
@@ -366,10 +362,7 @@ const appendRelatedPerson: Person = examplePerson.$appendRelated('pets', [
 ]);
 
 // static methods from Model should return the subclass type
-const personQB: objection.QueryBuilderYieldingOne<Person> = Person.loadRelated(
-  new Person(),
-  'movies'
-);
+const personQB: objection.QueryBuilder<Person, Person> = Person.loadRelated(new Person(), 'movies');
 const peopleQB: objection.QueryBuilder<Person> = Person.loadRelated([new Person()], 'movies');
 
 const person: Promise<Person> = personQB;
@@ -425,8 +418,7 @@ async () => {
 // (fewer characters than having each line `const qbNNN: QueryBuilder =`):
 
 const maybePerson: Promise<Person | undefined> = qb.findById(1);
-
-const maybePeople: Promise<Person[]> = qb.findById([1, 2, 3]);
+const maybePerson2: Promise<Person> = qb.findById([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -615,7 +607,7 @@ const rowInsertReturning: Promise<Person | undefined> = Person.query()
   .returning('*');
 
 const rowsInsertReturning: Promise<Person[]> = Person.query()
-  .insert([{}])
+  .insert([{ firstName: 'Jack' }])
   .returning('*');
 
 // Executing a query builder should be equivalent to treating it
@@ -910,6 +902,11 @@ const deleteByIDThrow: Promise<number> = qb.deleteById(32).throwIfNotFound();
 
 const whereFirst: Promise<Person | undefined> = qb.where({ firstName: 'Mo' }).first();
 const firstWhere: Promise<Person | undefined> = qb.first().where({ firstName: 'Mo' });
+const updateFirst: Promise<number> = qb.update({}).first();
+const updateReturningFirst: Promise<Person> = qb
+  .update({})
+  .returning('*')
+  .first();
 
 // Returning restores the result to Model or Model[].
 
