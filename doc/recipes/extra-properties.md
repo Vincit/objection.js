@@ -1,6 +1,6 @@
 # Join table extra properties
 
-Sometimes when you have a many-to-many relationship, you want to store some properties in the join (pivot) table and still join them with the related objects. In objection, these proerties can be defined as `extra` properties of many-to-many relationship.
+Sometimes when you have a many-to-many relationship, you want to store some properties in the join (pivot) table and still join them with the related objects. In objection, these properties can be defined as `extra` properties of many-to-many relationship.
 
 Let's consider a schema like this:
 
