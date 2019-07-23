@@ -162,6 +162,11 @@ declare namespace Objection {
   type ModelType<QB extends AnyQueryBuilder> = QB['ModelType'];
 
   /**
+   * Extracts the result type from a query builder type QB.
+   */
+  type ResultType<QB extends AnyQueryBuilder> = QB['ResultType'];
+
+  /**
    * Extracts the property names of the query builder's model class.
    */
   type ModelProps<QB extends AnyQueryBuilder> = Exclude<
@@ -416,12 +421,20 @@ declare namespace Objection {
     (start: number, end: number): PageQueryBuilder<QB>;
   }
 
-  interface RunBeforeAfterCallback<QB extends AnyQueryBuilder> {
-    (this: QB, result: ModelType<QB>, query: QB): any;
+  interface RunBeforeCallback<QB extends AnyQueryBuilder> {
+    (this: QB, result: any, query: QB): any;
   }
 
-  interface RunBeforeAfterMethod<QB extends AnyQueryBuilder> {
-    (cb: RunBeforeAfterCallback<QB>): QB;
+  interface RunBeforeMethod<QB extends AnyQueryBuilder> {
+    (cb: RunBeforeCallback<QB>): QB;
+  }
+
+  interface RunAfterCallback<QB extends AnyQueryBuilder> {
+    (this: QB, result: ResultType<QB>, query: QB): any;
+  }
+
+  interface RunAfterMethod<QB extends AnyQueryBuilder> {
+    (cb: RunAfterCallback<QB>): QB;
   }
 
   interface OnBuildMethod<QB extends AnyQueryBuilder> {
@@ -557,8 +570,8 @@ declare namespace Objection {
     page: PageMethod<this>;
     range: RangeMethod<this>;
 
-    runBefore: RunBeforeAfterMethod<this>;
-    runAfter: RunBeforeAfterMethod<this>;
+    runBefore: RunBeforeMethod<this>;
+    runAfter: RunAfterMethod<this>;
 
     onBuild: OnBuildMethod<this>;
     onBuildKnex: OnBuildKnexMethod<this>;
@@ -566,6 +579,8 @@ declare namespace Objection {
     onError: OnErrorMethod<this>;
 
     ModelType: M;
+    ResultType: R;
+
     ArrayQueryBuilderType: QueryBuilder<M, M[]>;
     SingleQueryBuilderType: QueryBuilder<M, M>;
     NumberQueryBuilderType: QueryBuilder<M, number>;
