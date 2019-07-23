@@ -37,10 +37,7 @@ declare namespace Objection {
 
   export interface LiteralBuilder extends Castable {}
   export interface LiteralFunction {
-    (value: LiteralValue): LiteralBuilder;
-    (value: LiteralValue[]): LiteralBuilder;
-    (value: LiteralValueObject): LiteralBuilder;
-    (value: LiteralValueObject[]): LiteralBuilder;
+    (value: LiteralValue | LiteralValue[] | LiteralValueObject | LiteralValueObject[]): LiteralBuilder;
   }
 
   export interface ReferenceBuilder extends Castable {}
@@ -785,11 +782,11 @@ declare namespace Objection {
     table?: string;
   }
 
-  interface BindKnex {
+  interface BindKnexMethod {
     <M>(this: M, trxOrKnex: Transaction | knex): M;
   }
 
-  interface FromJson {
+  interface FromJsonMethod {
     <M extends Model>(this: ModelClass<M>, json: object): M;
   }
 
@@ -811,15 +808,15 @@ declare namespace Objection {
     static columnNameMappers: ColumnNameMappers;
     static relationMappings: RelationMappings | (() => RelationMappings);
 
-    static fromJson: FromJson;
-    static fromDatabaseJson: FromJson;
+    static fromJson: FromJsonMethod;
+    static fromDatabaseJson: FromJsonMethod;
 
     static createValidationError(args: CreateValidationErrorArgs): Error;
     static tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     static fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
 
-    static bindKnex: BindKnex;
-    static bindTransaction: BindKnex;
+    static bindKnex: BindKnexMethod;
+    static bindTransaction: BindKnexMethod;
     static loadRelated: StaticLoadRelatedMethod;
     static raw: RawFunction;
 

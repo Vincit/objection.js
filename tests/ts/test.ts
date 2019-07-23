@@ -27,7 +27,7 @@ class Person extends BaseModel {
 
 const people: Promise<Person[]> = Person.query()
   .someCustomMethod()
-  .where('name', 'lol')
+  .where('firstName', 'lol')
   .someCustomMethod();
 
 const pets: Promise<Animal> = new Person()

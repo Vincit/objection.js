@@ -2,7 +2,7 @@ import * as ajv from 'ajv';
 import * as knex from 'knex';
 
 import * as objection from '../../';
-import { lit, raw, ref, RelationMappings, RelationMapping } from '../../';
+import { lit, raw, ref, RelationMappings } from '../../';
 
 // This file exercises the Objection.js typings.
 
@@ -742,10 +742,9 @@ Person.query()
 Person.query().insert({ firstName: 'Chuck' });
 
 // Verify we can call `.insert` via $relatedQuery
-// (albeit with a cast to Movie):
 
 async () => {
-  const m = await new Person().$relatedQuery<Movie>('movies').insert({ title: 'Total Recall' });
+  const m = await new Person().$relatedQuery('movies').insert({ title: 'Total Recall' });
   takesModel(m);
   takesMovie(m);
 };
