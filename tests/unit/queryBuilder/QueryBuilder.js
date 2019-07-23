@@ -866,6 +866,7 @@ describe('QueryBuilder', () => {
         ]);
         expect(res.total).to.equal(123);
         expect(res.results).to.eql([{ a: 1 }]);
+        expect(res.pages).to.eql(2);
         done();
       })
       .catch(done);
