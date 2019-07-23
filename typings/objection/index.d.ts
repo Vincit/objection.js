@@ -37,7 +37,9 @@ declare namespace Objection {
 
   export interface LiteralBuilder extends Castable {}
   export interface LiteralFunction {
-    (value: LiteralValue | LiteralValue[] | LiteralValueObject | LiteralValueObject[]): LiteralBuilder;
+    (
+      value: LiteralValue | LiteralValue[] | LiteralValueObject | LiteralValueObject[]
+    ): LiteralBuilder;
   }
 
   export interface ReferenceBuilder extends Castable {}
@@ -145,16 +147,37 @@ declare namespace Objection {
   type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 
   /**
-   * Given a model type, returns the equivalent POJO type.
+   * Any object that has some of the properties of model class T match this type.
    */
-  type ModelObject<T extends Model> = {
-    [K in NonFunctionPropertyNames<T>]: T[K] | NonLiteralValue
+  type PartialModelObject<T extends Model> = {
+    [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
+      ? T[K]
+      : Exclude<T[K], undefined> extends Array<infer I>
+      ? (I extends Model ? I[] : (T[K] | NonLiteralValue))
+      : (T[K] | NonLiteralValue)
+  } &
+    object;
+
+  /**
+   * Additional optional parameters that may be used in graphs.
+   */
+  type GraphParameters = {
+    '#dbRef'?: MaybeCompositeId;
+    '#ref'?: string;
+    '#id'?: string;
   };
 
   /**
-   * Just like ModelObject<M> but all properties are optional.
+   * Just like PartialModelObject but this is applied recursively to relations.
    */
-  type PartialModelObject<M extends Model> = Partial<ModelObject<M>> & object;
+  type PartialModelGraph<T> = {
+    [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
+      ? PartialModelGraph<Exclude<T[K], undefined>>
+      : Exclude<T[K], undefined> extends Array<infer I>
+      ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonLiteralValue))
+      : (T[K] | NonLiteralValue)
+  } &
+    GraphParameters;
 
   /**
    * Extracts the model type from a query builder type QB.
@@ -195,7 +218,7 @@ declare namespace Objection {
   type PageQueryBuilder<QB extends AnyQueryBuilder> = QB['PageQueryBuilderType'];
 
   interface ForClassMethod {
-    <M extends Model>(modelClass: ModelClass<M>): M['QueryBuilderType']
+    <M extends Model>(modelClass: ModelClass<M>): M['QueryBuilderType'];
   }
 
   type Selection<QB extends AnyQueryBuilder> = ColumnRef | AnyQueryBuilder | CallbackVoid<QB>;
@@ -457,6 +480,50 @@ declare namespace Objection {
     (cb: OnErrorCallback<QB>): QB;
   }
 
+  export interface InsertGraphOptions {
+    relate?: boolean | string[];
+  }
+
+  interface InsertGraphMethod {
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      graph: PartialModelGraph<ModelType<QB>>,
+      options?: InsertGraphOptions
+    ): SingleQueryBuilder<QB>;
+
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      graph: PartialModelGraph<ModelType<QB>>[],
+      options?: InsertGraphOptions
+    ): ArrayQueryBuilder<QB>;
+  }
+
+  export interface UpsertGraphOptions {
+    relate?: boolean | string[];
+    unrelate?: boolean | string[];
+    insertMissing?: boolean | string[];
+    update?: boolean | string[];
+    noInsert?: boolean | string[];
+    noUpdate?: boolean | string[];
+    noDelete?: boolean | string[];
+    noRelate?: boolean | string[];
+    noUnrelate?: boolean | string[];
+  }
+
+  interface UpsertGraphMethod {
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      graph: PartialModelGraph<ModelType<QB>>,
+      options?: UpsertGraphOptions
+    ): SingleQueryBuilder<QB>;
+
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      graph: PartialModelGraph<ModelType<QB>>[],
+      options?: UpsertGraphOptions
+    ): ArrayQueryBuilder<QB>;
+  }
+
   export interface Pojo {
     [key: string]: any;
   }
@@ -515,7 +582,7 @@ declare namespace Objection {
     leftJoin: JoinMethod<this>;
     leftOuterJoin: JoinMethod<this>;
     rightJoin: JoinMethod<this>;
-    rightOuterJoin: JoinMethod<this>;;
+    rightOuterJoin: JoinMethod<this>;
     outerJoin: JoinMethod<this>;
     fullOuterJoin: JoinMethod<this>;
     crossJoin: JoinMethod<this>;
@@ -578,13 +645,21 @@ declare namespace Objection {
 
     onError: OnErrorMethod<this>;
 
+    insertGraph: InsertGraphMethod;
+    insertGraphAndFetch: InsertGraphMethod;
+    insertWithRelated: InsertGraphMethod;
+    insertWithRelatedAndFetch: InsertGraphMethod;
+
+    upsertGraph: UpsertGraphMethod;
+    upsertGraphAndFetch: UpsertGraphMethod;
+
     ModelType: M;
     ResultType: R;
 
     ArrayQueryBuilderType: QueryBuilder<M, M[]>;
     SingleQueryBuilderType: QueryBuilder<M, M>;
     NumberQueryBuilderType: QueryBuilder<M, number>;
-    PageQueryBuilderType: QueryBuilder<M, Page<M>>
+    PageQueryBuilderType: QueryBuilder<M, Page<M>>;
   }
 
   interface StaticQueryMethod {

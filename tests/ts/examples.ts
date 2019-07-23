@@ -303,6 +303,8 @@ const relatedMovies: Promise<Person[]> = new Movie().$relatedQuery('actors');
 class Animal extends objection.Model {
   // prettier-ignore
   species!: string;
+  name?: string;
+  owner?: Person;
 
   // Tests the ColumnNameMappers interface.
   static columnNameMappers = {
@@ -467,8 +469,62 @@ const runAfterPersons: Promise<Person[]> = qb.runAfter(
 const rowInserted: Promise<Person> = qb.insert({ firstName: 'bob' });
 const rowsInserted: Promise<Person[]> = qb.insert([{ firstName: 'alice' }, { firstName: 'bob' }]);
 const rowsInsertedWithRelated: Promise<Person> = qb.insertWithRelated({});
-const rowsInsertGraph1: Promise<Person> = qb.insertGraph({});
-const rowsInsertGraph2: Promise<Person> = qb.insertGraph({}, { relate: true });
+const rowsInsertGraph1: Promise<Person> = qb.insertGraph({
+  '#id': 'root',
+  firstName: 'Name',
+
+  mom: {
+    lastName: 'Hello'
+  },
+
+  movies: [
+    {
+      director: {
+        firstName: 'Hans'
+      }
+    },
+    {
+      '#dbRef': 1
+    }
+  ],
+
+  pets: [
+    {
+      name: 'Pet'
+    },
+    {
+      species: 'Doggo'
+    },
+    {
+      name: 'Catto',
+
+      owner: {
+        '#ref': 'root'
+      }
+    }
+  ]
+});
+const rowsInsertGraph2: Promise<Person[]> = qb.insertGraph([
+  {
+    '#id': 'person',
+    firstName: 'Name',
+
+    pets: [
+      {
+        '#id': 'pet',
+        name: 'Pet'
+      },
+      {
+        species: 'Doggo',
+
+        owner: {
+          '#ref': 'person'
+        }
+      }
+    ]
+  }
+]);
+const rowsInsertGraph3: Promise<Person> = qb.insertGraph({}, { relate: true });
 const rowsUpdated: Promise<number> = qb.update({});
 const rowsPatched: Promise<number> = qb.patch({});
 const rowsDeleted: Promise<number> = qb.delete();
