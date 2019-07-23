@@ -447,7 +447,8 @@ qb = qb.alias('someAlias');
 const runBeforePerson: Promise<Person> = qb
   .first()
   .throwIfNotFound()
-  .runBefore(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+  .runBefore(async (result: any, builder: objection.QueryBuilder<Person, Person>) => 88);
+
 const runBeforePersons: Promise<Person[]> = qb.runBefore(
   async (result: any, builder: objection.QueryBuilder<Person>) => 88
 );
@@ -455,7 +456,8 @@ const runBeforePersons: Promise<Person[]> = qb.runBefore(
 const runAfterPerson: Promise<Person> = qb
   .first()
   .throwIfNotFound()
-  .runAfter(async (result: any, builder: objection.QueryBuilder<Person>) => 88);
+  .runAfter(async (result: any, builder: objection.QueryBuilder<Person, Person>) => 88);
+
 const runAfterPersons: Promise<Person[]> = qb.runAfter(
   async (result: any, builder: objection.QueryBuilder<Person>) => 88
 );
