@@ -38,7 +38,7 @@ declare namespace Objection {
   export interface LiteralBuilder extends Castable {}
   export interface LiteralFunction {
     (
-      value: LiteralValue | LiteralValue[] | LiteralValueObject | LiteralValueObject[]
+      value: PrimitiveValue | PrimitiveValue[] | PrimitiveValueObject | PrimitiveValueObject[]
     ): LiteralBuilder;
   }
 
@@ -86,11 +86,11 @@ declare namespace Objection {
 
   type Raw = RawBuilder;
   type Operator = string;
-  type NonLiteralValue = Raw | ReferenceBuilder | LiteralBuilder | AnyQueryBuilder;
+  type NonPrimitiveValue = Raw | ReferenceBuilder | LiteralBuilder | AnyQueryBuilder;
   type ColumnRef = string | Raw | ReferenceBuilder;
   type TableRef = ColumnRef | AnyQueryBuilder;
 
-  type LiteralValue =
+  type PrimitiveValue =
     | string
     | number
     | boolean
@@ -102,7 +102,7 @@ declare namespace Objection {
     | null
     | Buffer;
 
-  type Value = NonLiteralValue | LiteralValue;
+  type Value = NonPrimitiveValue | PrimitiveValue;
 
   type Id = string | number;
   type CompositeId = Id[];
@@ -112,8 +112,8 @@ declare namespace Objection {
     [key: string]: Value;
   }
 
-  interface LiteralValueObject {
-    [key: string]: LiteralValue;
+  interface PrimitiveValueObject {
+    [key: string]: PrimitiveValue;
   }
 
   interface CallbackVoid<T> {
@@ -153,8 +153,8 @@ declare namespace Objection {
     [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
       ? T[K]
       : Exclude<T[K], undefined> extends Array<infer I>
-      ? (I extends Model ? I[] : (T[K] | NonLiteralValue))
-      : (T[K] | NonLiteralValue)
+      ? (I extends Model ? I[] : (T[K] | NonPrimitiveValue))
+      : (T[K] | NonPrimitiveValue)
   } &
     object;
 
@@ -174,8 +174,8 @@ declare namespace Objection {
     [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
       ? PartialModelGraph<Exclude<T[K], undefined>>
       : Exclude<T[K], undefined> extends Array<infer I>
-      ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonLiteralValue))
-      : (T[K] | NonLiteralValue)
+      ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonPrimitiveValue))
+      : (T[K] | NonPrimitiveValue)
   } &
     GraphParameters;
 
