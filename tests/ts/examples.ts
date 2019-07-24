@@ -53,6 +53,10 @@ class Person extends objection.Model {
 
   examplePersonMethod = (arg: string) => 1;
 
+  static staticExamplePersonMethod() {
+    return 100
+  }
+
   petsWithId(petId: number): Promise<Animal[]> {
     return this.$relatedQuery('pets').where('id', petId);
   }
@@ -603,6 +607,9 @@ const patchedModels: Promise<Person>[] = [
 
 const rowsEager: Promise<Person[]> = Person.query()
   .eagerAlgorithm(Person.NaiveEagerAlgorithm)
+  .eagerAlgorithm(Person.JoinEagerAlgorithm)
+  .eagerAlgorithm(Person.WhereInEagerAlgorithm)
+  .eagerOptions({ joinOperation: 'innerJoin' })
   .eager('foo.bar');
 
 const rowsEager2: Promise<Person[]> = Person.query().eager({
@@ -614,6 +621,8 @@ const rowsEager2: Promise<Person[]> = Person.query().eager({
 const children: Promise<Person[]> = Person.query()
   .skipUndefined()
   .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
+  .allowEager({ pets: true })
+  .mergeAllowEager({ parent: true })
   .eager('children')
   .where('age', '>=', 42);
 
@@ -693,7 +702,8 @@ pagePromise = pageQb.execute();
 
 // non-wrapped methods:
 
-const modelFromQuery: typeof objection.Model = qb.modelClass();
+const modelFromQuery = qb.modelClass();
+
 
 const sql: string = qb.toSql();
 const tableName: string = qb.tableNameFor(Person);
@@ -710,6 +720,8 @@ qb = qb.context({
   runBefore: qbcb,
   onBuild: qbcb
 });
+
+const trx: objection.Transaction = qb.context().transaction;
 
 qb = qb.mergeContext({
   foo: 'bar'

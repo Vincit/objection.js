@@ -412,12 +412,28 @@ declare namespace Objection {
     (expr: RelationExpression<ModelType<QB>>, modifiers?: Modifiers): QB;
   }
 
+  interface AllowGraphMethod<QB extends AnyQueryBuilder> {
+    (expr: RelationExpression<ModelType<QB>>): QB;
+  }
+
   interface IdentityMethod<QB extends AnyQueryBuilder> {
     (): QB;
   }
 
-  interface OneStringMethod<QB extends AnyQueryBuilder> {
-    (arg: string): QB;
+  interface OneArgMethod<T, QB extends AnyQueryBuilder> {
+    (arg: T): QB;
+  }
+
+  interface StringReturningMethod {
+    (): string;
+  }
+
+  interface TableRefForMethod {
+    (modelClass: typeof Model): string;
+  }
+
+  interface ModelClassMethod {
+    (): typeof Model;
   }
 
   interface ReturningMethod {
@@ -524,6 +540,32 @@ declare namespace Objection {
     ): ArrayQueryBuilder<QB>;
   }
 
+  export interface EagerAlgorithm {}
+
+  interface EagerAlgorithmMethod<QB extends AnyQueryBuilder> {
+    (algorithm: EagerAlgorithm): QB;
+  }
+
+  export interface EagerOptions {
+    minimize?: boolean;
+    separator?: string;
+    aliases?: string[];
+    joinOperation: string;
+  }
+
+  interface EagerOptionsMethod<QB extends AnyQueryBuilder> {
+    (options: EagerOptions): QB;
+  }
+
+  interface ModifyEagerMethod<QB extends AnyQueryBuilder> {
+    <M extends Model>(expr: RelationExpression<ModelType<QB>>, modifier: Modifier<M['QueryBuilderType']>): QB;
+  }
+
+  interface ContextMethod<QB extends AnyQueryBuilder> {
+    (context: object): QB;
+    (): QueryContext;
+  }
+
   export interface Pojo {
     [key: string]: any;
   }
@@ -615,6 +657,7 @@ declare namespace Objection {
     deleteById: DeleteByIdMethod<this>;
 
     insert: InsertMethod<this>;
+    insertAndFetch: InsertMethod<this>;
 
     eager: EagerMethod<this>;
     mergeEager: EagerMethod<this>;
@@ -625,14 +668,26 @@ declare namespace Objection {
     naiveEager: EagerMethod<this>;
     mergeNaiveEager: EagerMethod<this>;
 
+    allowEager: AllowGraphMethod<this>;
+    mergeAllowEager: AllowGraphMethod<this>;
+
+    allowInsert: AllowGraphMethod<this>;
+    allowUpsert: AllowGraphMethod<this>;
+
     throwIfNotFound: IdentityMethod<this>;
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;
     debug: IdentityMethod<this>;
-    as: OneStringMethod<this>;
-    alias: OneStringMethod<this>;
-    withSchema: OneStringMethod<this>;
+    as: OneArgMethod<string, this>;
+    alias: OneArgMethod<string, this>;
+    withSchema: OneArgMethod<string, this>;
+    modelClass: ModelClassMethod
+    tableNameFor: TableRefForMethod;
+    tableRefFor: TableRefForMethod;
+    toSql: StringReturningMethod;
+    reject: OneArgMethod<any, this>;
+    resolve: OneArgMethod<any, this>;
 
     page: PageMethod<this>;
     range: RangeMethod<this>;
@@ -642,7 +697,6 @@ declare namespace Objection {
 
     onBuild: OnBuildMethod<this>;
     onBuildKnex: OnBuildKnexMethod<this>;
-
     onError: OnErrorMethod<this>;
 
     insertGraph: InsertGraphMethod;
@@ -652,6 +706,13 @@ declare namespace Objection {
 
     upsertGraph: UpsertGraphMethod;
     upsertGraphAndFetch: UpsertGraphMethod;
+
+    eagerAlgorithm: EagerAlgorithmMethod<this>;
+    eagerOptions: EagerOptionsMethod<this>;
+    modifyEager: ModifyEagerMethod<this>;
+
+    context: ContextMethod<this>;
+    mergeContext: ContextMethod<this>;
 
     ModelType: M;
     ResultType: R;
@@ -893,6 +954,10 @@ declare namespace Objection {
     static HasManyRelation: Relation;
     static ManyToManyRelation: Relation;
     static HasOneThroughRelation: Relation;
+
+    static WhereInEagerAlgorithm: EagerAlgorithm;
+    static NaiveEagerAlgorithm: EagerAlgorithm;
+    static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query: StaticQueryMethod;
     static columnNameMappers: ColumnNameMappers;
