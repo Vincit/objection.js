@@ -428,6 +428,10 @@ declare namespace Objection {
     (): string;
   }
 
+  interface BooleanReturningMethod {
+    (): boolean;
+  }
+
   interface TableRefForMethod {
     (modelClass: typeof Model): string;
   }
@@ -713,6 +717,16 @@ declare namespace Objection {
 
     context: ContextMethod<this>;
     mergeContext: ContextMethod<this>;
+
+    isFind: BooleanReturningMethod;
+    isInsert: BooleanReturningMethod;
+    isUpdate: BooleanReturningMethod;
+    isDelete: BooleanReturningMethod;
+    isRelate: BooleanReturningMethod;
+    isUnrelate: BooleanReturningMethod;
+    hasWheres: BooleanReturningMethod;
+    hasSelects: BooleanReturningMethod;
+    hasEager: BooleanReturningMethod;
 
     ModelType: M;
     ResultType: R;
