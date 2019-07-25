@@ -18,7 +18,9 @@ Find queries can be created by calling [Model.query()](/api/model/static-methods
 In addition to the examples here, you can find more examples behind these links.
 
 * [subqueries](/recipes/subqueries.html)
+* [relation subqueries](/recipes/relation-subqueries.html)
 * [raw queries](/recipes/raw-queries.html)
+* [precedence and parentheses](/recipes/precedence-and-parentheses.html)
 
  There's also a large amount of examples in the [API documentation](/api/query-builder/).
 
@@ -34,7 +36,7 @@ console.log(person instanceof Person); // --> true
 ```
 
 ```sql
-select "people".* from "people" where id = 1
+select "persons".* from "persons" where "persons"."id" = 1
 ```
 
 Fetch all people from the database:
@@ -47,7 +49,7 @@ console.log('there are', people.length, 'People in total');
 ```
 
 ```sql
-select "people".* from "people"
+select "persons".* from "persons"
 ```
 
 The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
@@ -55,6 +57,7 @@ The return value of the [query](/api/model/static-methods.html#static-query) met
 ```js
 const middleAgedJennifers = await Person
   .query()
+  .select('age', 'firstName', 'lastName')
   .where('age', '>', 40)
   .where('age', '<', 60)
   .where('firstName', 'Jennifer')
@@ -65,7 +68,8 @@ console.log(middleAgedJennifers[0].lastName);
 ```
 
 ```sql
-select "persons".* from "persons"
+select "age", "firstName", "lastName"
+from "persons"
 where "age" > 40
 and "age" < 60
 and "firstName" = 'Jennifer'
@@ -77,8 +81,8 @@ The next example shows how easy it is to build complex queries:
 ```js
 const people = await Person
   .query()
-  .select('persons.*', 'Parent.firstName as parentFirstName')
-  .join('persons as parent', 'persons.parentId', 'parent.id')
+  .select('persons.*', 'parent.firstName as parentFirstName')
+  .innerJoin('persons as parent', 'persons.parentId', 'parent.id')
   .where('persons.age', '<', Person.query().avg('persons.age'))
   .whereExists(
     Animal.query().select(1).whereColumn('persons.id', 'animals.ownerId')
@@ -173,9 +177,21 @@ console.log(jennifer.fullName()); // --> 'Jennifer Lawrence'
 insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 ```
 
+Just like with any query, you can mix in `raw` statements, subqueries, `knex.raw` instances etc.
+
+```js
+const jennifer = await Person
+  .query()
+  .insert({
+    firstName: 'Average',
+    lastName: 'Person',
+    age: Person.query().avg('age')
+  })
+```
+
 ### Update queries
 
-Update queries are created by chaining the [update](/api/query-builder/mutate-methods.html#update) or [patch](/api/query-builder/mutate-methods.html#patch) method to the query. [patch](/api/query-builder/mutate-methods.html#patch) and [update](/api/query-builder/mutate-methods.html#update) return the number of updated rows. If you want the freshly updated model as a result you can use the helper method [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/find-methods.html#returning) or take a look at [this recipe](/recipes/returning-tricks.html) for more ideas. See [update](/api/query-builder/mutate-methods.html#update) and [patch](/api/query-builder/mutate-methods.html#patch) API documentation for discussion about their differences.
+Update queries are created by chaining the [update](/api/query-builder/mutate-methods.html#update) or [patch](/api/query-builder/mutate-methods.html#patch) method to the query. [patch](/api/query-builder/mutate-methods.html#patch) and [update](/api/query-builder/mutate-methods.html#update) return the number of updated rows. If you want the freshly updated item as a result you can use the helper method [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/find-methods.html#returning) or take a look at [this recipe](/recipes/returning-tricks.html) for more ideas. See [update](/api/query-builder/mutate-methods.html#update) and [patch](/api/query-builder/mutate-methods.html#patch) API documentation for discussion about their differences.
 
 In addition to the examples here, you can find more examples behind these links.
 
@@ -311,18 +327,21 @@ where exists (
 
 ## Relation queries
 
-While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [$relatedQuery](/api/model/instance-methods.html#relatedquery) method can be used to query a single relation. [$relatedQuery](/api/model/instance-methods.html#relatedquery) returns an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
+While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [$relatedQuery](/api/model/instance-methods.html#relatedquery) method can be used to query related items of a single model instance. [$relatedQuery](/api/model/instance-methods.html#relatedquery) returns an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
 
 ### Find queries
 
 Simply call [$relatedQuery('relationName')](/api/model/instance-methods.html#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](/guide/query-examples.html#eager-loading) to fetch relations. [$relatedQuery](/api/model/instance-methods.html#relatedquery) is better when you only need one relation and you need to filter the query extensively.
 
-By default the fetched related models are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [$setRelated](/api/model/instance-methods.html#setrelated) and [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
+By default the fetched related items are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [$setRelated](/api/model/instance-methods.html#setrelated) and [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
 
 ##### Examples
 
+This example fetches the person's pets. `'pets'` is the name of a relation defined in [relationMappings](/api/model/static-properties.html#static-relationmappings).
+
 ```js
-// `person` is an instance of `Person` model.
+const person = await Person.query().findById(1);
+
 const pets = await person
   .$relatedQuery('pets')
   .where('species', 'dog')
@@ -351,10 +370,11 @@ By default the inserted related models are appended to the parent model to a pro
 Add a pet for a person:
 
 ```js
-// `person` is an instance of `Person` model.
+const person = await Person.query().findById(1);
+
 const fluffy = await person
   .$relatedQuery('pets')
-  .insert({name: 'Fluffy'});
+  .insert({ name: 'Fluffy' });
 
 console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 ```
@@ -402,11 +422,11 @@ See the [API documentation](/api/query-builder/mutate-methods.html#unrelate) of 
 
 ## Eager loading
 
-You can fetch an arbitrary graph of relations for the results of any query by chaining the [eager](/api/query-builder/eager-methods.html#eager) method. [eager](/api/query-builder/eager-methods.html#eager) takes a [relation expression](/api/types/#type-relationexpression) string as a parameter. In addition to making your life easier, eager queries avoid the "select N+1" problem and provide a great performance.
+You can fetch an arbitrary graph of relations for the results of any query by chaining the [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) method. Both methods take a [relation expression](/api/types/#type-relationexpression) as the first argument. In addition to making your life easier, eager loading avoids the "N+1 selects" problem and provide a great performance.
 
-Because the eager expressions are strings (there's also an optional [object notation](/api/types/#relationexpression-object-notation)) they can be easily passed for example as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method. [allowGraph](/api/query-builder/eager-methods.html#allowgraph) can be used to  limit the allowed eager expression to a certain subset.
+Because the relation expressions are strings (there's also an optional [object notation](/api/types/#relationexpression-object-notation)) they can be easily passed, for example, as a query parameter of an HTTP request. However, allowing the client to execute expressions like this without any limitations is not very secure. Therefore the [QueryBuilder](/api/query-builder/) has the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method. [allowGraph](/api/query-builder/eager-methods.html#allowgraph) can be used to limit the allowed relation expression to a certain subset.
 
-By giving the expression `[pets, children.pets]` for [allowGraph](/api/query-builder/eager-methods.html#allowgraph) the value passed to [eager](/api/query-builder/eager-methods.html#eager) is allowed to be one of:
+By giving the expression `[pets, children.pets]` for [allowGraph](/api/query-builder/eager-methods.html#allowgraph) the value passed to [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) is allowed to be one of:
 
  * `'pets'`
  * `'children'`
@@ -421,10 +441,10 @@ Examples of expressions that would cause an error:
  * `'[pets, children.children]'`
  * `'notEvenAnExistingRelation'`
 
-In addition to the [eager](/api/query-builder/eager-methods.html#eager) method, relations can be fetched using the [loadRelated](/api/model/static-properties.html#static-loadrelated) and
-[$loadRelated](/api/model/instance-methods.html#loadrelated) methods.
+In addition to the [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) methods, relations can be fetched using the [fetchGraph](/api/model/static-properties.html#static-fetchgraph) and
+[$fetchGraph](/api/model/instance-methods.html#fetchgraph) methods.
 
-By default eager loading is done using multiple queries (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/)). You can choose to use a join based eager loading algorithm that only performs one single query to fetch the whole eager tree. You can select which algorithm to use per query using [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method or per model by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property. All algorithms have their strengths and weaknesses, which are discussed in detail [here](/api/query-builder/eager-methods.html#eager).
+[withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) uses multiple queries to load the related items. (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/). Note that [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) used to be called `eager`.). [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) uses joins and only performs one single query to fetch the whole relation graph. This doesn't mean that `withGraphJoined` is faster though. See the performance discussion [here](/api/query-builder/eager-methods.html#withgraphfetched). You should only use `withGraphJoined` if you actually need the joins to be able to reference the nested tables. When in doubt use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched).
 
 ##### Examples
 
@@ -433,10 +453,10 @@ Fetch the `pets` relation for all results of a query:
 ```js
 const people = await Person
   .query()
-  .eager('pets');
+  .withGraphFetched('pets');
 
-// Each person has the `.pets` property populated with Animal objects related
-// through `pets` relation.
+// Each person has the `pets` property populated with Animal objects related
+// through the `pets` relation.
 console.log(people[0].pets[0].name);
 console.log(people[0].pets[0] instanceof Animal); // --> true
 ```
@@ -446,10 +466,10 @@ Fetch multiple relations on multiple levels:
 ```js
 const people = await Person
   .query()
-  .eager('[pets, children.[pets, children]]');
+  .withGraphFetched('[pets, children.[pets, children]]');
 
-// Each person has the `.pets` property populated with Animal objects related
-// through `pets` relation. The `.children` property contains the Person's
+// Each person has the `pets` property populated with Animal objects related
+// through the `pets` relation. The `children` property contains the Person's
 // children. Each child also has the `pets` and `children` relations eagerly
 // fetched.
 console.log(people[0].pets[0].name);
@@ -457,12 +477,12 @@ console.log(people[1].children[2].pets[1].name);
 console.log(people[1].children[2].children[0].name);
 ```
 
-Here's the previous query using the optional [object notation](/api/types/#relationexpression-object-notation)
+Here's the previous query using the [object notation](/api/types/#relationexpression-object-notation)
 
 ```js
 const people = await Person
   .query()
-  .eager({
+  .withGraphFetched({
     pets: true,
     children: {
       pets: true,
@@ -476,7 +496,7 @@ Fetch one relation recursively:
 ```js
 const people = await Person
   .query()
-  .eager('[pets, children.^]');
+  .withGraphFetched('[pets, children.^]');
 
 // The children relation is from Person to Person. If we want to fetch the whole
 // descendant tree of a person we can just say "fetch this relation recursively"
@@ -489,7 +509,7 @@ Limit recursion to 3 levels:
 ```js
 const people = await Person
   .query()
-  .eager('[pets, children.^3]');
+  .withGraphFetched('[pets, children.^3]');
 
 console.log(people[0].children[0].children[0].children[0].firstName);
 ```
@@ -499,7 +519,7 @@ Relations can be modified using the [modifyEager](/api/query-builder/other-metho
 ```js
 const people = await Person
   .query()
-  .eager('[children.[pets, movies], movies]')
+  .withGraphFetched('[children.[pets, movies], movies]')
   .modifyEager('children.pets', builder => {
     // Only select pets older than 10 years old for children
     // and only return their names.
@@ -512,14 +532,16 @@ Relations can also be modified using modifiers like this:
 ```js
 const people = await Person
   .query()
-  .eager('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]')
+  .withGraphFetched('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]')
   .modifiers({
     selectName: (builder) => {
       builder.select('name');
     },
+
     orderByAge: (builder) => {
       builder.orderBy('age');
     },
+
     onlyDogs: (builder) => {
       builder.where('species', 'dog');
     }
@@ -557,8 +579,9 @@ class Animal extends Model {
         builder.orderBy('name');
       },
 
-      onlyDogs(builder) {
-        builder.where('species', 'dog');
+      // Note that this modifier takes an argument.
+      onlySpecies(builder, species) {
+        builder.where('species', species);
       }
     };
   }
@@ -568,12 +591,16 @@ class Animal extends Model {
 
 const people = await Person
   .query()
-  .eager(`
+  .modifiers({
+    // This way you can bind arguments to modifiers.
+    onlyDogs: query => query.modify('onlySpecies', 'dog')
+  })
+  .withGraphFetched(`
     children(defaultSelects, orderByAge).[
       pets(onlyDogs, orderByName),
       movies
     ]
-  `);
+  `)
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -584,7 +611,7 @@ Relations can be aliased using `as` keyword:
 ```js
 const people = await Person
   .query()
-  .eager(`[
+  .withGraphFetched(`[
     children(orderByAge) as kids .[
       pets(filterDogs) as dogs,
       pets(filterCats) as cats
@@ -602,31 +629,24 @@ console.log(people[0].kids[0].movies[0].id);
 Example usage for [allowGraph](/api/query-builder/eager-methods.html#allowgraph) in an express route:
 
 ```js
-expressApp.get('/people', async (req, res, next) => {
+expressApp.get('/people', async (req, res) => {
   const people = await Person
     .query()
     .allowGraph('[pets, children.pets]')
-    .eager(req.query.eager);
+    .withGraphFetched(req.query.eager);
 
   res.send(people);
 });
 ```
 
-Eager loading algorithm can be changed using the [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method:
+[withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) can be used just like [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched). In addition you can refer to the related items from the root query because they are all joined:
 
 ```js
 const people = await Person
   .query()
-  .eagerAlgorithm(Model.JoinEagerAlgorithm)
-  .eager('[pets, children.pets]');
-```
-
-There are also shortcut methods for each of the eager algoriths:
-
-```js
-const people = await Person
-  .query()
-  .joinEager('[pets, children.pets]');
+  .withGraphJoined('[pets, children.pets]')
+  .where('pets.age', '>', 10)
+  .where('children:pets.age', '>', 10)
 ```
 
 ## Graph inserts

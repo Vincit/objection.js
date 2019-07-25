@@ -16,9 +16,11 @@ Each model must set this.
 
 ## `static` relationMappings
 
-This property defines the relations to other models.
+This property defines the relations (relationships, associations) to other models.
 
-relationMappings is an object (or a function that returns an object) whose keys are relation names and values are [RelationMapping](/api/types/#type-relationmapping) instances. The `join` property in addition to the relation type define how the models are related to one another. The `from` and `to` properties of the `join` object define the database columns through which the models are associated. Note that neither of these columns need to be primary keys. They can be any columns. In fact they can even be fields inside JSON columns (using the [ref](/api/objection/#ref) helper). In the case of ManyToManyRelation also the join table needs to be defined. This is done using the `through` object.
+`relationMappings` is an object (or a function/getter that returns an object) whose keys are relation names and values are [RelationMapping](/api/types/#type-relationmapping) instances. The `join` property in addition to the relation type define how the models are related to one another.
+
+The `from` and `to` properties of the `join` object define the database columns through which the models are associated. Note that neither of these columns need to be primary keys. They can be any columns. In fact they can even be fields inside JSON columns (using the [ref](/api/objection/#ref) helper). In the case of ManyToManyRelation also the join table needs to be defined. This is done using the `through` object.
 
 The `modelClass` passed to the relation mappings is the class of the related model. It can be one of the following:
 
@@ -49,12 +51,15 @@ class Person extends Model {
         modelClass: Animal,
         join: {
           from: 'persons.id',
+          to: 'animals.ownerId'
+
           // Any of the `to` and `from` fields can also be
           // references to nested fields (or arrays of references).
           // Here the relation is created between `persons.id` and
           // `animals.json.details.ownerId` properties. The reference
           // must be cast to the same type as the other key.
-          to: ref('animals.json:details.ownerId').castInt()
+          //
+          // to: ref('animals.json:details.ownerId').castInt()
         }
       },
 
@@ -84,7 +89,7 @@ class Person extends Model {
             // Columns listed here are automatically joined
             // to the related models on read and written to
             // the join table instead of the related table
-            // on insert.
+            // on insert/update.
             //
             // extra: ['someExtra']
           },
@@ -132,7 +137,7 @@ class Person extends Model {
 
 The optional schema against which the model is validated.
 
-Must follow [JSON Schema](http://json-schema.org) specification. If null no validation is done.
+Must follow [JSON Schema](http://json-schema.org) specification. If unset, no validation is done.
 
 ##### Read more
 
@@ -240,7 +245,7 @@ const pojo = person.toJSON({ virtuals: ['fullName'] })
 
 ## `static` modifiers
 
-Reusable query building functions that can be used in any [eager query](/api/query-builder/eager-methods.html#eager), using [modify](/api/query-builder/other-methods.html#modify) method and in many other places.
+Reusable query building functions that can be used in any query using [modify](/api/query-builder/other-methods.html#modify) method and in many other places.
 
 Also see the [modifier recipe](/recipes/modifiers.html) for more info and examples.
 
@@ -253,7 +258,7 @@ class Movie extends Model {
       },
 
       orderByName(builder) {
-        builder.orderBy('name')
+        builder.orderBy('name');
       }
     };
   }
@@ -270,12 +275,12 @@ class Animal extends Model {
 }
 ```
 
-Modifiers can be used in any eager query:
+Modifiers can be used for relations in a `withGraphFetched` or `withGraphJoined` query.
 
 ```js
 Person
   .query()
-  .eager('[movies(goodMovies, orderByName).actors, pets(dogs)]')
+  .withGraphFetched('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
 Modifiers can also be used through [modifyEager](/api/query-builder/other-methods.html#modifyeager):
@@ -283,12 +288,17 @@ Modifiers can also be used through [modifyEager](/api/query-builder/other-method
 ```js
 Person
   .query()
-  .eager('[movies.actors, pets]')
+  .withGraphFetched('[movies.actors, pets]')
   .modifyEager('movies', ['goodMovies', 'orderByName'])
   .modifyEager('pets', 'dogs')
 ```
 
 ## `static` namedFilters
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [modifiers](/api/model/static-properties.html#static-modifiers) instead.
+:::
+
 
 An alias for [modifiers](/api/model/static-properties.html#static-modifiers)
 
@@ -543,37 +553,35 @@ Defaults to false.
 
 ## `static` defaultEagerAlgorithm
 
-```js
-class Person extends Model {
-  static get defaultEagerAlgorithm() {
-    return Model.WhereInEagerAlgorithm;
-  }
-}
-```
-
-Sets the default eager loading algorithm for this model. Must be either
-`Model.WhereInEagerAlgorithm` or `Model.JoinEagerAlgorithm`.
-
-Defaults to `Model.WhereInEagerAlgorithm`.
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) explicitly.
+:::
 
 ## `static` defaultEagerOptions
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use `defaultGraphOptions` instead.
+:::
+
+## `static` defaultGraphOptions
+
 ```js
 class Person extends Model {
-  static get defaultEagerOptions() {
+  static get defaultGraphOptions() {
     return {
       minimize: true,
       separator: '->',
-      aliases: {}
+      aliases: {},
+      maxBatchSize: 10000
     };
   }
 }
 ```
 
-Sets the default options for eager loading algorithm. See the possible
-fields [here](/api/types/#type-eageroptions).
+Sets the default options for [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined). See the possible
+fields [here](/api/types/#type-graphoptions).
 
-Defaults to `{minimize: false, separator: ':', aliases: {}}`.
+Defaults to `{ minimize: false, separator: ':', aliases: {}, maxBatchSize: 10000 }`.
 
 ## `static` useLimitInFirst
 

@@ -244,6 +244,7 @@ declare namespace Objection {
     minimize?: boolean;
     separator?: string;
     aliases?: string[];
+    maxBatchSize?: number;
   }
 
   export interface UpsertGraphOptions {
@@ -862,6 +863,8 @@ declare namespace Objection {
     isUnrelate(): boolean;
     hasWheres(): boolean;
     hasSelects(): boolean;
+    hasWithGraph(): boolean;
+    // Deprecated
     hasEager(): boolean;
 
     runBefore(fn: (result: any, builder: QueryBuilder<QM, any>) => any): this;
@@ -870,23 +873,42 @@ declare namespace Objection {
     onBuildKnex(fn: (knexBuilder: knex.QueryBuilder, builder: this) => void): this;
     onError(fn: (error: Error, builder: this) => any): this;
 
+    withGraphFetched(relationExpression: RelationExpression, eagerOptions?: EagerOptions): this;
+    withGraphJoined(relationExpression: RelationExpression, eagerOptions?: EagerOptions): this;
+
+    // Deprecated
     eagerAlgorithm(algo: EagerAlgorithm): this;
+    // Deprecated
     eagerOptions(opts: EagerOptions): this;
 
+    // Deprecated
     eager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
+    // Deprecated
     mergeEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
 
+    // Deprecated
     joinEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
+    // Deprecated
     mergeJoinEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
 
+    // Deprecated
     naiveEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
+    // Deprecated
     mergeNaiveEager(relationExpression: RelationExpression, filters?: FilterExpression<QM>): this;
 
+    allowGraph: RelationExpressionMethod<QM, RM, RV>;
+    // Deprecated
     allowEager: RelationExpressionMethod<QM, RM, RV>;
+
+    modifyGraph: ModifyEager<QM, RM, RV>;
+    // Deprecated
     modifyEager: ModifyEager<QM, RM, RV>;
+    // Deprecated
     filterEager: ModifyEager<QM, RM, RV>;
 
+    // Deprecated
     allowInsert: RelationExpressionMethod<QM, RM, RV>;
+    // Deprecated
     allowUpsert: RelationExpressionMethod<QM, RM, RV>;
 
     modelClass(): typeof Model;

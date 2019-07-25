@@ -102,7 +102,7 @@ async function main() {
   // Load `children` relation eagerly.
   const sylvesters = await Person.query()
     .where('firstName', 'Sylvester')
-    .eager('children')
+    .withGraphFetched('children')
     .orderBy('id');
 
   console.log('sylvesters:', sylvesters);

@@ -1,51 +1,36 @@
-# Eager Methods
+# Eager Loading Methods
 
-## eager()
+## withGraphFetched()
 
 ```js
-queryBuilder = queryBuilder.eager(relationExpression, modifiers);
+queryBuilder = queryBuilder.withGraphFetched(relationExpression, graphOptions);
 ```
 
-Fetch relations eagerly for the result rows.
+Fetch a graph of related items for the result of any query (eager loading).
 
-See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info on the relation expression language.
+There are two methods that can be used to load relations eagerly: [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined). The main difference is that [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) uses multiple queries under the hood to fetch the result while [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) uses a single query and joins to fetch the results. Both methods allow you to do different things which we will go through in detail in the examples below and in the examples of the [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) method.
 
-You can choose the way objection performs the eager loading by using [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method on a query builder or by setting the [defaultEagerAlgorithm](/api/model/static-properties.html#static-defaulteageralgorithm) property of a model. The three algorithms currently available are `Model.WhereInEagerAlgorithm` (the default) `Model.JoinEagerAlgorithm` and `Model.NaiveEagerAlgorithm`. All three have their strengths and weaknesses. We will go through the main differences below. You can always see the executed SQL by calling the [debug](/api/query-builder/other-methods.html#debug) method for the query builder.
+As mentioned, this method uses multiple queries to fetch the related objects. Objection performs one query per level in the relation expression tree. For example only two additional queries will be created for the expression `children.children` no matter how many children the item has or how many children each of the children have. This algorithm is explained in detail in [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/) (note that `withGraphFetched` method used to be called `eager`).
 
-<b>WhereInEagerAlgorithm</b>
+**Limitations:**
 
-This algorithm uses multiple queries to fetch the related objects. Objection performs one query per level in the eager tree. For example only two additional queries will be created for eager expression `children.children` no matter how many children the model has or how many children each of the children have. This algorithm is explained in detail in [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
+ * Relations cannot be referenced in the root query because they are not joined.
+ * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyEager` or `modifiers` because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
 
-Limitations:
+See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info about the relation expression language.
 
- * Relations cannot be referred in the query because they are not joined.
- * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyEager`, because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
+See the [fetchGraph](/api/model/static-methods.html#static-fetchgraph) and [$fetchGraph](/api/model/instance-methods.html#fetchgraph) methods if you want to load relations for items already loaded from the database.
 
-<b>JoinEagerAlgorithm</b>
+**About performance:**
 
-This algorithm uses joins to fetch the whole eager tree using one single query. This allows you to reference the relations in the root query (see the last example). The related tables can be referred using the relation name. Nested relations must be separated by `:` character (dot is not used because of the way knex parses identifiers).
-
-When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
-
-Limitations:
-
- * `limit` and `page` methods will work incorrectly because they will limit the result set that contains all the result rows in a flattened format. For example the result set of the eager expression `children.children` will have `10 * 10 * 10` rows assuming the you fetched 10 models that all had 10 children that all had 10 children.
-
-<b>NaiveEagerAlgorithm</b>
-
-This algorithm naively fetches the relations using a separate query for each model. For example relation expression `children.children` will cause 111 queries to be performed assuming a result set of 10 each having 10 children each having 10 children. For small result sets this doesn't matter. The clear benefit of this algorithm is that there are no limitations. You can use `offset`, `limit`, `min`, `max` etc. in `modifyEager`. You can for example fetch only the youngest child for each parent.
-
-<b>Performance differences</b>
-
-`WhereInEagerAlgorithm` performs more queries than `JoinEagerAlgorithm` which can cause a significant delay especially if the round trip time to the database server is significant. On the other hand the result from `WhereInEagerAlgorithm` is trivial to parse into a tree structure while the result of `JoinEagerAlgorithm` needs some complex parsing which can lead to a significant performance decrease. Which method is faster depends heavily on the query and the environment. You should select the algorithm that makes your code cleaner and only consider performance if you have an actual measured real-life problem. Don't optimize prematurely! `NaiveEagerAlgorithm` is by far the slowest. It should only be used for
-cases where performance doesn't matter and when it is the only option to get the job done.
+Note that while [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) sounds more performant than [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched), both methods have very similar performance in most cases and [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) is actually much much faster in some cases where the [relationExpression](/api/types/#type-relationexpression) contains multiple many-to-many or has-many relations. The flat record list the db returns for joins can have an incredible amount of duplicate information in some cases. Transferring + parsing that data from the db to node can be very costly. You shouldn't select [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) blindly just because it sounds more peformant. The three rules of optimization apply here too: 1. Don't optimize 2. Don't optimize yet 3. Profile before optimizing. When you don't actually need joins, use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched).
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The eager expression
-modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|The modifier functions for the expression
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The relation expression describing which relations to fetch.
+options|[GraphOptions](/api/types/#type-graphoptions)|Optional options.
 
 ##### Return value
 
@@ -55,30 +40,60 @@ Type|Description
 
 ##### Examples
 
+Fetches all `Persons` named Arnold with all their pets. `'pets'` is the name of the relation defined in [relationMappings](/api/model/static-properties.html#static-relationmappings).
+
 ```js
-// Fetch `children` relation for each result Person and `pets` and `movies`
-// relations for all the children.
 const people = await Person
   .query()
-  .eager('children.[pets, movies]');
+  .where('firstName', 'Arnold')
+  .withGraphFetched('pets');
+
+console.log(people[0].pets[0].name);
+```
+
+Fetch `children` relation for each result Person and `pets` and `movies`
+relations for all the children.
+
+```js
+const people = await Person
+  .query()
+  .withGraphFetched('children.[pets, movies]');
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Relations can be modified by giving modifier functions as arguments to the relations:
+[Relation expressions](/api/types/#relationexpression-object-notation) can also be objects. This is equivalent to the previous example:
 
 ```js
 const people = await Person
   .query()
-  .eager('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]')
+  .withGraphFetched({
+    children: {
+      pets: true,
+      movies: true
+    }
+  });
+
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
+```
+
+Relation results can be filtered and modified by giving modifier function names as arguments for the relations:
+
+```js
+const people = await Person
+  .query()
+  .withGraphFetched('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]')
   .modifiers({
     selectNameAndId(builder) {
       builder.select('name', 'id');
     },
+
     orderByName(builder) {
       builder.orderBy('name');
     },
+
     onlyDogs(builder) {
       builder.where('species', 'dog');
     }
@@ -88,12 +103,17 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Reusable modifiers can be defined for a model class using [modifiers](/api/model/static-properties.html#static-modifiers). Also see the [modifiers](/recipes/modifiers.md) recipe.
+Reusable modifiers can be defined for a model class using [modifiers](/api/model/static-properties.html#static-modifiers). Also see the [modifiers recipe](/recipes/modifiers.md).
 
 ```js
 class Person extends Model {
   static get modifiers() {
     return {
+      // Note that this modifier takes an argument!
+      filterGender(builder, gender) {
+        builder.where('gender', gender)
+      },
+
       defaultSelects(builder) {
         builder.select('id', 'firstName', 'lastName')
       },
@@ -112,8 +132,8 @@ class Animal extends Model {
         builder.orderBy('name');
       },
 
-      onlyDogs(builder) {
-        builder.where('species', 'dog');
+      filterSpecies(builder, species) {
+        builder.where('species', species);
       }
     };
   }
@@ -121,9 +141,19 @@ class Animal extends Model {
 
 const people = await Person
   .query()
-  .eager(`
-    children(defaultSelects, orderByAge).[
-      pets(onlyDogs, orderByName),
+  .modifiers({
+    // You can bind arguments to Model modifiers like this
+    filterFemale(builder) {
+      builer.modify('filterGender', 'female')
+    },
+
+    filterDogs(builder) {
+      builder.modify('filterSpecies', 'dog')
+    }
+  })
+  .withGraphFetched(`
+    children(defaultSelects, orderByAge, filterFemale).[
+      pets(filterDogs, orderByName),
       movies
     ]
   `);
@@ -137,7 +167,7 @@ Filters can also be registered using the [modifyEager](/api/query-builder/other-
 ```js
 const people = await Person
   .query()
-  .eager('children.[pets, movies]')
+  .withGraphFetched('children.[pets, movies]')
   .modifyEager('children', builder => {
     // Order children by age and only select id.
     builder.orderBy('age').select('id');
@@ -146,10 +176,6 @@ const people = await Person
     // Only select `pets` and `movies` whose id > 10 for the children.
     builder.where('id', '>', 10);
   })
-  .modifyEager('children.movies]', builder => {
-    // Only select 100 first movies for the children.
-    builder.limit(100);
-  });
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -160,7 +186,7 @@ Relations can be given aliases using the `as` keyword:
 ```js
 const people = await Person
   .query()
-  .eager(`[
+  .withGraphFetched(`[
     children(orderByAge) as kids .[
       pets(filterDogs) as dogs,
       pets(filterCats) as cats
@@ -175,196 +201,146 @@ console.log(people[0].kids[0].dogs[0].name);
 console.log(people[0].kids[0].movies[0].id);
 ```
 
-The eager queries are optimized to avoid the N + 1 query problem. Consider this query:
+Eager loading is optimized to avoid the N + 1 queries problem. Consider this query:
 
 ```js
 const people = await Person
   .query()
   .where('id', 1)
-  .eager('children.children');
+  .withGraphFetched('children.children');
 
 console.log(people[0].children.length); // --> 10
 console.log(people[0].children[9].children.length); // --> 10
 ```
 
-The person has 10 children and they all have 10 children. The query above will return 100 database rows but will generate only three database queries when using `WhereInEagerAlgorithm` and only one query when using `JoinEagerAlgorithm`.
+The person has 10 children and they all have 10 children. The query above will return 100 database rows but will generate only three database queries when using `withGraphFetched` and only one query when using `withGraphJoined`.
 
-The loading algorithm can be changed using the [eagerAlgorithm](/api/query-builder/eager-methods.html#eageralgorithm) method:
+## withGraphJoined()
+
+```js
+queryBuilder = queryBuilder.withGraphJoined(relationExpression, graphOptions);
+```
+
+Join and fetch a graph of related items for the result of any query (eager loading).
+
+There are two methods that can be used to load relations eagerly: [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined). The main difference is that [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) uses multiple queries under the hood to fetch the result while [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) uses a single query and joins to fetch the results. Both methods allow you to do different things which we will go through in detail in the examples below and in the examples of the [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) method.
+
+As mentioned, this method uses [SQL joins](https://www.postgresql.org/docs/12/tutorial-join.html) to join all the relations defined in the `relationExpression` and then parses the result into a graph of model instances equal to the one you get from `withGraphFetched`. The main benefit of this is that you can filter the query based on the relations. See the examples.
+
+By default left join is used but you can define the join type using the [joinOperation](/api/types/#type-eageroptions) option.
+
+**Limitations:**
+
+ * limit and page methods will work incorrectly because they will limit the result set that contains all the result rows in a flattened format. For example the result set of the eager expression children.children will have 10 * 10 * 10 rows assuming the you fetched 10 models that all had 10 children that all had 10 children.
+
+**About performance:**
+
+Note that while [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) sounds more performant than [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched), both methods have very similar performance in most cases and [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) is actually much much faster in some cases where the [relationExpression](/api/types/#type-relationexpression) contains multiple many-to-many or has-many relations. The flat record list the db returns for joins can have an incredible amount of duplicate information in some cases. Transferring + parsing that data from the db to node can be very costly. You shouldn't select [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) blindly just because it sounds more peformant. The three rules of optimization apply here too: 1. Don't optimize 2. Don't optimize yet 3. Profile before optimizing. When you don't actually need joins, use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|--------------------
+relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The relation expression describing which relations to fetch.
+options|[GraphOptions](/api/types/#type-graphoptions)|Optional options.
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+
+##### Examples
+
+All examples in [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) also work with `withGraphJoined`. Remember to also study those. The following examples are only about the cases that don't work with [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched)
+
+Using `withGraphJoined` all the relations are joined to the main query and you can reference them in any query building method. Note that nested relations are named by concatenating relation names using `:` as a separator. See the next example:
 
 ```js
 const people = await Person
   .query()
-  .where('id', 1)
-  .eagerAlgorithm(Person.JoinEagerAlgorithm)
-  .eager('[movies, children.pets]')
-  .where('movies.name', 'like', '%terminator%')
-  .where('children:pets.species', 'dog');
+  .withGraphJoined('children.[pets, movies]')
+  .whereIn('children.firstName', ['Arnold', 'Jennifer'])
+  .where('children:pets.name', 'Fluffy')
+  .where('children:movies.name', 'like', 'Terminator%');
 
-console.log(people);
+console.log(people[0].children[0].pets[0].name);
+console.log(people[0].children[0].movies[0].id);
 ```
+
+Using [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) you can refer to columns only by their name because the column names are unique in the query. With `withGraphJoined` you often need to also mention the table name. Consider the following example. We join the relation `pets` to a `persons` query. Both tables have the `id` column. We need to use `where('persons.id', '>', 100)` instead of `where('id', '>', 100)` so that objection knows which `id` you mean. If you don't do this, you get an `ambiguous column name` error.
+
+```js
+const people = await Person
+  .query()
+  .withGraphJoined('pets')
+  .where('persons.id', '>', 100)
+```
+
+## eager()
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead.
+:::
 
 ## eagerAlgorithm()
 
-```js
-queryBuilder = queryBuilder.eagerAlgorithm(algo);
-```
-
-Select the eager loading algorithm for the query. See comparison between
-the available algorithms [here](/api/query-builder/eager-methods.html#eager).
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-algo|EagerAlgorithm|The eager loading algorithm to use. One of `Model.JoinEagerAlgorithm`, `Model.WhereInEagerAlgorithm` and `Model.NaiveEagerAlgorithm`.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-##### Examples
-
-```js
-const people = await Person
-  .query()
-  .eagerAlgorithm(Person.JoinEagerAlgorithm)
-  .eager('[pets, children]')
-```
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead.
+:::
 
 ## eagerOptions()
 
-```js
-queryBuilder = queryBuilder.eagerOptions(options);
-```
-
-Sets [options](/api/types/#type-eageroptions) for the eager query.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-options|[EagerOptions](/api/types/#type-eageroptions)|Options to set.
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-##### Examples
-
-```js
-const people = await Person
-  .query()
-  .eagerOptions({joinOperation: 'innerJoin'})
-  .eager('[pets, children]')
-```
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. You can pass options as the second argument for both methods.
+:::
 
 ## joinEager()
 
-```js
-queryBuilder = queryBuilder.joinEager(expr, modifiers)
-```
-
-Shorthand for
-
-```js
-queryBuilder
-  .eagerAlgorithm(Model.JoinEagerAlgorithm)
-  .eager(expr, modifiers)
-```
-
-When this algorithm is used, information schema queries are executed to get table column names. They are done only once for each table during the lifetime of the process and then cached.
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead.
+:::
 
 ## naiveEager()
 
-```js
-queryBuilder = queryBuilder.naiveEager(expr, modifiers)
-```
-
-Shorthand for
-
-```js
-queryBuilder
-  .eagerAlgorithm(Model.NaiveEagerAlgorithm)
-  .eager(expr, modifiers)
-```
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) instead with [maxBatchSize: 1](/api/types/#type-graphoptions) option..
+:::
 
 ## mergeEager()
 
-Just like [eager](/api/query-builder/eager-methods.html#eager) but instead of replacing query builder's eager expression this method merges the given expression to the existing expression.
-
-##### Arguments
-
-Argument|Type|Description
---------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The eager expression
-modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|The modifier functions for the expression
-
-##### Return value
-
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
-
-##### Examples
-
-The following queries are equivalent
-
-```js
-Person
-  .query()
-  .eager('[children.pets, movies]')
-```
-
-```js
-Person
-  .query()
-  .eager('children')
-  .mergeEager('children.pets')
-  .mergeEager('movies')
-```
-
-```js
-Person
-  .query()
-  .eager('children.pets')
-  .mergeEager('movies')
-```
-
-```js
-Person
-  .query()
-  .mergeEager('children.pets')
-  .mergeEager('movies')
-```
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. They merge the graphs by default.
+:::
 
 ## mergeJoinEager()
 
-Shorthand for `eagerAlgorithm(Model.JoinEagerAlgorithm).mergeEager(expr)`.
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. They merge the graphs by default.
+:::
 
 ## mergeNaiveEager()
 
-Shorthand for `eagerAlgorithm(Model.NaiveEagerAlgorithm).mergeEager(expr)`.
+::: warning
+Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) instead. They merge the graphs by default.
+:::
 
 ## eagerObject()
 
 ```js
 const builder = Person.query()
-  .eager('children.pets(onlyId)')
+  .withGraphFetched('children.pets(onlyId)')
 
 const eagerObject = builder.eagerObject();
 console.log(eagerObject.children.pets.modify);
 // prints ["onlyId"]
 
 eagerObject.children.movies = true
-// You can modify the object and pass it back to the `eager` method.
-builder.eager(eagerObject)
+// You can modify the object and pass it back to the `withGraphFetched` method.
+builder.withGraphFetched(bject)
 ```
 
-Returns the object representation of the current eager expression.
+Returns the object representation of the relation expression passed to either `withGraphFetched` or `withGraphJoined`.
 
 See [this section](/api/types/#relationexpression-object-notation) for more examples and information about the structure of the returned object.
 
@@ -372,22 +348,13 @@ See [this section](/api/types/#relationexpression-object-notation) for more exam
 
 Type|Description
 ----|-----------------------------
-object|Object representation of the current eager expression.
+object|Object representation of the current relation expression passed to either `withGraphFetched` or `withGraphJoined`.
 
 ## eagerModifiers()
 
-```js
-const builder = Person.query()
-  .eager('children.pets(onlyId)', {
-    onlyId: builder.select('id')
-  })
-
-const modifiers = builder.eagerModifiers();
-console.log(modifiers.onlyId.toString());
-// prints 'builder => builder.select("id")'
-```
-
-Returns the current eager modifiers of the query.
+::: warning
+Deprecated! Will be removed in version 3.0. Use [modifiers](/api/query-builder/other-methods.html#modifiers) without arguments instead.
+:::
 
 ##### Return value
 
@@ -401,11 +368,11 @@ object|Eager modifiers of the query.
 queryBuilder = queryBuilder.allowGraph(relationExpression);
 ```
 
-Sets the allowed tree of relations to fetch, insert or upsert using [eager](/api/query-builder/eager-methods.html#eager) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) or [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) methods.
+Sets the allowed tree of relations to fetch, insert or upsert using [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched), [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined), [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) or [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) methods.
 
-When using [eager](/api/query-builder/eager-methods.html#eager) (or any of its variants) the query is rejected if the [expression](/api/types/#type-relationexpression) passed to [eager](/api/query-builder/eager-methods.html#eager) is not a subset of the [expression](/api/types/#type-relationexpression) passed to `allowGraph`. This method is useful when the eager expression comes from an untrusted source like query parameters of a http request.
+When using [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) the query is rejected and an error is thrown if the [expression](/api/types/#type-relationexpression) passed to the methods is not a subset of the [expression](/api/types/#type-relationexpression) passed to `allowGraph`. This method is useful when the relation expression comes from an untrusted source like query parameters of a http request.
 
-If the model tree given to the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) or the [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method isn't a subtree of the given [expression](/api/types/#type-relationexpression), the query is rejected.
+If the model tree given to the [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) or the [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method isn't a subtree of the given [expression](/api/types/#type-relationexpression), the query is rejected and and error is thrown.
 
 See the examples.
 
@@ -429,7 +396,7 @@ This will throw because `actors` is not allowed.
 await Person
   .query()
   .allowGraph('[children.pets, movies]')
-  .eager('movies.actors')
+  .withGraphFetched('movies.actors')
 ```
 
 This will not throw:
@@ -438,7 +405,7 @@ This will not throw:
 await Person
   .query()
   .allowGraph('[children.pets, movies]')
-  .eager('children.pets')
+  .withGraphFetched('children.pets')
 ```
 
 Calling `allowGraph` multiple times merges the expressions. The following is equivalent to the previous example:
@@ -448,7 +415,7 @@ await Person
   .query()
   .allowGraph('children.pets')
   .allowGraph('movies')
-  .eager(req.query.eager)
+  .withGraphFetched(req.query.eager)
 ```
 
 Usage in `insertGraph` and `upsertGraph` works the same way. The following will not throw.
@@ -516,7 +483,7 @@ Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/
 queryBuilder = queryBuilder.modifyEager(pathExpression, modifier);
 ```
 
-Can be used to modify eager queries.
+Can be used to modify `withGraphFetched` and `withGraphJoined` queries.
 
 The `pathExpression` is a relation expression that specifies the queries for which the modifier is given.
 
@@ -540,7 +507,7 @@ Type|Description
 ```js
 Person
   .query()
-  .eager('[children.[pets, movies], movies]')
+  .withGraphFetched('[children.[pets, movies], movies]')
   .modifyEager('children.pets', builder => {
     builder.where('age', '>', 10);
   })
@@ -551,7 +518,7 @@ The path expression can have multiple targets. The next example sorts both the p
 ```js
 Person
   .query()
-  .eager('[children.[pets, movies], movies]')
+  .withGraphFetched('[children.[pets, movies], movies]')
   .modifyEager('children.[pets, movies]', builder => {
     builder.orderBy('id');
   })
@@ -562,7 +529,7 @@ This example only selects movies whose name contains the word 'Predator':
 ```js
 Person
   .query()
-  .eager('[children.[pets, movies], movies]')
+  .withGraphFetched('[children.[pets, movies], movies]')
   .modifyEager('[children.movies, movies]', builder => {
     builder.where('name', 'like', '%Predator%');
   })
@@ -573,7 +540,7 @@ The modifier can also be a [Model modifier](/api/model/static-properties.html#st
 ```js
 Person
   .query()
-  .eager('[children.[pets, movies], movies]')
+  .withGraphFetched('[children.[pets, movies], movies]')
   .modifyEager('children.movies', 'selectId')
 ```
 

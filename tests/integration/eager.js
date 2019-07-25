@@ -971,6 +971,69 @@ module.exports = session => {
         });
     });
 
+    it('setting maxBatchSize option to 1 should cause relations to be fetched naively to each parent separately', () => {
+      return Model1.query()
+        .withGraphFetched('model1Relation2', { maxBatchSize: 1 })
+        .whereExists(Model1.relatedQuery('model1Relation2'))
+        .modifyGraph('model1Relation2', query => {
+          // This works only because we set `maxBatchSize` to 1.
+          query.limit(1).orderBy('id_col');
+        })
+        .orderBy('id')
+        .then(result => {
+          expect(result).to.eql([
+            {
+              id: 1,
+              model1Id: 2,
+              model1Prop1: 'hello 1',
+              model1Prop2: null,
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model1Id: 1,
+                  model2Prop1: 'hejsan 1',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                }
+              ],
+              $afterGetCalled: 1
+            },
+            {
+              id: 4,
+              model1Id: null,
+              model1Prop1: 'hello 4',
+              model1Prop2: null,
+              model1Relation2: [
+                {
+                  idCol: 4,
+                  model1Id: 4,
+                  model2Prop1: 'hejsan 4',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                }
+              ],
+              $afterGetCalled: 1
+            },
+            {
+              id: 6,
+              model1Id: 7,
+              model1Prop1: 'hello 6',
+              model1Prop2: null,
+              model1Relation2: [
+                {
+                  idCol: 3,
+                  model1Id: 6,
+                  model2Prop1: 'hejsan 3',
+                  model2Prop2: null,
+                  $afterGetCalled: 1
+                }
+              ],
+              $afterGetCalled: 1
+            }
+          ]);
+        });
+    });
+
     it('mergeNaiveEager shorthand', () => {
       return Model1.query()
         .findById(1)
@@ -3152,6 +3215,15 @@ module.exports = session => {
     let testFn = opt.only ? it.only.bind(it) : it;
 
     if (!opt.disableWhereIn) {
+      testFn(testName + ' (QueryBuilder.withGraphFetched)', () => {
+        return opt.Model.query()
+          .where(idCol, opt.id)
+          .withGraphFetched(expr)
+          .modifiers(opt.filters)
+          .then(sortRelations(opt.disableSort))
+          .then(tester);
+      });
+
       testFn(testName + ' (QueryBuilder.eager)', () => {
         return opt.Model.query()
           .where(idCol, opt.id)
@@ -3193,6 +3265,15 @@ module.exports = session => {
     }
 
     if (!opt.disableJoin) {
+      testFn(testName + ' (withGraphJoined)', () => {
+        return opt.Model.query()
+          .where(idCol, opt.id)
+          .withGraphJoined(expr, opt.eagerOptions)
+          .modifiers(opt.filters)
+          .then(sortRelations(opt.disableSort))
+          .then(tester);
+      });
+
       testFn(testName + ' (JoinEagerAlgorithm)', () => {
         return opt.Model.query()
           .where(idCol, opt.id)

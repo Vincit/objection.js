@@ -217,12 +217,12 @@ UserGroupPermission
 */
 ```
 
-- `.eager()`
+- `.withGraphFetched()`
 
 ```js
 UserGroupPermission
   .query()
-  .eager("[user, permission]")
+  .withGraphFetched("[user, permission]")
   .where("group_id", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
 /*
 {

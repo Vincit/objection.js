@@ -75,12 +75,12 @@ Person
   });
 ```
 
-For example the `eager` method causes multiple queries to be executed from a single query builder. If you wanted to make all of them use the same schema you could write this:
+For example the `withGraphFetched` method causes multiple queries to be executed from a single query builder. If you wanted to make all of them use the same schema you could write this:
 
 ```js
 Person
   .query()
-  .eager('[movies, children.movies]')
+  .withGraphFetched('[movies, children.movies]')
   .context({
     onBuild(builder) {
       builder.withSchema('someSchema');
@@ -347,13 +347,13 @@ boolean|true if the query contains any specific select staments.
 const hasEager = queryBuilder.hasEager();
 ```
 
-Returns true if the query defines any eager expressions.
+Returns true if `withGraphFetched` or `withGraphJoined` has been called for the query.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-boolean|true if the query defines any eager expressions.
+boolean|true if `withGraphFetched` or `withGraphJoined` has been called for the query.
 
 ## has()
 
@@ -1175,7 +1175,7 @@ Type|Description
 ```js
 const people = await Person
   .query()
-  .eager('pets')
+  .withGraphFetched('pets')
   .traverse((model, parentModel, relationName) => {
     delete model.id;
   });
@@ -1187,7 +1187,7 @@ console.log(people[0].pets[0].id); // --> undefined
 ```js
 const persons = await Person
   .query()
-  .eager('pets')
+  .withGraphFetched('pets')
   .traverse(Animal, (animal, parentModel, relationName) => {
     delete animal.id;
   });
@@ -1229,7 +1229,7 @@ There are two ways to call this methods:
 ```js
 Person
   .query()
-  .eager('pets').
+  .withGraphFetched('pets').
   .pick(['id', 'name']);
 ```
 
@@ -1238,7 +1238,7 @@ and
 ```js
 Person
   .query()
-  .eager('pets')
+  .withGraphFetched('pets')
   .pick(Person, ['id', 'firstName'])
   .pick(Animal, ['id', 'name']);
 ```
@@ -1276,7 +1276,7 @@ There are two ways to call this methods:
 ```js
 Person
   .query()
-  .eager('pets').
+  .withGraphFetched('pets').
   .omit(['parentId', 'ownerId']);
 ```
 
@@ -1285,7 +1285,7 @@ and
 ```js
 Person
   .query()
-  .eager('pets')
+  .withGraphFetched('pets')
   .omit(Person, ['parentId', 'age'])
   .omit(Animal, ['ownerId', 'species']);
 ```
@@ -1326,7 +1326,7 @@ modifier|function([QueryBuilder](/api/query-builder/))&nbsp;&#124;&nbsp;string&n
 
 ##### Examples
 
-The first argument can be a name of a [model modifier](/api/model/static-properties.html#static-modifiers). The rest of the arguments are passed as arguments to the modifier.
+The first argument can be a name of a [model modifier](/api/model/static-properties.html#static-modifiers). The rest of the arguments are passed as arguments for the modifier.
 
 ```js
 Person
@@ -1393,6 +1393,8 @@ An alias for [applyModifier](/api/query-builder/other-methods.html#applymodifier
 
 Registers modifiers for the query.
 
+You can call this method without arguments to get the currently registered modifiers.
+
 See the [modifier recipe](/recipes/modifiers.html) for more info and examples.
 
 ##### Return value
@@ -1414,5 +1416,11 @@ const people = await Person
     filterWomen: query => query.modify('filterGender', 'female')
   })
   .modify('selectFields')
-  .eager('children(selectFields, filterWomen)')
+  .withGraphFetched('children(selectFields, filterWomen)')
+```
+
+You can get the currently registered modifiers by calling the method without arguments.
+
+```js
+const modifiers = query.modifiers();
 ```

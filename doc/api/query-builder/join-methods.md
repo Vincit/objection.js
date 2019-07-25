@@ -89,7 +89,7 @@ await Person
   .where('pr:pt.species', 'dog');
 ```
 
-You can also give aliases using the eager expression:
+You can also give aliases using the relation expression:
 
 ```js
 await Person

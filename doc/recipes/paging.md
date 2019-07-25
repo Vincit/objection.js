@@ -23,11 +23,11 @@ There are some cases where [page](/api/query-builder/other-methods.html#page) an
 // instead 10 results in total.
 const result = await Person
   .query()
-  .eager('children')
+  .withGraphFetched('children')
   .modifyEager('children', qb => qb.page(0, 10));
 ```
 
-2. When `joinEager` is used:
+2. When `withGraphJoined` is used:
 
 ```js
 // This doesn't work because of the way SQL joins work.
@@ -37,6 +37,6 @@ const result = await Person
 // the root query.
 const result = await Person
   .query()
-  .joinEager('children')
+  .withGraphJoined('children')
   .page(0, 10)
 ```
