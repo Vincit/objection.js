@@ -58,7 +58,7 @@ console.log(marksAndJennifers);
 const oldPeople = await Person
   .query()
   .where('age', '>', 60)
-  .eager('children.children.movies');
+  .withGraphFetched('children.children.movies');
 
 console.log('some old person\'s grand child has appeared in',
   oldPeople[0].children[0].children[0].movies.length,
@@ -231,7 +231,7 @@ Creates an anonymous model subclass class that is bound to the given knex instan
 
 This method can be used to bind a Model subclass to multiple databases for example in a multi-tenant system. See the [multi tenancy recipe](/recipes/multitenancy-using-multiple-databases.html) for more info.
 
-Also check out the the [model binding pattern for transactions](/guide/transactions.html#binding-models-to-a-transaction) which internally uses `bindKnex`.
+Also check out the [model binding pattern for transactions](/guide/transactions.html#binding-models-to-a-transaction) which internally uses `bindKnex`.
 
 ##### Arguments
 
@@ -561,7 +561,7 @@ const person1 = people[0];
 const person2 = people[1];
 ```
 
-Relations can be filtered by giving modifier functions as arguments to the relations:
+Relations can be filtered by giving modifier functions as arguments for the relations:
 
 ```js
 const people = await Person
@@ -716,7 +716,7 @@ const metadata = await Person.fetchTableMetadata(opt);
 
 Fetches and caches the table metadata.
 
-Most of the time objection doesn't need this metadata, but some methods like [joinEager](/api/query-builder/eager-methods.html#joineager) do. This method is called by objection when the metadata is needed. The result is cached and after the first call the cached promise is returned and no queries are executed.
+Most of the time objection doesn't need this metadata, but some methods like [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) do. This method is called by objection when the metadata is needed. The result is cached and after the first call the cached promise is returned and no queries are executed.
 
 Because objection uses this on demand, the first query that needs this information can have unpredicable performance. If that's a problem, you can call this method for each of your models during your app's startup.
 

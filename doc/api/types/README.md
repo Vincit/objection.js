@@ -59,14 +59,15 @@ Property|Type|Description
 shallow|boolean|If true, relations are ignored. Default is false.
 virtuals|boolean<br>string[]|If false, virtual attributes are omitted from the output. Default is true. You can also pass an array of property names and only those virtual properties get picked. You can even pass in property/function names that are not included in the static `virtualAttributes` array.
 
-## `type` EagerOptions
+## `type` GraphOptions
 
 Property|Type|Description
 --------|----|-----------
-minimize|boolean|If true the aliases of the joined tables and columns in a join based eager loading are minimized. This is sometimes needed because of identifier length limitations of some database engines. objection throws an exception when a query exceeds the length limit. You need to use this only in those cases.
-separator|string|Separator between relations in nested join based eager query. Defaults to `:`. Dot (`.`) cannot be used at the moment because of the way knex parses the identifiers.
-aliases|Object|Aliases for relations in a join based eager query. Defaults to an empty object.
+minimize|boolean|If true the aliases of the joined tables and columns created by `withGraphJoined` are minimized. This is sometimes needed because of identifier length limitations of some database engines. objection throws an exception when a query exceeds the length limit. You need to use this only in those cases.
+separator|string|Separator between relations in nested `withGraphJoined` query. Defaults to `:`. Dot (`.`) cannot be used at the moment because of the way knex parses the identifiers.
+aliases|Object|Aliases for relations in a `withGraphJoined` query. Defaults to an empty object.
 joinOperation|string|Which join type to use `['leftJoin', 'innerJoin', 'rightJoin', ...]` or any other knex join method name. Defaults to `leftJoin`.
+maxBatchSize|integer|For how many parents should a relation be fetched using a single query at a time. If you set this to `1` then a separate query is used for each parent to fetch a relation. For example if you want to fetch pets for 5 persons, you get five queries (one for each person). Setting this to `1` will allow you to use stuff like `limit` and aggregate functions in `modifyGraph` and other graph modifiers. This can be used to replace the `naiveEager` objection 1.x had.
 
 ## `type` UpsertGraphOptions
 
@@ -202,31 +203,31 @@ For example the expression `children.[movies.actors.[pets, children], pets]` rep
 
 ```
 
-The model classes are shown in parenthesis. When given to `eager` method, this expression would fetch all relations as shown in the tree above:
+The model classes are shown in parenthesis. When given to `withGraphFetched` method, this expression would fetch all relations as shown in the tree above:
 
 ```js
 const people = await Person
   .query()
-  .eager('children.[movies.actors.[pets, children], pets]');
+  .withGraphFetched('children.[movies.actors.[pets, children], pets]');
 
 // All persons have the given relation tree fetched.
 console.log(people[0].children[0].movies[0].actors[0].pets[0].name);
 ```
 
-Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](/api/model/static-properties.html#static-modifiers) or [local](/api/query-builder/eager-methods.html#eager)). Arguments are listed in parenthesis after the relation names like this:
+Relation expressions can have arguments. Arguments are used to refer to modifier functions (either [global](/api/model/static-properties.html#static-modifiers) or [local](/api/query-builder/other-methods.md#modifiers). Arguments are listed in parenthesis after the relation names like this:
 
 ```js
 Person
   .query()
-  .eager(`children(arg1, arg2).[movies.actors(arg3), pets]`)
+  .withGraphFetched(`children(arg1, arg2).[movies.actors(arg3), pets]`)
 ```
 
-You can spread eager expressions to multiple lines and add whitespace:
+You can spread relation expressions to multiple lines and add whitespace:
 
 ```js
 Person
   .query()
-  .eager(`[
+  .withGraphFetched(`[
     children.[
       pets,
       movies.actors.[
@@ -237,12 +238,12 @@ Person
   ]`)
 ```
 
-Eager expressions can be aliased using `as` keyword:
+Relation expressions can be aliased using `as` keyword:
 
 ```js
 Person
   .query()
-  .eager(`[
+  .withGraphFetched(`[
     children as kids.[
       pets(filterDogs) as dogs,
       pets(filterCats) as cats,

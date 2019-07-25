@@ -160,7 +160,7 @@ try {
       .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
 
     // This creates a query using the `Animal` model class but we
-    // don't need to give `Animal` as one of the arguments to the
+    // don't need to give `Animal` as one of the arguments for the
     // transaction function because `jennifer` is an instance of
     // the `Person` that is bound to a transaction.
     return jennifer

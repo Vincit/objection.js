@@ -90,4 +90,4 @@ await linda
   .where('movies.name', 'Curvature')
 ```
 
-`extra` properties also work with [eager](/api/query-builder/eager-methods.html#eager) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).
+`extra` properties also work with [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).

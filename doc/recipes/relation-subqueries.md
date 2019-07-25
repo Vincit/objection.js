@@ -1,6 +1,6 @@
 # Relation subqueries
 
-Let's say you have a `Tweet` model and a `Like` model. `Tweet` has a `HasManyRelation` named `likes` to `Like` table. Now let's assume you'd like to fetch a list of `Tweet`s and get the number of likes for each of them without fetching the actual `Like` rows. This cannot be easily achieved using `eager` because of the way the queries are optimized (you can read more [here](/api/query-builder/eager-methods.html#eager)). You can leverage SQL's subqueries and the [relatedQuery](/api/model/static-methods.html#static-relatedquery) helper:
+Let's say you have a `Tweet` model and a `Like` model. `Tweet` has a `HasManyRelation` named `likes` to `Like` table. Now let's assume you'd like to fetch a list of `Tweet`s and get the number of likes for each of them without fetching the actual `Like` rows. This cannot be easily achieved using `withGraphFetched` because of the way the queries are optimized (you can read more [here](/api/query-builder/eager-methods.html#withgraphfetched)). You can leverage SQL's subqueries and the [relatedQuery](/api/model/static-methods.html#static-relatedquery) helper:
 
 ```js
 const tweets = await Tweet

@@ -133,7 +133,7 @@ describe('QueryBuilder', () => {
     );
 
     expect(called1).to.equal(true);
-    lcalled1 = false;
+    called1 = false;
     called2 = false;
 
     // Should accept an array of functions.
@@ -187,7 +187,7 @@ describe('QueryBuilder', () => {
     builder.modify('modifier1', 'foo', 1);
     expect(called1).to.equal(true);
 
-    lcalled1 = false;
+    called1 = false;
     called2 = false;
 
     // Should accept an array of modifiers.

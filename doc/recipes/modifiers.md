@@ -37,14 +37,14 @@ const women = await Person
   .modify('filterGender', 'female')
 ```
 
-## Usage in an eager query
+## Usage with eager loading
 
-You can pass modifier names as "arguments" to the relation names in [relation expressions] (/api/types/#type-relationexpression). See the [eager](/api/query-builder/eager-methods.html#eager) method's docs for more info and examples.
+You can pass modifier names as "arguments" to the relation names in [relation expressions](/api/types/#type-relationexpression). See the [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) methods' docs for more info and examples.
 
 ```js
 const people = await Person
   .query()
-  .eager('children(defaultSelects)')
+  .withGraphFetched('children(defaultSelects)')
 ```
 
 Note that you can only use modifiers registered for the relation's model class. In the previous example `children` is of class `Person`, so you can use `defaultSelects` that was registerd for the `Person` model. In the following example, `filterDogs` must have been specified in `Pet` model's `modifiers` object.
@@ -52,7 +52,7 @@ Note that you can only use modifiers registered for the relation's model class. 
 ```js
 const people = await Person
   .query()
-  .eager('[children(defaultSelects), pets(onlyDogs)]')
+  .withGraphFetched('[children(defaultSelects), pets(onlyDogs)]')
 ```
 
 You can register new modifiers for a query using the [modifiers](/api/query-builder/other-methods.md#modifiers) query builder method. This also allows you to bind arguments to existing modifiers like this
@@ -60,7 +60,7 @@ You can register new modifiers for a query using the [modifiers](/api/query-buil
 ```js
 const people = await Person
   .query()
-  .eager('children(defaultSelects, filterWomen)')
+  .withGraphFetched('children(defaultSelects, filterWomen)')
   .modifiers({
     filterWomen: query => query.modify('filterGender', 'female')
   })
@@ -74,7 +74,7 @@ const women = await Person
   .joinRelation('children(defaultSelects)')
 ```
 
-Query builder [modifiers](/api/query-builder/other-methods.md#modifiers) can also be used with `joinRelation` just like with `eager`.
+Query builder [modifiers](/api/query-builder/other-methods.md#modifiers) can also be used with `joinRelation` just like with `withGraphFetched` and `withGraphJoined`.
 
 ## Other usages
 

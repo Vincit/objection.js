@@ -3,7 +3,7 @@
 Objection throws four kinds of errors:
 
 1. [ValidationError](/api/types/#class-validationerror) when an input that could come from the outside world is invalid. These inputs
-    include model instances and POJOs, eager expressions object graphs etc. [ValidationError](/api/types/#class-validationerror) has
+    include model instances and POJOs, relation expressions, object graphs etc. [ValidationError](/api/types/#class-validationerror) has
     a `type` property that can be used to distinguish between the different error types.
 
 2. [NotFoundError](/api/types/#class-notfounderror) when [throwIfNotFound](/api/query-builder/other-methods.html#throwifnotfound) was called for a query and no
