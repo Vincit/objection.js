@@ -6,7 +6,7 @@ sidebarDepth: 3
 
 The `Person` model used in the examples is defined [here](/guide/models.html#examples).
 
-All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
+All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), [relatedQuery](/api/model/static-methods.html#relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
 
 ## Basic queries
 
@@ -18,7 +18,6 @@ Find queries can be created by calling [Model.query()](/api/model/static-methods
 In addition to the examples here, you can find more examples behind these links.
 
 * [subqueries](/recipes/subqueries.html)
-* [relation subqueries](/recipes/relation-subqueries.html)
 * [raw queries](/recipes/raw-queries.html)
 * [precedence and parentheses](/recipes/precedence-and-parentheses.html)
 
@@ -327,13 +326,20 @@ where exists (
 
 ## Relation queries
 
-While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [$relatedQuery](/api/model/instance-methods.html#relatedquery) method can be used to query related items of a single model instance. [$relatedQuery](/api/model/instance-methods.html#relatedquery) returns an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
+While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [relatedQuery](/api/model/static-methods.html#static-relatedquery) and its instance method counterpart [$relatedQuery](/api/model/instance-methods.html#relatedquery) can be used to query items related to another item. Both of these methods return an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
 
-### Find queries
+### Relation find queries
 
 Simply call [$relatedQuery('relationName')](/api/model/instance-methods.html#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](/guide/query-examples.html#eager-loading) to fetch relations. [$relatedQuery](/api/model/instance-methods.html#relatedquery) is better when you only need one relation and you need to filter the query extensively.
 
+The static method [relatedQuery](/api/model/static-methods.html#static-relatedquery) can be used to create related queries for multiple items using identifiers, model instances or even subqueries. This allows you to build complex queries by composing simple pieces.
+
 By default the fetched related items are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [$setRelated](/api/model/instance-methods.html#setrelated) and [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
+
+In addition to the examples here, you can find more examples behind these links.
+
+* [relation subqueries](/recipes/relation-subqueries.html)
+* [relatedQuery](/api/model/static-methods.html#static-relatedquery)
 
 ##### Examples
 
@@ -341,14 +347,20 @@ This example fetches the person's pets. `'pets'` is the name of a relation defin
 
 ```js
 const person = await Person.query().findById(1);
+```
 
-const pets = await person
+```sql
+select "persons".* from "persons" where "persons"."id" = 1
+```
+
+```js
+const dogs = await person
   .$relatedQuery('pets')
   .where('species', 'dog')
   .orderBy('name');
 
-console.log(person.pets === pets); // --> true
-console.log(pets[0] instanceof Animal); // --> true
+console.log(person.pets === dogs); // --> true
+console.log(dogs[0] instanceof Animal); // --> true
 ```
 
 ```sql
@@ -358,9 +370,70 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-### Insert queries
+The above example needed two queries to find pets of a person. You can do this with one single query using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method.
 
-Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
+```js
+const dogs = await Person
+  .relatedQuery('pets')
+  .for(1)
+  .where('species', 'dog')
+  .orderBy('name')
+```
+
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "animals"."ownerId" = 1
+order by "name" asc
+```
+
+If you want to fetch dogs of multiple people in one query, you can pass an array of identifiers for the `for` method like this:
+
+```js
+const dogs = await Person
+  .relatedQuery('pets')
+  .for([1, 2])
+  .where('species', 'dog')
+  .orderBy('name')
+```
+
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "animals"."ownerId" in (1, 2)
+order by "name" asc
+```
+
+You can even give it a subquery! The following example fetches all dogs of all people named Jennifer.
+
+```js
+// Note that there is no `await` here. This query does not get executed.
+const jennifers = Person
+  .query()
+  .where('name', 'Jennifer');
+
+// This is the only executed query in this example.
+const dogs = await Person
+  .relatedQuery('pets')
+  .for(jennifers)
+  .where('species', 'dog')
+  .orderBy('name');
+```
+
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "animals"."ownerId" in (
+  select "persons"."id"
+  from "persons"
+  where "name" = 'Jennifer'
+)
+order by "name" asc
+```
+
+### Relation insert queries
+
+Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
 
 By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model/instance-methods.html#setrelated) and
 [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
@@ -371,7 +444,13 @@ Add a pet for a person:
 
 ```js
 const person = await Person.query().findById(1);
+```
 
+```sql
+select "persons".* from "persons" where "persons"."id" = 1
+```
+
+```js
 const fluffy = await person
   .$relatedQuery('pets')
   .insert({ name: 'Fluffy' });
@@ -383,13 +462,26 @@ console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
 ```
 
+Just like with [relation find queries](#relation-find-queries), you can save a query and add a pet for a person using one single query:
+
+```js
+const fluffy = await Person
+  .relatedQuery('pets')
+  .for(1)
+  .insert({ name: 'Fluffy' })
+```
+
+```sql
+insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
+```
+
 If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in the `extra` array of the `through` object in [relationMappings](/api/model/static-properties.html#static-relationmappings) (see the examples behind the link). For example, if you specified an array `extra: ['awesomeness']` in [relationMappings](/api/model/static-properties.html#static-relationmappings) then `awesomeness` is written to the join table in the following example:
 
 ```js
-// `person` is an instance of `Person` model.
-const movie = await person
-  .$relatedQuery('movies')
-  .insert({name: 'The room', awesomeness: 9001});
+const movie = await Person
+  .relatedQuery('movies')
+  .for(100)
+  .insert({ name: 'The room', awesomeness: 9001 });
 
 console.log('best movie ever was added');
 ```
@@ -399,26 +491,199 @@ insert into "movies" ("name")
 values ('The room')
 
 insert into "persons_movies" ("movieId", "personId", "awesomeness")
-values (14, 25, 9001)
+values (14, 100, 9001)
 ```
 
 See [this recipe](/recipes/extra-properties.html) for more information about `extra` properties.
 
-### Update queries
+### Relation relate queries
+
+Relating means attaching a existing item to another item through a relationship defined in the [relationMappings](/api/model/static-properties.html#static-relationmappings). This method does the same things the [relation insert queries](#relation-insert-queries) do, but don't insert the item first. The item (or its id) need to be provided by the user.
+
+In addition to the examples here, you can find more examples behind these links.
+
+* [relate method](/api/query-builder/mutate-methods.html#relate)
+
+##### Examples
+
+In the following example we relate an actor to a movie. In this example the relation between `Person` and `Movie` is a many-to-many relation but `relate` also works for all other relation types.
+
+```js
+const actor = await Person.query().findById(100);
+```
+
+```sql
+select "persons".* from "persons" where "persons"."id" = 100
+```
+
+```js
+const movie = await Movie.query().findById(200);
+```
+
+```sql
+select "movies".* from "movies" where "movies"."id" = 200
+```
+
+```js
+await actor.$relatedQuery('movies').relate(movie);
+```
+
+```sql
+insert into "persons_movies" ("personId", "movieId") values (100, 200)
+```
+
+You can also pass the id `200` directly to `relate` instead of passing a model instance. A more objectiony way of doing this would be to once again utilize the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
+
+```js
+await Person
+  .relateQuery('movies')
+  .for(100)
+  .relate(200);
+```
+
+```sql
+insert into "persons_movies" ("personId", "movieId") values (100, 200)
+```
+
+Actually in this case, the cleanest way of all would be to just insert a row to the `persons_movies` table. Note that you can create models for pivot (join) tables too. There's nothing wrong with that.
+
+Here's one more example that relates four movies to the first person whose first name Arnold. Note that this query only works on Postgres because on other databases it would require multiple queries.
+
+```js
+await Person
+  .relateQuery('movies')
+  .for(Person.query().where('firstName', 'Arnold').limit(1))
+  .relate([100, 200, 300, 400]);
+```
+
+### Relation unrelate queries
+
+Unrelating is the reverse operation of [relating](#relation-relate-queries). For example if an actor is related to a movie through a `movies` relation, unrelating them means removing this association, but neither the movie nor the actor get deleted from the database.
+
+##### Examples
+
+The first example `unrelates` all movies whose name starts with the string 'Terminator' from an actor.
+
+```js
+const actor = await Person.query().findById(100);
+```
+
+```sql
+select "persons".* from "persons" where "persons"."id" = 100
+```
+
+```js
+await actor
+  .$relatedQuery('movies')
+  .unrelate()
+  .where('name', 'like', 'Terminator%')
+```
+
+```sql
+delete from "persons_movies"
+where "persons_movies"."personId" = 100
+where "persons_movies"."movieId" in (
+  select "movies"."id" from "movies" where "name" like 'Terminator%'
+)
+```
+
+The same using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
+
+```js
+await Person
+  .relatedQuery('movies')
+  .for(100)
+  .unrelate()
+  .where('name', 'like', 'Terminator%')
+```
+
+```sql
+delete from "persons_movies"
+where "persons_movies"."personId" = 100
+and "persons_movies"."movieId" in (
+  select "movies"."id"
+  from "movies"
+  where "name" like 'Terminator%'
+)
+```
+
+The next query removes all Terminator movies from Arnold Schwarzenegger:
+
+```js
+// Once again, note that we don't await this query. This query
+// is not executed. It's a placeholder that will be used to build
+// a subquery when the `relatedQuery` gets executed.
+const arnold = Person.query().findOne({
+  firstName: 'Arnold',
+  lastName: 'Schwarzenegger'
+});
+
+await Person
+  .relatedQuery('movies')
+  .for(arnold)
+  .unrelate()
+  .where('name', 'like', 'Terminator%')
+```
+
+```sql
+delete from "persons_movies"
+where "persons_movies"."personId" in (
+  select "persons"."id"
+  from "persons"
+  where "firstName" = 'Arnold'
+  and "lastName" = 'Schwarzenegger'
+)
+and "persons_movies"."movieId" in (
+  select "movies"."id"
+  from "movies"
+  where "name" like 'Terminator%'
+)
+```
+
+### Relation update queries
+
+Relation update queries work just like the normal update queries, but the query is automatically filtered so that only the related items are affected.
 
 See the [API documentation](/api/query-builder/mutate-methods.html#update) of `update` method.
 
-### Delete queries
+##### Examples
+
+```js
+await Person
+  .relatedQuery('pets')
+  .for([1, 2])
+  .patch({ name: raw(`concat("name", ' the doggo')`) })
+  .where('species', 'dog')
+```
+
+```sql
+update "animals"
+set "name" = concat("name", ' the doggo')
+where "animals"."ownerId" in (1, 2)
+and "species" = 'dog'
+```
+
+### Relation delete queries
+
+Relation delete queries work just like the normal delete queries, but the query is automatically filtered so that only the related items are affected.
 
 See the [API documentation](/api/query-builder/mutate-methods.html#delete) of `delete` method.
 
-### Relate queries
+##### Examples
 
-See the [API documentation](/api/query-builder/mutate-methods.html#relate) of `relate` method.
+```js
+await Person
+  .relatedQuery('pets')
+  .for([1, 2])
+  .delete()
+  .where('species', 'dog')
+```
 
-### Unrelate queries
-
-See the [API documentation](/api/query-builder/mutate-methods.html#unrelate) of `unrelate` method.
+```sql
+delete from "animals"
+where "animals"."ownerId" in (1, 2)
+and "species" = 'dog'
+```
 
 ## Eager loading
 

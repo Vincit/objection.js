@@ -544,6 +544,16 @@ describe('QueryBuilder', () => {
   });
 
   describe('whereInComposite', () => {
+    it('should create a where-in query for composite id and a single choice', () => {
+      return QueryBuilder.forClass(TestModel)
+        .whereInComposite(['A.a', 'B.b'], [1, 2])
+        .then(() => {
+          expect(executedQueries).to.eql([
+            'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2))'
+          ]);
+        });
+    });
+
     it('should create a where-in query for composite id and array of choices', () => {
       return QueryBuilder.forClass(TestModel)
         .whereInComposite(['A.a', 'B.b'], [[1, 2], [3, 4]])
@@ -585,6 +595,14 @@ describe('QueryBuilder', () => {
           expect(executedQueries).to.eql([
             'select "Model".* from "Model" where "A"."a" in (select "a" from "Model")'
           ]);
+        });
+    });
+
+    it('should work just like a normal where-in query if one column is given (5)', () => {
+      return QueryBuilder.forClass(TestModel)
+        .whereInComposite('A.a', 1)
+        .then(() => {
+          expect(executedQueries).to.eql(['select "Model".* from "Model" where "A"."a" in (1)']);
         });
     });
 

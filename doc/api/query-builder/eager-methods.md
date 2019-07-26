@@ -84,7 +84,9 @@ Relation results can be filtered and modified by giving modifier function names 
 ```js
 const people = await Person
   .query()
-  .withGraphFetched('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]')
+  .withGraphFetched(
+    'children(selectNameAndId).[pets(onlyDogs, orderByName), movies]'
+  )
   .modifiers({
     selectNameAndId(builder) {
       builder.select('name', 'id');

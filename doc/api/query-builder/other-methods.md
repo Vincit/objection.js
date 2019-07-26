@@ -10,6 +10,22 @@ Type|Description
 ----|-----------------------------
 [QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
 
+## for()
+
+```js
+queryBuilder = queryBuilder.for(relationOwner);
+```
+
+This method can only be used in conjunction with the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method. See the [relatedQuery](/api/model/static-methods.html#static-relatedquery) documentation on how to use it.
+
+This method takes one argument (the owner(s) of the relation) and it can have any of the following types:
+
+ * A single identifier (may be composite)
+ * An array of identifiers (may be composite)
+ * A [QueryBuilder](/api/query-builder/)
+ * A model instance.
+ * An array of model instances.
+
 ## context()
 
 ```js

@@ -77,6 +77,16 @@ Use this to build a query that only affects the items related to an instance thr
 
 See the examples below and [here](/guide/query-examples.html#relation-queries).
 
+::: tip
+This methods is just a shortcut for this call to the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
+
+```js
+const builder = Person
+  .relatedQuery(relationName, transactionOrKnex)
+  .for(person)
+```
+:::
+
 ##### Arguments
 
 Argument|Type|Description

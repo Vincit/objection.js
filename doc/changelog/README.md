@@ -2,6 +2,10 @@
 
 ## 2.0.0
 
+### What's new
+
+  * relatedQuery can now be used for more than just subqueries. See the examples [here](/guide/query-examples.html#relation-queries)
+
 ### Breaking changes
 
 #### Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.

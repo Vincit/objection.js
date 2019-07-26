@@ -5,6 +5,7 @@ const Promise = require('bluebird');
 const objection = require('../../../');
 const classUtils = require('../../../lib/utils/classUtils');
 const knexMocker = require('../../../testUtils/mockKnex');
+const RelationOwner = require('../../../lib/relations/RelationOwner').RelationOwner;
 
 const Model = objection.Model;
 const QueryBuilder = objection.QueryBuilder;
@@ -382,7 +383,7 @@ describe('ManyToManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return relation.find(builder, [owner]);
+          return relation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -421,7 +422,7 @@ describe('ManyToManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return compositeKeyRelation.find(builder, [owner]);
+          return compositeKeyRelation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -463,7 +464,7 @@ describe('ManyToManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(function() {
-          return relation.find(this, owners);
+          return relation.find(this, RelationOwner.create(owners));
         });
 
       return builder.then(result => {
@@ -511,7 +512,7 @@ describe('ManyToManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(function() {
-          return compositeKeyRelation.find(this, owners);
+          return compositeKeyRelation.find(this, RelationOwner.create(owners));
         });
 
       return builder.then(result => {
@@ -551,7 +552,7 @@ describe('ManyToManyRelation', () => {
         .orWhere('age', '>', 60)
         .select('name')
         .findOperationFactory(function() {
-          return relation.find(this, [owner]);
+          return relation.find(this, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -590,7 +591,7 @@ describe('ManyToManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(function() {
-          return relation.find(this, [owner]);
+          return relation.find(this, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -630,7 +631,7 @@ describe('ManyToManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(function() {
-          return relation.find(this, [owner]);
+          return relation.find(this, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -672,7 +673,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -716,7 +717,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return compositeKeyRelation.insert(builder, owner);
+          return compositeKeyRelation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -758,7 +759,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -796,7 +797,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -827,7 +828,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -865,7 +866,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -909,7 +910,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -947,7 +948,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return relation.update(builder, owner);
+          return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -973,7 +974,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return compositeKeyRelation.update(builder, owner);
+          return compositeKeyRelation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -999,7 +1000,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return relation.update(builder, owner);
+          return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -1021,7 +1022,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return relation.update(builder, owner);
+          return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -1045,7 +1046,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
@@ -1081,7 +1082,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
@@ -1101,7 +1102,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .increment('test', 1)
         .then(() => {
@@ -1117,7 +1118,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .decrement('test', 10)
         .then(() => {
@@ -1136,7 +1137,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
@@ -1157,7 +1158,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
-          return relation.delete(builder, owner);
+          return relation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
@@ -1181,7 +1182,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
-          return compositeKeyRelation.delete(builder, owner);
+          return compositeKeyRelation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
@@ -1206,7 +1207,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
-          return relation.delete(builder, owner);
+          return relation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
@@ -1229,7 +1230,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate(10);
 
@@ -1253,7 +1254,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate([10, 20, 30]);
 
@@ -1281,7 +1282,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate([{ rid: 10 }, { rid: 20 }, { rid: 30 }]);
 
@@ -1315,7 +1316,7 @@ describe('ManyToManyRelation', () => {
       let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return compositeKeyRelation.relate(builder, owner);
+          return compositeKeyRelation.relate(builder, RelationOwner.create(owner));
         })
         .relate([[33, 44], [33, 55], [66, 77]]);
 
@@ -1349,7 +1350,7 @@ describe('ManyToManyRelation', () => {
       let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return compositeKeyRelation.relate(builder, owner);
+          return compositeKeyRelation.relate(builder, RelationOwner.create(owner));
         })
         .relate([{ cid: 33, did: 44 }, { cid: 33, did: 55 }, { cid: 66, did: 77 }]);
 
@@ -1377,7 +1378,7 @@ describe('ManyToManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate(11)
         .then(result => {
@@ -1395,7 +1396,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate({ rid: 10, extra2: 'foo', shouldNotBeInQuery: 'bar' });
 
@@ -1422,7 +1423,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {
-          return relation.unrelate(builder, owner);
+          return relation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77]);
@@ -1434,7 +1435,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
-          `delete from "JoinModel" where "JoinModel"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "code" in (55, 66, 77)) and "JoinModel"."ownerId" = 666`
+          `delete from "JoinModel" where "JoinModel"."relatedId" in (select "RelatedModel"."rid" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."rid" = "JoinModel"."relatedId" where "JoinModel"."ownerId" in (666) and "someColumn" = 100 and "code" in (55, 66, 77)) and "JoinModel"."ownerId" in (666)`
         );
       });
     });
@@ -1444,7 +1445,7 @@ describe('ManyToManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {
-          return compositeKeyRelation.unrelate(builder, owner);
+          return compositeKeyRelation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77])
@@ -1457,7 +1458,7 @@ describe('ManyToManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
-          `delete from "JoinModel" where ("JoinModel"."relatedCId","JoinModel"."relatedDId") in (select "RelatedModel"."cid", "RelatedModel"."did" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "code" in (55, 66, 77) and "someColumn" = 100) and ("JoinModel"."ownerAId" = 11 and "JoinModel"."ownerBId" = 22)`
+          `delete from "JoinModel" where ("JoinModel"."relatedCId","JoinModel"."relatedDId") in (select "RelatedModel"."cid", "RelatedModel"."did" from "RelatedModel" inner join "JoinModel" on "RelatedModel"."cid" = "JoinModel"."relatedCId" and "RelatedModel"."did" = "JoinModel"."relatedDId" where ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22)) and "code" in (55, 66, 77) and "someColumn" = 100) and ("JoinModel"."ownerAId", "JoinModel"."ownerBId") in ((11, 22))`
         );
       });
     });

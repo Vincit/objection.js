@@ -825,5 +825,475 @@ module.exports = session => {
         }
       });
     });
+
+    describe('relatedQuery().delete()', () => {
+      describe('belongs to one relation', () => {
+        beforeEach(() => {
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation1: {
+                id: 2,
+                model1Prop1: 'hello 2'
+              }
+            },
+            {
+              id: 3,
+              model1Prop1: 'hello 3',
+              model1Relation1: {
+                id: 4,
+                model1Prop1: 'hello 4'
+              }
+            }
+          ]);
+        });
+
+        it('should delete a related object (1)', () => {
+          return Model1.relatedQuery('model1Relation1')
+            .for(1)
+            .delete()
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(3);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
+              expectPartEql(rows[2], { id: 4, model1Prop1: 'hello 4' });
+            });
+        });
+
+        if (isPostgres(session.knex)) {
+          it('should delete and return a related object', () => {
+            return Model1.relatedQuery('model1Relation1')
+              .for(1)
+              .delete()
+              .first()
+              .returning('*')
+              .then(deletedObject => {
+                expect(deletedObject).to.be.a(Model1);
+                expectPartEql(deletedObject, { id: 2, model1Prop1: 'hello 2' });
+                return session.knex('Model1').orderBy('id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(3);
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 3, model1Prop1: 'hello 3' });
+                expectPartEql(rows[2], { id: 4, model1Prop1: 'hello 4' });
+              });
+          });
+        }
+
+        it('should delete a related object using a subquery', () => {
+          return Model1.relatedQuery('model1Relation1')
+            .for(Model1.query().findById(3))
+            .delete()
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
+              return session.knex('Model1').orderBy('id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(3);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'hello 3' });
+            });
+        });
+      });
+
+      describe('has many relation', () => {
+        beforeEach(() => {
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Prop2: 6
+                },
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Prop2: 5
+                },
+                {
+                  idCol: 3,
+                  model2Prop1: 'text 3',
+                  model2Prop2: 4
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 4,
+                  model2Prop1: 'text 4',
+                  model2Prop2: 3
+                },
+                {
+                  idCol: 5,
+                  model2Prop1: 'text 5',
+                  model2Prop2: 2
+                },
+                {
+                  idCol: 6,
+                  model2Prop1: 'text 6',
+                  model2Prop2: 1
+                }
+              ]
+            },
+            {
+              id: 3,
+              model1Prop1: 'hello 3',
+              model1Relation2: [
+                {
+                  idCol: 7,
+                  model2Prop1: 'text 7',
+                  model2Prop2: 0
+                }
+              ]
+            }
+          ]);
+        });
+
+        it('should delete all related objects', () => {
+          return Model1.relatedQuery('model1Relation2')
+            .for(1)
+            .delete()
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(3);
+              return session.knex('model2').orderBy('id_col');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(4);
+              expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
+              expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
+              expectPartEql(rows[2], { id_col: 6, model2_prop1: 'text 6' });
+              expectPartEql(rows[3], { id_col: 7, model2_prop1: 'text 7' });
+            });
+        });
+
+        if (isPostgres(session.knex)) {
+          it('should delete and return all related objects', () => {
+            let child1;
+
+            return Model1.relatedQuery('model1Relation2')
+              .for(1)
+              .delete()
+              .returning('*')
+              .then(deletedObjects => {
+                expect(deletedObjects).to.have.length(3);
+                child1 = _.find(deletedObjects, { idCol: 1 });
+                expect(child1).to.be.a(Model2);
+                expectPartEql(child1, { idCol: 1, model2Prop1: 'text 1' });
+                return session.knex('model2').orderBy('id_col');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(4);
+                expectPartEql(rows[0], { id_col: 4, model2_prop1: 'text 4' });
+                expectPartEql(rows[1], { id_col: 5, model2_prop1: 'text 5' });
+                expectPartEql(rows[2], { id_col: 6, model2_prop1: 'text 6' });
+                expectPartEql(rows[3], { id_col: 7, model2_prop1: 'text 7' });
+              });
+          });
+        }
+
+        it('should delete a related object', () => {
+          return Model1.relatedQuery('model1Relation2')
+            .for(1)
+            .delete()
+            .where('id_col', 2)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
+              return session.knex('model2').orderBy('id_col');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(6);
+              expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
+              expectPartEql(rows[1], { id_col: 3, model2_prop1: 'text 3' });
+              expectPartEql(rows[2], { id_col: 4, model2_prop1: 'text 4' });
+              expectPartEql(rows[3], { id_col: 5, model2_prop1: 'text 5' });
+              expectPartEql(rows[4], { id_col: 6, model2_prop1: 'text 6' });
+              expectPartEql(rows[5], { id_col: 7, model2_prop1: 'text 7' });
+            });
+        });
+
+        it('should delete multiple related objects using using a subquery', () => {
+          return Model1.relatedQuery('model1Relation2')
+            .for(Model1.query().findByIds([1, 2]))
+            .delete()
+            .where('model2_prop2', '<', 6)
+            .where('model2_prop1', 'like', 'text %')
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(5);
+              return session.knex('model2').orderBy('id_col');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(2);
+              expectPartEql(rows[0], { id_col: 1, model2_prop1: 'text 1' });
+              expectPartEql(rows[1], { id_col: 7, model2_prop1: 'text 7' });
+            });
+        });
+      });
+
+      describe('many to many relation', () => {
+        beforeEach(() => {
+          return session.populate([
+            {
+              id: 1,
+              model1Prop1: 'hello 1',
+              model1Relation2: [
+                {
+                  idCol: 1,
+                  model2Prop1: 'text 1',
+                  model2Relation1: [
+                    {
+                      id: 3,
+                      model1Prop1: 'blaa 1',
+                      model1Prop2: 6
+                    },
+                    {
+                      id: 4,
+                      model1Prop1: 'blaa 2',
+                      model1Prop2: 5
+                    },
+                    {
+                      id: 5,
+                      model1Prop1: 'blaa 3',
+                      model1Prop2: 4
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 2,
+              model1Prop1: 'hello 2',
+              model1Relation2: [
+                {
+                  idCol: 2,
+                  model2Prop1: 'text 2',
+                  model2Relation1: [
+                    {
+                      id: 6,
+                      model1Prop1: 'blaa 4',
+                      model1Prop2: 3
+                    },
+                    {
+                      id: 7,
+                      model1Prop1: 'blaa 5',
+                      model1Prop2: 2
+                    },
+                    {
+                      id: 8,
+                      model1Prop1: 'blaa 6',
+                      model1Prop2: 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]);
+        });
+
+        it('should delete all related objects', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for(1)
+            .delete()
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(3);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(5);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[3], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[4], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        });
+
+        it('should delete a related object', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for(1)
+            .delete()
+            .where('Model1.id', 5)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(7);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        });
+
+        it('should delete a related object using deleteById', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for(1)
+            .deleteById(5)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(1);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(7);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        });
+
+        if (session.isPostgres()) {
+          it('should delete a related object using deleteById and return the deleted row when `returning` is used', () => {
+            return Model2.relatedQuery('model2Relation1')
+              .for(1)
+              .returning('*')
+              .deleteById(5)
+              .then(deletedRow => {
+                expect(deletedRow).to.eql({
+                  id: 5,
+                  model1Id: null,
+                  model1Prop1: 'blaa 3',
+                  model1Prop2: 4
+                });
+
+                return session.knex('Model1').orderBy('Model1.id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(7);
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+                expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+                expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+                expectPartEql(rows[4], { id: 6, model1Prop1: 'blaa 4' });
+                expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+                expectPartEql(rows[6], { id: 8, model1Prop1: 'blaa 6' });
+              });
+          });
+        }
+
+        it('should delete multiple objects (1)', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for(2)
+            .delete()
+            .where('model1Prop1', 'like', 'blaa 4')
+            .orWhere('model1Prop1', 'like', 'blaa 6')
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(2);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(6);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+              expectPartEql(rows[4], { id: 5, model1Prop1: 'blaa 3' });
+              expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+            });
+        });
+
+        if (isPostgres(session.knex)) {
+          it('should delete and return multiple objects (1)', () => {
+            let child1;
+
+            return Model2.relatedQuery('model2Relation1')
+              .for(2)
+              .delete()
+              .where('model1Prop1', 'like', 'blaa 4')
+              .orWhere('model1Prop1', 'like', 'blaa 6')
+              .returning('*')
+              .then(deletedObjects => {
+                expect(deletedObjects).to.have.length(2);
+                child1 = _.find(deletedObjects, { id: 6 });
+                expect(child1).to.be.a(Model1);
+                expectPartEql(child1, { id: 6, model1Prop1: 'blaa 4' });
+                return session.knex('Model1').orderBy('Model1.id');
+              })
+              .then(rows => {
+                expect(rows).to.have.length(6);
+                expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+                expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+                expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+                expectPartEql(rows[3], { id: 4, model1Prop1: 'blaa 2' });
+                expectPartEql(rows[4], { id: 5, model1Prop1: 'blaa 3' });
+                expectPartEql(rows[5], { id: 7, model1Prop1: 'blaa 5' });
+              });
+          });
+        }
+
+        it('should delete multiple objects (2)', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for(1)
+            .delete()
+            .where('model1Prop2', '<', 6)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(2);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(6);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+              expectPartEql(rows[3], { id: 6, model1Prop1: 'blaa 4' });
+              expectPartEql(rows[4], { id: 7, model1Prop1: 'blaa 5' });
+              expectPartEql(rows[5], { id: 8, model1Prop1: 'blaa 6' });
+            });
+        });
+
+        it('should delete multiple objects for multiple parents', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for([1, 2])
+            .delete()
+            .where('model1Prop2', '<', 6)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(5);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(3);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+            });
+        });
+
+        it('should delete multiple objects for multiple parents using a subquery', () => {
+          return Model2.relatedQuery('model2Relation1')
+            .for(Model2.query().findByIds([1, 2]))
+            .delete()
+            .where('model1Prop2', '<', 6)
+            .then(numDeleted => {
+              expect(numDeleted).to.equal(5);
+              return session.knex('Model1').orderBy('Model1.id');
+            })
+            .then(rows => {
+              expect(rows).to.have.length(3);
+              expectPartEql(rows[0], { id: 1, model1Prop1: 'hello 1' });
+              expectPartEql(rows[1], { id: 2, model1Prop1: 'hello 2' });
+              expectPartEql(rows[2], { id: 3, model1Prop1: 'blaa 1' });
+            });
+        });
+      });
+    });
   });
 };

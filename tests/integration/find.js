@@ -1154,6 +1154,10 @@ module.exports = session => {
           {
             id: 2,
 
+            model1Relation1: {
+              id: 4
+            },
+
             model1Relation2: [
               {
                 idCol: 3
@@ -1193,8 +1197,9 @@ module.exports = session => {
           .then(res => {
             expect(res).to.eql([
               { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel1Count: 0, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
-              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+              { id: 2, rel1Count: 1, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
+              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 },
+              { id: 4, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
             ]);
           });
       });
@@ -1221,8 +1226,9 @@ module.exports = session => {
           .then(res => {
             expect(res).to.eql([
               { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel1Count: 0, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
-              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+              { id: 2, rel1Count: 1, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
+              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 },
+              { id: 4, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
             ]);
           });
       });
@@ -1239,8 +1245,9 @@ module.exports = session => {
           .then(res => {
             expect(res).to.eql([
               { id: 1, relId: 3, $afterGetCalled: 1 },
-              { id: 2, relId: null, $afterGetCalled: 1 },
-              { id: 3, relId: null, $afterGetCalled: 1 }
+              { id: 2, relId: 4, $afterGetCalled: 1 },
+              { id: 3, relId: null, $afterGetCalled: 1 },
+              { id: 4, relId: null, $afterGetCalled: 1 }
             ]);
           });
       });
@@ -1259,8 +1266,9 @@ module.exports = session => {
           .then(res => {
             expect(res).to.eql([
               { id: 1, relId: 3, $afterGetCalled: 1 },
-              { id: 2, relId: null, $afterGetCalled: 1 },
-              { id: 3, relId: null, $afterGetCalled: 1 }
+              { id: 2, relId: 4, $afterGetCalled: 1 },
+              { id: 3, relId: null, $afterGetCalled: 1 },
+              { id: 4, relId: null, $afterGetCalled: 1 }
             ]);
           });
       });
@@ -1272,6 +1280,148 @@ module.exports = session => {
           .then(res => {
             expect(res.id).to.equal(1);
           });
+      });
+
+      describe('for()', () => {
+        describe('belongs to one relation', () => {
+          it('find using single id', async () => {
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for(1)
+              .orderBy('id');
+
+            expect(result.length).to.equal(1);
+            expect(result[0].id).to.equal(3);
+          });
+
+          it('find using multiple ids', async () => {
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for([1, 2])
+              .orderBy('id');
+
+            expect(result.length).to.equal(2);
+            expect(result[0].id).to.equal(3);
+            expect(result[1].id).to.equal(4);
+          });
+
+          it('find using multiple ids and a filter', async () => {
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for([1, 2])
+              .whereNotIn('id', [1, 2, 3])
+              .orderBy('id');
+
+            expect(result.length).to.equal(1);
+            expect(result[0].id).to.equal(4);
+          });
+
+          it('find using query builder with one result', async () => {
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for(Model1.query().findById(1))
+              .orderBy('id');
+
+            expect(result.length).to.equal(1);
+            expect(result[0].id).to.equal(3);
+          });
+
+          it('find using query builder with multiple results', async () => {
+            const result = await Model1.relatedQuery('model1Relation1')
+              .for(Model1.query().findByIds([1, 2]))
+              .orderBy('id');
+
+            expect(result.length).to.equal(2);
+            expect(result[0].id).to.equal(3);
+            expect(result[1].id).to.equal(4);
+          });
+        });
+
+        describe('has many relation', () => {
+          it('find using single id', async () => {
+            const result = await Model1.relatedQuery('model1Relation2')
+              .for(1)
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(2);
+            expect(result[0].idCol).to.equal(1);
+            expect(result[1].idCol).to.equal(2);
+          });
+
+          it('find using multiple ids', async () => {
+            const result = await Model1.relatedQuery('model1Relation2')
+              .for([1, 2])
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(3);
+            expect(result[0].idCol).to.equal(1);
+            expect(result[1].idCol).to.equal(2);
+            expect(result[2].idCol).to.equal(3);
+          });
+
+          it('find using query builder with one result', async () => {
+            const result = await Model1.relatedQuery('model1Relation2')
+              .for(Model1.query().findById(1))
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(2);
+            expect(result[0].idCol).to.equal(1);
+            expect(result[1].idCol).to.equal(2);
+          });
+
+          it('find using query builder with multiple results', async () => {
+            const result = await Model1.relatedQuery('model1Relation2')
+              .for(Model1.query().findByIds([1, 2]))
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(3);
+            expect(result[0].idCol).to.equal(1);
+            expect(result[1].idCol).to.equal(2);
+            expect(result[2].idCol).to.equal(3);
+          });
+        });
+
+        describe('many to many relation', () => {
+          it('find using single id', async () => {
+            const result = await Model1.relatedQuery('model1Relation3')
+              .for(1)
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(1);
+            expect(result[0].idCol).to.equal(4);
+          });
+
+          it('find using multiple ids', async () => {
+            const result = await Model1.relatedQuery('model1Relation3')
+              .for([1, 2])
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(3);
+            expect(result[0].idCol).to.equal(4);
+            expect(result[1].idCol).to.equal(5);
+            expect(result[2].idCol).to.equal(6);
+          });
+
+          it('find using query builder with one result', async () => {
+            const result = await Model1.relatedQuery('model1Relation3')
+              .for(Model1.query().findById(1))
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(1);
+            expect(result[0].idCol).to.equal(4);
+          });
+
+          it('find using query builder with multiple results', async () => {
+            const result = await Model1.relatedQuery('model1Relation3')
+              .for(
+                Model1.query()
+                  .where('id', 1)
+                  .orWhere('id', 2)
+              )
+              .orderBy('id_col');
+
+            expect(result.length).to.equal(3);
+            expect(result[0].idCol).to.equal(4);
+            expect(result[1].idCol).to.equal(5);
+            expect(result[2].idCol).to.equal(6);
+          });
+        });
       });
     });
 

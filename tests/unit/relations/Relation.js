@@ -2,8 +2,6 @@ const _ = require('lodash');
 const Knex = require('knex');
 const expect = require('expect.js');
 const objection = require('../../../');
-
-const Model = objection.Model;
 const Relation = objection.Relation;
 
 describe('Relation', () => {

@@ -126,20 +126,22 @@ console.log('anyone over 90 is now removed from the database');
 ## `static` relatedQuery()
 
 ```js
-const queryBuilder = Person.relatedQuery(relationName);
+const queryBuilder = Person.relatedQuery(relationName, transactionOrKnex);
 ```
 
-Creates a subquery for a relation.
+Creates a query builder that can be used to query a relation of an item (or items).
 
-This query can only be used as a subquery and therefore there is no need to ever pass a transaction or a knex instance to it. It will always inherit its parent query's transaction because it is compiled and executed as a part of the parent query.
+This method is best explained through examples. See the examples below and the following sections:
 
-See the examples below. There are also more examples in the [Relation Subqueries recipe](/recipes/relation-subqueries.html).
+ * [relation queries](/guide/query-examples.html#relation-queries)
+ * [relation subqueries recipe](/recipes/relation-subqueries.html)
 
 ##### Arguments
 
 Argument|Type|Description
 --------|----|--------------------
-relationName|string|The name of the relation to create subquery for.
+relationName|string|The name of the relation to query.
+transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
 
 ##### Return value
 
@@ -149,7 +151,84 @@ Type|Description
 
 ##### Examples
 
-Select count of a relation and the maximum value of another one:
+This example fetches dogs for a person with id 1:
+
+```js
+const personId = 1
+const dogs = await Person
+  .relatedQuery('pets')
+  .for(personId)
+  .where('species', 'dog')
+  .orderBy('name')
+```
+
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "animals"."ownerId" = 1
+order by "name" asc
+```
+
+If you want to fetch dogs of multiple people in one query, you can pass an array of identifiers for the `for` method like this:
+
+```js
+const dogs = await Person
+  .relatedQuery('pets')
+  .for([1, 2])
+  .where('species', 'dog')
+  .orderBy('name')
+```
+
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "animals"."ownerId" in (1, 2)
+order by "name" asc
+```
+
+You can even give it a subquery! The following example fetches all dogs of all people named Jennifer.
+
+```js
+// Note that there is no `await` here. This query does not get executed.
+const jennifers = Person
+  .query()
+  .where('name', 'Jennifer');
+
+// This is the only executed query in this example.
+const allDogsOfAllJennifers = await Person
+  .relatedQuery('pets')
+  .for(jennifers)
+  .where('species', 'dog')
+  .orderBy('name');
+```
+
+```sql
+select "animals".* from "animals"
+where "species" = 'dog'
+and "animals"."ownerId" in (
+  select "persons"."id"
+  from "persons"
+  where "name" = 'Jennifer'
+)
+order by "name" asc
+```
+
+`relatedQuery` also works with `relate` , `unrelate`, `delete` and all other mutating query methods. The following example relates a person with id 100 to a movie with id 200 for the many-to-many relation `movies`:
+
+```js
+await Person
+  .relateQuery('movies')
+  .for(100)
+  .relate(200);
+```
+
+```sql
+insert into "persons_movies" ("personId", "movieId") values (100, 200)
+```
+
+See more examples [here](/guide/query-examples.html#relation-queries).
+
+`relatedQuery` can also be used as a subquery when `for` is omitted. The next example selects the count of a relation and the maximum value of another one:
 
 ```js
 const people = await Person

@@ -49,8 +49,9 @@ console.log(jennifer.id);
 Batch insert (Only works on Postgres):
 
 ```js
-const actors = await someMovie
-  .$relatedQuery('actors')
+const actors = await Movie
+  .relatedQuery('actors')
+  .for(someMovie)
   .insert([
     {firstName: 'Jennifer', lastName: 'Lawrence'},
     {firstName: 'Bradley', lastName: 'Cooper'}
@@ -78,8 +79,9 @@ written to the join table instead of the target table. The `someExtra` field in 
 to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`. See [this recipe](/recipes/extra-properties.html) for more info.
 
 ```js
-const jennifer = await someMovie
-  .$relatedQuery('actors')
+const jennifer = await Movie
+  .relatedQuery('actors')
+  .for(someMovie)
   .insert({
     firstName: 'Jennifer',
     lastName: 'Lawrence',
@@ -576,7 +578,7 @@ console.log('removed', numberOfDeletedRows, 'people');
 queryBuilder = queryBuilder.relate(ids);
 ```
 
-Relate (attach) an existing item to another item.
+Relate (attach) an existing item to another item through a relation.
 
 This method doesn't create a new item but only updates the foreign keys. In
 the case of a many-to-many relation, creates a join row to the join table.
@@ -597,31 +599,83 @@ Type|Description
 
 ##### Examples
 
-```js
-const person = await Person
-  .query()
-  .findById(123);
+In the following example we relate an actor to a movie. In this example the relation between `Person` and `Movie` is a many-to-many relation but `relate` also works for all other relation types.
 
-const numRelatedRows = await person.$relatedQuery('movies').relate(50);
+```js
+const actor = await Person.query().findById(100);
+```
+
+```sql
+select "persons".* from "persons" where "persons"."id" = 100
+```
+
+```js
+const movie = await Movie.query().findById(200);
+```
+
+```sql
+select "movies".* from "movies" where "movies"."id" = 200
+```
+
+```js
+await actor.$relatedQuery('movies').relate(movie);
+```
+
+```sql
+insert into "persons_movies" ("personId", "movieId") values (100, 200)
+```
+
+You can also pass the id `200` directly to `relate` instead of passing a model instance. A more objectiony way of doing this would be to utilize the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
+
+```js
+await Person
+  .relateQuery('movies')
+  .for(100)
+  .relate(200);
+```
+
+```sql
+insert into "persons_movies" ("personId", "movieId") values (100, 200)
+```
+
+The next example four movies to the first person whose first name Arnold. Note that this query only works on Postgres because on other databases it would require multiple queries.
+
+```js
+await Person
+  .relateQuery('movies')
+  .for(Person.query().where('firstName', 'Arnold').limit(1))
+  .relate([100, 200, 300, 400]);
+```
+
+The `relate` method returns the amount of affected rows.
+
+```js
+const numRelatedRows = await person
+  .relatedQuery('movies')
+  .for(123)
+  .relate(50);
+
 console.log('movie 50 is now related to person 123 through `movies` relation');
 ```
 
 Relate multiple (only works with postgres)
 
 ```js
-const numRelatedRows = await person
-  .$relatedQuery('movies')
+const numRelatedRows = await Person
+  .relatedQuery('movies')
+  .for(123)
   .relate([50, 60, 70]);
 
 console.log(`${numRelatedRows} rows were related`);
 ```
 
-Composite key
+Composite key can either be provided as an array of identifiers or using an object like this:
 
 ```js
-const numRelatedRows = await person
-  .$relatedQuery('movies')
-  .relate({foo: 50, bar: 20, baz: 10});
+const numRelatedRows = await Person
+  .relatedQuery('movies')
+  .for(123)
+  .relate({ foo: 50, bar: 20, baz: 10 });
 
 console.log(`${numRelatedRows} rows were related`);
 ```
@@ -629,8 +683,9 @@ console.log(`${numRelatedRows} rows were related`);
 Fields marked as [extras](/api/types/#type-relationthrough) for many-to-many relations in [relationMappings](/api/model/static-properties.html#static-relationmappings) are automatically written to the join table. The `someExtra` field in the following example is written to the join table if the `extra` array of the relation mapping contains the string `'someExtra'`.
 
 ```js
-const numRelatedRows = await someMovie
-  .$relatedQuery('actors')
+const numRelatedRows = await Movie
+  .relatedQuery('actors')
+  .for(movieId)
   .relate({
     id: 50,
     someExtra: "I'll be written to the join table"
@@ -645,9 +700,9 @@ console.log(`${numRelatedRows} rows were related`);
 queryBuilder = queryBuilder.unrelate();
 ```
 
-Remove (detach) a connection between two rows.
+Remove (detach) a connection between two items.
 
-Doesn't delete the rows. Only removes the connection. For ManyToMany relations this
+Doesn't delete the items. Only removes the connection. For ManyToMany relations this
 deletes the join row from the join table. For other relation types this sets the
 join columns to null.
 
@@ -661,6 +716,84 @@ Type|Description
 [QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
 
 ##### Examples
+
+```js
+const actor = await Person.query().findById(100);
+```
+
+```sql
+select "persons".* from "persons" where "persons"."id" = 100
+```
+
+```js
+await actor
+  .$relatedQuery('movies')
+  .unrelate()
+  .where('name', 'like', 'Terminator%')
+```
+
+```sql
+delete from "persons_movies"
+where "persons_movies"."personId" = 100
+where "persons_movies"."movieId" in (
+  select "movies"."id" from "movies" where "name" like 'Terminator%'
+)
+```
+
+The same using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
+
+```js
+await Person
+  .relatedQuery('movies')
+  .for(100)
+  .unrelate()
+  .where('name', 'like', 'Terminator%')
+```
+
+```sql
+delete from "persons_movies"
+where "persons_movies"."personId" = 100
+and "persons_movies"."movieId" in (
+  select "movies"."id"
+  from "movies"
+  where "name" like 'Terminator%'
+)
+```
+
+The next query removes all Terminator movies from Arnold Schwarzenegger:
+
+```js
+// Note that we don't await this query. This query is not executed.
+// It's a placeholder that will be used to build a subquery when
+// the `relatedQuery` gets executed.
+const arnold = Person.query().findOne({
+  firstName: 'Arnold',
+  lastName: 'Schwarzenegger'
+});
+
+await Person
+  .relatedQuery('movies')
+  .for(arnold)
+  .unrelate()
+  .where('name', 'like', 'Terminator%')
+```
+
+```sql
+delete from "persons_movies"
+where "persons_movies"."personId" in (
+  select "persons"."id"
+  from "persons"
+  where "firstName" = 'Arnold'
+  and "lastName" = 'Schwarzenegger'
+)
+and "persons_movies"."movieId" in (
+  select "movies"."id"
+  from "movies"
+  where "name" like 'Terminator%'
+)
+```
+
+`unrelate` returns the number of affected rows.
 
 ```js
 const person = await Person

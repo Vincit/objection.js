@@ -4,6 +4,7 @@ const _ = require('lodash'),
   Promise = require('bluebird'),
   objection = require('../../../'),
   knexMocker = require('../../../testUtils/mockKnex'),
+  RelationOwner = require('../../../lib/relations/RelationOwner').RelationOwner,
   Model = objection.Model,
   QueryBuilder = objection.QueryBuilder,
   HasManyRelation = objection.HasManyRelation;
@@ -91,7 +92,7 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return relation.find(builder, [owner]);
+          return relation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -129,7 +130,7 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return compositeKeyRelation.find(builder, owners);
+          return compositeKeyRelation.find(builder, RelationOwner.create(owners));
         });
 
       return builder.then(result => {
@@ -173,7 +174,7 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return relation.find(builder, owners);
+          return relation.find(builder, RelationOwner.create(owners));
         });
 
       return builder.then(result => {
@@ -212,7 +213,7 @@ describe('HasManyRelation', () => {
         .orWhere('age', '>', 60)
         .select('name')
         .findOperationFactory(builder => {
-          return relation.find(builder, [owner]);
+          return relation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -243,7 +244,7 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return relation.find(builder, [owner]);
+          return relation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -274,7 +275,7 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return relation.find(builder, [owner]);
+          return relation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -305,7 +306,7 @@ describe('HasManyRelation', () => {
         .where('name', 'Teppo')
         .orWhere('age', '>', 60)
         .findOperationFactory(builder => {
-          return relation.find(builder, [owner]);
+          return relation.find(builder, RelationOwner.create(owner));
         });
 
       return builder.then(result => {
@@ -334,7 +335,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -367,7 +368,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return compositeKeyRelation.insert(builder, owner);
+          return compositeKeyRelation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related);
 
@@ -400,7 +401,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related)
         .then(result => {
@@ -425,7 +426,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related)
         .then(result => {
@@ -446,7 +447,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
-          return relation.insert(builder, owner);
+          return relation.insert(builder, RelationOwner.create(owner));
         })
         .insert(related)
         .then(result => {
@@ -469,7 +470,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return relation.update(builder, owner);
+          return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -495,7 +496,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return compositeKeyRelation.update(builder, owner);
+          return compositeKeyRelation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -521,7 +522,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return relation.update(builder, owner);
+          return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -546,7 +547,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .updateOperationFactory(builder => {
-          return relation.update(builder, owner);
+          return relation.update(builder, RelationOwner.create(owner));
         })
         .update(update)
         .where('gender', 'male')
@@ -571,7 +572,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
@@ -606,7 +607,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
@@ -627,7 +628,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .increment('test', 1)
         .then(numUpdated => {
@@ -645,7 +646,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .decrement('test', 10)
         .then(numUpdated => {
@@ -665,7 +666,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .patchOperationFactory(builder => {
-          return relation.patch(builder, owner);
+          return relation.patch(builder, RelationOwner.create(owner));
         })
         .patch(patch)
         .where('gender', 'male')
@@ -686,7 +687,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
-          return relation.delete(builder, owner);
+          return relation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
@@ -710,7 +711,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
-          return compositeKeyRelation.delete(builder, owner);
+          return compositeKeyRelation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
@@ -735,7 +736,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .deleteOperationFactory(builder => {
-          return relation.delete(builder, owner);
+          return relation.delete(builder, RelationOwner.create(owner));
         })
         .delete()
         .where('gender', 'male')
@@ -758,7 +759,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate(10);
 
@@ -780,7 +781,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate([10, 20, 30]);
 
@@ -802,7 +803,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate({ id: 10 });
 
@@ -824,7 +825,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate([{ id: 10 }, { id: 20 }]);
 
@@ -846,7 +847,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return compositeKeyRelation.relate(builder, owner);
+          return compositeKeyRelation.relate(builder, RelationOwner.create(owner));
         })
         .relate([1, 2, 3]);
 
@@ -868,7 +869,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .relateOperationFactory(builder => {
-          return relation.relate(builder, owner);
+          return relation.relate(builder, RelationOwner.create(owner));
         })
         .relate(11)
         .then(result => {
@@ -888,7 +889,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {
-          return relation.unrelate(builder, owner);
+          return relation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77]);
@@ -900,7 +901,7 @@ describe('HasManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
-          'update "RelatedModel" set "ownerId" = NULL where "code" in (55, 66, 77) and "RelatedModel"."ownerId" = 666'
+          'update "RelatedModel" set "ownerId" = NULL where "code" in (55, 66, 77) and "RelatedModel"."ownerId" in (666)'
         );
       });
     });
@@ -911,7 +912,7 @@ describe('HasManyRelation', () => {
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {
-          return compositeKeyRelation.unrelate(builder, owner);
+          return compositeKeyRelation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77]);
@@ -923,7 +924,7 @@ describe('HasManyRelation', () => {
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
         expect(executedQueries[0]).to.eql(
-          'update "RelatedModel" set "ownerAId" = NULL, "ownerBId" = NULL where "code" in (55, 66, 77) and ("RelatedModel"."ownerAId" = 11 and "RelatedModel"."ownerBId" = 22)'
+          'update "RelatedModel" set "ownerAId" = NULL, "ownerBId" = NULL where "code" in (55, 66, 77) and ("RelatedModel"."ownerAId", "RelatedModel"."ownerBId") in ((11, 22))'
         );
       });
     });
@@ -934,7 +935,7 @@ describe('HasManyRelation', () => {
 
       return QueryBuilder.forClass(RelatedModel)
         .unrelateOperationFactory(builder => {
-          return relation.unrelate(builder, owner);
+          return relation.unrelate(builder, RelationOwner.create(owner));
         })
         .unrelate()
         .whereIn('code', [55, 66, 77])
@@ -942,7 +943,7 @@ describe('HasManyRelation', () => {
           expect(executedQueries).to.have.length(1);
           expect(result).to.eql({});
           expect(executedQueries[0]).to.eql(
-            'update "RelatedModel" set "ownerId" = NULL where "code" in (55, 66, 77) and "RelatedModel"."ownerId" = 666 and "someColumn" = 100'
+            'update "RelatedModel" set "ownerId" = NULL where "code" in (55, 66, 77) and "RelatedModel"."ownerId" in (666) and "someColumn" = 100'
           );
         });
     });
