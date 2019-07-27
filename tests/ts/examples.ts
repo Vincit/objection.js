@@ -54,7 +54,7 @@ class Person extends objection.Model {
   examplePersonMethod = (arg: string) => 1;
 
   static staticExamplePersonMethod() {
-    return 100
+    return 100;
   }
 
   petsWithId(petId: number): Promise<Animal[]> {
@@ -704,7 +704,6 @@ pagePromise = pageQb.execute();
 
 const modelFromQuery = qb.modelClass();
 
-
 const sql: string = qb.toSql();
 const tableName: string = qb.tableNameFor(Person);
 const tableRef: string = qb.tableRefFor(Person);
@@ -859,6 +858,17 @@ Person.query().select(
 Person.query().where(builder => {
   builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
+
+/**
+ * http://knexjs.org/#Builder-count
+ */
+Person.query().count('active', { as: 'a' });
+Person.query().count('active as a');
+Person.query().count({ a: 'active' });
+Person.query().count({ a: 'active', v: 'valid' });
+Person.query().count('id', 'active');
+Person.query().count({ count: ['id', 'active'] });
+Person.query().count(raw('??', ['active']));
 
 // RawBuilder:
 

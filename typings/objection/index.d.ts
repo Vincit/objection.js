@@ -221,6 +221,13 @@ declare namespace Objection {
     <M extends Model>(modelClass: ModelClass<M>): M['QueryBuilderType'];
   }
 
+  /**
+   * https://vincit.github.io/objection.js/api/types/#type-fieldexpression
+   */
+  type FieldExpression = string;
+
+  type JsonObjectOrFieldExpression = object | object[] | FieldExpression;
+
   type Selection<QB extends AnyQueryBuilder> = ColumnRef | AnyQueryBuilder | CallbackVoid<QB>;
 
   interface SelectMethod<QB extends AnyQueryBuilder> {
@@ -276,6 +283,21 @@ declare namespace Objection {
     (col: ColumnRef | ColumnRef[], value: Value[]): QB;
     (col: ColumnRef | ColumnRef[], cb: CallbackVoid<QB>): QB;
     (col: ColumnRef | ColumnRef[], qb: AnyQueryBuilder): QB;
+  }
+
+  interface WhereBetweenMethod<QB extends AnyQueryBuilder> {
+    (column: ColumnRef, range: [Value, Value]): QB;
+  }
+
+  interface WhereJsonSupersetOfMethod<QB extends AnyQueryBuilder> {
+    (
+      fieldExpression: FieldExpression,
+      jsonObjectOrFieldExpression: JsonObjectOrFieldExpression
+    ): QB;
+  }
+
+  interface WhereJsonIsArrayMethod<QB extends AnyQueryBuilder> {
+    (fieldExpression: FieldExpression): QB;
   }
 
   type QBOrCallback<QB extends AnyQueryBuilder> = AnyQueryBuilder | CallbackVoid<QB>;
@@ -350,6 +372,12 @@ declare namespace Objection {
 
   interface IncrementDecrementMethod<QB extends AnyQueryBuilder> {
     (column: string, amount?: number): QB;
+  }
+
+  interface CountMethod<QB extends AnyQueryBuilder> {
+    (column?: ColumnRef, options?: { as: string }): QB;
+    (aliasToColumnDict: { [alias: string]: string | string[] }): QB;
+    (...columns: ColumnRef[]): QB;
   }
 
   interface OrderByMethod<QB extends AnyQueryBuilder> {
@@ -562,7 +590,10 @@ declare namespace Objection {
   }
 
   interface ModifyEagerMethod<QB extends AnyQueryBuilder> {
-    <M extends Model>(expr: RelationExpression<ModelType<QB>>, modifier: Modifier<M['QueryBuilderType']>): QB;
+    <M extends Model>(
+      expr: RelationExpression<ModelType<QB>>,
+      modifier: Modifier<M['QueryBuilderType']>
+    ): QB;
   }
 
   interface ContextMethod<QB extends AnyQueryBuilder> {
@@ -610,6 +641,11 @@ declare namespace Objection {
     whereNotIn: WhereInMethod<this>;
     orWhereNotIn: WhereInMethod<this>;
 
+    whereBetween: WhereBetweenMethod<this>;
+
+    whereJsonSupersetOf: WhereJsonSupersetOfMethod<this>;
+    whereJsonIsArray: WhereJsonIsArrayMethod<this>;
+
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
 
@@ -633,6 +669,7 @@ declare namespace Objection {
     fullOuterJoin: JoinMethod<this>;
     crossJoin: JoinMethod<this>;
 
+    count: CountMethod<this>;
     increment: IncrementDecrementMethod<this>;
     decrement: IncrementDecrementMethod<this>;
 
@@ -686,7 +723,7 @@ declare namespace Objection {
     as: OneArgMethod<string, this>;
     alias: OneArgMethod<string, this>;
     withSchema: OneArgMethod<string, this>;
-    modelClass: ModelClassMethod
+    modelClass: ModelClassMethod;
     tableNameFor: TableRefForMethod;
     tableRefFor: TableRefForMethod;
     toSql: StringReturningMethod;
@@ -974,6 +1011,7 @@ declare namespace Objection {
     static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query: StaticQueryMethod;
+    static relatedQuery: RelatedQueryMethod<Model>;
     static columnNameMappers: ColumnNameMappers;
     static relationMappings: RelationMappings | (() => RelationMappings);
 
@@ -1024,4 +1062,8 @@ declare namespace Objection {
 
     QueryBuilderType: QueryBuilder<this, this[]>;
   }
+
+  export interface transaction<T> {}
+
+  export const transaction: transaction<any>;
 }
