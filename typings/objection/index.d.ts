@@ -1022,6 +1022,7 @@ declare namespace Objection {
     static tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     static fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
 
+    static knex(knex?: knex): knex;
     static bindKnex: BindKnexMethod;
     static bindTransaction: BindKnexMethod;
     static loadRelated: StaticLoadRelatedMethod;
@@ -1063,7 +1064,96 @@ declare namespace Objection {
     QueryBuilderType: QueryBuilder<this, this[]>;
   }
 
-  export interface transaction<T> {}
+  /**
+   * Overloading is required here until the following issues (at least) are resolved:
+   *
+   * - https://github.com/microsoft/TypeScript/issues/1360
+   * - https://github.com/Microsoft/TypeScript/issues/5453
+   *
+   * @tutorial https://vincit.github.io/objection.js/guide/transactions.html#creating-a-transaction
+   */
+  export interface transaction {
+    start(knexOrModel: knex | ModelClass<any>): Promise<Transaction>;
 
-  export const transaction: transaction<any>;
+    <MC1 extends ModelClass<any>, ReturnValue>(
+      modelClass1: MC1,
+      callback: (boundModelClass: MC1, trx?: Transaction) => Promise<ReturnValue>
+    ): Promise<ReturnValue>;
+
+    <MC1 extends ModelClass<any>, MC2 extends ModelClass<any>, ReturnValue>(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      callback: (
+        boundModelClass1: MC1,
+        boundModelClass2: MC2,
+        trx?: Transaction
+      ) => Promise<ReturnValue>
+    ): Promise<ReturnValue>;
+
+    <
+      MC1 extends ModelClass<any>,
+      MC2 extends ModelClass<any>,
+      MC3 extends ModelClass<any>,
+      ReturnValue
+    >(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      callback: (
+        boundModelClass1: MC1,
+        boundModelClass2: MC2,
+        boundModelClass3: MC3,
+        trx?: Transaction
+      ) => Promise<ReturnValue>
+    ): Promise<ReturnValue>;
+
+    <
+      MC1 extends ModelClass<any>,
+      MC2 extends ModelClass<any>,
+      MC3 extends ModelClass<any>,
+      MC4 extends ModelClass<any>,
+      ReturnValue
+    >(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      modelClass4: MC4,
+      callback: (
+        boundModelClass1: MC1,
+        boundModelClass2: MC2,
+        boundModelClass3: MC3,
+        boundModelClass4: MC4,
+        trx?: Transaction
+      ) => Promise<ReturnValue>
+    ): Promise<ReturnValue>;
+
+    <
+      MC1 extends ModelClass<any>,
+      MC2 extends ModelClass<any>,
+      MC3 extends ModelClass<any>,
+      MC4 extends ModelClass<any>,
+      MC5 extends ModelClass<any>,
+      ReturnValue
+    >(
+      modelClass1: MC1,
+      modelClass2: MC2,
+      modelClass3: MC3,
+      modelClass4: MC4,
+      modelClass5: MC5,
+      callback: (
+        boundModelClass1: MC1,
+        boundModelClass2: MC2,
+        boundModelClass3: MC3,
+        boundModelClass4: MC4,
+        boundModelClass5: MC5,
+        trx?: Transaction
+      ) => Promise<ReturnValue>
+    ): Promise<ReturnValue>;
+
+    <ReturnValue>(knex: knex, callback: (trx: Transaction) => Promise<ReturnValue>): Promise<
+      ReturnValue
+    >;
+  }
+
+  export const transaction: transaction;
 }
