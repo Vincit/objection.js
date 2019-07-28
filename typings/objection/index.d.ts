@@ -436,6 +436,16 @@ declare namespace Objection {
     (insert: PartialModelObject<ModelType<QB>>[]): ArrayQueryBuilder<QB>;
   }
 
+  interface RelateMethod<QB extends AnyQueryBuilder> {
+    <RelatedModel extends Model>(
+      ids: MaybeCompositeId | Partial<RelatedModel> | Partial<RelatedModel>[]
+    ): SingleQueryBuilder<QB>;
+
+    <RelatedModel extends Model>(
+      ids: MaybeCompositeId | Partial<RelatedModel> | Partial<RelatedModel>[]
+    ): ArrayQueryBuilder<QB>;
+  }
+
   interface EagerMethod<QB extends AnyQueryBuilder> {
     (expr: RelationExpression<ModelType<QB>>, modifiers?: Modifiers): QB;
   }
@@ -699,6 +709,8 @@ declare namespace Objection {
 
     insert: InsertMethod<this>;
     insertAndFetch: InsertMethod<this>;
+
+    relate: RelateMethod<this>;
 
     eager: EagerMethod<this>;
     mergeEager: EagerMethod<this>;
