@@ -24,7 +24,7 @@ select "Tweet".*, (
 from "Tweet"
 ```
 
-Naturally you can add as many subquery selects as you like. For example you could also get the count of retweets in the same query. [relatedQuery](/api/model/static-methods.html#relatedquery) method works with all relations and not just `HasManyRelation`.
+Naturally you can add as many subquery selects as you like. For example you could also get the count of retweets in the same query. [relatedQuery](/api/model/static-methods.html#static-relatedquery) method works with all relations and not just `HasManyRelation`.
 
 Another common use case for subqueries is selecting `Tweet`s that have one or more likes. That could also be achieved using joins, but it's often simpler to use a subquery. There should be no performance difference between the two methods on modern database engines.
 

@@ -7,7 +7,7 @@ const queryBuilder = Person.query(transactionOrKnex);
 ```
 Creates a query builder for the model's table.
 
-All query builders are created using this function, including `$query`, `$relatedQuery` and `relatedQuery`. That means you can modify each query by overriding this method for your model class.
+All query builders are created using this function, including `$query`, `relatedQuery` and `$relatedQuery`. That means you can modify each query by overriding this method for your model class.
 
 See the [query examples](/guide/query-examples.html) section for more examples.
 

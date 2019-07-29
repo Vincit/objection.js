@@ -6,7 +6,7 @@ sidebarDepth: 3
 
 The `Person` model used in the examples is defined [here](/guide/models.html#examples).
 
-All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), [relatedQuery](/api/model/static-methods.html#relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
+All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
 
 ## Basic queries
 
@@ -387,7 +387,7 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-If you want to fetch dogs of multiple people in one query, you can pass an array of identifiers for the `for` method like this:
+If you want to fetch dogs for multiple people in one query, you can pass an array of identifiers for the `for` method like this:
 
 ```js
 const dogs = await Person
@@ -433,7 +433,7 @@ order by "name" asc
 
 ### Relation insert queries
 
-Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for a model _instance_. The query inserts a new object to the related table and updates the needed tables to create the relation. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
+Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for an item. The query inserts a new object to the related table and updates the needed tables to create the relationship. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
 
 By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model/instance-methods.html#setrelated) and
 [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.

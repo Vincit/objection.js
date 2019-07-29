@@ -43,14 +43,6 @@ module.exports = session => {
           ]);
         });
 
-        beforeEach(() => {
-          return Model1.query().then(models => {
-            model1 = _.find(models, { id: 1 });
-            model2 = _.find(models, { id: 2 });
-            model3 = _.find(models, { id: 3 });
-          });
-        });
-
         it('should relate', () => {
           return model1
             .$relatedQuery('model1Relation1')
