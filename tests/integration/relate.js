@@ -43,6 +43,11 @@ module.exports = session => {
           ]);
         });
 
+        beforeEach(async () => {
+          model1 = await Model1.query().findById(1);
+          model2 = await Model1.query().findById(2);
+        });
+
         it('should relate', () => {
           return model1
             .$relatedQuery('model1Relation1')
