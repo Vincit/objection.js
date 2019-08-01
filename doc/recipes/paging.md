@@ -14,7 +14,7 @@ console.log(result.total); // --> 3341
 
 There are some cases where [page](/api/query-builder/other-methods.html#page) and [range](/api/query-builder/other-methods.html#range) don't work.
 
-1. In [modifyEager](/api/query-builder/other-methods.html#modifyeager) or modifiers:
+1. In [modifyGraph](/api/query-builder/other-methods.html#modifygraph) or modifiers:
 
 ```js
 // This doesn't work because the query `qb` fetches the
@@ -24,7 +24,7 @@ There are some cases where [page](/api/query-builder/other-methods.html#page) an
 const result = await Person
   .query()
   .withGraphFetched('children')
-  .modifyEager('children', qb => qb.page(0, 10));
+  .modifyGraph('children', qb => qb.page(0, 10));
 ```
 
 2. When `withGraphJoined` is used:

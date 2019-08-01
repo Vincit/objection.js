@@ -283,14 +283,14 @@ Person
   .withGraphFetched('[movies(goodMovies, orderByName).actors, pets(dogs)]')
 ```
 
-Modifiers can also be used through [modifyEager](/api/query-builder/other-methods.html#modifyeager):
+Modifiers can also be used through [modifyGraph](/api/query-builder/other-methods.html#modifygraph):
 
 ```js
 Person
   .query()
   .withGraphFetched('[movies.actors, pets]')
-  .modifyEager('movies', ['goodMovies', 'orderByName'])
-  .modifyEager('pets', 'dogs')
+  .modifyGraph('movies', ['goodMovies', 'orderByName'])
+  .modifyGraph('pets', 'dogs')
 ```
 
 ## `static` namedFilters

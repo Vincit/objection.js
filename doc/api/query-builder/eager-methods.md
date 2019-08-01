@@ -15,7 +15,7 @@ As mentioned, this method uses multiple queries to fetch the related objects. Ob
 **Limitations:**
 
  * Relations cannot be referenced in the root query because they are not joined.
- * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyEager` or `modifiers` because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
+ * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyGraph` or `modifiers` because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
 
 See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info about the relation expression language.
 
@@ -164,17 +164,17 @@ console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
 ```
 
-Filters can also be registered using the [modifyEager](/api/query-builder/other-methods.html#modifyeager) method:
+Filters can also be registered using the [modifyGraph](/api/query-builder/other-methods.html#modifygraph) method:
 
 ```js
 const people = await Person
   .query()
   .withGraphFetched('children.[pets, movies]')
-  .modifyEager('children', builder => {
+  .modifyGraph('children', builder => {
     // Order children by age and only select id.
     builder.orderBy('age').select('id');
   })
-  .modifyEager('children.[pets, movies]', builder => {
+  .modifyGraph('children.[pets, movies]', builder => {
     // Only select `pets` and `movies` whose id > 10 for the children.
     builder.where('id', '>', 10);
   })
@@ -340,7 +340,7 @@ const builder = Person.query()
   .withGraphFetched('children.pets(onlyId)')
 
 const expr = builder.graphExpressionObject();
-console.log(expr.children.pets.modify);
+console.log(expr.children.pets.$modify);
 // prints ["onlyId"]
 
 expr.children.movies = true
@@ -487,8 +487,14 @@ Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/
 
 ## modifyEager()
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use [modifyGraph](#modifygraph) instead.
+:::
+
+## modifyGraph()
+
 ```js
-queryBuilder = queryBuilder.modifyEager(pathExpression, modifier);
+queryBuilder = queryBuilder.modifyGraph(pathExpression, modifier);
 ```
 
 Can be used to modify `withGraphFetched` and `withGraphJoined` queries.
@@ -516,7 +522,7 @@ Type|Description
 Person
   .query()
   .withGraphFetched('[children.[pets, movies], movies]')
-  .modifyEager('children.pets', builder => {
+  .modifyGraph('children.pets', builder => {
     builder.where('age', '>', 10);
   })
 ```
@@ -527,7 +533,7 @@ The path expression can have multiple targets. The next example sorts both the p
 Person
   .query()
   .withGraphFetched('[children.[pets, movies], movies]')
-  .modifyEager('children.[pets, movies]', builder => {
+  .modifyGraph('children.[pets, movies]', builder => {
     builder.orderBy('id');
   })
 ```
@@ -538,7 +544,7 @@ This example only selects movies whose name contains the word 'Predator':
 Person
   .query()
   .withGraphFetched('[children.[pets, movies], movies]')
-  .modifyEager('[children.movies, movies]', builder => {
+  .modifyGraph('[children.movies, movies]', builder => {
     builder.where('name', 'like', '%Predator%');
   })
 ```
@@ -549,14 +555,14 @@ The modifier can also be a [Model modifier](/api/model/static-properties.html#st
 Person
   .query()
   .withGraphFetched('[children.[pets, movies], movies]')
-  .modifyEager('children.movies', 'selectId')
+  .modifyGraph('children.movies', 'selectId')
 ```
 
 ## filterEager()
 
 ::: warning
-Deprecated! Will be removed in version 3.0. Use [modifyEager](#modifyeager) instead.
+Deprecated! Will be removed in version 3.0. Use [modifyGraph](#modifygraph) instead.
 :::
 
 
-Alias for [modifyEager](/api/query-builder/other-methods.html#modifyeager).
+Alias for [modifyGraph](/api/query-builder/other-methods.html#modifygraph).

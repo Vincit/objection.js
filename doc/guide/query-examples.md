@@ -779,13 +779,13 @@ const people = await Person
 console.log(people[0].children[0].children[0].children[0].firstName);
 ```
 
-Relations can be modified using the [modifyEager](/api/query-builder/other-methods.html#modifyeager) method:
+Relations can be modified using the [modifyGraph](/api/query-builder/other-methods.html#modifygraph) method:
 
 ```js
 const people = await Person
   .query()
   .withGraphFetched('[children.[pets, movies], movies]')
-  .modifyEager('children.pets', builder => {
+  .modifyGraph('children.pets', builder => {
     // Only select pets older than 10 years old for children
     // and only return their names.
     builder.where('age', '>', 10).select('name');
