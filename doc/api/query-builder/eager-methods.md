@@ -475,7 +475,11 @@ You can use [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgr
 
 ## clearAllowGraph()
 
-Clears any calls to `allowGraph`.
+Clears all calls to `allowGraph`.
+
+## clearWithGraph()
+
+Clears all calls to `withGraphFetched` and `withGraphJoined`.
 
 ## allowEager()
 
