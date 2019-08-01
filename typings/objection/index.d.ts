@@ -219,6 +219,8 @@ declare namespace Objection {
     to: string | Reference | (string | Reference)[];
     modelClass?: ModelClass<any> | string;
     extra?: string[] | object;
+    modify?: ((queryBuilder: QueryBuilder<any>) => QueryBuilder<any>) | string | object;
+    filter?: ((queryBuilder: QueryBuilder<any>) => QueryBuilder<any>) | string | object;
     beforeInsert?: (model: Model, context: QueryContext) => Promise<void> | void;
   }
 
