@@ -605,12 +605,17 @@ Type|Description
 
 ## `static` loadRelated()
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use [fetchGraph](#static-fetchgraph) instead.
+:::
+
+## `static` fetchGraph()
+
 ```js
-const queryBuilder = Person.loadRelated(
+const queryBuilder = Person.fetchGraph(
   models,
   expression,
-  modifiers,
-  transactionOrKnex
+  options
 );
 ```
 
@@ -622,8 +627,7 @@ Argument|Type|Description
 --------|----|-------------------
 models|Array&lt;[Model](/api/model/)&#124;Object&gt;|Model instances for which to fetch the relations. Can be an array of model instances, array of POJOs, a single model instance or a single POJO.
 expression|string&#124;[RelationExpression](/api/types/#type-relationexpression)|The relation expression
-modifiers|Object&lt;string,&nbsp;function([QueryBuilder](/api/query-builder/))&gt;|Optional modifiers
-transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
+options|[FetchGraphOptions](/api/types/#type-fetchgraphoptions)|Optional options.
 
 ##### Return value
 
@@ -634,7 +638,7 @@ Type|Description
 ##### Examples
 
 ```js
-const people = await Person.loadRelated([person1, person2], 'children.pets');
+const people = await Person.fetchGraph([person1, person2], 'children.pets');
 
 const person1 = people[0];
 const person2 = people[1];
@@ -644,12 +648,13 @@ Relations can be filtered by giving modifier functions as arguments for the rela
 
 ```js
 const people = await Person
-  .loadRelated([person1, person2], `
+  .fetchGraph([person1, person2], `
     children(orderByAge).[
       pets(onlyDogs, orderByName),
       movies
     ]
-  `, {
+  `)
+  .modifiers({
     orderByAge(builder) {
       builder.orderBy('age');
     },

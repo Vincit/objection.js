@@ -89,6 +89,12 @@ Property|Type|Description
 --------|----|-----------
 relate|boolean<br>string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-inserts).
 
+## `type` FetchGraphOptions
+
+Property|Type|Description
+--------|----|-----------
+transaction|knex<br>Transaction|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database.
+
 ## `type` TableMetadataFetchOptions
 
 Property|Type|Description

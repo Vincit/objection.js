@@ -934,15 +934,20 @@ child2 = person.children[person.children.length - 2];
 
 ## $loadRelated()
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use [$fetchGraph](#fetchgraph) instead.
+:::
+
+## $fetchGraph()
+
 ```js
-const builder = person.$loadRelated(
+const builder = person.$fetchGraph(
   expression,
-  filters,
-  transactionOrKnex
+  options
 );
 ```
 
-Shortcut for [Person.loadRelated(person, expression, filter, transactionOrKnex)](/api/model/static-methods.html#static-loadrelated)
+Shortcut for [Person.fetchGraph(person, options)](/api/model/static-methods.html#static-fetchgraph)
 
 ## $traverse()
 
