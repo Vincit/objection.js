@@ -1145,6 +1145,8 @@ declare namespace Objection {
     to: RelationMappingColumnRef;
     extra?: string | string[] | Record<string, string>;
     modelClass?: ModelClassSpecifier;
+    modify?: Modifier<QueryBuilderType<M>>;
+    filter?: Modifier<QueryBuilderType<M>>;
     beforeInsert?: RelationMappingHook<M>;
   }
 
