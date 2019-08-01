@@ -329,17 +329,23 @@ Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-bu
 
 ## eagerObject()
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use [graphExpressionObject](#graphexpressionobject) without arguments instead.
+:::
+
+## graphExpressionObject()
+
 ```js
 const builder = Person.query()
   .withGraphFetched('children.pets(onlyId)')
 
-const eagerObject = builder.eagerObject();
-console.log(eagerObject.children.pets.modify);
+const expr = builder.graphExpressionObject();
+console.log(expr.children.pets.modify);
 // prints ["onlyId"]
 
-eagerObject.children.movies = true
+expr.children.movies = true
 // You can modify the object and pass it back to the `withGraphFetched` method.
-builder.withGraphFetched(bject)
+builder.withGraphFetched(expr)
 ```
 
 Returns the object representation of the relation expression passed to either `withGraphFetched` or `withGraphJoined`.
@@ -547,5 +553,10 @@ Person
 ```
 
 ## filterEager()
+
+::: warning
+Deprecated! Will be removed in version 3.0. Use [modifyEager](#modifyeager) instead.
+:::
+
 
 Alias for [modifyEager](/api/query-builder/other-methods.html#modifyeager).
