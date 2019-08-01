@@ -359,8 +359,14 @@ boolean|true if the query contains any specific select staments.
 
 ## hasEager()
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use [hasWithGraph](#haswithgraph) instead.
+:::
+
+## hasWithGraph()
+
 ```js
-const hasEager = queryBuilder.hasEager();
+const hasWithGraph = queryBuilder.hasWithGraph();
 ```
 
 Returns true if `withGraphFetched` or `withGraphJoined` has been called for the query.

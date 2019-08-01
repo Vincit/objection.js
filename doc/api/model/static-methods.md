@@ -151,13 +151,26 @@ Type|Description
 
 ##### Examples
 
-This example fetches dogs for a person with id 1:
+This example fetches `pets` for a person with id 1. `pets` is the name of the relation defined in [relationMappings](/api/model/static-properties.html#static-relationmappings).
 
 ```js
 const personId = 1
-const dogs = await Person
+const pets = await Person
   .relatedQuery('pets')
   .for(personId)
+```
+
+```sql
+select "animals".* from "animals"
+and "animals"."ownerId" = 1
+```
+
+Just like to any query, you can chain any methods. The following example only fetches dogs and sorts them by name:
+
+```js
+const dogs = await Person
+  .relatedQuery('pets')
+  .for(1)
   .where('species', 'dog')
   .orderBy('name')
 ```
@@ -169,7 +182,7 @@ and "animals"."ownerId" = 1
 order by "name" asc
 ```
 
-If you want to fetch dogs of multiple people in one query, you can pass an array of identifiers for the `for` method like this:
+If you want to fetch dogs of multiple people in one query, you can pass an array of identifiers to the [for](/api/query-builder/other-methods.html#for) method like this:
 
 ```js
 const dogs = await Person
@@ -213,7 +226,7 @@ and "animals"."ownerId" in (
 order by "name" asc
 ```
 
-`relatedQuery` also works with `relate` , `unrelate`, `delete` and all other mutating query methods. The following example relates a person with id 100 to a movie with id 200 for the many-to-many relation `movies`:
+`relatedQuery` also works with `relate` , `unrelate`, `delete` and all other query methods. The following example relates a person with id 100 to a movie with id 200 for the many-to-many relation `movies`:
 
 ```js
 await Person
