@@ -473,6 +473,10 @@ const insertedPerson = await Person
 
 You can use [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) to clear any previous calls to `allowGraph`.
 
+## clearAllowGraph()
+
+Clears any calls to `allowGraph`.
+
 ## allowEager()
 
 ::: warning

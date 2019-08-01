@@ -699,7 +699,7 @@ An instance of this is returned from the [raw](/api/objection/#raw) helper funct
 
 Gives an alias for the raw expression `.select(raw('concat(foo, bar)').as('fooBar'))`.
 
-You should use this instead of inserting the alias to the SQL to give objection more information about the query. Some edge cases, like using `raw` in `select` inside a `joinEager` modifier won't work unless you use this method.
+You should use this instead of inserting the alias to the SQL to give objection more information about the query. Some edge cases, like using `raw` in `select` inside a `withGraphJoined` modifier won't work unless you use this method.
 
 ## `class` Validator
 
