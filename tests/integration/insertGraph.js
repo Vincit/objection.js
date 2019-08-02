@@ -283,7 +283,7 @@ module.exports = session => {
 
               return Promise.all([session.knex('Model1'), session.knex('model2')]);
             })
-            .spread((rows1, rows2) => {
+            .then(([rows1, rows2]) => {
               expect(rows1).to.have.length(1);
               expect(rows2).to.have.length(1);
               done();

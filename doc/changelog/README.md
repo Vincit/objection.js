@@ -8,6 +8,8 @@
 
 ### Breaking changes
 
+ * Objection now uses the native promise instead of bluebird which means that all bluebird specific methods like `map`, `reduce`, `reflect`, `bind`, `asCallback`, `nodeify`, `return` etc. have been removed from the `QueryBuilder`.
+
 #### Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.
 
 You need to change code like this:

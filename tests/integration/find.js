@@ -2058,9 +2058,11 @@ module.exports = session => {
           .groupBy('Model1.id', 'Model1.model1Prop1')
           .findByIds([1, 2])
           .orderBy('id')
-          .map(it => {
-            it.relCount = parseInt(it.relCount);
-            return it;
+          .then(result => {
+            return result.map(it => {
+              it.relCount = parseInt(it.relCount);
+              return it;
+            });
           })
           .then(res => {
             expect(res).to.eql([

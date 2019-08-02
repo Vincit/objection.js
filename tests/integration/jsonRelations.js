@@ -411,8 +411,8 @@ module.exports = session => {
         it('relate', () => {
           return Animal.query()
             .findOne({ name: 'Fluffy' })
-            .then(it => [it, Person.query().findOne({ name: 'Brad' })])
-            .spread((fluffy, brad) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
+            .then(it => Promise.all([it, Person.query().findOne({ name: 'Brad' })]))
+            .then(([fluffy, brad]) => fluffy.$relatedQuery('peopleWhoseFavoriteIAm').relate(brad))
             .then(() =>
               Animal.query()
                 .findOne({ name: 'Fluffy' })
@@ -434,12 +434,12 @@ module.exports = session => {
         it('unrelate', () => {
           return Animal.query()
             .findOne({ name: 'Fluffy' })
-            .then(it => [it, Person.query().findOne({ name: 'Brad' })])
-            .spread((fluffy, brad) =>
+            .then(it => Promise.all([it, Person.query().findOne({ name: 'Brad' })]))
+            .then(([fluffy, brad]) =>
               fluffy
                 .$relatedQuery('peopleWhoseFavoriteIAm')
                 .relate(brad)
-                .return(fluffy)
+                .then(() => fluffy)
             )
             .then(it =>
               it
@@ -546,8 +546,8 @@ module.exports = session => {
         it('relate', () => {
           return Person.query()
             .findOne({ name: 'Arnold' })
-            .then(it => [it, Movie.query().findOne({ name: 'Inglorious bastards' })])
-            .spread((arnold, bastards) => arnold.$relatedQuery('movies').relate(bastards.id))
+            .then(it => Promise.all([it, Movie.query().findOne({ name: 'Inglorious bastards' })]))
+            .then(([arnold, bastards]) => arnold.$relatedQuery('movies').relate(bastards.id))
             .then(() =>
               Person.query()
                 .select('name')
@@ -573,12 +573,12 @@ module.exports = session => {
         it('unrelate', () => {
           return Person.query()
             .findOne({ name: 'Arnold' })
-            .then(it => [it, Movie.query().findOne({ name: 'Inglorious bastards' })])
-            .spread((arnold, bastards) =>
+            .then(it => Promise.all([it, Movie.query().findOne({ name: 'Inglorious bastards' })]))
+            .then(([arnold, bastards]) =>
               arnold
                 .$relatedQuery('movies')
                 .relate(bastards.id)
-                .return(arnold)
+                .then(() => arnold)
             )
             .then(arnold =>
               arnold

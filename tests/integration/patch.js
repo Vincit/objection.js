@@ -1142,15 +1142,15 @@ module.exports = session => {
                 .then(numUpdated => {
                   expect(numUpdated).to.equal(1);
 
-                  return [
+                  return Promise.all([
                     session.knex('model2').orderBy('id_col'),
                     session
                       .knex('Model1Model2')
                       .select('model1Id', 'model2Id', 'extra1', 'extra2')
                       .orderBy(['model1Id', 'model2Id'])
-                  ];
+                  ]);
                 })
-                .spread((model2, model1Model2) => {
+                .then(([model2, model1Model2]) => {
                   expect(model2.length).to.equal(8);
                   expect(model1Model2.length).to.equal(12);
 
@@ -1218,15 +1218,15 @@ module.exports = session => {
                 .then(numUpdated => {
                   expect(numUpdated).to.equal(3);
 
-                  return [
+                  return Promise.all([
                     session.knex('model2').orderBy('id_col'),
                     session
                       .knex('Model1Model2')
                       .select('model1Id', 'model2Id', 'extra1', 'extra2')
                       .orderBy(['model1Id', 'model2Id'])
-                  ];
+                  ]);
                 })
-                .spread((model2, model1Model2) => {
+                .then(([model2, model1Model2]) => {
                   expect(model2.length).to.equal(8);
                   expect(model1Model2.length).to.equal(12);
 
@@ -1869,15 +1869,15 @@ module.exports = session => {
             .then(numUpdated => {
               expect(numUpdated).to.equal(1);
 
-              return [
+              return Promise.all([
                 session.knex('model2').orderBy('id_col'),
                 session
                   .knex('Model1Model2')
                   .select('model1Id', 'model2Id', 'extra1', 'extra2')
                   .orderBy(['model1Id', 'model2Id'])
-              ];
+              ]);
             })
-            .spread((model2, model1Model2) => {
+            .then(([model2, model1Model2]) => {
               expect(model2.length).to.equal(8);
               expect(model1Model2.length).to.equal(12);
 
@@ -1941,15 +1941,15 @@ module.exports = session => {
             .then(numUpdated => {
               expect(numUpdated).to.equal(3);
 
-              return [
+              return Promise.all([
                 session.knex('model2').orderBy('id_col'),
                 session
                   .knex('Model1Model2')
                   .select('model1Id', 'model2Id', 'extra1', 'extra2')
                   .orderBy(['model1Id', 'model2Id'])
-              ];
+              ]);
             })
-            .spread((model2, model1Model2) => {
+            .then(([model2, model1Model2]) => {
               expect(model2.length).to.equal(8);
               expect(model1Model2.length).to.equal(12);
 

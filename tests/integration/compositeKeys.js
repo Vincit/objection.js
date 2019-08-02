@@ -430,7 +430,7 @@ module.exports = session => {
               session.knex('B').orderBy(['id3', 'id4'])
             ]);
           })
-          .spread((a, b) => {
+          .then(([a, b]) => {
             expect(a).to.eql([
               { id1: 1, id2: '1', aval: 'x', bid3: 1, bid4: '1' },
               { id1: 1, id2: '2', aval: 'w', bid3: 1, bid4: '1' },
@@ -785,9 +785,9 @@ module.exports = session => {
           return A.query()
             .findById([1, '1'])
             .then(a1 => {
-              return [a1, a1.$relatedQuery('b')];
+              return Promise.all([a1, a1.$relatedQuery('b')]);
             })
-            .spread((a1, b1) => {
+            .then(([a1, b1]) => {
               expect(a1.b).to.eql({ id3: 1, id4: '1', bval: 'b1' });
               expect(b1).to.equal(a1.b);
             });
@@ -797,9 +797,12 @@ module.exports = session => {
           return A.query()
             .findById([1, '1'])
             .then(a1 => {
-              return [a1, a1.$relatedQuery('b').insert({ id3: 1000, id4: '2000', bval: 'new' })];
+              return Promise.all([
+                a1,
+                a1.$relatedQuery('b').insert({ id3: 1000, id4: '2000', bval: 'new' })
+              ]);
             })
-            .spread((a1, bNew) => {
+            .then(([a1, bNew]) => {
               expect(a1.b).to.eql({ id3: 1000, id4: '2000', bval: 'new' });
               expect(bNew).to.equal(a1.b);
               expect(a1).to.eql({
@@ -821,7 +824,7 @@ module.exports = session => {
                   .first()
               ]);
             })
-            .spread((a1, bNew) => {
+            .then(([a1, bNew]) => {
               expect(a1).to.eql({ id1: 1, id2: '1', aval: 'a1', bid3: 1000, bid4: '2000' });
               expect(bNew).to.eql({ id3: 1000, id4: '2000', bval: 'new' });
             });
@@ -831,9 +834,9 @@ module.exports = session => {
           return A.query()
             .findById([1, '1'])
             .then(a1 => {
-              return [a1, a1.$relatedQuery('b').update({ bval: 'updated' })];
+              return Promise.all([a1, a1.$relatedQuery('b').update({ bval: 'updated' })]);
             })
-            .spread((a1, numUpdated) => {
+            .then(([a1, numUpdated]) => {
               expect(numUpdated).to.equal(1);
               return session.knex('B').where('bval', 'updated');
             })
@@ -847,9 +850,12 @@ module.exports = session => {
           return A.query()
             .findById([1, '1'])
             .then(a1 => {
-              return [a1, a1.$relatedQuery('b').updateAndFetchById([1, '1'], { bval: 'updated' })];
+              return Promise.all([
+                a1,
+                a1.$relatedQuery('b').updateAndFetchById([1, '1'], { bval: 'updated' })
+              ]);
             })
-            .spread((a1, b1) => {
+            .then(([a1, b1]) => {
               expect(b1).to.eql({ id3: 1, id4: '1', bval: 'updated' });
               return session.knex('B').where('bval', 'updated');
             })
@@ -863,9 +869,9 @@ module.exports = session => {
           return A.query()
             .findById([2, '2'])
             .then(a1 => {
-              return [a1, a1.$relatedQuery('b').delete()];
+              return Promise.all([a1, a1.$relatedQuery('b').delete()]);
             })
-            .spread((a1, numDeleted) => {
+            .then(([a1, numDeleted]) => {
               expect(numDeleted).to.equal(1);
               return session.knex('B');
             })
@@ -881,9 +887,9 @@ module.exports = session => {
             .then(a1 => {
               expect(a1.bid3).to.equal(1);
               expect(a1.bid4).to.equal('2');
-              return [a1, a1.$relatedQuery('b').relate([1, '1'])];
+              return Promise.all([a1, a1.$relatedQuery('b').relate([1, '1'])]);
             })
-            .spread(a1 => {
+            .then(([a1]) => {
               expect(a1.bid3).to.equal(1);
               expect(a1.bid4).to.equal('1');
               return A.query().findById([2, '2']);
@@ -900,9 +906,9 @@ module.exports = session => {
             .then(a1 => {
               expect(a1.bid3).to.equal(1);
               expect(a1.bid4).to.equal('2');
-              return [a1, a1.$relatedQuery('b').unrelate()];
+              return Promise.all([a1, a1.$relatedQuery('b').unrelate()]);
             })
-            .spread(a1 => {
+            .then(([a1]) => {
               expect(a1.bid3).to.equal(null);
               expect(a1.bid4).to.equal(null);
               return A.query().findById([2, '2']);
@@ -919,9 +925,9 @@ module.exports = session => {
           return B.query()
             .findById([1, '1'])
             .then(b1 => {
-              return [b1, b1.$relatedQuery('a').orderBy(['id1', 'id2'])];
+              return Promise.all([b1, b1.$relatedQuery('a').orderBy(['id1', 'id2'])]);
             })
-            .spread((b1, a) => {
+            .then(([b1, a]) => {
               expect(b1.a).to.eql(a);
               expect(a).to.eql([
                 { id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1' },
@@ -935,9 +941,12 @@ module.exports = session => {
           return B.query()
             .findById([1, '1'])
             .then(b1 => {
-              return [b1, b1.$relatedQuery('a').insert({ id1: 1000, id2: '2000', aval: 'new' })];
+              return Promise.all([
+                b1,
+                b1.$relatedQuery('a').insert({ id1: 1000, id2: '2000', aval: 'new' })
+              ]);
             })
-            .spread((b1, aNew) => {
+            .then(([b1, aNew]) => {
               expect(_.last(b1.a)).to.eql({
                 id1: 1000,
                 id2: '2000',
@@ -1128,7 +1137,7 @@ module.exports = session => {
                 session.knex('A_B').orderBy(['bid3', 'bid4', 'aid1', 'aid2'])
               ]);
             })
-            .spread((b2, a, ab) => {
+            .then(([b2, a, ab]) => {
               aOld = a;
               abOld = ab;
 
@@ -1140,7 +1149,7 @@ module.exports = session => {
                 session.knex('A_B').orderBy(['bid3', 'bid4', 'aid1', 'aid2'])
               ]);
             })
-            .spread((a, ab) => {
+            .then(([a, ab]) => {
               expect(a).to.eql(
                 aOld.concat([{ id1: 1000, id2: '2000', aval: 'new', bid3: null, bid4: null }])
               );
@@ -1211,7 +1220,7 @@ module.exports = session => {
                 session.knex('A_B').orderBy(['bid3', 'bid4', 'aid1', 'aid2'])
               ]);
             })
-            .spread((b2, a, ab) => {
+            .then(([b2, a, ab]) => {
               aOld = a;
               abOld = ab;
 
@@ -1223,7 +1232,7 @@ module.exports = session => {
                 session.knex('A_B').orderBy(['bid3', 'bid4', 'aid1', 'aid2'])
               ]);
             })
-            .spread((a, ab) => {
+            .then(([a, ab]) => {
               expect(a).to.eql(aOld);
               expect(ab).to.eql(
                 _.sortBy(abOld.concat([{ aid1: 1, aid2: '2', bid3: 1, bid4: '2' }]), [
@@ -1249,7 +1258,7 @@ module.exports = session => {
                 session.knex('A_B').orderBy(['bid3', 'bid4', 'aid1', 'aid2'])
               ]);
             })
-            .spread((b2, a, ab) => {
+            .then(([b2, a, ab]) => {
               aOld = a;
               abOld = ab;
 
@@ -1261,7 +1270,7 @@ module.exports = session => {
                 session.knex('A_B').orderBy(['bid3', 'bid4', 'aid1', 'aid2'])
               ]);
             })
-            .spread((a, ab) => {
+            .then(([a, ab]) => {
               expect(a).to.eql(aOld);
               expect(ab).to.eql(_.reject(abOld, { bid3: 1, bid4: '2' }));
             });

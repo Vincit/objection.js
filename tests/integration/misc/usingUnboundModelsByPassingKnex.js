@@ -442,40 +442,45 @@ module.exports = session => {
           return Model1.query().joinRelation('model1Relation1');
         }).reflect(),
 
-        Model1.query(session.knex)
-          .findById(1)
-          .then(model => {
-            return model.$relatedQuery('model1Relation1');
-          })
-          .reflect(),
+        Promise.try(() => {
+          return Model1.query(session.knex)
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation1');
+            });
+        }).reflect(),
 
-        Model1.query(session.knex)
-          .findById(2)
-          .then(model => {
-            return model.$relatedQuery('model1Relation1Inverse');
-          })
-          .reflect(),
+        Promise.try(() => {
+          return Model1.query(session.knex)
+            .findById(2)
+            .then(model => {
+              return model.$relatedQuery('model1Relation1Inverse');
+            });
+        }).reflect(),
 
-        Model1.query(session.knex)
-          .findById(1)
-          .then(model => {
-            return model.$relatedQuery('model1Relation2');
-          })
-          .reflect(),
+        Promise.try(() => {
+          return Model1.query(session.knex)
+            .findById(1)
+            .then(model => {
+              return model.$relatedQuery('model1Relation2');
+            });
+        }).reflect(),
 
-        Model2.query(session.knex)
-          .findById(2)
-          .then(model => {
-            return model.$relatedQuery('model2Relation1');
-          })
-          .reflect(),
+        Promise.try(() => {
+          return Model2.query(session.knex)
+            .findById(2)
+            .then(model => {
+              return model.$relatedQuery('model2Relation1');
+            });
+        }).reflect(),
 
-        Model1.query(session.knex)
-          .findById(1)
-          .then(model => {
-            return model.$query();
-          })
-          .reflect()
+        Promise.try(() => {
+          return Model1.query(session.knex)
+            .findById(1)
+            .then(model => {
+              return model.$query();
+            });
+        }).reflect()
       ]).then(results => {
         results.forEach(result => {
           expect(result.isRejected()).to.equal(true);

@@ -38,10 +38,8 @@ describe('main module', () => {
     expect(objection.ref).to.equal(require('../lib/queryBuilder/ReferenceBuilder').ref);
     expect(objection.raw).to.equal(require('../lib/queryBuilder/RawBuilder').raw);
     expect(objection.lit).to.equal(require('../lib/queryBuilder/LiteralBuilder').lit);
-    expect(objection.Promise).to.equal(require('bluebird'));
     expect(objection.mixin).to.equal(require('../lib/utils/mixin').mixin);
     expect(objection.compose).to.equal(require('../lib/utils/mixin').compose);
-    expect(objection.lodash).to.equal(require('lodash'));
     expect(Object.getPrototypeOf(objection.Validator)).to.equal(
       require('../lib/model/Validator').Validator
     );

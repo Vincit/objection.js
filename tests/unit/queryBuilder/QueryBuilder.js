@@ -2,7 +2,7 @@ const _ = require('lodash'),
   Knex = require('knex'),
   expect = require('expect.js'),
   chai = require('chai'),
-  Promise = require('bluebird'),
+  Bluebird = require('bluebird'),
   objection = require('../../../'),
   knexUtils = require('../../../lib/utils/knexUtils'),
   knexMocker = require('../../../testUtils/mockKnex'),
@@ -63,6 +63,7 @@ describe('QueryBuilder', () => {
     let ignore = [
       'and',
       'toSQL',
+      'bind',
       'timeout',
       'connection',
       'stream',
@@ -362,46 +363,6 @@ describe('QueryBuilder', () => {
     return promise;
   });
 
-  it('should return a promise from .map method', () => {
-    let promise = QueryBuilder.forClass(TestModel).map(_.identity);
-    expect(promise).to.be.a(Promise);
-    return promise;
-  });
-
-  it('should return a promise from .reduce method', () => {
-    let promise = QueryBuilder.forClass(TestModel).reduce(_.identity);
-    expect(promise).to.be.a(Promise);
-    return promise;
-  });
-
-  it('should return a promise from .return method', () => {
-    let promise = QueryBuilder.forClass(TestModel).return({});
-    expect(promise).to.be.a(Promise);
-    return promise;
-  });
-
-  it('should return a promise from .bind method', () => {
-    let promise = QueryBuilder.forClass(TestModel).bind({});
-    expect(promise).to.be.a(Promise);
-    return promise;
-  });
-
-  it('should pass node-style values to the asCallback method', done => {
-    mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
-    QueryBuilder.forClass(TestModel).asCallback((err, models) => {
-      expect(models).to.eql(mockKnexQueryResults[0]);
-      done();
-    });
-  });
-
-  it('should pass node-style values to the nodeify method', done => {
-    mockKnexQueryResults = [[{ a: 1 }, { a: 2 }]];
-    QueryBuilder.forClass(TestModel).nodeify((err, models) => {
-      expect(models).to.eql(mockKnexQueryResults[0]);
-      done();
-    });
-  });
-
   it('should return a promise from .catch method', () => {
     let promise = QueryBuilder.forClass(TestModel).catch(_.noop);
     expect(promise).to.be.a(Promise);
@@ -697,7 +658,7 @@ describe('QueryBuilder', () => {
       })
       .runBefore(() => {
         expect(mockKnexQueryResults[0]).to.equal(1);
-        return Promise.delay(1).return(++mockKnexQueryResults[0]);
+        return Bluebird.delay(1).return(++mockKnexQueryResults[0]);
       })
       .runBefore(() => {
         expect(mockKnexQueryResults[0]).to.equal(2);
@@ -705,7 +666,7 @@ describe('QueryBuilder', () => {
       })
       .runAfter(res => {
         expect(res).to.equal(3);
-        return Promise.delay(1).then(() => {
+        return Bluebird.delay(1).then(() => {
           return ++res;
         });
       })
@@ -1182,7 +1143,7 @@ describe('QueryBuilder', () => {
   it('update() should call $beforeUpdate on the model (async)', done => {
     TestModel.prototype.$beforeUpdate = function() {
       let self = this;
-      return Promise.delay(5).then(() => {
+      return Bluebird.delay(5).then(() => {
         self.c = 'beforeUpdate';
       });
     };
@@ -1229,7 +1190,7 @@ describe('QueryBuilder', () => {
   it('patch() should call $beforeUpdate on the model (async)', done => {
     TestModel.prototype.$beforeUpdate = function() {
       let self = this;
-      return Promise.delay(5).then(() => {
+      return Bluebird.delay(5).then(() => {
         self.c = 'beforeUpdate';
       });
     };
@@ -1275,7 +1236,7 @@ describe('QueryBuilder', () => {
   it('insert() should call $beforeInsert on the model (async)', done => {
     TestModel.prototype.$beforeInsert = function() {
       let self = this;
-      return Promise.delay(5).then(() => {
+      return Bluebird.delay(5).then(() => {
         self.c = 'beforeInsert';
       });
     };
@@ -1346,7 +1307,7 @@ describe('QueryBuilder', () => {
 
     TestModel.prototype.$afterGet = function(context) {
       let self = this;
-      return Promise.delay(10).then(() => {
+      return Bluebird.delay(10).then(() => {
         self.b = self.a * 2 + context.x;
       });
     };
@@ -1385,7 +1346,7 @@ describe('QueryBuilder', () => {
 
     TestModel.prototype.$afterGet = function(context) {
       let self = this;
-      return Promise.delay(10).then(() => {
+      return Bluebird.delay(10).then(() => {
         self.b = self.a * 2 + context.x;
       });
     };

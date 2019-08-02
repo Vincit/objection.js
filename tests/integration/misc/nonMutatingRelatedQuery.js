@@ -60,7 +60,7 @@ module.exports = session => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
           .then(model => {
-            return model.$relatedQuery('model1Relation1').return(model);
+            return model.$relatedQuery('model1Relation1').then(() => model);
           })
           .then(model => {
             expect(model.toJSON()).to.eql({
@@ -76,7 +76,7 @@ module.exports = session => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
           .then(model => {
-            return model.$relatedQuery('model1Relation2').return(model);
+            return model.$relatedQuery('model1Relation2').then(() => model);
           })
           .then(model => {
             expect(model.toJSON()).to.eql({
@@ -92,7 +92,7 @@ module.exports = session => {
         return ModelOne.query()
           .findOne({ model1Prop1: 'root' })
           .then(model => {
-            return model.$relatedQuery('model1Relation3').return(model);
+            return model.$relatedQuery('model1Relation3').then(() => model);
           })
           .then(model => {
             expect(model.toJSON()).to.eql({
@@ -113,7 +113,7 @@ module.exports = session => {
             return model
               .$relatedQuery('model1Relation1')
               .insert({ id: 10, model1Prop1: 'new' })
-              .return(model);
+              .then(() => model);
           })
           .then(model => {
             expect(model.toJSON()).to.eql({
@@ -132,7 +132,7 @@ module.exports = session => {
             return model
               .$relatedQuery('model1Relation2')
               .insert({ model2Prop1: 'new' })
-              .return(model);
+              .then(() => model);
           })
           .then(model => {
             expect(model.toJSON()).to.eql({
@@ -151,7 +151,7 @@ module.exports = session => {
             return model
               .$relatedQuery('model1Relation3')
               .insert({ model2Prop1: 'new' })
-              .return(model);
+              .then(() => model);
           })
           .then(model => {
             expect(model.toJSON()).to.eql({

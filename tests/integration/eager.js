@@ -2616,9 +2616,11 @@ module.exports = session => {
           .eager('model2Relation1(select)', {
             select: b => b.select('model1Prop1')
           })
-          .map(model => {
-            model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
-            return model;
+          .then(result => {
+            return result.map(model => {
+              model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
+              return model;
+            });
           })
           .then(models => {
             expect(models).to.eql([
@@ -2668,9 +2670,11 @@ module.exports = session => {
             select: b => b.select('model1Prop1')
           })
           .eager('model2Relation1(select)')
-          .map(model => {
-            model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
-            return model;
+          .then(result => {
+            return result.map(model => {
+              model.model2Relation1 = _.sortBy(model.model2Relation1, 'model1Prop1');
+              return model;
+            });
           })
           .then(models => {
             expect(models).to.eql([
