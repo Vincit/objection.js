@@ -44,7 +44,7 @@ class TestSession {
 
       static get namedFilters() {
         return {
-          'orderById': builder => builder.orderBy('Model1.id'),
+          orderById: builder => builder.orderBy('Model1.id'),
           'select:id': builder => builder.select(this.ref('id')),
           'select:model1Prop1': builder => builder.select('model1Prop1'),
           'select:model1Prop1Aliased': builder => builder.select('model1Prop1 as aliasedInFilter'),
@@ -192,7 +192,7 @@ class TestSession {
       ['$afterDelete', 1],
       ['$beforeUpdate', 1, (self, args) => (self.$beforeUpdateOptions = _.cloneDeep(args[0]))],
       ['$afterUpdate', 1, (self, args) => (self.$afterUpdateOptions = _.cloneDeep(args[0]))],
-      ['$afterGet', 1]
+      ['$afterFind', 1]
     ].forEach(hook => {
       Model1.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
       Model2.prototype[hook[0]] = createHook(hook[0], hook[1], hook[2]);
@@ -221,7 +221,8 @@ class TestSession {
         return knex.schema
           .createTable('Model1', table => {
             table.increments('id').primary();
-            table.integer('model1Id')
+            table
+              .integer('model1Id')
               .index()
               .unsigned()
               .references('Model1.id')
@@ -231,7 +232,8 @@ class TestSession {
           })
           .createTable('model2', table => {
             table.increments('id_col').primary();
-            table.integer('model1_id')
+            table
+              .integer('model1_id')
               .index()
               .unsigned()
               .references('Model1.id')

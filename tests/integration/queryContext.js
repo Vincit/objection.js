@@ -80,12 +80,12 @@ module.exports = session => {
       mockKnex.reset();
     });
 
-    it('should get passed to the $afterGet method', () => {
+    it('should get passed to the $afterFind method', () => {
       let Model = inheritModel(Model1);
       let context = { a: 1, b: '2' };
       let called = false;
 
-      Model.prototype.$afterGet = queryContext => {
+      Model.prototype.$afterFind = queryContext => {
         expect(queryContext).to.eql(context);
         expect(context.transaction).to.equal(undefined);
         expect(queryContext.transaction).to.equal(mockKnex);
@@ -506,21 +506,21 @@ module.exports = session => {
                   model1Prop1: 'hello 1',
                   model1Prop2: null,
                   computed: 'hello 1 computed1 after',
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
                   model1Relation1: {
                     id: 2,
                     model1Id: 3,
                     model1Prop1: 'hello 2',
                     model1Prop2: null,
                     computed: 'hello 2 computed1 after',
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
                     model1Relation1: {
                       id: 3,
                       model1Id: null,
                       model1Prop1: 'hello 3',
                       model1Prop2: null,
                       computed: 'hello 3 computed1 after',
-                      $afterGetCalled: 1
+                      $afterFindCalled: 1
                     },
                     model1Relation2: [
                       {
@@ -529,7 +529,7 @@ module.exports = session => {
                         model2Prop1: 'hejsan 1',
                         model2Prop2: 30,
                         computed: 'hejsan 1 computed2 after',
-                        $afterGetCalled: 1,
+                        $afterFindCalled: 1,
                         model2Relation1: [
                           {
                             id: 4,
@@ -537,7 +537,7 @@ module.exports = session => {
                             model1Prop1: 'hello 4',
                             model1Prop2: null,
                             computed: 'hello 4 computed1 after',
-                            $afterGetCalled: 1
+                            $afterFindCalled: 1
                           }
                         ]
                       },
@@ -548,7 +548,7 @@ module.exports = session => {
                         model2Prop2: 20,
                         computed: 'hejsan 2 computed2 after',
                         model2Relation1: [],
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }

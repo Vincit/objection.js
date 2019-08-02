@@ -33,4 +33,4 @@ In addition to these data formatting hooks, Model also has query lifecycle hooks
 * [$afterInsert](/api/model/instance-methods.html#afterinsert)
 * [$beforeDelete](/api/model/instance-methods.html#beforedelete)
 * [$afterDelete](/api/model/instance-methods.html#afterdelete)
-* [$afterGet](/api/model/instance-methods.html#afterget)
+* [$afterFind](/api/model/instance-methods.html#afterfind)

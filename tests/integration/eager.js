@@ -93,13 +93,13 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           }
         }
       ]);
@@ -115,13 +115,13 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           }
         }
       ]);
@@ -137,10 +137,10 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             model1Prop1: 'hello 2',
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           }
         }
       ]);
@@ -162,10 +162,10 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               model1Prop1: 'hello 2',
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           }
         ]);
@@ -182,19 +182,19 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 3,
               model1Id: 4,
               model1Prop1: 'hello 3',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           }
         }
@@ -208,19 +208,19 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 3,
               model1Id: 4,
               model1Prop1: 'hello 3',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           }
         }
@@ -234,19 +234,19 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1Inverse: {
               id: 1,
               model1Id: 2,
               model1Prop1: 'hello 1',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           }
         }
@@ -262,25 +262,25 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1: {
                 id: 3,
                 model1Id: 4,
                 model1Prop1: 'hello 3',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation1: {
                   id: 4,
                   model1Id: null,
                   model1Prop1: 'hello 4',
                   model1Prop2: null,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
                   model1Relation1: null
                 }
               }
@@ -298,19 +298,19 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 3,
               model1Id: 4,
               model1Prop1: 'hello 3',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           }
         }
@@ -331,20 +331,20 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
 
             aliased1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               aliased1: {
                 id: 3,
                 model1Id: 4,
                 model1Prop1: 'hello 3',
                 model1Prop2: null,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             }
           }
@@ -361,18 +361,18 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 2,
               model1Id: 3,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1: {
                 id: 3,
                 model1Id: 4,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation1: {
                   id: 4,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
                   model1Id: null,
                   model1Relation1: null
                 }
@@ -400,16 +400,16 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               model1Prop1: 'hello 2',
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1: {
                 model1Prop1: 'hello 3',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation1: {
                   model1Prop1: 'hello 4',
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
                   model1Relation1: null
                 }
               }
@@ -435,7 +435,7 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
 
           model1Relation2: [
             {
@@ -443,14 +443,14 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
 
               model2Relation2: {
                 id: 8,
                 model1Id: 9,
                 model1Prop1: 'hello 8',
                 model1Prop2: null,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             },
             {
@@ -458,7 +458,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 2',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model2Relation2: null
             }
           ]
@@ -476,7 +476,7 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
 
           model1Relation2: [
             {
@@ -484,21 +484,21 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
 
               model2Relation2: {
                 id: 8,
                 model1Id: 9,
                 model1Prop1: 'hello 8',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 9,
                   model1Id: null,
                   model1Prop1: 'hello 9',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               }
             },
@@ -507,7 +507,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 2',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model2Relation2: null
             }
           ]
@@ -525,14 +525,14 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
 
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           },
 
           model1Relation2: [
@@ -541,14 +541,14 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             },
             {
               idCol: 2,
               model1Id: 1,
               model2Prop1: 'hejsan 2',
               model2Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           ]
         }
@@ -567,14 +567,14 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
 
             model1Relation1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             },
 
             model1Relation2: [
@@ -582,13 +582,13 @@ module.exports = session => {
                 idCol: 2,
                 model1Id: 1,
                 model2Prop1: 'hejsan 2',
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               },
               {
                 idCol: 1,
                 model1Id: 1,
                 model2Prop1: 'hejsan 1',
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             ]
           }
@@ -615,14 +615,14 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
 
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           },
 
           model1Relation2: [
@@ -631,7 +631,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model2Relation1: []
             },
             {
@@ -639,7 +639,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 2',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
 
               model2Relation1: [
                 {
@@ -648,7 +648,7 @@ module.exports = session => {
                   model1Prop1: 'hello 5',
                   model1Prop2: null,
                   aliasedExtra: 'extra 5',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   id: 6,
@@ -656,7 +656,7 @@ module.exports = session => {
                   model1Prop1: 'hello 6',
                   model1Prop2: null,
                   aliasedExtra: 'extra 6',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]
             }
@@ -672,14 +672,14 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
 
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           },
 
           model1Relation2: [
@@ -688,7 +688,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model2Relation1: []
             },
             {
@@ -696,7 +696,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 2',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
 
               model2Relation1: [
                 {
@@ -705,7 +705,7 @@ module.exports = session => {
                   model1Prop1: 'hello 5',
                   model1Prop2: null,
                   aliasedExtra: 'extra 5',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   id: 6,
@@ -713,7 +713,7 @@ module.exports = session => {
                   model1Prop1: 'hello 6',
                   model1Prop2: null,
                   aliasedExtra: 'extra 6',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]
             }
@@ -729,14 +729,14 @@ module.exports = session => {
           model1Id: 2,
           model1Prop1: 'hello 1',
           model1Prop2: null,
-          $afterGetCalled: 1,
+          $afterFindCalled: 1,
 
           model1Relation1: {
             id: 2,
             model1Id: 3,
             model1Prop1: 'hello 2',
             model1Prop2: null,
-            $afterGetCalled: 1
+            $afterFindCalled: 1
           },
 
           model1Relation2: [
@@ -745,7 +745,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 1',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model2Relation1: []
             },
             {
@@ -753,7 +753,7 @@ module.exports = session => {
               model1Id: 1,
               model2Prop1: 'hejsan 2',
               model2Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
 
               model2Relation1: [
                 {
@@ -764,7 +764,7 @@ module.exports = session => {
                   aliasedExtra: 'extra 5',
                   model1Relation1: null,
                   model1Relation2: [],
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   id: 6,
@@ -772,14 +772,14 @@ module.exports = session => {
                   model1Prop1: 'hello 6',
                   model1Prop2: null,
                   aliasedExtra: 'extra 6',
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   model1Relation1: {
                     id: 7,
                     model1Id: null,
                     model1Prop1: 'hello 7',
                     model1Prop2: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
 
                   model1Relation2: [
@@ -788,7 +788,7 @@ module.exports = session => {
                       model1Id: 6,
                       model2Prop1: 'hejsan 3',
                       model2Prop2: null,
-                      $afterGetCalled: 1
+                      $afterFindCalled: 1
                     }
                   ]
                 }
@@ -817,12 +817,12 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
 
             model1Relation1: {
               id: 2,
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             },
 
             model1Relation2: [
@@ -831,7 +831,7 @@ module.exports = session => {
                 model1Id: 1,
                 model2Prop1: 'hejsan 1',
                 model2Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model2Relation1: []
               },
               {
@@ -839,25 +839,25 @@ module.exports = session => {
                 model1Id: 1,
                 model2Prop1: 'hejsan 2',
                 model2Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model2Relation1: [
                   {
                     model1Prop1: 'hello 5',
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model1Relation1: null,
                     model1Relation2: []
                   },
                   {
                     model1Prop1: 'hello 6',
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model1Relation1: {
                       id: 7,
                       model1Prop1: 'hello 7',
                       aliasedInFilter: 'hello 7',
-                      $afterGetCalled: 1
+                      $afterFindCalled: 1
                     },
 
                     model1Relation2: [
@@ -866,7 +866,7 @@ module.exports = session => {
                         model1Id: 6,
                         model2Prop1: 'hejsan 3',
                         model2Prop2: null,
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -896,13 +896,13 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           });
         });
@@ -934,13 +934,13 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           });
         });
@@ -959,13 +959,13 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           });
         });
@@ -993,10 +993,10 @@ module.exports = session => {
                   model1Id: 1,
                   model2Prop1: 'hejsan 1',
                   model2Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ],
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             },
             {
               id: 4,
@@ -1009,10 +1009,10 @@ module.exports = session => {
                   model1Id: 4,
                   model2Prop1: 'hejsan 4',
                   model2Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ],
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             },
             {
               id: 6,
@@ -1025,10 +1025,10 @@ module.exports = session => {
                   model1Id: 6,
                   model2Prop1: 'hejsan 3',
                   model2Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ],
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           ]);
         });
@@ -1047,13 +1047,13 @@ module.exports = session => {
             model1Id: 2,
             model1Prop1: 'hello 1',
             model1Prop2: null,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
             model1Relation1: {
               id: 2,
               model1Id: 3,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             }
           });
         });
@@ -1102,14 +1102,14 @@ module.exports = session => {
                   model1Prop1: 'hello 0',
                   model1Prop2: null,
                   model1Id: 1,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   model1Relation1: {
                     id: 1,
                     model1Prop1: 'hello 1',
                     model1Prop2: null,
                     model1Id: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
 
                   model1Relation2: [
@@ -1118,7 +1118,7 @@ module.exports = session => {
                       model2Prop1: 'hejsan 1',
                       model2Prop2: null,
                       model1Id: 0,
-                      $afterGetCalled: 1,
+                      $afterFindCalled: 1,
 
                       model2Relation1: [
                         {
@@ -1127,7 +1127,7 @@ module.exports = session => {
                           model1Prop2: null,
                           aliasedExtra: null,
                           model1Id: null,
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         }
                       ]
                     }
@@ -1155,35 +1155,35 @@ module.exports = session => {
           expect(res).to.eql({
             id: 1,
             model1Id: 2,
-            $afterGetCalled: 1,
+            $afterFindCalled: 1,
 
             model1Relation1: {
               id: 2,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             },
 
             model1Relation2: [
               {
                 idCol: 1,
                 model1Id: 1,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model2Relation1: []
               },
               {
                 idCol: 2,
                 model1Id: 1,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model2Relation1: [
                   {
                     id: 5,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
                     objectiontmpjoin0: 2
                   },
                   {
                     id: 6,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
                     objectiontmpjoin0: 2
                   }
                 ]
@@ -1303,14 +1303,14 @@ module.exports = session => {
               {
                 id: 1,
                 model1Prop1: 'hello 1',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
 
                 model1Relation2: [
@@ -1319,7 +1319,7 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
@@ -1328,7 +1328,7 @@ module.exports = session => {
                         model1Prop1: 'hello 6',
                         model1Prop2: null,
                         aliasedExtra: 'extra 6',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -1359,14 +1359,14 @@ module.exports = session => {
                   model1Prop2: null,
                   model1Id: 2,
                   rawThingy: 'hello 1 - 1',
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   model1Relation1: {
                     id: 2,
                     model1Id: 3,
                     model1Prop1: 'hello 2',
                     model1Prop2: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
 
                   model1Relation2: [
@@ -1375,7 +1375,7 @@ module.exports = session => {
                       model1Id: 1,
                       model2Prop1: 'hejsan 2',
                       model2Prop2: null,
-                      $afterGetCalled: 1,
+                      $afterFindCalled: 1,
 
                       model2Relation1: [
                         {
@@ -1384,7 +1384,7 @@ module.exports = session => {
                           model1Prop1: 'hello 6',
                           model1Prop2: null,
                           aliasedExtra: 'extra 6',
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         }
                       ]
                     }
@@ -1411,11 +1411,11 @@ module.exports = session => {
               expect(models).to.eql([
                 {
                   id: 1,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   model1Relation1: {
                     rawThingy: 'hello 2 - 4',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
 
                   model1Relation2: [
@@ -1424,7 +1424,7 @@ module.exports = session => {
                       model1Id: 1,
                       model2Prop1: 'hejsan 2',
                       model2Prop2: null,
-                      $afterGetCalled: 1,
+                      $afterFindCalled: 1,
 
                       model2Relation1: [
                         {
@@ -1433,7 +1433,7 @@ module.exports = session => {
                           model1Prop1: 'hello 6',
                           model1Prop2: null,
                           aliasedExtra: 'extra 6',
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         }
                       ]
                     }
@@ -1457,14 +1457,14 @@ module.exports = session => {
               {
                 theId: 1,
                 leProp: 'hello 1',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
 
                 model1Relation2: [
@@ -1473,7 +1473,7 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
@@ -1482,7 +1482,7 @@ module.exports = session => {
                         model1Prop1: 'hello 6',
                         model1Prop2: null,
                         aliasedExtra: 'extra 6',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -1505,49 +1505,49 @@ module.exports = session => {
               {
                 id: 1,
                 model1Prop1: 'hello 1',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation2: [
                   {
                     idCol: 1,
                     model1Id: 1,
                     model2Prop1: 'hejsan 1',
                     model2Prop2: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
                   {
                     idCol: 2,
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               },
               {
                 id: 4,
                 model1Prop1: 'hello 4',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation2: [
                   {
                     idCol: 4,
                     model1Id: 4,
                     model2Prop1: 'hejsan 4',
                     model2Prop2: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               },
               {
                 id: 6,
                 model1Prop1: 'hello 6',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation2: [
                   {
                     idCol: 3,
                     model1Id: 6,
                     model2Prop1: 'hejsan 3',
                     model2Prop2: null,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               }
@@ -1568,14 +1568,14 @@ module.exports = session => {
               {
                 id: 1,
                 model1Prop1: 'hello 1',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
 
                 model1Relation2: [
@@ -1584,7 +1584,7 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
@@ -1593,7 +1593,7 @@ module.exports = session => {
                         model1Prop1: 'hello 6',
                         model1Prop2: null,
                         aliasedExtra: 'extra 6',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -1617,14 +1617,14 @@ module.exports = session => {
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
 
                 model1Relation2: [
@@ -1633,7 +1633,7 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
@@ -1642,7 +1642,7 @@ module.exports = session => {
                         model1Prop1: 'hello 5',
                         model1Prop2: null,
                         aliasedExtra: 'extra 5',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       },
                       {
                         id: 6,
@@ -1650,7 +1650,7 @@ module.exports = session => {
                         model1Prop1: 'hello 6',
                         model1Prop2: null,
                         aliasedExtra: 'extra 6',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -1678,14 +1678,14 @@ module.exports = session => {
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
 
                 model1Relation2: [
@@ -1694,7 +1694,7 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
@@ -1703,7 +1703,7 @@ module.exports = session => {
                         model1Prop1: 'hello 5',
                         model1Prop2: null,
                         aliasedExtra: 'extra 5',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       },
                       {
                         id: 6,
@@ -1711,7 +1711,7 @@ module.exports = session => {
                         model1Prop1: 'hello 6',
                         model1Prop2: null,
                         aliasedExtra: 'extra 6',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -1758,25 +1758,25 @@ module.exports = session => {
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
                   model1Relation1: {
                     id: 3,
                     model1Id: 4,
                     model1Prop1: 'hello 3',
                     model1Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
                     model1Relation1: {
                       id: 4,
                       model1Id: null,
                       model1Prop1: 'hello 4',
                       model1Prop2: null,
-                      $afterGetCalled: 1,
+                      $afterFindCalled: 1,
                       model1Relation1: null
                     }
                   }
@@ -1894,14 +1894,14 @@ module.exports = session => {
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation1: {
                   id: 2,
                   model1Id: 3,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
 
                 model1Relation2: [
@@ -1910,7 +1910,7 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
@@ -1919,7 +1919,7 @@ module.exports = session => {
                         model1Prop1: 'hello 5',
                         model1Prop2: null,
                         aliasedExtra: 'extra 5',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       },
                       {
                         id: 6,
@@ -1927,7 +1927,7 @@ module.exports = session => {
                         model1Prop1: 'hello 6',
                         model1Prop2: null,
                         aliasedExtra: 'extra 6',
-                        $afterGetCalled: 1
+                        $afterFindCalled: 1
                       }
                     ]
                   }
@@ -1975,7 +1975,7 @@ module.exports = session => {
                 const model2 = models[0].model1Relation2.find(it => it.idCol === 2);
                 expect(Object.keys(model2.model2Relation1[0])).to.eql([
                   'model1Prop1',
-                  '$afterGetCalled'
+                  '$afterFindCalled'
                 ]);
               });
           })
@@ -1994,7 +1994,7 @@ module.exports = session => {
                 expect(Object.keys(models[0].model1Relation1)).to.eql([
                   'id',
                   'model1Prop1',
-                  '$afterGetCalled'
+                  '$afterFindCalled'
                 ]);
               });
           })
@@ -2031,40 +2031,40 @@ module.exports = session => {
                 expect(models).to.eql([
                   {
                     model1Prop1: 'hello 1',
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model1Relation2: [
                       {
                         model2Prop1: 'hejsan 1',
-                        $afterGetCalled: 1,
+                        $afterFindCalled: 1,
 
                         model2Relation1: []
                       },
                       {
                         model2Prop1: 'hejsan 2',
-                        $afterGetCalled: 1,
+                        $afterFindCalled: 1,
 
                         model2Relation1: [
                           {
                             model1Prop1: 'hello 5',
-                            $afterGetCalled: 1,
+                            $afterFindCalled: 1,
 
                             model1Relation1: null,
                             model1Relation2: []
                           },
                           {
                             model1Prop1: 'hello 6',
-                            $afterGetCalled: 1,
+                            $afterFindCalled: 1,
 
                             model1Relation1: {
                               model1Prop1: 'hello 7',
-                              $afterGetCalled: 1
+                              $afterFindCalled: 1
                             },
 
                             model1Relation2: [
                               {
                                 model2Prop1: 'hejsan 3',
-                                $afterGetCalled: 1
+                                $afterFindCalled: 1
                               }
                             ]
                           }
@@ -2107,12 +2107,12 @@ module.exports = session => {
             expect(models).to.eql([
               {
                 model1Prop1: 'hello 1',
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation2: [
                   {
                     model2Prop1: 'hejsan 1',
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
                     x1: 1,
                     x2: 1,
 
@@ -2120,14 +2120,14 @@ module.exports = session => {
                   },
                   {
                     model2Prop1: 'hejsan 2',
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
                     x1: 2,
                     x2: 1,
 
                     model2Relation1: [
                       {
                         model1Prop1: 'hello 5',
-                        $afterGetCalled: 1,
+                        $afterFindCalled: 1,
                         y1: 5,
                         y2: null,
 
@@ -2136,13 +2136,13 @@ module.exports = session => {
                       },
                       {
                         model1Prop1: 'hello 6',
-                        $afterGetCalled: 1,
+                        $afterFindCalled: 1,
                         y1: 6,
                         y2: 7,
 
                         model1Relation1: {
                           model1Prop1: 'hello 7',
-                          $afterGetCalled: 1,
+                          $afterFindCalled: 1,
                           y1: 7,
                           y2: null
                         },
@@ -2150,7 +2150,7 @@ module.exports = session => {
                         model1Relation2: [
                           {
                             model2Prop1: 'hejsan 3',
-                            $afterGetCalled: 1,
+                            $afterFindCalled: 1,
                             x1: 3,
                             x2: 6
                           }
@@ -2185,7 +2185,7 @@ module.exports = session => {
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
 
                 model1Relation2: [
                   {
@@ -2193,19 +2193,19 @@ module.exports = session => {
                     model1Id: 1,
                     model2Prop1: 'hejsan 2',
                     model2Prop2: null,
-                    $afterGetCalled: 1,
+                    $afterFindCalled: 1,
 
                     model2Relation1: [
                       {
                         model1Prop1: 'hello 6',
-                        $afterGetCalled: 1,
+                        $afterFindCalled: 1,
 
                         model1Relation1: {
                           id: 7,
                           model1Id: null,
                           model1Prop1: 'hello 7',
                           model1Prop2: null,
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         },
 
                         model1Relation2: [
@@ -2214,7 +2214,7 @@ module.exports = session => {
                             model1Id: 6,
                             model2Prop1: 'hejsan 3',
                             model2Prop2: null,
-                            $afterGetCalled: 1
+                            $afterFindCalled: 1
                           }
                         ]
                       }
@@ -2543,28 +2543,28 @@ module.exports = session => {
                 expect(models).to.eql([
                   {
                     model1Prop1: 'hello 8',
-                    model1Relation1: { model1Prop1: 'hello 9', $afterGetCalled: 1 },
-                    $afterGetCalled: 1
+                    model1Relation1: { model1Prop1: 'hello 9', $afterFindCalled: 1 },
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 6',
-                    model1Relation1: { model1Prop1: 'hello 7', $afterGetCalled: 1 },
-                    $afterGetCalled: 1
+                    model1Relation1: { model1Prop1: 'hello 7', $afterFindCalled: 1 },
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 3',
-                    model1Relation1: { model1Prop1: 'hello 4', $afterGetCalled: 1 },
-                    $afterGetCalled: 1
+                    model1Relation1: { model1Prop1: 'hello 4', $afterFindCalled: 1 },
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 2',
-                    model1Relation1: { model1Prop1: 'hello 3', $afterGetCalled: 1 },
-                    $afterGetCalled: 1
+                    model1Relation1: { model1Prop1: 'hello 3', $afterFindCalled: 1 },
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 1',
-                    model1Relation1: { model1Prop1: 'hello 2', $afterGetCalled: 1 },
-                    $afterGetCalled: 1
+                    model1Relation1: { model1Prop1: 'hello 2', $afterFindCalled: 1 },
+                    $afterFindCalled: 1
                   }
                 ]);
               });
@@ -2629,15 +2629,15 @@ module.exports = session => {
                 model1Id: null,
                 model2Prop1: 'hejsan 1',
                 model2Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model2Relation1: [
                   {
                     model1Prop1: 'hello 5',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 6',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               },
@@ -2646,15 +2646,15 @@ module.exports = session => {
                 model1Id: null,
                 model2Prop1: 'hejsan 2',
                 model2Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model2Relation1: [
                   {
                     model1Prop1: 'hello 7',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 8',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               }
@@ -2683,15 +2683,15 @@ module.exports = session => {
                 model1Id: null,
                 model2Prop1: 'hejsan 1',
                 model2Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model2Relation1: [
                   {
                     model1Prop1: 'hello 5',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 6',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               },
@@ -2700,15 +2700,15 @@ module.exports = session => {
                 model1Id: null,
                 model2Prop1: 'hejsan 2',
                 model2Prop2: null,
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 model2Relation1: [
                   {
                     model1Prop1: 'hello 7',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
                   {
                     model1Prop1: 'hello 8',
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 ]
               }
@@ -2825,44 +2825,44 @@ module.exports = session => {
 
                 expect(model).to.eql({
                   id: 1,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   a: {
                     id: 2,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   },
 
                   b: [
                     {
                       idCol: 1,
-                      $afterGetCalled: 1,
+                      $afterFindCalled: 1,
 
                       c: [],
                       d: []
                     },
                     {
                       idCol: 2,
-                      $afterGetCalled: 1,
+                      $afterFindCalled: 1,
 
                       c: [
                         {
                           id: 5,
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         },
                         {
                           id: 6,
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         }
                       ],
 
                       d: [
                         {
                           id: 5,
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         },
                         {
                           id: 6,
-                          $afterGetCalled: 1
+                          $afterFindCalled: 1
                         }
                       ]
                     }
@@ -2899,33 +2899,33 @@ module.exports = session => {
 
             expect(model).to.eql({
               id: 1,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
 
               a: {
                 id: 2,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               },
 
               b: [
                 {
                   idCol: 2,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   c: [
                     {
                       id: 5,
-                      $afterGetCalled: 1
+                      $afterFindCalled: 1
                     },
                     {
                       id: 6,
-                      $afterGetCalled: 1
+                      $afterFindCalled: 1
                     }
                   ],
 
                   d: [
                     {
                       id: 6,
-                      $afterGetCalled: 1
+                      $afterFindCalled: 1
                     }
                   ]
                 }
@@ -2949,11 +2949,11 @@ module.exports = session => {
               .then(model => {
                 expect(model).to.eql({
                   id: 1,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   a: {
                     id: 2,
-                    $afterGetCalled: 1
+                    $afterFindCalled: 1
                   }
                 });
               });

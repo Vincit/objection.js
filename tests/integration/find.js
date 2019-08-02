@@ -110,13 +110,13 @@ module.exports = session => {
               expect(models[0]).to.be.a(Model2);
               // Test that only the selected columns (and stuff set by the $afterGet hook)  were returned.
               expect(_.uniq(_.flattenDeep(_.map(models, _.keys))).sort()).to.eql([
-                '$afterGetCalled',
+                '$afterFindCalled',
                 'idCol',
                 'model2Prop2'
               ]);
               expect(_.map(models, 'idCol').sort()).to.eql([1, 2, 3]);
               expect(_.map(models, 'model2Prop2').sort()).to.eql([10, 20, 30]);
-              expect(_.map(models, '$afterGetCalled').sort()).to.eql([1, 1, 1]);
+              expect(_.map(models, '$afterFindCalled').sort()).to.eql([1, 1, 1]);
             });
         });
 
@@ -200,9 +200,9 @@ module.exports = session => {
             .orderBy('model2.id_col')
             .then(result => {
               expect(result).to.eql([
-                { model1Id: 1, model2Id: 1, $afterGetCalled: 1 },
-                { model1Id: 1, model2Id: 2, $afterGetCalled: 1 },
-                { model1Id: 1, model2Id: 3, $afterGetCalled: 1 }
+                { model1Id: 1, model2Id: 1, $afterFindCalled: 1 },
+                { model1Id: 1, model2Id: 2, $afterFindCalled: 1 },
+                { model1Id: 1, model2Id: 3, $afterFindCalled: 1 }
               ]);
             });
         });
@@ -671,7 +671,7 @@ module.exports = session => {
                 model2Prop1: 'hejsan 3',
                 model2Prop2: 10,
                 concatProp: 'hejsan 310',
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               });
             });
         });
@@ -966,21 +966,21 @@ module.exports = session => {
                   model1Id: 1,
                   model2Prop1: 'hejsan 1',
                   model2Prop2: 30,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   idCol: 2,
                   model1Id: 1,
                   model2Prop1: 'hejsan 2',
                   model2Prop2: 20,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   idCol: 3,
                   model1Id: 1,
                   model2Prop1: 'hejsan 3',
                   model2Prop2: 10,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]);
             });
@@ -1196,10 +1196,10 @@ module.exports = session => {
           .orderBy('id')
           .then(res => {
             expect(res).to.eql([
-              { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel1Count: 1, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
-              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 },
-              { id: 4, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+              { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterFindCalled: 1 },
+              { id: 2, rel1Count: 1, rel2Count: '1', rel3Count: '2', $afterFindCalled: 1 },
+              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterFindCalled: 1 },
+              { id: 4, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1225,10 +1225,10 @@ module.exports = session => {
           .orderBy('id')
           .then(res => {
             expect(res).to.eql([
-              { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterGetCalled: 1 },
-              { id: 2, rel1Count: 1, rel2Count: '1', rel3Count: '2', $afterGetCalled: 1 },
-              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 },
-              { id: 4, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterGetCalled: 1 }
+              { id: 1, rel1Count: 1, rel2Count: '2', rel3Count: '1', $afterFindCalled: 1 },
+              { id: 2, rel1Count: 1, rel2Count: '1', rel3Count: '2', $afterFindCalled: 1 },
+              { id: 3, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterFindCalled: 1 },
+              { id: 4, rel1Count: 0, rel2Count: '0', rel3Count: '0', $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1244,10 +1244,10 @@ module.exports = session => {
           .orderBy('id')
           .then(res => {
             expect(res).to.eql([
-              { id: 1, relId: 3, $afterGetCalled: 1 },
-              { id: 2, relId: 4, $afterGetCalled: 1 },
-              { id: 3, relId: null, $afterGetCalled: 1 },
-              { id: 4, relId: null, $afterGetCalled: 1 }
+              { id: 1, relId: 3, $afterFindCalled: 1 },
+              { id: 2, relId: 4, $afterFindCalled: 1 },
+              { id: 3, relId: null, $afterFindCalled: 1 },
+              { id: 4, relId: null, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1265,10 +1265,10 @@ module.exports = session => {
           .orderBy('id')
           .then(res => {
             expect(res).to.eql([
-              { id: 1, relId: 3, $afterGetCalled: 1 },
-              { id: 2, relId: 4, $afterGetCalled: 1 },
-              { id: 3, relId: null, $afterGetCalled: 1 },
-              { id: 4, relId: null, $afterGetCalled: 1 }
+              { id: 1, relId: 3, $afterFindCalled: 1 },
+              { id: 2, relId: 4, $afterFindCalled: 1 },
+              { id: 3, relId: null, $afterFindCalled: 1 },
+              { id: 4, relId: null, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1524,14 +1524,14 @@ module.exports = session => {
             .orderBy('Model1.id')
             .then(models => {
               expect(models).to.eql([
-                { id: 1, rel_model1Prop1: 'hello 2', $afterGetCalled: 1 },
-                { id: 2, rel_model1Prop1: 'hello 3', $afterGetCalled: 1 },
-                { id: 3, rel_model1Prop1: 'hello 4', $afterGetCalled: 1 },
-                { id: 4, rel_model1Prop1: null, $afterGetCalled: 1 },
-                { id: 5, rel_model1Prop1: null, $afterGetCalled: 1 },
-                { id: 6, rel_model1Prop1: null, $afterGetCalled: 1 },
-                { id: 7, rel_model1Prop1: 'hello 8', $afterGetCalled: 1 },
-                { id: 8, rel_model1Prop1: null, $afterGetCalled: 1 }
+                { id: 1, rel_model1Prop1: 'hello 2', $afterFindCalled: 1 },
+                { id: 2, rel_model1Prop1: 'hello 3', $afterFindCalled: 1 },
+                { id: 3, rel_model1Prop1: 'hello 4', $afterFindCalled: 1 },
+                { id: 4, rel_model1Prop1: null, $afterFindCalled: 1 },
+                { id: 5, rel_model1Prop1: null, $afterFindCalled: 1 },
+                { id: 6, rel_model1Prop1: null, $afterFindCalled: 1 },
+                { id: 7, rel_model1Prop1: 'hello 8', $afterFindCalled: 1 },
+                { id: 8, rel_model1Prop1: null, $afterFindCalled: 1 }
               ]);
             });
         });
@@ -1549,10 +1549,10 @@ module.exports = session => {
           .orderBy(['id', 'm2r2Id'])
           .then(models => {
             expect(models).to.eql([
-              { id: 1, m2r2Id: 1, $afterGetCalled: 1 },
-              { id: 1, m2r2Id: 2, $afterGetCalled: 1 },
-              { id: 4, m2r2Id: 4, $afterGetCalled: 1 },
-              { id: 7, m2r2Id: 3, $afterGetCalled: 1 }
+              { id: 1, m2r2Id: 1, $afterFindCalled: 1 },
+              { id: 1, m2r2Id: 2, $afterFindCalled: 1 },
+              { id: 4, m2r2Id: 4, $afterFindCalled: 1 },
+              { id: 7, m2r2Id: 3, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1572,10 +1572,10 @@ module.exports = session => {
           .orderBy(['id', 'm2r2Id'])
           .then(models => {
             expect(models).to.eql([
-              { id: 1, m2r2Id: 1, $afterGetCalled: 1 },
-              { id: 1, m2r2Id: 2, $afterGetCalled: 1 },
-              { id: 4, m2r2Id: 4, $afterGetCalled: 1 },
-              { id: 7, m2r2Id: 3, $afterGetCalled: 1 }
+              { id: 1, m2r2Id: 1, $afterFindCalled: 1 },
+              { id: 1, m2r2Id: 2, $afterFindCalled: 1 },
+              { id: 4, m2r2Id: 4, $afterFindCalled: 1 },
+              { id: 7, m2r2Id: 3, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1754,21 +1754,21 @@ module.exports = session => {
                   m1r1Id: 2,
                   m1r2Id: 1,
                   m1r2M2r1Id: 5,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   id: 1,
                   m1r1Id: 2,
                   m1r2Id: 2,
                   m1r2M2r1Id: 6,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   id: 1,
                   m1r1Id: 2,
                   m1r2Id: 2,
                   m1r2M2r1Id: 7,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]);
             })
@@ -1787,10 +1787,10 @@ module.exports = session => {
           .orderBy('Model1.id')
           .then(models => {
             expect(models).to.eql([
-              { id: 1, m1r1Id: 2, m1r1Id2: 2, $afterGetCalled: 1 },
-              { id: 2, m1r1Id: 3, m1r1Id2: 3, $afterGetCalled: 1 },
-              { id: 3, m1r1Id: 4, m1r1Id2: 4, $afterGetCalled: 1 },
-              { id: 7, m1r1Id: 8, m1r1Id2: 8, $afterGetCalled: 1 }
+              { id: 1, m1r1Id: 2, m1r1Id2: 2, $afterFindCalled: 1 },
+              { id: 2, m1r1Id: 3, m1r1Id2: 3, $afterFindCalled: 1 },
+              { id: 3, m1r1Id: 4, m1r1Id2: 4, $afterFindCalled: 1 },
+              { id: 7, m1r1Id: 8, m1r1Id2: 8, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1803,10 +1803,10 @@ module.exports = session => {
           .orderBy('Model1.id')
           .then(models => {
             expect(models).to.eql([
-              { id: 1, m1r1Id: 2, m1r1Id2: 2, $afterGetCalled: 1 },
-              { id: 2, m1r1Id: 3, m1r1Id2: 3, $afterGetCalled: 1 },
-              { id: 3, m1r1Id: 4, m1r1Id2: 4, $afterGetCalled: 1 },
-              { id: 7, m1r1Id: 8, m1r1Id2: 8, $afterGetCalled: 1 }
+              { id: 1, m1r1Id: 2, m1r1Id2: 2, $afterFindCalled: 1 },
+              { id: 2, m1r1Id: 3, m1r1Id2: 3, $afterFindCalled: 1 },
+              { id: 3, m1r1Id: 4, m1r1Id2: 4, $afterFindCalled: 1 },
+              { id: 7, m1r1Id: 8, m1r1Id2: 8, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1821,11 +1821,11 @@ module.exports = session => {
           .orderBy(['Model1.id', 'model1Relation2.id_col'])
           .then(models => {
             expect(models).to.eql([
-              { id: 1, m1r1Id: 2, m1r2Id: 1, $afterGetCalled: 1 },
-              { id: 1, m1r1Id: 2, m1r2Id: 2, $afterGetCalled: 1 },
-              { id: 2, m1r1Id: 3, m1r2Id: null, $afterGetCalled: 1 },
-              { id: 3, m1r1Id: 4, m1r2Id: null, $afterGetCalled: 1 },
-              { id: 7, m1r1Id: 8, m1r2Id: 3, $afterGetCalled: 1 }
+              { id: 1, m1r1Id: 2, m1r2Id: 1, $afterFindCalled: 1 },
+              { id: 1, m1r1Id: 2, m1r2Id: 2, $afterFindCalled: 1 },
+              { id: 2, m1r1Id: 3, m1r2Id: null, $afterFindCalled: 1 },
+              { id: 3, m1r1Id: 4, m1r2Id: null, $afterFindCalled: 1 },
+              { id: 7, m1r1Id: 8, m1r2Id: 3, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -1846,10 +1846,10 @@ module.exports = session => {
           .orderBy('Model1.id')
           .then(models => {
             expect(models).to.eql([
-              { id: 1, m1r1Id: 2, m1r1Id2: 2, $afterGetCalled: 1 },
-              { id: 2, m1r1Id: 3, m1r1Id2: 3, $afterGetCalled: 1 },
-              { id: 3, m1r1Id: 4, m1r1Id2: 4, $afterGetCalled: 1 },
-              { id: 7, m1r1Id: 8, m1r1Id2: 8, $afterGetCalled: 1 }
+              { id: 1, m1r1Id: 2, m1r1Id2: 2, $afterFindCalled: 1 },
+              { id: 2, m1r1Id: 3, m1r1Id2: 3, $afterFindCalled: 1 },
+              { id: 3, m1r1Id: 4, m1r1Id2: 4, $afterFindCalled: 1 },
+              { id: 7, m1r1Id: 8, m1r1Id2: 8, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -2023,7 +2023,7 @@ module.exports = session => {
               {
                 idCol: 8,
                 model1Id: 7,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             ]);
           });
@@ -2066,8 +2066,8 @@ module.exports = session => {
           })
           .then(res => {
             expect(res).to.eql([
-              { id: 1, model1Prop1: 'hello 1', relCount: 2, $afterGetCalled: 1 },
-              { id: 2, model1Prop1: 'hello 2', relCount: 1, $afterGetCalled: 1 }
+              { id: 1, model1Prop1: 'hello 1', relCount: 2, $afterFindCalled: 1 },
+              { id: 2, model1Prop1: 'hello 2', relCount: 1, $afterFindCalled: 1 }
             ]);
           });
       });
@@ -2247,7 +2247,7 @@ module.exports = session => {
               model1Id: null,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             });
           });
         });
@@ -2259,7 +2259,7 @@ module.exports = session => {
               .select('id')
               .then(related => {
                 expect(related).to.be.a(Model1);
-                expect(_.keys(related).sort()).to.eql(['$afterGetCalled', 'id']);
+                expect(_.keys(related).sort()).to.eql(['$afterFindCalled', 'id']);
               });
           });
 
@@ -2273,7 +2273,7 @@ module.exports = session => {
                   model1Id: null,
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               });
           });
@@ -2291,7 +2291,7 @@ module.exports = session => {
                   model1Prop1: 'hello 2',
                   model1Prop2: null,
                   parentProp1: 'hello 1',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               });
           });
@@ -2373,7 +2373,7 @@ module.exports = session => {
                   model1Id: parent1.id,
                   model2Prop1: 'text 1',
                   model2Prop2: 6,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               }),
             parent2
@@ -2391,7 +2391,7 @@ module.exports = session => {
                   model1Id: parent2.id,
                   model2Prop1: 'text 4',
                   model2Prop2: 3,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               })
           ]);
@@ -2409,7 +2409,7 @@ module.exports = session => {
                 expect(related[2]).to.be.a(Model2);
                 expect(_.map(related, 'idCol').sort()).to.eql([1, 2, 3]);
                 expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql([
-                  '$afterGetCalled',
+                  '$afterFindCalled',
                   'idCol'
                 ]);
               });
@@ -2483,7 +2483,7 @@ module.exports = session => {
                   model2Prop1: 'text 6',
                   model2Prop2: 1,
                   parentProp1: parent2.model1Prop1,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               });
           });
@@ -2581,7 +2581,7 @@ module.exports = session => {
                   model1Prop1: 'blaa 1',
                   model1Prop2: 6,
                   aliasedExtra: null,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               }),
             parent2
@@ -2601,7 +2601,7 @@ module.exports = session => {
                   model1Prop1: 'blaa 4',
                   model1Prop2: 3,
                   aliasedExtra: 'extra 4',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 });
               })
           ]);
@@ -2633,7 +2633,7 @@ module.exports = session => {
                   model1Prop1: 'blaa 6',
                   model1Prop2: 1,
                   aliasedExtra: 'extra 6',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]);
             });
@@ -2652,7 +2652,7 @@ module.exports = session => {
                   model1Prop1: 'blaa 6',
                   model1Prop2: 1,
                   aliasedExtra: 'extra 6',
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]);
             });
@@ -2670,7 +2670,7 @@ module.exports = session => {
                 expect(related[2]).to.be.a(Model1);
                 expect(_.map(related, 'id').sort()).to.eql([3, 4, 5]);
                 expect(_.uniq(_.flattenDeep(_.map(related, _.keys))).sort()).to.eql([
-                  '$afterGetCalled',
+                  '$afterFindCalled',
                   'id'
                 ]);
               });
@@ -2773,7 +2773,7 @@ module.exports = session => {
               model1Id: null,
               model1Prop1: 'blaa 1',
               model1Prop2: 6,
-              $afterGetCalled: 1
+              $afterFindCalled: 1
             });
           });
         });

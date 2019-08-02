@@ -3712,7 +3712,7 @@ module.exports = session => {
                 chai.expect(result).to.containSubset({
                   id: 2,
                   model1Id: 3,
-                  $afterGetCalled: 1,
+                  $afterFindCalled: 1,
 
                   model1Relation1: {
                     id: 3,
@@ -3779,7 +3779,7 @@ module.exports = session => {
   }
 
   function omitIrrelevantProps(model) {
-    const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterGetCalled'];
+    const delProps = ['model1Prop2', 'model2Prop2', 'aliasedExtra', '$afterFindCalled'];
 
     Model1.traverse(model, model => {
       delProps.forEach(prop => delete model[prop]);

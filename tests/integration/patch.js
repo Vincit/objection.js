@@ -421,14 +421,14 @@ module.exports = session => {
                   model1Id: 1,
                   model2Prop1: 'text 1',
                   model2Prop2: 2,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   idCol: 2,
                   model1Id: 1,
                   model2Prop1: 'text 2',
                   model2Prop2: 1,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]
             });
@@ -466,12 +466,12 @@ module.exports = session => {
                 {
                   idCol: 1,
                   model1Id: 1,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 },
                 {
                   idCol: 2,
                   model1Id: 1,
-                  $afterGetCalled: 1
+                  $afterFindCalled: 1
                 }
               ]
             });
@@ -2239,7 +2239,7 @@ module.exports = session => {
             expect(beforeUpdateOpt).to.eql({
               patch: true,
               old: {
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 id: 1,
                 model1Id: 2,
                 model1Prop1: 'hello 1',
@@ -2251,7 +2251,7 @@ module.exports = session => {
             expect(afterUpdateOpt).to.eql({
               patch: true,
               old: {
-                $afterGetCalled: 1,
+                $afterFindCalled: 1,
                 id: 1,
                 model1Id: 2,
                 model1Prop1: 'hello 1',

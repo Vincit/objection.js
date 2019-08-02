@@ -36,7 +36,7 @@ Sets/gets the query context.
 
 Some query builder methods create more than one query. The query context is an object that is shared with all queries started by a query builder.
 
-The context is also passed to [$beforeInsert](/api/model/instance-methods.html#beforeinsert), [$afterInsert](/api/model/instance-methods.html#afterinsert), [$beforeUpdate](/api/model/instance-methods.html#beforeupdate), [$afterUpdate](/api/model/instance-methods.html#afterupdate), [$beforeDelete](/api/model/instance-methods.html#beforedelete), [$afterDelete](/api/model/instance-methods.html#afterdelete) and [$afterGet](/api/model/instance-methods.html#afterget) calls that the query creates.
+The context is also passed to [$beforeInsert](/api/model/instance-methods.html#beforeinsert), [$afterInsert](/api/model/instance-methods.html#afterinsert), [$beforeUpdate](/api/model/instance-methods.html#beforeupdate), [$afterUpdate](/api/model/instance-methods.html#afterupdate), [$beforeDelete](/api/model/instance-methods.html#beforedelete), [$afterDelete](/api/model/instance-methods.html#afterdelete) and [$afterFind](/api/model/instance-methods.html#afterfind) calls that the query creates.
 
 In addition to properties added using this method (and [mergeContext](/api/query-builder/other-methods.html#mergecontext)) the query context object always has a `transaction` property that holds the active transaction. If there is no active transaction the `transaction` property contains the normal knex instance. In both cases the value can be passed anywhere where a transaction object can be passed so you never need to check for the existence of the `transaction` property.
 

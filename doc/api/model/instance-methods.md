@@ -531,9 +531,15 @@ class Person extends Model {
 
 ## $afterGet()
 
+::: warning
+Deprecated! Will be removed in version 3.0. Use [$afterFind](#afterfind) instead.
+:::
+
+## $afterFind()
+
 ```js
 class Person extends Model {
-  $afterGet(queryContext) {
+  $afterFind(queryContext) {
     return doPossiblyAsyncStuff();
   }
 }
@@ -563,7 +569,7 @@ The current query's transaction/knex instance can always be accessed through `qu
 
 ```js
 class Person extends Model {
-  $afterGet(queryContext) {
+  $afterFind(queryContext) {
     // This can always be done even if there is no running transaction.
     // In that case `queryContext.transaction` returns the normal knex
     // instance. This makes sure that the query is not executed outside

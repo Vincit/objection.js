@@ -37,13 +37,13 @@ module.exports = session => {
               model1Id: 2,
               model1Prop1: 'hello 1',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1: {
                 id: 2,
                 model1Id: null,
                 model1Prop1: 'hello 2',
                 model1Prop2: null,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             },
             {
@@ -51,13 +51,13 @@ module.exports = session => {
               model1Id: 4,
               model1Prop1: 'hello 1',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1: {
                 id: 4,
                 model1Id: null,
                 model1Prop1: 'hello 2',
                 model1Prop2: null,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             }
           ]);
@@ -75,13 +75,13 @@ module.exports = session => {
               model1Id: null,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1Inverse: {
                 id: 1,
                 model1Id: 2,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             },
             {
@@ -89,13 +89,13 @@ module.exports = session => {
               model1Id: null,
               model1Prop1: 'hello 2',
               model1Prop2: null,
-              $afterGetCalled: 1,
+              $afterFindCalled: 1,
               model1Relation1Inverse: {
                 id: 3,
                 model1Id: 4,
                 model1Prop1: 'hello 1',
                 model1Prop2: null,
-                $afterGetCalled: 1
+                $afterFindCalled: 1
               }
             }
           ]);
