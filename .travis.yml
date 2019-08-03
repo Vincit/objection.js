@@ -33,3 +33,6 @@ notifications:
 
 addons:
   postgresql: '9.5'
+
+services:
+  - mysql
