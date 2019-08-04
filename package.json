@@ -61,7 +61,8 @@
   ],
   "types": "./typings/objection/index.d.ts",
   "dependencies": {
-    "ajv": "^6.10.0"
+    "ajv": "^6.10.0",
+    "db-errors": "^0.2.3"
   },
   "peerDependencies": {
     "knex": "0.x"

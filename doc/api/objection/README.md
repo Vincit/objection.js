@@ -415,3 +415,59 @@ const { NotFoundError } = require('objection');
 ```
 
 The [NotFoundError](/api/types/#class-notfounderror) class.
+
+## DBError
+
+```js
+const { DBError } = require('objection');
+```
+
+The [DBError](https://github.com/Vincit/db-errors#dberror) from [db-errors](https://github.com/Vincit/db-errors) library.
+
+## ConstraintViolationError
+
+```js
+const { ConstraintViolationError } = require('objection');
+```
+
+The [ConstraintViolationError](https://github.com/Vincit/db-errors#constraintviolationerror) from [db-errors](https://github.com/Vincit/db-errors) library.
+
+## UniqueViolationError
+
+```js
+const { UniqueViolationError } = require('objection');
+```
+
+The [UniqueViolationError](https://github.com/Vincit/db-errors#uniqueviolationerror) from [db-errors](https://github.com/Vincit/db-errors) library.
+
+## NotNullViolationError
+
+```js
+const { NotNullViolationError } = require('objection');
+```
+
+The [NotNullViolationError](https://github.com/Vincit/db-errors#notnullviolationerror) from [db-errors](https://github.com/Vincit/db-errors) library.
+
+## ForeignKeyViolationError
+
+```js
+const { ForeignKeyViolationError } = require('objection');
+```
+
+The [ForeignKeyViolationError](https://github.com/Vincit/db-errors#foreignkeyviolationerror) from [db-errors](https://github.com/Vincit/db-errors) library.
+
+## CheckViolationError
+
+```js
+const { CheckViolationError } = require('objection');
+```
+
+The [CheckViolationError](https://github.com/Vincit/db-errors#checkviolationerror) from [db-errors](https://github.com/Vincit/db-errors) library.
+
+## DataError
+
+```js
+const { DataError } = require('objection');
+```
+
+The [DataError](https://github.com/Vincit/db-errors#dataerror) from [db-errors](https://github.com/Vincit/db-errors) library.

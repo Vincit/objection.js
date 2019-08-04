@@ -5,7 +5,6 @@ A curated list of plugins and modules for objection. Only plugins that follow [t
 ## 3rd party plugins
 
   * [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for your models
-  * [objection-db-errors](https://github.com/Vincit/objection-db-errors) - better database errors for your queries
   * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
   * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
   * [objection-soft-delete](https://github.com/griffinpp/objection-soft-delete) - Soft delete functionality with minimal configuration

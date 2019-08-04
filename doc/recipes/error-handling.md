@@ -9,23 +9,19 @@ Objection throws four kinds of errors:
 2. [NotFoundError](/api/types/#class-notfounderror) when [throwIfNotFound](/api/query-builder/other-methods.html#throwifnotfound) was called for a query and no
     results were found.
 
-3. Database errors (unique violation error etc.) are thrown by the database client libraries and the error types depend on the
-    library. You can use the [objection-db-errors](https://github.com/Vincit/objection-db-errors) plugin to handle these.
+3. Database errors as defined by the [db-errors library](https://github.com/Vincit/db-errors). You can access the error classes through objection. See the example.
 
 4. A basic JavaScript `Error` when a programming or logic error is detected. In these cases there is nothing the users
     can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
 
 ## Examples
 
-An example error handler function that handles all possible errors. This example uses the [objection-db-errors](https://github.com/Vincit/objection-db-errors) library. Note that you should never send the errors directly to the client as they may contain SQL and other information that reveals too much about the inner workings of your app.
+An example error handler function that handles all possible errors. Note that you should never send the errors directly to the client as they may contain SQL and other information that reveals too much about the inner workings of your app.
 
 ```js
 const {
   ValidationError,
-  NotFoundError
-} = require('objection');
-
-const {
+  NotFoundError,
   DBError,
   ConstraintViolationError,
   UniqueViolationError,
@@ -33,7 +29,7 @@ const {
   ForeignKeyViolationError,
   CheckViolationError,
   DataError
-} = require('objection-db-errors');
+} = require('objection');
 
 // In this example `res` is an express response object.
 function errorHandler(err, res) {

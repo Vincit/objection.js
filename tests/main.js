@@ -50,5 +50,15 @@ describe('main module', () => {
     expect(Object.getPrototypeOf(objection.QueryBuilder)).to.equal(
       require('../lib/queryBuilder/QueryBuilder').QueryBuilder
     );
+    expect(objection.DBError).to.equal(require('db-errors').DBError);
+    expect(objection.UniqueViolationError).to.equal(require('db-errors').UniqueViolationError);
+    expect(objection.ConstraintViolationError).to.equal(
+      require('db-errors').ConstraintViolationError
+    );
+    expect(objection.ForeignKeyViolationError).to.equal(
+      require('db-errors').ForeignKeyViolationError
+    );
+    expect(objection.NotNullViolationError).to.equal(require('db-errors').NotNullViolationError);
+    expect(objection.DataError).to.equal(require('db-errors').DataError);
   });
 });

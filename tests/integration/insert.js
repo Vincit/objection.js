@@ -3,7 +3,7 @@ const chai = require('chai');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const { inheritModel } = require('../../lib/model/inheritModel');
-const { ValidationError } = require('../../');
+const { ValidationError, UniqueViolationError } = require('../../');
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -50,6 +50,15 @@ module.exports = session => {
           .then(rows => {
             expect(_.map(rows, 'model1Prop1').sort()).to.eql(['hello 1', 'hello 2', 'hello 3']);
           });
+      });
+
+      it('should throw a UniqueViolationError when existing id is given', async () => {
+        try {
+          await Model1.query().insert({ id: 1 });
+          throw new Error('should not get here');
+        } catch (err) {
+          expect(err).to.be.a(UniqueViolationError);
+        }
       });
 
       it('should insert new model (additionalProperties = false)', () => {
