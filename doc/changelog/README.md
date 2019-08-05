@@ -4,45 +4,17 @@
 
 ### What's new
 
-  * relatedQuery can now be used for more than just subqueries. See the examples [here](/guide/query-examples.html#relation-queries)
+  * relatedQuery can now be used for more than just subqueries. See the examples [here](/guide/query-examples.html#relation-queries).
+
+  * modifiers can now take arguments and are a lot more useful. See [this recipe](https://vincit.github.io/objection.js/recipes/modifiers.html) for more info.
 
 ### Breaking changes
 
- * Objection now uses the native promise instead of bluebird which means that all bluebird specific methods like `map`, `reduce`, `reflect`, `bind`, `asCallback`, `nodeify`, `return` etc. have been removed from the `QueryBuilder`.
+  * Objection now uses the native promise instead of bluebird which means that all bluebird specific methods like `map`, `reduce`, `reflect`, `bind`, `asCallback`, `nodeify`, `return` etc. have been removed from the `QueryBuilder`.
 
   * Database errors throw by objection are now wrapped using the [db-errors library](https://github.com/Vincit/db-errors). If you have code that uses the properties of the old native database errors, you can access the native error through `err.nativeError`.
 
-#### Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.
-
-You need to change code like this:
-
-```js
-Person
-  .query()
-  .modify('modifier1', 'modifier2')
-```
-
-to:
-
-```js
-Person
-  .query()
-  .modify(['modifier1', 'modifier2'])
-```
-
-Now code like this is possible:
-
-```js
-class Person extends Model {
-  static modifiers = {
-    modifier1: (query, arg1, arg2) => query.where(arg1, arg2)
-  }
-}
-
-Person
-  .query()
-  .modify('modifier1', arg1, arg2)
-```
+  * Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.
 
 ## 1.6.9
 

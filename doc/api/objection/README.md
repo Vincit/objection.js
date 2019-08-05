@@ -108,10 +108,10 @@ await Person
   }));
 ```
 
-You can nest `ref`, `raw`, `lit` and query builders (both knex and objection) in `raw` calls
+You can nest `ref`, `raw`, `val` and query builders (both knex and objection) in `raw` calls
 
 ```js
-const { lit } = require('objection')
+const { val } = require('objection')
 
 await Person
   .query()
@@ -120,23 +120,29 @@ await Person
     alias: 'ageSum'
   }))
   .where('age', '<', raw(':value1 + :value2', {
-    value1: lit(50)
+    value1: val(50)
     value2: knex.raw('25')
   }));
 ```
 
 ## lit
 
+::: warning
+Deprecated! Will be removed in 3.0. Use [val](#val) instead.
+:::
+
+## val
+
 ```js
-const { lit } = require('objection')
+const { val } = require('objection')
 ```
 
-Factory function that returns a [LiteralBuilder](/api/types/#class-literalbuilder) instance. [LiteralBuilder](/api/types/#class-literalbuilder) helps build literals of different types.
+Factory function that returns a [ValueBuilder](/api/types/#class-valuebuilder) instance. [ValueBuilder](/api/types/#class-valuebuilder) helps build values of different types.
 
 ##### Examples
 
 ```js
-const { lit, ref } = require('objection');
+const { val, ref } = require('objection');
 
 // Compare json objects
 await Model
@@ -144,14 +150,14 @@ await Model
   .where(
     ref('Model.jsonColumn:details'),
     '=',
-    lit({name: 'Jennifer', age: 29})
+    val({name: 'Jennifer', age: 29})
   )
 
-// Insert an array literal
+// Insert an array.
 await Model
   .query()
   .insert({
-    numbers: lit([1, 2, 3]).asArray().castTo('real[]')
+    numbers: val([1, 2, 3]).asArray().castTo('real[]')
   })
 ```
 

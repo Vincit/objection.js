@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const expect = require('expect.js');
 const Promise = require('bluebird');
-const { Model, ref, lit, raw } = require('../../');
+const { Model, ref, val, raw } = require('../../');
 
 function expectIdsEqual(resultArray, expectedIds) {
   expectArraysEqual(
@@ -349,10 +349,10 @@ module.exports = session => {
             });
         });
 
-        it('should be able to patch internal field of json column using a lit() instance', () => {
+        it('should be able to patch internal field of json column using a val() instance', () => {
           return BoundModel.query()
             .patch({
-              'jsonObject:attr': lit('baz').castJson()
+              'jsonObject:attr': val('baz').castJson()
             })
             .where('id', 2)
             .then(() =>
@@ -526,10 +526,10 @@ module.exports = session => {
         });
       });
 
-      describe('.where(ref(fieldExpr), lit(<array|object|string>))', () => {
+      describe('.where(ref(fieldExpr), val(<array|object|string>))', () => {
         it('should find results for jsonArray == []', () => {
           return BoundModel.query()
-            .where('jsonArray', lit([]).castJson())
+            .where('jsonArray', val([]).castJson())
             .then(results => {
               expectIdsEqual(results, [2, 6, 7]);
             });
@@ -537,7 +537,7 @@ module.exports = session => {
 
         it('should find results for jsonArray != []', () => {
           return BoundModel.query()
-            .where('jsonArray', '!=', lit([]))
+            .where('jsonArray', '!=', val([]))
             .then(results => {
               expectIdsEqual(results, [1, 4, 5]);
             });
@@ -545,7 +545,7 @@ module.exports = session => {
 
         it('should find results for jsonObject == {}', () => {
           return BoundModel.query()
-            .where('jsonObject', lit({}))
+            .where('jsonObject', val({}))
             .then(results => {
               expectIdsEqual(results, [2, 4, 5]);
             });
@@ -553,7 +553,7 @@ module.exports = session => {
 
         it('should not find results for jsonArray == {}', () => {
           return BoundModel.query()
-            .where('jsonArray', lit({}))
+            .where('jsonArray', val({}))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -561,7 +561,7 @@ module.exports = session => {
 
         it('should not find results for jsonObject == []', () => {
           return BoundModel.query()
-            .where('jsonObject', lit([]))
+            .where('jsonObject', val([]))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -569,7 +569,7 @@ module.exports = session => {
 
         it('should find result for jsonObject == {a: 1}', () => {
           return BoundModel.query()
-            .where('jsonObject', lit({ a: 1 }))
+            .where('jsonObject', val({ a: 1 }))
             .then(results => {
               expectIdsEqual(results, [6]);
             });
@@ -585,7 +585,7 @@ module.exports = session => {
 
         it('should find result where keys are in different order jsonObject.a == {2:2, 1:1}', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:a'), lit({ 2: 2, 1: 1 }))
+            .where(ref('jsonObject:a'), val({ 2: 2, 1: 1 }))
             .then(results => {
               expectIdsEqual(results, [7]);
             });
@@ -593,7 +593,7 @@ module.exports = session => {
 
         it('should not find result with wrong type as value jsonObject == {a: "1"}', () => {
           return BoundModel.query()
-            .where('jsonObject', lit({ a: '1' }))
+            .where('jsonObject', val({ a: '1' }))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -601,7 +601,7 @@ module.exports = session => {
 
         it('should find results jsonArray[0].arrayField[0] == { noMoreLevels: true }', () => {
           return BoundModel.query()
-            .where(ref('jsonArray:[0].arrayField[0]'), lit({ noMoreLevels: true }))
+            .where(ref('jsonArray:[0].arrayField[0]'), val({ noMoreLevels: true }))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -609,7 +609,7 @@ module.exports = session => {
 
         it('should not find results jsonArray[0].arrayField[0] == { noMoreLevels: false }', () => {
           return BoundModel.query()
-            .where(ref('jsonArray:[0].arrayField[0]'), lit({ noMoreLevels: false }))
+            .where(ref('jsonArray:[0].arrayField[0]'), val({ noMoreLevels: false }))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -617,7 +617,7 @@ module.exports = session => {
 
         it('should find result with jsonArray == [ null ]', () => {
           return BoundModel.query()
-            .where('jsonArray', lit([null]))
+            .where('jsonArray', val([null]))
             .then(results => {
               expectIdsEqual(results, [5]);
             });
@@ -625,7 +625,7 @@ module.exports = session => {
 
         it('should find results with jsonArray == complexJsonObj.jsonArray', () => {
           return BoundModel.query()
-            .where('jsonArray', lit(complexJsonObj.jsonArray))
+            .where('jsonArray', val(complexJsonObj.jsonArray))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -633,7 +633,7 @@ module.exports = session => {
 
         it('should find results with jsonObject,jsonArray == complexJsonObj.jsonArray', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:jsonArray'), lit(complexJsonObj.jsonArray))
+            .where(ref('jsonObject:jsonArray'), val(complexJsonObj.jsonArray))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -641,7 +641,7 @@ module.exports = session => {
 
         it('should not find results jsonArray == [2,1]', () => {
           return BoundModel.query()
-            .where('jsonArray', lit([2, 1]))
+            .where('jsonArray', val([2, 1]))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -649,7 +649,7 @@ module.exports = session => {
 
         it('should find results jsonArray == [1,2]', () => {
           return BoundModel.query()
-            .where('jsonArray', lit([1, 2]))
+            .where('jsonArray', val([1, 2]))
             .then(results => {
               expectIdsEqual(results, [4]);
             });
@@ -657,8 +657,8 @@ module.exports = session => {
 
         it('should find results jsonArray == [2,1] OR jsonArray == [1,2]', () => {
           return BoundModel.query()
-            .where('jsonArray', lit([1, 2]))
-            .orWhere('jsonArray', lit([2, 1]))
+            .where('jsonArray', val([1, 2]))
+            .orWhere('jsonArray', val([2, 1]))
             .then(results => {
               expectIdsEqual(results, [4]);
             });
@@ -666,8 +666,8 @@ module.exports = session => {
 
         it('should find results jsonArray == [1,2] OR jsonArray != [1,2]', () => {
           return BoundModel.query()
-            .where('jsonArray', lit([1, 2]))
-            .orWhere('jsonArray', '!=', lit([2, 1]))
+            .where('jsonArray', val([1, 2]))
+            .orWhere('jsonArray', '!=', val([2, 1]))
             .then(results => {
               expectIdsEqual(results, [1, 2, 4, 5, 6, 7]);
             });
@@ -710,7 +710,7 @@ module.exports = session => {
 
         it('should find all empty arrays with jsonArray @> []', () => {
           return BoundModel.query()
-            .where('jsonArray', '@>', lit([]))
+            .where('jsonArray', '@>', val([]))
             .then(results => {
               expectIdsEqual(results, [1, 2, 4, 5, 6, 7]);
             });
@@ -726,7 +726,7 @@ module.exports = session => {
 
         it('should find results jsonArray @> [1,2] (set is its own superset)', () => {
           return BoundModel.query()
-            .where('jsonArray', '@>', lit([1, 2]))
+            .where('jsonArray', '@>', val([1, 2]))
             .then(results => {
               expectIdsEqual(results, [4]);
             });
@@ -742,7 +742,7 @@ module.exports = session => {
 
         it('should not find results jsonArray @> {}', () => {
           return BoundModel.query()
-            .where('jsonArray', '@>', lit({}))
+            .where('jsonArray', '@>', val({}))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -758,7 +758,7 @@ module.exports = session => {
 
         it('should not find results jsonObject @> []', () => {
           return BoundModel.query()
-            .where('jsonObject', '@>', lit([]))
+            .where('jsonObject', '@>', val([]))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -790,7 +790,7 @@ module.exports = session => {
 
         it('should find results jsonObject @> {}', () => {
           return BoundModel.query()
-            .where('jsonObject', '@>', lit({}))
+            .where('jsonObject', '@>', val({}))
             .then(results => {
               expectIdsEqual(results, [1, 2, 4, 5, 6, 7]);
             });
@@ -806,7 +806,7 @@ module.exports = session => {
 
         it('should find results jsonObject.objectField @> complexJsonObj.jsonObject.objectField', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:objectField'), '@>', lit(complexJsonObj.jsonObject.objectField))
+            .where(ref('jsonObject:objectField'), '@>', val(complexJsonObj.jsonObject.objectField))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -828,7 +828,7 @@ module.exports = session => {
           obj.otherKey = 'Im here too!';
 
           return BoundModel.query()
-            .where(ref('jsonObject:objectField'), '@>', lit(obj))
+            .where(ref('jsonObject:objectField'), '@>', val(obj))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -849,7 +849,7 @@ module.exports = session => {
             .where(
               ref('jsonObject:objectField'),
               '@>',
-              lit({
+              val({
                 object: 'something else'
               })
             )
@@ -869,8 +869,8 @@ module.exports = session => {
 
         it('should find results jsonObject @> [] OR jsonObject @> {}', () => {
           return BoundModel.query()
-            .where('jsonObject', '@>', lit([]))
-            .orWhere('jsonObject', '@>', lit({}))
+            .where('jsonObject', '@>', val([]))
+            .orWhere('jsonObject', '@>', val({}))
             .then(results => {
               expectIdsEqual(results, [1, 2, 4, 5, 6, 7]);
             });
@@ -889,7 +889,7 @@ module.exports = session => {
             .whereNot(
               ref('jsonObject:objectField'),
               '@>',
-              lit(complexJsonObj.jsonObject.objectField)
+              val(complexJsonObj.jsonObject.objectField)
             )
             .then(results => {
               expectIdsEqual(results, []);
@@ -948,7 +948,7 @@ module.exports = session => {
 
         it('should find results jsonArray = {} or NOT(jsonObject @> jsonArray)', () => {
           return BoundModel.query()
-            .where('jsonArray', '=', lit({}))
+            .where('jsonArray', '=', val({}))
             .orWhereNot('jsonObject', '@>', ref('jsonArray'))
             .then(results => {
               expectIdsEqual(results, [1, 2, 4, 5, 6, 7]);
@@ -992,7 +992,7 @@ module.exports = session => {
 
         it('should not find results jsonArray <@ {}', () => {
           return BoundModel.query()
-            .where('jsonArray', '<@', lit({}))
+            .where('jsonArray', '<@', val({}))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -1008,7 +1008,7 @@ module.exports = session => {
 
         it('should not find results jsonObject <@ []', () => {
           return BoundModel.query()
-            .where('jsonObject', '<@', lit([]))
+            .where('jsonObject', '<@', val([]))
             .then(results => {
               expect(results).to.have.length(0);
             });
@@ -1040,7 +1040,7 @@ module.exports = session => {
 
         it('should find results jsonObject <@ {}', () => {
           return BoundModel.query()
-            .where('jsonObject', '<@', lit({}))
+            .where('jsonObject', '<@', val({}))
             .then(results => {
               expectIdsEqual(results, [2, 4, 5]);
             });
@@ -1056,7 +1056,7 @@ module.exports = session => {
 
         it('should find results jsonObject.objectField <@ complexJsonObj.jsonObject.objectField', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:objectField'), '<@', lit(complexJsonObj.jsonObject.objectField))
+            .where(ref('jsonObject:objectField'), '<@', val(complexJsonObj.jsonObject.objectField))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -1078,7 +1078,7 @@ module.exports = session => {
           obj.otherKey = 'Im here too!';
 
           return BoundModel.query()
-            .where(ref('jsonObject:objectField'), '<@', lit(obj))
+            .where(ref('jsonObject:objectField'), '<@', val(obj))
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -1099,7 +1099,7 @@ module.exports = session => {
             .where(
               ref('jsonObject:objectField'),
               '<@',
-              lit({
+              val({
                 object: 'something else'
               })
             )
@@ -1119,8 +1119,8 @@ module.exports = session => {
 
         it('should find results jsonObject <@ {} OR jsonArray <@ []', () => {
           return BoundModel.query()
-            .where('jsonObject', '<@', lit({}))
-            .orWhere('jsonArray', '<@', lit([]))
+            .where('jsonObject', '<@', val({}))
+            .orWhere('jsonArray', '<@', val([]))
             .then(results => {
               expectIdsEqual(results, [2, 4, 5, 6, 7]);
             });
@@ -1327,7 +1327,7 @@ module.exports = session => {
         it('should find results for a', () => {
           // TODO knex doesn't support ?| operator.
           return BoundModel.query()
-            .where(raw('?? \\?| ?', ['jsonObject', lit('a').castArray()]))
+            .where(raw('?? \\?| ?', ['jsonObject', val('a').asArray()]))
             .then(results => {
               expectIdsEqual(results, [6, 7]);
             });
@@ -1369,7 +1369,7 @@ module.exports = session => {
         it('should find results for a and b', () => {
           // TODO knex doesn't support ?& operator.
           return BoundModel.query()
-            .where(raw('?? \\?& ?', ['jsonObject', lit(['a', 'b']).castArray()]))
+            .where(raw('?? \\?& ?', ['jsonObject', val(['a', 'b']).asArray()]))
             .then(results => {
               expectIdsEqual(results, [7]);
             });
@@ -1415,7 +1415,7 @@ module.exports = session => {
 
         it('should be able to find numbers with >', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:numberField').castFloat(), '>', lit(1.4).castFloat())
+            .where(ref('jsonObject:numberField').castFloat(), '>', val(1.4).castFloat())
             .then(results => {
               expectIdsEqual(results, [1]);
             });
@@ -1446,7 +1446,7 @@ module.exports = session => {
             .where(
               ref('jsonObject:stringField').castText(),
               '=',
-              lit('string in jsonObject.stringField').castText()
+              val('string in jsonObject.stringField').castText()
             )
             .then(results => {
               expectIdsEqual(results, [1]);
@@ -1464,7 +1464,7 @@ module.exports = session => {
 
         it('should be able to find every but first row where booleanField equals true or is NULL', () => {
           return BoundModel.query()
-            .where(ref('jsonObject:booleanField').castBool(), '=', lit(true).castBool())
+            .where(ref('jsonObject:booleanField').castBool(), '=', val(true).castBool())
             .orWhere(ref('jsonObject:booleanField'), 'IS', null)
             .then(results => {
               expectIdsEqual(results, [2, 3, 4, 5, 6, 7]);

@@ -615,9 +615,9 @@ reference will be json type.
 
 Gives an alias for the reference `.select(ref('age').as('yougness'))`
 
-## `class` LiteralBuilder
+## `class` ValueBuilder
 
-An instance of this is returned from the [lit](/api/objection/#lit) helper function. If an object
+An instance of this is returned from the [val](/api/objection/#val) helper function. If an object
 is given as a value, it is cast to json by default.
 
 ### Instance Methods
@@ -650,14 +650,6 @@ Cast to sql type `real`.
 
 Cast to sql type `boolean`.
 
-#### castType()
-
-Give custom type to which referenced value is cast to.
-
-**DEPRECATED:** Use `castTo` instead. `castType` Will be removed in 2.0.
-
-`.castType('mytype') --> CAST(?? as mytype)`
-
 #### castTo()
 
 Give custom type to which referenced value is cast to.
@@ -669,21 +661,15 @@ Give custom type to which referenced value is cast to.
 Converts the value to json (jsonb in case of postgresql). The default
 cast type for object values.
 
-#### castArray
-
-Converts the value to an array literal.
-
-**DEPRECATED:** Use `asArray` instead. `castArray` Will be removed in 2.0.
-
 #### asArray()
 
-Converts the value to an array literal.
+Converts the value to an array.
 
-`lit([1, 2, 3]).asArray() --> ARRAY[?, ?, ?]`
+`val([1, 2, 3]).asArray() --> ARRAY[?, ?, ?]`
 
 Can be used in conjuction with `castTo`.
 
-`lit([1, 2, 3]).asArray().castTo('real[]') -> CAST(ARRAY[?, ?, ?] AS real[])`
+`val([1, 2, 3]).asArray().castTo('real[]') -> CAST(ARRAY[?, ?, ?] AS real[])`
 
 #### as()
 
