@@ -12,9 +12,9 @@
 // * Karl Blomster <https://github.com/kblomster>
 // * And many others: See <https://github.com/Vincit/objection.js/blob/master/typings/objection/index.d.ts>
 
-import * as knex from 'knex';
 import * as ajv from 'ajv';
 import * as dbErrors from 'db-errors';
+import * as knex from 'knex';
 
 export = Objection;
 
@@ -207,7 +207,7 @@ declare namespace Objection {
       ? PartialModelGraph<Exclude<T[K], undefined>>
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonPrimitiveValue))
-      : (T[K] | NonPrimitiveValue);
+      : (T[K] | NonPrimitiveValue)
   } &
     GraphParameters;
 
@@ -232,7 +232,7 @@ declare namespace Objection {
         ? (I extends Model ? never : K)
         : T[K] extends Function
         ? never
-        : K;
+        : K
     }[keyof T],
     undefined | 'QueryBuilderType'
   >;
@@ -246,7 +246,7 @@ declare namespace Objection {
         ? K
         : Exclude<T[K], undefined> extends Array<infer I>
         ? (I extends Model ? K : never)
-        : never;
+        : never
     }[keyof T],
     undefined
   >;
@@ -291,6 +291,9 @@ declare namespace Objection {
 
     <QBP extends QB>(...columns: Selection<QBP>[]): QB;
     <QBP extends QB>(columns: Selection<QBP>[]): QB;
+
+    // Allows things like `select(1)`, not sure if we should be more specific here?
+    <QBP extends QB>(...args: any[]): QB;
   }
 
   interface AsMethod<QB extends AnyQueryBuilder> {

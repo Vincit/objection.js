@@ -1,9 +1,9 @@
 import { Model, QueryBuilder } from '../../';
 
 class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
-  ArrayQueryBuilderType: CustomQueryBuilder<M, M[]>;
-  SingleQueryBuilderType: CustomQueryBuilder<M, M>;
-  NumberQueryBuilderType: CustomQueryBuilder<M, number>;
+  ArrayQueryBuilderType!: CustomQueryBuilder<M, M[]>;
+  SingleQueryBuilderType!: CustomQueryBuilder<M, M>;
+  NumberQueryBuilderType!: CustomQueryBuilder<M, number>;
 
   someCustomMethod(): this {
     return this;
@@ -11,18 +11,18 @@ class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
 }
 
 class BaseModel extends Model {
-  QueryBuilderType: CustomQueryBuilder<this>;
+  QueryBuilderType!: CustomQueryBuilder<this>;
 }
 
 class Animal extends BaseModel {
-  id: number;
-  name: string;
-  owner: Person;
+  id!: number;
+  name!: string;
+  owner!: Person;
 }
 
 class Person extends BaseModel {
-  firstName: string;
-  pets: Animal[];
+  firstName!: string;
+  pets!: Animal[];
 }
 
 const people: Promise<Person[]> = Person.query()
