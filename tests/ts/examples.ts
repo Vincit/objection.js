@@ -426,7 +426,7 @@ async () => {
 
 const maybePerson: Promise<Person | undefined> = qb.findById(1);
 
-const maybePeople: Promise<Person[]> = qb.findById([1, 2, 3]);
+const maybePeople: Promise<Person[]> = qb.findByIds([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -1032,4 +1032,33 @@ const plugin2 = ({} as any) as objection.Plugin;
   takesModelClass(MyPerson);
   takesPersonClass(MyPerson);
   takesModelSubclass(new MyPerson());
+};
+
+// Examples with composite key
+class Interview extends objection.Model {
+  interviewer!: Person;
+  interviewee!: Person;
+  interviewDate?: number;
+
+  static columnNameMappers = objection.snakeCaseMappers();
+
+  static idColumn = ['interviewer', 'interviewee'];
+}
+
+async () => {
+  // findById with composite key
+  const interview: Interview | undefined = await Interview.query().findById([10, 11]);
+
+  // findById with composite key, chained with other query builder methods
+  const interviewWithAssignedDate: Interview | undefined = await Interview.query()
+    .findById([10, 11])
+    .whereNotNull('interviewDate');
+
+  // findByIds with sets of composite key
+  const interviews: Interview[] = await Interview.query().findByIds([[10, 11], [11, 12], [12, 13]]);
+
+  // findByIds with sets of composite key, chained with other query builder methods
+  const interviewsWithAssignedDate: Interview[] = await Interview.query()
+    .findByIds([[10, 11], [11, 12], [12, 13]])
+    .whereNotNull('interviewDate');
 };
