@@ -731,8 +731,7 @@ declare namespace Objection {
 
     applyFilter(...namedFilters: string[]): this;
 
-    findById(id: Id): QueryBuilderYieldingOneOrNone<QM>;
-    findById(idOrIds: IdOrIds): this;
+    findById(idOrIds: IdOrIds): QueryBuilderYieldingOneOrNone<QM>;
     findByIds(ids: Id[] | Id[][]): this;
     /** findOne is shorthand for .where(...whereArgs).first() */
     findOne: FindOne<QM>;
