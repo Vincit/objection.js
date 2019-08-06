@@ -10,7 +10,5 @@
     "strict": true,
     "target": "es6"
   },
-  "files": [
-    "tests/ts/examples.ts"
-  ]
+  "include": ["tests/ts/**/*.ts"]
 }
