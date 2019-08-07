@@ -1036,8 +1036,8 @@ const plugin2 = ({} as any) as objection.Plugin;
 
 // Examples with composite key
 class Interview extends objection.Model {
-  interviewer!: Person;
-  interviewee!: Person;
+  interviewer!: number;
+  interviewee!: number;
   interviewDate?: number;
 
   static columnNameMappers = objection.snakeCaseMappers();
