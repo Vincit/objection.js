@@ -68,6 +68,7 @@ module.exports = {
             'relations',
             'query-examples',
             'transactions',
+            'hooks',
             'validation',
             'documents',
             'plugins',

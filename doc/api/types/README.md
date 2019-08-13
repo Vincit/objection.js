@@ -115,6 +115,18 @@ Property|Type|Description
 --------|----|-----------
 columns|string[]|Names of all the columns in a table.
 
+## `type` StaticHookArguments
+
+Property|Type|Description
+--------|----|-----------
+items|Model[]|Items for which the query was started. For example in case of an instance query `person.$query()` or `person.$relatedQuery('pets')` `items` would equal `[person]`. In case of `Person.relatedQuery('pets').for([matt, jennifer])` `items` would equal `[matt, jennifer]`. In many cases like `Person.query()` or `Person.query().findById(1)` this array is empty. It's only populated when the query has been explicitly started for a set of model instances.
+inputItems|Model[]|Items that were passed as an input for the query. For example in case of `Person.query().insert(person)` or `Person.query().patch(person)` `inputItems` would equal `[person]`.
+asFindQuery|()&nbsp;=>&nbsp;[QueryBuilder](/api/query-builder/)|A function that returns a query builder that can be used to fetch the items that were/would get affected by the query being executed. Modifying this query builder doesn't affect the query being executed. For example calling `await asFindQuery().select('id')` in a `beforeDelete` hook would get you the identifiers of all the items that will get deleted by the query. This query is automatically executed inside any existing transaction. This query builder always returns an array even if the query being executed would return an object, a number or something else.
+transaction|knex<br>Transaction|If the query being executed has a transaction, this property will contain it. Otherwise this holds the knex instance installed for the query. Either way, this can and should be passed to any queries executed in the static hooks.
+context|object|The context of the query. See [context](/api/query-builder/other-methods.html#context).
+relation|[Relation](#class-relation)|If the query is for a relation, this property holds the [Relation](#class-relation) object. For example when you call `person.$relatedQuery('pets)` or `Person.relatedQuery('movies')` the `relation` will be a relation object for pets and movies relation of `Person` respectively.
+cancelQuery|function(any)|Cancels the query being executed. You can pass an arugment for the function and that value will be the result of the query.
+
 ## `type` FieldExpression
 
 Field expressions are strings that allow you to refer to JSONB fields inside columns.

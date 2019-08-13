@@ -498,7 +498,7 @@ See [this recipe](/recipes/extra-properties.html) for more information about `ex
 
 ### Relation relate queries
 
-Relating means attaching a existing item to another item through a relationship defined in the [relationMappings](/api/model/static-properties.html#static-relationmappings). This method does the same things the [relation insert queries](#relation-insert-queries) do, but don't insert the item first. The item (or its id) need to be provided by the user.
+Relating means attaching a existing item to another item through a relationship defined in the [relationMappings](/api/model/static-properties.html#static-relationmappings).
 
 In addition to the examples here, you can find more examples behind these links.
 
@@ -536,7 +536,7 @@ You can also pass the id `200` directly to `relate` instead of passing a model i
 
 ```js
 await Person
-  .relateQuery('movies')
+  .relatedQuery('movies')
   .for(100)
   .relate(200);
 ```
@@ -551,14 +551,14 @@ Here's one more example that relates four movies to the first person whose first
 
 ```js
 await Person
-  .relateQuery('movies')
+  .relatedQuery('movies')
   .for(Person.query().where('firstName', 'Arnold').limit(1))
   .relate([100, 200, 300, 400]);
 ```
 
 ### Relation unrelate queries
 
-Unrelating is the reverse operation of [relating](#relation-relate-queries). For example if an actor is related to a movie through a `movies` relation, unrelating them means removing this association, but neither the movie nor the actor get deleted from the database.
+Unrelating is the inverse of [relating](#relation-relate-queries). For example if an actor is related to a movie through a `movies` relation, unrelating them means removing this association, but neither the movie nor the actor get deleted from the database.
 
 ##### Examples
 

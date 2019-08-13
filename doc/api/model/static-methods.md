@@ -313,6 +313,239 @@ Get the knex instance:
 const knex = Person.knex();
 ```
 
+
+## `static` beforeFind()
+
+```js
+class Person extends Model {
+  static beforeFind(args) {
+
+  }
+}
+```
+
+A hook that is executed before find queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|The return value is not used.
+
+## `static` afterFind()
+
+```js
+class Person extends Model {
+  static afterFind(args) {
+
+  }
+}
+```
+
+A hook that is executed after find queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|If the return value is not `undefined`, it will be used as the return value of the query.
+
+## `static` beforeUpdate()
+
+```js
+class Person extends Model {
+  static beforeUpdate(args) {
+
+  }
+}
+```
+
+A hook that is executed before update and patch queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|The return value is not used.
+
+## `static` afterUpdate()
+
+```js
+class Person extends Model {
+  static afterUpdate(args) {
+
+  }
+}
+```
+
+A hook that is executed after update and patch queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|If the return value is not `undefined`, it will be used as the return value of the query.
+
+## `static` beforeInsert()
+
+```js
+class Person extends Model {
+  static beforeInsert(args) {
+
+  }
+}
+```
+
+A hook that is executed before insert queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|The return value is not used.
+
+## `static` afterInsert()
+
+```js
+class Person extends Model {
+  static afterInsert(args) {
+
+  }
+}
+```
+
+A hook that is executed after insert queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|If the return value is not `undefined`, it will be used as the return value of the query.
+
+## `static` beforeDelete()
+
+```js
+class Person extends Model {
+  static beforeDelete(args) {
+
+  }
+}
+```
+
+A hook that is executed before delete queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|The return value is not used.
+
+## `static` afterDelete()
+
+```js
+class Person extends Model {
+  static afterDelete(args) {
+
+  }
+}
+```
+
+A hook that is executed after delete queries.
+
+See these links for more information:
+
+ * [static hooks guide](/guide/hooks.html#static-query-hooks)
+ * [documentation for the arguments](/api/types/#type-statichookarguments)
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+
+##### Return value
+
+Type|Description
+----|-----------------------------
+any|If the return value is not `undefined`, it will be used as the return value of the query.
+
 ## `static` bindKnex()
 
 ```js

@@ -446,14 +446,14 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances`', () => {
+        it('should have access to `items`', () => {
           return Movie.query()
             .findOne({ name: 'Hungergames' })
             .then(movie => {
-              Movie.beforeFind = createHookSpy(({ modelInstances }) => {
-                expect(modelInstances.length).to.equal(1);
+              Movie.beforeFind = createHookSpy(({ items }) => {
+                expect(items.length).to.equal(1);
 
-                chaiExpect(modelInstances).to.containSubset([
+                chaiExpect(items).to.containSubset([
                   {
                     name: 'Hungergames'
                   }
@@ -471,14 +471,14 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.beforeFind = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Movie.beforeFind = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -507,14 +507,14 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.beforeFind = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Pet.beforeFind = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -545,14 +545,14 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.beforeFind = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Person.beforeFind = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Doggo'
                     }
@@ -576,10 +576,10 @@ module.exports = session => {
 
       describe('eager', () => {
         it('should have access to all parents and relation', () => {
-          Pet.beforeFind = createHookSpy(({ modelInstances, relation }) => {
-            expect(modelInstances.length).to.equal(2);
+          Pet.beforeFind = createHookSpy(({ items, relation }) => {
+            expect(items.length).to.equal(2);
 
-            chaiExpect(modelInstances).to.containSubset([
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Jennifer'
               },
@@ -591,14 +591,14 @@ module.exports = session => {
             expect(relation).to.equal(Person.getRelation('pets'));
           });
 
-          Person.beforeFind = createHookSpy(({ modelInstances, relation }) => {
+          Person.beforeFind = createHookSpy(({ items, relation }) => {
             // Ignore the first call (root query).
             if (Person.beforeFind.calls.length === 1) {
               return;
             }
 
-            expect(modelInstances.length).to.equal(4);
-            chaiExpect(modelInstances).to.containSubset([
+            expect(items.length).to.equal(4);
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Doggo'
               },
@@ -616,10 +616,10 @@ module.exports = session => {
             expect(relation).to.equal(Pet.getRelation('owner'));
           });
 
-          Movie.beforeFind = createHookSpy(({ modelInstances, relation }) => {
-            expect(modelInstances.length).to.equal(2);
+          Movie.beforeFind = createHookSpy(({ items, relation }) => {
+            expect(items.length).to.equal(2);
 
-            chaiExpect(modelInstances).to.containSubset([
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Jennifer'
               },
@@ -787,14 +787,14 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances`', () => {
+        it('should have access to `items`', () => {
           return Movie.query()
             .findOne({ name: 'Hungergames' })
             .then(movie => {
-              Movie.afterFind = createHookSpy(({ modelInstances }) => {
-                expect(modelInstances.length).to.equal(1);
+              Movie.afterFind = createHookSpy(({ items }) => {
+                expect(items.length).to.equal(1);
 
-                chaiExpect(modelInstances).to.containSubset([
+                chaiExpect(items).to.containSubset([
                   {
                     name: 'Hungergames'
                   }
@@ -812,14 +812,14 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.afterFind = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Movie.afterFind = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -848,14 +848,14 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.afterFind = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Pet.afterFind = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -886,14 +886,14 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.afterFind = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Person.afterFind = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Doggo'
                     }
@@ -917,10 +917,10 @@ module.exports = session => {
 
       describe('eager', () => {
         it('should have access to all parents and relation', () => {
-          Pet.afterFind = createHookSpy(({ modelInstances, relation }) => {
-            expect(modelInstances.length).to.equal(2);
+          Pet.afterFind = createHookSpy(({ items, relation }) => {
+            expect(items.length).to.equal(2);
 
-            chaiExpect(modelInstances).to.containSubset([
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Jennifer'
               },
@@ -932,14 +932,14 @@ module.exports = session => {
             expect(relation).to.equal(Person.getRelation('pets'));
           });
 
-          Person.afterFind = createHookSpy(({ modelInstances, relation }) => {
+          Person.afterFind = createHookSpy(({ items, relation }) => {
             // Ignore the last call (root query).
             if (Person.afterFind.calls.length === 2) {
               return;
             }
 
-            expect(modelInstances.length).to.equal(4);
-            chaiExpect(modelInstances).to.containSubset([
+            expect(items.length).to.equal(4);
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Doggo'
               },
@@ -957,10 +957,10 @@ module.exports = session => {
             expect(relation).to.equal(Pet.getRelation('owner'));
           });
 
-          Movie.afterFind = createHookSpy(({ modelInstances, relation }) => {
-            expect(modelInstances.length).to.equal(2);
+          Movie.afterFind = createHookSpy(({ items, relation }) => {
+            expect(items.length).to.equal(2);
 
-            chaiExpect(modelInstances).to.containSubset([
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Jennifer'
               },
@@ -1098,11 +1098,11 @@ module.exports = session => {
             });
         });
 
-        it('should have access to `inputModelInstances`', () => {
-          Movie.beforeUpdate = createHookSpy(({ inputModelInstances }) => {
-            expect(inputModelInstances.length).to.equal(1);
-            expect(inputModelInstances[0] instanceof Movie).to.equal(true);
-            chaiExpect(inputModelInstances).to.containSubset([
+        it('should have access to `inputItems`', () => {
+          Movie.beforeUpdate = createHookSpy(({ inputItems }) => {
+            expect(inputItems.length).to.equal(1);
+            expect(inputItems[0] instanceof Movie).to.equal(true);
+            chaiExpect(inputItems).to.containSubset([
               {
                 name: 'Updated'
               }
@@ -1117,8 +1117,8 @@ module.exports = session => {
         });
 
         it('should be able to fetch the rows about to be updated', () => {
-          Movie.beforeUpdate = createHookSpy(({ findQuery }, call) => {
-            return findQuery
+          Movie.beforeUpdate = createHookSpy(({ asFindQuery }, call) => {
+            return asFindQuery()
               .select('name')
               .forUpdate()
               .then(moviesToBeUpdated => {
@@ -1169,21 +1169,21 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances` and `inputModelInstances`', () => {
+        it('should have access to `items` and `inputItems`', () => {
           return Movie.query()
             .findOne({ name: 'Silver Linings Playbook' })
             .then(movie => {
-              Movie.beforeUpdate = createHookSpy(({ modelInstances, inputModelInstances }) => {
-                expect(modelInstances.length).to.equal(1);
-                expect(inputModelInstances.length).to.equal(1);
+              Movie.beforeUpdate = createHookSpy(({ items, inputItems }) => {
+                expect(items.length).to.equal(1);
+                expect(inputItems.length).to.equal(1);
 
-                chaiExpect(modelInstances).to.containSubset([
+                chaiExpect(items).to.containSubset([
                   {
                     name: 'Silver Linings Playbook'
                   }
                 ]);
 
-                chaiExpect(inputModelInstances).to.containSubset([
+                chaiExpect(inputItems).to.containSubset([
                   {
                     name: 'Updated'
                   }
@@ -1204,8 +1204,8 @@ module.exports = session => {
             .then(movie => {
               queries = [];
 
-              Movie.beforeUpdate = createHookSpy(({ findQuery }, call) => {
-                return findQuery
+              Movie.beforeUpdate = createHookSpy(({ asFindQuery }, call) => {
+                return asFindQuery()
                   .select('name')
                   .forUpdate()
                   .then(moviesToBeUpdated => {
@@ -1233,30 +1233,28 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.beforeUpdate = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Movie.beforeUpdate = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'Updated'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'Updated'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('movies'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('movies'));
+                });
 
                 return person.$relatedQuery('movies').update({ name: 'Updated' });
               })
@@ -1272,8 +1270,8 @@ module.exports = session => {
               .then(person => {
                 queries = [];
 
-                Movie.beforeUpdate = createHookSpy(({ findQuery }, call) => {
-                  return findQuery
+                Movie.beforeUpdate = createHookSpy(({ asFindQuery }, call) => {
+                  return asFindQuery()
                     .select('name')
                     .forUpdate()
                     .then(moviesToBeUpdated => {
@@ -1304,30 +1302,28 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.beforeUpdate = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Pet.beforeUpdate = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        species: 'Frog'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      species: 'Frog'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('pets'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('pets'));
+                });
 
                 return person.$relatedQuery('pets').patch({ species: 'Frog' });
               })
@@ -1343,8 +1339,8 @@ module.exports = session => {
               .then(person => {
                 queries = [];
 
-                Pet.beforeUpdate = createHookSpy(({ findQuery }, call) => {
-                  return findQuery
+                Pet.beforeUpdate = createHookSpy(({ asFindQuery }, call) => {
+                  return asFindQuery()
                     .select('name')
                     .forUpdate()
                     .then(moviesToBeUpdated => {
@@ -1375,30 +1371,28 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances', () => {
+          it('should have access to `relation`, `items` and `inputItems', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.beforeUpdate = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Person.beforeUpdate = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Doggo'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Doggo'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'New Owner'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'New Owner'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Pet.getRelation('owner'));
-                  }
-                );
+                  expect(relation).to.equal(Pet.getRelation('owner'));
+                });
 
                 return pet.$relatedQuery('owner').patch({ name: 'New Owner' });
               })
@@ -1414,8 +1408,8 @@ module.exports = session => {
               .then(pet => {
                 queries = [];
 
-                Person.beforeUpdate = createHookSpy(({ findQuery }, call) => {
-                  return findQuery
+                Person.beforeUpdate = createHookSpy(({ asFindQuery }, call) => {
+                  return asFindQuery()
                     .select('name')
                     .forUpdate()
                     .then(peopleToBeUpdated => {
@@ -1568,11 +1562,11 @@ module.exports = session => {
             });
         });
 
-        it('should have access to `inputModelInstances`', () => {
-          Movie.afterUpdate = createHookSpy(({ inputModelInstances }) => {
-            expect(inputModelInstances.length).to.equal(1);
-            expect(inputModelInstances[0] instanceof Movie).to.equal(true);
-            chaiExpect(inputModelInstances).to.containSubset([
+        it('should have access to `inputItems`', () => {
+          Movie.afterUpdate = createHookSpy(({ inputItems }) => {
+            expect(inputItems.length).to.equal(1);
+            expect(inputItems[0] instanceof Movie).to.equal(true);
+            chaiExpect(inputItems).to.containSubset([
               {
                 name: 'Updated'
               }
@@ -1588,21 +1582,21 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances` and `inputModelInstances`', () => {
+        it('should have access to `items` and `inputItems`', () => {
           return Movie.query()
             .findOne({ name: 'Silver Linings Playbook' })
             .then(movie => {
-              Movie.afterUpdate = createHookSpy(({ modelInstances, inputModelInstances }) => {
-                expect(modelInstances.length).to.equal(1);
-                expect(inputModelInstances.length).to.equal(1);
+              Movie.afterUpdate = createHookSpy(({ items, inputItems }) => {
+                expect(items.length).to.equal(1);
+                expect(inputItems.length).to.equal(1);
 
-                chaiExpect(modelInstances).to.containSubset([
+                chaiExpect(items).to.containSubset([
                   {
                     name: 'Silver Linings Playbook'
                   }
                 ]);
 
-                chaiExpect(inputModelInstances).to.containSubset([
+                chaiExpect(inputItems).to.containSubset([
                   {
                     name: 'Updated'
                   }
@@ -1620,30 +1614,28 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.afterUpdate = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Movie.afterUpdate = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'Updated'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'Updated'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('movies'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('movies'));
+                });
 
                 return person.$relatedQuery('movies').update({ name: 'Updated' });
               })
@@ -1655,30 +1647,28 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.afterUpdate = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Pet.afterUpdate = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        species: 'Frog'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      species: 'Frog'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('pets'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('pets'));
+                });
 
                 return person.$relatedQuery('pets').patch({ species: 'Frog' });
               })
@@ -1690,30 +1680,28 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances', () => {
+          it('should have access to `relation`, `items` and `inputItems', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.afterUpdate = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Person.afterUpdate = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Doggo'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Doggo'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'New Owner'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'New Owner'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Pet.getRelation('owner'));
-                  }
-                );
+                  expect(relation).to.equal(Pet.getRelation('owner'));
+                });
 
                 return pet.$relatedQuery('owner').patch({ name: 'New Owner' });
               })
@@ -1841,8 +1829,8 @@ module.exports = session => {
         });
 
         it('should be able to fetch the rows about to be deleted', () => {
-          Movie.beforeDelete = createHookSpy(({ findQuery }, call) => {
-            return findQuery
+          Movie.beforeDelete = createHookSpy(({ asFindQuery }, call) => {
+            return asFindQuery()
               .select('name')
               .forUpdate()
               .then(moviesToBeDeleted => {
@@ -1892,17 +1880,40 @@ module.exports = session => {
               expect(queries.length).to.equal(0);
             });
         });
+
+        it('should be able to fetch the rows about to be deleted`', async () => {
+          queries = [];
+
+          Movie.beforeDelete = createHookSpy(async ({ asFindQuery, cancelQuery }) => {
+            const numUpdated = await asFindQuery().patch({ name: 'deleted' });
+            cancelQuery(numUpdated);
+          });
+
+          const numPatched = await Movie.query()
+            .findOne({ name: 'Silver Linings Playbook' })
+            .delete();
+
+          expect(numPatched).to.equal(1);
+          expect(queries.length).to.equal(1);
+          expect(queries[0].bindings).to.eql(['deleted', 'Silver Linings Playbook']);
+
+          if (session.isMySql()) {
+            expect(queries[0].sql).to.equal('update `movies` set `name` = ? where `name` = ?');
+          } else if (session.isPostgres()) {
+            expect(queries[0].sql).to.equal('update "movies" set "name" = ? where "name" = ?');
+          }
+        });
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances`', () => {
+        it('should have access to `items`', () => {
           return Movie.query()
             .findOne({ name: 'Silver Linings Playbook' })
             .then(movie => {
-              Movie.beforeDelete = createHookSpy(({ modelInstances, inputModelInstances }) => {
-                expect(modelInstances.length).to.equal(1);
+              Movie.beforeDelete = createHookSpy(({ items, inputItems }) => {
+                expect(items.length).to.equal(1);
 
-                chaiExpect(modelInstances).to.containSubset([
+                chaiExpect(items).to.containSubset([
                   {
                     name: 'Silver Linings Playbook'
                   }
@@ -1923,8 +1934,8 @@ module.exports = session => {
             .then(movie => {
               queries = [];
 
-              Movie.beforeDelete = createHookSpy(({ findQuery }, call) => {
-                return findQuery
+              Movie.beforeDelete = createHookSpy(({ asFindQuery }, call) => {
+                return asFindQuery()
                   .select('name')
                   .forUpdate()
                   .then(moviesToBeDeleted => {
@@ -1952,14 +1963,14 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.beforeDelete = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Movie.beforeDelete = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -1982,8 +1993,8 @@ module.exports = session => {
               .then(person => {
                 queries = [];
 
-                Movie.beforeDelete = createHookSpy(({ findQuery }, call) => {
-                  return findQuery
+                Movie.beforeDelete = createHookSpy(({ asFindQuery }, call) => {
+                  return asFindQuery()
                     .select('name')
                     .forUpdate()
                     .then(moviesToBeDeleted => {
@@ -2014,14 +2025,14 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.beforeDelete = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Pet.beforeDelete = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -2044,8 +2055,8 @@ module.exports = session => {
               .then(person => {
                 queries = [];
 
-                Pet.beforeDelete = createHookSpy(({ findQuery }, call) => {
-                  return findQuery
+                Pet.beforeDelete = createHookSpy(({ asFindQuery }, call) => {
+                  return asFindQuery()
                     .select('name')
                     .forUpdate()
                     .then(moviesToBeDeleted => {
@@ -2076,14 +2087,14 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.beforeDelete = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Person.beforeDelete = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Doggo'
                     }
@@ -2106,8 +2117,8 @@ module.exports = session => {
               .then(pet => {
                 queries = [];
 
-                Person.beforeDelete = createHookSpy(({ findQuery }, call) => {
-                  return findQuery
+                Person.beforeDelete = createHookSpy(({ asFindQuery }, call) => {
+                  return asFindQuery()
                     .select('name')
                     .forUpdate()
                     .then(peopleToBeDeleted => {
@@ -2266,14 +2277,14 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances`', () => {
+        it('should have access to `items`', () => {
           return Movie.query()
             .findOne({ name: 'Silver Linings Playbook' })
             .then(movie => {
-              Movie.afterDelete = createHookSpy(({ modelInstances }) => {
-                expect(modelInstances.length).to.equal(1);
+              Movie.afterDelete = createHookSpy(({ items }) => {
+                expect(items.length).to.equal(1);
 
-                chaiExpect(modelInstances).to.containSubset([
+                chaiExpect(items).to.containSubset([
                   {
                     name: 'Silver Linings Playbook'
                   }
@@ -2291,14 +2302,14 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.afterDelete = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Movie.afterDelete = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -2317,14 +2328,14 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.afterDelete = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Pet.afterDelete = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Jennifer'
                     }
@@ -2343,14 +2354,14 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation` and `modelInstances`', () => {
+          it('should have access to `relation` and `items`', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.afterDelete = createHookSpy(({ modelInstances, relation }) => {
-                  expect(modelInstances.length).to.equal(1);
+                Person.afterDelete = createHookSpy(({ items, relation }) => {
+                  expect(items.length).to.equal(1);
 
-                  chaiExpect(modelInstances).to.containSubset([
+                  chaiExpect(items).to.containSubset([
                     {
                       name: 'Doggo'
                     }
@@ -2480,11 +2491,11 @@ module.exports = session => {
             });
         });
 
-        it('should have access to `inputModelInstances`', () => {
-          Movie.beforeInsert = createHookSpy(({ inputModelInstances }) => {
-            expect(inputModelInstances.length).to.equal(1);
-            expect(inputModelInstances[0] instanceof Movie).to.equal(true);
-            chaiExpect(inputModelInstances).to.containSubset([
+        it('should have access to `inputItems`', () => {
+          Movie.beforeInsert = createHookSpy(({ inputItems }) => {
+            expect(inputItems.length).to.equal(1);
+            expect(inputItems[0] instanceof Movie).to.equal(true);
+            chaiExpect(inputItems).to.containSubset([
               {
                 name: 'Inserted'
               }
@@ -2499,8 +2510,8 @@ module.exports = session => {
         });
 
         it('should be able to fetch the rows about to be updated', () => {
-          Movie.beforeInsert = createHookSpy(({ findQuery }, call) => {
-            return findQuery
+          Movie.beforeInsert = createHookSpy(({ asFindQuery }, call) => {
+            return asFindQuery()
               .select('name')
               .forUpdate()
               .then(moviesToBeUpdated => {
@@ -2552,20 +2563,20 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances` and `inputModelInstances`', () => {
+        it('should have access to `items` and `inputItems`', () => {
           const movie = Movie.fromJson({ name: 'Inserted' });
 
-          Movie.beforeInsert = createHookSpy(({ modelInstances, inputModelInstances }) => {
-            expect(modelInstances.length).to.equal(1);
-            expect(inputModelInstances.length).to.equal(1);
+          Movie.beforeInsert = createHookSpy(({ items, inputItems }) => {
+            expect(items.length).to.equal(1);
+            expect(inputItems.length).to.equal(1);
 
-            chaiExpect(modelInstances).to.containSubset([
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Inserted'
               }
             ]);
 
-            chaiExpect(inputModelInstances).to.containSubset([
+            chaiExpect(inputItems).to.containSubset([
               {
                 name: 'Inserted'
               }
@@ -2584,30 +2595,28 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.beforeInsert = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Movie.beforeInsert = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'Inserted'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'Inserted'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('movies'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('movies'));
+                });
 
                 return person.$relatedQuery('movies').insert({ name: 'Inserted' });
               })
@@ -2638,30 +2647,28 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.beforeInsert = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Pet.beforeInsert = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        species: 'Frog'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      species: 'Frog'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('pets'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('pets'));
+                });
 
                 return person.$relatedQuery('pets').insert({ species: 'Frog' });
               })
@@ -2674,30 +2681,28 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances', () => {
+          it('should have access to `relation`, `items` and `inputItems', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.beforeInsert = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Person.beforeInsert = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Doggo'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Doggo'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'New Owner'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'New Owner'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Pet.getRelation('owner'));
-                  }
-                );
+                  expect(relation).to.equal(Pet.getRelation('owner'));
+                });
 
                 return pet.$relatedQuery('owner').insert({ name: 'New Owner' });
               })
@@ -2856,11 +2861,11 @@ module.exports = session => {
             });
         });
 
-        it('should have access to `inputModelInstances`', () => {
-          Movie.afterInsert = createHookSpy(({ inputModelInstances }) => {
-            expect(inputModelInstances.length).to.equal(1);
-            expect(inputModelInstances[0] instanceof Movie).to.equal(true);
-            chaiExpect(inputModelInstances).to.containSubset([
+        it('should have access to `inputItems`', () => {
+          Movie.afterInsert = createHookSpy(({ inputItems }) => {
+            expect(inputItems.length).to.equal(1);
+            expect(inputItems[0] instanceof Movie).to.equal(true);
+            chaiExpect(inputItems).to.containSubset([
               {
                 name: 'Inserted'
               }
@@ -2876,20 +2881,20 @@ module.exports = session => {
       });
 
       describe('$query', () => {
-        it('should have access to `modelInstances` and `inputModelInstances`', () => {
+        it('should have access to `items` and `inputItems`', () => {
           const movie = Movie.fromJson({ name: 'Inserted' });
 
-          Movie.afterInsert = createHookSpy(({ modelInstances, inputModelInstances }) => {
-            expect(modelInstances.length).to.equal(1);
-            expect(inputModelInstances.length).to.equal(1);
+          Movie.afterInsert = createHookSpy(({ items, inputItems }) => {
+            expect(items.length).to.equal(1);
+            expect(inputItems.length).to.equal(1);
 
-            chaiExpect(modelInstances).to.containSubset([
+            chaiExpect(items).to.containSubset([
               {
                 name: 'Inserted'
               }
             ]);
 
-            chaiExpect(inputModelInstances).to.containSubset([
+            chaiExpect(inputItems).to.containSubset([
               {
                 name: 'Inserted'
               }
@@ -2908,30 +2913,28 @@ module.exports = session => {
 
       describe('$relatedQuery', () => {
         describe('many to many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Movie.afterInsert = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Movie.afterInsert = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'Inserted'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'Inserted'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('movies'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('movies'));
+                });
 
                 return person.$relatedQuery('movies').insert({ name: 'Inserted' });
               })
@@ -2943,31 +2946,29 @@ module.exports = session => {
         });
 
         describe('has many', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances`', () => {
+          it('should have access to `relation`, `items` and `inputItems`', () => {
             return Person.query()
               .findOne({ name: 'Jennifer' })
               .then(person => {
-                Pet.afterInsert = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Pet.afterInsert = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Jennifer'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Jennifer'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'Lol',
-                        species: 'Frog'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'Lol',
+                      species: 'Frog'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Person.getRelation('pets'));
-                  }
-                );
+                  expect(relation).to.equal(Person.getRelation('pets'));
+                });
 
                 return person.$relatedQuery('pets').insert({ name: 'Lol', species: 'Frog' });
               })
@@ -2979,30 +2980,28 @@ module.exports = session => {
         });
 
         describe('belongs to one', () => {
-          it('should have access to `relation`, `modelInstances` and `inputModelInstances', () => {
+          it('should have access to `relation`, `items` and `inputItems', () => {
             return Pet.query()
               .findOne({ name: 'Doggo' })
               .then(pet => {
-                Person.afterInsert = createHookSpy(
-                  ({ modelInstances, inputModelInstances, relation }) => {
-                    expect(modelInstances.length).to.equal(1);
-                    expect(inputModelInstances.length).to.equal(1);
+                Person.afterInsert = createHookSpy(({ items, inputItems, relation }) => {
+                  expect(items.length).to.equal(1);
+                  expect(inputItems.length).to.equal(1);
 
-                    chaiExpect(modelInstances).to.containSubset([
-                      {
-                        name: 'Doggo'
-                      }
-                    ]);
+                  chaiExpect(items).to.containSubset([
+                    {
+                      name: 'Doggo'
+                    }
+                  ]);
 
-                    chaiExpect(inputModelInstances).to.containSubset([
-                      {
-                        name: 'New Owner'
-                      }
-                    ]);
+                  chaiExpect(inputItems).to.containSubset([
+                    {
+                      name: 'New Owner'
+                    }
+                  ]);
 
-                    expect(relation).to.equal(Pet.getRelation('owner'));
-                  }
-                );
+                  expect(relation).to.equal(Pet.getRelation('owner'));
+                });
 
                 return pet.$relatedQuery('owner').insert({ name: 'New Owner' });
               })
