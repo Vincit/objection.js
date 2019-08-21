@@ -14,12 +14,15 @@
 
 import * as knex from 'knex';
 import * as ajv from 'ajv';
+import * as dbErrors from 'db-errors'
 
 export = Objection;
 
 declare namespace Objection {
   const raw: RawFunction;
-  const lit: LiteralFunction;
+  // Deprecated
+  const lit: ValueFunction;
+  const val: ValueFunction;
   const ref: ReferenceFunction;
 
   const compose: ComposeFunction;
@@ -28,6 +31,8 @@ declare namespace Objection {
   const snakeCaseMappers: SnakeCaseMappersFactory;
   const knexSnakeCaseMappers: KnexSnakeCaseMappersFactory;
 
+  const transaction: transaction;
+
   export interface RawBuilder extends Aliasable {}
 
   export interface RawFunction extends RawInterface<RawBuilder> {}
@@ -35,11 +40,11 @@ declare namespace Objection {
     (sql: string, ...bindings: any[]): R;
   }
 
-  export interface LiteralBuilder extends Castable {}
-  export interface LiteralFunction {
+  export interface ValueBuilder extends Castable {}
+  export interface ValueFunction {
     (
       value: PrimitiveValue | PrimitiveValue[] | PrimitiveValueObject | PrimitiveValueObject[]
-    ): LiteralBuilder;
+    ): ValueBuilder;
   }
 
   export interface ReferenceBuilder extends Castable {}
@@ -86,7 +91,7 @@ declare namespace Objection {
 
   type Raw = RawBuilder;
   type Operator = string;
-  type NonPrimitiveValue = Raw | ReferenceBuilder | LiteralBuilder | AnyQueryBuilder;
+  type NonPrimitiveValue = Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
   type ColumnRef = string | Raw | ReferenceBuilder;
   type TableRef = ColumnRef | AnyQueryBuilder;
 
@@ -450,6 +455,15 @@ declare namespace Objection {
     ): ArrayQueryBuilder<QB>;
   }
 
+  interface WithGraphFetchedMethod<QB extends AnyQueryBuilder> {
+    (expr: RelationExpression<ModelType<QB>>, options?:GraphOptions): QB;
+  }
+
+  interface WithGraphJoinedMethod<QB extends AnyQueryBuilder> {
+    (expr: RelationExpression<ModelType<QB>>, options?:GraphOptions): QB;
+  }
+
+  // Deprecated
   interface EagerMethod<QB extends AnyQueryBuilder> {
     (expr: RelationExpression<ModelType<QB>>, modifiers?: Modifiers): QB;
   }
@@ -586,12 +600,15 @@ declare namespace Objection {
     ): ArrayQueryBuilder<QB>;
   }
 
+  // Deprecated
   export interface EagerAlgorithm {}
 
+  // Deprecated
   interface EagerAlgorithmMethod<QB extends AnyQueryBuilder> {
     (algorithm: EagerAlgorithm): QB;
   }
 
+  // Deprecated
   export interface EagerOptions {
     minimize?: boolean;
     separator?: string;
@@ -599,11 +616,20 @@ declare namespace Objection {
     joinOperation: string;
   }
 
+  export interface GraphOptions {
+    minimize?: boolean;
+    separator?: string;
+    aliases?: string[];
+    joinOperation: string;
+    maxBatchSize?: number;
+  }
+
+  // Deprecated
   interface EagerOptionsMethod<QB extends AnyQueryBuilder> {
     (options: EagerOptions): QB;
   }
 
-  interface ModifyEagerMethod<QB extends AnyQueryBuilder> {
+  interface ModifyGraphMethod<QB extends AnyQueryBuilder> {
     <M extends Model>(
       expr: RelationExpression<ModelType<QB>>,
       modifier: Modifier<M['QueryBuilderType']>
@@ -613,6 +639,10 @@ declare namespace Objection {
   interface ContextMethod<QB extends AnyQueryBuilder> {
     (context: object): QB;
     (): QueryContext;
+  }
+
+  interface ModifyMethod<QB extends AnyQueryBuilder> {
+    (modifier: Modifier<QB> | Modifier<QB>[], ...args: any[]): QB;
   }
 
   export interface Pojo {
@@ -721,24 +751,39 @@ declare namespace Objection {
 
     relate: RelateMethod<this>;
 
+    withGraphFetched: WithGraphFetchedMethod<this>;
+    withGraphJoined: WithGraphJoinedMethod<this>;
+
+    // Deprecated
     eager: EagerMethod<this>;
+    // Deprecated
     mergeEager: EagerMethod<this>;
 
+    // Deprecated
     joinEager: EagerMethod<this>;
+    // Deprecated
     mergeJoinEager: EagerMethod<this>;
 
+    // Deprecated
     naiveEager: EagerMethod<this>;
+    // Deprecated
     mergeNaiveEager: EagerMethod<this>;
 
+    // Deprecated
     allowEager: AllowGraphMethod<this>;
+    // Deprecated
     mergeAllowEager: AllowGraphMethod<this>;
 
+    allowGraph: AllowGraphMethod<this>;
+    // Deprecated
     allowInsert: AllowGraphMethod<this>;
+    // Deprecated
     allowUpsert: AllowGraphMethod<this>;
 
     throwIfNotFound: IdentityMethod<this>;
     returning: ReturningMethod;
     forUpdate: IdentityMethod<this>;
+    forShare: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;
     debug: IdentityMethod<this>;
     as: OneArgMethod<string, this>;
@@ -769,12 +814,18 @@ declare namespace Objection {
     upsertGraph: UpsertGraphMethod;
     upsertGraphAndFetch: UpsertGraphMethod;
 
+    // Deprecated
     eagerAlgorithm: EagerAlgorithmMethod<this>;
+    // Deprecated
     eagerOptions: EagerOptionsMethod<this>;
-    modifyEager: ModifyEagerMethod<this>;
+    // Deprecated
+    modifyEager: ModifyGraphMethod<this>;
+    modifyGraph: ModifyGraphMethod<this>;
 
     context: ContextMethod<this>;
     mergeContext: ContextMethod<this>;
+
+    modify: ModifyMethod<this>;
 
     isFind: BooleanReturningMethod;
     isInsert: BooleanReturningMethod;
@@ -784,7 +835,9 @@ declare namespace Objection {
     isUnrelate: BooleanReturningMethod;
     hasWheres: BooleanReturningMethod;
     hasSelects: BooleanReturningMethod;
+    // Deprecated
     hasEager: BooleanReturningMethod;
+    hasWithGraph: BooleanReturningMethod;
 
     ModelType: M;
     ResultType: R;
@@ -819,6 +872,7 @@ declare namespace Objection {
     ): RM['QueryBuilderType'];
   }
 
+  // Deprecated
   interface LoadRelatedMethod<M extends Model> {
     (
       expression: RelationExpression<M>,
@@ -827,6 +881,18 @@ declare namespace Objection {
     ): SingleQueryBuilder<M['QueryBuilderType']>;
   }
 
+  interface FetchGraphMethod<M extends Model> {
+    (
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
+    ): SingleQueryBuilder<M['QueryBuilderType']>;
+  }
+
+  interface FetchGraphOptions {
+    transaction?: Transaction | knex
+  }
+
+  // Deprecated
   interface StaticLoadRelatedMethod {
     <M extends Model>(
       this: ModelClass<M>,
@@ -842,6 +908,22 @@ declare namespace Objection {
       expression: RelationExpression<M>,
       modifiers?: Modifiers<M['QueryBuilderType']>,
       trxOrKnex?: Transaction | knex
+    ): M['QueryBuilderType'];
+  }
+
+  interface StaticFetchGraphMethod {
+    <M extends Model>(
+      this: ModelClass<M>,
+      modelOrObject: PartialModelObject<M>,
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
+    ): SingleQueryBuilder<M['QueryBuilderType']>;
+
+    <M extends Model>(
+      this: ModelClass<M>,
+      modelOrObject: PartialModelObject<M>[],
+      expression: RelationExpression<M>,
+      options?: FetchGraphOptions
     ): M['QueryBuilderType'];
   }
 
@@ -866,7 +948,7 @@ declare namespace Objection {
   type RelationMappingColumnRef = string | ReferenceBuilder | (string | ReferenceBuilder)[];
 
   export interface RelationMapping<M extends Model = Model> {
-    relation: Relation;
+    relation: RelationType;
     modelClass: ModelClassSpecifier;
     join: RelationJoin;
     modify?: Modifier<M['QueryBuilderType']>;
@@ -888,7 +970,30 @@ declare namespace Objection {
     beforeInsert?: RelationMappingHook;
   }
 
-  export interface Relation {}
+  export interface RelationType extends Constructor<Relation> {}
+
+  export interface Relation {
+    name: string;
+    ownerModelClass: typeof Model;
+    relatedModelClass: typeof Model;
+    ownerProp: RelationProperty;
+    relatedProp: RelationProperty;
+    joinModelClass: typeof Model;
+    joinTable: string;
+    joinTableOwnerProp: RelationProperty;
+    joinTableRelatedProp: RelationProperty;
+  }
+
+  export interface RelationProperty {
+    size: number;
+    modelClass: typeof Model;
+    props: string[];
+    cols: string[];
+  }
+
+  export interface Relations {
+    [name: string]: Relation
+  }
 
   export interface QueryContext {
     transaction: Transaction;
@@ -1013,19 +1118,22 @@ declare namespace Objection {
     <M extends Model>(this: ModelClass<M>, json: object): M;
   }
 
-  export interface ModelClass<M> {
-    new (): M;
+  export interface Constructor<T> {
+    new (): T;
   }
+
+  export interface ModelClass<M> extends Constructor<M> {}
 
   export class Model {
     static tableName: string;
     static idColumn: string | string[];
+    static jsonSchema: JSONSchema;
 
-    static BelongsToOneRelation: Relation;
-    static HasOneRelation: Relation;
-    static HasManyRelation: Relation;
-    static ManyToManyRelation: Relation;
-    static HasOneThroughRelation: Relation;
+    static BelongsToOneRelation: RelationType;
+    static HasOneRelation: RelationType;
+    static HasManyRelation: RelationType;
+    static ManyToManyRelation: RelationType;
+    static HasOneThroughRelation: RelationType;
 
     static WhereInEagerAlgorithm: EagerAlgorithm;
     static NaiveEagerAlgorithm: EagerAlgorithm;
@@ -1046,13 +1154,20 @@ declare namespace Objection {
     static knex(knex?: knex): knex;
     static bindKnex: BindKnexMethod;
     static bindTransaction: BindKnexMethod;
+    // Deprecated
     static loadRelated: StaticLoadRelatedMethod;
+    static fetchGraph: StaticFetchGraphMethod;
     static raw: RawFunction;
+
+    static getRelations(): Relations;
+    static getRelation(name: string): Relation;
 
     $query: QueryMethod;
     $relatedQuery: RelatedQueryMethod<this>;
     $id: IdMethod;
+    // Deprecated
     $loadRelated: LoadRelatedMethod<this>;
+    $fetchGraph: FetchGraphMethod<this>;
 
     $formatDatabaseJson(json: Pojo): Pojo;
     $parseDatabaseJson(json: Pojo): Pojo;
@@ -1176,5 +1291,155 @@ declare namespace Objection {
     >;
   }
 
-  export const transaction: transaction;
+  export type DBError = dbErrors.DBError
+  export type DataError = dbErrors.DataError
+  export type CheckViolationError = dbErrors.CheckViolationError
+  export type UniqueViolationError = dbErrors.UniqueViolationError
+  export type ConstraintViolationError = dbErrors.ConstraintViolationError
+  export type ForeignKeyViolationError = dbErrors.ForeignKeyViolationError
+
+  /**
+   * JSON Schema 7
+   * Draft 07
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01
+   *
+   * These definitions were written by
+   *
+   * Boris Cherny https://github.com/bcherny,
+   * Cyrille Tuzi https://github.com/cyrilletuzi,
+   * Lucian Buzzo https://github.com/lucianbuzzo,
+   * Roland Groza https://github.com/rolandjitsu.
+   *
+   * https://www.npmjs.com/package/@types/json-schema
+   */
+
+  /**
+   * Primitive type
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1.1
+   */
+  export type JSONSchemaTypeName = 'string' | 'number' | 'integer' | 'boolean' | 'object' | 'array' | 'null';
+  export type JSONSchemaType = JSONSchemaArray[] | boolean | number | null | object | string;
+
+  // Workaround for infinite type recursion
+  // https://github.com/Microsoft/TypeScript/issues/3496#issuecomment-128553540
+  export interface JSONSchemaArray extends Array<JSONSchemaType> {}
+
+  /**
+   * Meta schema
+   *
+   * Recommended values:
+   * - 'http://json-schema.org/schema#'
+   * - 'http://json-schema.org/hyper-schema#'
+   * - 'http://json-schema.org/draft-07/schema#'
+   * - 'http://json-schema.org/draft-07/hyper-schema#'
+   *
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-5
+   */
+  export type JSONSchemaVersion = string;
+
+  /**
+   * JSON Schema v7
+   * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01
+   */
+  export type JSONSchemaDefinition = JSONSchema | boolean;
+  export interface JSONSchema {
+    $id?: string;
+    $ref?: string;
+    $schema?: JSONSchemaVersion;
+    $comment?: string;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1
+     */
+    type?: JSONSchemaTypeName | JSONSchemaTypeName[];
+    enum?: JSONSchemaType[];
+    const?: JSONSchemaType;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.2
+     */
+    multipleOf?: number;
+    maximum?: number;
+    exclusiveMaximum?: number;
+    minimum?: number;
+    exclusiveMinimum?: number;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.3
+     */
+    maxLength?: number;
+    minLength?: number;
+    pattern?: string;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.4
+     */
+    items?: JSONSchemaDefinition | JSONSchemaDefinition[];
+    additionalItems?: JSONSchemaDefinition;
+    maxItems?: number;
+    minItems?: number;
+    uniqueItems?: boolean;
+    contains?: JSONSchema;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.5
+     */
+    maxProperties?: number;
+    minProperties?: number;
+    required?: string[];
+    properties?: {
+        [key: string]: JSONSchemaDefinition;
+    };
+    patternProperties?: {
+        [key: string]: JSONSchemaDefinition;
+    };
+    additionalProperties?: JSONSchemaDefinition;
+    dependencies?: {
+        [key: string]: JSONSchemaDefinition | string[];
+    };
+    propertyNames?: JSONSchemaDefinition;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.6
+     */
+    if?: JSONSchemaDefinition;
+    then?: JSONSchemaDefinition;
+    else?: JSONSchemaDefinition;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.7
+     */
+    allOf?: JSONSchemaDefinition[];
+    anyOf?: JSONSchemaDefinition[];
+    oneOf?: JSONSchemaDefinition[];
+    not?: JSONSchemaDefinition;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-7
+     */
+    format?: string;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-8
+     */
+    contentMediaType?: string;
+    contentEncoding?: string;
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-9
+     */
+    definitions?: {
+        [key: string]: JSONSchemaDefinition;
+    };
+
+    /**
+     * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-10
+     */
+    title?: string;
+    description?: string;
+    default?: JSONSchemaType;
+    readOnly?: boolean;
+    writeOnly?: boolean;
+    examples?: JSONSchemaType;
+  }
 }

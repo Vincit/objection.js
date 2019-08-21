@@ -313,6 +313,37 @@ Get the knex instance:
 const knex = Person.knex();
 ```
 
+## `static` startTransaction()
+
+```js
+const trx = await Person.startTransaction(trxOrKnex);
+```
+
+Shortcut for `objection.transaction.start(Model1.knex())`.
+
+See the [transaction guide](/guide/transactions.html).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+trxOrKnex|knex or Transation|Optional existing transaction or knex instance.
+
+##### Examples
+
+```js
+const trx = await Person.startTransaction();
+
+try {
+  await Person.query(trx).insert(person1);
+  await Person.query(trx).insert(person2);
+  await Person.query(trx).patch(person3).where('id', person3.id);
+  await trx.commit();
+} catch (err) {
+  await trx.rollback();
+  throw err;
+}
+```
 
 ## `static` beforeFind()
 
@@ -326,7 +357,7 @@ class Person extends Model {
 
 A hook that is executed before find queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -355,7 +386,7 @@ class Person extends Model {
 
 A hook that is executed after find queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -384,7 +415,7 @@ class Person extends Model {
 
 A hook that is executed before update and patch queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -413,7 +444,7 @@ class Person extends Model {
 
 A hook that is executed after update and patch queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -442,7 +473,7 @@ class Person extends Model {
 
 A hook that is executed before insert queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -471,7 +502,7 @@ class Person extends Model {
 
 A hook that is executed after insert queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -500,7 +531,7 @@ class Person extends Model {
 
 A hook that is executed before delete queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)
@@ -529,7 +560,7 @@ class Person extends Model {
 
 A hook that is executed after delete queries.
 
-See these links for more information:
+See these sections for more information:
 
  * [static hooks guide](/guide/hooks.html#static-query-hooks)
  * [documentation for the arguments](/api/types/#type-statichookarguments)

@@ -30,21 +30,20 @@ The second argument is a callback that gets called with the transaction object a
 
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise is rejected or an error is thrown inside the callback the transaction is rolled back.
 
-An alternative way to start a transaction is to use the `objection.transaction.start` method:
+An alternative way to start a transaction is to use the [Model.startTransaction()](/api/model/static-methods.html#static-starttransaction) method:
 
 ```js
 const { transaction } = require('objection');
 
-let trx;
-try {
-  trx = await transaction.start(Person.knex());
-  // Here you can use the transaction.
+const trx = await Person.startTransction();
 
-  // If you created the transaction using `transaction.start`, you need
+try {
+  // If you created the transaction using `Model.startTransction`, you need
   // commit or rollback the transaction manually.
   await trx.commit();
 } catch (err) {
   await trx.rollback();
+  throw err;
 }
 ```
 
@@ -103,7 +102,7 @@ async function insertPersonAndPet(person, pet, db) {
 // All following four ways to call insertPersonAndPet work:
 
 // 1.
-const trx = await transaction.start(Person.knex());
+const trx = await Person.startTransaction();
 await insertPersonAndPet(person, pet, trx);
 await trx.commit();
 
@@ -210,9 +209,18 @@ await transaction(Person, async (Person, trx) => {
   // It can be passed to `transacting`, `query` etc.
   // methods, or used as a knex query builder.
 
-  const jennifer = await trx('persons').insert({firstName: 'Jennifer', lastName: 'Lawrence'});
-  const scrappy = await Animal.query(trx).insert({name: 'Scrappy'});
-  const fluffy = await Animal.query().transacting(trx).insert({name: 'Fluffy'});
+  const jennifer = await trx('persons').insert({
+    firstName: 'Jennifer',
+    lastName: 'Lawrence'}
+  );
+
+  const scrappy = await Animal.query(trx).insert({
+    name: 'Scrappy'
+  });
+
+  const fluffy = await Animal.query().transacting(trx).insert({
+    name: 'Fluffy'
+  });
 
   return {
     jennifer,

@@ -566,11 +566,51 @@ module.exports = session => {
         .catch(done);
     });
 
-    describe('transaction.start()', () => {
+    describe('transaction.start() / Model.startTransaction()', () => {
       it('should commit transaction when the commit method is called', done => {
         let trx;
+
         transaction
           .start(Model1)
+          .then(trans => {
+            trx = trans;
+            return Model1.bindKnex(trx)
+              .query()
+              .insert({ model1Prop1: 'test 1' });
+          })
+          .then(() => {
+            return Model1.bindKnex(trx)
+              .query()
+              .insert({ model1Prop1: 'test 2' });
+          })
+          .then(() => {
+            return Model2.bindKnex(trx)
+              .query()
+              .insert({ model2Prop1: 'test 3' });
+          })
+          .then(() => {
+            return trx.commit();
+          })
+          .then(() => {
+            return session.knex('Model1');
+          })
+          .then(rows => {
+            expect(rows).to.have.length(2);
+            expect(_.map(rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+            return session.knex('model2');
+          })
+          .then(rows => {
+            expect(rows).to.have.length(1);
+            expect(rows[0].model2_prop1).to.equal('test 3');
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should commit transaction when the commit method is called (Model.startTransaction())', done => {
+        let trx;
+
+        Model1.startTransaction()
           .then(trans => {
             trx = trans;
             return Model1.bindKnex(trx)
@@ -610,6 +650,27 @@ module.exports = session => {
         'commit should work with yield (and thus async/await)',
         Promise.coroutine(function*() {
           const trx = yield transaction.start(Model1.knex());
+
+          yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
+          yield Model1.query(trx).insert({ model1Prop1: 'test 2' });
+          yield Model2.query(trx).insert({ model2Prop1: 'test 3' });
+          yield trx.commit();
+
+          const model1Rows = yield session.knex('Model1');
+          const model2Rows = yield session.knex('model2');
+
+          expect(model1Rows).to.have.length(2);
+          expect(_.map(model1Rows, 'model1Prop1').sort()).to.eql(['test 1', 'test 2']);
+
+          expect(model2Rows).to.have.length(1);
+          expect(model2Rows[0].model2_prop1).to.equal('test 3');
+        })
+      );
+
+      it(
+        'commit should work with yield (and thus async/await) (Model.startTransaction())',
+        Promise.coroutine(function*() {
+          const trx = yield Model1.startTransaction();
 
           yield Model1.query(trx).insert({ model1Prop1: 'test 1' });
           yield Model1.query(trx).insert({ model1Prop1: 'test 2' });

@@ -2,7 +2,7 @@ import * as ajv from 'ajv';
 import * as knex from 'knex';
 
 import * as objection from '../../';
-import { lit, raw, ref, RelationMappings } from '../../';
+import { lit, raw, ref, RelationMappings, JSONSchema } from '../../';
 
 // This file exercises the Objection.js typings.
 
@@ -50,6 +50,16 @@ class Person extends objection.Model {
   movies?: Movie[];
 
   static columnNameMappers = objection.snakeCaseMappers();
+
+  static jsonSchema: JSONSchema = {
+    type: 'object',
+
+    properties: {
+      firstName: {
+        type: 'string'
+      }
+    }
+  }
 
   examplePersonMethod = (arg: string) => 1;
 
@@ -633,6 +643,20 @@ const childrenAndPets: Promise<Person[]> = Person.query()
   .modifyEager('[pets, children.pets]', 'orderByName')
   .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
 
+const childrenAndPets2: Promise<Person[]> = Person.query()
+  .withGraphFetched('children')
+  .where('age', '>=', 42)
+  .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'))
+  .modifyEager('[pets, children.pets]', 'orderByName')
+  .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
+
+const childrenAndPets3: Promise<Person[]> = Person.query()
+  .withGraphJoined('children')
+  .where('age', '>=', 42)
+  .modifyEager('[pets, children.pets]', qb => qb.orderBy('name'))
+  .modifyEager('[pets, children.pets]', 'orderByName')
+  .modifyEager('[pets, children.pets]', ['orderByName', 'orderBySomethingElse']);
+
 const rowsPage: Promise<{
   total: number;
   results: Person[];
@@ -699,6 +723,13 @@ deletePromise = deleteQb.execute();
 const pageQb = Person.query().page(1, 10);
 let pagePromise: Promise<objection.Page<Person>> = pageQb;
 pagePromise = pageQb.execute();
+
+Person
+  .query()
+  .modify('someModifier')
+  .modify('someModifier', 1, 'foo', { bar: true })
+  .modify(['someModifier', 'someOtherModifier'])
+  .modify(qb => qb.where('firstName', 'lol'))
 
 // non-wrapped methods:
 
@@ -1017,6 +1048,9 @@ const orderByColumns: Promise<Person[]> = qb.orderBy([
   { column: 'firstName', order: 'asc' },
   { column: 'lastName' }
 ]);
+
+const someModel1: typeof objection.Model = Person.getRelations()['pets'].joinModelClass
+const someModel2: typeof objection.Model = Person.getRelation('pets').ownerModelClass
 
 // Verify that Model.query() and model.$query() return the same type of query builder.
 // Confirming this prevent us from having to duplicate the tests for each.
