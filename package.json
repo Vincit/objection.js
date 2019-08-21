@@ -1,6 +1,6 @@
 {
   "name": "objection",
-  "version": "1.6.9",
+  "version": "2.0.0-alpha.1",
   "description": "An SQL-friendly ORM for Node.js",
   "main": "lib/objection.js",
   "license": "MIT",
@@ -75,7 +75,7 @@
     "chai-subset": "^1.6.0",
     "coveralls": "^3.0.6",
     "cross-env": "^5.2.0",
-    "eslint": "^6.2.1",
+    "eslint": "^6.1.0",
     "eslint-plugin-prettier": "^3.1.0",
     "expect.js": "^0.3.1",
     "fs-extra": "^8.1.0",
@@ -87,7 +87,7 @@
     "pg": "^7.12.1",
     "prettier": "1.18.2",
     "sqlite3": "^4.1.0",
-    "typescript": "^3.7.0-dev.20190821",
+    "typescript": "3.5.3",
     "vuepress": "1.0.3"
   },
   "nyc": {
