@@ -2,6 +2,7 @@ exports.up = knex => {
   return knex.schema
     .createTable('persons', table => {
       table.increments('id').primary();
+
       table
         .integer('parentId')
         .unsigned()
@@ -9,6 +10,7 @@ exports.up = knex => {
         .inTable('persons')
         .onDelete('SET NULL')
         .index();
+
       table.string('firstName');
       table.string('lastName');
       table.integer('age');
@@ -20,6 +22,7 @@ exports.up = knex => {
     })
     .createTable('animals', table => {
       table.increments('id').primary();
+
       table
         .integer('ownerId')
         .unsigned()
@@ -27,11 +30,13 @@ exports.up = knex => {
         .inTable('persons')
         .onDelete('SET NULL')
         .index();
+
       table.string('name');
       table.string('species');
     })
     .createTable('persons_movies', table => {
       table.increments('id').primary();
+
       table
         .integer('personId')
         .unsigned()
@@ -39,6 +44,7 @@ exports.up = knex => {
         .inTable('persons')
         .onDelete('CASCADE')
         .index();
+
       table
         .integer('movieId')
         .unsigned()

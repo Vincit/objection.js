@@ -1,8 +1,6 @@
 'use strict';
 
 const { Model } = require('objection');
-const Animal = require('./Animal');
-const Movie = require('./Movie');
 
 class Person extends Model {
   // Table name is the only required property.
@@ -37,8 +35,34 @@ class Person extends Model {
     };
   }
 
+  // Modifiers are reusable query snippets that can be used in various places.
+  static get modifiers() {
+    return {
+      // Our example modifier is a a semi-dumb fuzzy name match. We split the
+      // name into pieces using whitespace and then try to partially match
+      // each of those pieces to both the `firstName` and the `lastName`
+      // fields.
+      searchByName(query, name) {
+        // This `where` simply creates parentheses so that other `where`
+        // statements don't get mixed with the these.
+        query.where(query => {
+          for (const namePart of name.trim().split(/\s+/)) {
+            for (const column of ['firstName', 'lastName']) {
+              query.orWhereRaw('lower(??) like ?', [column, namePart.toLowerCase() + '%']);
+            }
+          }
+        });
+      }
+    };
+  }
+
   // This object defines the relations to other models.
   static get relationMappings() {
+    // One way to prevent circular references
+    // is to require the model classes here.
+    const Animal = require('./Animal');
+    const Movie = require('./Movie');
+
     return {
       pets: {
         relation: Model.HasManyRelation,

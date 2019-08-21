@@ -1,0 +1,28 @@
+{
+  "name": "objection-example-koa",
+  "version": "2.0.0",
+  "description": "Objection.js koa example",
+  "main": "app.js",
+  "scripts": {
+    "migrate": "knex migrate:latest",
+    "start": "npm run migrate && node app"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "author": "Sami Koskimäki",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "knex": "^0.19.1",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "objection": "../../",
+    "sqlite3": "^4.0.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0"
+  }
+}
