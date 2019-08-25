@@ -253,9 +253,11 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal(
-        "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'"
-      );
+      expect(
+        err.message.startsWith(
+          "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'"
+        )
+      ).to.equal(true);
     });
   });
 
