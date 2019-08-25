@@ -202,12 +202,17 @@ declare namespace Objection {
   type ResultType<QB extends AnyQueryBuilder> = QB['ResultType'];
 
   /**
-   * Extracts the property names of the query builder's model class.
+   * Extracts the property names (excluding relations) of the query builder's model class.
    */
-  type ModelProps<QB extends AnyQueryBuilder> = Exclude<
-    NonFunctionPropertyNames<ModelType<QB>>,
-    'QueryBuilderType'
-  >;
+  type ModelProps<T extends Model> = Exclude<{
+    [K in keyof T]?: Exclude<T[K], undefined> extends Model
+      ? never
+      : Exclude<T[K], undefined> extends Array<infer I>
+      ? (I extends Model ? never : K)
+      : T[K] extends Function
+      ? never
+      : K
+  }[keyof T], undefined | 'QueryBuilderType'>
 
   /**
    * Gets the single item query builder type for a query builder.
@@ -243,21 +248,25 @@ declare namespace Objection {
   type Selection<QB extends AnyQueryBuilder> = ColumnRef | AnyQueryBuilder | CallbackVoid<QB>;
 
   interface SelectMethod<QB extends AnyQueryBuilder> {
-    <AQB extends AnyQueryBuilder>(...columns: Selection<AQB>[]): QB;
-    <AQB extends AnyQueryBuilder>(columns: Selection<AQB>[]): QB;
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(...columns: ModelProps<ModelType<QBP>>[]): QB;
+    <QBP extends QB>(columns: ModelProps<ModelType<QBP>>[]): QB;
+
+    <QBP extends QB>(...columns: Selection<QBP>[]): QB;
+    <QBP extends QB>(columns: Selection<QBP>[]): QB;
   }
 
   interface FromMethod<QB extends AnyQueryBuilder> {
     (table: string): QB;
     (cb: CallbackVoid<QB>): QB;
     (raw: Raw): QB;
-    <QBA extends AnyQueryBuilder>(qb: QBA): QB;
+    <QBP extends AnyQueryBuilder>(qb: QBP): QB;
   }
 
   interface WhereMethod<QB extends AnyQueryBuilder> {
     // These must come first so that we get autocomplete.
-    <QBP extends QB>(col: ModelProps<QBP>, op: Operator, value: Value): QB;
-    <QBP extends QB>(col: ModelProps<QBP>, value: Value): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, op: Operator, value: Value): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, value: Value): QB;
 
     (col: ColumnRef, op: Operator, value: Value): QB;
     (col: ColumnRef, value: Value): QB;
@@ -288,9 +297,9 @@ declare namespace Objection {
 
   interface WhereInMethod<QB extends AnyQueryBuilder> {
     // These must come first so that we get autocomplete.
-    <QBP extends QB>(col: ModelProps<QBP>, value: Value): QB;
-    <QBP extends QB>(col: ModelProps<QBP>, cb: CallbackVoid<QB>): QB;
-    <QBP extends QB>(col: ModelProps<QBP>, qb: AnyQueryBuilder): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, value: Value): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, cb: CallbackVoid<QB>): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, qb: AnyQueryBuilder): QB;
 
     (col: ColumnRef | ColumnRef[], value: Value[]): QB;
     (col: ColumnRef | ColumnRef[], cb: CallbackVoid<QB>): QB;
