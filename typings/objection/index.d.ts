@@ -33,6 +33,13 @@ declare namespace Objection {
 
   const transaction: transaction;
 
+  const DBError: typeof dbErrors.DBError
+  const DataError: typeof dbErrors.DataError
+  const CheckViolationError: typeof dbErrors.CheckViolationError
+  const UniqueViolationError: typeof dbErrors.UniqueViolationError
+  const ConstraintViolationError: typeof dbErrors.ConstraintViolationError
+  const ForeignKeyViolationError: typeof dbErrors.ForeignKeyViolationError
+
   export interface RawBuilder extends Aliasable {}
 
   export interface RawFunction extends RawInterface<RawBuilder> {}
@@ -1290,13 +1297,6 @@ declare namespace Objection {
       ReturnValue
     >;
   }
-
-  export type DBError = dbErrors.DBError
-  export type DataError = dbErrors.DataError
-  export type CheckViolationError = dbErrors.CheckViolationError
-  export type UniqueViolationError = dbErrors.UniqueViolationError
-  export type ConstraintViolationError = dbErrors.ConstraintViolationError
-  export type ForeignKeyViolationError = dbErrors.ForeignKeyViolationError
 
   /**
    * JSON Schema 7

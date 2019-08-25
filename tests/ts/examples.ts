@@ -2,7 +2,7 @@ import * as ajv from 'ajv';
 import * as knex from 'knex';
 
 import * as objection from '../../';
-import { lit, raw, ref, RelationMappings, JSONSchema } from '../../';
+import { lit, raw, ref, RelationMappings, JSONSchema, DBError } from '../../';
 
 // This file exercises the Objection.js typings.
 
@@ -1085,6 +1085,19 @@ takesPerson(Person.fromDatabaseJson({ firstName: 'jennifer', lastName: 'Lawrence
 
 const plugin1 = ({} as any) as objection.Plugin;
 const plugin2 = ({} as any) as objection.Plugin;
+
+// DB errors
+() => {
+  const e = new DBError('message')
+
+  if (e instanceof DBError) {
+
+  }
+
+  if (e instanceof objection.ConstraintViolationError) {
+
+  }
+}
 
 () => {
   const BaseModel = objection.mixin(objection.Model, [plugin1, plugin2]);
