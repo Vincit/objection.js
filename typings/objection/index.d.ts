@@ -14,7 +14,7 @@
 
 import * as knex from 'knex';
 import * as ajv from 'ajv';
-import * as dbErrors from 'db-errors'
+import * as dbErrors from 'db-errors';
 
 export = Objection;
 
@@ -33,12 +33,12 @@ declare namespace Objection {
 
   const transaction: transaction;
 
-  const DBError: typeof dbErrors.DBError
-  const DataError: typeof dbErrors.DataError
-  const CheckViolationError: typeof dbErrors.CheckViolationError
-  const UniqueViolationError: typeof dbErrors.UniqueViolationError
-  const ConstraintViolationError: typeof dbErrors.ConstraintViolationError
-  const ForeignKeyViolationError: typeof dbErrors.ForeignKeyViolationError
+  const DBError: typeof dbErrors.DBError;
+  const DataError: typeof dbErrors.DataError;
+  const CheckViolationError: typeof dbErrors.CheckViolationError;
+  const UniqueViolationError: typeof dbErrors.UniqueViolationError;
+  const ConstraintViolationError: typeof dbErrors.ConstraintViolationError;
+  const ForeignKeyViolationError: typeof dbErrors.ForeignKeyViolationError;
 
   export interface RawBuilder extends Aliasable {}
 
@@ -166,7 +166,7 @@ declare namespace Objection {
       ? T[K]
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? I[] : (T[K] | NonPrimitiveValue))
-      : (T[K] | NonPrimitiveValue)
+      : (T[K] | NonPrimitiveValue);
   } &
     object;
 
@@ -187,7 +187,7 @@ declare namespace Objection {
       ? PartialModelGraph<Exclude<T[K], undefined>>
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonPrimitiveValue))
-      : (T[K] | NonPrimitiveValue)
+      : (T[K] | NonPrimitiveValue);
   } &
     GraphParameters;
 
@@ -202,17 +202,34 @@ declare namespace Objection {
   type ResultType<QB extends AnyQueryBuilder> = QB['ResultType'];
 
   /**
-   * Extracts the property names (excluding relations) of the query builder's model class.
+   * Extracts the property names (excluding relations) of a model class.
    */
-  type ModelProps<T extends Model> = Exclude<{
-    [K in keyof T]?: Exclude<T[K], undefined> extends Model
-      ? never
-      : Exclude<T[K], undefined> extends Array<infer I>
-      ? (I extends Model ? never : K)
-      : T[K] extends Function
-      ? never
-      : K
-  }[keyof T], undefined | 'QueryBuilderType'>
+  type ModelProps<T extends Model> = Exclude<
+    {
+      [K in keyof T]?: Exclude<T[K], undefined> extends Model
+        ? never
+        : Exclude<T[K], undefined> extends Array<infer I>
+        ? (I extends Model ? never : K)
+        : T[K] extends Function
+        ? never
+        : K;
+    }[keyof T],
+    undefined | 'QueryBuilderType'
+  >;
+
+  /**
+   * Extracts the relation names of the a model class.
+   */
+  type ModelRelations<T extends Model> = Exclude<
+    {
+      [K in keyof T]?: Exclude<T[K], undefined> extends Model
+        ? K
+        : Exclude<T[K], undefined> extends Array<infer I>
+        ? (I extends Model ? K : never)
+        : never;
+    }[keyof T],
+    undefined
+  >;
 
   /**
    * Gets the single item query builder type for a query builder.
@@ -471,12 +488,18 @@ declare namespace Objection {
     ): ArrayQueryBuilder<QB>;
   }
 
+  type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
+
+  interface ForMethod<QB extends AnyQueryBuilder> {
+    (ids: ForIdValue | ForIdValue[]): QB;
+  }
+
   interface WithGraphFetchedMethod<QB extends AnyQueryBuilder> {
-    (expr: RelationExpression<ModelType<QB>>, options?:GraphOptions): QB;
+    (expr: RelationExpression<ModelType<QB>>, options?: GraphOptions): QB;
   }
 
   interface WithGraphJoinedMethod<QB extends AnyQueryBuilder> {
-    (expr: RelationExpression<ModelType<QB>>, options?:GraphOptions): QB;
+    (expr: RelationExpression<ModelType<QB>>, options?: GraphOptions): QB;
   }
 
   // Deprecated
@@ -703,10 +726,10 @@ declare namespace Objection {
 
     whereBetween: WhereBetweenMethod<this>;
 
-    whereNull: WhereNullMethod<this>
-    orWhereNull: WhereNullMethod<this>
-    whereNotNull: WhereNullMethod<this>
-    orWhereNotNull: WhereNullMethod<this>
+    whereNull: WhereNullMethod<this>;
+    orWhereNull: WhereNullMethod<this>;
+    whereNotNull: WhereNullMethod<this>;
+    orWhereNotNull: WhereNullMethod<this>;
 
     whereJsonSupersetOf: WhereJsonSupersetOfMethod<this>;
     whereJsonIsArray: WhereJsonIsArrayMethod<this>;
@@ -766,6 +789,7 @@ declare namespace Objection {
     insertAndFetch: InsertMethod<this>;
 
     relate: RelateMethod<this>;
+    for: ForMethod<this>;
 
     withGraphFetched: WithGraphFetchedMethod<this>;
     withGraphJoined: WithGraphJoinedMethod<this>;
@@ -880,8 +904,28 @@ declare namespace Objection {
     ? (I extends Model ? I['QueryBuilderType'] : never)
     : never;
 
+  type ArrayRelatedQueryBuilder<T> = T extends Model
+    ? T['QueryBuilderType']
+    : T extends Array<infer I>
+    ? (I extends Model ? I['QueryBuilderType'] : never)
+    : never;
+
   interface RelatedQueryMethod<M extends Model> {
     <K extends keyof M>(relationName: K, trxOrKnex?: Transaction | knex): RelatedQueryBuilder<M[K]>;
+
+    <RM extends Model>(
+      relationName: string,
+      trxOrKnex?: Transaction | knex
+    ): RM['QueryBuilderType'];
+  }
+
+  interface StaticRelatedQueryMethod {
+    <M extends Model, K extends keyof M>(
+      this: ModelClass<M>,
+      relationName: K,
+      trxOrKnex?: Transaction | knex
+    ): ArrayRelatedQueryBuilder<M[K]>;
+
     <RM extends Model>(
       relationName: string,
       trxOrKnex?: Transaction | knex
@@ -898,14 +942,13 @@ declare namespace Objection {
   }
 
   interface FetchGraphMethod<M extends Model> {
-    (
-      expression: RelationExpression<M>,
-      options?: FetchGraphOptions
-    ): SingleQueryBuilder<M['QueryBuilderType']>;
+    (expression: RelationExpression<M>, options?: FetchGraphOptions): SingleQueryBuilder<
+      M['QueryBuilderType']
+    >;
   }
 
   interface FetchGraphOptions {
-    transaction?: Transaction | knex
+    transaction?: Transaction | knex;
   }
 
   // Deprecated
@@ -948,20 +991,13 @@ declare namespace Objection {
   }
 
   interface StaticTraverseMethod {
-    (
-      filterConstructor: typeof Model,
-      models: Model | Model[],
-      traverser: TraverserFunction
-    ): void;
+    (filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
 
     (models: Model | Model[], traverser: TraverserFunction): void;
   }
 
   interface TraverseMethod {
-    (
-      filterConstructor: typeof Model,
-      traverser: TraverserFunction
-    ): void;
+    (filterConstructor: typeof Model, traverser: TraverserFunction): void;
 
     (traverser: TraverserFunction): void;
   }
@@ -1031,7 +1067,7 @@ declare namespace Objection {
   }
 
   export interface Relations {
-    [name: string]: Relation
+    [name: string]: Relation;
   }
 
   export interface QueryContext {
@@ -1204,7 +1240,7 @@ declare namespace Objection {
     static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query: StaticQueryMethod;
-    static relatedQuery: RelatedQueryMethod<Model>;
+    static relatedQuery: StaticRelatedQueryMethod;
     static columnNameMappers: ColumnNameMappers;
     static relationMappings: RelationMappings | (() => RelationMappings);
 
@@ -1397,7 +1433,14 @@ declare namespace Objection {
    * Primitive type
    * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-6.1.1
    */
-  export type JSONSchemaTypeName = 'string' | 'number' | 'integer' | 'boolean' | 'object' | 'array' | 'null';
+  export type JSONSchemaTypeName =
+    | 'string'
+    | 'number'
+    | 'integer'
+    | 'boolean'
+    | 'object'
+    | 'array'
+    | 'null';
   export type JSONSchemaType = JSONSchemaArray[] | boolean | number | null | object | string;
 
   // Workaround for infinite type recursion
@@ -1468,14 +1511,14 @@ declare namespace Objection {
     minProperties?: number;
     required?: string[];
     properties?: {
-        [key: string]: JSONSchemaDefinition;
+      [key: string]: JSONSchemaDefinition;
     };
     patternProperties?: {
-        [key: string]: JSONSchemaDefinition;
+      [key: string]: JSONSchemaDefinition;
     };
     additionalProperties?: JSONSchemaDefinition;
     dependencies?: {
-        [key: string]: JSONSchemaDefinition | string[];
+      [key: string]: JSONSchemaDefinition | string[];
     };
     propertyNames?: JSONSchemaDefinition;
 
@@ -1509,7 +1552,7 @@ declare namespace Objection {
      * @see https://tools.ietf.org/html/draft-handrews-json-schema-validation-01#section-9
      */
     definitions?: {
-        [key: string]: JSONSchemaDefinition;
+      [key: string]: JSONSchemaDefinition;
     };
 
     /**

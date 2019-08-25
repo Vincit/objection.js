@@ -59,7 +59,7 @@ class Person extends objection.Model {
         type: 'string'
       }
     }
-  }
+  };
 
   examplePersonMethod = (arg: string) => 1;
 
@@ -69,6 +69,10 @@ class Person extends objection.Model {
 
   petsWithId(petId: number): Promise<Animal[]> {
     return this.$relatedQuery('pets').where('id', petId);
+  }
+
+  commentsWithId(commentId: number): Promise<Comment[]> {
+    return this.$relatedQuery('comments').where('id', commentId);
   }
 
   fetchMom(): Promise<Person | undefined> {
@@ -264,6 +268,10 @@ class Movie extends objection.Model {
   actors!: Person[];
   // prettier-ignore
   director!: Person;
+
+  fetchDirector(): Promise<Person> {
+    return this.$relatedQuery('director');
+  }
 
   /**
    * This static field instructs Objection how to hydrate and persist
@@ -628,6 +636,12 @@ const rowsEager2: Promise<Person[]> = Person.query().eager({
   }
 });
 
+const rowsEager3: Promise<Person[]> = Person.query().withGraphFetched({
+  foo: {
+    bar: true
+  }
+});
+
 const children: Promise<Person[]> = Person.query()
   .skipUndefined()
   .allowEager('[pets, parent, children.[pets, movies.actors], movies.actors.pets]')
@@ -724,12 +738,11 @@ const pageQb = Person.query().page(1, 10);
 let pagePromise: Promise<objection.Page<Person>> = pageQb;
 pagePromise = pageQb.execute();
 
-Person
-  .query()
+Person.query()
   .modify('someModifier')
   .modify('someModifier', 1, 'foo', { bar: true })
   .modify(['someModifier', 'someOtherModifier'])
-  .modify(qb => qb.where('firstName', 'lol'))
+  .modify(qb => qb.where('firstName', 'lol'));
 
 // non-wrapped methods:
 
@@ -890,6 +903,19 @@ Person.query().where(builder => {
   builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
 
+const relQueryResult1: Promise<Animal[]> = Person.relatedQuery('pets').for(1);
+const relQueryResult2: Promise<Animal[]> = Person.relatedQuery('pets').for([1, 2]);
+const relQueryResult3: Promise<Animal[]> = Person.relatedQuery('pets').for('something');
+const relQueryResult4: Promise<Animal[]> = Person.relatedQuery('pets').for(['something', 'eles']);
+const relQueryResult5: Promise<Animal[]> = Person.relatedQuery('pets').for([[1, 2], [3, 4]]);
+const relQueryResult6: Promise<Animal[]> = Person.relatedQuery('pets').for(
+  Movie.query().select('id')
+);
+const relQueryResult7: Promise<Movie[]> = Person.relatedQuery('movies').for(1);
+const relQueryResult8: Promise<Person[]> = Person.relatedQuery('mom').for(1);
+const relQueryResult9: Promise<Person[]> = Person.relatedQuery('children').for(1);
+const relQueryResult10: Promise<Movie[]> = Person.relatedQuery<Movie>('nonExistentRelation').for(1);
+
 /**
  * http://knexjs.org/#Builder-count
  */
@@ -1049,8 +1075,8 @@ const orderByColumns: Promise<Person[]> = qb.orderBy([
   { column: 'lastName' }
 ]);
 
-const someModel1: typeof objection.Model = Person.getRelations()['pets'].joinModelClass
-const someModel2: typeof objection.Model = Person.getRelation('pets').ownerModelClass
+const someModel1: typeof objection.Model = Person.getRelations()['pets'].joinModelClass;
+const someModel2: typeof objection.Model = Person.getRelation('pets').ownerModelClass;
 
 // Verify that Model.query() and model.$query() return the same type of query builder.
 // Confirming this prevent us from having to duplicate the tests for each.
@@ -1088,16 +1114,14 @@ const plugin2 = ({} as any) as objection.Plugin;
 
 // DB errors
 () => {
-  const e = new DBError('message')
+  const e = new DBError('message');
 
   if (e instanceof DBError) {
-
   }
 
   if (e instanceof objection.ConstraintViolationError) {
-
   }
-}
+};
 
 () => {
   const BaseModel = objection.mixin(objection.Model, [plugin1, plugin2]);
