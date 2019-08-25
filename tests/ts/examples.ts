@@ -235,6 +235,10 @@ async () => {
       qb => qb.table(Person.tableName).where({ lastName: 'black' }),
       true
     );
+
+  await Person.query().intersect(Person.query().where({ lastName: 'doe' }), qb =>
+    qb.table(Person.tableName).where({ lastName: 'black' })
+  );
 };
 
 // .query().castTo()

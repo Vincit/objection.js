@@ -272,6 +272,10 @@ declare namespace Objection {
     <QBP extends QB>(columns: Selection<QBP>[]): QB;
   }
 
+  interface AsMethod<QB extends AnyQueryBuilder> {
+    (alias: string): QB;
+  }
+
   interface FromMethod<QB extends AnyQueryBuilder> {
     (table: string): QB;
     (cb: CallbackVoid<QB>): QB;
@@ -366,13 +370,13 @@ declare namespace Objection {
 
   type QBOrCallback<QB extends AnyQueryBuilder> = AnyQueryBuilder | CallbackVoid<QB>;
 
-  interface SetOperations<QB extends AnyQueryBuilder> extends BaseSetOperations<QB> {
-    (...callbacksOrBuilders: QBOrCallback<QB>[]): QB;
-  }
-
   interface BaseSetOperations<QB extends AnyQueryBuilder> {
     (callbackOrBuilder: QBOrCallback<QB>, wrap?: boolean): QB;
     (callbacksOrBuilders: QBOrCallback<QB>[], wrap?: boolean): QB;
+  }
+
+  interface SetOperations<QB extends AnyQueryBuilder> extends BaseSetOperations<QB> {
+    (...callbacksOrBuilders: QBOrCallback<QB>[]): QB;
   }
 
   interface UnionMethod<QB extends AnyQueryBuilder> extends BaseSetOperations<QB> {
@@ -569,6 +573,10 @@ declare namespace Objection {
 
   interface BooleanReturningMethod {
     (): boolean;
+  }
+
+  interface ColumnInfoMethod<QB extends AnyQueryBuilder> {
+    (): Promise<knex.ColumnInfo>;
   }
 
   interface TableRefForMethod {
@@ -780,6 +788,7 @@ declare namespace Objection {
     columns: SelectMethod<this>;
     column: SelectMethod<this>;
     distinct: SelectMethod<this>;
+    as: AsMethod<this>;
 
     from: FromMethod<this>;
     table: FromMethod<this>;
@@ -858,6 +867,7 @@ declare namespace Objection {
 
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
+    intersect: SetOperations<this>;
 
     with: WithMethod<this>;
     withRaw: WithRawMethod<this>;
@@ -963,7 +973,6 @@ declare namespace Objection {
     forShare: IdentityMethod<this>;
     skipUndefined: IdentityMethod<this>;
     debug: IdentityMethod<this>;
-    as: OneArgMethod<string, this>;
     alias: OneArgMethod<string, this>;
     aliasFor: AliasForMethod<this>;
     withSchema: OneArgMethod<string, this>;
@@ -978,6 +987,7 @@ declare namespace Objection {
     connection: OneArgMethod<knex | Transaction, this>;
     timeout: TimeoutMethod<this>;
     clone: IdentityMethod<this>;
+    columnInfo: ColumnInfoMethod<this>;
 
     // Deprecated
     pluck: OneArgMethod<string, this>;
@@ -1015,6 +1025,8 @@ declare namespace Objection {
     eagerOptions: EagerOptionsMethod<this>;
     // Deprecated
     modifyEager: ModifyGraphMethod<this>;
+    // Deprecated
+    filterEager: ModifyGraphMethod<this>;
     modifyGraph: ModifyGraphMethod<this>;
 
     context: ContextMethod<this>;
