@@ -1432,6 +1432,7 @@ declare namespace Objection {
 
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
+    static startTransaction(knexOrTransaction?: Transaction | knex): Transaction;
 
     static bindKnex: BindKnexMethod;
     static bindTransaction: BindKnexMethod;
