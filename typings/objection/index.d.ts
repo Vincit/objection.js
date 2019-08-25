@@ -934,6 +934,29 @@ declare namespace Objection {
     ): M['QueryBuilderType'];
   }
 
+  interface TraverserFunction {
+    (model: Model, parentModel: Model, relationName: string): void;
+  }
+
+  interface StaticTraverseMethod {
+    (
+      filterConstructor: typeof Model,
+      models: Model | Model[],
+      traverser: TraverserFunction
+    ): void;
+
+    (models: Model | Model[], traverser: TraverserFunction): void;
+  }
+
+  interface TraverseMethod {
+    (
+      filterConstructor: typeof Model,
+      traverser: TraverserFunction
+    ): void;
+
+    (traverser: TraverserFunction): void;
+  }
+
   interface IdMethod {
     (id: any): void;
     (): any;
@@ -1135,6 +1158,22 @@ declare namespace Objection {
     static tableName: string;
     static idColumn: string | string[];
     static jsonSchema: JSONSchema;
+    static modelPaths: string[];
+    static jsonAttributes: string[];
+    static virtualAttributes: string[];
+    static uidProp: string;
+    static uidRefProp: string;
+    static dbRefProp: string;
+    static propRefRegex: RegExp;
+    static pickJsonSchemaProperties: boolean;
+    static relatedFindQueryMutates: boolean;
+    static relatedInsertQueryMutates: boolean;
+    static modifiers: Modifiers;
+
+    static QueryBuilder: typeof QueryBuilder;
+
+    static raw: RawFunction;
+    static fn: knex.FunctionHelper;
 
     static BelongsToOneRelation: RelationType;
     static HasOneRelation: RelationType;
@@ -1142,8 +1181,17 @@ declare namespace Objection {
     static ManyToManyRelation: RelationType;
     static HasOneThroughRelation: RelationType;
 
+    static defaultGraphOptions?: GraphOptions;
+    // Deprecated
+    static defaultEagerAlgorithm?: EagerAlgorithm;
+    // Deprecated
+    static defaultEagerOptions?: EagerOptions;
+
+    // Deprecated
     static WhereInEagerAlgorithm: EagerAlgorithm;
+    // Deprecated
     static NaiveEagerAlgorithm: EagerAlgorithm;
+    // Deprecated
     static JoinEagerAlgorithm: EagerAlgorithm;
 
     static query: StaticQueryMethod;
@@ -1154,20 +1202,27 @@ declare namespace Objection {
     static fromJson: FromJsonMethod;
     static fromDatabaseJson: FromJsonMethod;
 
+    static createValidator(): Validator;
     static createValidationError(args: CreateValidationErrorArgs): Error;
+    static createNotFoundError(): Error;
+
     static tableMetadata(opt?: TableMetadataOptions): TableMetadata;
     static fetchTableMetadata(opt?: FetchTableMetadataOptions): Promise<TableMetadata>;
 
     static knex(knex?: knex): knex;
+    static knexQuery(): knex.QueryBuilder;
+
     static bindKnex: BindKnexMethod;
     static bindTransaction: BindKnexMethod;
+
     // Deprecated
     static loadRelated: StaticLoadRelatedMethod;
     static fetchGraph: StaticFetchGraphMethod;
-    static raw: RawFunction;
 
     static getRelations(): Relations;
     static getRelation(name: string): Relation;
+
+    static traverse: StaticTraverseMethod;
 
     $query: QueryMethod;
     $relatedQuery: RelatedQueryMethod<this>;
@@ -1181,6 +1236,18 @@ declare namespace Objection {
 
     $formatJson(json: Pojo): Pojo;
     $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
+
+    $beforeValidate(jsonSchema: JSONSchema, json: Pojo, opt: ModelOptions): JSONSchema;
+    $validate(json: Pojo, opt: ModelOptions): Pojo; // may throw ValidationError if validation fails
+    $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
+
+    $beforeInsert(queryContext: QueryContext): Promise<any> | void;
+    $afterInsert(queryContext: QueryContext): Promise<any> | void;
+    $afterUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<any> | void;
+    $beforeUpdate(opt: ModelOptions, queryContext: QueryContext): Promise<any> | void;
+    $afterGet(queryContext: QueryContext): Promise<any> | void;
+    $beforeDelete(queryContext: QueryContext): Promise<any> | void;
+    $afterDelete(queryContext: QueryContext): Promise<any> | void;
 
     $toDatabaseJson(): Pojo;
     $toJson(opt?: ToJsonOptions): Pojo;
@@ -1203,6 +1270,10 @@ declare namespace Objection {
     $omit(keys: string | string[] | { [key: string]: boolean }): this;
     $pick(keys: string | string[] | { [key: string]: boolean }): this;
     $clone(opt?: CloneOptions): this;
+    $traverse: TraverseMethod;
+
+    $knex(): knex;
+    $transaction(): knex;
 
     QueryBuilderType: QueryBuilder<this, this[]>;
   }
