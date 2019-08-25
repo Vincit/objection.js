@@ -465,6 +465,11 @@ qb = qb.joinRelation('table', { alias: false });
 qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
 qb = qb.alias('someAlias');
+qb = qb.with('alias', Movie.query())
+qb = qb.with('alias', qb => qb.from('someTable').select('id'))
+qb = qb.withRaw('alias', 'select * from table where id = ?', 1)
+qb = qb.withRaw('alias', 'select * from table where id = ?', [1])
+qb = qb.whereColumn('firstName', 'lastName')
 
 // Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
 

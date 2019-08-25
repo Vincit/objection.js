@@ -145,7 +145,6 @@ declare namespace Objection {
     [key: string]: Modifier<QB>;
   }
 
-  // TODO: This can be improved by typing the object using M's relations.
   type RelationExpression<M extends Model> = string | object;
 
   /**
@@ -214,6 +213,7 @@ declare namespace Objection {
         ? never
         : K;
     }[keyof T],
+
     undefined | 'QueryBuilderType'
   >;
 
@@ -228,6 +228,7 @@ declare namespace Objection {
         ? (I extends Model ? K : never)
         : never;
     }[keyof T],
+
     undefined
   >;
 
@@ -331,6 +332,15 @@ declare namespace Objection {
     (column: ColumnRef): QB;
   }
 
+  interface WhereColumnMethod<QB extends AnyQueryBuilder> {
+    // These must come first so that we get autocomplete.
+    <QBP extends QB>(col1: ModelProps<ModelType<QBP>>, op: Operator, col2: ColumnRef): QB;
+    <QBP extends QB>(col1: ModelProps<ModelType<QBP>>, col2: ColumnRef): QB;
+
+    (col1: ColumnRef, op: Operator, col2: ColumnRef): QB;
+    (col1: ColumnRef, col2: ColumnRef): QB;
+  }
+
   interface WhereJsonSupersetOfMethod<QB extends AnyQueryBuilder> {
     (
       fieldExpression: FieldExpression,
@@ -391,6 +401,15 @@ declare namespace Objection {
       arg7: QBOrCallback<QB>,
       wrap?: boolean
     ): QB;
+  }
+
+  interface WithMethod<QB extends AnyQueryBuilder> {
+    (alias: string, expr: CallbackVoid<QB> | AnyQueryBuilder | Raw): QB
+  }
+
+  interface WithRawMethod<QB extends AnyQueryBuilder> {
+    (alias: string, sql: string, ...bindings: any[]): QB
+    (alias: string, sql: string, bindings: any[]): QB
   }
 
   interface JoinRelationOptions {
@@ -725,17 +744,33 @@ declare namespace Objection {
     orWhereNotIn: WhereInMethod<this>;
 
     whereBetween: WhereBetweenMethod<this>;
+    orWhereBetween: WhereBetweenMethod<this>;
+    andWhereBetween: WhereBetweenMethod<this>;
+    whereNotBetween: WhereBetweenMethod<this>;
+    orWhereNotBetween: WhereBetweenMethod<this>;
+    andWhereNotBetween: WhereBetweenMethod<this>;
 
     whereNull: WhereNullMethod<this>;
     orWhereNull: WhereNullMethod<this>;
     whereNotNull: WhereNullMethod<this>;
     orWhereNotNull: WhereNullMethod<this>;
 
+    whereColumn: WhereColumnMethod<this>;
+    orWhereColumn: WhereColumnMethod<this>;
+    andWhereColumn: WhereColumnMethod<this>;
+    whereNotColumn: WhereColumnMethod<this>;
+    orWhereNotColumn: WhereColumnMethod<this>;
+    andWhereNotColumn: WhereColumnMethod<this>;
+
     whereJsonSupersetOf: WhereJsonSupersetOfMethod<this>;
     whereJsonIsArray: WhereJsonIsArrayMethod<this>;
 
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
+
+    with: WithMethod<this>
+    withRaw: WithRawMethod<this>
+    withWrapped: WithMethod<this>
 
     joinRelation: JoinRelationMethod<this>;
     innerJoinRelation: JoinRelationMethod<this>;

@@ -29,6 +29,7 @@ const people: Promise<Person[]> = Person.query()
   .someCustomMethod()
   .where('firstName', 'lol')
   .someCustomMethod()
+  .with('someAlias', qb => qb.someCustomMethod().from('lol').select('id'))
   .modifyEager<Animal>('pets', qb =>
     qb
       .someCustomMethod()
