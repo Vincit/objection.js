@@ -473,6 +473,13 @@ qb = qb.whereColumn('firstName', 'lastName');
 qb = qb.groupBy('firstName');
 qb = qb.groupBy(['firstName', 'lastName']);
 qb = qb.orderBy('firstName');
+qb = qb.whereComposite('id', 1);
+qb = qb.whereComposite('id', '>', 1);
+qb = qb.whereComposite(['id1', 'id2'], [1, '2']);
+qb = qb.whereComposite(['id1', 'id2'], Person.query());
+qb = qb.whereInComposite('id', [1, 2]);
+qb = qb.whereInComposite(['id1', 'id2'], [[1, '2'], [1, '2']]);
+qb = qb.whereInComposite(['id1', 'id2'], Person.query().select('firstName', 'lastName'));
 
 // Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
 

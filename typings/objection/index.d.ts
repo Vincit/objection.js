@@ -350,6 +350,20 @@ declare namespace Objection {
     (fieldExpression: FieldExpression): QB;
   }
 
+  interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
+    (column: ColumnRef, value: Value): QB;
+    (column: ColumnRef, op: Operator, value: Value): QB;
+    (column: ColumnRef[], value: Value[]): QB;
+    (column: ColumnRef[], qb: AnyQueryBuilder): QB;
+  }
+
+  interface WhereInCompositeMethod<QB extends AnyQueryBuilder> {
+    (column: ColumnRef, value: Value[]): QB;
+    (column: ColumnRef, qb: AnyQueryBuilder): QB;
+    (column: ColumnRef[], value: Value[][]): QB;
+    (column: ColumnRef[], qb: AnyQueryBuilder): QB;
+  }
+
   type QBOrCallback<QB extends AnyQueryBuilder> = AnyQueryBuilder | CallbackVoid<QB>;
 
   interface SetOperations<QB extends AnyQueryBuilder> extends BaseSetOperations<QB> {
@@ -514,6 +528,10 @@ declare namespace Objection {
     ): ArrayQueryBuilder<QB>;
   }
 
+  interface UnrelateMethod<QB extends AnyQueryBuilder> {
+    (): QB;
+  }
+
   type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
 
   interface ForMethod<QB extends AnyQueryBuilder> {
@@ -557,6 +575,10 @@ declare namespace Objection {
     (modelClass: typeof Model): string;
   }
 
+  interface AliasForMethod<QB extends AnyQueryBuilder> {
+    (modelClassOrTableName: string | ModelClass<any>, alias: string): QB;
+  }
+
   interface ModelClassMethod {
     (): typeof Model;
   }
@@ -569,6 +591,26 @@ declare namespace Objection {
       : QB extends NumberQueryBuilder<QB>
       ? ArrayQueryBuilder<QB>
       : SingleQueryBuilder<QB>;
+  }
+
+  interface TimeoutOptions {
+    cancel: boolean;
+  }
+
+  interface TimeoutMethod<QB extends AnyQueryBuilder> {
+    (ms: number, options?: TimeoutOptions): QB;
+  }
+
+  // Deprecated
+  interface PickMethod<QB extends AnyQueryBuilder> {
+    (modelClass: typeof Model, properties: string[]): QB;
+    (properties: string[]): QB;
+  }
+
+  // Deprecated
+  interface OmitMethod<QB extends AnyQueryBuilder> {
+    (modelClass: typeof Model, properties: string[]): QB;
+    (properties: string[]): QB;
   }
 
   export interface Page<M extends Model> {
@@ -591,6 +633,10 @@ declare namespace Objection {
 
   interface LimitMethod<QB extends AnyQueryBuilder> {
     (limit: number): PageQueryBuilder<QB>;
+  }
+
+  interface ResultSizeMethod {
+    (): Promise<number>;
   }
 
   interface RunBeforeCallback<QB extends AnyQueryBuilder> {
@@ -718,6 +764,11 @@ declare namespace Objection {
     (modifier: Modifier<QB> | Modifier<QB>[], ...args: any[]): QB;
   }
 
+  // Deprecated
+  interface ApplyFilterMethod<QB extends AnyQueryBuilder> {
+    (...filters: string[]): QB;
+  }
+
   export interface Pojo {
     [key: string]: any;
   }
@@ -802,6 +853,9 @@ declare namespace Objection {
     havingNotBetween: WhereMethod<this>;
     orHavingNotBetween: WhereMethod<this>;
 
+    whereComposite: WhereCompositeMethod<this>;
+    whereInComposite: WhereInCompositeMethod<this>;
+
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
 
@@ -871,6 +925,7 @@ declare namespace Objection {
     insertAndFetch: InsertMethod<this>;
 
     relate: RelateMethod<this>;
+    unrelate: UnrelateMethod<this>;
     for: ForMethod<this>;
 
     withGraphFetched: WithGraphFetchedMethod<this>;
@@ -910,18 +965,34 @@ declare namespace Objection {
     debug: IdentityMethod<this>;
     as: OneArgMethod<string, this>;
     alias: OneArgMethod<string, this>;
+    aliasFor: AliasForMethod<this>;
     withSchema: OneArgMethod<string, this>;
     modelClass: ModelClassMethod;
     tableNameFor: TableRefForMethod;
     tableRefFor: TableRefForMethod;
     toSql: StringReturningMethod;
+    toString: StringReturningMethod;
     reject: OneArgMethod<any, this>;
     resolve: OneArgMethod<any, this>;
+    transacting: OneArgMethod<knex | Transaction, this>;
+    connection: OneArgMethod<knex | Transaction, this>;
+    timeout: TimeoutMethod<this>;
+    clone: IdentityMethod<this>;
+
+    // Deprecated
+    pluck: OneArgMethod<string, this>;
+    // Deprecated
+    pick: PickMethod<this>;
+    // Deprecated
+    omit: OmitMethod<this>;
+    // Deprecated
+    traverse: TraverseMethod<this>;
 
     page: PageMethod<this>;
     range: RangeMethod<this>;
     offset: OffsetMethod<this>;
     limit: LimitMethod<this>;
+    resultSize: ResultSizeMethod;
 
     runBefore: RunBeforeMethod<this>;
     runAfter: RunAfterMethod<this>;
@@ -950,8 +1021,11 @@ declare namespace Objection {
     mergeContext: ContextMethod<this>;
 
     modify: ModifyMethod<this>;
+    // Deprecated
+    applyFilter: ApplyFilterMethod<this>;
 
     isFind: BooleanReturningMethod;
+    isExecutable: BooleanReturningMethod;
     isInsert: BooleanReturningMethod;
     isUpdate: BooleanReturningMethod;
     isDelete: BooleanReturningMethod;
@@ -967,6 +1041,7 @@ declare namespace Objection {
     clearOrder: IdentityMethod<this>;
     clearWhere: IdentityMethod<this>;
     clearWithGraph: IdentityMethod<this>;
+    clearAllowGraph: IdentityMethod<this>;
     // Deprecated
     clearEager: IdentityMethod<this>;
 
@@ -1083,14 +1158,12 @@ declare namespace Objection {
 
   interface StaticTraverseMethod {
     (filterConstructor: typeof Model, models: Model | Model[], traverser: TraverserFunction): void;
-
     (models: Model | Model[], traverser: TraverserFunction): void;
   }
 
-  interface TraverseMethod {
-    (filterConstructor: typeof Model, traverser: TraverserFunction): void;
-
-    (traverser: TraverserFunction): void;
+  interface TraverseMethod<R> {
+    (filterConstructor: typeof Model, traverser: TraverserFunction): R;
+    (traverser: TraverserFunction): R;
   }
 
   interface IdMethod {
@@ -1406,7 +1479,7 @@ declare namespace Objection {
     $omit(keys: string | string[] | { [key: string]: boolean }): this;
     $pick(keys: string | string[] | { [key: string]: boolean }): this;
     $clone(opt?: CloneOptions): this;
-    $traverse: TraverseMethod;
+    $traverse: TraverseMethod<void>;
 
     $knex(): knex;
     $transaction(): knex;
