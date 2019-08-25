@@ -213,7 +213,6 @@ declare namespace Objection {
         ? never
         : K;
     }[keyof T],
-
     undefined | 'QueryBuilderType'
   >;
 
@@ -228,7 +227,6 @@ declare namespace Objection {
         ? (I extends Model ? K : never)
         : never;
     }[keyof T],
-
     undefined
   >;
 
@@ -404,12 +402,12 @@ declare namespace Objection {
   }
 
   interface WithMethod<QB extends AnyQueryBuilder> {
-    (alias: string, expr: CallbackVoid<QB> | AnyQueryBuilder | Raw): QB
+    (alias: string, expr: CallbackVoid<QB> | AnyQueryBuilder | Raw): QB;
   }
 
   interface WithRawMethod<QB extends AnyQueryBuilder> {
-    (alias: string, sql: string, ...bindings: any[]): QB
-    (alias: string, sql: string, bindings: any[]): QB
+    (alias: string, sql: string, ...bindings: any[]): QB;
+    (alias: string, sql: string, bindings: any[]): QB;
   }
 
   interface JoinRelationOptions {
@@ -435,10 +433,19 @@ declare namespace Objection {
     (column: string, amount?: number): QB;
   }
 
+  interface AggregateMethod<QB extends AnyQueryBuilder> {
+    (column: ColumnRef): QB;
+  }
+
   interface CountMethod<QB extends AnyQueryBuilder> {
     (column?: ColumnRef, options?: { as: string }): QB;
     (aliasToColumnDict: { [alias: string]: string | string[] }): QB;
     (...columns: ColumnRef[]): QB;
+  }
+
+  interface GroupByMethod<QB extends AnyQueryBuilder> {
+    (...columns: ColumnRef[]): QB;
+    (columns: ColumnRef[]): QB;
   }
 
   interface OrderByMethod<QB extends AnyQueryBuilder> {
@@ -576,6 +583,14 @@ declare namespace Objection {
   interface RangeMethod<QB extends AnyQueryBuilder> {
     (): PageQueryBuilder<QB>;
     (start: number, end: number): PageQueryBuilder<QB>;
+  }
+
+  interface OffsetMethod<QB extends AnyQueryBuilder> {
+    (offset: number): PageQueryBuilder<QB>;
+  }
+
+  interface LimitMethod<QB extends AnyQueryBuilder> {
+    (limit: number): PageQueryBuilder<QB>;
   }
 
   interface RunBeforeCallback<QB extends AnyQueryBuilder> {
@@ -765,12 +780,34 @@ declare namespace Objection {
     whereJsonSupersetOf: WhereJsonSupersetOfMethod<this>;
     whereJsonIsArray: WhereJsonIsArrayMethod<this>;
 
+    having: WhereMethod<this>;
+    andHaving: WhereMethod<this>;
+    orHaving: WhereMethod<this>;
+    havingRaw: WhereMethod<this>;
+    orHavingRaw: WhereMethod<this>;
+    havingIn: WhereMethod<this>;
+    orHavingIn: WhereMethod<this>;
+    havingNotIn: WhereMethod<this>;
+    orHavingNotIn: WhereMethod<this>;
+    havingNull: WhereMethod<this>;
+    orHavingNull: WhereMethod<this>;
+    havingNotNull: WhereMethod<this>;
+    orHavingNotNull: WhereMethod<this>;
+    havingExists: WhereMethod<this>;
+    orHavingExists: WhereMethod<this>;
+    havingNotExists: WhereMethod<this>;
+    orHavingNotExists: WhereMethod<this>;
+    havingBetween: WhereMethod<this>;
+    orHavingBetween: WhereMethod<this>;
+    havingNotBetween: WhereMethod<this>;
+    orHavingNotBetween: WhereMethod<this>;
+
     union: UnionMethod<this>;
     unionAll: UnionMethod<this>;
 
-    with: WithMethod<this>
-    withRaw: WithRawMethod<this>
-    withWrapped: WithMethod<this>
+    with: WithMethod<this>;
+    withRaw: WithRawMethod<this>;
+    withWrapped: WithMethod<this>;
 
     joinRelation: JoinRelationMethod<this>;
     innerJoinRelation: JoinRelationMethod<this>;
@@ -793,6 +830,13 @@ declare namespace Objection {
     crossJoin: JoinMethod<this>;
 
     count: CountMethod<this>;
+    countDistinct: CountMethod<this>;
+    min: AggregateMethod<this>;
+    max: AggregateMethod<this>;
+    sum: AggregateMethod<this>;
+    sumDistinct: AggregateMethod<this>;
+    avg: AggregateMethod<this>;
+    avgDistinct: AggregateMethod<this>;
     increment: IncrementDecrementMethod<this>;
     decrement: IncrementDecrementMethod<this>;
 
@@ -804,6 +848,9 @@ declare namespace Objection {
 
     orderBy: OrderByMethod<this>;
     orderByRaw: OrderByRawMethod<this>;
+
+    groupBy: GroupByMethod<this>;
+    groupByRaw: RawInterface<this>;
 
     execute: ExecuteMethod<R>;
     castTo: CastToMethod;
@@ -873,6 +920,8 @@ declare namespace Objection {
 
     page: PageMethod<this>;
     range: RangeMethod<this>;
+    offset: OffsetMethod<this>;
+    limit: LimitMethod<this>;
 
     runBefore: RunBeforeMethod<this>;
     runAfter: RunAfterMethod<this>;
@@ -913,6 +962,13 @@ declare namespace Objection {
     // Deprecated
     hasEager: BooleanReturningMethod;
     hasWithGraph: BooleanReturningMethod;
+
+    clearSelect: IdentityMethod<this>;
+    clearOrder: IdentityMethod<this>;
+    clearWhere: IdentityMethod<this>;
+    clearWithGraph: IdentityMethod<this>;
+    // Deprecated
+    clearEager: IdentityMethod<this>;
 
     ModelType: M;
     ResultType: R;
