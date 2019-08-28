@@ -776,7 +776,7 @@ objection.transaction.start(Person).then(trx => {
     .catch(() => trx.rollback());
 });
 
-// Vefiry where methods take a queryBuilder of any.
+// Verify where methods take a queryBuilder of any.
 const whereSubQuery = Movie.query().select('name');
 
 Person.query().whereIn('firstName', whereSubQuery);
@@ -798,6 +798,26 @@ Person.query().select(
 Person.query().where(builder => {
   builder.whereBetween('age', [30, 40]).orWhereIn('lastName', whereSubQuery);
 });
+Person.query()
+  .max({ lastPerson: 'id' })
+  .first()
+  .then(result => result && result.lastPerson);
+Person.query()
+  .max('age')
+  .then(result => result.length);
+Person.query().max('age', { as: 'a' });
+Person.query().max({ max: 'age', exp: 'experience' });
+Person.query().min({ max: ['age', 'logins'] });
+Person.query().sum('products', 'orders');
+Person.query().sumDistinct('products');
+Person.query()
+  .avg({ avg: ['age', 'logins'] })
+  .first()
+  .then(result => result && result.avg);
+Person.query().avg(Person.knex().raw('??', ['age']));
+Person.query()
+  .avgDistinct('age')
+  .then(result => result);
 
 // RawBuilder:
 

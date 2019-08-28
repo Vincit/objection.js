@@ -1147,12 +1147,12 @@ declare namespace Objection {
     // Aggregation
     count(columnName?: string): this;
     countDistinct(columnName?: string): this;
-    min(columnName: string): this;
-    max(columnName: string): this;
-    sum(columnName: string): this;
-    sumDistinct(columnName: string): this;
-    avg(columnName: string): this;
-    avgDistinct(columnName: string): this;
+    min: knex.TypePreservingAggregation<QM, RM>;
+    max: knex.TypePreservingAggregation<QM, RM>;
+    sum: knex.TypePreservingAggregation<QM, RM>;
+    sumDistinct: knex.TypePreservingAggregation<QM, RM>;
+    avg: knex.TypePreservingAggregation<QM, RM>;
+    avgDistinct: knex.TypePreservingAggregation<QM, RM>;
     increment(columnName: string, amount?: number): this;
     decrement(columnName: string, amount?: number): this;
 
@@ -1556,7 +1556,7 @@ declare namespace Objection {
      */
     type?: string | string[];
     /**
-     * fallback raw string for custom formats, 
+     * fallback raw string for custom formats,
      * or formats that aren't in the standard yet
      */
     format?: JsonSchemaFormatType | string;
