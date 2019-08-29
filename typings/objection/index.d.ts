@@ -674,7 +674,9 @@ declare namespace Objection {
   export interface QueryBuilderYieldingOne<QM extends Model> extends QueryBuilder<QM, QM, QM> {}
 
   export interface QueryBuilderYieldingOneOrNone<QM extends Model>
-    extends QueryBuilder<QM, QM, QM | undefined> {}
+    extends QueryBuilder<QM, QM, QM | undefined> {
+    throwIfNotFound(): QueryBuilderYieldingOne<QM>;
+  }
 
   export interface QueryBuilderYieldingCount<QM extends Model, RM = QM[]>
     extends QueryBuilderBase<QM, RM, number>,
@@ -1556,7 +1558,7 @@ declare namespace Objection {
      */
     type?: string | string[];
     /**
-     * fallback raw string for custom formats, 
+     * fallback raw string for custom formats,
      * or formats that aren't in the standard yet
      */
     format?: JsonSchemaFormatType | string;
