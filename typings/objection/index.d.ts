@@ -166,8 +166,7 @@ declare namespace Objection {
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? I[] : (T[K] | NonPrimitiveValue))
       : (T[K] | NonPrimitiveValue);
-  } &
-    object;
+  }
 
   /**
    * Additional optional parameters that may be used in graphs.
