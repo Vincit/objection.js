@@ -24,6 +24,7 @@ declare namespace Objection {
   const lit: ValueFunction;
   const val: ValueFunction;
   const ref: ReferenceFunction;
+  const fn: FunctionFunction;
 
   const compose: ComposeFunction;
   const mixin: MixinFunction;
@@ -57,6 +58,15 @@ declare namespace Objection {
   export interface ReferenceBuilder extends Castable {}
   export interface ReferenceFunction {
     (expression: string): ReferenceBuilder;
+  }
+
+  export interface FunctionBuilder extends Castable {}
+  export interface FunctionFunction {
+    (functionName: string, ...arguments: any[]): FunctionBuilder;
+
+    now(precision: number): FunctionBuilder;
+    coalesce(...arguments: any[]): FunctionBuilder;
+    concat(...arguments: any[]): FunctionBuilder;
   }
 
   export interface ComposeFunction {
@@ -166,7 +176,7 @@ declare namespace Objection {
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? I[] : (T[K] | NonPrimitiveValue))
       : (T[K] | NonPrimitiveValue);
-  }
+  };
 
   /**
    * Additional optional parameters that may be used in graphs.
@@ -1393,6 +1403,7 @@ declare namespace Objection {
     static QueryBuilder: typeof QueryBuilder;
 
     static raw: RawFunction;
+    static ref: ReferenceFunction;
     static fn: knex.FunctionHelper;
 
     static BelongsToOneRelation: RelationType;

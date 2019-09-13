@@ -161,6 +161,47 @@ await Model
   })
 ```
 
+## fn
+
+```js
+const { fn } = require('objection')
+```
+
+Factory function that returns a [FunctionBuilder](/api/types/#class-functionbuilder) instance. [FunctionBuilder](/api/types/#class-functionbuilder) helps calling SQL functions. The `fn` function also has properties for most common functions:
+
+```js
+fn.now()
+fn.now(precision)
+fn.coalesce(arg1, arg2, ...)
+fn.concat(arg1, arg2, ...)
+```
+
+All arguments are interpreted as values by default. Use `ref` to refer to columns. you can also pass `raw` instances, `QueryBuilders` knex builders, knex raw and anything else just like to any objection method.
+
+##### Examples
+
+```js
+const { fn, ref } = require('objection');
+
+// Compare nullable numbers
+await Model
+  .query()
+  .where(
+    fn('coalesce', ref('age'), 0),
+    '>',
+    30
+  )
+
+// The same example using the fn.coalesce shortcut
+await Model
+  .query()
+  .where(
+    fn.coalesce(ref('age'), 0),
+    '>',
+    30
+  )
+```
+
 ## mixin
 
 ```js

@@ -4,7 +4,7 @@ const expect = require('expect.js');
 const Promise = require('bluebird');
 
 const { TimeoutError } = require('bluebird');
-const { raw, ref, lit, Model, QueryBuilderOperation } = require('../..');
+const { raw, ref, lit, val, fn, Model, QueryBuilderOperation } = require('../..');
 
 module.exports = session => {
   let Model1 = session.models.Model1;
@@ -706,6 +706,87 @@ module.exports = session => {
               expect(_.map(models, 'model2Prop2')).to.eql([40, 30, 20]);
             });
         });
+
+        if (session.isMySql()) {
+          it('fn in select', () => {
+            return Model2.query()
+              .select('model2.*', fn('concat', ref('model2_prop2'), '10').as('model2_prop2'))
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(_.map(models, 'model2Prop2')).to.eql(['3010', '2010', '1010']);
+              });
+          });
+
+          it('fn.concat in select', () => {
+            return Model2.query()
+              .select('model2.*', fn.concat(ref('model2_prop2'), '10').as('model2_prop2'))
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(_.map(models, 'model2Prop2')).to.eql(['3010', '2010', '1010']);
+              });
+          });
+        }
+
+        if (session.isPostgres()) {
+          it('fn in select', () => {
+            return Model2.query()
+              .select(
+                'model2.*',
+                fn('concat', ref('model2_prop2'), val('10').castText()).as('model2_prop2')
+              )
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(_.map(models, 'model2Prop2')).to.eql(['3010', '2010', '1010']);
+              });
+          });
+
+          it('fn.concat in select', () => {
+            return Model2.query()
+              .select(
+                'model2.*',
+                fn.concat(ref('model2_prop2'), val('10').castText()).as('model2_prop2')
+              )
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(_.map(models, 'model2Prop2')).to.eql(['3010', '2010', '1010']);
+              });
+          });
+
+          it('fn.coalesce in select', () => {
+            return Model2.query()
+              .select('model2.*', fn.coalesce(null, ref('model2_prop2')).as('foo'))
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(_.map(models, 'foo')).to.eql([30, 20, 10]);
+              });
+          });
+
+          it('fn.now in select', () => {
+            return Model2.query()
+              .select('model2.*', fn.now().as('lultz'))
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(models[0].lultz).to.be.a(Date);
+              });
+          });
+
+          it('fn.now(precision) in select', () => {
+            return Model2.query()
+              .select('model2.*', fn.now(0).as('lultz'))
+              .orderBy('id_col')
+              .then(models => {
+                expect(_.map(models, 'idCol')).to.eql([1, 2, 3]);
+                expect(models[0].lultz).to.be.a(Date);
+                expect(models[0].lultz.getMilliseconds()).to.equal(0);
+              });
+          });
+        }
 
         it('raw in where', () => {
           return Model2.query()

@@ -2,7 +2,7 @@ import * as ajv from 'ajv';
 import * as knex from 'knex';
 
 import * as objection from '../../';
-import { lit, raw, ref, RelationMappings, JSONSchema, DBError } from '../../';
+import { lit, raw, ref, fn, RelationMappings, JSONSchema, DBError } from '../../';
 
 // This file exercises the Objection.js typings.
 
@@ -468,6 +468,8 @@ qb = qb.joinRelation('table');
 qb = qb.joinRelation('table', { alias: false });
 qb = qb.where(raw('random()', 1, '2'));
 qb = qb.where(Person.raw('random()', 1, '2', raw('3')));
+qb = qb.where(fn.coalesce(null, fn('random')), '=', 1);
+qb = qb.where(Person.ref('column1'), 1)
 qb = qb.alias('someAlias');
 qb = qb.with('alias', Movie.query());
 qb = qb.with('alias', qb => qb.from('someTable').select('id'));
