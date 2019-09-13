@@ -61,12 +61,22 @@ declare namespace Objection {
   }
 
   export interface FunctionBuilder extends Castable {}
+  export interface SqlFunctionShortcut {
+    (...args: any[]): FunctionBuilder;
+  }
   export interface FunctionFunction {
     (functionName: string, ...arguments: any[]): FunctionBuilder;
 
     now(precision: number): FunctionBuilder;
-    coalesce(...arguments: any[]): FunctionBuilder;
-    concat(...arguments: any[]): FunctionBuilder;
+    coalesce: SqlFunctionShortcut;
+    concat: SqlFunctionShortcut;
+    sum: SqlFunctionShortcut;
+    avg: SqlFunctionShortcut;
+    min: SqlFunctionShortcut;
+    max: SqlFunctionShortcut;
+    count: SqlFunctionShortcut;
+    upper: SqlFunctionShortcut;
+    lower: SqlFunctionShortcut;
   }
 
   export interface ComposeFunction {

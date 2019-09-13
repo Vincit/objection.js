@@ -172,11 +172,18 @@ Factory function that returns a [FunctionBuilder](/api/types/#class-functionbuil
 ```js
 fn.now()
 fn.now(precision)
-fn.coalesce(arg1, arg2, ...)
-fn.concat(arg1, arg2, ...)
+fn.coalesce(a...args)
+fn.concat(...args)
+fn.sum(...args)
+fn.avg(...args)
+fn.min(...args)
+fn.max(...args)
+fn.count(...args)
+fn.upper(...args)
+fn.lower(...args)
 ```
 
-All arguments are interpreted as values by default. Use `ref` to refer to columns. you can also pass `raw` instances, `QueryBuilders` knex builders, knex raw and anything else just like to any objection method.
+All arguments are interpreted as values by default. Use `ref` to refer to columns. you can also pass `raw` instances, other `fn` instances, `QueryBuilders` knex builders, knex raw and anything else just like to any other objection method.
 
 ##### Examples
 
