@@ -68,6 +68,8 @@ declare namespace Objection {
     (functionName: string, ...arguments: any[]): FunctionBuilder;
 
     now(precision: number): FunctionBuilder;
+    now(): FunctionBuilder;
+
     coalesce: SqlFunctionShortcut;
     concat: SqlFunctionShortcut;
     sum: SqlFunctionShortcut;
