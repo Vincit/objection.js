@@ -127,9 +127,14 @@ module.exports = session => {
         .then(() => {
           return Role.query()
             .first()
-            .eager('sets(orderById).setAttributes(orderById)', {
+            .withGraphFetched('sets(orderById).setAttributes(orderByName)')
+            .modifiers({
               orderById(query) {
                 query.orderBy('id');
+              },
+
+              orderByName(query) {
+                query.orderBy('name');
               }
             });
         })
