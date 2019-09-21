@@ -15,26 +15,6 @@ const { map } = require('../../lib/utils/promiseUtils');
 const { jsonEquals } = require('../../lib/utils/objectUtils');
 
 describe('utils', () => {
-  describe('isSubclassOf', () => {
-    class A {}
-    class B extends A {}
-    class C extends B {}
-
-    it('should return true for subclass constructor', () => {
-      expect(classUtils.isSubclassOf(B, A)).to.equal(true);
-      expect(classUtils.isSubclassOf(C, B)).to.equal(true);
-      expect(classUtils.isSubclassOf(C, A)).to.equal(true);
-      expect(classUtils.isSubclassOf(A, B)).to.equal(false);
-      expect(classUtils.isSubclassOf(B, C)).to.equal(false);
-      expect(classUtils.isSubclassOf(A, C)).to.equal(false);
-    });
-
-    it('should return false if one of the inputs is not a constructor', () => {
-      expect(classUtils.isSubclassOf(function() {}, {})).to.equal(false);
-      expect(classUtils.isSubclassOf({}, function() {})).to.equal(false);
-    });
-  });
-
   describe('mixin', () => {
     it('should mixin rest of the arguments to the first argument', () => {
       class X {}

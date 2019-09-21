@@ -3,7 +3,7 @@ const Knex = require('knex');
 const expect = require('expect.js');
 const Promise = require('bluebird');
 const objection = require('../../../');
-const classUtils = require('../../../lib/utils/classUtils');
+const { isFunction } = require('../../../lib/utils/objectUtils');
 const knexMocker = require('../../../testUtils/mockKnex');
 
 const Model = objection.Model;
@@ -140,7 +140,7 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTable).to.equal('JoinModel');
     expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
     expect(relation.joinTableRelatedProp.props).to.eql(['relatedId']);
-    expect(classUtils.isSubclassOf(relation.joinModelClass, JoinModel)).to.equal(true);
+    expect(isSubclassOf(relation.joinModelClass, JoinModel)).to.equal(true);
   });
 
   it('should accept an absolute file path to a join model in join.through object', () => {
@@ -163,9 +163,7 @@ describe('ManyToManyRelation', () => {
     expect(relation.joinTable).to.equal('JoinModel');
     expect(relation.joinTableOwnerProp.cols).to.eql(['ownerId']);
     expect(relation.joinTableRelatedProp.cols).to.eql(['relatedId']);
-    expect(classUtils.isSubclassOf(relation.joinModelClass, require('./files/JoinModel'))).to.equal(
-      true
-    );
+    expect(isSubclassOf(relation.joinModelClass, require('./files/JoinModel'))).to.equal(true);
   });
 
   it('should accept a composite keys in join.through object (1)', () => {
@@ -1480,3 +1478,19 @@ describe('ManyToManyRelation', () => {
     });
   }
 });
+
+function isSubclassOf(Constructor, SuperConstructor) {
+  if (!isFunction(SuperConstructor)) {
+    return false;
+  }
+
+  while (isFunction(Constructor)) {
+    if (Constructor === SuperConstructor) {
+      return true;
+    }
+
+    Constructor = Object.getPrototypeOf(Constructor);
+  }
+
+  return false;
+}
