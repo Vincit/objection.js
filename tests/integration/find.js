@@ -102,6 +102,18 @@ module.exports = session => {
           });
       });
 
+      it('calling page twice should override the previous call', () => {
+        return Model2.query()
+          .page(1, 2)
+          .page(0, 2)
+          .orderBy('model2_prop2', 'desc')
+          .then(result => {
+            expect(result.results[0]).to.be.a(Model2);
+            expect(result.total === 3).to.equal(true);
+            expect(_.map(result.results, 'model2Prop2')).to.eql([30, 20]);
+          });
+      });
+
       describe('query builder methods', () => {
         it('.select()', () => {
           return Model2.query()
