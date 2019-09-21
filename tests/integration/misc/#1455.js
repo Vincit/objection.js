@@ -139,7 +139,7 @@ module.exports = session => {
             });
         })
         .then(setsAfterUpsertGraph => {
-          expect(setsAfterUpsertGraph).to.eql({
+          expect(setsAfterUpsertGraph).to.containSubset({
             id: 1,
             name: 'First Role',
             sets: [
@@ -149,8 +149,8 @@ module.exports = session => {
                 roleId: 1,
 
                 setAttributes: [
-                  { id: 1, name: 'First SetAttribute', setId: 1 },
-                  { id: 2, name: 'Second SetAttribute', setId: 1 }
+                  { name: 'First SetAttribute', setId: 1 },
+                  { name: 'Second SetAttribute', setId: 1 }
                 ]
               },
               {
@@ -159,8 +159,8 @@ module.exports = session => {
                 roleId: 1,
 
                 setAttributes: [
-                  { id: 3, name: 'First SetAttribute', setId: 2 },
-                  { id: 4, name: 'Second SetAttribute', setId: 2 }
+                  { name: 'First SetAttribute', setId: 2 },
+                  { name: 'Second SetAttribute', setId: 2 }
                 ]
               }
             ]
