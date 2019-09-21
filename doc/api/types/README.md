@@ -82,12 +82,14 @@ noUpdate|boolean<br>string[]|If true, no updates are performed. Updates can be d
 noDelete|boolean<br>string[]|If true, no deletes are performed. Deletes can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
 noRelate|boolean<br>string[]|If true, no relates are performed. Relate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
 noUnrelate|boolean<br>string[]|If true, no unrelate operations are performed. Unrelate operations can be disabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-upserts).
+allowRefs|boolean|This needs to be true if you want to use `#ref` in your graphs. See [this section](/guide/query-examples.html#graph-inserts) for `#ref` usage examples.
 
 ## `type` InsertGraphOptions
 
 Property|Type|Description
 --------|----|-----------
 relate|boolean<br>string[]|If true, models with an `id` are related instead of inserted. Relate functionality can be enabled for a subset of relations of the graph by providing a list of relation expressions. See the examples [here](/guide/query-examples.html#graph-inserts).
+allowRefs|boolean|This needs to be true if you want to use `#ref` in your graphs. See [this section](/guide/query-examples.html#graph-inserts) for `#ref` usage examples.
 
 ## `type` FetchGraphOptions
 

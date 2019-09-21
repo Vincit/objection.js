@@ -2719,40 +2719,43 @@ module.exports = session => {
 
     describe('Same ManyToMany child for multiple parents + extras', () => {
       beforeEach(() => {
-        return Model2.query().insertGraph([
-          {
-            idCol: 100,
-            model2Prop1: 'hejsan 1',
+        return Model2.query().insertGraph(
+          [
+            {
+              idCol: 100,
+              model2Prop1: 'hejsan 1',
 
-            model2Relation1: [
-              {
-                id: 500,
-                model1Prop1: 'hello 5'
-              },
-              {
-                '#id': 'shared',
-                id: 600,
-                model1Prop1: 'hello 6',
-                aliasedExtra: 'lol1'
-              }
-            ]
-          },
-          {
-            idCol: 200,
-            model2Prop1: 'hejsan 2',
+              model2Relation1: [
+                {
+                  id: 500,
+                  model1Prop1: 'hello 5'
+                },
+                {
+                  '#id': 'shared',
+                  id: 600,
+                  model1Prop1: 'hello 6',
+                  aliasedExtra: 'lol1'
+                }
+              ]
+            },
+            {
+              idCol: 200,
+              model2Prop1: 'hejsan 2',
 
-            model2Relation1: [
-              {
-                '#ref': 'shared',
-                aliasedExtra: 'lol2'
-              },
-              {
-                id: 700,
-                model1Prop1: 'hello 7'
-              }
-            ]
-          }
-        ]);
+              model2Relation1: [
+                {
+                  '#ref': 'shared',
+                  aliasedExtra: 'lol2'
+                },
+                {
+                  id: 700,
+                  model1Prop1: 'hello 7'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       it('test', () => {

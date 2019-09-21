@@ -304,52 +304,55 @@ module.exports = session => {
 
     describe('beforeFind', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {
@@ -649,52 +652,55 @@ module.exports = session => {
 
     describe('afterFind', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       describe('query', () => {
@@ -990,55 +996,58 @@ module.exports = session => {
 
     describe('beforeUpdate', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              },
-              {
-                name: 'A Star is Born'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                },
+                {
+                  name: 'A Star is Born'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {
@@ -1440,55 +1449,58 @@ module.exports = session => {
 
     describe('afterUpdate', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              },
-              {
-                name: 'A Star is Born'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                },
+                {
+                  name: 'A Star is Born'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {
@@ -1716,55 +1728,58 @@ module.exports = session => {
 
     describe('beforeDelete', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              },
-              {
-                name: 'A Star is Born'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                },
+                {
+                  name: 'A Star is Born'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {
@@ -2149,55 +2164,58 @@ module.exports = session => {
 
     describe('afterDelete', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              },
-              {
-                name: 'A Star is Born'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                },
+                {
+                  name: 'A Star is Born'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {
@@ -2383,55 +2401,58 @@ module.exports = session => {
 
     describe('beforeInsert', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              },
-              {
-                name: 'A Star is Born'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                },
+                {
+                  name: 'A Star is Born'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {
@@ -2738,55 +2759,58 @@ module.exports = session => {
 
     describe('afterInsert', () => {
       beforeEach(() => {
-        return Person.query().insertGraph([
-          {
-            name: 'Jennifer',
+        return Person.query().insertGraph(
+          [
+            {
+              name: 'Jennifer',
 
-            pets: [
-              {
-                name: 'Doggo',
-                species: 'dog'
-              },
-              {
-                name: 'Cato',
-                species: 'cat'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Doggo',
+                  species: 'dog'
+                },
+                {
+                  name: 'Cato',
+                  species: 'cat'
+                }
+              ],
 
-            movies: [
-              {
-                '#id': 'silver',
-                name: 'Silver Linings Playbook'
-              },
-              {
-                name: 'Hungergames'
-              }
-            ]
-          },
-          {
-            name: 'Brad',
+              movies: [
+                {
+                  '#id': 'silver',
+                  name: 'Silver Linings Playbook'
+                },
+                {
+                  name: 'Hungergames'
+                }
+              ]
+            },
+            {
+              name: 'Brad',
 
-            pets: [
-              {
-                name: 'Jamie',
-                species: 'Lion'
-              },
-              {
-                name: 'Rob',
-                species: 'Deer'
-              }
-            ],
+              pets: [
+                {
+                  name: 'Jamie',
+                  species: 'Lion'
+                },
+                {
+                  name: 'Rob',
+                  species: 'Deer'
+                }
+              ],
 
-            movies: [
-              {
-                '#ref': 'silver'
-              },
-              {
-                name: 'A Star is Born'
-              }
-            ]
-          }
-        ]);
+              movies: [
+                {
+                  '#ref': 'silver'
+                },
+                {
+                  name: 'A Star is Born'
+                }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       beforeEach(() => {

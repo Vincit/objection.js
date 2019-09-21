@@ -539,41 +539,44 @@ module.exports = session => {
 
     describe('relations', () => {
       beforeEach(() => {
-        return B.query().insertWithRelated([
-          {
-            id3: 1,
-            id4: '1',
-            bval: 'b1',
-            a: [
-              { id1: 1, id2: '1', aval: 'a1', '#id': 'a1' },
-              { id1: 1, id2: '2', aval: 'a2' },
-              { id1: 2, id2: '1', aval: 'a3' }
-            ],
-            ab: [
-              { id1: 11, id2: '11', aval: 'a7', '#id': 'a7' },
-              { id1: 11, id2: '12', aval: 'a8' },
-              { id1: 12, id2: '11', aval: 'a9' }
-            ]
-          },
-          {
-            id3: 1,
-            id4: '2',
-            bval: 'b2',
-            a: [
-              { id1: 2, id2: '2', aval: 'a4' },
-              { id1: 2, id2: '3', aval: 'a5' },
-              { id1: 3, id2: '2', aval: 'a6' }
-            ],
-            ab: [
-              { '#ref': 'a1' },
-              { '#ref': 'a7' },
+        return B.query().insertWithRelated(
+          [
+            {
+              id3: 1,
+              id4: '1',
+              bval: 'b1',
+              a: [
+                { id1: 1, id2: '1', aval: 'a1', '#id': 'a1' },
+                { id1: 1, id2: '2', aval: 'a2' },
+                { id1: 2, id2: '1', aval: 'a3' }
+              ],
+              ab: [
+                { id1: 11, id2: '11', aval: 'a7', '#id': 'a7' },
+                { id1: 11, id2: '12', aval: 'a8' },
+                { id1: 12, id2: '11', aval: 'a9' }
+              ]
+            },
+            {
+              id3: 1,
+              id4: '2',
+              bval: 'b2',
+              a: [
+                { id1: 2, id2: '2', aval: 'a4' },
+                { id1: 2, id2: '3', aval: 'a5' },
+                { id1: 3, id2: '2', aval: 'a6' }
+              ],
+              ab: [
+                { '#ref': 'a1' },
+                { '#ref': 'a7' },
 
-              { id1: 21, id2: '21', aval: 'a10' },
-              { id1: 21, id2: '22', aval: 'a11' },
-              { id1: 22, id2: '21', aval: 'a12' }
-            ]
-          }
-        ]);
+                { id1: 21, id2: '21', aval: 'a10' },
+                { id1: 21, id2: '22', aval: 'a11' },
+                { id1: 22, id2: '21', aval: 'a12' }
+              ]
+            }
+          ],
+          { allowRefs: true }
+        );
       });
 
       afterEach(() => {

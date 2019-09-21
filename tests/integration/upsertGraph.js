@@ -906,7 +906,7 @@ module.exports = session => {
         };
 
         return BoundModel1.query()
-          .upsertGraph(upsert, { fetchStrategy })
+          .upsertGraph(upsert, { fetchStrategy, allowRefs: true })
           .then(() => {
             return BoundModel1.query()
               .findById(1)
@@ -3190,7 +3190,8 @@ module.exports = session => {
           const options = {
             // Insert missing from the root.
             insertMissing: [''],
-            fetchStrategy
+            fetchStrategy,
+            allowRefs: true
           };
 
           return Model1.query(session.knex)
@@ -3266,7 +3267,8 @@ module.exports = session => {
           const options = {
             // Insert missing from the root.
             insertMissing: [''],
-            fetchStrategy
+            fetchStrategy,
+            allowRefs: true
           };
 
           return Model1.query(session.knex)
@@ -3342,7 +3344,8 @@ module.exports = session => {
           const options = {
             // Insert missing from the root.
             insertMissing: [''],
-            fetchStrategy
+            fetchStrategy,
+            allowRefs: true
           };
 
           Model1.query(session.knex)
@@ -3480,7 +3483,7 @@ module.exports = session => {
 
           Model1.bindKnex(session.knex)
             .query()
-            .upsertGraph(upsert, { fetchStrategy })
+            .upsertGraph(upsert, { fetchStrategy, allowRefs: true })
             .then(() => {
               done(new Error('should not get here'));
             })
@@ -3514,7 +3517,7 @@ module.exports = session => {
 
           return Model1.bindKnex(session.knex)
             .query()
-            .upsertGraph(upsert, { fetchStrategy })
+            .upsertGraph(upsert, { fetchStrategy, allowRefs: true })
             .then(() => {
               return Model1.query(session.knex)
                 .findById(2)

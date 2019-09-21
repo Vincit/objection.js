@@ -16,6 +16,8 @@
 
   * Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.
 
+  * Using `#ref` in an `insertGraph` or an `upsertGraph` now needs the [allowGraph](/api/types/#type-insertgraphoptions) option to be true.
+
 ## 1.6.10
 
   * Fixes [#1455](https://github.com/Vincit/objection.js/issues/1455)

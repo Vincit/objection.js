@@ -958,24 +958,29 @@ If you need to refer to the same model in multiple places you can use the specia
 ```js
 await Person
   .query()
-  .insertGraph([{
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
+  .insertGraph([
+    {
+      firstName: 'Jennifer',
+      lastName: 'Lawrence',
 
-    movies: [{
-      "#id": 'silverLiningsPlaybook'
-      name: 'Silver Linings Playbook',
-      duration: 122
-    }]
-  }, {
-    firstName: 'Bradley',
-    lastName: 'Cooper',
+      movies: [{
+        "#id": 'silverLiningsPlaybook'
+        name: 'Silver Linings Playbook',
+        duration: 122
+      }]
+    }, {
+      firstName: 'Bradley',
+      lastName: 'Cooper',
 
-    movies: [{
-      "#ref": 'silverLiningsPlaybook'
-    }]
-  }]);
+      movies: [{
+        "#ref": 'silverLiningsPlaybook'
+      }]
+    }
+  ],
+  { allowRefs: true });
 ```
+
+Note that you need to also set the `allowRefs` option to true for this to work.
 
 The query above will insert only one movie (the 'Silver Linings Playbook') but both 'Jennifer' and 'Bradley' will have the movie related to them through the many-to-many relation `movies`. The `#id` can be any string. There are no format or length requirements for them. It is quite easy to create circular dependencies using `#id` and `#ref`. Luckily [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) detects them and rejects the query with a clear error message.
 
@@ -984,17 +989,21 @@ You can refer to the properties of other models anywhere in the graph using expr
 ```js
 await Person
   .query()
-  .insertGraph([{
-    "#id": 'jenni',
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
+  .insertGraph([
+    {
+      "#id": 'jenni',
+      firstName: 'Jennifer',
+      lastName: 'Lawrence',
 
-    pets: [{
-      name: "I am the dog of #ref{jenni.firstName} whose id is #ref{jenni.id}",
-      species: 'dog'
-    }]
+      pets: [{
+        name: "I am the dog of #ref{jenni.firstName} whose id is #ref{jenni.id}",
+        species: 'dog'
+      }
+    ],
+    { allowRefs: true }
   }]);
 ```
+Again, make sure you set the `allowRefs` option to true.
 
 The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used within a string, the references are replaced with the referred values inside the string. If the reference string contains nothing but the reference, the referred value is copied to its place preserving its type.
 
