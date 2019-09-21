@@ -1127,17 +1127,14 @@ module.exports = session => {
           return Model1.query()
             .findById(1)
             .then(parent => {
-              return parent
-                .$relatedQuery('model1Relation3')
-                .debug()
-                .patchAndFetchById(4, {
-                  model2Prop1: 'iam updated',
-                  extra1: 'updated extra 1',
-                  // Test query properties. sqlite doesn't have `concat` function. Use a literal for it.
-                  extra2: isSqlite(session.knex)
-                    ? 'updated extra 2'
-                    : raw(`CONCAT('updated extra ', '2')`)
-                });
+              return parent.$relatedQuery('model1Relation3').patchAndFetchById(4, {
+                model2Prop1: 'iam updated',
+                extra1: 'updated extra 1',
+                // Test query properties. sqlite doesn't have `concat` function. Use a literal for it.
+                extra2: isSqlite(session.knex)
+                  ? 'updated extra 2'
+                  : raw(`CONCAT('updated extra ', '2')`)
+              });
             })
             .then(result => {
               chai.expect(result).to.containSubset({
