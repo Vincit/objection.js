@@ -1149,7 +1149,42 @@ module.exports = session => {
                 .eager('model1Relation3');
             })
             .then(model1 => {
-              console.dir(model1, { depth: null });
+              chai.expect(model1).to.containSubset({
+                id: 1,
+                model1Id: null,
+                model1Prop1: 'hello 1',
+                model1Prop2: null,
+                model1Relation3: [
+                  {
+                    idCol: 5,
+                    model1Id: null,
+                    model2Prop1: 'foo 3',
+                    model2Prop2: null,
+                    extra1: 'extra 13',
+                    extra2: 'extra 23',
+                    $afterFindCalled: 1
+                  },
+                  {
+                    idCol: 4,
+                    model1Id: null,
+                    model2Prop1: 'iam updated',
+                    model2Prop2: null,
+                    extra1: 'updated extra 1',
+                    extra2: 'updated extra 2',
+                    $afterFindCalled: 1
+                  },
+                  {
+                    idCol: 3,
+                    model1Id: null,
+                    model2Prop1: 'foo 1',
+                    model2Prop2: null,
+                    extra1: 'extra 11',
+                    extra2: 'extra 21',
+                    $afterFindCalled: 1
+                  }
+                ],
+                $afterFindCalled: 1
+              });
             });
         });
 
