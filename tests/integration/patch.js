@@ -1123,6 +1123,39 @@ module.exports = session => {
             });
         });
 
+        it('should patch a related object with extras using patchAndFetchById', () => {
+          return Model1.query()
+            .findById(1)
+            .then(parent => {
+              return parent
+                .$relatedQuery('model1Relation3')
+                .debug()
+                .patchAndFetchById(4, {
+                  model2Prop1: 'iam updated',
+                  extra1: 'updated extra 1',
+                  // Test query properties. sqlite doesn't have `concat` function. Use a literal for it.
+                  extra2: isSqlite(session.knex)
+                    ? 'updated extra 2'
+                    : raw(`CONCAT('updated extra ', '2')`)
+                });
+            })
+            .then(result => {
+              chai.expect(result).to.containSubset({
+                model2Prop1: 'iam updated',
+                extra1: 'updated extra 1',
+                extra2: 'updated extra 2',
+                idCol: 4
+              });
+
+              return Model1.query()
+                .findById(1)
+                .eager('model1Relation3');
+            })
+            .then(model1 => {
+              console.dir(model1, { depth: null });
+            });
+        });
+
         it('should patch a related object with extras', () => {
           return Model1.query()
             .findById(1)
