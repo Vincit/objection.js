@@ -253,11 +253,9 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(
-        err.message.startsWith(
-          "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'"
-        )
-      ).to.equal(true);
+      expect(err.message).to.contain(
+        "OwnerModel.relationMappings.testRelation: Cannot find module '/not/a/path/to/a/model'"
+      );
     });
   });
 
@@ -277,7 +275,7 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal(
+      expect(err.message).to.contain(
         'OwnerModel.relationMappings.testRelation: join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}'
       );
     });
@@ -299,7 +297,7 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal(
+      expect(err.message).to.contain(
         'OwnerModel.relationMappings.testRelation: join.through must be an object that describes the join table. For example: {from: "JoinTable.someId", to: "JoinTable.someOtherId"}'
       );
     });
@@ -322,7 +320,7 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal(
+      expect(err.message).to.contain(
         'OwnerModel.relationMappings.testRelation: join.through.from must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].'
       );
     });
@@ -345,7 +343,7 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal(
+      expect(err.message).to.contain(
         'OwnerModel.relationMappings.testRelation: join.through.to must have format JoinTable.columnName. For example "JoinTable.someId" or in case of composite key ["JoinTable.a", "JoinTable.b"].'
       );
     });
@@ -368,7 +366,7 @@ describe('ManyToManyRelation', () => {
         }
       });
     }).to.throwException(err => {
-      expect(err.message).to.equal(
+      expect(err.message).to.contain(
         'OwnerModel.relationMappings.testRelation: join.through `from` and `to` must point to the same join table.'
       );
     });

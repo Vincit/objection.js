@@ -16,6 +16,10 @@
 
   * Only the first argument of [modify](/api/query-builder/other-methods.html#modify) query builder method is interpreted as a modifier name. Rest of the arguments are passed as arguments to the modifier. The first argument can be an array of modifier names.
 
+## 1.6.10
+
+  * Fixes [#1455](https://github.com/Vincit/objection.js/issues/1455)
+
 ## 1.6.9
 
   * Revert fix for [#1089](https://github.com/Vincit/objection.js/issues/1089). It was causing more bugs than it fixed. #1089 will be addressed in 2.0.
