@@ -1,5 +1,5 @@
 const { Model, transaction } = require('../../../');
-const { expect } = require('chai');
+const expect = require('expect.js');
 
 module.exports = session => {
   describe('UpsertGraph deletes rows for relation which is not mentioned in graph #1455', () => {
