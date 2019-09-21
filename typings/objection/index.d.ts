@@ -364,15 +364,27 @@ declare namespace Objection {
     (col1: ColumnRef, col2: ColumnRef): QB;
   }
 
-  interface WhereJsonSupersetOfMethod<QB extends AnyQueryBuilder> {
+  interface WhereJson<QB extends AnyQueryBuilder> {
     (
       fieldExpression: FieldExpression,
       jsonObjectOrFieldExpression: JsonObjectOrFieldExpression
     ): QB;
   }
 
-  interface WhereJsonIsArrayMethod<QB extends AnyQueryBuilder> {
+  interface WhereFieldExpression<QB extends AnyQueryBuilder> {
     (fieldExpression: FieldExpression): QB;
+  }
+
+  interface WhereJsonExpression<QB extends AnyQueryBuilder> {
+    (fieldExpression: FieldExpression, keys: string | string[]): QB;
+  }
+
+  interface WhereJsonField<QB extends AnyQueryBuilder> {
+    (
+      fieldExpression: FieldExpression,
+      operator: string,
+      value: boolean | number | string | null
+    ): QB;
   }
 
   interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
@@ -858,8 +870,26 @@ declare namespace Objection {
     orWhereNotColumn: WhereColumnMethod<this>;
     andWhereNotColumn: WhereColumnMethod<this>;
 
-    whereJsonSupersetOf: WhereJsonSupersetOfMethod<this>;
-    whereJsonIsArray: WhereJsonIsArrayMethod<this>;
+    whereJsonSupersetOf: WhereJson<this>;
+    orWhereJsonSupersetOf: WhereJson<this>;
+    whereJsonNotSupersetOf: WhereJson<this>;
+    orWhereJsonNotSupersetOf: WhereJson<this>;
+    whereJsonSubsetOf: WhereJson<this>;
+    orWhereJsonSubsetOf: WhereJson<this>;
+    whereJsonNotSubsetOf: WhereJson<this>;
+    orWhereJsonNotSubsetOf: WhereJson<this>;
+    whereJsonIsArray: WhereFieldExpression<this>;
+    orWhereJsonIsArray: WhereFieldExpression<this>;
+    whereJsonNotArray: WhereFieldExpression<this>;
+    orWhereJsonNotArray: WhereFieldExpression<this>;
+    whereJsonIsObject: WhereFieldExpression<this>;
+    orWhereJsonIsObject: WhereFieldExpression<this>;
+    whereJsonNotObject: WhereFieldExpression<this>;
+    orWhereJsonNotObject: WhereFieldExpression<this>;
+    whereJsonHasAny: WhereJsonExpression<this>;
+    orWhereJsonHasAny: WhereJsonExpression<this>;
+    whereJsonHasAll: WhereJsonExpression<this>;
+    orWhereJsonHasAll: WhereJsonExpression<this>;
 
     having: WhereMethod<this>;
     andHaving: WhereMethod<this>;
