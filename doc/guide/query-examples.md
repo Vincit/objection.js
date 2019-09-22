@@ -6,7 +6,7 @@ sidebarDepth: 3
 
 The `Person` model used in the examples is defined [here](/guide/models.html#examples).
 
-All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
+All queries are started with one of the [Model](/api/model/) methods [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query), [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [\$relatedQuery](/api/model/instance-methods.html#relatedquery). All these methods return a [QueryBuilder](/api/query-builder/) instance that can be used just like a [knex QueryBuilder](http://knexjs.org/#Builder) but they also have a bunch of methods added by objection.
 
 ## Basic queries
 
@@ -17,11 +17,11 @@ Find queries can be created by calling [Model.query()](/api/model/static-methods
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [subqueries](/recipes/subqueries.html)
-* [raw queries](/recipes/raw-queries.html)
-* [precedence and parentheses](/recipes/precedence-and-parentheses.html)
+- [subqueries](/recipes/subqueries.html)
+- [raw queries](/recipes/raw-queries.html)
+- [precedence and parentheses](/recipes/precedence-and-parentheses.html)
 
- There's also a large amount of examples in the [API documentation](/api/query-builder/).
+There's also a large amount of examples in the [API documentation](/api/query-builder/).
 
 ##### Examples
 
@@ -30,7 +30,7 @@ Fetch an item by id:
 ```js
 const person = await Person.query().findById(1);
 
-console.log(person.firstName)
+console.log(person.firstName);
 console.log(person instanceof Person); // --> true
 ```
 
@@ -54,13 +54,12 @@ select "persons".* from "persons"
 The return value of the [query](/api/model/static-methods.html#static-query) method is an instance of [QueryBuilder](/api/query-builder/) that has all the methods a [knex QueryBuilder](http://knexjs.org/#Builder) has and a lot more. Here is a simple example that uses some of them:
 
 ```js
-const middleAgedJennifers = await Person
-  .query()
+const middleAgedJennifers = await Person.query()
   .select('age', 'firstName', 'lastName')
   .where('age', '>', 40)
   .where('age', '<', 60)
   .where('firstName', 'Jennifer')
-  .orderBy('lastName')
+  .orderBy('lastName');
 
 console.log('The last name of the first middle aged Jennifer is');
 console.log(middleAgedJennifers[0].lastName);
@@ -78,13 +77,14 @@ order by "lastName" asc
 The next example shows how easy it is to build complex queries:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .select('persons.*', 'parent.firstName as parentFirstName')
   .innerJoin('persons as parent', 'persons.parentId', 'parent.id')
   .where('persons.age', '<', Person.query().avg('persons.age'))
   .whereExists(
-    Animal.query().select(1).whereColumn('persons.id', 'animals.ownerId')
+    Animal.query()
+      .select(1)
+      .whereColumn('persons.id', 'animals.ownerId')
   )
   .orderBy('persons.lastName');
 
@@ -112,12 +112,11 @@ order by "persons"."lastName" asc
 In addition to knex methods, the [QueryBuilder](/api/query-builder/) has a lot of helpers for dealing with relations like the [joinRelation](/api/query-builder/join-methods.html#joinrelation) method:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .select('parent:parent.name as grandParentName')
   .joinRelation('parent.parent');
 
-console.log(people[0].grandParentName)
+console.log(people[0].grandParentName);
 ```
 
 ```sql
@@ -134,11 +133,10 @@ inner join "persons"
 Objection allows a bit more modern syntax with groupings and subqueries. Where knex requires you to use an old fashioned `function` an `this`, with objection you can use arrow functions:
 
 ```js
-const nonMiddleAgedJennifers = await Person
-  .query()
+const nonMiddleAgedJennifers = await Person.query()
   .where(builder => builder.where('age', '<', 4).orWhere('age', '>', 60))
   .where('firstName', 'Jennifer')
-  .orderBy('lastName')
+  .orderBy('lastName');
 
 console.log('The last name of the first non middle aged Jennifer is');
 console.log(nonMiddleAgedJennifers[0].lastName);
@@ -157,15 +155,13 @@ Insert queries are created by chaining the [insert](/api/query-builder/mutate-me
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [insert API reference](/api/query-builder/mutate-methods.html#insert)
-* [graph inserts](/guide/query-examples.html#graph-inserts)
+- [insert API reference](/api/query-builder/mutate-methods.html#insert)
+- [graph inserts](/guide/query-examples.html#graph-inserts)
 
 ##### Examples
 
 ```js
-const jennifer = await Person
-  .query()
-  .insert({ firstName: 'Jennifer', lastName: 'Lawrence' })
+const jennifer = await Person.query().insert({ firstName: 'Jennifer', lastName: 'Lawrence' });
 
 console.log(jennifer instanceof Person); // --> true
 console.log(jennifer.firstName); // --> 'Jennifer'
@@ -179,23 +175,21 @@ insert into "persons" ("firstName", "lastName") values ('Jennifer', 'Lawrence')
 Just like with any query, you can mix in `raw` statements, subqueries, `knex.raw` instances etc.
 
 ```js
-const jennifer = await Person
-  .query()
-  .insert({
-    firstName: 'Average',
-    lastName: 'Person',
-    age: Person.query().avg('age')
-  })
+const jennifer = await Person.query().insert({
+  firstName: 'Average',
+  lastName: 'Person',
+  age: Person.query().avg('age')
+});
 ```
 
 ### Update queries
 
-Update queries are created by chaining the [update](/api/query-builder/mutate-methods.html#update) or [patch](/api/query-builder/mutate-methods.html#patch) method to the query. [patch](/api/query-builder/mutate-methods.html#patch) and [update](/api/query-builder/mutate-methods.html#update) return the number of updated rows. If you want the freshly updated item as a result you can use the helper method [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('*')](/api/query-builder/find-methods.html#returning) or take a look at [this recipe](/recipes/returning-tricks.html) for more ideas. See [update](/api/query-builder/mutate-methods.html#update) and [patch](/api/query-builder/mutate-methods.html#patch) API documentation for discussion about their differences.
+Update queries are created by chaining the [update](/api/query-builder/mutate-methods.html#update) or [patch](/api/query-builder/mutate-methods.html#patch) method to the query. [patch](/api/query-builder/mutate-methods.html#patch) and [update](/api/query-builder/mutate-methods.html#update) return the number of updated rows. If you want the freshly updated item as a result you can use the helper method [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid) and [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid). On postgresql you can simply chain [.returning('\*')](/api/query-builder/find-methods.html#returning) or take a look at [this recipe](/recipes/returning-tricks.html) for more ideas. See [update](/api/query-builder/mutate-methods.html#update) and [patch](/api/query-builder/mutate-methods.html#patch) API documentation for discussion about their differences.
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [patch API reference](/api/query-builder/mutate-methods.html#patch)
-* [raw queries](/recipes/raw-queries.html)
+- [patch API reference](/api/query-builder/mutate-methods.html#patch)
+- [raw queries](/recipes/raw-queries.html)
 
 ##### Examples
 
@@ -206,7 +200,7 @@ const numUpdated = await Person.query()
   .findById(1)
   .patch({
     firstName: 'Jennifer'
-  })
+  });
 ```
 
 ```sql
@@ -218,7 +212,7 @@ Update multiple items:
 ```js
 const numUpdated = await Person.query()
   .patch({ lastName: 'Dinosaur' })
-  .where('age', '>', 60)
+  .where('age', '>', 60);
 
 console.log('all people over 60 years old are now dinosaurs');
 console.log(numUpdated, 'people were updated');
@@ -231,9 +225,7 @@ update "persons" set "lastName" = 'Dinosaur' where "age" > 60
 Update and fetch an item:
 
 ```js
-const updatedPerson = await Person
-  .query()
-  .patchAndFetchById(246, {lastName: 'Updated'});
+const updatedPerson = await Person.query().patchAndFetchById(246, { lastName: 'Updated' });
 
 console.log(updatedPerson.lastName); // --> Updated.
 ```
@@ -247,16 +239,14 @@ select "persons".* from "persons" where "id" = 246
 
 Delete queries are created by chaining the [delete](/api/query-builder/mutate-methods.html#delete) method to the query.
 
-NOTE: The return value of the query will be the number of deleted rows. *If you're using Postgres take a look at [this recipe](/recipes/returning-tricks.html) if you'd like the deleted rows to be returned as Model instances*.
+NOTE: The return value of the query will be the number of deleted rows. _If you're using Postgres take a look at [this recipe](/recipes/returning-tricks.html) if you'd like the deleted rows to be returned as Model instances_.
 
 ##### Examples
 
 Delete an item by id:
 
 ```js
-const numDeleted = await Person
-  .query()
-  .deleteById(1)
+const numDeleted = await Person.query().deleteById(1);
 ```
 
 ```sql
@@ -266,8 +256,7 @@ delete from "persons" where id = 1
 Delete multiple items:
 
 ```js
-const numDeleted = await Person
-  .query()
+const numDeleted = await Person.query()
   .delete()
   .where(raw('lower("firstName")'), 'like', '%ennif%');
 
@@ -282,8 +271,7 @@ You can always use [subqueries](/recipes/subqueries.html), [raw](/api/objection/
 
 ```js
 // This query deletes all people that have a pet named "Fluffy".
-await Person
-  .query()
+await Person.query()
   .delete()
   .whereIn(
     'id',
@@ -306,12 +294,9 @@ where "id" in (
 
 ```js
 // This is another way to implement the previous query.
-await Person
-  .query()
+await Person.query()
   .delete()
-  .whereExists(
-    Person.relatedQuery('pets').where('pets.name', 'Fluffy')
-  );
+  .whereExists(Person.relatedQuery('pets').where('pets.name', 'Fluffy'));
 ```
 
 ```sql
@@ -326,20 +311,20 @@ where exists (
 
 ## Relation queries
 
-While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [relatedQuery](/api/model/static-methods.html#static-relatedquery) and its instance method counterpart [$relatedQuery](/api/model/instance-methods.html#relatedquery) can be used to query items related to another item. Both of these methods return an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
+While the static [query](/api/model/static-methods.html#static-query) method can be used to create a query to a whole table [relatedQuery](/api/model/static-methods.html#static-relatedquery) and its instance method counterpart [\$relatedQuery](/api/model/instance-methods.html#relatedquery) can be used to query items related to another item. Both of these methods return an instance of [QueryBuilder](/api/query-builder/) just like the [query](/api/model/static-methods.html#static-query) method.
 
 ### Relation find queries
 
-Simply call [$relatedQuery('relationName')](/api/model/instance-methods.html#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](/guide/query-examples.html#eager-loading) to fetch relations. [$relatedQuery](/api/model/instance-methods.html#relatedquery) is better when you only need one relation and you need to filter the query extensively.
+Simply call [\$relatedQuery('relationName')](/api/model/instance-methods.html#relatedquery) for a model _instance_ to fetch a relation for it. The relation name is given as the only argument. The return value is a [QueryBuilder](/api/query-builder/) so you once again have all the query methods at your disposal. In many cases it's more convenient to use [eager loading](/guide/query-examples.html#eager-loading) to fetch relations. [\$relatedQuery](/api/model/instance-methods.html#relatedquery) is better when you only need one relation and you need to filter the query extensively.
 
 The static method [relatedQuery](/api/model/static-methods.html#static-relatedquery) can be used to create related queries for multiple items using identifiers, model instances or even subqueries. This allows you to build complex queries by composing simple pieces.
 
-By default the fetched related items are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [$setRelated](/api/model/instance-methods.html#setrelated) and [$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
+By default the fetched related items are assigned to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets')` example query, the return value would be assigned to `person.pets`. This behaviour can be modified using [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates). Also check out [\$setRelated](/api/model/instance-methods.html#setrelated) and [\$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [relation subqueries](/recipes/relation-subqueries.html)
-* [relatedQuery](/api/model/static-methods.html#static-relatedquery)
+- [relation subqueries](/recipes/relation-subqueries.html)
+- [relatedQuery](/api/model/static-methods.html#static-relatedquery)
 
 ##### Examples
 
@@ -373,11 +358,10 @@ order by "name" asc
 The above example needed two queries to find pets of a person. You can do this with one single query using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method.
 
 ```js
-const dogs = await Person
-  .relatedQuery('pets')
+const dogs = await Person.relatedQuery('pets')
   .for(1)
   .where('species', 'dog')
-  .orderBy('name')
+  .orderBy('name');
 ```
 
 ```sql
@@ -390,11 +374,10 @@ order by "name" asc
 If you want to fetch dogs for multiple people in one query, you can pass an array of identifiers for the `for` method like this:
 
 ```js
-const dogs = await Person
-  .relatedQuery('pets')
+const dogs = await Person.relatedQuery('pets')
   .for([1, 2])
   .where('species', 'dog')
-  .orderBy('name')
+  .orderBy('name');
 ```
 
 ```sql
@@ -408,13 +391,10 @@ You can even give it a subquery! The following example fetches all dogs of all p
 
 ```js
 // Note that there is no `await` here. This query does not get executed.
-const jennifers = Person
-  .query()
-  .where('name', 'Jennifer');
+const jennifers = Person.query().where('name', 'Jennifer');
 
 // This is the only executed query in this example.
-const dogs = await Person
-  .relatedQuery('pets')
+const dogs = await Person.relatedQuery('pets')
   .for(jennifers)
   .where('species', 'dog')
   .orderBy('name');
@@ -433,10 +413,10 @@ order by "name" asc
 
 ### Relation insert queries
 
-Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for an item. The query inserts a new object to the related table and updates the needed tables to create the relationship. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
+Chain the [insert](/api/query-builder/mutate-methods.html#insert) method to a [relatedQuery](/api/model/static-methods.html#static-relatedquery) or [\$relatedQuery](/api/model/instance-methods.html#relatedquery) call to insert a related object for an item. The query inserts a new object to the related table and updates the needed tables to create the relationship. In case of many-to-many relation a row is inserted to the join table etc. Also check out [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) method for an alternative way to insert related models.
 
-By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [$setRelated](/api/model/instance-methods.html#setrelated) and
-[$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
+By default the inserted related models are appended to the parent model to a property by the same name as the relation. For example in our `person.$relatedQuery('pets').insert(obj)` example query, the return value would be appended to `person.pets`. This behaviour can be modified using [relatedInsertQueryMutates](/api/model/static-properties.html#static-relatedinsertquerymutates). Also check out the [\$setRelated](/api/model/instance-methods.html#setrelated) and
+[\$appendRelated](/api/model/instance-methods.html#appendrelated) helpers.
 
 ##### Examples
 
@@ -451,9 +431,7 @@ select "persons".* from "persons" where "persons"."id" = 1
 ```
 
 ```js
-const fluffy = await person
-  .$relatedQuery('pets')
-  .insert({ name: 'Fluffy' });
+const fluffy = await person.$relatedQuery('pets').insert({ name: 'Fluffy' });
 
 console.log(person.pets.indexOf(fluffy) !== -1); // --> true
 ```
@@ -465,10 +443,9 @@ insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
 Just like with [relation find queries](#relation-find-queries), you can save a query and add a pet for a person using one single query:
 
 ```js
-const fluffy = await Person
-  .relatedQuery('pets')
+const fluffy = await Person.relatedQuery('pets')
   .for(1)
-  .insert({ name: 'Fluffy' })
+  .insert({ name: 'Fluffy' });
 ```
 
 ```sql
@@ -478,8 +455,7 @@ insert into "animals" ("name", "ownerId") values ('Fluffy', 1)
 If you want to write columns to the join table of a many-to-many relation you first need to specify the columns in the `extra` array of the `through` object in [relationMappings](/api/model/static-properties.html#static-relationmappings) (see the examples behind the link). For example, if you specified an array `extra: ['awesomeness']` in [relationMappings](/api/model/static-properties.html#static-relationmappings) then `awesomeness` is written to the join table in the following example:
 
 ```js
-const movie = await Person
-  .relatedQuery('movies')
+const movie = await Person.relatedQuery('movies')
   .for(100)
   .insert({ name: 'The room', awesomeness: 9001 });
 
@@ -502,7 +478,7 @@ Relating means attaching a existing item to another item through a relationship 
 
 In addition to the examples here, you can find more examples behind these links.
 
-* [relate method](/api/query-builder/mutate-methods.html#relate)
+- [relate method](/api/query-builder/mutate-methods.html#relate)
 
 ##### Examples
 
@@ -535,8 +511,7 @@ insert into "persons_movies" ("personId", "movieId") values (100, 200)
 You can also pass the id `200` directly to `relate` instead of passing a model instance. A more objectiony way of doing this would be to once again utilize the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
 
 ```js
-await Person
-  .relatedQuery('movies')
+await Person.relatedQuery('movies')
   .for(100)
   .relate(200);
 ```
@@ -550,9 +525,12 @@ Actually in this case, the cleanest way of all would be to just insert a row to 
 Here's one more example that relates four movies to the first person whose first name Arnold. Note that this query only works on Postgres because on other databases it would require multiple queries.
 
 ```js
-await Person
-  .relatedQuery('movies')
-  .for(Person.query().where('firstName', 'Arnold').limit(1))
+await Person.relatedQuery('movies')
+  .for(
+    Person.query()
+      .where('firstName', 'Arnold')
+      .limit(1)
+  )
   .relate([100, 200, 300, 400]);
 ```
 
@@ -576,7 +554,7 @@ select "persons".* from "persons" where "persons"."id" = 100
 await actor
   .$relatedQuery('movies')
   .unrelate()
-  .where('name', 'like', 'Terminator%')
+  .where('name', 'like', 'Terminator%');
 ```
 
 ```sql
@@ -590,11 +568,10 @@ where "persons_movies"."movieId" in (
 The same using the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
 
 ```js
-await Person
-  .relatedQuery('movies')
+await Person.relatedQuery('movies')
   .for(100)
   .unrelate()
-  .where('name', 'like', 'Terminator%')
+  .where('name', 'like', 'Terminator%');
 ```
 
 ```sql
@@ -618,11 +595,10 @@ const arnold = Person.query().findOne({
   lastName: 'Schwarzenegger'
 });
 
-await Person
-  .relatedQuery('movies')
+await Person.relatedQuery('movies')
   .for(arnold)
   .unrelate()
-  .where('name', 'like', 'Terminator%')
+  .where('name', 'like', 'Terminator%');
 ```
 
 ```sql
@@ -649,11 +625,10 @@ See the [API documentation](/api/query-builder/mutate-methods.html#update) of `u
 ##### Examples
 
 ```js
-await Person
-  .relatedQuery('pets')
+await Person.relatedQuery('pets')
   .for([1, 2])
   .patch({ name: raw(`concat("name", ' the doggo')`) })
-  .where('species', 'dog')
+  .where('species', 'dog');
 ```
 
 ```sql
@@ -672,11 +647,10 @@ See the [API documentation](/api/query-builder/mutate-methods.html#delete) of `d
 ##### Examples
 
 ```js
-await Person
-  .relatedQuery('pets')
+await Person.relatedQuery('pets')
   .for([1, 2])
   .delete()
-  .where('species', 'dog')
+  .where('species', 'dog');
 ```
 
 ```sql
@@ -693,21 +667,21 @@ Because the relation expressions are strings (there's also an optional [object n
 
 By giving the expression `[pets, children.pets]` for [allowGraph](/api/query-builder/eager-methods.html#allowgraph) the value passed to [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) is allowed to be one of:
 
- * `'pets'`
- * `'children'`
- * `'children.pets'`
- * `'[pets, children]'`
- * `'[pets, children.pets]'`
+- `'pets'`
+- `'children'`
+- `'children.pets'`
+- `'[pets, children]'`
+- `'[pets, children.pets]'`
 
 Examples of expressions that would cause an error:
 
- * `'movies'`
- * `'children.children'`
- * `'[pets, children.children]'`
- * `'notEvenAnExistingRelation'`
+- `'movies'`
+- `'children.children'`
+- `'[pets, children.children]'`
+- `'notEvenAnExistingRelation'`
 
 In addition to the [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) methods, relations can be fetched using the [fetchGraph](/api/model/static-properties.html#static-fetchgraph) and
-[$fetchGraph](/api/model/instance-methods.html#fetchgraph) methods.
+[\$fetchGraph](/api/model/instance-methods.html#fetchgraph) methods.
 
 [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) uses multiple queries to load the related items. (for details see [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/). Note that [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) used to be called `eager`.). [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) uses joins and only performs one single query to fetch the whole relation graph. This doesn't mean that `withGraphJoined` is faster though. See the performance discussion [here](/api/query-builder/eager-methods.html#withgraphfetched). You should only use `withGraphJoined` if you actually need the joins to be able to reference the nested tables. When in doubt use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched).
 
@@ -716,9 +690,7 @@ In addition to the [withGraphFetched](/api/query-builder/eager-methods.html#with
 Fetch the `pets` relation for all results of a query:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('pets');
+const people = await Person.query().withGraphFetched('pets');
 
 // Each person has the `pets` property populated with Animal objects related
 // through the `pets` relation.
@@ -729,9 +701,7 @@ console.log(people[0].pets[0] instanceof Animal); // --> true
 Fetch multiple relations on multiple levels:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('[pets, children.[pets, children]]');
+const people = await Person.query().withGraphFetched('[pets, children.[pets, children]]');
 
 // Each person has the `pets` property populated with Animal objects related
 // through the `pets` relation. The `children` property contains the Person's
@@ -745,23 +715,19 @@ console.log(people[1].children[2].children[0].name);
 Here's the previous query using the [object notation](/api/types/#relationexpression-object-notation)
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched({
+const people = await Person.query().withGraphFetched({
+  pets: true,
+  children: {
     pets: true,
-    children: {
-      pets: true,
-      children: true
-    }
-  });
+    children: true
+  }
+});
 ```
 
 Fetch one relation recursively:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('[pets, children.^]');
+const people = await Person.query().withGraphFetched('[pets, children.^]');
 
 // The children relation is from Person to Person. If we want to fetch the whole
 // descendant tree of a person we can just say "fetch this relation recursively"
@@ -772,9 +738,7 @@ console.log(people[0].children[0].children[0].children[0].children[0].firstName)
 Limit recursion to 3 levels:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('[pets, children.^3]');
+const people = await Person.query().withGraphFetched('[pets, children.^3]');
 
 console.log(people[0].children[0].children[0].children[0].firstName);
 ```
@@ -782,8 +746,7 @@ console.log(people[0].children[0].children[0].children[0].firstName);
 Relations can be modified using the [modifyGraph](/api/query-builder/other-methods.html#modifygraph) method:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphFetched('[children.[pets, movies], movies]')
   .modifyGraph('children.pets', builder => {
     // Only select pets older than 10 years old for children
@@ -795,19 +758,18 @@ const people = await Person
 Relations can also be modified using modifiers like this:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphFetched('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]')
   .modifiers({
-    selectName: (builder) => {
+    selectName: builder => {
       builder.select('name');
     },
 
-    orderByAge: (builder) => {
+    orderByAge: builder => {
       builder.orderBy('age');
     },
 
-    onlyDogs: (builder) => {
+    onlyDogs: builder => {
       builder.where('species', 'dog');
     }
   });
@@ -825,7 +787,7 @@ class Person extends Model {
   static get modifiers() {
     return {
       defaultSelects(builder) {
-        builder.select('id', 'firstName')
+        builder.select('id', 'firstName');
       },
 
       orderByAge(builder) {
@@ -854,18 +816,15 @@ class Animal extends Model {
 
 // somewhereElse.js
 
-const people = await Person
-  .query()
-  .modifiers({
-    // This way you can bind arguments to modifiers.
-    onlyDogs: query => query.modify('onlySpecies', 'dog')
-  })
-  .withGraphFetched(`
+const people = await Person.query().modifiers({
+  // This way you can bind arguments to modifiers.
+  onlyDogs: query => query.modify('onlySpecies', 'dog')
+}).withGraphFetched(`
     children(defaultSelects, orderByAge).[
       pets(onlyDogs, orderByName),
       movies
     ]
-  `)
+  `);
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -874,9 +833,7 @@ console.log(people[0].children[0].movies[0].id);
 Relations can be aliased using `as` keyword:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched(`[
+const people = await Person.query().withGraphFetched(`[
     children(orderByAge) as kids .[
       pets(filterDogs) as dogs,
       pets(filterCats) as cats
@@ -895,8 +852,7 @@ Example usage for [allowGraph](/api/query-builder/eager-methods.html#allowgraph)
 
 ```js
 expressApp.get('/people', async (req, res) => {
-  const people = await Person
-    .query()
+  const people = await Person.query()
     .allowGraph('[pets, children.pets]')
     .withGraphFetched(req.query.eager);
 
@@ -907,11 +863,10 @@ expressApp.get('/people', async (req, res) => {
 [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) can be used just like [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched). In addition you can refer to the related items from the root query because they are all joined:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphJoined('[pets, children.pets]')
   .where('pets.age', '>', 10)
-  .where('children:pets.age', '>', 10)
+  .where('children:pets.age', '>', 10);
 ```
 
 ## Graph inserts
@@ -922,7 +877,7 @@ See the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method if
 
 If you are using Postgres the inserts are done in batches for maximum performance. On other databases the rows need to be inserted one at a time. This is because postgresql is the only database engine that returns the identifiers of all inserted rows and not just the first or the last one.
 
-[insertGraph](/api/query-builder/mutate-methods.html#insertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
+[insertGraph](/api/query-builder/mutate-methods.html#insertgraph) operation is **not** atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
 
 You can read more about graph inserts from [this blog post](https://www.vincit.fi/en/blog/nested-eager-loading-and-inserts-with-objection-js/).
 
@@ -933,22 +888,24 @@ You can read more about graph inserts from [this blog post](https://www.vincit.f
 // model instances. Inserted objects have ids added to them and related
 // rows have foreign keys set, but no other columns get fetched from
 // the database. You can use `insertGraphAndFetch` for that.
-const graph = await Person
-  .query()
-  .insertGraph({
-    firstName: 'Sylvester',
-    lastName: 'Stallone',
+const graph = await Person.query().insertGraph({
+  firstName: 'Sylvester',
+  lastName: 'Stallone',
 
-    children: [{
+  children: [
+    {
       firstName: 'Sage',
       lastName: 'Stallone',
 
-      pets: [{
-        name: 'Fluffy',
-        species: 'dog'
-      }]
-    }]
-  });
+      pets: [
+        {
+          name: 'Fluffy',
+          species: 'dog'
+        }
+      ]
+    }
+  ]
+});
 ```
 
 The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create relationships between them as defined in the [relationMappings](/api/model/static-properties.html#static-relationmappings) of the models. Technically [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) builds a dependency graph from the object graph and inserts the models that don't depend on any other models until the whole graph is inserted.
@@ -1003,6 +960,7 @@ await Person
     { allowRefs: true }
   }]);
 ```
+
 Again, make sure you set the `allowRefs` option to true.
 
 The query above will insert a pet named `I am the dog of Jennifer whose id is 523` for Jennifer. If `#ref{}` is used within a string, the references are replaced with the referred values inside the string. If the reference string contains nothing but the reference, the referred value is copied to its place preserving its type.
@@ -1010,80 +968,96 @@ The query above will insert a pet named `I am the dog of Jennifer whose id is 52
 Existing rows can be related to newly inserted rows by using the `relate` option. `relate` can be `true` in which case all models in the graph that have an identifier get related. `relate` can also be an array of relation paths like `['children', 'children.movies.actors']` in which case only objects in those paths get related even if they have an idetifier.
 
 ```js
-await Person
-  .query()
-  .insertGraph([{
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
+await Person.query().insertGraph(
+  [
+    {
+      firstName: 'Jennifer',
+      lastName: 'Lawrence',
 
-    movies: [{
-      id: 2636
-    }]
-  }], {
+      movies: [
+        {
+          id: 2636
+        }
+      ]
+    }
+  ],
+  {
     relate: true
-  });
+  }
+);
 ```
 
 The query above would create a new person `Jennifer Lawrence` and add an existing movie (id = 2636) to its `movies` relation. The next query would do the same:
 
 ```js
-await Person
-  .query()
-  .insertGraph([{
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
+await Person.query().insertGraph(
+  [
+    {
+      firstName: 'Jennifer',
+      lastName: 'Lawrence',
 
-    movies: [{
-      id: 2636
-    }]
-  }], {
-    relate: [
-      'movies'
-    ]
-  });
+      movies: [
+        {
+          id: 2636
+        }
+      ]
+    }
+  ],
+  {
+    relate: ['movies']
+  }
+);
 ```
 
 The `relate` option can also contain nested relations:
 
 ```js
-await Person
-  .query()
-  .insertGraph([{
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
+await Person.query().insertGraph(
+  [
+    {
+      firstName: 'Jennifer',
+      lastName: 'Lawrence',
 
-    movies: [{
-      name: 'Silver Linings Playbook',
-      duration: 122,
+      movies: [
+        {
+          name: 'Silver Linings Playbook',
+          duration: 122,
 
-      actors: [{
-        id: 2516
-      }]
-    }]
-  }], {
-    relate: [
-      'movies.actors'
-    ]
-  });
+          actors: [
+            {
+              id: 2516
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  {
+    relate: ['movies.actors']
+  }
+);
 ```
 
 If you need to mix inserts and relates inside a single relation, you can use the special property `#dbRef`
 
 ```js
-await Person
-  .query()
-  .insertGraph([{
+await Person.query().insertGraph([
+  {
     firstName: 'Jennifer',
     lastName: 'Lawrence',
 
-    movies: [{
-      "#dbRef": 2636
-    }, {
-      // This will be inserted with an id.
-      id: 100,
-      name: 'New movie'
-    }]
-  }]);
+    movies: [
+      {
+        '#dbRef': 2636
+      },
+      {
+        // This will be inserted with an id.
+        id: 100,
+        name: 'New movie'
+      }
+    ]
+  }
+]);
 ```
 
 ## Graph upserts
@@ -1096,9 +1070,21 @@ The [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method wor
 
 [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) uses [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) under the hood for inserts. That means that you can insert object graphs for relations and use all [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) features like `#ref` references.
 
-[upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation is __not__ atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
+[upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation is **not** atomic by default! You need to start a transaction and pass it to the query using any of the supported ways. See the section about [transactions](/guide/transactions.html) for more information.
 
-See the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method if you need to limit  which relations can be modified using [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method to avoid security issues.
+See the [allowGraph](/api/query-builder/eager-methods.html#allowgraph) method if you need to limit which relations can be modified using [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) method to avoid security issues.
+
+::: warning
+WARNING!
+
+Before you start using `upsertGraph` beware that it's not the silver bullet it seems to be. If you start using it because it seems to provide a "mongodb API" for a relational database, you are using it for a wrong reason!
+
+Our suggestion is to first try to write any code without it and only use `upsertGraph` if it saves you **a lot** of code and makes things simpler. Over time you'll learn where `upsertGraph` helps and where it makes things more complicated. Don't use it by default for everything. You can search through the objection issues to see what kind of problems `upsertGraph` can cause if used too much.
+
+For simple things `upsertGraph` calls are easy to understand and remain readable. When you start passing it a bunch of options it becomes increasingly difficult for other developers (and even yourself) to understand.
+
+It's also really easy to create a server that doesn't work well with multiple users by overusing `upsertGraph`. That's because you can easily get into a situation where you override other user's changes if you always upsert large graphs at a time. Always try to update the minimum amount of rows and columns and you'll save yourself a lot of trouble in the long run.
+:::
 
 ##### Examples
 
@@ -1160,61 +1146,68 @@ By default [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) met
 // model instances. Inserted objects have ids added to them related
 // rows have foreign keys set but no other columns get fetched from
 // the database. You can use `upsertGraphAndFetch` for that.
-const graph = await Person
-  .query()
-  .upsertGraph({
-    // This updates the `Jennifer Aniston` person since the id property is present.
-    id: 1,
-    firstName: 'Jonnifer',
+const graph = await Person.query().upsertGraph({
+  // This updates the `Jennifer Aniston` person since the id property is present.
+  id: 1,
+  firstName: 'Jonnifer',
 
-    parent: {
-      // This also gets updated since the id property is present. If no id was given
-      // here, Nancy Dow would get deleted, a new Person John Aniston would
-      // get inserted and related to Jennifer.
-      id: 2,
-      firstName: 'John',
-      lastName: 'Aniston'
-    },
+  parent: {
+    // This also gets updated since the id property is present. If no id was given
+    // here, Nancy Dow would get deleted, a new Person John Aniston would
+    // get inserted and related to Jennifer.
+    id: 2,
+    firstName: 'John',
+    lastName: 'Aniston'
+  },
 
-    // Notice that Kat the Cat is not listed in `pets`. It will get deleted.
-    pets: [{
+  // Notice that Kat the Cat is not listed in `pets`. It will get deleted.
+  pets: [
+    {
       // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
       // that there is no id!
       name: 'Wolfgang',
       species: 'Dog'
-    }, {
+    },
+    {
       // It turns out Doggo is a cat. Update it.
       id: 1,
-      species: 'Cat',
-    }],
+      species: 'Cat'
+    }
+  ],
 
-    // Notice that Wanderlust is missing from the list. It will get deleted.
-    // It is also worth mentioning that the Wanderlust's `reviews` or any
-    // other relations are NOT recursively deleted (unless you have
-    // defined `ON DELETE CASCADE` or other hooks in the db).
-    movies: [{
+  // Notice that Wanderlust is missing from the list. It will get deleted.
+  // It is also worth mentioning that the Wanderlust's `reviews` or any
+  // other relations are NOT recursively deleted (unless you have
+  // defined `ON DELETE CASCADE` or other hooks in the db).
+  movies: [
+    {
       id: 1,
 
       // Upsert graphs can be arbitrarily deep. This modifies the
       // reviews of "Horrible Bosses".
-      reviews: [{
-        // Update a review.
-        id: 1,
-        stars: 2,
-        text: 'Even more Meh'
-      }, {
-        // And insert another one.
-        stars: 5,
-        title: 'Loved it',
-        text: 'Best movie ever'
-      }, {
-        // And insert a third one.
-        stars: 4,
-        title: '4 / 5',
-        text: 'Would see again'
-      }]
-    }]
-  });
+      reviews: [
+        {
+          // Update a review.
+          id: 1,
+          stars: 2,
+          text: 'Even more Meh'
+        },
+        {
+          // And insert another one.
+          stars: 5,
+          title: 'Loved it',
+          text: 'Best movie ever'
+        },
+        {
+          // And insert a third one.
+          stars: 4,
+          title: '4 / 5',
+          text: 'Would see again'
+        }
+      ]
+    }
+  ]
+});
 ```
 
 By giving `relate: true` and/or `unrelate: true` options as the second argument, you can change the behaviour so that instead of inserting and deleting rows, they are related and/or unrelated. Rows with no id still get inserted, but rows that have an id and are not currently related, get related.
@@ -1225,9 +1218,8 @@ const options = {
   unrelate: true
 };
 
-await Person
-  .query()
-  .upsertGraph({
+await Person.query().upsertGraph(
+  {
     // This updates the `Jennifer Aniston` person since the id property is present.
     id: 1,
     firstName: 'Jonnifer',
@@ -1236,40 +1228,51 @@ await Person
     parent: null,
 
     // Notice that Kat the Cat is not listed in `pets`. It will get unrelated.
-    pets: [{
-      // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
-      // that there is no id!
-      name: 'Wolfgang',
-      species: 'Dog'
-    }, {
-      // It turns out Doggo is a cat. Update it.
-      id: 1,
-      species: 'Cat',
-    }],
+    pets: [
+      {
+        // Jennifer just got a new pet. Insert it and relate it to Jennifer. Notice
+        // that there is no id!
+        name: 'Wolfgang',
+        species: 'Dog'
+      },
+      {
+        // It turns out Doggo is a cat. Update it.
+        id: 1,
+        species: 'Cat'
+      }
+    ],
 
     // Notice that Wanderlust is missing from the list. It will get unrelated.
-    movies: [{
-      id: 1,
-
-      // Upsert graphs can be arbitrarily deep. This modifies the
-      // reviews of "Horrible Bosses".
-      reviews: [{
-        // Update a review.
+    movies: [
+      {
         id: 1,
-        stars: 2,
-        text: 'Even more Meh'
-      }, {
-        // And insert another one.
-        stars: 5,
-        title: 'Loved it',
-        text: 'Best movie ever'
-      }]
-    }, {
-      // This is some existing movie that isn't currently related to Jennifer.
-      // It will get related.
-      id: 1253
-    }]
-  }, options);
+
+        // Upsert graphs can be arbitrarily deep. This modifies the
+        // reviews of "Horrible Bosses".
+        reviews: [
+          {
+            // Update a review.
+            id: 1,
+            stars: 2,
+            text: 'Even more Meh'
+          },
+          {
+            // And insert another one.
+            stars: 5,
+            title: 'Loved it',
+            text: 'Best movie ever'
+          }
+        ]
+      },
+      {
+        // This is some existing movie that isn't currently related to Jennifer.
+        // It will get related.
+        id: 1253
+      }
+    ]
+  },
+  options
+);
 ```
 
 `relate` and `unrelate` (and all other [options](/api/types/#type-upsertgraphoptions) can also be lists of relation paths. In that case the option is only applied for the listed relations.
@@ -1284,9 +1287,8 @@ const options = {
   noDelete: ['movies']
 };
 
-await Person
-  .query()
-  .upsertGraph({
+await Person.query().upsertGraph(
+  {
     id: 1,
 
     // This gets deleted since `unrelate` list doesn't have 'parent' in it
@@ -1294,37 +1296,47 @@ await Person
     parent: null,
 
     // Notice that Kat the Cat is not listed in `pets`. It will get unrelated.
-    pets: [{
-      // It turns out Doggo is a cat. Update it.
-      id: 1,
-      species: 'Cat'
-    }],
+    pets: [
+      {
+        // It turns out Doggo is a cat. Update it.
+        id: 1,
+        species: 'Cat'
+      }
+    ],
 
     // Notice that Wanderlust is missing from the list. It will NOT get unrelated
     // or deleted since `unrelate` list doesn't contain `movies` and `noDelete`
     // list does.
-    movies: [{
-      id: 1,
-
-      // Upsert graphs can be arbitrarily deep. This modifies the
-      // reviews of "Horrible Bosses".
-      reviews: [{
-        // Update a review.
+    movies: [
+      {
         id: 1,
-        stars: 2,
-        text: 'Even more Meh'
-      }, {
-        // And insert another one.
-        stars: 5,
-        title: 'Loved it',
-        text: 'Best movie ever'
-      }]
-    }, {
-      // This is some existing movie that isn't currently related to Jennifer.
-      // It will get related.
-      id: 1253
-    }]
-  }, options);
+
+        // Upsert graphs can be arbitrarily deep. This modifies the
+        // reviews of "Horrible Bosses".
+        reviews: [
+          {
+            // Update a review.
+            id: 1,
+            stars: 2,
+            text: 'Even more Meh'
+          },
+          {
+            // And insert another one.
+            stars: 5,
+            title: 'Loved it',
+            text: 'Best movie ever'
+          }
+        ]
+      },
+      {
+        // This is some existing movie that isn't currently related to Jennifer.
+        // It will get related.
+        id: 1253
+      }
+    ]
+  },
+  options
+);
 ```
 
 You can disable updates, inserts, deletes etc. for the whole [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph) operation or for individual relations by using the `noUpdate`, `noInsert`, `noDelete` etc. options. See [UpsertGraphOptions](/api/types/#type-upsertgraphoptions) docs for more info.

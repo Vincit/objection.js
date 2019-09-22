@@ -8,7 +8,7 @@ Note that this is not an example of how to build a web server. It's an example o
 
 ```sh
 git clone git@github.com:Vincit/objection.js.git objection
-cd objection/examples/koa
+cd objection/examples/koa-ts
 npm install
 npm start
 node client.js

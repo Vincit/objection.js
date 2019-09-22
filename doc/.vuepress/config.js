@@ -51,6 +51,20 @@ module.exports = {
       },
 
       {
+        text: 'v1.x',
+        items: [
+          {
+            text: 'Migration to 2.0',
+            link: '/1.x/migration.md'
+          },
+          {
+            text: 'v1.x documentation',
+            link: 'https://github.com/Vincit/objection.js/tree/v1/doc'
+          }
+        ]
+      },
+
+      {
         text: '⭐ Star',
         link: 'https://github.com/vincit/objection.js'
       }
