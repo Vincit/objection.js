@@ -18,6 +18,8 @@
 
   * Using `#ref` in an `insertGraph` or an `upsertGraph` now needs the [allowGraph](/api/types/#type-insertgraphoptions) option to be true.
 
+  * `relate` now always returns the number of affected rows. Previously it returned the inserted pivot table row in case of `ManyToManyRelation`.
+
 ## 1.6.10
 
   * Fixes [#1455](https://github.com/Vincit/objection.js/issues/1455)

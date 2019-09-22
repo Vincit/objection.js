@@ -585,6 +585,8 @@ the case of a many-to-many relation, creates a join row to the join table.
 
 On Postgres multiple items can be related by giving an array of identifiers.
 
+The return value of the query is the number of affected items.
+
 ##### Arguments
 
 Argument|Type|Description
@@ -708,6 +710,8 @@ join columns to null.
 
 Note that, unlike for `relate`, you shouldn't pass arguments for the `unrelate` method.
 Use `unrelate` like `delete` and filter the rows using the returned query builder.
+
+The return value of the query is the number of affected items.
 
 ##### Return value
 

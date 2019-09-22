@@ -878,7 +878,7 @@ Person.query()
     console.log(`Inserted ${p}`);
     ea.$loadRelated('movies')
       .relate<Movie>({ title: 'Total Recall' })
-      .then((pWithMovie: Person) => {
+      .then((pWithMovie: number) => {
         console.log(`Related ${pWithMovie}`);
       });
   });

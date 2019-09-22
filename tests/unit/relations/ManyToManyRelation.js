@@ -1234,7 +1234,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({ ownerId: 666, relatedId: 10 });
+        expect(result).to.eql(1);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1258,11 +1258,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([
-          { ownerId: 666, relatedId: 10 },
-          { ownerId: 666, relatedId: 20 },
-          { ownerId: 666, relatedId: 30 }
-        ]);
+        expect(result).to.eql(3);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1286,11 +1282,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([
-          { ownerId: 666, relatedId: 10 },
-          { ownerId: 666, relatedId: 20 },
-          { ownerId: 666, relatedId: 30 }
-        ]);
+        expect(result).to.eql(3);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1320,11 +1312,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([
-          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44 },
-          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55 },
-          { ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77 }
-        ]);
+        expect(result).to.eql(3);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1354,11 +1342,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql([
-          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 44 },
-          { ownerAId: 11, ownerBId: 22, relatedCId: 33, relatedDId: 55 },
-          { ownerAId: 11, ownerBId: 22, relatedCId: 66, relatedDId: 77 }
-        ]);
+        expect(result).to.equal(3);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());
@@ -1381,7 +1365,7 @@ describe('ManyToManyRelation', () => {
         .relate(11)
         .then(result => {
           expect(executedQueries).to.have.length(1);
-          expect(result).to.eql({ ownerId: 666, relatedId: 11 });
+          expect(result).to.eql(1);
           expect(executedQueries[0]).to.eql(
             'insert into "JoinModel" ("ownerId", "relatedId") values (666, 11) returning "relatedId"'
           );
@@ -1400,7 +1384,7 @@ describe('ManyToManyRelation', () => {
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
-        expect(result).to.eql({ ownerId: 666, relatedId: 10, extra2: 'foo' });
+        expect(result).to.eql(1);
 
         expect(executedQueries[0]).to.equal(builder.toString());
         expect(executedQueries[0]).to.equal(builder.toSql());

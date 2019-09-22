@@ -561,15 +561,15 @@ declare namespace Objection {
   interface RelateMethod<QB extends AnyQueryBuilder> {
     <RelatedModel extends Model>(
       ids: MaybeCompositeId | Partial<RelatedModel> | Partial<RelatedModel>[]
-    ): SingleQueryBuilder<QB>;
+    ): NumberQueryBuilder<QB>;
 
     <RelatedModel extends Model>(
       ids: MaybeCompositeId | Partial<RelatedModel> | Partial<RelatedModel>[]
-    ): ArrayQueryBuilder<QB>;
+    ): NumberQueryBuilder<QB>;
   }
 
   interface UnrelateMethod<QB extends AnyQueryBuilder> {
-    (): QB;
+    (): NumberQueryBuilder<QB>;
   }
 
   type ForIdValue = MaybeCompositeId | AnyQueryBuilder;
