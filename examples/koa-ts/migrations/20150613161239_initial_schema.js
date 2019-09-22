@@ -1,7 +1,7 @@
 exports.up = knex => {
   return knex.schema
     .createTable('persons', table => {
-      table.increments('id').primary();
+      table.increments('id').primary()
 
       table
         .integer('parentId')
@@ -9,19 +9,19 @@ exports.up = knex => {
         .references('id')
         .inTable('persons')
         .onDelete('SET NULL')
-        .index();
+        .index()
 
-      table.string('firstName');
-      table.string('lastName');
-      table.integer('age');
-      table.json('address');
+      table.string('firstName')
+      table.string('lastName')
+      table.integer('age')
+      table.json('address')
     })
     .createTable('movies', table => {
-      table.increments('id').primary();
-      table.string('name');
+      table.increments('id').primary()
+      table.string('name')
     })
     .createTable('animals', table => {
-      table.increments('id').primary();
+      table.increments('id').primary()
 
       table
         .integer('ownerId')
@@ -29,13 +29,13 @@ exports.up = knex => {
         .references('id')
         .inTable('persons')
         .onDelete('SET NULL')
-        .index();
+        .index()
 
-      table.string('name');
-      table.string('species');
+      table.string('name')
+      table.string('species')
     })
     .createTable('persons_movies', table => {
-      table.increments('id').primary();
+      table.increments('id').primary()
 
       table
         .integer('personId')
@@ -43,7 +43,7 @@ exports.up = knex => {
         .references('id')
         .inTable('persons')
         .onDelete('CASCADE')
-        .index();
+        .index()
 
       table
         .integer('movieId')
@@ -51,14 +51,14 @@ exports.up = knex => {
         .references('id')
         .inTable('movies')
         .onDelete('CASCADE')
-        .index();
-    });
-};
+        .index()
+    })
+}
 
 exports.down = knex => {
   return knex.schema
     .dropTableIfExists('persons_movies')
     .dropTableIfExists('animals')
     .dropTableIfExists('movies')
-    .dropTableIfExists('persons');
-};
+    .dropTableIfExists('persons')
+}

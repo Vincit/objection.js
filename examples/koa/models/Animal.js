@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-const { Model } = require('objection');
+const { Model } = require('objection')
 
 class Animal extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'animals';
+    return 'animals'
   }
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
@@ -22,14 +22,14 @@ class Animal extends Model {
         name: { type: 'string', minLength: 1, maxLength: 255 },
         species: { type: 'string', minLength: 1, maxLength: 255 }
       }
-    };
+    }
   }
 
   // This object defines the relations to other models.
   static get relationMappings() {
     // One way to prevent circular references
     // is to require the model classes here.
-    const Person = require('./Person');
+    const Person = require('./Person')
 
     return {
       owner: {
@@ -44,8 +44,8 @@ class Animal extends Model {
           to: 'persons.id'
         }
       }
-    };
+    }
   }
 }
 
-module.exports = Animal;
+module.exports = Animal

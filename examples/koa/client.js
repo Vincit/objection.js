@@ -1,54 +1,54 @@
-'use strict';
+'use strict'
 
 /**
  * This file contains a bunch of HTTP requests that use the
  * API defined in api.js.
  */
 
-const axios = require('axios');
-const qs = require('querystring');
+const axios = require('axios')
+const qs = require('querystring')
 
 const req = axios.create({
   baseURL: 'http://localhost:8641/',
   paramsSerializer: qs.stringify
-});
+})
 
-(async () => {
-  const matt = await inserPersonWithRelations();
-  await fetchPeople();
+;(async () => {
+  const matt = await inserPersonWithRelations()
+  await fetchPeople()
 
-  await updatePerson(matt, { age: 41 });
-  await deletePerson(matt.children[0]);
+  await updatePerson(matt, { age: 41 })
+  await deletePerson(matt.children[0])
 
   const isabella = await insertChildForPerson(matt, {
     firstName: 'Isabella',
     lastName: 'Damon',
     age: 13
-  });
+  })
 
   await insertChildForPerson(matt.parent, {
     firstName: 'Kyle',
     lastName: 'Damon',
     age: 52
-  });
+  })
 
-  await fetchChildren(matt.parent);
-  await insertPetForPerson(isabella, { name: 'Chewy', species: 'hamster' });
-  await fetchPersonsHamsters(isabella);
+  await fetchChildren(matt.parent)
+  await insertPetForPerson(isabella, { name: 'Chewy', species: 'hamster' })
+  await fetchPersonsHamsters(isabella)
 
-  const departed = await insertMovie({ name: 'The Departed' });
-  await addPersonToMovieAsActor(departed, matt);
-  await removePersonFromMovie(departed, matt);
+  const departed = await insertMovie({ name: 'The Departed' })
+  await addPersonToMovieAsActor(departed, matt)
+  await removePersonFromMovie(departed, matt)
 })().catch(err => {
-  console.error('error:', err.response.status, err.response.data);
-});
+  console.error('error:', err.response.status, err.response.data)
+})
 
 async function inserPersonWithRelations() {
   console.log(`
     ////////////////////////////////////////////////
     //       Insert a person with relations       //
     ////////////////////////////////////////////////
-  `);
+  `)
 
   const { data: matt } = await req.post('persons', {
     firstName: 'Matt',
@@ -88,10 +88,10 @@ async function inserPersonWithRelations() {
         age: 13
       }
     ]
-  });
+  })
 
-  console.dir(matt, { depth: null });
-  return matt;
+  console.dir(matt, { depth: null })
+  return matt
 }
 
 async function fetchPeople() {
@@ -99,7 +99,7 @@ async function fetchPeople() {
     ////////////////////////////////////////////////
     //      Fetch people using some filters       //
     ////////////////////////////////////////////////
-  `);
+  `)
 
   const { data: allPeople } = await req.get('persons', {
     params: {
@@ -109,9 +109,9 @@ async function fetchPeople() {
       withMovieCount: true,
       withGraph: '[pets, children]'
     }
-  });
+  })
 
-  console.dir(allPeople, { depth: null });
+  console.dir(allPeople, { depth: null })
 }
 
 async function updatePerson(person, patch) {
@@ -119,11 +119,11 @@ async function updatePerson(person, patch) {
     ////////////////////////////////////////////////
     //              Update a person               //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.patch(`persons/${person.id}`, patch);
+  const { data } = await req.patch(`persons/${person.id}`, patch)
 
-  console.dir(data);
+  console.dir(data)
 }
 
 async function deletePerson(person) {
@@ -131,11 +131,11 @@ async function deletePerson(person) {
     ////////////////////////////////////////////////
     //              Delete a person               //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.delete(`persons/${person.id}`);
+  const { data } = await req.delete(`persons/${person.id}`)
 
-  console.dir(data);
+  console.dir(data)
 }
 
 async function insertChildForPerson(person, child) {
@@ -143,12 +143,12 @@ async function insertChildForPerson(person, child) {
     ////////////////////////////////////////////////
     //          Add a child for a person          //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.post(`persons/${person.id}/children`, child);
+  const { data } = await req.post(`persons/${person.id}/children`, child)
 
-  console.dir(data);
-  return data;
+  console.dir(data)
+  return data
 }
 
 async function fetchChildren(person) {
@@ -156,15 +156,15 @@ async function fetchChildren(person) {
     ////////////////////////////////////////////////
     //          Fetch a person's children         //
     ////////////////////////////////////////////////
-  `);
+  `)
 
   const { data } = await req.get(`persons/${person.id}/children`, {
     params: {
       actorInMovie: 'Good Will Hunting'
     }
-  });
+  })
 
-  console.dir(data);
+  console.dir(data)
 }
 
 async function insertPetForPerson(person, pet) {
@@ -172,11 +172,11 @@ async function insertPetForPerson(person, pet) {
     ////////////////////////////////////////////////
     //           Add a pet for a person           //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.post(`persons/${person.id}/pets`, pet);
+  const { data } = await req.post(`persons/${person.id}/pets`, pet)
 
-  console.dir(data);
+  console.dir(data)
 }
 
 async function fetchPersonsHamsters(person) {
@@ -184,15 +184,15 @@ async function fetchPersonsHamsters(person) {
     ////////////////////////////////////////////////
     //           Fetch a person's pets            //
     ////////////////////////////////////////////////
-  `);
+  `)
 
   const { data } = await req.get(`persons/${person.id}/pets`, {
     params: {
       species: 'hamster'
     }
-  });
+  })
 
-  console.dir(data);
+  console.dir(data)
 }
 
 async function insertMovie(movie) {
@@ -200,12 +200,12 @@ async function insertMovie(movie) {
     ////////////////////////////////////////////////
     //             Insert a new movie             //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.post(`movies`, movie);
+  const { data } = await req.post(`movies`, movie)
 
-  console.dir(data);
-  return data;
+  console.dir(data)
+  return data
 }
 
 async function addPersonToMovieAsActor(movie, actor) {
@@ -213,11 +213,11 @@ async function addPersonToMovieAsActor(movie, actor) {
     ////////////////////////////////////////////////
     //        Connect a movie and an actor        //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.post(`movies/${movie.id}/actors/${actor.id}`);
+  const { data } = await req.post(`movies/${movie.id}/actors/${actor.id}`)
 
-  console.dir(data);
+  console.dir(data)
 }
 
 async function removePersonFromMovie(movie, actor) {
@@ -225,9 +225,9 @@ async function removePersonFromMovie(movie, actor) {
     ////////////////////////////////////////////////
     //      Disconnect a movie and an actor       //
     ////////////////////////////////////////////////
-  `);
+  `)
 
-  const { data } = await req.delete(`movies/${movie.id}/actors/${actor.id}`);
+  const { data } = await req.delete(`movies/${movie.id}/actors/${actor.id}`)
 
-  console.dir(data);
+  console.dir(data)
 }

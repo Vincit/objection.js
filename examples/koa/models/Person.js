@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-const { Model } = require('objection');
+const { Model } = require('objection')
 
 class Person extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'persons';
+    return 'persons'
   }
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
@@ -32,7 +32,7 @@ class Person extends Model {
           }
         }
       }
-    };
+    }
   }
 
   // Modifiers are reusable query snippets that can be used in various places.
@@ -48,20 +48,20 @@ class Person extends Model {
         query.where(query => {
           for (const namePart of name.trim().split(/\s+/)) {
             for (const column of ['firstName', 'lastName']) {
-              query.orWhereRaw('lower(??) like ?', [column, namePart.toLowerCase() + '%']);
+              query.orWhereRaw('lower(??) like ?', [column, namePart.toLowerCase() + '%'])
             }
           }
-        });
+        })
       }
-    };
+    }
   }
 
   // This object defines the relations to other models.
   static get relationMappings() {
     // One way to prevent circular references
     // is to require the model classes here.
-    const Animal = require('./Animal');
-    const Movie = require('./Movie');
+    const Animal = require('./Animal')
+    const Movie = require('./Movie')
 
     return {
       pets: {
@@ -106,8 +106,8 @@ class Person extends Model {
           to: 'persons.id'
         }
       }
-    };
+    }
   }
 }
 
-module.exports = Person;
+module.exports = Person
