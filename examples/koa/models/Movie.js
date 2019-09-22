@@ -1,11 +1,11 @@
-'use strict';
+'use strict'
 
-const { Model } = require('objection');
+const { Model } = require('objection')
 
 class Movie extends Model {
   // Table name is the only required property.
   static get tableName() {
-    return 'movies';
+    return 'movies'
   }
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
@@ -20,13 +20,13 @@ class Movie extends Model {
         id: { type: 'integer' },
         name: { type: 'string', minLength: 1, maxLength: 255 }
       }
-    };
+    }
   }
 
   static get relationMappings() {
     // One way to prevent circular references
     // is to require the model classes here.
-    const Person = require('./Person');
+    const Person = require('./Person')
 
     return {
       actors: {
@@ -47,8 +47,8 @@ class Movie extends Model {
           to: 'persons.id'
         }
       }
-    };
+    }
   }
 }
 
-module.exports = Movie;
+module.exports = Movie
