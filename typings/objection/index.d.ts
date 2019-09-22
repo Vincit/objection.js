@@ -721,6 +721,7 @@ declare namespace Objection {
 
   export interface InsertGraphOptions {
     relate?: boolean | string[];
+    allowRefs?: boolean;
   }
 
   interface InsertGraphMethod {
@@ -747,6 +748,7 @@ declare namespace Objection {
     noDelete?: boolean | string[];
     noRelate?: boolean | string[];
     noUnrelate?: boolean | string[];
+    allowRefs?: boolean;
   }
 
   interface UpsertGraphMethod {
