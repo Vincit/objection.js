@@ -1,26 +1,19 @@
-import { Model } from 'objection';
-import Person from './Person';
-import { join } from 'path';
+import { Model, JSONSchema, RelationMappings } from 'objection'
+import Person from './Person'
 
 export default class Animal extends Model {
-  // prettier-ignore
-  readonly id!: number;
-  ownerId?: number;
-  // prettier-ignore
-  name!: string;
-  // prettier-ignore
-  species!: string;
+  id!: number
+  name!: string
 
-  // Optional eager relations.
-  owner?: Person;
+  owner?: Person
 
   // Table name is the only required property.
-  static tableName = 'animals';
+  static tableName = 'animals'
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
   // based on this. This is only used for validation. Whenever a model instance
   // is created it is checked against this schema. http://json-schema.org/.
-  static jsonSchema = {
+  static jsonSchema: JSONSchema = {
     type: 'object',
     required: ['name'],
 
@@ -30,20 +23,20 @@ export default class Animal extends Model {
       name: { type: 'string', minLength: 1, maxLength: 255 },
       species: { type: 'string', minLength: 1, maxLength: 255 }
     }
-  };
+  }
 
-  // This object defines the relations to other models.
-  static relationMappings = {
+  // The relationMappings property can be a thunk to prevent
+  // circular dependencies.
+  static relationMappings = (): RelationMappings => ({
     owner: {
       relation: Model.BelongsToOneRelation,
-      // The related model. This can be either a Model subclass constructor or an
-      // absolute file path to a module that exports one. We use the file path version
-      // here to prevent require loops.
-      modelClass: join(__dirname, 'Person'),
+      // The related model.
+      modelClass: Person,
+
       join: {
         from: 'animals.ownerId',
         to: 'persons.id'
       }
     }
-  };
+  })
 }

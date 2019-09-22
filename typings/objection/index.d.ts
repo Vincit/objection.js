@@ -158,7 +158,7 @@ declare namespace Objection {
   type AnyQueryBuilder = QueryBuilder<any, any>;
   type AnyModelClass = ModelClass<any>;
   type Modifier<QB extends AnyQueryBuilder = AnyQueryBuilder> =
-    | ((qb: QB) => void)
+    | ((qb: QB, ...args: any[]) => void)
     | string
     | object;
   type OrderByDirection = 'asc' | 'desc' | 'ASC' | 'DESC';

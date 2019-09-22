@@ -1,21 +1,19 @@
-import { Model } from 'objection';
-import Person from './Person';
-import { join } from 'path';
+import { Model, JSONSchema, RelationMappings } from 'objection'
+import Person from './Person'
 
 export default class Movie extends Model {
-  readonly id!: number;
-  name?: string;
+  id!: number
+  name!: string
 
-  // Optional eager relations.
-  actors?: Person[];
+  actors!: Person[]
 
   // Table name is the only required property.
-  static tableName = 'movies';
+  static tableName = 'movies'
 
   // Optional JSON schema. This is not the database schema! Nothing is generated
   // based on this. This is only used for validation. Whenever a model instance
   // is created it is checked against this schema. http://json-schema.org/.
-  static jsonSchema = {
+  static jsonSchema: JSONSchema = {
     type: 'object',
     required: ['name'],
 
@@ -23,25 +21,28 @@ export default class Movie extends Model {
       id: { type: 'integer' },
       name: { type: 'string', minLength: 1, maxLength: 255 }
     }
-  };
+  }
 
-  // This relationMappings is a thunk, which prevents require loops:
-  static relationMappings = () => ({
+  // The relationMappings property can be a thunk to prevent
+  // circular dependencies.
+  static relationMappings = (): RelationMappings => ({
     actors: {
       relation: Model.ManyToManyRelation,
-      // The related model. This can be either a Model subclass constructor or an
-      // absolute file path to a module that exports one. We use the file path version
-      // here to prevent require loops.
-      modelClass: join(__dirname, 'Person'),
+
+      // The related model.
+      modelClass: Person,
+
       join: {
         from: 'movies.id',
+
         // ManyToMany relation needs the `through` object to describe the join table.
         through: {
           from: 'persons_movies.movieId',
           to: 'persons_movies.personId'
         },
+
         to: 'persons.id'
       }
     }
-  });
+  })
 }

@@ -10,8 +10,10 @@
     "noImplicitThis": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "es6",
-    "rootDir": "src",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "target": "esnext",
+    "rootDir": "./",
     "outDir": "lib"
   }
 }
