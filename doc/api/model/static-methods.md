@@ -313,6 +313,47 @@ Get the knex instance:
 const knex = Person.knex();
 ```
 
+
+## `static` transaction()
+
+```js
+const result = await Person.transaction(callback);
+const result = await Person.transaction(trxOrKnex, callback);
+```
+
+Shortcut for `Person.knex().transaction(callback)`.
+
+See the [transaction guide](/guide/transactions.html).
+
+##### Arguments
+
+Argument|Type|Description
+--------|----|-------------------
+callback|function|
+trxOrKnex|knex or Transation|Optional existing transaction or knex instance.
+
+##### Examples
+
+```js
+try {
+  const scrappy = await Person.transaction(async trx => {
+    const jennifer = await Person
+      .query(trx)
+      .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+    const scrappy = await jennifer
+      .$relatedQuery('pets', trx)
+      .insert({name: 'Scrappy'});
+
+    return scrappy;
+  });
+
+  console.log('Great success! Both Jennifer and Scrappy were inserted');
+} catch (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+}
+```
+
 ## `static` startTransaction()
 
 ```js

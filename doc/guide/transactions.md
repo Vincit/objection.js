@@ -1,17 +1,14 @@
 # Transactions
 
-
 Transactions are atomic and isolated units of work in relational databases. If you are not familiar with transactions, I suggest you read up on them. [The wikipedia article](https://en.wikipedia.org/wiki/Database_transaction) is a good place to start.
 
 ## Creating a transaction
 
-In objection, a transaction can be started by calling the [objection.transaction](/api/objection/#transaction) function:
+In objection, a transaction can be started by calling the [Model.transaction](/api/model/static-methods.html#static-transaction) function:
 
 ```js
-const { transaction } = require('objection');
-
 try {
-  const returnValue = await transaction(Person.knex(), async (trx) => {
+  const returnValue = await Person.transaction(async trx => {
     // Here you can use the transaction.
 
     // Whatever you return from the transaction callback gets returned
@@ -24,11 +21,25 @@ try {
 }
 ```
 
-You need to pass a knex instance as the first argument. If you don't have a knex instance otherwise available you can always access it through any [Model](/api/model/) using [Model.knex()](/api/model/static-methods.html#static-knex) provided that you have installed the knex instance globally using [Model.knex(knex)](/api/model/static-methods.html#static-knex) at some point.
-
-The second argument is a callback that gets called with the transaction object as an argument once the transaction has been successfully started. The transaction object is actually just a [knex transaction object](http://knexjs.org/#Transactions) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function.
+The first argument is a callback that gets called with the transaction object as an argument once the transaction has been successfully started. The transaction object is actually just a [knex transaction object](http://knexjs.org/#Transactions) and you can start the transaction just as well using [knex.transaction](http://knexjs.org/#Transactions) function.
 
 The transaction is committed if the promise returned from the callback is resolved successfully. If the returned Promise is rejected or an error is thrown inside the callback the transaction is rolled back.
+
+The above example works if you have installed a knex instance globally using the `Model.knex()` method. If you haven't, you can pass the knex instance as the first argument to the `trnasaction` method
+
+```js
+const returnValue = await Person.transaction(knex, async trx => { ... })
+```
+
+Or just simply use `knex.transaction`
+
+```js
+const returnValue = await knex.transaction(async trx => { ... })
+```
+
+::: tip
+Note: Even if you start a transaction using `Person.transaction` it doesn't mean that the transaction is just for `Persons`. It's just a normal knex transaction, no matter what model you use to start it. You can even use the `Model` base class if you want.
+:::
 
 An alternative way to start a transaction is to use the [Model.startTransaction()](/api/model/static-methods.html#static-starttransaction) method:
 
@@ -47,6 +58,8 @@ try {
 }
 ```
 
+There's also a third way to use transactions, which is described in detail [later](#binding-models-to-a-transaction).
+
 ## Using a transaction
 
 After you have created a transaction, you need to tell objection which queries should be executed inside that transaction. There are two ways to do that:
@@ -59,13 +72,8 @@ After you have created a transaction, you need to tell objection which queries s
 The most straight forwared way to use a transaction is to explicitly give it to each query you start. [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query) and [$relatedQuery](/api/model/instance-methods.html#relatedquery) accept a transaction as their last argument.
 
 ```js
-const { transaction } = require('objection');
-// You can access `knex` instance anywhere you want.
-// One way is to get it through any model.
-const knex = Person.knex();
-
 try {
-  const scrappy = await transaction(knex, async (trx) => {
+  const scrappy = await Person.transaction(async trx => {
     const jennifer = await Person
       .query(trx)
       .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
@@ -107,7 +115,7 @@ await insertPersonAndPet(person, pet, trx);
 await trx.commit();
 
 // 2.
-await transaction(Person.knex(), async (trx) => {
+await Person.transaction(async trx => {
   await insertPersonAndPet(person, pet, trx);
 });
 
@@ -231,3 +239,29 @@ await transaction(Person, async (Person, trx) => {
 ```
 
 Originally we advertised this way of doing transactions as a remedy to the transaction passing plague but it has turned out to be pretty error-prone. This approach is handy for single inline functions that do a handful of operations, but becomes tricky when you have to call services and helper methods that also perform database queries. To get the helpers and service functions to participate in the transaction you need to pass around the bound copies of the model classes. If you `require` the same models in the helpers and start queries through them, they will __not__ be executed in the transaction since the required models are not the bound copies, but the original models from which the copies were taken.
+
+## Setting the isolation level
+
+You can use `raw` to set the isolation level (among other things):
+
+```js
+try {
+  const scrappy = await Person.transaction(async trx => {
+    await trx.raw('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE')
+
+    const jennifer = await Person
+      .query(trx)
+      .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+
+    const scrappy = await jennifer
+      .$relatedQuery('pets', trx)
+      .insert({name: 'Scrappy'});
+
+    return scrappy;
+  });
+
+  console.log('Great success! Both Jennifer and Scrappy were inserted');
+} catch (err) {
+  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+}
+```

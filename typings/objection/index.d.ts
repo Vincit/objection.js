@@ -207,7 +207,7 @@ declare namespace Objection {
       ? PartialModelGraph<Exclude<T[K], undefined>>
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonPrimitiveValue))
-      : (T[K] | NonPrimitiveValue)
+      : (T[K] | NonPrimitiveValue);
   } &
     GraphParameters;
 
@@ -232,7 +232,7 @@ declare namespace Objection {
         ? (I extends Model ? never : K)
         : T[K] extends Function
         ? never
-        : K
+        : K;
     }[keyof T],
     undefined | 'QueryBuilderType'
   >;
@@ -246,7 +246,7 @@ declare namespace Objection {
         ? K
         : Exclude<T[K], undefined> extends Array<infer I>
         ? (I extends Model ? K : never)
-        : never
+        : never;
     }[keyof T],
     undefined
   >;
@@ -1237,11 +1237,7 @@ declare namespace Objection {
     (): any;
   }
 
-  export interface Transaction extends knex {
-    savepoint(transactionScope: (trx: Transaction) => any): Promise<any>;
-    commit<QM>(value?: any): Promise<QM>;
-    rollback<QM>(error?: Error): Promise<QM>;
-  }
+  export type Transaction = knex.Transaction;
 
   export interface RelationMappings {
     [relationName: string]: RelationMapping;
@@ -1415,6 +1411,11 @@ declare namespace Objection {
     table?: string;
   }
 
+  interface TransactionMethod {
+    <T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
+    <T>(trxOrKnex: Transaction | knex, callback: (trx: Transaction) => Promise<T>): Promise<T>;
+  }
+
   interface BindKnexMethod {
     <M>(this: M, trxOrKnex: Transaction | knex): M;
   }
@@ -1488,6 +1489,7 @@ declare namespace Objection {
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
     static startTransaction(knexOrTransaction?: Transaction | knex): Transaction;
+    static transaction: TransactionMethod;
 
     static bindKnex: BindKnexMethod;
     static bindTransaction: BindKnexMethod;

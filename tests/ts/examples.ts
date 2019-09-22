@@ -806,7 +806,17 @@ qb = qb.onBuildKnex((knexBuilder: knex.QueryBuilder, builder: objection.QueryBui
 qb = qb.reject('fail');
 qb = qb.resolve('success');
 
-objection.transaction(Person, TxPerson => {
+const trxRes1: Promise<Person> = Person.transaction(async trx => {
+  const person = await Person.query(trx).findById(1);
+  return person;
+});
+
+const trxRes2: Promise<Person[]> = Person.transaction(Person.knex(), async trx => {
+  const person = await Person.query(trx).findById(1);
+  return [person];
+});
+
+const trxRes3: Promise<string> = objection.transaction(Person, TxPerson => {
   const n: number = new TxPerson().examplePersonMethod('hello');
   return Promise.resolve('yay');
 });
