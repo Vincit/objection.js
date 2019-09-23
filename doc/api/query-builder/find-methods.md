@@ -35,7 +35,7 @@ const person = await Person.query().findById([1, '10']);
 `findById` can be used together with `patch`, `delete` and any other query method. All it does is adds the needed `where` clauses to the query.
 
 ```js
-await Person.findById(someId).patch({ firstName: 'Jennifer' })
+await Person.query().findById(someId).patch({ firstName: 'Jennifer' })
 ```
 
 ## findByIds()
@@ -165,7 +165,7 @@ Type|Description
 // This query uses joinRelation to join a many-to-many relation which also joins
 // the join table `persons_movies`. We specify that the `persons_movies` table
 // should be called `pm` instead of the default `movies_join`.
-await person
+await Person
   .query()
   .aliasFor('persons_movies', 'pm')
   .joinRelation('movies')
@@ -335,7 +335,7 @@ Type|Description
 
 ## whereNot()
 
-See [knex documentation](http://knexjs.org/#Builder-where)
+See [knex documentation](http://knexjs.org/#Builder-whereNot)
 
 ##### Return value
 
@@ -345,7 +345,7 @@ Type|Description
 
 ## orWhereNot()
 
-See [knex documentation](http://knexjs.org/#Builder-where)
+See [knex documentation](http://knexjs.org/#Builder-whereNot)
 
 ##### Return value
 
