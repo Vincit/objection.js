@@ -23,6 +23,8 @@ export class Person extends objection.Model {
 
   oldLastName?: string;
 
+  address!: objection.Pojo;
+
   static columnNameMappers = objection.snakeCaseMappers();
 
   examplePersonMethod = (arg: string) => 1;
