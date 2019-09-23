@@ -1,7 +1,5 @@
-import * as objection from '../../../../';
 import { raw } from '../../../../';
-
-class Person extends objection.Model {}
+import { Person } from '../../fixtures/person';
 
 (async () => {
   await Person.query().deleteById(1);

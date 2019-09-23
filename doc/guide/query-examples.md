@@ -913,28 +913,33 @@ The query above will insert 'Sylvester', 'Sage' and 'Fluffy' into db and create 
 If you need to refer to the same model in multiple places you can use the special properties `#id` and `#ref` like this:
 
 ```js
-await Person
-  .query()
-  .insertGraph([
+await Person.query().insertGraph(
+  [
     {
       firstName: 'Jennifer',
       lastName: 'Lawrence',
 
-      movies: [{
-        "#id": 'silverLiningsPlaybook'
-        name: 'Silver Linings Playbook',
-        duration: 122
-      }]
-    }, {
+      movies: [
+        {
+          '#id': 'silverLiningsPlaybook',
+          name: 'Silver Linings Playbook',
+          duration: 122
+        }
+      ]
+    },
+    {
       firstName: 'Bradley',
       lastName: 'Cooper',
 
-      movies: [{
-        "#ref": 'silverLiningsPlaybook'
-      }]
+      movies: [
+        {
+          '#ref': 'silverLiningsPlaybook'
+        }
+      ]
     }
   ],
-  { allowRefs: true });
+  { allowRefs: true }
+);
 ```
 
 Note that you need to also set the `allowRefs` option to true for this to work.

@@ -6,6 +6,8 @@ import { Movie } from './movie';
 class CustomValidationError extends Error {}
 
 export class Person extends objection.Model {
+  id!: number;
+
   // With TypeScript 2.7, fields in models need either optionality:
   firstName?: string;
   // Or for not-null fields that are always initialized, you can use the new ! syntax:
@@ -17,6 +19,7 @@ export class Person extends objection.Model {
   comments?: Comment[];
   movies?: Movie[];
   age!: number;
+  parent?: Partial<Person> | null;
 
   oldLastName?: string;
 
@@ -72,8 +75,12 @@ export class Person extends objection.Model {
 
   static get modifiers() {
     return {
-      myFilter(builder: objection.QueryBuilder<Person>) {
-        return builder.orderBy('date');
+      defaultSelects(builder: objection.QueryBuilder<Person>) {
+        builder.select('id', 'firstName');
+      },
+
+      orderByAge(builder: objection.QueryBuilder<Person>) {
+        builder.orderBy('age');
       }
     };
   }

@@ -1,26 +1,5 @@
-import * as objection from '../../../../';
-
-class Person extends objection.Model {
-  firstName?: string;
-  lastName!: string;
-}
-
-class Animal extends objection.Model {
-  species!: string;
-  name?: string;
-  owner?: Person;
-
-  // Tests the ColumnNameMappers interface.
-  static columnNameMappers = {
-    parse(json: objection.Pojo) {
-      return json;
-    },
-
-    format(json: objection.Pojo) {
-      return json;
-    }
-  };
-}
+import { Animal } from '../../fixtures/animal';
+import { Person } from '../../fixtures/person';
 
 (async () => {
   const person = await Person.query().findById(1);

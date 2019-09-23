@@ -2,6 +2,8 @@ import * as objection from '../../../';
 import { Person } from './person';
 
 export class Animal extends objection.Model {
+  id!: number;
+
   species!: string;
   name?: string;
   owner?: Person;
@@ -16,4 +18,16 @@ export class Animal extends objection.Model {
       return json;
     }
   };
+
+  static get modifiers() {
+    return {
+      orderByName(builder: objection.QueryBuilder<Animal>) {
+        builder.orderBy('name');
+      },
+
+      onlyDogs(builder: objection.QueryBuilder<Animal>) {
+        builder.where('species', 'dog');
+      }
+    };
+  }
 }
