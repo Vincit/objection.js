@@ -754,15 +754,15 @@ declare namespace Objection {
   interface UpsertGraphMethod {
     <QB extends AnyQueryBuilder>(
       this: QB,
-      graph: PartialModelGraph<ModelType<QB>>,
-      options?: UpsertGraphOptions
-    ): SingleQueryBuilder<QB>;
-
-    <QB extends AnyQueryBuilder>(
-      this: QB,
       graph: PartialModelGraph<ModelType<QB>>[],
       options?: UpsertGraphOptions
     ): ArrayQueryBuilder<QB>;
+
+    <QB extends AnyQueryBuilder>(
+      this: QB,
+      graph: PartialModelGraph<ModelType<QB>>,
+      options?: UpsertGraphOptions
+    ): SingleQueryBuilder<QB>;
   }
 
   // Deprecated

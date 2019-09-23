@@ -1,11 +1,18 @@
 import * as objection from '../../../';
-import { RelationMappings, ref } from '../../../';
+import { ref, RelationMappings } from '../../../';
 import { Person } from './person';
+import { Review } from './review';
 
 export class Movie extends objection.Model {
+  readonly id!: number;
+
+  duration!: number;
+
   title!: string;
   actors!: Person[];
   director!: Person;
+
+  reviews!: Review[];
 
   /**
    * This static field instructs Objection how to hydrate and persist
