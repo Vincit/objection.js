@@ -230,7 +230,7 @@ order by "name" asc
 
 ```js
 await Person
-  .relateQuery('movies')
+  .relatedQuery('movies')
   .for(100)
   .relate(200);
 ```

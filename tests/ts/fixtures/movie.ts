@@ -4,7 +4,7 @@ import { Person } from './person';
 import { Review } from './review';
 
 export class Movie extends objection.Model {
-  readonly id!: number;
+  id!: number;
 
   duration!: number;
 
@@ -13,6 +13,11 @@ export class Movie extends objection.Model {
   director!: Person;
 
   reviews!: Review[];
+
+  // Needed for testing `relate({ foo: 50, bar: 20, baz: 10 })`
+  foo!: number;
+  bar!: number;
+  baz!: number;
 
   /**
    * This static field instructs Objection how to hydrate and persist
