@@ -567,12 +567,12 @@ declare namespace Objection {
   }
 
   interface RelateMethod<QB extends AnyQueryBuilder> {
-    <RelatedModel extends Model>(
-      ids: MaybeCompositeId | Partial<RelatedModel> | Partial<RelatedModel>[]
-    ): NumberQueryBuilder<QB>;
-
-    <RelatedModel extends Model>(
-      ids: MaybeCompositeId | Partial<RelatedModel> | Partial<RelatedModel>[]
+    (
+      ids:
+        | MaybeCompositeId
+        | MaybeCompositeId[]
+        | PartialModelObject<ModelType<QB>>
+        | PartialModelObject<ModelType<QB>>[]
     ): NumberQueryBuilder<QB>;
   }
 
@@ -1004,6 +1004,8 @@ declare namespace Objection {
 
     withGraphFetched: WithGraphFetchedMethod<this>;
     withGraphJoined: WithGraphJoinedMethod<this>;
+
+    truncate(): Promise<void>;
 
     // Deprecated
     eager: EagerMethod<this>;

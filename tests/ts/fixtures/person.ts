@@ -23,7 +23,11 @@ export class Person extends objection.Model {
 
   oldLastName?: string;
 
+  detailsJsonColumn!: objection.Pojo;
   address!: objection.Pojo;
+
+  // fields marked as extras in relationMappings
+  someExtra!: string;
 
   static columnNameMappers = objection.snakeCaseMappers();
 
