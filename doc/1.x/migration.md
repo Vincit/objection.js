@@ -8,7 +8,8 @@ Here's a list of the breaking changes
 - [modify method signature change](#modify-method-signature-change)
 - [Bluebird and lodash have been removed](#bluebird-and-lodash-have-been-removed)
 - [Database errors now come from db-errors library](#database-errors-now-come-from-the-db-errors-library)
-- [`#ref` references in `insertGraph` and `upsertGraph` now require the `allowRefs: true` option](#ref-references-in-insertgraph-and-upsertgraph-now-require-the-allowrefs-true-option)
+- [#ref references in insertGraph and upsertGraph now require the allowRefs: true option](#ref-references-in-insertgraph-and-upsertgraph-now-require-the-allowrefs-true-option)
+- [relate method now always returns the number of affected rows](relate-method-now-always-returns-the-number-of-affected-rows)
 - [Rewritten typings](#rewritten-typings)
 
 In addition to these, **a lot** of methods were deprecated and replaced by a new method. The old methods still work, but they print a warning (once per process) when you use them. The warning message tells which method you should be using in the future and you can slowly replace the methods as you get annoyed by the warnings.
@@ -35,7 +36,17 @@ Person.query().modify(['foo', 'bar']);
 
 ## Bluebird and lodash have been removed
 
-Before, all async objection operations returned a bluebird promise. Now the bluebird dependency has been dropped an the native `Promise` is used instead. This also means that all bluebird-specific methods `map`, `reduce`, `reflect`, `bind`, `spread`, `asCallback` and `nodeify` have been removed from the `QueryBuilder`.
+Before, all async objection operations returned a bluebird promise. Now the bluebird dependency has been dropped an the native `Promise` is used instead. This also means that all bluebird-specific methods
+
+- `map`
+- `reduce`
+- `reflect`
+- `bind`
+- `spread`
+- `asCallback`
+- `nodeify`
+
+have been removed from the `QueryBuilder`.
 
 You need to go through your code and make sure you don't use any bluebird methods or trust that objection returns a bluebird promise.
 
@@ -69,7 +80,7 @@ into this:
 try {
   await Person.query().where('foo', 'bar')
 } catch (err) {
-  err = err.nativeError
+  err = err.nativeError || err
 
   if (err.code === 13514) {
     ...
@@ -79,7 +90,7 @@ try {
 
 A preferred way to handle this would be to use the new `db-error` classes as described [here](http://localhost:8080/objection.js/recipes/error-handling.html#error-handling), but the fastest migration path is to do the above trick.
 
-## `#ref` references in `insertGraph` and `upsertGraph` now require the `allowRefs: true` option
+## #ref references in insertGraph and upsertGraph now require the allowRefs: true option
 
 The usage of `'#ref': 'someId'` and `#ref{someId.someProp}` now requires an explicit `allowRefs: true` option to be passed to the called method:
 
@@ -87,7 +98,7 @@ The usage of `'#ref': 'someId'` and `#ref{someId.someProp}` now requires an expl
 await Person.query().insertGraph(graphWithRefs, { allowRefs: true });
 ```
 
-This change was made for security reasons. An attacker could, in theory, use the `#ref{someId.someProperty}` to access for example the password hash of a user:
+This change was made for security reasons. An attacker could, in theory, use a `#ref{someId.someProperty}` reference to access for example the password hash of a user:
 
 ```js
 const graphUpsertSentByTheAttacker = {
@@ -104,9 +115,13 @@ const graphUpsertSentByTheAttacker = {
 
 and then the attacker could just take the password hash out of the movies's name in a client of some sort.
 
-For this attack to work, the attacker must already have an access to the API that modifies the user's information. Additionally and more importantly, the graph described above (and all other graphs I could think of) would only yield the password hash in the movies name **if the program sets the hash to the graph before the `upsertGraph` call is executed**. This is a highly unlikely scenario and in case of passowords, would require the attacker to be able to access a route that changes the user's password.
+For this attack to work, the attacker must already have an access to the API that modifies the user's information. Additionally and more importantly, the graph described above (and all other graphs I could think of) would only yield the password hash in the movie's name **if the program sets the hash to the graph before the `upsertGraph` call is executed**. This is a highly unlikely scenario and in case of passowords, would require the attacker to be able to access a route that changes the user's password. The reference can never access the property in the database, only in the object itself.
 
 Even though there's very little chance this kind of attack could be carried out at the moment, I'd advice you to never use `upsertGraph` with `{ allowRefs: true }` and unvalidated user input with references!
+
+## relate method now always returns the number of affected rows
+
+`relate` used to return the inserted pivot table row in case of `ManyToManyRelation` and the number of updated rows in case of other relations. Now an integer is always returned.
 
 ## Rewritten typings
 
