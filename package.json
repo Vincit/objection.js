@@ -87,7 +87,7 @@
     "pg": "^7.12.1",
     "prettier": "1.18.2",
     "sqlite3": "^4.1.0",
-    "typescript": "3.5.3",
+    "typescript": "^3.6.3",
     "vuepress": "1.0.4"
   },
   "nyc": {

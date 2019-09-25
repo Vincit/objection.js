@@ -202,14 +202,13 @@ declare namespace Objection {
   /**
    * Just like PartialModelObject but this is applied recursively to relations.
    */
-  type PartialModelGraph<T> = {
+  type PartialModelGraph<M, T = M & GraphParameters> = {
     [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
       ? PartialModelGraph<Exclude<T[K], undefined>>
       : Exclude<T[K], undefined> extends Array<infer I>
       ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonPrimitiveValue))
       : (T[K] | NonPrimitiveValue);
-  } &
-    GraphParameters;
+  };
 
   /**
    * Extracts the model type from a query builder type QB.
