@@ -2464,6 +2464,33 @@ describe('QueryBuilder', () => {
         });
     });
   });
+
+  describe('omit', () => {
+    it('omit properties from model when ommiting an array', done => {
+      mockKnexQueryResults = [[{ a: 1 }, { b: 2 }, { c: 3 }]];
+      TestModel.query()
+        .omit(['a', 'b'])
+        .then(result => {
+          expect(result[0]).to.not.have.property('a');
+          expect(result[1]).to.not.have.property('b');
+          expect(result[2]).to.have.property('c');
+          expect(result[2].c).to.be.equal(3);
+          done();
+        });
+    });
+
+    it('omit properties from model', done => {
+      mockKnexQueryResults = [[{ a: 1 }, { b: 2 }]];
+      TestModel.query()
+        .omit('b')
+        .then(result => {
+          expect(result[0]).to.have.property('a');
+          expect(result[0].a).to.be.equal(1);
+          expect(result[1]).to.not.have.property('b');
+          done();
+        });
+    });
+  });
 });
 
 const operationBuilder = QueryBuilder.forClass(Model);
