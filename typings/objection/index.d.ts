@@ -120,7 +120,6 @@ declare namespace Objection {
 
   type Raw = RawBuilder;
   type Operator = string;
-  type NonPrimitiveValue = Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
   type ColumnRef = string | Raw | ReferenceBuilder;
   type TableRef = ColumnRef | AnyQueryBuilder;
 
@@ -136,14 +135,14 @@ declare namespace Objection {
     | null
     | Buffer;
 
-  type Value = NonPrimitiveValue | PrimitiveValue;
+  type Expression<T> = T | Raw | ReferenceBuilder | ValueBuilder | AnyQueryBuilder;
 
   type Id = string | number;
   type CompositeId = Id[];
   type MaybeCompositeId = Id | CompositeId;
 
-  interface ValueObject {
-    [key: string]: Value;
+  interface ExpressionObject {
+    [key: string]: Expression<PrimitiveValue>;
   }
 
   interface PrimitiveValueObject {
@@ -180,14 +179,19 @@ declare namespace Objection {
   type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof T];
 
   /**
+   * Removes `undefined` from a type.
+   */
+  type Defined<T> = Exclude<T, undefined>;
+
+  /**
    * Any object that has some of the properties of model class T match this type.
    */
   type PartialModelObject<T extends Model> = {
-    [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
+    [K in NonFunctionPropertyNames<T>]?: Defined<T[K]> extends Model
       ? T[K]
-      : Exclude<T[K], undefined> extends Array<infer I>
-      ? (I extends Model ? I[] : (T[K] | NonPrimitiveValue))
-      : (T[K] | NonPrimitiveValue);
+      : Defined<T[K]> extends Array<infer I>
+      ? (I extends Model ? I[] : Expression<T[K]>)
+      : Expression<T[K]>;
   };
 
   /**
@@ -203,11 +207,11 @@ declare namespace Objection {
    * Just like PartialModelObject but this is applied recursively to relations.
    */
   type PartialModelGraph<M, T = M & GraphParameters> = {
-    [K in NonFunctionPropertyNames<T>]?: Exclude<T[K], undefined> extends Model
-      ? PartialModelGraph<Exclude<T[K], undefined>>
-      : Exclude<T[K], undefined> extends Array<infer I>
-      ? (I extends Model ? PartialModelGraph<I>[] : (T[K] | NonPrimitiveValue))
-      : (T[K] | NonPrimitiveValue);
+    [K in NonFunctionPropertyNames<T>]?: Defined<T[K]> extends Model
+      ? PartialModelGraph<Defined<T[K]>>
+      : Defined<T[K]> extends Array<infer I>
+      ? (I extends Model ? PartialModelGraph<I>[] : Expression<T[K]>)
+      : Expression<T[K]>;
   };
 
   /**
@@ -225,9 +229,9 @@ declare namespace Objection {
    */
   type ModelProps<T extends Model> = Exclude<
     {
-      [K in keyof T]?: Exclude<T[K], undefined> extends Model
+      [K in keyof T]?: Defined<T[K]> extends Model
         ? never
-        : Exclude<T[K], undefined> extends Array<infer I>
+        : Defined<T[K]> extends Array<infer I>
         ? (I extends Model ? never : K)
         : T[K] extends Function
         ? never
@@ -239,15 +243,14 @@ declare namespace Objection {
   /**
    * Extracts the relation names of the a model class.
    */
-  type ModelRelations<T extends Model> = Exclude<
+  type ModelRelations<T extends Model> = Defined<
     {
-      [K in keyof T]?: Exclude<T[K], undefined> extends Model
+      [K in keyof T]?: Defined<T[K]> extends Model
         ? K
-        : Exclude<T[K], undefined> extends Array<infer I>
+        : Defined<T[K]> extends Array<infer I>
         ? (I extends Model ? K : never)
         : never;
-    }[keyof T],
-    undefined
+    }[keyof T]
   >;
 
   /**
@@ -308,11 +311,16 @@ declare namespace Objection {
 
   interface WhereMethod<QB extends AnyQueryBuilder> {
     // These must come first so that we get autocomplete.
-    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, op: Operator, value: Value): QB;
-    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, value: Value): QB;
+    <QBP extends QB>(
+      col: ModelProps<ModelType<QBP>>,
+      op: Operator,
+      expr: Expression<PrimitiveValue>
+    ): QB;
 
-    (col: ColumnRef, op: Operator, value: Value): QB;
-    (col: ColumnRef, value: Value): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, expr: Expression<PrimitiveValue>): QB;
+
+    (col: ColumnRef, op: Operator, expr: Expression<PrimitiveValue>): QB;
+    (col: ColumnRef, expr: Expression<PrimitiveValue>): QB;
 
     (condition: boolean): QB;
     (cb: CallbackVoid<QB>): QB;
@@ -340,17 +348,17 @@ declare namespace Objection {
 
   interface WhereInMethod<QB extends AnyQueryBuilder> {
     // These must come first so that we get autocomplete.
-    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, value: Value): QB;
+    <QBP extends QB>(col: ModelProps<ModelType<QBP>>, expr: Expression<PrimitiveValue>): QB;
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, cb: CallbackVoid<QB>): QB;
     <QBP extends QB>(col: ModelProps<ModelType<QBP>>, qb: AnyQueryBuilder): QB;
 
-    (col: ColumnRef | ColumnRef[], value: Value[]): QB;
+    (col: ColumnRef | ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
     (col: ColumnRef | ColumnRef[], cb: CallbackVoid<QB>): QB;
     (col: ColumnRef | ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
   interface WhereBetweenMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, range: [Value, Value]): QB;
+    (column: ColumnRef, range: [Expression<PrimitiveValue>, Expression<PrimitiveValue>]): QB;
   }
 
   interface WhereNullMethod<QB extends AnyQueryBuilder> {
@@ -390,16 +398,16 @@ declare namespace Objection {
   }
 
   interface WhereCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, value: Value): QB;
-    (column: ColumnRef, op: Operator, value: Value): QB;
-    (column: ColumnRef[], value: Value[]): QB;
+    (column: ColumnRef, expr: Expression<PrimitiveValue>): QB;
+    (column: ColumnRef, op: Operator, expr: Expression<PrimitiveValue>): QB;
+    (column: ColumnRef[], expr: Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 
   interface WhereInCompositeMethod<QB extends AnyQueryBuilder> {
-    (column: ColumnRef, value: Value[]): QB;
+    (column: ColumnRef, expr: Expression<PrimitiveValue>[]): QB;
     (column: ColumnRef, qb: AnyQueryBuilder): QB;
-    (column: ColumnRef[], value: Value[][]): QB;
+    (column: ColumnRef[], expr: Expression<PrimitiveValue>[][]): QB;
     (column: ColumnRef[], qb: AnyQueryBuilder): QB;
   }
 

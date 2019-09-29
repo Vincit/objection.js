@@ -1,9 +1,10 @@
-import { Model, QueryBuilder } from '../../';
+import { Model, QueryBuilder, Page } from '../../';
 
 class CustomQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   ArrayQueryBuilderType!: CustomQueryBuilder<M, M[]>;
   SingleQueryBuilderType!: CustomQueryBuilder<M, M>;
   NumberQueryBuilderType!: CustomQueryBuilder<M, number>;
+  PageQueryBuilderType!: CustomQueryBuilder<M, Page<M>>;
 
   someCustomMethod(): this {
     return this;
@@ -52,4 +53,8 @@ const pets: Promise<Animal> = new Person()
 const numUpdated: Promise<number> = Person.query()
   .someCustomMethod()
   .patch({ firstName: 'test' })
+  .someCustomMethod();
+
+const allPets: Promise<Animal[]> = Person.relatedQuery('pets')
+  .for(Person.query().select('id'))
   .someCustomMethod();
