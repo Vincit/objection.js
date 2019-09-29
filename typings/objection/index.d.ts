@@ -118,7 +118,7 @@ declare namespace Objection {
     castTo(sqlType: string): this;
   }
 
-  type Raw = RawBuilder;
+  type Raw = RawBuilder | knex.Raw;
   type Operator = string;
   type ColumnRef = string | Raw | ReferenceBuilder;
   type TableRef = ColumnRef | AnyQueryBuilder;
