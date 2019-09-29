@@ -2388,6 +2388,101 @@ module.exports = session => {
           .catch(done);
       });
 
+      it('should throw if any `where` calls are added to the query', done => {
+        Model1.bindKnex(session.knex)
+          .query()
+          .where('id', 1)
+          .upsertGraph(
+            {
+              id: 1
+            },
+            {
+              fetchStrategy
+            }
+          )
+          .then(() => {
+            throw new Error('should not get here');
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+            );
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should throw if any `findById` call is added to the query', done => {
+        Model1.bindKnex(session.knex)
+          .query()
+          .findById(1)
+          .upsertGraph(
+            {
+              id: 1
+            },
+            {
+              fetchStrategy
+            }
+          )
+          .then(() => {
+            throw new Error('should not get here');
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+            );
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should throw if any `findOne` call is added to the query', done => {
+        Model1.bindKnex(session.knex)
+          .query()
+          .findOne({ id: 1 })
+          .upsertGraph(
+            {
+              id: 1
+            },
+            {
+              fetchStrategy
+            }
+          )
+          .then(() => {
+            throw new Error('should not get here');
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+            );
+            done();
+          })
+          .catch(done);
+      });
+
+      it('should throw if `upsertGraph` is used with `$relatedQuery`', done => {
+        Model1.fromJson({ id: 1 })
+          .$relatedQuery('model1Relation1', session.knex)
+          .upsertGraph(
+            {
+              id: 1
+            },
+            {
+              fetchStrategy
+            }
+          )
+          .then(() => {
+            throw new Error('should not get here');
+          })
+          .catch(err => {
+            expect(err.message).to.equal(
+              'upsertGraph query should contain no other query builder calls like `findById`, `where` or `$relatedQuery` that would affect the SQL. They have no effect.'
+            );
+            done();
+          })
+          .catch(done);
+      });
+
       if (fetchStrategy !== FetchStrategy.OnlyIdentifiers) {
         describe('fetchStrategy != OnlyIdentifiers', () => {
           it('should fetch all properties and avoid useless update operations if fetchStrategy != OnlyIdentifiers', () => {
