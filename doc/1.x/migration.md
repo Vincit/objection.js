@@ -9,7 +9,8 @@ Here's a list of the breaking changes
 - [Bluebird and lodash have been removed](#bluebird-and-lodash-have-been-removed)
 - [Database errors now come from db-errors library](#database-errors-now-come-from-the-db-errors-library)
 - [#ref references in insertGraph and upsertGraph now require the allowRefs: true option](#ref-references-in-insertgraph-and-upsertgraph-now-require-the-allowrefs-true-option)
-- [relate method now always returns the number of affected rows](relate-method-now-always-returns-the-number-of-affected-rows)
+- [relate method now always returns the number of affected rows](#relate-method-now-always-returns-the-number-of-affected-rows)
+- [\$relatedQuery no longer mutates](#relatedquery-no-longer-mutates)
 - [Rewritten typings](#rewritten-typings)
 
 In addition to these, **a lot** of methods were deprecated and replaced by a new method. The old methods still work, but they print a warning (once per process) when you use them. The warning message tells which method you should be using in the future and you can slowly replace the methods as you get annoyed by the warnings.
@@ -121,7 +122,31 @@ Even though there's very little chance this kind of attack could be carried out 
 
 ## relate method now always returns the number of affected rows
 
-`relate` used to return the inserted pivot table row in case of `ManyToManyRelation` and the number of updated rows in case of other relations. Now an integer is always returned.
+`relate` used to return the inserted pivot table row in case of `ManyToManyRelation` and the number of updated rows in case of other relations. Now an integer indicating the number of affected rows is always returned.
+
+## \$relatedQuery no longer mutates
+
+With objection 1.x, doing this
+
+```js
+await somePerson.$relatedQuery('pets');
+```
+
+addad a property `pets` for `somePerson` and saved the result there. This no longer happens with objection 2. Also inserting a new item using
+
+```js
+await somePerson.$relatedQuery('pets').insert(pet);
+```
+
+would previously add the `pet` to the `pets` array of `somePerson`. This also no longer happens.
+
+You can use `withGraphFetched` and `fetchGraph` methods if you want to populate the relations. Also, nothing prevents you from simply doing this:
+
+```js
+somePerson.pets = await somePerson.$relatedQuery('pets');
+```
+
+You can also use the `Model.relatedInsertQueryMutates` and `Model.relatedFindQueryMutates` properties to revert back to 1.x behavior. Note that those properties are now deprecated and will be removed in 3.0.
 
 ## Rewritten typings
 

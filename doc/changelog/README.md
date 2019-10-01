@@ -22,6 +22,8 @@ See the [migration guide](/1.x/migration.md).
 
 - `relate` now always returns the number of affected rows. Previously it returned the inserted pivot table row in case of `ManyToManyRelation`.
 
+- The default value for [relatedFindQueryMutates](/api/model/static-properties.html#static-relatedfindquerymutates) and [relatedInsertQueryMutates](https://vincit.github.io/objection.js/api/model/static-properties.html#static-relatedinsertquerymutates) is now false. It used to be true.
+
 ## 1.6.10
 
 - Fixes [#1455](https://github.com/Vincit/objection.js/issues/1455)

@@ -790,9 +790,8 @@ module.exports = session => {
             .then(a1 => {
               return Promise.all([a1, a1.$relatedQuery('b')]);
             })
-            .then(([a1, b1]) => {
-              expect(a1.b).to.eql({ id3: 1, id4: '1', bval: 'b1' });
-              expect(b1).to.equal(a1.b);
+            .then(([_, b1]) => {
+              expect(b1).to.eql({ id3: 1, id4: '1', bval: 'b1' });
             });
         });
 
@@ -806,15 +805,13 @@ module.exports = session => {
               ]);
             })
             .then(([a1, bNew]) => {
-              expect(a1.b).to.eql({ id3: 1000, id4: '2000', bval: 'new' });
-              expect(bNew).to.equal(a1.b);
+              expect(bNew).to.eql({ id3: 1000, id4: '2000', bval: 'new' });
               expect(a1).to.eql({
                 id1: 1,
                 id2: '1',
                 aval: 'a1',
                 bid3: 1000,
-                bid4: '2000',
-                b: bNew
+                bid4: '2000'
               });
               return Promise.all([
                 session
@@ -930,8 +927,7 @@ module.exports = session => {
             .then(b1 => {
               return Promise.all([b1, b1.$relatedQuery('a').orderBy(['id1', 'id2'])]);
             })
-            .then(([b1, a]) => {
-              expect(b1.a).to.eql(a);
+            .then(([_, a]) => {
               expect(a).to.eql([
                 { id1: 1, id2: '1', aval: 'a1', bid3: 1, bid4: '1' },
                 { id1: 1, id2: '2', aval: 'a2', bid3: 1, bid4: '1' },
@@ -950,14 +946,13 @@ module.exports = session => {
               ]);
             })
             .then(([b1, aNew]) => {
-              expect(_.last(b1.a)).to.eql({
+              expect(aNew).to.eql({
                 id1: 1000,
                 id2: '2000',
                 aval: 'new',
                 bid3: 1,
                 bid4: '1'
               });
-              expect(_.last(b1.a)).to.equal(aNew);
               return session
                 .knex('A')
                 .where({ id1: 1000, id2: '2000' })

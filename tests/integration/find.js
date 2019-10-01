@@ -2334,7 +2334,7 @@ module.exports = session => {
         it('should return all related rows when no knex methods are chained', () => {
           return parent1.$relatedQuery('model1Relation1').then(related => {
             expect(related).to.be.a(Model1);
-            expect(parent1.model1Relation1).to.eql(related);
+            expect(parent1.model1Relation1).to.eql(undefined);
             expect(related).to.eql({
               id: 2,
               model1Id: null,
@@ -2456,7 +2456,7 @@ module.exports = session => {
               .orderBy('id_col')
               .then(related => {
                 expect(related.length).to.equal(3);
-                expect(parent1.model1Relation2).to.eql(related);
+                expect(parent1.model1Relation2).to.equal(undefined);
                 expect(related[0]).to.be.a(Model2);
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
@@ -2474,7 +2474,7 @@ module.exports = session => {
               .orderBy('id_col')
               .then(related => {
                 expect(related.length).to.equal(3);
-                expect(parent2.model1Relation2).to.eql(related);
+                expect(parent2.model1Relation2).to.equal(undefined);
                 expect(related[0]).to.be.a(Model2);
                 expect(related[1]).to.be.a(Model2);
                 expect(related[2]).to.be.a(Model2);
@@ -2662,7 +2662,7 @@ module.exports = session => {
               .orderBy('id')
               .then(related => {
                 expect(related.length).to.equal(3);
-                expect(parent1.model2Relation1).to.eql(related);
+                expect(parent1.model2Relation1).to.equal(undefined);
                 expect(related[0]).to.be.a(Model1);
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);
@@ -2682,7 +2682,7 @@ module.exports = session => {
               .orderBy('id')
               .then(related => {
                 expect(related.length).to.equal(3);
-                expect(parent2.model2Relation1).to.eql(related);
+                expect(parent2.model2Relation1).to.equal(undefined);
                 expect(related[0]).to.be.a(Model1);
                 expect(related[1]).to.be.a(Model1);
                 expect(related[2]).to.be.a(Model1);

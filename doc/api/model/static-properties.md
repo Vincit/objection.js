@@ -31,8 +31,9 @@ The `modelClass` passed to the relation mappings is the class of the related mod
 The file path versions are handy for avoiding require loops.
 
 Further reading:
- * [the relation guide](/guide/relations.html)
- * [RelationMapping](/api/types/#type-relationmapping)
+
+- [the relation guide](/guide/relations.html)
+- [RelationMapping](/api/types/#type-relationmapping)
 
 ##### Examples
 
@@ -126,9 +127,9 @@ class Person extends Model {
       type: 'object',
       required: ['name'],
       properties: {
-        id: {type: 'integer'},
-        name: {type: 'string', minLength: 1, maxLength: 255},
-        age: {type: 'number'}, // optional
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        age: { type: 'number' } // optional
       }
     };
   }
@@ -141,9 +142,9 @@ Must follow [JSON Schema](http://json-schema.org) specification. If unset, no va
 
 ##### Read more
 
-* [$validate](/api/model/instance-methods.html#validate)
-* [jsonAttributes](/api/model/static-properties.html#static-jsonattributes)
-* [custom validation recipe](/recipes/custom-validation.html)
+- [\$validate](/api/model/instance-methods.html#validate)
+- [jsonAttributes](/api/model/static-properties.html#static-jsonattributes)
+- [custom validation recipe](/recipes/custom-validation.html)
 
 ##### Examples
 
@@ -155,11 +156,11 @@ class Person extends Model {
       required: ['firstName', 'lastName'],
 
       properties: {
-        id: {type: 'integer'},
-        parentId: {type: ['integer', 'null']},
-        firstName: {type: 'string', minLength: 1, maxLength: 255},
-        lastName: {type: 'string', minLength: 1, maxLength: 255},
-        age: {type: 'number'},
+        id: { type: 'integer' },
+        parentId: { type: ['integer', 'null'] },
+        firstName: { type: 'string', minLength: 1, maxLength: 255 },
+        lastName: { type: 'string', minLength: 1, maxLength: 255 },
+        age: { type: 'number' },
 
         // Properties defined as objects or arrays are
         // automatically converted to JSON strings when
@@ -170,9 +171,9 @@ class Person extends Model {
         address: {
           type: 'object',
           properties: {
-            street: {type: 'string'},
-            city: {type: 'string'},
-            zipCode: {type: 'string'}
+            street: { type: 'string' },
+            city: { type: 'string' },
+            zipCode: { type: 'string' }
           }
         }
       }
@@ -233,14 +234,14 @@ const person = Person.fromJson({
 // aware of use JSON.stringify to serialize objects to JSON.
 const pojo = person.toJSON();
 
-console.log(pojo.fullName) // --> 'Jennifer Aniston'
-console.log(pojo.isFemale) // --> true
+console.log(pojo.fullName); // --> 'Jennifer Aniston'
+console.log(pojo.isFemale); // --> true
 ```
 
 You can also pass options to [toJSON](/api/model/instance-methods.html#tojson) to only serialize a subset of virtual attributes. In fact, when the `virtuals` option is used, the attributes don't even need to be listed in `virtualAttributes`.
 
 ```js
-const pojo = person.toJSON({ virtuals: ['fullName'] })
+const pojo = person.toJSON({ virtuals: ['fullName'] });
 ```
 
 ## `static` modifiers
@@ -278,19 +279,16 @@ class Animal extends Model {
 Modifiers can be used for relations in a `withGraphFetched` or `withGraphJoined` query.
 
 ```js
-Person
-  .query()
-  .withGraphFetched('[movies(goodMovies, orderByName).actors, pets(dogs)]')
+Person.query().withGraphFetched('[movies(goodMovies, orderByName).actors, pets(dogs)]');
 ```
 
 Modifiers can also be used through [modifyGraph](/api/query-builder/other-methods.html#modifygraph):
 
 ```js
-Person
-  .query()
+Person.query()
   .withGraphFetched('[movies.actors, pets]')
   .modifyGraph('movies', ['goodMovies', 'orderByName'])
-  .modifyGraph('pets', 'dogs')
+  .modifyGraph('pets', 'dogs');
 ```
 
 ## `static` namedFilters
@@ -298,7 +296,6 @@ Person
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [modifiers](/api/model/static-properties.html#static-modifiers) instead.
 :::
-
 
 An alias for [modifiers](/api/model/static-properties.html#static-modifiers)
 
@@ -416,8 +413,8 @@ The mappers to use to convert column names to property names in code.
 
 Further reading:
 
- * [snakeCaseMappers](/api/objection/#snakecasemappers)
- * [snake_case to camelCase conversion recipe](/recipes/snake-case-to-camel-case-conversion.html)
+- [snakeCaseMappers](/api/objection/#snakecasemappers)
+- [snake_case to camelCase conversion recipe](/recipes/snake-case-to-camel-case-conversion.html)
 
 ##### Examples
 
@@ -451,6 +448,10 @@ class Person extends Model {
 
 ## `static` relatedFindQueryMutates
 
+::: warning
+Deprecated! Will be removed in version 3.0.
+:::
+
 ```js
 class Person extends Model {
   static get relatedFindQueryMutates() {
@@ -459,9 +460,13 @@ class Person extends Model {
 }
 ```
 
-If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assign the fetched related models to `foo.bar`. The default is true.
+If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assign the fetched related models to `foo.bar`. The default is false.
 
 ## `static` relatedInsertQueryMutates
+
+::: warning
+Deprecated! Will be removed in version 3.0.
+:::
 
 ```js
 class Person extends Model {
@@ -471,7 +476,7 @@ class Person extends Model {
 }
 ```
 
-If this config is set to false, calling `foo.$relatedQuery('bar').insert(obj)` doesn't append the inserted related model to `foo.bar`. The default is true.
+If this config is set to false, calling `foo.$relatedQuery('bar').insert(obj)` doesn't append the inserted related model to `foo.bar`. The default is false.
 
 ## `static` uidProp
 
@@ -482,7 +487,6 @@ class Person extends Model {
   }
 }
 ```
-
 
 Name of the property used to store a temporary non-db identifier for the model.
 
@@ -521,7 +525,6 @@ Name of the property used to point to an existing database row from an `insertGr
 NOTE: You cannot use any of the model's properties as `dbRefProp`. For example if your model has a property `id`, you cannot set `dbRefProp = 'id'`.
 
 Defaults to '#dbRef'.
-
 
 ## `static` propRefRegex
 
@@ -607,7 +610,7 @@ class Person extends Model {
 
 [QueryBuilder](/api/query-builder/) subclass to use for all queries created for this model.
 
-This constructor is used whenever a query builder is created using [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), [$relatedQuery](/api/model/instance-methods.html#relatedquery) or any other method that creates a query. You can override this to use your own [QueryBuilder](/api/query-builder/) subclass.
+This constructor is used whenever a query builder is created using [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query), [\$relatedQuery](/api/model/instance-methods.html#relatedquery) or any other method that creates a query. You can override this to use your own [QueryBuilder](/api/query-builder/) subclass.
 
 [Usage example](/recipes/custom-query-builder.html).
 
