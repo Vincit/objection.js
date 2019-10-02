@@ -2517,6 +2517,14 @@ module.exports = session => {
               });
           });
 
+          it('.max()', async () => {
+            const [{ max }] = await parent2
+              .$relatedQuery('model1Relation2')
+              .max('model2_prop2 as max');
+
+            expect(max).to.equal(3);
+          });
+
           it('.orWhere()', () => {
             return parent2
               .$relatedQuery('model1Relation2')
@@ -2776,6 +2784,14 @@ module.exports = session => {
               .then(related => {
                 expect(_.map(related, 'model1Prop2')).to.eql([2]);
               });
+          });
+
+          it('.max()', async () => {
+            const [{ min }] = await parent2
+              .$relatedQuery('model2Relation1')
+              .min('model1Prop1 as min');
+
+            expect(min).to.equal('blaa 4');
           });
 
           it('.orWhere()', () => {
