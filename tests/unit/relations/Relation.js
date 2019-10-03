@@ -177,7 +177,7 @@ describe('Relation', () => {
       });
     }).to.throwException(err => {
       expect(err.message).to.equal(
-        "OwnerModel.relationMappings.foo: join: relation name and join property 'foo' cannot have the same name. If you cannot change one or the other, you can use $parseDatabaseJson and $formatDatabaseJson methods to convert the column name."
+        "OwnerModel.relationMappings.foo: join: relation mapping name and join property 'foo' cannot have the same name. If you cannot change one or the other, you can use $parseDatabaseJson and $formatDatabaseJson methods to convert the column name."
       );
     });
   });
