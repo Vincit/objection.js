@@ -774,6 +774,10 @@ declare namespace Objection {
     ): SingleQueryBuilder<QB>;
   }
 
+  interface GraphExpressionObjectMethod<QB extends AnyQueryBuilder> {
+    (): any;
+  }
+
   // Deprecated
   export interface EagerAlgorithm {}
 
@@ -817,6 +821,10 @@ declare namespace Objection {
 
   interface ModifyMethod<QB extends AnyQueryBuilder> {
     (modifier: Modifier<QB> | Modifier<QB>[], ...args: any[]): QB;
+  }
+
+  interface ModifiersMethod<QB extends AnyQueryBuilder> {
+    (modifiers: Modifiers): QB;
   }
 
   // Deprecated
@@ -1086,6 +1094,8 @@ declare namespace Objection {
     upsertGraph: UpsertGraphMethod;
     upsertGraphAndFetch: UpsertGraphMethod;
 
+    graphExpressionObject: GraphExpressionObjectMethod<this>;
+
     // Deprecated
     eagerAlgorithm: EagerAlgorithmMethod<this>;
     // Deprecated
@@ -1100,6 +1110,7 @@ declare namespace Objection {
     mergeContext: ContextMethod<this>;
 
     modify: ModifyMethod<this>;
+    modifiers: ModifiersMethod<this>;
     // Deprecated
     applyFilter: ApplyFilterMethod<this>;
 

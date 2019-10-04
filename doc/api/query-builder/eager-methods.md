@@ -14,12 +14,12 @@ As mentioned, this method uses multiple queries to fetch the related objects. Ob
 
 **Limitations:**
 
- * Relations cannot be referenced in the root query because they are not joined.
- * `limit` and `page` methods will work incorrectly when applied to a relation using `modifyGraph` or `modifiers` because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
+- Relations cannot be referenced in the root query because they are not joined.
+- `limit` and `page` methods will work incorrectly when applied to a relation using `modifyGraph` or `modifiers` because they will be applied on a query that fetches relations for multiple parents. You can use `limit` and `page` for the root query.
 
 See the [eager loading](/guide/query-examples.html#eager-loading) section for more examples and [RelationExpression](/api/types/#type-relationexpression) for more info about the relation expression language.
 
-See the [fetchGraph](/api/model/static-methods.html#static-fetchgraph) and [$fetchGraph](/api/model/instance-methods.html#fetchgraph) methods if you want to load relations for items already loaded from the database.
+See the [fetchGraph](/api/model/static-methods.html#static-fetchgraph) and [\$fetchGraph](/api/model/instance-methods.html#fetchgraph) methods if you want to load relations for items already loaded from the database.
 
 **About performance:**
 
@@ -27,24 +27,23 @@ Note that while [withGraphJoined](/api/query-builder/eager-methods.html#withgrap
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The relation expression describing which relations to fetch.
-options|[GraphOptions](/api/types/#type-graphoptions)|Optional options.
+| Argument           | Type                                                      | Description                                                  |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------------------------ |
+| relationExpression | [RelationExpression](/api/types/#type-relationexpression) | The relation expression describing which relations to fetch. |
+| options            | [GraphOptions](/api/types/#type-graphoptions)             | Optional options.                                            |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
 ##### Examples
 
 Fetches all `Persons` named Arnold with all their pets. `'pets'` is the name of the relation defined in [relationMappings](/api/model/static-properties.html#static-relationmappings).
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .where('firstName', 'Arnold')
   .withGraphFetched('pets');
 
@@ -55,9 +54,7 @@ Fetch `children` relation for each result Person and `pets` and `movies`
 relations for all the children.
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('children.[pets, movies]');
+const people = await Person.query().withGraphFetched('children.[pets, movies]');
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -66,14 +63,12 @@ console.log(people[0].children[0].movies[0].id);
 [Relation expressions](/api/types/#relationexpression-object-notation) can also be objects. This is equivalent to the previous example:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched({
-    children: {
-      pets: true,
-      movies: true
-    }
-  });
+const people = await Person.query().withGraphFetched({
+  children: {
+    pets: true,
+    movies: true
+  }
+});
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -82,11 +77,8 @@ console.log(people[0].children[0].movies[0].id);
 Relation results can be filtered and modified by giving modifier function names as arguments for the relations:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched(
-    'children(selectNameAndId).[pets(onlyDogs, orderByName), movies]'
-  )
+const people = await Person.query()
+  .withGraphFetched('children(selectNameAndId).[pets(onlyDogs, orderByName), movies]')
   .modifiers({
     selectNameAndId(builder) {
       builder.select('name', 'id');
@@ -113,11 +105,11 @@ class Person extends Model {
     return {
       // Note that this modifier takes an argument!
       filterGender(builder, gender) {
-        builder.where('gender', gender)
+        builder.where('gender', gender);
       },
 
       defaultSelects(builder) {
-        builder.select('id', 'firstName', 'lastName')
+        builder.select('id', 'firstName', 'lastName');
       },
 
       orderByAge(builder) {
@@ -141,19 +133,16 @@ class Animal extends Model {
   }
 }
 
-const people = await Person
-  .query()
-  .modifiers({
-    // You can bind arguments to Model modifiers like this
-    filterFemale(builder) {
-      builer.modify('filterGender', 'female')
-    },
+const people = await Person.query().modifiers({
+  // You can bind arguments to Model modifiers like this
+  filterFemale(builder) {
+    builder.modify('filterGender', 'female');
+  },
 
-    filterDogs(builder) {
-      builder.modify('filterSpecies', 'dog')
-    }
-  })
-  .withGraphFetched(`
+  filterDogs(builder) {
+    builder.modify('filterSpecies', 'dog');
+  }
+}).withGraphFetched(`
     children(defaultSelects, orderByAge, filterFemale).[
       pets(filterDogs, orderByName),
       movies
@@ -167,8 +156,7 @@ console.log(people[0].children[0].movies[0].id);
 Filters can also be registered using the [modifyGraph](/api/query-builder/other-methods.html#modifygraph) method:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphFetched('children.[pets, movies]')
   .modifyGraph('children', builder => {
     // Order children by age and only select id.
@@ -177,7 +165,7 @@ const people = await Person
   .modifyGraph('children.[pets, movies]', builder => {
     // Only select `pets` and `movies` whose id > 10 for the children.
     builder.where('id', '>', 10);
-  })
+  });
 
 console.log(people[0].children[0].pets[0].name);
 console.log(people[0].children[0].movies[0].id);
@@ -186,9 +174,7 @@ console.log(people[0].children[0].movies[0].id);
 Relations can be given aliases using the `as` keyword:
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched(`[
+const people = await Person.query().withGraphFetched(`[
     children(orderByAge) as kids .[
       pets(filterDogs) as dogs,
       pets(filterCats) as cats
@@ -206,8 +192,7 @@ console.log(people[0].kids[0].movies[0].id);
 Eager loading is optimized to avoid the N + 1 queries problem. Consider this query:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .where('id', 1)
   .withGraphFetched('children.children');
 
@@ -233,7 +218,7 @@ By default left join is used but you can define the join type using the [joinOpe
 
 **Limitations:**
 
- * limit and page methods will work incorrectly because they will limit the result set that contains all the result rows in a flattened format. For example the result set of the eager expression children.children will have 10 * 10 * 10 rows assuming the you fetched 10 models that all had 10 children that all had 10 children.
+- limit and page methods will work incorrectly because they will limit the result set that contains all the result rows in a flattened format. For example the result set of the eager expression children.children will have 10 _ 10 _ 10 rows assuming the you fetched 10 models that all had 10 children that all had 10 children.
 
 **About performance:**
 
@@ -241,16 +226,16 @@ Note that while [withGraphJoined](/api/query-builder/eager-methods.html#withgrap
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The relation expression describing which relations to fetch.
-options|[GraphOptions](/api/types/#type-graphoptions)|Optional options.
+| Argument           | Type                                                      | Description                                                  |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------------------------ |
+| relationExpression | [RelationExpression](/api/types/#type-relationexpression) | The relation expression describing which relations to fetch. |
+| options            | [GraphOptions](/api/types/#type-graphoptions)             | Optional options.                                            |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
 ##### Examples
 
@@ -259,8 +244,7 @@ All examples in [withGraphFetched](/api/query-builder/eager-methods.html#withgra
 Using `withGraphJoined` all the relations are joined to the main query and you can reference them in any query building method. Note that nested relations are named by concatenating relation names using `:` as a separator. See the next example:
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphJoined('children.[pets, movies]')
   .whereIn('children.firstName', ['Arnold', 'Jennifer'])
   .where('children:pets.name', 'Fluffy')
@@ -273,10 +257,9 @@ console.log(people[0].children[0].movies[0].id);
 Using [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) you can refer to columns only by their name because the column names are unique in the query. With `withGraphJoined` you often need to also mention the table name. Consider the following example. We join the relation `pets` to a `persons` query. Both tables have the `id` column. We need to use `where('persons.id', '>', 100)` instead of `where('id', '>', 100)` so that objection knows which `id` you mean. If you don't do this, you get an `ambiguous column name` error.
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphJoined('pets')
-  .where('persons.id', '>', 100)
+  .where('persons.id', '>', 100);
 ```
 
 ## eager()
@@ -336,16 +319,15 @@ Deprecated! Will be removed in version 3.0. Use [graphExpressionObject](#graphex
 ## graphExpressionObject()
 
 ```js
-const builder = Person.query()
-  .withGraphFetched('children.pets(onlyId)')
+const builder = Person.query().withGraphFetched('children.pets(onlyId)');
 
 const expr = builder.graphExpressionObject();
 console.log(expr.children.pets.$modify);
 // prints ["onlyId"]
 
-expr.children.movies = true
+expr.children.movies = true;
 // You can modify the object and pass it back to the `withGraphFetched` method.
-builder.withGraphFetched(expr)
+builder.withGraphFetched(expr);
 ```
 
 Returns the object representation of the relation expression passed to either `withGraphFetched` or `withGraphJoined`.
@@ -354,9 +336,9 @@ See [this section](/api/types/#relationexpression-object-notation) for more exam
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-object|Object representation of the current relation expression passed to either `withGraphFetched` or `withGraphJoined`.
+| Type   | Description                                                                                                        |
+| ------ | ------------------------------------------------------------------------------------------------------------------ |
+| object | Object representation of the current relation expression passed to either `withGraphFetched` or `withGraphJoined`. |
 
 ## eagerModifiers()
 
@@ -366,9 +348,9 @@ Deprecated! Will be removed in version 3.0. Use [modifiers](/api/query-builder/o
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-object|Eager modifiers of the query.
+| Type   | Description                   |
+| ------ | ----------------------------- |
+| object | Eager modifiers of the query. |
 
 ## allowGraph()
 
@@ -386,89 +368,94 @@ See the examples.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-relationExpression|[RelationExpression](/api/types/#type-relationexpression)|The allowed relation expression
+| Argument           | Type                                                      | Description                     |
+| ------------------ | --------------------------------------------------------- | ------------------------------- |
+| relationExpression | [RelationExpression](/api/types/#type-relationexpression) | The allowed relation expression |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
 ##### Examples
 
 This will throw because `actors` is not allowed.
 
 ```js
-await Person
-  .query()
+await Person.query()
   .allowGraph('[children.pets, movies]')
-  .withGraphFetched('movies.actors')
+  .withGraphFetched('movies.actors');
 ```
 
 This will not throw:
 
 ```js
-await Person
-  .query()
+await Person.query()
   .allowGraph('[children.pets, movies]')
-  .withGraphFetched('children.pets')
+  .withGraphFetched('children.pets');
 ```
 
 Calling `allowGraph` multiple times merges the expressions. The following is equivalent to the previous example:
 
 ```js
-await Person
-  .query()
+await Person.query()
   .allowGraph('children.pets')
   .allowGraph('movies')
-  .withGraphFetched(req.query.eager)
+  .withGraphFetched(req.query.eager);
 ```
 
 Usage in `insertGraph` and `upsertGraph` works the same way. The following will not throw.
 
 ```js
-const insertedPerson = await Person
-  .query()
+const insertedPerson = await Person.query()
   .allowGraph('[children.pets, movies]')
   .insertGraph({
     firstName: 'Sylvester',
-    children: [{
-      firstName: 'Sage',
-      pets: [{
-        name: 'Fluffy'
-        species: 'dog'
-      }, {
-        name: 'Scrappy',
-        species: 'dog'
-      }]
-    }]
-  })
+    children: [
+      {
+        firstName: 'Sage',
+        pets: [
+          {
+            name: 'Fluffy',
+            species: 'dog'
+          },
+          {
+            name: 'Scrappy',
+            species: 'dog'
+          }
+        ]
+      }
+    ]
+  });
 ```
 
 This will throw because `cousins` is not allowed:
 
 ```js
-const insertedPerson = await Person
-  .query()
+const insertedPerson = await Person.query()
   .allowGraph('[children.pets, movies]')
   .upsertGraph({
     firstName: 'Sylvester',
 
-    children: [{
-      firstName: 'Sage',
-      pets: [{
-        name: 'Fluffy'
-        species: 'dog'
-      }, {
-        name: 'Scrappy',
-        species: 'dog'
-      }]
-    }],
+    children: [
+      {
+        firstName: 'Sage',
+        pets: [
+          {
+            name: 'Fluffy',
+            species: 'dog'
+          },
+          {
+            name: 'Scrappy',
+            species: 'dog'
+          }
+        ]
+      }
+    ],
 
     cousins: [sylvestersCousin]
-  })
+  });
 ```
 
 You can use [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) to clear any previous calls to `allowGraph`.
@@ -513,57 +500,53 @@ The following query would filter out the children's pets that are <= 10 years ol
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-pathExpression|[RelationExpression](/api/types/#type-relationexpression)|Expression that specifies the queries for which to give the filter.
-modifier|function([QueryBuilder](/api/query-builder/)&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[]|A modifier function, [model modifier](/api/model/static-properties.html#static-modifiers) name or an array of model modifier names.
+| Argument       | Type                                                                                           | Description                                                                                                                         |
+| -------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| pathExpression | [RelationExpression](/api/types/#type-relationexpression)                                      | Expression that specifies the queries for which to give the filter.                                                                 |
+| modifier       | function([QueryBuilder](/api/query-builder/)&nbsp;&#124;&nbsp;string&nbsp;&#124;&nbsp;string[] | A modifier function, [model modifier](/api/model/static-properties.html#static-modifiers) name or an array of model modifier names. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|`this` query builder for chaining.
+| Type                                | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| [QueryBuilder](/api/query-builder/) | `this` query builder for chaining. |
 
 ##### Examples
 
 ```js
-Person
-  .query()
+Person.query()
   .withGraphFetched('[children.[pets, movies], movies]')
   .modifyGraph('children.pets', builder => {
     builder.where('age', '>', 10);
-  })
+  });
 ```
 
 The path expression can have multiple targets. The next example sorts both the pets and movies of the children by id:
 
 ```js
-Person
-  .query()
+Person.query()
   .withGraphFetched('[children.[pets, movies], movies]')
   .modifyGraph('children.[pets, movies]', builder => {
     builder.orderBy('id');
-  })
+  });
 ```
 
 This example only selects movies whose name contains the word 'Predator':
 
 ```js
-Person
-  .query()
+Person.query()
   .withGraphFetched('[children.[pets, movies], movies]')
   .modifyGraph('[children.movies, movies]', builder => {
     builder.where('name', 'like', '%Predator%');
-  })
+  });
 ```
 
 The modifier can also be a [Model modifier](/api/model/static-properties.html#static-modifiers) name, or an array of them:
 
 ```js
-Person
-  .query()
+Person.query()
   .withGraphFetched('[children.[pets, movies], movies]')
-  .modifyGraph('children.movies', 'selectId')
+  .modifyGraph('children.movies', 'selectId');
 ```
 
 ## filterEager()
@@ -571,6 +554,5 @@ Person
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [modifyGraph](#modifygraph) instead.
 :::
-
 
 Alias for [modifyGraph](/api/query-builder/other-methods.html#modifygraph).
