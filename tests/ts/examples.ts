@@ -1,7 +1,17 @@
 import * as ajv from 'ajv';
 import * as knex from 'knex';
 import * as objection from '../../';
-import { DBError, fn, JSONSchema, lit, raw, ref, RelationMappings } from '../../';
+import {
+  DBError,
+  fn,
+  JSONSchema,
+  lit,
+  raw,
+  ref,
+  RelationMappings,
+  RelationMapping,
+  QueryBuilder
+} from '../../';
 
 // This file exercises the Objection.js typings.
 
@@ -112,13 +122,31 @@ class Person extends objection.Model {
     return new CustomValidationError('my custom error: ' + message + ' ' + itemMessage);
   }
 
-  static get modifiers() {
-    return {
-      myFilter(builder: objection.QueryBuilder<Person>) {
-        return builder.orderBy('date');
+  static modifiers = {
+    myFilter(query: QueryBuilder<Person>) {
+      query.where('something', 'something');
+    }
+  };
+
+  static relationMappings = () => ({
+    fancyPets: {
+      modelClass: Animal,
+      relation: objection.Model.HasManyRelation,
+
+      beforeInsert(pet) {
+        pet.name = pet.name + ' Fancy Pants';
+      },
+
+      modify(query) {
+        query.where('name', 'like', '% Fancy Pants');
+      },
+
+      join: {
+        from: 'person.ownerId',
+        to: 'pet.id'
       }
-    };
-  }
+    } as RelationMapping<Animal>
+  });
 }
 
 function takesModelSubclass<M extends objection.Model>(m: M) {}

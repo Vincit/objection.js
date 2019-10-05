@@ -159,7 +159,8 @@ declare namespace Objection {
   type Modifier<QB extends AnyQueryBuilder = AnyQueryBuilder> =
     | ((qb: QB, ...args: any[]) => void)
     | string
-    | object;
+    | string[]
+    | Record<string, Expression<PrimitiveValue>>;
   type OrderByDirection = 'asc' | 'desc' | 'ASC' | 'DESC';
 
   interface Modifiers<QB extends AnyQueryBuilder = AnyQueryBuilder> {
@@ -1252,35 +1253,38 @@ declare namespace Objection {
   export type Transaction = knex.Transaction;
 
   export interface RelationMappings {
-    [relationName: string]: RelationMapping;
+    [relationName: string]: RelationMapping<any>;
   }
 
   type ModelClassFactory = () => AnyModelClass;
   type ModelClassSpecifier = ModelClassFactory | AnyModelClass | string;
-  type RelationMappingHook = (model: Model, context: QueryContext) => Promise<void> | void;
+  type RelationMappingHook<M extends Model> = (
+    model: M,
+    context: QueryContext
+  ) => Promise<void> | void;
   type RelationMappingColumnRef = string | ReferenceBuilder | (string | ReferenceBuilder)[];
 
-  export interface RelationMapping<M extends Model = Model> {
+  export interface RelationMapping<M extends Model> {
     relation: RelationType;
     modelClass: ModelClassSpecifier;
     join: RelationJoin;
     modify?: Modifier<M['QueryBuilderType']>;
     filter?: Modifier<M['QueryBuilderType']>;
-    beforeInsert?: RelationMappingHook;
+    beforeInsert?: RelationMappingHook<M>;
   }
 
   export interface RelationJoin {
     from: RelationMappingColumnRef;
     to: RelationMappingColumnRef;
-    through?: RelationThrough;
+    through?: RelationThrough<any>;
   }
 
-  export interface RelationThrough {
+  export interface RelationThrough<M extends Model> {
     from: RelationMappingColumnRef;
     to: RelationMappingColumnRef;
-    extra?: string[] | object;
+    extra?: string[] | Record<string, string>;
     modelClass?: ModelClassSpecifier;
-    beforeInsert?: RelationMappingHook;
+    beforeInsert?: RelationMappingHook<M>;
   }
 
   export interface RelationType extends Constructor<Relation> {}
