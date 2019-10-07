@@ -80,7 +80,9 @@
     "expect.js": "^0.3.1",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
+    "husky": "^3.0.8",
     "knex": "0.19.4",
+    "lint-staged": "^9.4.1",
     "mocha": "^6.2.0",
     "mysql": "^2.17.1",
     "nyc": "^14.1.1",
@@ -103,5 +105,21 @@
       "text"
     ],
     "report-dir": "./testCoverage"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{md,yml}": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }
