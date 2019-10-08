@@ -175,7 +175,7 @@ Skips the database query and "fakes" an error result.
 
 | Argument | Type | Description          |
 | -------- | ---- | -------------------- |
-| reson    |      | The rejection reason |
+| reason   |      | The rejection reason |
 
 ##### Return value
 
@@ -617,17 +617,17 @@ Registers an error handler. Just like `catch` but doesn't execute the query.
 const query = Person.query();
 
 query
- .onError(async (error, queryBuilder) => {
-   // Handle `SomeError` but let other errors go through.
-   if (error instanceof SomeError) {
-     // This will cause the query to be resolved with an object
-     // instead of throwing an error.
-     return {error: 'some error occurred'};
-   } else {
-     return Promise.reject(error);
-   }
- })
- .where('age', > 30);
+  .onError(async (error, queryBuilder) => {
+    // Handle `SomeError` but let other errors go through.
+    if (error instanceof SomeError) {
+      // This will cause the query to be resolved with an object
+      // instead of throwing an error.
+      return { error: 'some error occurred' };
+    } else {
+      return Promise.reject(error);
+    }
+  })
+  .where('age', '>', 30);
 ```
 
 ## castTo()

@@ -620,6 +620,14 @@ declare namespace Objection {
     (): boolean;
   }
 
+  interface HasMethod {
+    (selector: string | RegExp): boolean;
+  }
+
+  interface ClearMethod<QB extends AnyQueryBuilder> {
+    (selector: string | RegExp): QB;
+  }
+
   interface ColumnInfoMethod<QB extends AnyQueryBuilder> {
     (): Promise<knex.ColumnInfo>;
   }
@@ -825,6 +833,7 @@ declare namespace Objection {
 
   interface ModifiersMethod<QB extends AnyQueryBuilder> {
     (modifiers: Modifiers): QB;
+    (): QB;
   }
 
   // Deprecated
@@ -1121,11 +1130,15 @@ declare namespace Objection {
     isDelete: BooleanReturningMethod;
     isRelate: BooleanReturningMethod;
     isUnrelate: BooleanReturningMethod;
+    isInternal: BooleanReturningMethod;
     hasWheres: BooleanReturningMethod;
     hasSelects: BooleanReturningMethod;
     // Deprecated
     hasEager: BooleanReturningMethod;
     hasWithGraph: BooleanReturningMethod;
+
+    has: HasMethod;
+    clear: ClearMethod<this>;
 
     clearSelect: IdentityMethod<this>;
     clearOrder: IdentityMethod<this>;

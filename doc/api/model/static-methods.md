@@ -151,7 +151,7 @@ const pets = await Person.relatedQuery('pets').for(personId);
 
 ```sql
 select "animals".* from "animals"
-and "animals"."ownerId" = 1
+where "animals"."ownerId" = 1
 ```
 
 Just like to any query, you can chain any methods. The following example only fetches dogs and sorts them by name:
