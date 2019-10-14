@@ -61,6 +61,7 @@
   ],
   "types": "./typings/objection/index.d.ts",
   "dependencies": {
+    "@types/json-schema": "^7.0.3",
     "ajv": "^6.10.0",
     "bluebird": "^3.5.5",
     "lodash": "^4.17.11"
