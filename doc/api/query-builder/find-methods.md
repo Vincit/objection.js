@@ -737,6 +737,8 @@ Type|Description
 
 See [knex documentation](http://knexjs.org/#Builder-count)
 
+Also see the [resultSize](/api/query-builder/other-methods.md#resultsize) method for a cleaner way to just get the number of rows a query would create.
+
 ##### Return value
 
 Type|Description

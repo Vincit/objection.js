@@ -170,6 +170,55 @@ async () => {
   takesMaybePerson(await Person.query().findOne({ lastName }));
 };
 
+// union/unionAll types
+
+async () => {
+  await Person.query()
+    .where({ lastName: 'finnigan' })
+    .union(
+      // supports callbacks, or querybuilders along-side each other.
+      Person.query().where({ lastName: 'doe' }),
+      qb => qb.table(Person.tableName).where({ lastName: 'black' })
+    );
+  await Person.query()
+    .where({ lastName: 'finnigan' })
+    .union(
+      // multiple query builders
+      Person.query().where({ lastName: 'doe' }),
+      Person.query().where({ lastName: 'black' })
+    );
+  await Person.query()
+    .where({ lastName: 'finnigan' })
+    .union(
+      // supports callbacks, or querybuilders along-side each other.
+      qb => qb.table(Person.tableName).where({ lastName: 'doe' }),
+      qb => qb.table(Person.tableName).where({ lastName: 'black' })
+    );
+  // checks for unions that include wrap options
+  await Person.query()
+    .where({ lastName: 'finnigan' })
+    .union(
+      [
+        qb => qb.table(Person.tableName).where({ lastName: 'doe' }),
+        qb => qb.table(Person.tableName).where({ lastName: 'black' })
+      ],
+      true
+    );
+  await Person.query()
+    .where({ lastName: 'finnigan' })
+    .union(qb => qb.table(Person.tableName).where({ lastName: 'black' }), true);
+  await Person.query()
+    .where({ lastName: 'finnigan' })
+    .union(
+      // allows `wrap` to be passed as the last argument alongside
+      // other forms of unions. supports up to 7 union args before wrap arg.
+      Person.query().where({ lastName: 'doe' }),
+      qb => qb.table(Person.tableName).where({ lastName: 'doe' }),
+      qb => qb.table(Person.tableName).where({ lastName: 'black' }),
+      true
+    );
+};
+
 // .query().castTo()
 async () => {
   const animals = await Person.query()
@@ -377,7 +426,7 @@ async () => {
 
 const maybePerson: Promise<Person | undefined> = qb.findById(1);
 
-const maybePeople: Promise<Person[]> = qb.findById([1, 2, 3]);
+const maybePeople: Promise<Person[]> = qb.findByIds([1, 2, 3]);
 
 // query builder knex-wrapping methods:
 
@@ -886,6 +935,13 @@ const whereDelRetFirstWhere: Promise<Person | undefined> = qb
   .first()
   .where({ firstName: 'Mo' });
 
+const orderByColumn: Promise<Person[]> = qb.orderBy('firstName', 'asc');
+const orderByColumns: Promise<Person[]> = qb.orderBy([
+  'email',
+  { column: 'firstName', order: 'asc' },
+  { column: 'lastName' }
+]);
+
 // Verify that Model.query() and model.$query() return the same type of query builder.
 // Confirming this prevent us from having to duplicate the tests for each.
 
@@ -976,4 +1032,33 @@ const plugin2 = ({} as any) as objection.Plugin;
   takesModelClass(MyPerson);
   takesPersonClass(MyPerson);
   takesModelSubclass(new MyPerson());
+};
+
+// Examples with composite key
+class Interview extends objection.Model {
+  interviewer!: number;
+  interviewee!: number;
+  interviewDate?: number;
+
+  static columnNameMappers = objection.snakeCaseMappers();
+
+  static idColumn = ['interviewer', 'interviewee'];
+}
+
+async () => {
+  // findById with composite key
+  const interview: Interview | undefined = await Interview.query().findById([10, 11]);
+
+  // findById with composite key, chained with other query builder methods
+  const interviewWithAssignedDate: Interview | undefined = await Interview.query()
+    .findById([10, 11])
+    .whereNotNull('interviewDate');
+
+  // findByIds with sets of composite key
+  const interviews: Interview[] = await Interview.query().findByIds([[10, 11], [11, 12], [12, 13]]);
+
+  // findByIds with sets of composite key, chained with other query builder methods
+  const interviewsWithAssignedDate: Interview[] = await Interview.query()
+    .findByIds([[10, 11], [11, 12], [12, 13]])
+    .whereNotNull('interviewDate');
 };

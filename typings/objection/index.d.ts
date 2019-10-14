@@ -30,8 +30,13 @@ declare namespace Objection {
   const compose: Compose;
   const mixin: Mixin;
 
-  const snakeCaseMappers: () => ColumnNameMappers;
-  const knexSnakeCaseMappers: () => KnexMappers;
+  const snakeCaseMappers: (opt?: SnakeCaseMappersOptions) => ColumnNameMappers;
+  const knexSnakeCaseMappers: (opt?: SnakeCaseMappersOptions) => KnexMappers;
+
+  export interface SnakeCaseMappersOptions {
+    upperCase?: boolean;
+    underscoreBeforeDigits?: boolean;
+  }
 
   interface LiteralObject {
     [key: string]: Value;
@@ -271,7 +276,9 @@ declare namespace Objection {
 
   type DeepPartialGraph<T> = T extends (any[] | ReadonlyArray<any>)
     ? DeepPartialGraphArray<T[number]>
-    : T extends Model ? DeepPartialGraphModel<T> : T;
+    : T extends Model
+    ? DeepPartialGraphModel<T>
+    : T;
 
   export interface InsertGraphOptions {
     relate?: boolean | string[];
@@ -718,7 +725,7 @@ declare namespace Objection {
   }
 
   type PartialUpdate<QM extends Model> = {
-    [P in keyof QM]?: QM[P] | Raw | Reference | QueryBuilder<any, any[]>
+    [P in keyof QM]?: QM[P] | Raw | Reference | QueryBuilder<any, any[]>;
   };
 
   interface QueryBuilderBase<QM extends Model, RM, RV> extends QueryInterface<QM, RM, RV> {
@@ -727,8 +734,7 @@ declare namespace Objection {
 
     applyFilter(...namedFilters: string[]): this;
 
-    findById(id: Id): QueryBuilderYieldingOneOrNone<QM>;
-    findById(idOrIds: IdOrIds): this;
+    findById(idOrIds: IdOrIds): QueryBuilderYieldingOneOrNone<QM>;
     findByIds(ids: Id[] | Id[][]): this;
     /** findOne is shorthand for .where(...whereArgs).first() */
     findOne: FindOne<QM>;
@@ -805,7 +811,10 @@ declare namespace Objection {
       operator: string,
       value: Value[] | QueryBuilder<any, any[]>
     ): this;
-    whereInComposite(column: ColumnRef | ColumnRef[], values: Value[] | QueryBuilder<any, any[]>): this;
+    whereInComposite(
+      column: ColumnRef | ColumnRef[],
+      values: Value[] | QueryBuilder<any, any[]>
+    ): this;
 
     whereJsonSupersetOf: WhereJson<QM, RM, RV>;
     orWhereJsonSupersetOf: WhereJson<QM, RM, RV>;
@@ -914,7 +923,7 @@ declare namespace Objection {
     first(): QueryBuilderYieldingOneOrNone<QM>;
 
     alias(alias: string): this;
-    aliasFor(modelClassOrTableName: string | ModelClass<any>, alias:string): this;
+    aliasFor(modelClassOrTableName: string | ModelClass<any>, alias: string): this;
     tableRefFor(modelClass: ModelClass<any>): string;
     tableNameFor(modelClass: ModelClass<any>): string;
 
@@ -1102,8 +1111,8 @@ declare namespace Objection {
     orderByRaw: RawMethod<QM, RM, RV>;
 
     // Union
-    union: SetOperations<QM>;
-    unionAll: SetOperations<QM>;
+    union: Union<QM>;
+    unionAll: Union<QM>;
     intersect: SetOperations<QM>;
 
     // Having
@@ -1299,10 +1308,67 @@ declare namespace Objection {
       ColumnNamesMethod<QM, RM, RV> {}
 
   interface OrderBy<QM extends Model, RM, RV> {
-    (column: ColumnRef, direction?: string): QueryBuilder<QM, RM, RV>;
+    (column: ColumnRef, order?: string): QueryBuilder<QM, RM, RV>;
+    (columns: ({ column: ColumnRef; order?: string } | string)[]): QueryBuilder<QM, RM, RV>;
   }
 
-  interface SetOperations<QM extends Model> {
+  type QBOrCallback<QM extends Model> =
+    | QueryBuilder<QM, QM[]>
+    | ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void);
+
+  interface Union<QM extends Model> extends BaseSetOperations<QM> {
+    (...args: QBOrCallback<QM>[]): QueryBuilder<QM, QM[]>;
+    (arg1: QBOrCallback<QM>, wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (arg1: QBOrCallback<QM>, arg2: QBOrCallback<QM>, wrap?: boolean): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      arg5: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      arg5: QBOrCallback<QM>,
+      arg6: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+    (
+      arg1: QBOrCallback<QM>,
+      arg2: QBOrCallback<QM>,
+      arg3: QBOrCallback<QM>,
+      arg4: QBOrCallback<QM>,
+      arg5: QBOrCallback<QM>,
+      arg6: QBOrCallback<QM>,
+      arg7: QBOrCallback<QM>,
+      wrap?: boolean
+    ): QueryBuilder<QM, QM[]>;
+  }
+
+  interface SetOperations<QM extends Model> extends BaseSetOperations<QM> {
+    (
+      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
+    ): QueryBuilder<QM, QM[]>;
+  }
+
+  interface BaseSetOperations<QM extends Model> {
     (
       callback: (this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void,
       wrap?: boolean
@@ -1310,9 +1376,6 @@ declare namespace Objection {
     (
       callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[],
       wrap?: boolean
-    ): QueryBuilder<QM, QM[]>;
-    (
-      ...callbacks: ((this: QueryBuilder<QM, QM[]>, queryBuilder: QueryBuilder<QM, QM[]>) => void)[]
     ): QueryBuilder<QM, QM[]>;
   }
 

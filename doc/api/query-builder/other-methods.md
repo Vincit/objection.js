@@ -947,13 +947,15 @@ Type|Description
 const promise = queryBuilder.resultSize();
 ```
 
-Returns the amount of rows the current query would produce without [limit](/api/query-builder/find-methods.html#limit) and [offset](/api/query-builder/find-methods.html#offset) applied. Note that this executes a query (not the one we are building) and returns a Promise.
+Returns the amount of rows the current query would produce without [limit](/api/query-builder/find-methods.html#limit) and [offset](/api/query-builder/find-methods.html#offset) applied. Note that this executes a copy of the query and returns a Promise.
+
+This method is often more convenient than `count` which returns an array of objects instead a single number.
 
 ##### Return value
 
 Type|Description
 ----|-----------------------------
-`Promise`|Promise the will be resolved with the result size.
+`Promise<number>`|Promise the will be resolved with the result size.
 
 ##### Examples
 

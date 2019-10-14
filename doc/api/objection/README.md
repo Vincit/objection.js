@@ -297,15 +297,17 @@ For older nodes:
 const Knex = require('knex');
 const knexSnakeCaseMappers = require('objection').knexSnakeCaseMappers;
 
-const knex = Knex(Object.assign({
+const knex = Knex({
   client: 'postgres',
 
   connection: {
     host: '127.0.0.1',
     user: 'objection',
     database: 'objection_test'
-  }
-}, knexSnakeCaseMappers()));
+  },
+
+  ...knexSnakeCaseMappers()
+});
 ```
 
 ## knexIdentifierMapping
@@ -381,19 +383,21 @@ For older nodes:
 const Knex = require('knex');
 const knexIdentifierMapping = require('objection').knexIdentifierMapping;
 
-const knex = Knex(Object.assign({
+const knex = Knex({
   client: 'postgres',
 
   connection: {
     host: '127.0.0.1',
     user: 'objection',
     database: 'objection_test'
-  }
-}, knexIdentifierMapping({
-  MyId: 'id',
-  MyProp: 'prop',
-  MyAnotherProp: 'anotherProp'
-})));
+  },
+
+  ...knexIdentifierMapping({
+    MyId: 'id',
+    MyProp: 'prop',
+    MyAnotherProp: 'anotherProp'
+  })
+});
 ```
 
 ## ValidationError

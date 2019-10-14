@@ -5,7 +5,7 @@ module.exports = {
 
   themeConfig: {
     repo: 'vincit/objection.js',
-    repoLabel: 'Github',
+    repoLabel: 'GitHub',
 
     algolia: {
       apiKey: '8b9b4ac9f68d11c702e8102479760861',

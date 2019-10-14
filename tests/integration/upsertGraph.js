@@ -2526,6 +2526,29 @@ module.exports = session => {
             });
           });
         });
+
+        it('should throw a sensible error if an option with an invalid type is passed', done => {
+          Model1.bindKnex(session.knex)
+            .query()
+            .upsertGraph(
+              {
+                id: 1
+              },
+              {
+                noRelate: 'model1Relation2'
+              }
+            )
+            .then(() => {
+              throw new Error('should not get here');
+            })
+            .catch(err => {
+              expect(err.message).to.equal(
+                'expected noRelate option value "model1Relation2" to be an instance of boolean or array of strings'
+              );
+              done();
+            })
+            .catch(done);
+        });
       }
 
       describe('relate with children => upsertGraph recursively called', () => {
