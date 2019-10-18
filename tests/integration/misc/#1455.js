@@ -55,6 +55,10 @@ module.exports = session => {
         static get useLimitInFirst() {
           return true;
         }
+
+        static get concurrency() {
+          return 1;
+        }
       }
 
       class SetAttribute extends BaseModel {
