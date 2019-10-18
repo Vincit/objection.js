@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const chai = require('chai');
 const utils = require('../../lib/utils/knexUtils');
 const expect = require('expect.js');
 const Promise = require('bluebird');
@@ -570,7 +571,8 @@ module.exports = session => {
               .eager(eagerExpr)
               .findById(inserted.id)
               .then(fetched => {
-                expect(inserted.$toJson()).to.eql(fetched.$toJson());
+                chai.expect(inserted.$toJson()).to.containSubset(fetched.$toJson());
+                chai.expect(fetched.$toJson()).to.containSubset(inserted.$toJson());
               });
           });
       });
