@@ -2,12 +2,11 @@
 
 By default, the examples guide you to setup the database connection by calling [Model.knex(knex)](/api/model/static-methods.html#static-knex). This doesn't fly if you want to select the database based on the request as it sets the connection globally. There are (at least) two patterns for dealing with this kind of setup:
 
-*NOTE:* The following patterns don't work if you have a large amount of tenanats since we need to create a knex instance for each of them. In those cases you probably shouldn't be creating a separate database for each tenant anyway.
+_NOTE:_ The following patterns don't work if you have a large amount of tenanats since we need to create a knex instance for each of them. In those cases you probably shouldn't be creating a separate database for each tenant anyway.
 
 ## Model binding pattern
 
 If you have a different database for each tenant, a useful pattern is to add a middleware that adds the models to `req.models` hash and then _always_ use the models through `req.models` instead of requiring them directly. What [bindKnex](/api/model/static-properties.html#static-bindknex) method actually does is that it creates an anonymous subclass of the model class and sets its knex connection. That way the database connection doesn't change for the other requests that are currently being executed.
-
 
 ```js
 const Knex = require('knex');
@@ -52,9 +51,7 @@ function knexConfigForTenant(tenantId) {
 app.get('/people', async (req, res) => {
   const { Person } = req.models;
 
-  const people = await Person
-    .query()
-    .findById(req.params.id);
+  const people = await Person.query().findById(req.params.id);
 
   res.send(people);
 });
@@ -62,8 +59,7 @@ app.get('/people', async (req, res) => {
 
 ## Knex passing pattern
 
-Another option is to add the knex instance to the request using a middleware and not bind models at all (not even using [Model.knex()](/api/model/static-methods.html#static-knex)). The knex instance can be passed to [query](/api/model/static-methods.html#static-query), [$query](/api/model/instance-methods.html#query), and [$relatedQuery](/api/model/instance-methods.html#relatedquery) methods as the last argument. This pattern forces you to design your services and helper methods in a way that you always need to pass in a knex instance. A great thing about this is that you can pass a transaction object instead. (the knex/objection transaction object is a query builder just like the normal knex instance). This gives you a fine grained control over your transactions.
-
+Another option is to add the knex instance to the request using a middleware and not bind models at all (not even using [Model.knex()](/api/model/static-methods.html#static-knex)). The knex instance can be passed to [query](/api/model/static-methods.html#static-query), [\$query](/api/model/instance-methods.html#query), and [\$relatedQuery](/api/model/instance-methods.html#relatedquery) methods as the last argument. This pattern forces you to design your services and helper methods in a way that you always need to pass in a knex instance. A great thing about this is that you can pass a transaction object instead. (the knex/objection transaction object is a query builder just like the normal knex instance). This gives you a fine grained control over your transactions.
 
 ```js
 app.use((req, res, next) => {
@@ -73,10 +69,8 @@ app.use((req, res, next) => {
 });
 
 app.get('/people', async (req, res) => {
-  const people = await Person
-    .query(req.knex)
-    .findById(req.params.id);
+  const people = await Person.query(req.knex).findById(req.params.id);
 
-  res.send(people)
+  res.send(people);
 });
 ```

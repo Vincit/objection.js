@@ -5,6 +5,7 @@
 ```js
 const queryBuilder = Person.query(transactionOrKnex);
 ```
+
 Creates a query builder for the model's table.
 
 All query builders are created using this function, including `$query`, `relatedQuery` and `$relatedQuery`. That means you can modify each query by overriding this method for your model class.
@@ -13,15 +14,15 @@ See the [query examples](/guide/query-examples.html) section for more examples.
 
 #### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. for a query. Falsy values are ignored.
+| Argument          | Type   | Description                                                                                                                                                         |
+| ----------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| transactionOrKnex | object | Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database. for a query. Falsy values are ignored. |
 
 #### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+| Type                                | Description               |
+| ----------------------------------- | ------------------------- |
+| [QueryBuilder](/api/query-builder/) | The created query builder |
 
 #### Examples
 
@@ -37,40 +38,36 @@ console.log('there are', people.length, 'people in the database');
 // FROM "persons"
 // WHERE ("firstName" = 'Jennifer' AND "age" < 30)
 // OR ("firstName" = 'Mark' AND "age" > 30)
-const marksAndJennifers = await Person
-  .query()
+const marksAndJennifers = await Person.query()
   .where(builder => {
-    builder
-      .where('firstName', 'Jennifer')
-      .where('age', '<', 30);
+    builder.where('firstName', 'Jennifer').where('age', '<', 30);
   })
   .orWhere(builder => {
-    builder
-      .where('firstName', 'Mark')
-      .where('age', '>', 30);
+    builder.where('firstName', 'Mark').where('age', '>', 30);
   });
 
 console.log(marksAndJennifers);
 
-
 // Get a subset of rows and fetch related models
 // for each row.
-const oldPeople = await Person
-  .query()
+const oldPeople = await Person.query()
   .where('age', '>', 60)
   .withGraphFetched('children.children.movies');
 
-console.log('some old person\'s grand child has appeared in',
+console.log(
+  "some old person's grand child has appeared in",
   oldPeople[0].children[0].children[0].movies.length,
-  'movies');
+  'movies'
+);
 ```
 
 Insert models to the database:
 
 ```js
-const sylvester = await Person
-  .query()
-  .insert({firstName: 'Sylvester', lastName: 'Stallone'});
+const sylvester = await Person.query().insert({
+  firstName: 'Sylvester',
+  lastName: 'Stallone'
+});
 
 console.log(sylvester.fullName());
 // --> 'Sylvester Stallone'.
@@ -80,12 +77,10 @@ console.log(sylvester.fullName());
 // _all_ inserted rows. If you need to do batch inserts
 // on other databases useknex* directly.
 // (See .knexQuery() method).
-const inserted = await Person
-  .query()
-  .insert([
-    {firstName: 'Arnold', lastName: 'Schwarzenegger'},
-    {firstName: 'Sylvester', lastName: 'Stallone'}
-  ]);
+const inserted = await Person.query().insert([
+  { firstName: 'Arnold', lastName: 'Schwarzenegger' },
+  { firstName: 'Sylvester', lastName: 'Stallone' }
+]);
 
 console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
 ```
@@ -93,30 +88,26 @@ console.log(inserted[0].fullName()); // --> 'Arnold Schwarzenegger'
 `update` and `patch` can be used to update models. Only difference between the mentioned methods is that `update` validates the input objects using the model class's full jsonSchema and `patch` ignores the `required` property of the schema. Use `update` when you want to update _all_ properties of a model and `patch` when only a subset should be updated.
 
 ```js
-const numUpdatedRows = await Person
-  .query()
-  .update({firstName: 'Jennifer', lastName: 'Lawrence', age: 35})
+const numUpdatedRows = await Person.query()
+  .update({ firstName: 'Jennifer', lastName: 'Lawrence', age: 35 })
   .where('id', jennifer.id);
 
 console.log(numUpdatedRows);
 
 // This will throw assuming that `firstName` or `lastName`
 // is a required property for a Person.
-await Person.query().update({age: 100});
+await Person.query().update({ age: 100 });
 
 // This will _not_ throw.
-await Person
-  .query()
-  .patch({age: 100});
+await Person.query().patch({ age: 100 });
 
 console.log('Everyone is now 100 years old');
 ```
 
-Models can be deleted using the delete method. Naturally the delete query can be chained with any knex* methods:
+Models can be deleted using the delete method. Naturally the delete query can be chained with any knex\* methods:
 
 ```js
-await Person
-  .query()
+await Person.query()
   .delete()
   .where('age', '>', 90);
 
@@ -133,31 +124,29 @@ Creates a query builder that can be used to query a relation of an item (or item
 
 This method is best explained through examples. See the examples below and the following sections:
 
- * [relation queries](/guide/query-examples.html#relation-queries)
- * [relation subqueries recipe](/recipes/relation-subqueries.html)
+- [relation queries](/guide/query-examples.html#relation-queries)
+- [relation subqueries recipe](/recipes/relation-subqueries.html)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-relationName|string|The name of the relation to query.
-transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
+| Argument          | Type   | Description                                                                                                                                                        |
+| ----------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| relationName      | string | The name of the relation to query.                                                                                                                                 |
+| transactionOrKnex | object | Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+| Type                                | Description               |
+| ----------------------------------- | ------------------------- |
+| [QueryBuilder](/api/query-builder/) | The created query builder |
 
 ##### Examples
 
 This example fetches `pets` for a person with id 1. `pets` is the name of the relation defined in [relationMappings](/api/model/static-properties.html#static-relationmappings).
 
 ```js
-const personId = 1
-const pets = await Person
-  .relatedQuery('pets')
-  .for(personId)
+const personId = 1;
+const pets = await Person.relatedQuery('pets').for(personId);
 ```
 
 ```sql
@@ -168,11 +157,10 @@ and "animals"."ownerId" = 1
 Just like to any query, you can chain any methods. The following example only fetches dogs and sorts them by name:
 
 ```js
-const dogs = await Person
-  .relatedQuery('pets')
+const dogs = await Person.relatedQuery('pets')
   .for(1)
   .where('species', 'dog')
-  .orderBy('name')
+  .orderBy('name');
 ```
 
 ```sql
@@ -185,11 +173,10 @@ order by "name" asc
 If you want to fetch dogs of multiple people in one query, you can pass an array of identifiers to the [for](/api/query-builder/other-methods.html#for) method like this:
 
 ```js
-const dogs = await Person
-  .relatedQuery('pets')
+const dogs = await Person.relatedQuery('pets')
   .for([1, 2])
   .where('species', 'dog')
-  .orderBy('name')
+  .orderBy('name');
 ```
 
 ```sql
@@ -203,13 +190,10 @@ You can even give it a subquery! The following example fetches all dogs of all p
 
 ```js
 // Note that there is no `await` here. This query does not get executed.
-const jennifers = Person
-  .query()
-  .where('name', 'Jennifer');
+const jennifers = Person.query().where('name', 'Jennifer');
 
 // This is the only executed query in this example.
-const allDogsOfAllJennifers = await Person
-  .relatedQuery('pets')
+const allDogsOfAllJennifers = await Person.relatedQuery('pets')
   .for(jennifers)
   .where('species', 'dog')
   .orderBy('name');
@@ -229,8 +213,7 @@ order by "name" asc
 `relatedQuery` also works with `relate` , `unrelate`, `delete` and all other query methods. The following example relates a person with id 100 to a movie with id 200 for the many-to-many relation `movies`:
 
 ```js
-await Person
-  .relatedQuery('movies')
+await Person.relatedQuery('movies')
   .for(100)
   .relate(200);
 ```
@@ -244,32 +227,30 @@ See more examples [here](/guide/query-examples.html#relation-queries).
 `relatedQuery` can also be used as a subquery when `for` is omitted. The next example selects the count of a relation and the maximum value of another one:
 
 ```js
-const people = await Person
-  .query()
-  .select([
-    'persons.*',
+const people = await Person.query().select([
+  'persons.*',
 
-    Person.relatedQuery('pets')
-      .count()
-      .where('species', 'dog')
-      .as('dogCount'),
+  Person.relatedQuery('pets')
+    .count()
+    .where('species', 'dog')
+    .as('dogCount'),
 
-    Person.relatedQuery('movies')
-      .max('createdAt')
-      .as('mostRecentMovieDate')
-  ]);
+  Person.relatedQuery('movies')
+    .max('createdAt')
+    .as('mostRecentMovieDate')
+]);
 
 console.log(people[0].id);
-console.log(people[0].dogCount)
+console.log(people[0].dogCount);
 console.log(people[0].mostRecentMovieDate);
 ```
 
 Find models that have at least one item in a relation:
 
 ```js
-const peopleThatHavePets = await Person
-  .query()
-  .whereExists(Person.relatedQuery('pets'));
+const peopleThatHavePets = await Person.query().whereExists(
+  Person.relatedQuery('pets')
+);
 ```
 
 Generates something like this:
@@ -313,7 +294,6 @@ Get the knex instance:
 const knex = Person.knex();
 ```
 
-
 ## `static` transaction()
 
 ```js
@@ -327,30 +307,33 @@ See the [transaction guide](/guide/transactions.html).
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-callback|function|
-trxOrKnex|knex or Transation|Optional existing transaction or knex instance.
+| Argument  | Type               | Description                                     |
+| --------- | ------------------ | ----------------------------------------------- |
+| callback  | function           |
+| trxOrKnex | knex or Transation | Optional existing transaction or knex instance. |
 
 ##### Examples
 
 ```js
 try {
   const scrappy = await Person.transaction(async trx => {
-    const jennifer = await Person
-      .query(trx)
-      .insert({firstName: 'Jennifer', lastName: 'Lawrence'});
+    const jennifer = await Person.query(trx).insert({
+      firstName: 'Jennifer',
+      lastName: 'Lawrence'
+    });
 
     const scrappy = await jennifer
       .$relatedQuery('pets', trx)
-      .insert({name: 'Scrappy'});
+      .insert({ name: 'Scrappy' });
 
     return scrappy;
   });
 
   console.log('Great success! Both Jennifer and Scrappy were inserted');
 } catch (err) {
-  console.log('Something went wrong. Neither Jennifer nor Scrappy were inserted');
+  console.log(
+    'Something went wrong. Neither Jennifer nor Scrappy were inserted'
+  );
 }
 ```
 
@@ -366,9 +349,9 @@ See the [transaction guide](/guide/transactions.html).
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-trxOrKnex|knex or Transation|Optional existing transaction or knex instance.
+| Argument  | Type               | Description                                     |
+| --------- | ------------------ | ----------------------------------------------- |
+| trxOrKnex | knex or Transation | Optional existing transaction or knex instance. |
 
 ##### Examples
 
@@ -378,7 +361,9 @@ const trx = await Person.startTransaction();
 try {
   await Person.query(trx).insert(person1);
   await Person.query(trx).insert(person2);
-  await Person.query(trx).patch(person3).where('id', person3.id);
+  await Person.query(trx)
+    .patch(person3)
+    .where('id', person3.id);
   await trx.commit();
 } catch (err) {
   await trx.rollback();
@@ -390,9 +375,7 @@ try {
 
 ```js
 class Person extends Model {
-  static beforeFind(args) {
-
-  }
+  static beforeFind(args) {}
 }
 ```
 
@@ -400,28 +383,26 @@ A hook that is executed before find queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|The return value is not used.
+| Type | Description                   |
+| ---- | ----------------------------- |
+| any  | The return value is not used. |
 
 ## `static` afterFind()
 
 ```js
 class Person extends Model {
-  static afterFind(args) {
-
-  }
+  static afterFind(args) {}
 }
 ```
 
@@ -429,28 +410,26 @@ A hook that is executed after find queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|If the return value is not `undefined`, it will be used as the return value of the query.
+| Type | Description                                                                               |
+| ---- | ----------------------------------------------------------------------------------------- |
+| any  | If the return value is not `undefined`, it will be used as the return value of the query. |
 
 ## `static` beforeUpdate()
 
 ```js
 class Person extends Model {
-  static beforeUpdate(args) {
-
-  }
+  static beforeUpdate(args) {}
 }
 ```
 
@@ -458,28 +437,26 @@ A hook that is executed before update and patch queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|The return value is not used.
+| Type | Description                   |
+| ---- | ----------------------------- |
+| any  | The return value is not used. |
 
 ## `static` afterUpdate()
 
 ```js
 class Person extends Model {
-  static afterUpdate(args) {
-
-  }
+  static afterUpdate(args) {}
 }
 ```
 
@@ -487,28 +464,26 @@ A hook that is executed after update and patch queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|If the return value is not `undefined`, it will be used as the return value of the query.
+| Type | Description                                                                               |
+| ---- | ----------------------------------------------------------------------------------------- |
+| any  | If the return value is not `undefined`, it will be used as the return value of the query. |
 
 ## `static` beforeInsert()
 
 ```js
 class Person extends Model {
-  static beforeInsert(args) {
-
-  }
+  static beforeInsert(args) {}
 }
 ```
 
@@ -516,28 +491,26 @@ A hook that is executed before insert queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|The return value is not used.
+| Type | Description                   |
+| ---- | ----------------------------- |
+| any  | The return value is not used. |
 
 ## `static` afterInsert()
 
 ```js
 class Person extends Model {
-  static afterInsert(args) {
-
-  }
+  static afterInsert(args) {}
 }
 ```
 
@@ -545,28 +518,26 @@ A hook that is executed after insert queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|If the return value is not `undefined`, it will be used as the return value of the query.
+| Type | Description                                                                               |
+| ---- | ----------------------------------------------------------------------------------------- |
+| any  | If the return value is not `undefined`, it will be used as the return value of the query. |
 
 ## `static` beforeDelete()
 
 ```js
 class Person extends Model {
-  static beforeDelete(args) {
-
-  }
+  static beforeDelete(args) {}
 }
 ```
 
@@ -574,28 +545,26 @@ A hook that is executed before delete queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|The return value is not used.
+| Type | Description                   |
+| ---- | ----------------------------- |
+| any  | The return value is not used. |
 
 ## `static` afterDelete()
 
 ```js
 class Person extends Model {
-  static afterDelete(args) {
-
-  }
+  static afterDelete(args) {}
 }
 ```
 
@@ -603,20 +572,20 @@ A hook that is executed after delete queries.
 
 See these sections for more information:
 
- * [static hooks guide](/guide/hooks.html#static-query-hooks)
- * [documentation for the arguments](/api/types/#type-statichookarguments)
+- [static hooks guide](/guide/hooks.html#static-query-hooks)
+- [documentation for the arguments](/api/types/#type-statichookarguments)
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-args|[StaticHookArguments](/api/types/#type-statichookarguments)|The arguments
+| Argument | Type                                                        | Description   |
+| -------- | ----------------------------------------------------------- | ------------- |
+| args     | [StaticHookArguments](/api/types/#type-statichookarguments) | The arguments |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-any|If the return value is not `undefined`, it will be used as the return value of the query.
+| Type | Description                                                                               |
+| ---- | ----------------------------------------------------------------------------------------- |
+| any  | If the return value is not `undefined`, it will be used as the return value of the query. |
 
 ## `static` bindKnex()
 
@@ -632,15 +601,15 @@ Also check out the [model binding pattern for transactions](/guide/transactions.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-transactionOrKnex|object|knex instance or a transaction to bind the model to.
+| Argument          | Type   | Description                                          |
+| ----------------- | ------ | ---------------------------------------------------- |
+| transactionOrKnex | object | knex instance or a transaction to bind the model to. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Constructor<? extends Model>|The created model subclass constructor
+| Type                         | Description                            |
+| ---------------------------- | -------------------------------------- |
+| Constructor<? extends Model> | The created model subclass constructor |
 
 ##### Examples
 
@@ -690,16 +659,13 @@ Alias for [bindKnex](/api/model/static-methods.html#static-bindknex).
 const { transaction } = require('objection');
 const Person = require('./models/Person');
 
-await transaction(Person.knex(), async (trx) => {
-  const TransactingPerson =  Person.bindTransaction(trx);
+await transaction(Person.knex(), async trx => {
+  const TransactingPerson = Person.bindTransaction(trx);
 
-  await TransactingPerson
-    .query()
-    .insert({firstName: 'Jennifer'});
+  await TransactingPerson.query().insert({ firstName: 'Jennifer' });
 
-  return TransactingPerson
-    .query()
-    .patch({lastName: 'Lawrence'})
+  return TransactingPerson.query()
+    .patch({ lastName: 'Lawrence' })
     .where('id', jennifer.id);
 });
 ```
@@ -710,14 +676,11 @@ This is 100% equivalent to the example above:
 const { transaction } = require('objection');
 const Person = require('./models/Person');
 
-await transaction(Person, async (TransactingPerson) => {
-  await TransactingPerson
-    .query()
-    .insert({firstName: 'Jennifer'});
+await transaction(Person, async TransactingPerson => {
+  await TransactingPerson.query().insert({ firstName: 'Jennifer' });
 
-  return TransactingPerson
-    .query()
-    .patch({lastName: 'Lawrence'})
+  return TransactingPerson.query()
+    .patch({ lastName: 'Lawrence' })
     .where('id', jennifer.id);
 });
 ```
@@ -732,27 +695,27 @@ Creates a model instance from a POJO (Plain Old Javascript Object).
 
 The object is checked against [jsonSchema](/api/model/static-properties.html#static-jsonschema) if a schema is provided and an exception is thrown on failure.
 
-The `json` object is also passed through the [$parseJson](/api/model/instance-methods.html#parsejson) hook before the model instance is created. See [this section](/api/model/overview.html#model-data-lifecycle) for more info.
+The `json` object is also passed through the [\$parseJson](/api/model/instance-methods.html#parsejson) hook before the model instance is created. See [this section](/api/model/overview.html#model-data-lifecycle) for more info.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON object from which to create the model.
-opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
+| Argument | Type                                          | Description                                     |
+| -------- | --------------------------------------------- | ----------------------------------------------- |
+| json     | Object                                        | The JSON object from which to create the model. |
+| opt      | [ModelOptions](/api/types/#type-modeloptions) | Update options.                                 |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|The created model instance
+| Type                 | Description                |
+| -------------------- | -------------------------- |
+| [Model](/api/model/) | The created model instance |
 
 ##### Examples
 
 Create a model instance:
 
 ```js
-const jennifer = Person.fromJson({ firstName: 'Jennifer' })
+const jennifer = Person.fromJson({ firstName: 'Jennifer' });
 ```
 
 Create a model instance skipping validation:
@@ -761,7 +724,7 @@ Create a model instance skipping validation:
 const jennifer = Person.fromJson(
   { firstName: 'Jennifer' },
   { skipValidation: true }
-)
+);
 ```
 
 ## `static` fromDatabaseJson()
@@ -776,26 +739,26 @@ Unlike [fromJson](/api/model/static-methods.html#static-fromjson), this method d
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-row|Object|A database row.
+| Argument | Type   | Description     |
+| -------- | ------ | --------------- |
+| row      | Object | A database row. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|The created model instance
+| Type                 | Description                |
+| -------------------- | -------------------------- |
+| [Model](/api/model/) | The created model instance |
 
 ## `static` modifierNotFound()
 
 ```js
 class BaseModel extends Model {
   static modifierNotFound(builder, modifier) {
-    const { properties } = this.jsonSchema
+    const { properties } = this.jsonSchema;
     if (properties && modifier in properties) {
-      builder.select(modifier)
+      builder.select(modifier);
     } else {
-      super.modifierNotFound(builder, modifier)
+      super.modifierNotFound(builder, modifier);
     }
   }
 }
@@ -807,10 +770,10 @@ By default, the static `modifierNotFound()` hook throws a `ModifierNotFoundError
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-builder|[QueryBuilder](/api/query-builder/)|The query builder on which to apply the modifier.
-modifier|string|The name of the unknown modifier.
+| Argument | Type                                | Description                                       |
+| -------- | ----------------------------------- | ------------------------------------------------- |
+| builder  | [QueryBuilder](/api/query-builder/) | The query builder on which to apply the modifier. |
+| modifier | string                              | The name of the unknown modifier.                 |
 
 ## `static` createValidator()
 
@@ -852,7 +815,7 @@ const AjvValidator = require('objection').AjvValidator;
 class Model {
   static createValidator() {
     return new AjvValidator({
-      onCreateAjv: (ajv) => {
+      onCreateAjv: ajv => {
         // Here you can modify the `Ajv` instance.
       },
       options: {
@@ -881,15 +844,15 @@ to throw any error you want.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-queryContext|Object|The context object of query that produced the empty result. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type   | Description                                                                                                               |
+| ------------ | ------ | ------------------------------------------------------------------------------------------------------------------------- |
+| queryContext | Object | The context object of query that produced the empty result. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-`Error`|The created error. [NotFoundError](/api/types/#class-notfounderror) by default.
+| Type    | Description                                                                     |
+| ------- | ------------------------------------------------------------------------------- |
+| `Error` | The created error. [NotFoundError](/api/types/#class-notfounderror) by default. |
 
 ##### Examples
 
@@ -917,9 +880,9 @@ Creates an error thrown when validation fails for a model. You can override this
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-`Error`|The created error. [ValidationError](/api/types/#class-validationerror) by default.
+| Type    | Description                                                                         |
+| ------- | ----------------------------------------------------------------------------------- |
+| `Error` | The created error. [ValidationError](/api/types/#class-validationerror) by default. |
 
 ## `static` loadRelated()
 
@@ -930,28 +893,24 @@ Deprecated! Will be removed in version 3.0. Use [fetchGraph](#static-fetchgraph)
 ## `static` fetchGraph()
 
 ```js
-const queryBuilder = Person.fetchGraph(
-  models,
-  expression,
-  options
-);
+const queryBuilder = Person.fetchGraph(models, expression, options);
 ```
 
 Load related models for a set of models using a [RelationExpression](/api/types/#type-relationexpression).
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-models|Array&lt;[Model](/api/model/)&#124;Object&gt;|Model instances for which to fetch the relations. Can be an array of model instances, array of POJOs, a single model instance or a single POJO.
-expression|string&#124;[RelationExpression](/api/types/#type-relationexpression)|The relation expression
-options|[FetchGraphOptions](/api/types/#type-fetchgraphoptions)|Optional options.
+| Argument   | Type                                                                  | Description                                                                                                                                     |
+| ---------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| models     | Array&lt;[Model](/api/model/)&#124;Object&gt;                         | Model instances for which to fetch the relations. Can be an array of model instances, array of POJOs, a single model instance or a single POJO. |
+| expression | string&#124;[RelationExpression](/api/types/#type-relationexpression) | The relation expression                                                                                                                         |
+| options    | [FetchGraphOptions](/api/types/#type-fetchgraphoptions)               | Optional options.                                                                                                                               |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+| Type                                | Description               |
+| ----------------------------------- | ------------------------- |
+| [QueryBuilder](/api/query-builder/) | The created query builder |
 
 ##### Examples
 
@@ -965,26 +924,27 @@ const person2 = people[1];
 Relations can be filtered by giving modifier functions as arguments for the relations:
 
 ```js
-const people = await Person
-  .fetchGraph([person1, person2], `
+const people = await Person.fetchGraph(
+  [person1, person2],
+  `
     children(orderByAge).[
       pets(onlyDogs, orderByName),
       movies
     ]
-  `)
-  .modifiers({
-    orderByAge(builder) {
-      builder.orderBy('age');
-    },
+  `
+).modifiers({
+  orderByAge(builder) {
+    builder.orderBy('age');
+  },
 
-    orderByName(builder) {
-      builder.orderBy('name');
-    },
+  orderByName(builder) {
+    builder.orderBy('name');
+  },
 
-    onlyDogs(builder) {
-      builder.where('species', 'dog');
-    }
-  });
+  onlyDogs(builder) {
+    builder.where('species', 'dog');
+  }
+});
 
 console.log(people[1].children.pets[0]);
 ```
@@ -999,11 +959,11 @@ In the second example the traverser function is only called for `Person` instanc
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-filterConstructor|function|If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.
-models|[Model](/api/model/)&#124;[Model](/api/model/)[]|The model(s) whose relation trees to traverse.
-traverser|function([Model](/api/model/), string, string)|The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation.
+| Argument          | Type                                             | Description                                                                                                                                                                                                                                 |
+| ----------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| filterConstructor | function                                         | If this optional constructor is given, the `traverser` is only called for models for which `model instanceof filterConstructor` returns true.                                                                                               |
+| models            | [Model](/api/model/)&#124;[Model](/api/model/)[] | The model(s) whose relation trees to traverse.                                                                                                                                                                                              |
+| traverser         | function([Model](/api/model/), string, string)   | The traverser function that is called for each model. The first argument is the model itself. If the model is in a relation of some other model the second argument is the parent model and the third argument is the name of the relation. |
 
 ##### Examples
 
@@ -1020,11 +980,15 @@ await Model.traverseAsync(models, async (model, parentModel, relationName) => {
 and
 
 ```js
-const persons = await Person.query()
+const persons = await Person.query();
 
-Model.traverseAsync(Person, persons, async (person, parentModel, relationName) => {
-  await doSomethingWithPerson(person);
-});
+Model.traverseAsync(
+  Person,
+  persons,
+  async (person, parentModel, relationName) => {
+    await doSomethingWithPerson(person);
+  }
+);
 ```
 
 Also works with a single model instance
@@ -1049,9 +1013,9 @@ This method is mainly useful for plugin developers and for other generic usages.
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object&lt;string,&nbsp;[Relation](/api/types/#class-relation)&gt;|Object whose keys are relation names and values are [Relation](/api/types/#class-relation) instances.
+| Type                                                              | Description                                                                                           |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Object&lt;string,&nbsp;[Relation](/api/types/#class-relation)&gt; | Object whose keys are relation names and values are [Relation](/api/types/#class-relation) instances. |
 
 ## `static` columnNameToPropertyName()
 
@@ -1063,15 +1027,15 @@ Runs the property through possible `columnNameMappers` and `$parseDatabaseJson` 
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-columnName|string|A column name
+| Argument   | Type   | Description   |
+| ---------- | ------ | ------------- |
+| columnName | string | A column name |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-string|The property name
+| Type   | Description       |
+| ------ | ----------------- |
+| string | The property name |
 
 ##### Examples
 
@@ -1087,19 +1051,20 @@ console.log(propName); // --> 'fooBar'
 ```js
 const columnName = Person.propertyNameToColumnName(propertyName);
 ```
+
 Runs the property through possible `columnNameMappers` and `$formatDatabaseJson` hooks to apply any possible conversion for the property name.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-propertyName|string|A property name
+| Argument     | Type   | Description     |
+| ------------ | ------ | --------------- |
+| propertyName | string | A property name |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-string|The column name
+| Type   | Description     |
+| ------ | --------------- |
+| string | The column name |
 
 ##### Examples
 
@@ -1126,15 +1091,15 @@ If you've implemented [tableMetadata](/api/model/static-methods.html#static-tabl
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-opt|[TableMetadataFetchOptions](/api/types/#type-tablemetadatafetchoptions)|Optional options
+| Argument | Type                                                                    | Description      |
+| -------- | ----------------------------------------------------------------------- | ---------------- |
+| opt      | [TableMetadataFetchOptions](/api/types/#type-tablemetadatafetchoptions) | Optional options |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Promise&lt;[TableMetadata](/api/types/#type-tablemetadata)&gt;|The table metadata object
+| Type                                                           | Description               |
+| -------------------------------------------------------------- | ------------------------- |
+| Promise&lt;[TableMetadata](/api/types/#type-tablemetadata)&gt; | The table metadata object |
 
 ## `static` tableMetadata()
 
@@ -1151,18 +1116,15 @@ See [fetchTableMetadata](/api/model/static-methods.html#static-fetchtablemetadat
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-opt|[TableMetadataOptions](/api/types/#type-tablemetadataoptions)|Optional options
+| Argument | Type                                                          | Description      |
+| -------- | ------------------------------------------------------------- | ---------------- |
+| opt      | [TableMetadataOptions](/api/types/#type-tablemetadataoptions) | Optional options |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[TableMetadata](/api/types/#type-tablemetadata)|The table metadata object
-
-
-
+| Type                                            | Description               |
+| ----------------------------------------------- | ------------------------- |
+| [TableMetadata](/api/types/#type-tablemetadata) | The table metadata object |
 
 ##### Examples
 
@@ -1187,8 +1149,8 @@ Shortcut for `Person.knex().raw(...args)`
 Returns a [ReferenceBuilder](/api/types/#class-referencebuilder) instance that is bound to the model class. Any reference created using it will add the correct table name to the reference.
 
 ```js
-const { ref } = Person
-await Person.query().where(ref('firstName'), 'Jennifer')
+const { ref } = Person;
+await Person.query().where(ref('firstName'), 'Jennifer');
 ```
 
 ```sql
@@ -1198,8 +1160,10 @@ select "persons".* from "persons" where "persons"."firstName" = 'Jennifer'
 `ref` uses the correct table name even when an alias has been given to the table.
 
 ```js
-const { ref } = Person
-await Person.query().alias('p').where(ref('firstName'), 'Jennifer')
+const { ref } = Person;
+await Person.query()
+  .alias('p')
+  .where(ref('firstName'), 'Jennifer');
 ```
 
 ```sql
@@ -1209,12 +1173,12 @@ select "p".* from "persons" as "p" where "p"."firstName" = 'Jennifer'
 Note that the following two ways to use `Model.ref` are completely equivalent:
 
 ```js
-const { ref } = Person
-await Person.query().where(ref('firstName'), 'Jennifer')
+const { ref } = Person;
+await Person.query().where(ref('firstName'), 'Jennifer');
 ```
 
 ```js
-await Person.query().where(Person.ref('firstName'), 'Jennifer')
+await Person.query().where(Person.ref('firstName'), 'Jennifer');
 ```
 
 ## `static` fn()

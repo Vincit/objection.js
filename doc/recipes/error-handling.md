@@ -3,16 +3,16 @@
 Objection throws four kinds of errors:
 
 1. [ValidationError](/api/types/#class-validationerror) when an input that could come from the outside world is invalid. These inputs
-    include model instances and POJOs, relation expressions, object graphs etc. [ValidationError](/api/types/#class-validationerror) has
-    a `type` property that can be used to distinguish between the different error types.
+   include model instances and POJOs, relation expressions, object graphs etc. [ValidationError](/api/types/#class-validationerror) has
+   a `type` property that can be used to distinguish between the different error types.
 
 2. [NotFoundError](/api/types/#class-notfounderror) when [throwIfNotFound](/api/query-builder/other-methods.html#throwifnotfound) was called for a query and no
-    results were found.
+   results were found.
 
 3. Database errors as defined by the [db-errors library](https://github.com/Vincit/db-errors). You can access the error classes through objection. See the example.
 
 4. A basic JavaScript `Error` when a programming or logic error is detected. In these cases there is nothing the users
-    can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
+   can do and the only correct way to handle the error is to send a 500 response to the user and to fix the program.
 
 ## Examples
 
@@ -93,7 +93,7 @@ function errorHandler(err, res) {
       type: 'NotNullViolation',
       data: {
         column: err.column,
-        table: err.table,
+        table: err.table
       }
     });
   } else if (err instanceof ForeignKeyViolationError) {

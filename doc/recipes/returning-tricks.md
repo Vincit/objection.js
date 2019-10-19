@@ -1,15 +1,14 @@
 # PostgreSQL "returning" tricks
 
-Because PostgreSQL (and some others) support [returning('*')](/api/query-builder/find-methods.html#returning) chaining, you can actually `insert` a row, or `update` / `patch` / `delete` existing rows, __and__ receive the affected rows as Model instances in a single query, thus improving efficiency. See the examples for more clarity.
+Because PostgreSQL (and some others) support [returning('\*')](/api/query-builder/find-methods.html#returning) chaining, you can actually `insert` a row, or `update` / `patch` / `delete` existing rows, **and** receive the affected rows as Model instances in a single query, thus improving efficiency. See the examples for more clarity.
 
 # Examples
 
 Insert and return a Model instance in 1 query:
 
 ```js
-const jennifer = await Person
-  .query()
-  .insert({firstName: 'Jennifer', lastName: 'Lawrence'})
+const jennifer = await Person.query()
+  .insert({ firstName: 'Jennifer', lastName: 'Lawrence' })
   .returning('*');
 
 console.log(jennifer.createdAt); // NOW()-ish
@@ -19,9 +18,8 @@ console.log(jennifer.id); // Sequence ID
 Update a single row by ID and return the updated Model instance in 1 query:
 
 ```js
-const jennifer = await Person
-  .query()
-  .patch({firstName: 'Jenn', lastName: 'Lawrence'})
+const jennifer = await Person.query()
+  .patch({ firstName: 'Jenn', lastName: 'Lawrence' })
   .where('id', 1234)
   .returning('*');
 
@@ -34,7 +32,7 @@ Patch a Model instance and receive DB updates to Model instance in 1 query:
 ```js
 const updateJennifer = await jennifer
   .$query()
-  .patch({firstName: 'J.', lastName: 'Lawrence'})
+  .patch({ firstName: 'J.', lastName: 'Lawrence' })
   .returning('*');
 
 console.log(updateJennifer.updatedAt); // NOW()-ish
@@ -44,10 +42,9 @@ console.log(updateJennifer.firstName); // "J."
 Delete all Persons named Jennifer and return the deleted rows as Model instances in 1 query:
 
 ```js
-const deletedJennifers = await Person
-  .query()
+const deletedJennifers = await Person.query()
   .delete()
-  .where({firstName: 'Jennifer'})
+  .where({ firstName: 'Jennifer' })
   .returning('*');
 
 console.log(deletedJennifers.length); // How many Jennifers there were
@@ -60,7 +57,7 @@ Delete all of Jennifer's dogs and return the deleted Model instances in 1 query:
 const jennsDeletedDogs = await jennifer
   .$relatedQuery('pets')
   .delete()
-  .where({'species': 'dog'})
+  .where({ species: 'dog' })
   .returning('*');
 
 console.log(jennsDeletedDogs.length); // How many dogs Jennifer had

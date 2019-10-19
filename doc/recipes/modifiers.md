@@ -4,7 +4,7 @@ Modifiers allow you to easily reuse snippets of query logic. A modifier is simpl
 
 ```js
 function filterGender(query, gender) {
-  query.where('gender', gender)
+  query.where('gender', gender);
 }
 ```
 
@@ -14,13 +14,13 @@ Model classes have the static [modifiers](/api/model/static-properties.md#static
 class Person extends Model {
   static modifiers = {
     defaultSelects(query) {
-      query.select('id', 'firstName')
+      query.select('id', 'firstName');
     },
 
     filterGender(query, gender) {
-      query.where('gender', gender)
+      query.where('gender', gender);
     }
-  }
+  };
 }
 ```
 
@@ -31,10 +31,9 @@ Modifiers defined in the [modifiers](/api/model/static-properties.md#static-modi
 You can apply any modifier using the [modify](/api/query-builder/other-methods.md#modify) method:
 
 ```js
-const women = await Person
-  .query()
+const women = await Person.query()
   .modify('defaultSelects')
-  .modify('filterGender', 'female')
+  .modify('filterGender', 'female');
 ```
 
 ## Usage with eager loading
@@ -42,43 +41,40 @@ const women = await Person
 You can pass modifier names as "arguments" to the relation names in [relation expressions](/api/types/#type-relationexpression). See the [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) and [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) methods' docs for more info and examples.
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('children(defaultSelects)')
+const people = await Person.query().withGraphFetched(
+  'children(defaultSelects)'
+);
 ```
 
 Note that you can only use modifiers registered for the relation's model class. In the previous example `children` is of class `Person`, so you can use `defaultSelects` that was registerd for the `Person` model. In the following example, `filterDogs` must have been specified in `Pet` model's `modifiers` object.
 
 ```js
-const people = await Person
-  .query()
-  .withGraphFetched('[children(defaultSelects), pets(onlyDogs)]')
+const people = await Person.query().withGraphFetched(
+  '[children(defaultSelects), pets(onlyDogs)]'
+);
 ```
 
 You can register new modifiers for a query using the [modifiers](/api/query-builder/other-methods.md#modifiers) query builder method. This also allows you to bind arguments to existing modifiers like this
 
 ```js
-const people = await Person
-  .query()
+const people = await Person.query()
   .withGraphFetched('children(defaultSelects, filterWomen)')
   .modifiers({
     filterWomen: query => query.modify('filterGender', 'female')
-  })
+  });
 ```
 
 ## Usage in joinRelation
 
 ```js
-const women = await Person
-  .query()
-  .joinRelation('children(defaultSelects)')
+const women = await Person.query().joinRelation('children(defaultSelects)');
 ```
 
 Query builder [modifiers](/api/query-builder/other-methods.md#modifiers) can also be used with `joinRelation` just like with `withGraphFetched` and `withGraphJoined`.
 
 ## Other usages
 
-* Relation mappings' [modify](/api/types/#type-relationmapping) properties.
+- Relation mappings' [modify](/api/types/#type-relationmapping) properties.
 
 ## Modifier best practices
 
@@ -88,15 +84,15 @@ You can refer to column names using strings just like we did in the previous exa
 class Person extends Model {
   static modifiers = {
     defaultSelects(query) {
-      const { ref } = Person
-      query.select(ref('id'), ref('firstName'))
+      const { ref } = Person;
+      query.select(ref('id'), ref('firstName'));
     },
 
     filterGender(query, gender) {
-      const { ref } = Person
-      query.where(ref('gender'), gender)
+      const { ref } = Person;
+      query.where(ref('gender'), gender);
     }
-  }
+  };
 }
 ```
 

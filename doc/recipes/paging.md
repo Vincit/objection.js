@@ -3,8 +3,7 @@
 Most of the queries can be paged using the [page](/api/query-builder/other-methods.html#page) or [range](/api/query-builder/other-methods.html#range) method.
 
 ```js
-const result = await Person
-  .query()
+const result = await Person.query()
   .where('age', '>', 20)
   .page(5, 100);
 
@@ -21,8 +20,7 @@ There are some cases where [page](/api/query-builder/other-methods.html#page) an
 // `children` for all parents at once. Paging that query
 //  will have not fetch 10 results for all parents, but
 // instead 10 results in total.
-const result = await Person
-  .query()
+const result = await Person.query()
   .withGraphFetched('children')
   .modifyGraph('children', qb => qb.page(0, 10));
 ```
@@ -35,8 +33,7 @@ const result = await Person
 // list of records. Paging the query will page the
 // flattened results which has alot more rows than
 // the root query.
-const result = await Person
-  .query()
+const result = await Person.query()
   .withGraphJoined('children')
-  .page(0, 10)
+  .page(0, 10);
 ```

@@ -11,40 +11,40 @@ Here's how you could create your models:
 
 ```js
 // User.js
-const { Model } = require("objection");
+const { Model } = require('objection');
 
 class User extends Model {
   static get tableName() {
-    return "user";
+    return 'user';
   }
 
   static get relationMappings() {
     return {
       groups: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("./Group"),
+        modelClass: require('./Group'),
         join: {
-          from: "user.id",
+          from: 'user.id',
           through: {
-            from: "user_group_permission.user_id",
-            extra: ["extra_attribute"],
-            to: "user_group_permission.group_id"
+            from: 'user_group_permission.user_id',
+            extra: ['extra_attribute'],
+            to: 'user_group_permission.group_id'
           },
-          to: "group.id"
+          to: 'group.id'
         }
       },
 
       permissions: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("./Permission"),
+        modelClass: require('./Permission'),
         join: {
-          from: "user.id",
+          from: 'user.id',
           through: {
-            from: "user_group_permission.user_id",
-            extra: ["extra_attribute"],
-            to: "user_group_permission.permission_id"
+            from: 'user_group_permission.user_id',
+            extra: ['extra_attribute'],
+            to: 'user_group_permission.permission_id'
           },
-          to: "permission.id"
+          to: 'permission.id'
         }
       }
     };
@@ -56,40 +56,40 @@ module.exports = User;
 
 ```js
 // Group.js
-const { Model } = require("objection");
+const { Model } = require('objection');
 
 class Group extends Model {
   static get tableName() {
-    return "group";
+    return 'group';
   }
 
   static get relationMappings() {
     return {
       users: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("./User"),
+        modelClass: require('./User'),
         join: {
-          from: "group.id",
+          from: 'group.id',
           through: {
-            from: "user_group_permission.group_id",
-            extra: ["extra_attribute"],
-            to: "user_group_permission.user_id"
+            from: 'user_group_permission.group_id',
+            extra: ['extra_attribute'],
+            to: 'user_group_permission.user_id'
           },
-          to: "user.id"
+          to: 'user.id'
         }
       },
 
       permissions: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("./Permission"),
+        modelClass: require('./Permission'),
         join: {
-          from: "group.id",
+          from: 'group.id',
           through: {
-            from: "user_group_permission.group_id",
-            extra: ["extra_attribute"],
-            to: "user_group_permission.permission_id"
+            from: 'user_group_permission.group_id',
+            extra: ['extra_attribute'],
+            to: 'user_group_permission.permission_id'
           },
-          to: "permission.id"
+          to: 'permission.id'
         }
       }
     };
@@ -101,40 +101,40 @@ module.exports = Group;
 
 ```js
 // Permission.js
-const { Model } = require("objection");
+const { Model } = require('objection');
 
 class Permission extends Model {
   static get tableName() {
-    return "permission";
+    return 'permission';
   }
 
   static get relationMappings() {
     return {
       users: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("./User"),
+        modelClass: require('./User'),
         join: {
-          from: "permission.id",
+          from: 'permission.id',
           through: {
-            from: "user_group_permission.permission_id",
-            extra: ["extra_attribute"],
-            to: "user_group_permission.user_id"
+            from: 'user_group_permission.permission_id',
+            extra: ['extra_attribute'],
+            to: 'user_group_permission.user_id'
           },
-          to: "user.id"
+          to: 'user.id'
         }
       },
 
       groups: {
         relation: Model.ManyToManyRelation,
-        modelClass: require("./Group"),
+        modelClass: require('./Group'),
         join: {
-          from: "permission.id",
+          from: 'permission.id',
           through: {
-            from: "user_group_permission.permission_id",
-            extra: ["extra_attribute"],
-            to: "user_group_permission.group_id"
+            from: 'user_group_permission.permission_id',
+            extra: ['extra_attribute'],
+            to: 'user_group_permission.group_id'
           },
-          to: "group.id"
+          to: 'group.id'
         }
       }
     };
@@ -146,43 +146,43 @@ module.exports = Permission;
 
 ```js
 // UserGroupPermission.js
-const { Model } = require("objection");
+const { Model } = require('objection');
 
 class UserGroupPermission extends Model {
   static get tableName() {
-    return "user_group_permission";
+    return 'user_group_permission';
   }
 
   static get idColumn() {
-    return ["user_id", "group_id", "permission_id"];
+    return ['user_id', 'group_id', 'permission_id'];
   }
 
   static get relationMappings() {
     return {
       user: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require("./User"),
+        modelClass: require('./User'),
         join: {
-          from: "user_group_permission.user_id",
-          to: "user.id"
+          from: 'user_group_permission.user_id',
+          to: 'user.id'
         }
       },
 
       group: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require("./Group"),
+        modelClass: require('./Group'),
         join: {
-          from: "user_group_permission.group_id",
-          to: "group.id"
+          from: 'user_group_permission.group_id',
+          to: 'group.id'
         }
       },
 
       permission: {
         relation: Model.BelongsToOneRelation,
-        modelClass: require("./Permission"),
+        modelClass: require('./Permission'),
         join: {
-          from: "user_group_permission.permission_id",
-          to: "permission.id"
+          from: 'user_group_permission.permission_id',
+          to: 'permission.id'
         }
       }
     };
@@ -197,16 +197,10 @@ Here's how you can query your models:
 - `.*JoinRelation()`
 
 ```js
-UserGroupPermission
-  .query()
-  .select(
-    "first_name",
-    "last_name",
-    "label",
-    "extra_attribute"
-  )
-  .joinRelation("[user, permission]")
-  .where("group_id", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+UserGroupPermission.query()
+  .select('first_name', 'last_name', 'label', 'extra_attribute')
+  .joinRelation('[user, permission]')
+  .where('group_id', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
 /*
 {
   first_name: ... ,
@@ -220,10 +214,9 @@ UserGroupPermission
 - `.withGraphFetched()`
 
 ```js
-UserGroupPermission
-  .query()
-  .withGraphFetched("[user, permission]")
-  .where("group_id", "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx");
+UserGroupPermission.query()
+  .withGraphFetched('[user, permission]')
+  .where('group_id', 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
 /*
 {
   user: {

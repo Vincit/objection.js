@@ -161,7 +161,10 @@ In addition to the examples here, you can find more examples behind these links.
 ##### Examples
 
 ```js
-const jennifer = await Person.query().insert({ firstName: 'Jennifer', lastName: 'Lawrence' });
+const jennifer = await Person.query().insert({
+  firstName: 'Jennifer',
+  lastName: 'Lawrence'
+});
 
 console.log(jennifer instanceof Person); // --> true
 console.log(jennifer.firstName); // --> 'Jennifer'
@@ -225,7 +228,9 @@ update "persons" set "lastName" = 'Dinosaur' where "age" > 60
 Update and fetch an item:
 
 ```js
-const updatedPerson = await Person.query().patchAndFetchById(246, { lastName: 'Updated' });
+const updatedPerson = await Person.query().patchAndFetchById(246, {
+  lastName: 'Updated'
+});
 
 console.log(updatedPerson.lastName); // --> Updated.
 ```
@@ -701,7 +706,9 @@ console.log(people[0].pets[0] instanceof Animal); // --> true
 Fetch multiple relations on multiple levels:
 
 ```js
-const people = await Person.query().withGraphFetched('[pets, children.[pets, children]]');
+const people = await Person.query().withGraphFetched(
+  '[pets, children.[pets, children]]'
+);
 
 // Each person has the `pets` property populated with Animal objects related
 // through the `pets` relation. The `children` property contains the Person's
@@ -732,7 +739,9 @@ const people = await Person.query().withGraphFetched('[pets, children.^]');
 // The children relation is from Person to Person. If we want to fetch the whole
 // descendant tree of a person we can just say "fetch this relation recursively"
 // using the `.^` notation.
-console.log(people[0].children[0].children[0].children[0].children[0].firstName);
+console.log(
+  people[0].children[0].children[0].children[0].children[0].firstName
+);
 ```
 
 Limit recursion to 3 levels:
@@ -759,7 +768,9 @@ Relations can also be modified using modifiers like this:
 
 ```js
 const people = await Person.query()
-  .withGraphFetched('[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]')
+  .withGraphFetched(
+    '[pets(selectName, onlyDogs), children(orderByAge).[pets, children]]'
+  )
   .modifiers({
     selectName: builder => {
       builder.select('name');

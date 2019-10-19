@@ -12,20 +12,20 @@ There are also some helper methods such as [whereRaw](/api/query-builder/find-me
 const { raw } = require('objection');
 const ageToAdd = 10;
 
-await Person
-  .query()
-  .patch({
-    age: raw('age + ?', ageToAdd)
-  })
+await Person.query().patch({
+  age: raw('age + ?', ageToAdd)
+});
 ```
 
 ```js
 const { raw } = require('objection');
 
-const childAgeSums = await Person
-  .query()
+const childAgeSums = await Person.query()
   .select(raw('coalesce(sum(??), 0)', 'age').as('childAgeSum'))
-  .where(raw(`?? || ' ' || ??`, 'firstName', 'lastName'), 'Arnold Schwarzenegger')
+  .where(
+    raw(`?? || ' ' || ??`, 'firstName', 'lastName'),
+    'Arnold Schwarzenegger'
+  )
   .orderBy(raw('random()'));
 
 console.log(childAgeSums[0].childAgeSum);
@@ -36,10 +36,12 @@ Also see the [fn](/api/objection/#fn) helper for calling SQL functions. The foll
 ```js
 const { fn, ref } = require('objection');
 
-const childAgeSums = await Person
-  .query()
+const childAgeSums = await Person.query()
   .select(fn.coalesce(fn.sum(ref('age')), 0).as('childAgeSum'))
-  .where(fn.concat(ref('firstName'), ' ', ref('lastName')), 'Arnold Schwarzenegger')
+  .where(
+    fn.concat(ref('firstName'), ' ', ref('lastName')),
+    'Arnold Schwarzenegger'
+  )
   .orderBy(fn('random'));
 
 console.log(childAgeSums[0].childAgeSum);

@@ -39,7 +39,10 @@ through [knexQuery](/api/model/static-methods.html#static-knexquery).
 ##### Examples
 
 ```js
-const jennifer = await Person.query().insert({ firstName: 'Jennifer', lastName: 'Lawrence' });
+const jennifer = await Person.query().insert({
+  firstName: 'Jennifer',
+  lastName: 'Lawrence'
+});
 
 console.log(jennifer.id);
 ```
@@ -784,7 +787,9 @@ const numUnrelatedRows = await person
   .unrelate()
   .where('id', 50);
 
-console.log('movie 50 is no longer related to person 123 through `movies` relation');
+console.log(
+  'movie 50 is no longer related to person 123 through `movies` relation'
+);
 ```
 
 ## increment()

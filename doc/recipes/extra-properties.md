@@ -43,7 +43,7 @@ class Actor extends Model {
         },
         to: 'movies.id'
       }
-    }
+    };
   }
 }
 ```
@@ -51,43 +51,35 @@ class Actor extends Model {
 `extra` properties automatically work with all objection operations:
 
 ```js
-const linda = await Actor
-  .query()
-  .findOne({ name: 'Linda Hamilton' });
+const linda = await Actor.query().findOne({ name: 'Linda Hamilton' });
 
 // Fetch a movie.
-const someMovie = await linda
-  .$relatedQuery('movies')
-  .first()
+const someMovie = await linda.$relatedQuery('movies').first();
 
 console.log(
   "Linda's character's name in the movie",
   someMovie.name,
   'is',
   someMovie.characterName
-)
+);
 
 // Insert a movie with a `characterName`.
-await linda
-  .$relatedQuery('movies')
-  .insert({
-    name: 'Terminator',
-    characterName: 'Sarah Connor'
-  });
+await linda.$relatedQuery('movies').insert({
+  name: 'Terminator',
+  characterName: 'Sarah Connor'
+});
 
 // Relate an existing movie with a `characterName`.
-await linda
-  .$relatedQuery('movies')
-  .relate({
-    id: 23452,
-    characterName: 'Sarah Connor'
-  });
+await linda.$relatedQuery('movies').relate({
+  id: 23452,
+  characterName: 'Sarah Connor'
+});
 
 // Update a movie and change `characterName`
 await linda
   .$relatedQuery('movies')
   .patch({ characterName: 'Florence' })
-  .where('movies.name', 'Curvature')
+  .where('movies.name', 'Curvature');
 ```
 
 `extra` properties also work with [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) and [upsertGraph](/api/query-builder/mutate-methods.html#upsertgraph).

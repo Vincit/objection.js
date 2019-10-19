@@ -1,10 +1,9 @@
 # Precedence and parentheses
 
-You can add parentheses to queries by passing a function to any of the [where*](/api/query-builder/find-methods.html#where) methods.
+You can add parentheses to queries by passing a function to any of the [where\*](/api/query-builder/find-methods.html#where) methods.
 
 ```js
-await Person
-  .query()
+await Person.query()
   .where('stuff', 1)
   .where(builder => {
     builder.where('foo', 2).orWhere('bar', 3);

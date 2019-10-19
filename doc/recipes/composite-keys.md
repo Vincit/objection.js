@@ -4,14 +4,14 @@ Composite (compound) keys are fully supported. Just give an array of columns whe
 
 Here's a list of methods that may help working with composite keys:
 
- * [whereComposite](/api/query-builder/find-methods.html#wherecomposite)
- * [whereInComposite](/api/query-builder/find-methods.html#whereincomposite)
- * [findById](/api/query-builder/find-methods.html#findbyid)
- * [findByIds](/api/query-builder/find-methods.html#findbyids)
- * [deleteById](/api/query-builder/mutate-methods.html#deletebyid)
- * [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid)
- * [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid)
- * [$id](/api/model/instance-methods.html#id)
+- [whereComposite](/api/query-builder/find-methods.html#wherecomposite)
+- [whereInComposite](/api/query-builder/find-methods.html#whereincomposite)
+- [findById](/api/query-builder/find-methods.html#findbyid)
+- [findByIds](/api/query-builder/find-methods.html#findbyids)
+- [deleteById](/api/query-builder/mutate-methods.html#deletebyid)
+- [updateAndFetchById](/api/query-builder/mutate-methods.html#updateandfetchbyid)
+- [patchAndFetchById](/api/query-builder/mutate-methods.html#patchandfetchbyid)
+- [\$id](/api/model/instance-methods.html#id)
 
 ## Examples
 
@@ -53,33 +53,26 @@ class Person extends Model {
       }
     };
   }
-};
+}
 ```
 
 [findById](/api/query-builder/find-methods.html#findbyid):
 
 ```js
-await Person
-  .query()
-  .findById([1, 'something', 7])
+await Person.query().findById([1, 'something', 7]);
 ```
-
 
 [whereComposite](/api/query-builder/find-methods.html#wherecomposite):
 
 ```js
-await Person
-  .query()
-  .whereComposite(['foo', 'bar'], [1, 'barValue']);
+await Person.query().whereComposite(['foo', 'bar'], [1, 'barValue']);
 ```
 
 [whereInComposite](/api/query-builder/find-methods.html#whereincomposite):
 
 ```js
-await Person
-  .query()
-  .whereInComposite(['foo', 'bar'], [
-    [1, 'barValue1'],
-    [2, 'barValue2']
-  ]);
+await Person.query().whereInComposite(
+  ['foo', 'bar'],
+  [[1, 'barValue1'], [2, 'barValue2']]
+);
 ```

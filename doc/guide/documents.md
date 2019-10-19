@@ -6,22 +6,18 @@ Model property.
 The `address` property of the Person model is defined as an object in the [Person.jsonSchema](/api/model/static-properties.html#static-jsonschema):
 
 ```js
-const jennifer = await Person
-  .query()
-  .insert({
-    firstName: 'Jennifer',
-    lastName: 'Lawrence',
-    age: 24,
-    address: {
-      street: 'Somestreet 10',
-      zipCode: '123456',
-      city: 'Tampere'
-    }
-  });
+const jennifer = await Person.query().insert({
+  firstName: 'Jennifer',
+  lastName: 'Lawrence',
+  age: 24,
+  address: {
+    street: 'Somestreet 10',
+    zipCode: '123456',
+    city: 'Tampere'
+  }
+});
 
-const jenniferFromDb = await Person
-  .query()
-  .findById(jennifer.id);
+const jenniferFromDb = await Person.query().findById(jennifer.id);
 
 console.log(jennifer.address.city); // --> Tampere
 console.log(jenniferFromDb.address.city); // --> Tampere

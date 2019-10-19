@@ -279,7 +279,9 @@ class Animal extends Model {
 Modifiers can be used for relations in a `withGraphFetched` or `withGraphJoined` query.
 
 ```js
-Person.query().withGraphFetched('[movies(goodMovies, orderByName).actors, pets(dogs)]');
+Person.query().withGraphFetched(
+  '[movies(goodMovies, orderByName).actors, pets(dogs)]'
+);
 ```
 
 Modifiers can also be used through [modifyGraph](/api/query-builder/other-methods.html#modifygraph):

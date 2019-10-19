@@ -2,7 +2,7 @@
 
 All instance methods start with the character `$` to prevent them from colliding with the database column names.
 
-## $query()
+## \$query()
 
 ```js
 const queryBuilder = person.$query(transactionOrKnex);
@@ -14,15 +14,15 @@ All queries built using the returned builder only affect this instance.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
+| Argument          | Type   | Description                                                                                                                                                        |
+| ----------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| transactionOrKnex | object | Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|query builder
+| Type                                | Description   |
+| ----------------------------------- | ------------- |
+| [QueryBuilder](/api/query-builder/) | query builder |
 
 ##### Examples
 
@@ -39,8 +39,7 @@ person.$set(reFetchedPerson);
 Insert a new item to database:
 
 ```js
-const jennifer = await Person
-  .fromJson({ firstName: 'Jennifer' })
+const jennifer = await Person.fromJson({ firstName: 'Jennifer' })
   .$query()
   .insert();
 
@@ -50,9 +49,7 @@ console.log(jennifer.id);
 Patch an item:
 
 ```js
-await person
-  .$query()
-  .patch({ lastName: 'Cooper' });
+await person.$query().patch({ lastName: 'Cooper' });
 
 console.log('person updated');
 ```
@@ -60,14 +57,12 @@ console.log('person updated');
 Delete an item.
 
 ```js
-await person
-  .$query()
-  .delete();
+await person.$query().delete();
 
 console.log('person deleted');
 ```
 
-## $relatedQuery()
+## \$relatedQuery()
 
 ```js
 const builder = person.$relatedQuery(relationName, transactionOrKnex);
@@ -81,24 +76,25 @@ See the examples below and [here](/guide/query-examples.html#relation-queries).
 This methods is just a shortcut for this call to the static [relatedQuery](/api/model/static-methods.html#static-relatedquery) method:
 
 ```js
-const builder = Person
-  .relatedQuery(relationName, transactionOrKnex)
-  .for(person)
+const builder = Person.relatedQuery(relationName, transactionOrKnex).for(
+  person
+);
 ```
+
 :::
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-relationName|string|The name of the relation to query.
-transactionOrKnex|object|Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored.
+| Argument          | Type   | Description                                                                                                                                                        |
+| ----------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| relationName      | string | The name of the relation to query.                                                                                                                                 |
+| transactionOrKnex | object | Optional transaction or knex instance for the query. This can be used to specify a transaction or even a different database for a query. Falsy values are ignored. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|A query builder
+| Type                                | Description     |
+| ----------------------------------- | --------------- |
+| [QueryBuilder](/api/query-builder/) | A query builder |
 
 ##### Examples
 
@@ -132,7 +128,7 @@ This inserts a new item to the database and binds it to the owner item as define
 ```js
 const waldo = await jennifer
   .$relatedQuery('pets')
-  .insert({species: 'dog', name: 'Fluffy'});
+  .insert({ species: 'dog', name: 'Fluffy' });
 
 console.log(waldo.id);
 ```
@@ -140,9 +136,7 @@ console.log(waldo.id);
 To attach an existing item to a relation the `relate` method can be used. In this example the dog `fluffy` already exists in the database but it isn't related to `jennifer` through the `pets` relation. We can make the connection like this:
 
 ```js
-await jennifer
-  .$relatedQuery('pets')
-  .relate(fluffy.id);
+await jennifer.$relatedQuery('pets').relate(fluffy.id);
 
 console.log('fluffy is now related to jennifer through pets relation');
 ```
@@ -164,7 +158,7 @@ Related items can be deleted using the delete method. Note that in the case of M
 await jennifer
   .$relatedQuery('pets')
   .delete()
-  .where('species', 'cat')
+  .where('species', 'cat');
 
 console.log('jennifer no longer has any cats');
 ```
@@ -174,28 +168,28 @@ console.log('jennifer no longer has any cats');
 ```js
 const updatedFluffy = await jennifer
   .$relatedQuery('pets')
-  .update({species: 'dog', name: 'Fluffy the great', vaccinated: false})
+  .update({ species: 'dog', name: 'Fluffy the great', vaccinated: false })
   .where('id', fluffy.id);
 
-console.log('fluffy\'s new name is', updatedFluffy.name);
+console.log("fluffy's new name is", updatedFluffy.name);
 
 // This query will be rejected assuming that `name` or `species`
 // is a required property for an Animal.
 await jennifer
   .$relatedQuery('pets')
-  .update({vaccinated: true})
+  .update({ vaccinated: true })
   .where('species', 'dog');
 
 // This query will succeed.
 await jennifer
   .$relatedQuery('pets')
-  .patch({vaccinated: true})
+  .patch({ vaccinated: true })
   .where('species', 'dog');
 
 console.log('jennifer just got all her dogs vaccinated');
 ```
 
-## $beforeInsert()
+## \$beforeInsert()
 
 ```js
 class Person extends Model {
@@ -214,15 +208,15 @@ If you start a query from this hook, make sure you specify `queryContext.transac
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-queryContext|Object|The context object of the insert query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type   | Description                                                                                           |
+| ------------ | ------ | ----------------------------------------------------------------------------------------------------- |
+| queryContext | Object | The context object of the insert query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -237,14 +231,12 @@ class Person extends Model {
     // returns the normal knex instance. This makes sure that
     // the query is not executed outside the original query's
     // transaction.
-    await SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    await SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
 
-## $afterInsert()
+## \$afterInsert()
 
 ```js
 class Person extends Model {
@@ -261,15 +253,15 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-queryContext|Object|The context object of the insert query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type   | Description                                                                                           |
+| ------------ | ------ | ----------------------------------------------------------------------------------------------------- |
+| queryContext | Object | The context object of the insert query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -283,14 +275,12 @@ class Person extends Model {
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    await SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    await SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
 
-## $beforeUpdate()
+## \$beforeUpdate()
 
 ```js
 class Person extends Model {
@@ -308,20 +298,20 @@ you need to do update specific validation.
 
 This method is also called before a model is patched. Therefore all the model's properties may not exist. You can check if the update operation is a patch by checking the `opt.patch` boolean.
 
-Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
+Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [\$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type                                          | Description                                                                                           |
+| ------------ | --------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| opt          | [ModelOptions](/api/types/#type-modeloptions) | Update options.                                                                                       |
+| queryContext | Object                                        | The context object of the update query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -335,9 +325,7 @@ class Person extends Model {
     // In that case `queryContext.transaction` returns the normal knex
     // instance. This makes sure that the query is not executed outside
     // the original query's transaction.
-    await SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    await SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
@@ -345,22 +333,19 @@ class Person extends Model {
 Note that the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
-somePerson
-  .$query()
-  .update(newValues);
+somePerson.$query().update(newValues);
 ```
 
 For the following query `opt.old` is `undefined` because there is no old object in the JavaScript side. objection.js doesn't fetch the old values even if they existed in the database
 for performance and simplicity reasons.
 
 ```js
-Person
-  .query()
+Person.query()
   .update(newValues)
   .where('foo', 'bar');
 ```
 
-## $afterUpdate()
+## \$afterUpdate()
 
 ```js
 class Person extends Model {
@@ -377,20 +362,20 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 This method is also called after a model is patched. Therefore all the model's properties may not exist. You can check if the update operation is a patch by checking the `opt.patch` boolean.
 
-Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
+Inside the hook, `this` contains the values to be updated. If (and only if) the query is started for an existing model instance using [\$query](/api/model/instance-methods.html#query), `opt.old` object contains the old values. The old values are never fetched from the database implicitly. For non-instance queries the `opt.old` object is `undefined`. See the examples.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-opt|[ModelOptions](/api/types/#type-modeloptions)|Update options.
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type                                          | Description                                                                                           |
+| ------------ | --------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| opt          | [ModelOptions](/api/types/#type-modeloptions) | Update options.                                                                                       |
+| queryContext | Object                                        | The context object of the update query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -404,9 +389,7 @@ class Person extends Model {
     // In that case `queryContext.transaction` returns the normal knex
     // instance. This makes sure that the query is not executed
     // outside the original query's transaction.
-    await SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    await SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
@@ -414,22 +397,18 @@ class Person extends Model {
 Note that the `opt.old` object is only populated for instance queries started with `$query`:
 
 ```js
-somePerson
-  .$query()
-  .update(newValues);
+somePerson.$query().update(newValues);
 ```
 
 For the following query `opt.old` is `undefined` because there is no old object in the JavaScript side. objection.js doesn't fetch the old values even if they existed in the database for performance and simplicity reasons.
 
 ```js
-Person
-  .query()
+Person.query()
   .update(newValues)
   .where('foo', 'bar');
 ```
 
-
-## $beforeDelete()
+## \$beforeDelete()
 
 ```js
 class Person extends Model {
@@ -445,20 +424,20 @@ Called before a model is deleted.
 You can return a promise from this function if you need to do asynchronous stuff.
 
 ::: warning
-This method is only called for instance deletes started with [$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
+This method is only called for instance deletes started with [\$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [\$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
 :::
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type   | Description                                                                                           |
+| ------------ | ------ | ----------------------------------------------------------------------------------------------------- |
+| queryContext | Object | The context object of the update query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -472,14 +451,12 @@ class Person extends Model {
     // In that case `queryContext.transaction` returns the normal knex
     // instance. This makes sure that the query is not executed outside
     // the original query's transaction.
-    await SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    await SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
 
-## $afterDelete()
+## \$afterDelete()
 
 ```js
 class Person extends Model {
@@ -495,20 +472,20 @@ Called after a model is deleted.
 You can return a promise from this function if you need to do asynchronous stuff.
 
 ::: warning
-This method is only called for instance deletes started with [$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
+This method is only called for instance deletes started with [\$query()](/api/model/instance-methods.html#query) method. All hooks are instance methods. For deletes there is no instance for which to call the hook, except when [\$query()](/api/model/instance-methods.html#query) is used. Objection doesn't fetch the item just to call the hook for it to ensure predictable performance and prevent a whole class of concurrency bugs.
 :::
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type   | Description                                                                                           |
+| ------------ | ------ | ----------------------------------------------------------------------------------------------------- |
+| queryContext | Object | The context object of the update query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -522,20 +499,18 @@ class Person extends Model {
     // case `queryContext.transaction` returns the normal knex instance. This
     // makes sure that the query is not executed outside the original query's
     // transaction.
-    await SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    await SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
 
-## $afterGet()
+## \$afterGet()
 
 ::: warning
-Deprecated! Will be removed in version 3.0. Use [$afterFind](#afterfind) instead.
+Deprecated! Will be removed in version 3.0. Use [\$afterFind](#afterfind) instead.
 :::
 
-## $afterFind()
+## \$afterFind()
 
 ```js
 class Person extends Model {
@@ -553,15 +528,15 @@ You can return a promise from this function if you need to do asynchronous stuff
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-queryContext|Object|The context object of the update query. See [context](/api/query-builder/other-methods.html#context).
+| Argument     | Type   | Description                                                                                           |
+| ------------ | ------ | ----------------------------------------------------------------------------------------------------- |
+| queryContext | Object | The context object of the update query. See [context](/api/query-builder/other-methods.html#context). |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void|Promise or void depending whether your hook is async or not.
+| Type                                                               | Description                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| [Promise](http://bluebirdjs.com/docs/getting-started.html)<br>void | Promise or void depending whether your hook is async or not. |
 
 ##### Examples
 
@@ -574,14 +549,12 @@ class Person extends Model {
     // In that case `queryContext.transaction` returns the normal knex
     // instance. This makes sure that the query is not executed outside
     // the original query's transaction.
-    return SomeModel
-      .query(queryContext.transaction)
-      .insert(whatever);
+    return SomeModel.query(queryContext.transaction).insert(whatever);
   }
 }
 ```
 
-## $clone()
+## \$clone()
 
 ```js
 const clone = modelInstance.$clone(options);
@@ -593,15 +566,15 @@ If the item to be cloned has instances of [Model](/api/model/) as properties (or
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-opt|[CloneOptions](/api/types/#type-cloneoptions)|Optional options
+| Argument | Type                                          | Description      |
+| -------- | --------------------------------------------- | ---------------- |
+| opt      | [CloneOptions](/api/types/#type-cloneoptions) | Optional options |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|Deep clone of `this`
+| Type                 | Description          |
+| -------------------- | -------------------- |
+| [Model](/api/model/) | Deep clone of `this` |
 
 ##### Examples
 
@@ -621,15 +594,15 @@ See [this section](/api/model/overview.html#model-data-lifecycle) for more infor
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-opt|[ToJsonOptions](/api/types/#type-tojsonoptions)|Optional options
+| Argument | Type                                            | Description      |
+| -------- | ----------------------------------------------- | ---------------- |
+| opt      | [ToJsonOptions](/api/types/#type-tojsonoptions) | Optional options |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|Model as a JSON object.
+| Type   | Description             |
+| ------ | ----------------------- |
+| Object | Model as a JSON object. |
 
 ##### Examples
 
@@ -641,11 +614,11 @@ const shallowObj = modelInstance.toJSON({ shallow: true, virtuals: false });
 const onlySomeVirtuals = modelInstance.toJSON({ virtuals: ['fullName'] });
 ```
 
-## $toJson()
+## \$toJson()
 
 Alias for [toJSON](/api/model/instance-methods.html#tojson)
 
-## $toDatabaseJson()
+## \$toDatabaseJson()
 
 ```js
 const row = modelInstance.$toDatabaseJson();
@@ -659,11 +632,11 @@ See [this section](/api/model/overview.html#model-data-lifecycle) for more infor
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|Database row.
+| Type   | Description   |
+| ------ | ------------- |
+| Object | Database row. |
 
-## $parseDatabaseJson()
+## \$parseDatabaseJson()
 
 ```js
 class Person extends Model {
@@ -688,17 +661,17 @@ There are a couple of requirements for the implementation:
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON POJO in database format
+| Argument | Type   | Description                      |
+| -------- | ------ | -------------------------------- |
+| json     | Object | The JSON POJO in database format |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|The JSON POJO in internal format
+| Type   | Description                      |
+| ------ | -------------------------------- |
+| Object | The JSON POJO in internal format |
 
-## $formatDatabaseJson()
+## \$formatDatabaseJson()
 
 ```js
 class Person extends Model {
@@ -723,17 +696,17 @@ There are a couple of requirements for the implementation:
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON POJO in internal format
+| Argument | Type   | Description                      |
+| -------- | ------ | -------------------------------- |
+| json     | Object | The JSON POJO in internal format |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|The JSON POJO in database format
+| Type   | Description                      |
+| ------ | -------------------------------- |
+| Object | The JSON POJO in database format |
 
-## $parseJson()
+## \$parseJson()
 
 ```js
 class Person extends Model {
@@ -758,18 +731,18 @@ There are a couple of requirements for the implementation:
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON POJO in external format
-opt|[ModelOptions](/api/types/#type-modeloptions)|Optional options
+| Argument | Type                                          | Description                      |
+| -------- | --------------------------------------------- | -------------------------------- |
+| json     | Object                                        | The JSON POJO in external format |
+| opt      | [ModelOptions](/api/types/#type-modeloptions) | Optional options                 |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|The JSON POJO in internal format
+| Type   | Description                      |
+| ------ | -------------------------------- |
+| Object | The JSON POJO in internal format |
 
-## $formatJson()
+## \$formatJson()
 
 ```js
 class Person extends Model {
@@ -794,17 +767,17 @@ There are a couple of requirements for the implementation:
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON POJO in internal format
+| Argument | Type   | Description                      |
+| -------- | ------ | -------------------------------- |
+| json     | Object | The JSON POJO in internal format |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|The JSON POJO in external format
+| Type   | Description                      |
+| ------ | -------------------------------- |
+| Object | The JSON POJO in external format |
 
-## $setJson()
+## \$setJson()
 
 ```js
 modelInstance.$setJson(json, opt);
@@ -816,18 +789,18 @@ Validates the JSON before setting values.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON POJO to set
-opt|[ModelOptions](/api/types/#type-modeloptions)|Optional options
+| Argument | Type                                          | Description          |
+| -------- | --------------------------------------------- | -------------------- |
+| json     | Object                                        | The JSON POJO to set |
+| opt      | [ModelOptions](/api/types/#type-modeloptions) | Optional options     |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
-## $setDatabaseJson()
+## \$setDatabaseJson()
 
 ```js
 modelInstance.$setDatabaseJson(json);
@@ -837,17 +810,17 @@ Sets the values from a JSON object in database format.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON POJO in database format
+| Argument | Type   | Description                      |
+| -------- | ------ | -------------------------------- |
+| json     | Object | The JSON POJO in database format |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
-## $set()
+## \$set()
 
 ```js
 modelInstance.$set(json);
@@ -855,21 +828,21 @@ modelInstance.$set(json);
 
 Sets the values from another model instance or object.
 
-Unlike [$setJson](/api/model/instance-methods.html#setjson), this doesn't call any [$parseJson](/api/model/instance-methods.html#parsejson) hooks or validate the input. This simply sets each value in the object to this object.
+Unlike [\$setJson](/api/model/instance-methods.html#setjson), this doesn't call any [\$parseJson](/api/model/instance-methods.html#parsejson) hooks or validate the input. This simply sets each value in the object to this object.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-obj|Object|The values to set
+| Argument | Type   | Description       |
+| -------- | ------ | ----------------- |
+| obj      | Object | The values to set |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
-## $setRelated()
+## \$setRelated()
 
 ```js
 modelInstance.$setRelated(relation, relatedModels);
@@ -879,16 +852,16 @@ Sets related models to a corresponding property in the object.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-relation|string&#124;[Relation](/api/types/#class-relation)|Relation name or a relation instance to set.
-relatedModels|[Model](/api/model/)&#124;[Model](/api/model/)[]|Models to set.
+| Argument      | Type                                               | Description                                  |
+| ------------- | -------------------------------------------------- | -------------------------------------------- |
+| relation      | string&#124;[Relation](/api/types/#class-relation) | Relation name or a relation instance to set. |
+| relatedModels | [Model](/api/model/)&#124;[Model](/api/model/)[]   | Models to set.                               |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
 ##### Examples
 
@@ -902,7 +875,7 @@ person.$setRelated('children', children);
 console.log(person.children[0]);
 ```
 
-## $appendRelated()
+## \$appendRelated()
 
 ```js
 modelInstance.$appendRelated(relation, relatedModels);
@@ -912,16 +885,16 @@ Appends related models to a corresponding property in the object.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-relation|string&#124;[Relation](/api/types/#class-relation)|Relation name or a relation instance to append to.
-relatedModels|[Model](/api/model/)&#124;[Model](/api/model/)[]|Models to append.
+| Argument      | Type                                               | Description                                        |
+| ------------- | -------------------------------------------------- | -------------------------------------------------- |
+| relation      | string&#124;[Relation](/api/types/#class-relation) | Relation name or a relation instance to append to. |
+| relatedModels | [Model](/api/model/)&#124;[Model](/api/model/)[]   | Models to append.                                  |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
 ##### Examples
 
@@ -938,56 +911,53 @@ child1 = person.children[person.children.length - 1];
 child2 = person.children[person.children.length - 2];
 ```
 
-## $loadRelated()
+## \$loadRelated()
 
 ::: warning
-Deprecated! Will be removed in version 3.0. Use [$fetchGraph](#fetchgraph) instead.
+Deprecated! Will be removed in version 3.0. Use [\$fetchGraph](#fetchgraph) instead.
 :::
 
-## $fetchGraph()
+## \$fetchGraph()
 
 ```js
-const builder = person.$fetchGraph(
-  expression,
-  options
-);
+const builder = person.$fetchGraph(expression, options);
 ```
 
 Shortcut for [Person.fetchGraph(person, options)](/api/model/static-methods.html#static-fetchgraph)
 
-## $traverse()
+## \$traverse()
 
 ```js
-person.$traverse(filterConstructor, callback)
+person.$traverse(filterConstructor, callback);
 ```
 
 Shortcut for [Model.traverse(filterConstructor, this, callback)](/api/model/static-methods.html#static-traverse).
 
-## $traverseAsync()
+## \$traverseAsync()
 
 ```js
-person.$traverseAsync(filterConstructor, callback)
+person.$traverseAsync(filterConstructor, callback);
 ```
 
 Shortcut for [Model.traverseAsync(filterConstructor, this, callback)](/api/model/static-methods.html#static-traverseasync).
 
-## $knex()
+## \$knex()
 
 ```js
-const knex = person.$knex()
+const knex = person.$knex();
 ```
 
 Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
 
-## $transaction()
+## \$transaction()
 
 ```js
-const knex = person.$transaction()
+const knex = person.$transaction();
 ```
 
 Shortcut for [Person.knex()](/api/model/static-methods.html#static-knex).
 
-## $id()
+## \$id()
 
 ```js
 console.log(model.$id()); // -> 100
@@ -1011,8 +981,7 @@ console.log(model.$id()); // -> [100, 20, 30]
 model.$id([100, 20, 30]);
 ```
 
-
-## $beforeValidate()
+## \$beforeValidate()
 
 ```js
 class Person extends Model {
@@ -1030,25 +999,23 @@ You can add any additional validation to this method. If validation fails, simpl
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-jsonSchema|Object|A deep clone of this class's jsonSchema
-json|Object|The JSON object to be validated
-opt|[ModelOptions](/api/types/type-modeloptions)|Optional options
+| Argument   | Type                                         | Description                             |
+| ---------- | -------------------------------------------- | --------------------------------------- |
+| jsonSchema | Object                                       | A deep clone of this class's jsonSchema |
+| json       | Object                                       | The JSON object to be validated         |
+| opt        | [ModelOptions](/api/types/type-modeloptions) | Optional options                        |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-Object|The modified jsonSchema or the input jsonSchema.
+| Type   | Description                                      |
+| ------ | ------------------------------------------------ |
+| Object | The modified jsonSchema or the input jsonSchema. |
 
-## $afterValidate()
+## \$afterValidate()
 
 ```js
 class Person extends Model {
-  $afterValidate(json, opt) {
-
-  }
+  $afterValidate(json, opt) {}
 }
 ```
 
@@ -1060,12 +1027,12 @@ You can do further validation here and throw an error if something goes wrong.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-json|Object|The JSON object to be validated
-opt|[ModelOptions](/api/types/type-modeloptions)|Optional options
+| Argument | Type                                         | Description                     |
+| -------- | -------------------------------------------- | ------------------------------- |
+| json     | Object                                       | The JSON object to be validated |
+| opt      | [ModelOptions](/api/types/type-modeloptions) | Optional options                |
 
-## $validate()
+## \$validate()
 
 ```js
 modelInstance.$validate();
@@ -1073,16 +1040,16 @@ modelInstance.$validate();
 
 Validates the model instance.
 
-Calls [$beforeValidate](/api/model/instance-methods.html#beforevalidate) and [$afterValidate](/api/model/instance-methods.html#aftervalidate) methods. This method is called automatically from [fromJson](/api/model/static-methods.html#static-fromjson) and [$setJson](/api/model/instance-methods.html#setjson) methods. This method can also be
+Calls [\$beforeValidate](/api/model/instance-methods.html#beforevalidate) and [\$afterValidate](/api/model/instance-methods.html#aftervalidate) methods. This method is called automatically from [fromJson](/api/model/static-methods.html#static-fromjson) and [\$setJson](/api/model/instance-methods.html#setjson) methods. This method can also be
 called explicitly when needed.
 
 ##### Throws
 
-Type|Description
-----|-----------------------------
-[ValidationError](/api/types/#class-validationerror)|If validation fails.
+| Type                                                 | Description          |
+| ---------------------------------------------------- | -------------------- |
+| [ValidationError](/api/types/#class-validationerror) | If validation fails. |
 
-## $omit()
+## \$omit()
 
 ```js
 modelInstance.$omit(keys);
@@ -1092,15 +1059,15 @@ Omits a set of properties.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-keys|string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt;|keys to omit
+| Argument | Type                                                     | Description  |
+| -------- | -------------------------------------------------------- | ------------ |
+| keys     | string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt; | keys to omit |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
 ##### Examples
 
@@ -1108,7 +1075,7 @@ Omits a set of properties.
 
 ```js
 const json = person
-  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
   .$omit('lastName')
   .toJSON();
 
@@ -1117,7 +1084,7 @@ console.log(_.has(json, 'lastName')); // --> false
 
 ```js
 const json = person
-  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
   .$omit(['lastName'])
   .toJSON();
 
@@ -1126,14 +1093,14 @@ console.log(_.has(json, 'lastName')); // --> false
 
 ```js
 const json = person
-  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .$omit({lastName: true})
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
+  .$omit({ lastName: true })
   .toJSON();
 
 console.log(_.has(json, 'lastName')); // --> false
 ```
 
-## $pick()
+## \$pick()
 
 ```js
 modelInstance.$pick(keys);
@@ -1143,21 +1110,21 @@ Picks a set of properties.
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|-------------------
-keys|string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt;|keys to pick
+| Argument | Type                                                     | Description  |
+| -------- | -------------------------------------------------------- | ------------ |
+| keys     | string<br>string[]<br>Object&lt;string,&nbsp;boolean&gt; | keys to pick |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[Model](/api/model/)|`this` for chaining
+| Type                 | Description         |
+| -------------------- | ------------------- |
+| [Model](/api/model/) | `this` for chaining |
 
 ##### Examples
 
 ```js
 const json = person
-  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
   .$pick('firstName', 'age')
   .toJSON();
 
@@ -1166,7 +1133,7 @@ console.log(_.has(json, 'lastName')); // --> false
 
 ```js
 const json = person
-  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
   .$pick(['firstName', 'age'])
   .toJSON();
 
@@ -1175,8 +1142,8 @@ console.log(_.has(json, 'lastName')); // --> false
 
 ```js
 const json = person
-  .fromJson({firstName: 'Jennifer', lastName: 'Lawrence', age: 24})
-  .$pick({firstName: true, age: true})
+  .fromJson({ firstName: 'Jennifer', lastName: 'Lawrence', age: 24 })
+  .$pick({ firstName: true, age: true })
   .toJSON();
 
 console.log(_.has(json, 'lastName')); // --> false

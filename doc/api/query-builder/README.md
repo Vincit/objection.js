@@ -8,4 +8,4 @@ QueryBuilder is thenable, meaning that it can be used like a promise. You can `a
 
 See also
 
- * [Custom query builder recipe](/recipes/custom-query-builder.html)
+- [Custom query builder recipe](/recipes/custom-query-builder.html)

@@ -1,6 +1,6 @@
 # Models
 
- A [Model](/api/model/) subclass represents a database table and instances of that class represent table rows. Models are created by inheriting from the [Model](/api/model/) class. A [Model](/api/model/) class can define [relationships](/guide/relations.html) (aka. relations, associations) to other models using the static [relationMappings](/api/model/static-properties.html#static-relationmappings) property.
+A [Model](/api/model/) subclass represents a database table and instances of that class represent table rows. Models are created by inheriting from the [Model](/api/model/) class. A [Model](/api/model/) class can define [relationships](/guide/relations.html) (aka. relations, associations) to other models using the static [relationMappings](/api/model/static-properties.html#static-relationmappings) property.
 
 Models can optionally define a [jsonSchema](/api/model/static-properties.html#static-jsonschema) object that is used for input validation. Every time a [Model](/api/model/) instance is created, it is validated against the [jsonSchema](/api/model/static-properties.html#static-tablename). Note that [Model](/api/model/) instances are implicitly created whenever you call [insert](/api/query-builder/mutate-methods.html#insert), [insertGraph](/api/query-builder/mutate-methods.html#insertgraph), [patch](/api/query-builder/mutate-methods.html#patch) or any other method that takes in model properties (no validation is done when reading from the database).
 
@@ -32,7 +32,6 @@ Model with custom methods, json schema validation and relations. This model is u
 const { Model } = require('objection');
 
 class Person extends Model {
-
   // Table name is the only required property.
   static get tableName() {
     return 'persons';
@@ -58,17 +57,17 @@ class Person extends Model {
   // used for input validation. Whenever a model instance is created
   // either explicitly or implicitly it is checked against this schema.
   // See http://json-schema.org/ for more info.
-  static get jsonSchema () {
+  static get jsonSchema() {
     return {
       type: 'object',
       required: ['firstName', 'lastName'],
 
       properties: {
-        id: {type: 'integer'},
-        parentId: {type: ['integer', 'null']},
-        firstName: {type: 'string', minLength: 1, maxLength: 255},
-        lastName: {type: 'string', minLength: 1, maxLength: 255},
-        age: {type: 'number'},
+        id: { type: 'integer' },
+        parentId: { type: ['integer', 'null'] },
+        firstName: { type: 'string', minLength: 1, maxLength: 255 },
+        lastName: { type: 'string', minLength: 1, maxLength: 255 },
+        age: { type: 'number' },
 
         // Properties defined as objects or arrays are
         // automatically converted to JSON strings when
@@ -79,9 +78,9 @@ class Person extends Model {
         address: {
           type: 'object',
           properties: {
-            street: {type: 'string'},
-            city: {type: 'string'},
-            zipCode: {type: 'string'}
+            street: { type: 'string' },
+            city: { type: 'string' },
+            zipCode: { type: 'string' }
           }
         }
       }

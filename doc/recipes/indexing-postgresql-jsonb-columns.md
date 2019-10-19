@@ -2,8 +2,8 @@
 
 Good reading on the subject:
 
- * [JSONB type performance in PostgreSQL 9.4](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/) and
- * [Postgres 9.4 feature highlight - Indexing JSON data with jsonb data type](http://paquier.xyz/postgresql-2/postgres-9-4-feature-highlight-indexing-jsonb/).
+- [JSONB type performance in PostgreSQL 9.4](https://blog.2ndquadrant.com/jsonb-type-performance-postgresql-9-4/) and
+- [Postgres 9.4 feature highlight - Indexing JSON data with jsonb data type](http://paquier.xyz/postgresql-2/postgres-9-4-feature-highlight-indexing-jsonb/).
 
 ## General Inverted Indexes a.k.a. GIN
 
@@ -44,32 +44,29 @@ Complete example how to try out different index choices.
 Migration:
 
 ```js
-exports.up = (knex) => {
+exports.up = knex => {
   return knex.schema
-    .createTable('Hero', (table) => {
+    .createTable('Hero', table => {
       table.increments('id').primary();
       table.string('name');
       table.jsonb('details');
-      table.integer('homeId').unsigned()
-        .references('id').inTable('Place');
+      table
+        .integer('homeId')
+        .unsigned()
+        .references('id')
+        .inTable('Place');
     })
-    .raw(
-      'CREATE INDEX on ?? USING GIN (??)',
-      ['Hero', 'details']
-    )
-    .raw(
-      "CREATE INDEX on ?? ((??#>>'{type}'))",
-      ['Hero', 'details']
-    )
-    .createTable('Place', (table) => {
+    .raw('CREATE INDEX on ?? USING GIN (??)', ['Hero', 'details'])
+    .raw("CREATE INDEX on ?? ((??#>>'{type}'))", ['Hero', 'details'])
+    .createTable('Place', table => {
       table.increments('id').primary();
       table.string('name');
       table.jsonb('details');
     })
-    .raw(
-      'CREATE INDEX on ?? USING GIN (?? jsonb_path_ops)',
-      ['Place', 'details']
-    );
+    .raw('CREATE INDEX on ?? USING GIN (?? jsonb_path_ops)', [
+      'Place',
+      'details'
+    ]);
 };
 ```
 

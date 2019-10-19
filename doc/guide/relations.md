@@ -26,8 +26,8 @@ If you've used other ORMs you may notice that objection's [relationMappings](/ap
 
 Vocabulary for the relation descriptions:
 
- * source model: The model for which you are writing the `relationMapping` for.
- * related model: The model at the other end of the relation.
+- source model: The model for which you are writing the `relationMapping` for.
+- related model: The model at the other end of the relation.
 
 `BelongsToOneRelation`: Use this relation when the source model has the foreign key
 
@@ -44,7 +44,7 @@ class Animal extends Model {
         to: 'persons.id'
       }
     }
-  }
+  };
 }
 ```
 
@@ -63,7 +63,7 @@ class Person extends Model {
         to: 'animals.ownerId'
       }
     }
-  }
+  };
 }
 ```
 
@@ -82,7 +82,7 @@ class Person extends Model {
         to: 'animals.ownerId'
       }
     }
-  }
+  };
 }
 ```
 
@@ -106,7 +106,7 @@ class Person extends Model {
         to: 'movies.id'
       }
     }
-  }
+  };
 }
 ```
 
@@ -130,7 +130,7 @@ class Person extends Model {
         to: 'movies.id'
       }
     }
-  }
+  };
 }
 ```
 

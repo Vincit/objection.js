@@ -4,17 +4,17 @@ A curated list of plugins and modules for objection. Only plugins that follow [t
 
 ## 3rd party plugins
 
-  * [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for your models
-  * [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
-  * [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
-  * [objection-soft-delete](https://github.com/griffinpp/objection-soft-delete) - Soft delete functionality with minimal configuration
-  * [objection-unique](https://github.com/seegno/objection-unique) - Unique validation for your models
-  * [objection-visibility](https://github.com/oscaroox/objection-visibility) - whitelist/blacklist your model properties
+- [objection-dynamic-finder](https://github.com/snlamm/objection-dynamic-finder) - dynamic finders for your models
+- [objection-guid](https://github.com/seegno/objection-guid) - automatic guid for your models
+- [objection-password](https://github.com/scoutforpets/objection-password) - automatic password hashing for your models
+- [objection-soft-delete](https://github.com/griffinpp/objection-soft-delete) - Soft delete functionality with minimal configuration
+- [objection-unique](https://github.com/seegno/objection-unique) - Unique validation for your models
+- [objection-visibility](https://github.com/oscaroox/objection-visibility) - whitelist/blacklist your model properties
 
 ## Other 3rd party modules
 
- * [objection-filter](https://github.com/tandg-digital/objection-filter) - API filtering on data and related models
- * [objection-graphql](https://github.com/vincit/objection-graphql) - Automatically generates rich graphql schema for objection models
+- [objection-filter](https://github.com/tandg-digital/objection-filter) - API filtering on data and related models
+- [objection-graphql](https://github.com/vincit/objection-graphql) - Automatically generates rich graphql schema for objection models
 
 ## Plugin development best practices
 
@@ -35,27 +35,21 @@ function SomeMixin(Model) {
 Mixins can be then applied like this:
 
 ```js
-class Person extends SomeMixin(Model) {
-
-}
+class Person extends SomeMixin(Model) {}
 ```
 
-This __doesn't__ work since mixins never modify the input:
+This **doesn't** work since mixins never modify the input:
 
 ```js
 // This does absolutely nothing.
 SomeMixin(Model);
-class Person extends Model {
-
-}
+class Person extends Model {}
 ```
 
 Multiple mixins:
 
 ```js
-class Person extends SomeMixin(SomeOtherMixin(Model)) {
-
-}
+class Person extends SomeMixin(SomeOtherMixin(Model)) {}
 ```
 
 There are a couple of helpers in objection main module for applying multiple mixins.
@@ -68,10 +62,8 @@ class Person extends mixin(Model, [
   SomeOtherMixin,
   EvenMoreMixins,
   LolSoManyMixins,
-  ImAMixinWithOptions({foo: 'bar'})
-]) {
-
-}
+  ImAMixinWithOptions({ foo: 'bar' })
+]) {}
 ```
 
 ```js
@@ -82,20 +74,16 @@ const mixins = compose(
   SomeOtherMixin,
   EvenMoreMixins,
   LolSoManyMixins,
-  ImAMixinWithOptions({foo: 'bar'})
+  ImAMixinWithOptions({ foo: 'bar' })
 );
 
-class Person extends mixins(Model) {
-
-}
+class Person extends mixins(Model) {}
 ```
 
 Mixins can also be used as decorators:
 
 ```js
 @SomeMixin
-@MixinWithOptions({foo: 'bar'})
-class Person extends Model {
-
-}
+@MixinWithOptions({ foo: 'bar' })
+class Person extends Model {}
 ```

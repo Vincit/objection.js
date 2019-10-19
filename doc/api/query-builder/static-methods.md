@@ -10,15 +10,15 @@ Create QueryBuilder for a Model subclass. You rarely need to call this. Query bu
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-modelClass|ModelClass|A Model class constructor
+| Argument   | Type       | Description               |
+| ---------- | ---------- | ------------------------- |
+| modelClass | ModelClass | A Model class constructor |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-[QueryBuilder](/api/query-builder/)|The created query builder
+| Type                                | Description               |
+| ----------------------------------- | ------------------------- |
+| [QueryBuilder](/api/query-builder/) | The created query builder |
 
 ## parseRelationExpression()
 
@@ -30,12 +30,12 @@ Parses a string relation expression into the [object notation](/api/types/#relat
 
 ##### Arguments
 
-Argument|Type|Description
---------|----|--------------------
-expr|[RelationExpression](/api/types/#type-relationexpression)|A relation expression string or object.
+| Argument | Type                                                      | Description                             |
+| -------- | --------------------------------------------------------- | --------------------------------------- |
+| expr     | [RelationExpression](/api/types/#type-relationexpression) | A relation expression string or object. |
 
 ##### Return value
 
-Type|Description
-----|-----------------------------
-object|The relation expression in object notation.
+| Type   | Description                                 |
+| ------ | ------------------------------------------- |
+| object | The relation expression in object notation. |

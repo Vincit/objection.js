@@ -20,7 +20,7 @@ For a pull request to get merged it needs to have the following things:
 
 1. **A good description of what the PR fixes or adds. You can just add a link to the corresponding issue.**
 
-2. **Tests that verify the fix/feature.** It's possible to create a PR without tests and ask for someone else to write them but in that case it may take a long time or forever until someone finds time to do it. *Untested code will never get merged!*
+2. **Tests that verify the fix/feature.** It's possible to create a PR without tests and ask for someone else to write them but in that case it may take a long time or forever until someone finds time to do it. _Untested code will never get merged!_
 
 3. **For features you also need to write documentation.** See the [development setup](/guide/contributing.html#development-setup) section for instructions on how to write documentation.
 

@@ -11,13 +11,13 @@ Each hook type serve a different purpose. We'll go through the different types i
 
 These hooks are executed in different stages of each query type (find, update, insert, delete) for **model instances**. The following hooks exist:
 
-* [$beforeInsert](/api/model/instance-methods.html#beforeinsert)
-* [$afterInsert](/api/model/instance-methods.html#afterinsert)
-* [$beforeUpdate](/api/model/instance-methods.html#beforeupdate)
-* [$afterUpdate](/api/model/instance-methods.html#afterupdate)
-* [$beforeDelete](/api/model/instance-methods.html#beforedelete)
-* [$afterDelete](/api/model/instance-methods.html#afterdelete)
-* [$afterFind](/api/model/instance-methods.html#afterfind)
+- [\$beforeInsert](/api/model/instance-methods.html#beforeinsert)
+- [\$afterInsert](/api/model/instance-methods.html#afterinsert)
+- [\$beforeUpdate](/api/model/instance-methods.html#beforeupdate)
+- [\$afterUpdate](/api/model/instance-methods.html#afterupdate)
+- [\$beforeDelete](/api/model/instance-methods.html#beforedelete)
+- [\$afterDelete](/api/model/instance-methods.html#afterdelete)
+- [\$afterFind](/api/model/instance-methods.html#afterfind)
 
 All of these are instance methods on a model. Therefore you can access the model instance's properties through `this`.
 
@@ -59,7 +59,9 @@ await arnold.$query().delete();
 
 // This will NOT execute the delete hooks because we don't have model
 // instance for Arnold.
-await Person.query().delete().where('name', 'Arnold');
+await Person.query()
+  .delete()
+  .where('name', 'Arnold');
 ```
 
 Objection could fetch the items from the database and call the hooks for those model instances, but that would lead to unpredicable performance, and that's something objection tries to avoid. If you need to do something like this, you can do it using [the static query hooks](#static-query-hooks).
@@ -74,8 +76,7 @@ class Person extends Model {
 }
 
 // This will print 'Jennifer'
-await Person
-  .query()
+await Person.query()
   .patch({ firstName: 'Jennifer' })
   .where('id', 1);
 
@@ -95,8 +96,7 @@ class Person extends Model {
 }
 
 // This will print 'hello!'
-await Person
-  .query()
+await Person.query()
   .mergeContext({ hello: 'hello!' })
   .patch({ firstName: 'Jennifer' })
   .where('id', 1);
@@ -121,20 +121,21 @@ class Person extends SomePluginP(Model) {
   }
 }
 ```
+
 :::
 
 ## Static query hooks
 
 Static hooks are executed in different stages of each query type (find, update, insert, delete). Unlike the [instance query hooks](#instance-query-hooks), static hooks are executed once per query. Static hooks are always executed and there are no corner cases like the `$beforeDelete`/`$afterDelete` issue with instance hooks. The following hooks are available:
 
-* [beforeInsert](/api/model/static-methods.html#static-beforeinsert)
-* [afterInsert](/api/model/static-methods.html#static-afterinsert)
-* [beforeUpdate](/api/model/static-methods.html#static-beforeupdate)
-* [afterUpdate](/api/model/static-methods.html#static-afterupdate)
-* [beforeDelete](/api/model/static-methods.html#static-beforedelete)
-* [afterDelete](/api/model/static-methods.html#static-afterdelete)
-* [beforeFind](/api/model/static-methods.html#static-beforefind)
-* [afterFind](/api/model/static-methods.html#static-afterfind)
+- [beforeInsert](/api/model/static-methods.html#static-beforeinsert)
+- [afterInsert](/api/model/static-methods.html#static-afterinsert)
+- [beforeUpdate](/api/model/static-methods.html#static-beforeupdate)
+- [afterUpdate](/api/model/static-methods.html#static-afterupdate)
+- [beforeDelete](/api/model/static-methods.html#static-beforedelete)
+- [afterDelete](/api/model/static-methods.html#static-afterdelete)
+- [beforeFind](/api/model/static-methods.html#static-beforefind)
+- [afterFind](/api/model/static-methods.html#static-afterfind)
 
 The static hooks are passed one argument of type [StaticHookArguments](/api/types/#type-statichookarguments). The most interesting of all properties of that object is the `asFindQuery` parameter that allows you to fetch the items that were/would be affected by the query. For example the following example would fetch the identifiers of all people that would get deleted by the query being executed:
 
@@ -188,36 +189,36 @@ You can also access the model instances for which the query is started, the inpu
 ```js
 class Person extends Model {
   static beforeUpdate({ items, inputItems, relation }) {
-    console.log('items:     ', items)
-    console.log('inputItems:', inputItems)
-    console.log('relation:  ', relation ? relation.name : 'none')
+    console.log('items:     ', items);
+    console.log('inputItems:', inputItems);
+    console.log('relation:  ', relation ? relation.name : 'none');
   }
 
   static afterInsert({ items, inputItems, relation }) {
-    console.log('items:     ', items)
-    console.log('inputItems:', inputItems)
-    console.log('relation:  ', relation ? relation.name : 'none')
+    console.log('items:     ', items);
+    console.log('inputItems:', inputItems);
+    console.log('relation:  ', relation ? relation.name : 'none');
   }
 }
 
-const jennifer = await Person.query().insert({ firstName: 'Jennifer' })
+const jennifer = await Person.query().insert({ firstName: 'Jennifer' });
 // items:      []
 // inputItems: [{ firstName: 'Jennifer' }]
 // relation:   none
 
-await jennifer.$query().patch({ lastName: 'Aniston' })
+await jennifer.$query().patch({ lastName: 'Aniston' });
 // items:      [{ id: 1, firstName: 'Jennifer' }]
 // inputItems: [{ lastName: 'Jennifer' }]
 // relation:   none
 
-await jennifer.$relatedQuery('movies').insert({ name: "We're the Millers" })
+await jennifer.$relatedQuery('movies').insert({ name: "We're the Millers" });
 // items:      [{ id: 1, firstName: 'Jennifer' }]
 // inputItems: [{ name: "We're the Millers" }]
 // relation:   movies
 
 await Person.relatedQuery('pets')
   .for([jennifer, brad])
-  .insert([{ name: 'Cato' }, { name: 'Doggo' }])
+  .insert([{ name: 'Cato' }, { name: 'Doggo' }]);
 // items:      [{ id: 1, firstName: 'Jennifer' }, { id: 2, firstName: 'Brad' }]
 // inputItems: [{ name: 'Cato' }, { name: 'Doggo' }]
 // relation:   pets
@@ -231,7 +232,7 @@ class Person extends Model {
     return {
       result,
       success: true
-    }
+    };
   }
 }
 
@@ -262,4 +263,5 @@ class Person extends SomePlugin(Model) {
   }
 }
 ```
+
 :::

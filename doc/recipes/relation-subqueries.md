@@ -3,12 +3,12 @@
 Let's say you have a `Tweet` model and a `Like` model. `Tweet` has a `HasManyRelation` named `likes` to `Like` table. Now let's assume you'd like to fetch a list of `Tweet`s and get the number of likes for each of them without fetching the actual `Like` rows. This cannot be easily achieved using `withGraphFetched` because of the way the queries are optimized (you can read more [here](/api/query-builder/eager-methods.html#withgraphfetched)). You can leverage SQL's subqueries and the [relatedQuery](/api/model/static-methods.html#static-relatedquery) helper:
 
 ```js
-const tweets = await Tweet
-  .query()
-  .select(
-    'Tweet.*',
-    Tweet.relatedQuery('likes').count().as('numberOfLikes')
-  );
+const tweets = await Tweet.query().select(
+  'Tweet.*',
+  Tweet.relatedQuery('likes')
+    .count()
+    .as('numberOfLikes')
+);
 
 console.log(tweets[4].numberOfLikes);
 ```
@@ -29,9 +29,7 @@ Naturally you can add as many subquery selects as you like. For example you coul
 Another common use case for subqueries is selecting `Tweet`s that have one or more likes. That could also be achieved using joins, but it's often simpler to use a subquery. There should be no performance difference between the two methods on modern database engines.
 
 ```js
-const tweets = await Tweet
-  .query()
-  .whereExists(Tweet.relatedQuery('likes'))
+const tweets = await Tweet.query().whereExists(Tweet.relatedQuery('likes'));
 ```
 
 The generated SQL is something like this:
@@ -49,9 +47,9 @@ where exists (
 You can even use the common `select 1` optimization if you want (I'm fairly sure it's useless nowadays though):
 
 ```js
-const tweets = await Tweet
-  .query()
-  .whereExists(Tweet.relatedQuery('likes').select(1))
+const tweets = await Tweet.query().whereExists(
+  Tweet.relatedQuery('likes').select(1)
+);
 ```
 
 The generated SQL is something like this:
