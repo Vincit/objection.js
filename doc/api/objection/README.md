@@ -24,6 +24,7 @@ const { Model } = require('objection');
 ```js
 const { transaction } = require('objection');
 ```
+
 [The transaction function](/guide/transactions.html)
 
 ## ref
@@ -44,8 +45,12 @@ const { ref } = require('objection');
 await Model.query()
   .select([
     'id',
-    ref('Model.jsonColumn:details.name').castText().as('name'),
-    ref('Model.jsonColumn:details.age').castInt().as('age')
+    ref('Model.jsonColumn:details.name')
+      .castText()
+      .as('name'),
+    ref('Model.jsonColumn:details.age')
+      .castInt()
+      .as('age')
   ])
   .join(
     'OtherModel',
@@ -54,6 +59,25 @@ await Model.query()
     ref('OtherModel.name')
   )
   .where('age', '>', ref('OtherModel.ageLimit'));
+```
+
+`withGraphJoined` and `joinRelated` methods also use `:` as a separator which can lead to ambiquous queries when combined with json references. For example:
+
+```
+jsonColumn:details.name
+```
+
+Can mean two things:
+
+1. column `name` of the relation `jsonColumn.details`
+2. field `name` of the `details` object inside `jsonColumn` column
+
+When used with `withGraphJoined` and `joinRelated` you can use the `from` method of the `ReferenceBuilder` to specify the table:
+
+```js
+await Person.query()
+  .withGraphJoined('children.children')
+  .where(ref('jsonColumn:details.name').from('children:children'), 'Jennifer');
 ```
 
 ## raw
@@ -68,15 +92,14 @@ Also see [the raw query recipe](/recipes/raw-queries.html).
 
 ##### Examples
 
-When using raw SQL segments in queries, it's a good idea to use placeholders instead of  adding user input directly to the SQL to avoid injection errors. Placeholders are sent to the database engine which then takes care of interpolating the SQL safely.
+When using raw SQL segments in queries, it's a good idea to use placeholders instead of adding user input directly to the SQL to avoid injection errors. Placeholders are sent to the database engine which then takes care of interpolating the SQL safely.
 
 You can use `??` as a placeholder for identifiers (column names, aliases etc.) and `?` for values.
 
 ```js
 const { raw } = require('objection');
 
-const result = await Person
-  .query()
+const result = await Person.query()
   .select(raw('coalesce(sum(??), 0) as ??', ['age', 'ageSum']))
   .where('age', '<', raw('? + ?', [50, 25]));
 
@@ -86,26 +109,29 @@ console.log(result[0].ageSum);
 You can use `raw` in insert and update queries too:
 
 ```js
-await Person
-  .query()
-  .patch({
-    age: raw('age + ?', 10)
-  })
+await Person.query().patch({
+  age: raw('age + ?', 10)
+});
 ```
 
 You can also use named placeholders. `:someName:` for identifiers (column names, aliases etc.) and `:someName` for values.
 
 ```js
-await Person
-  .query()
-  .select(raw('coalesce(sum(:sumColumn:), 0) as :alias:', {
-    sumColumn: 'age',
-    alias: 'ageSum'
-  }))
-  .where('age', '<', raw(':value1 + :value2', {
-    value1: 50,
-    value2: 25
-  }));
+await Person.query()
+  .select(
+    raw('coalesce(sum(:sumColumn:), 0) as :alias:', {
+      sumColumn: 'age',
+      alias: 'ageSum'
+    })
+  )
+  .where(
+    'age',
+    '<',
+    raw(':value1 + :value2', {
+      value1: 50,
+      value2: 25
+    })
+  );
 ```
 
 You can nest `ref`, `raw`, `val` and query builders (both knex and objection) in `raw` calls
@@ -134,7 +160,7 @@ Deprecated! Will be removed in 3.0. Use [val](#val) instead.
 ## val
 
 ```js
-const { val } = require('objection')
+const { val } = require('objection');
 ```
 
 Factory function that returns a [ValueBuilder](/api/types/#class-valuebuilder) instance. [ValueBuilder](/api/types/#class-valuebuilder) helps build values of different types.
@@ -145,26 +171,24 @@ Factory function that returns a [ValueBuilder](/api/types/#class-valuebuilder) i
 const { val, ref } = require('objection');
 
 // Compare json objects
-await Model
-  .query()
-  .where(
-    ref('Model.jsonColumn:details'),
-    '=',
-    val({name: 'Jennifer', age: 29})
-  )
+await Model.query().where(
+  ref('Model.jsonColumn:details'),
+  '=',
+  val({ name: 'Jennifer', age: 29 })
+);
 
 // Insert an array.
-await Model
-  .query()
-  .insert({
-    numbers: val([1, 2, 3]).asArray().castTo('real[]')
-  })
+await Model.query().insert({
+  numbers: val([1, 2, 3])
+    .asArray()
+    .castTo('real[]')
+});
 ```
 
 ## fn
 
 ```js
-const { fn } = require('objection')
+const { fn } = require('objection');
 ```
 
 Factory function that returns a [FunctionBuilder](/api/types/#class-functionbuilder) instance. [FunctionBuilder](/api/types/#class-functionbuilder) helps calling SQL functions. The `fn` function also has properties for most common functions:
@@ -191,22 +215,10 @@ All arguments are interpreted as values by default. Use `ref` to refer to column
 const { fn, ref } = require('objection');
 
 // Compare nullable numbers
-await Model
-  .query()
-  .where(
-    fn('coalesce', ref('age'), 0),
-    '>',
-    30
-  )
+await Model.query().where(fn('coalesce', ref('age'), 0), '>', 30);
 
 // The same example using the fn.coalesce shortcut
-await Model
-  .query()
-  .where(
-    fn.coalesce(ref('age'), 0),
-    '>',
-    30
-  )
+await Model.query().where(fn.coalesce(ref('age'), 0), '>', 30);
 ```
 
 ## mixin
@@ -227,10 +239,8 @@ class Person extends mixin(Model, [
   SomeOtherMixin,
   EvenMoreMixins,
   LolSoManyMixins,
-  ImAMixinWithOptions({foo: 'bar'})
-]) {
-
-}
+  ImAMixinWithOptions({ foo: 'bar' })
+]) {}
 ```
 
 ## compose
@@ -251,12 +261,10 @@ const mixins = compose(
   SomeOtherMixin,
   EvenMoreMixins,
   LolSoManyMixins,
-  ImAMixinWithOptions({foo: 'bar'})
+  ImAMixinWithOptions({ foo: 'bar' })
 );
 
-class Person extends mixins(Model) {
-
-}
+class Person extends mixins(Model) {}
 ```
 
 ## snakeCaseMappers
@@ -267,9 +275,9 @@ const { snakeCaseMappers } = require('objection');
 
 Function for adding snake_case to camelCase conversion to objection models. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `snakeCaseMappers` function accepts an options object. The available options are:
 
-Option|Type|Description
----------|-------|------------------------
-upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
+| Option    | Type    | Description                                          |
+| --------- | ------- | ---------------------------------------------------- |
+| upperCase | boolean | Set to `true` if your columns are UPPER_SNAKE_CASED. |
 
 ##### Examples
 
@@ -303,9 +311,9 @@ const { knexSnakeCaseMappers } = require('objection');
 
 Function for adding a snake_case to camelCase conversion to `knex`. Better documented [here](/recipes/snake-case-to-camel-case-conversion.html). The `knexSnakeCaseMappers` function accepts an options object. The available options are:
 
-Option|Type|Description
----------|-------|------------------------
-upperCase|boolean|Set to `true` if your columns are UPPER_SNAKE_CASED.
+| Option    | Type    | Description                                          |
+| --------- | ------- | ---------------------------------------------------- |
+| upperCase | boolean | Set to `true` if your columns are UPPER_SNAKE_CASED. |
 
 ##### Examples
 
