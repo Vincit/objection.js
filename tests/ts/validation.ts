@@ -2,7 +2,12 @@ import { ValidationError } from '../../typings/objection';
 import { Person } from './fixtures/person';
 
 (async () => {
-  Person.fromJson({ firstName: 'jennifer', lastName: 'Lawrence' });
+  const person = Person.fromJson({ firstName: 'jennifer', lastName: 'Lawrence' });
+
+  person.$validate();
+  person.$validate(person);
+  person.$validate({ firstName: 'jennifer' }, { patch: true });
+
   await Person.query().insert({ firstName: 'jennifer', lastName: 'Lawrence' });
   await Person.query()
     .update({ firstName: 'jennifer', lastName: 'Lawrence' })

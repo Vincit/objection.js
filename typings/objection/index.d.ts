@@ -1544,7 +1544,7 @@ declare namespace Objection {
     $parseJson(json: Pojo, opt?: ModelOptions): Pojo;
 
     $beforeValidate(jsonSchema: JSONSchema, json: Pojo, opt: ModelOptions): JSONSchema;
-    $validate(json: Pojo, opt: ModelOptions): Pojo; // may throw ValidationError if validation fails
+    $validate(json?: Pojo, opt?: ModelOptions): Pojo; // may throw ValidationError if validation fails
     $afterValidate(json: Pojo, opt: ModelOptions): void; // may throw ValidationError if validation fails
 
     $beforeInsert(queryContext: QueryContext): Promise<any> | void;
