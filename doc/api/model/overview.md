@@ -25,7 +25,7 @@ By overriding the lifecycle methods, you can have different layouts for the data
 
 All instance methods of models are prefixed with `$` letter so that they won’t overlap with database properties. All properties that start with `$` are also removed from `database` and `external` layouts.
 
-In addition to these data formatting hooks, Model also has query lifecycle hooks
+In addition to these data formatting hooks, Model also has query and validation lifecycle hooks
 
 * [$beforeUpdate](/api/model/instance-methods.html#beforeupdate)
 * [$afterUpdate](/api/model/instance-methods.html#afterupdate)
@@ -34,3 +34,5 @@ In addition to these data formatting hooks, Model also has query lifecycle hooks
 * [$beforeDelete](/api/model/instance-methods.html#beforedelete)
 * [$afterDelete](/api/model/instance-methods.html#afterdelete)
 * [$afterGet](/api/model/instance-methods.html#afterget)
+* [$beforeValidate](/api/model/instance-methods.html#beforevalidate)
+* [$afterValidate](/api/model/instance-methods.html#aftervalidate)
