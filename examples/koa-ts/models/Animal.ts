@@ -25,8 +25,8 @@ export default class Animal extends Model {
     }
   }
 
-  // The relationMappings property can be a thunk to prevent
-  // circular dependencies.
+  // This object defines the relations to other models. The relationMappings
+  // property can be a thunk to prevent circular dependencies.
   static relationMappings = (): RelationMappings => ({
     owner: {
       relation: Model.BelongsToOneRelation,
