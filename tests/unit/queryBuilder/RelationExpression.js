@@ -1359,7 +1359,10 @@ describe('RelationExpression', () => {
         });
       });
 
-      expect(items).to.eql([{ exprName: 'a', relation: 'aa' }, { exprName: 'a', relation: 'aa' }]);
+      expect(items).to.eql([
+        { exprName: 'a', relation: 'aa' },
+        { exprName: 'a', relation: 'aa' }
+      ]);
     });
 
     it('should work with all recursive expressions', () => {

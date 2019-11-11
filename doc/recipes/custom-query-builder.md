@@ -73,10 +73,10 @@ TIP: Consider using [modifiers](/recipes/modifiers.html#usage-in-a-query) instea
 
 # Extending the query builder in typescript
 
-With typescript, you need to add some extra type properties for the custom query builder. These are necessary until typescript fully supports our use case. The good news is that you only need to define them once, for the shared `BaseModel`. If you don't already have one, it's time to crate it.
+With typescript, you need to add some extra type properties for the custom query builder. These are necessary until typescript fully supports our use case. The good news is that you only need to define them once for the shared `BaseModel`. If you don't already have one, it's time to crate it.
 
 ```ts
-import { Model } from 'objection';
+import { Model, Page } from 'objection';
 
 class MyQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   // These are necessary. You can just copy-paste them and change the
@@ -84,6 +84,7 @@ class MyQueryBuilder<M extends Model, R = M[]> extends QueryBuilder<M, R> {
   ArrayQueryBuilderType!: MyQueryBuilder<M, M[]>;
   SingleQueryBuilderType!: MyQueryBuilder<M, M>;
   NumberQueryBuilderType!: MyQueryBuilder<M, number>;
+  PageQueryBuilderType!: MyQueryBuilder<M, Page<M>>;
 
   myCustomMethod(something: number): this {
     doSomething(something);
@@ -101,7 +102,9 @@ class BaseModel extends Model {
 Now all models you inherit from `BaseModel` use `MyQueryBuilder` as a query builder.
 
 ```js
-class Person extends BaseModel {}
+class Person extends BaseModel {
+  static tableName = 'persons';
+}
 
 await Person.query()
   .where('id', 1)

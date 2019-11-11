@@ -601,16 +601,14 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model1_id: 1 },
-                  { id_col: 2, model1_id: 1 },
-                  { id_col: 3, model1_id: 1 },
-                  { id_col: 4, model1_id: 2 },
-                  { id_col: 5, model1_id: 3 },
-                  { id_col: 6, model1_id: 3 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model1_id: 1 },
+                { id_col: 2, model1_id: 1 },
+                { id_col: 3, model1_id: 1 },
+                { id_col: 4, model1_id: 2 },
+                { id_col: 5, model1_id: 3 },
+                { id_col: 6, model1_id: 3 }
+              ]);
             });
         });
 
@@ -624,16 +622,14 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model1_id: 1 },
-                  { id_col: 2, model1_id: 1 },
-                  { id_col: 3, model1_id: 1 },
-                  { id_col: 4, model1_id: 2 },
-                  { id_col: 5, model1_id: 3 },
-                  { id_col: 6, model1_id: 3 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model1_id: 1 },
+                { id_col: 2, model1_id: 1 },
+                { id_col: 3, model1_id: 1 },
+                { id_col: 4, model1_id: 2 },
+                { id_col: 5, model1_id: 3 },
+                { id_col: 6, model1_id: 3 }
+              ]);
             });
         });
 
@@ -663,16 +659,14 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model1_id: 1 },
-                  { id_col: 2, model1_id: 1 },
-                  { id_col: 3, model1_id: 1 },
-                  { id_col: 4, model1_id: 2 },
-                  { id_col: 5, model1_id: 1 },
-                  { id_col: 6, model1_id: 3 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model1_id: 1 },
+                { id_col: 2, model1_id: 1 },
+                { id_col: 3, model1_id: 1 },
+                { id_col: 4, model1_id: 2 },
+                { id_col: 5, model1_id: 1 },
+                { id_col: 6, model1_id: 3 }
+              ]);
             });
         });
 
@@ -686,16 +680,14 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model1_id: 1 },
-                  { id_col: 2, model1_id: 1 },
-                  { id_col: 3, model1_id: 1 },
-                  { id_col: 4, model1_id: 2 },
-                  { id_col: 5, model1_id: 3 },
-                  { id_col: 6, model1_id: 3 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model1_id: 1 },
+                { id_col: 2, model1_id: 1 },
+                { id_col: 3, model1_id: 1 },
+                { id_col: 4, model1_id: 2 },
+                { id_col: 5, model1_id: 3 },
+                { id_col: 6, model1_id: 3 }
+              ]);
             });
         });
 
@@ -709,16 +701,14 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(6);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model1_id: 1 },
-                  { id_col: 2, model1_id: 1 },
-                  { id_col: 3, model1_id: 1 },
-                  { id_col: 4, model1_id: 2 },
-                  { id_col: 5, model1_id: 1 },
-                  { id_col: 6, model1_id: 3 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model1_id: 1 },
+                { id_col: 2, model1_id: 1 },
+                { id_col: 3, model1_id: 1 },
+                { id_col: 4, model1_id: 2 },
+                { id_col: 5, model1_id: 1 },
+                { id_col: 6, model1_id: 3 }
+              ]);
             });
         });
       });
@@ -783,15 +773,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              chai
-                .expect(rows)
-                .to.containSubset([
-                  { model2Id: 1, model1Id: 3 },
-                  { model2Id: 1, model1Id: 5 },
-                  { model2Id: 2, model1Id: 4 },
-                  { model2Id: 2, model1Id: 5 },
-                  { model2Id: 2, model1Id: 6 }
-                ]);
+              chai.expect(rows).to.containSubset([
+                { model2Id: 1, model1Id: 3 },
+                { model2Id: 1, model1Id: 5 },
+                { model2Id: 2, model1Id: 4 },
+                { model2Id: 2, model1Id: 5 },
+                { model2Id: 2, model1Id: 6 }
+              ]);
             });
         });
 
@@ -805,15 +793,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              chai
-                .expect(rows)
-                .to.containSubset([
-                  { model2Id: 1, model1Id: 3 },
-                  { model2Id: 1, model1Id: 5 },
-                  { model2Id: 2, model1Id: 4 },
-                  { model2Id: 2, model1Id: 5 },
-                  { model2Id: 2, model1Id: 6 }
-                ]);
+              chai.expect(rows).to.containSubset([
+                { model2Id: 1, model1Id: 3 },
+                { model2Id: 1, model1Id: 5 },
+                { model2Id: 2, model1Id: 4 },
+                { model2Id: 2, model1Id: 5 },
+                { model2Id: 2, model1Id: 6 }
+              ]);
             });
         });
 
@@ -828,16 +814,14 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(6);
-                chai
-                  .expect(rows)
-                  .to.containSubset([
-                    { model2Id: 1, model1Id: 3 },
-                    { model2Id: 1, model1Id: 5 },
-                    { model2Id: 1, model1Id: 6 },
-                    { model2Id: 2, model1Id: 4 },
-                    { model2Id: 2, model1Id: 5 },
-                    { model2Id: 2, model1Id: 6 }
-                  ]);
+                chai.expect(rows).to.containSubset([
+                  { model2Id: 1, model1Id: 3 },
+                  { model2Id: 1, model1Id: 5 },
+                  { model2Id: 1, model1Id: 6 },
+                  { model2Id: 2, model1Id: 4 },
+                  { model2Id: 2, model1Id: 5 },
+                  { model2Id: 2, model1Id: 6 }
+                ]);
               });
           });
 
@@ -850,16 +834,14 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(6);
-                chai
-                  .expect(rows)
-                  .to.containSubset([
-                    { model2Id: 1, model1Id: 3 },
-                    { model2Id: 1, model1Id: 5 },
-                    { model2Id: 1, model1Id: 6 },
-                    { model2Id: 2, model1Id: 4 },
-                    { model2Id: 2, model1Id: 5 },
-                    { model2Id: 2, model1Id: 6 }
-                  ]);
+                chai.expect(rows).to.containSubset([
+                  { model2Id: 1, model1Id: 3 },
+                  { model2Id: 1, model1Id: 5 },
+                  { model2Id: 1, model1Id: 6 },
+                  { model2Id: 2, model1Id: 4 },
+                  { model2Id: 2, model1Id: 5 },
+                  { model2Id: 2, model1Id: 6 }
+                ]);
               });
           });
 
@@ -872,18 +854,16 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(8);
-                chai
-                  .expect(rows)
-                  .to.containSubset([
-                    { model2Id: 1, model1Id: 1 },
-                    { model2Id: 1, model1Id: 2 },
-                    { model2Id: 1, model1Id: 3 },
-                    { model2Id: 2, model1Id: 1 },
-                    { model2Id: 2, model1Id: 2 },
-                    { model2Id: 2, model1Id: 4 },
-                    { model2Id: 2, model1Id: 5 },
-                    { model2Id: 2, model1Id: 6 }
-                  ]);
+                chai.expect(rows).to.containSubset([
+                  { model2Id: 1, model1Id: 1 },
+                  { model2Id: 1, model1Id: 2 },
+                  { model2Id: 1, model1Id: 3 },
+                  { model2Id: 2, model1Id: 1 },
+                  { model2Id: 2, model1Id: 2 },
+                  { model2Id: 2, model1Id: 4 },
+                  { model2Id: 2, model1Id: 5 },
+                  { model2Id: 2, model1Id: 6 }
+                ]);
               });
           });
         }
@@ -898,15 +878,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              chai
-                .expect(rows)
-                .to.containSubset([
-                  { model2Id: 1, model1Id: 3 },
-                  { model2Id: 1, model1Id: 5 },
-                  { model2Id: 2, model1Id: 4 },
-                  { model2Id: 2, model1Id: 5 },
-                  { model2Id: 2, model1Id: 6 }
-                ]);
+              chai.expect(rows).to.containSubset([
+                { model2Id: 1, model1Id: 3 },
+                { model2Id: 1, model1Id: 5 },
+                { model2Id: 2, model1Id: 4 },
+                { model2Id: 2, model1Id: 5 },
+                { model2Id: 2, model1Id: 6 }
+              ]);
             });
         });
 
@@ -920,15 +898,13 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(5);
-              chai
-                .expect(rows)
-                .to.containSubset([
-                  { model2Id: 1, model1Id: 3 },
-                  { model2Id: 1, model1Id: 5, extra3: 'foobar' },
-                  { model2Id: 2, model1Id: 4 },
-                  { model2Id: 2, model1Id: 5 },
-                  { model2Id: 2, model1Id: 6 }
-                ]);
+              chai.expect(rows).to.containSubset([
+                { model2Id: 1, model1Id: 3 },
+                { model2Id: 1, model1Id: 5, extra3: 'foobar' },
+                { model2Id: 2, model1Id: 4 },
+                { model2Id: 2, model1Id: 5 },
+                { model2Id: 2, model1Id: 6 }
+              ]);
             });
         });
       });

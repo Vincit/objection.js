@@ -71,10 +71,7 @@ describe('utils', () => {
           }
         };
 
-      const m3 = compose(
-        m1,
-        m2
-      );
+      const m3 = compose(m1, m2);
       const m4 = compose([m1, m2]);
 
       const Y = m3(X);

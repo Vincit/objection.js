@@ -16,6 +16,7 @@ import * as ajv from 'ajv';
 import * as dbErrors from 'db-errors';
 import * as knex from 'knex';
 
+// Export the entire Objection namespace.
 export = Objection;
 
 declare namespace Objection {
@@ -156,8 +157,9 @@ declare namespace Objection {
   type Identity<T> = (value: T) => T;
   type AnyQueryBuilder = QueryBuilder<any, any>;
   type AnyModelClass = ModelClass<any>;
+  type ModifierFunc<QB extends AnyQueryBuilder> = (qb: QB, ...args: any[]) => void;
   type Modifier<QB extends AnyQueryBuilder = AnyQueryBuilder> =
-    | ((qb: QB, ...args: any[]) => void)
+    | ModifierFunc<QB>
     | string
     | string[]
     | Record<string, Expression<PrimitiveValue>>;
@@ -191,7 +193,9 @@ declare namespace Objection {
     [K in NonFunctionPropertyNames<T>]?: Defined<T[K]> extends Model
       ? T[K]
       : Defined<T[K]> extends Array<infer I>
-      ? (I extends Model ? I[] : Expression<T[K]>)
+      ? I extends Model
+        ? I[]
+        : Expression<T[K]>
       : Expression<T[K]>;
   };
 
@@ -211,7 +215,9 @@ declare namespace Objection {
     [K in NonFunctionPropertyNames<T>]?: Defined<T[K]> extends Model
       ? PartialModelGraph<Defined<T[K]>>
       : Defined<T[K]> extends Array<infer I>
-      ? (I extends Model ? PartialModelGraph<I>[] : Expression<T[K]>)
+      ? I extends Model
+        ? PartialModelGraph<I>[]
+        : Expression<T[K]>
       : Expression<T[K]>;
   };
 
@@ -233,7 +239,9 @@ declare namespace Objection {
       [K in keyof T]?: Defined<T[K]> extends Model
         ? never
         : Defined<T[K]> extends Array<infer I>
-        ? (I extends Model ? never : K)
+        ? I extends Model
+          ? never
+          : K
         : T[K] extends Function
         ? never
         : K;
@@ -249,7 +257,9 @@ declare namespace Objection {
       [K in keyof T]?: Defined<T[K]> extends Model
         ? K
         : Defined<T[K]> extends Array<infer I>
-        ? (I extends Model ? K : never)
+        ? I extends Model
+          ? K
+          : never
         : never;
     }[keyof T]
   >;
@@ -513,7 +523,7 @@ declare namespace Objection {
 
   interface OrderByMethod<QB extends AnyQueryBuilder> {
     (column: ColumnRef, order?: OrderByDirection): QB;
-    (columns: ({ column: ColumnRef; order?: OrderByDirection } | ColumnRef)[]): QB;
+    (columns: { column: ColumnRef; order?: OrderByDirection } | ColumnRef[]): QB;
   }
 
   interface OrderByRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
@@ -1157,13 +1167,17 @@ declare namespace Objection {
   type RelatedQueryBuilder<T> = T extends Model
     ? SingleQueryBuilder<T['QueryBuilderType']>
     : T extends Array<infer I>
-    ? (I extends Model ? I['QueryBuilderType'] : never)
+    ? I extends Model
+      ? I['QueryBuilderType']
+      : never
     : never;
 
   type ArrayRelatedQueryBuilder<T> = T extends Model
     ? T['QueryBuilderType']
     : T extends Array<infer I>
-    ? (I extends Model ? I['QueryBuilderType'] : never)
+    ? I extends Model
+      ? I['QueryBuilderType']
+      : never
     : never;
 
   interface RelatedQueryMethod<M extends Model> {
@@ -1267,13 +1281,15 @@ declare namespace Objection {
     [relationName: string]: RelationMapping<any>;
   }
 
+  export type RelationMappingsThunk = () => RelationMappings;
+
   type ModelClassFactory = () => AnyModelClass;
   type ModelClassSpecifier = ModelClassFactory | AnyModelClass | string;
   type RelationMappingHook<M extends Model> = (
     model: M,
     context: QueryContext
   ) => Promise<void> | void;
-  type RelationMappingColumnRef = string | ReferenceBuilder | (string | ReferenceBuilder)[];
+  type RelationMappingColumnRef = string | ReferenceBuilder | string | ReferenceBuilder[];
 
   export interface RelationMapping<M extends Model> {
     relation: RelationType;
@@ -1501,7 +1517,7 @@ declare namespace Objection {
     static query: StaticQueryMethod;
     static relatedQuery: StaticRelatedQueryMethod;
     static columnNameMappers: ColumnNameMappers;
-    static relationMappings: RelationMappings | (() => RelationMappings);
+    static relationMappings: RelationMappings | RelationMappingsThunk;
 
     static fromJson: FromJsonMethod;
     static fromDatabaseJson: FromJsonMethod;

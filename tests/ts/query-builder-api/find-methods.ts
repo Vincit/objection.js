@@ -10,7 +10,10 @@ import { Person } from '../fixtures/person';
     .patch({ firstName: 'Jennifer' });
 
   const [person1, person2] = await Person.query().findByIds([1, 2]);
-  const [person3, person4] = await Person.query().findByIds([[1, '10'], [2, '10']]);
+  const [person3, person4] = await Person.query().findByIds([
+    [1, '10'],
+    [2, '10']
+  ]);
 
   await Person.query().findOne({
     firstName: 'Jennifer',
@@ -265,7 +268,14 @@ import { Person } from '../fixtures/person';
   await Person.query().whereComposite(['id', 'name'], '=', [1, 'Jennifer']);
   await Person.query().whereComposite('id', 1);
 
-  await Person.query().whereInComposite(['a', 'b'], [[1, 2], [3, 4], [1, 4]]);
+  await Person.query().whereInComposite(
+    ['a', 'b'],
+    [
+      [1, 2],
+      [3, 4],
+      [1, 4]
+    ]
+  );
   await Person.query().whereInComposite('a', [[1], [3], [1]]);
   await Person.query().whereInComposite('a', [1, 3, 1]);
   await Person.query().whereInComposite(['a', 'b'], Person.query().select('a', 'b'));

@@ -668,7 +668,10 @@ describe('Model', () => {
       let model = Model1.fromJson({
         id: 10,
         model1Id: 13,
-        relation1: [{ id: 11, model1Id: 10 }, { id: 12, model1Id: 10 }],
+        relation1: [
+          { id: 11, model1Id: 10 },
+          { id: 12, model1Id: 10 }
+        ],
         relation2: { id: 13, model1Id: null }
       });
 
@@ -713,7 +716,10 @@ describe('Model', () => {
         id: 10,
         model1Id: 13
       });
-      model.relation1 = [{ id: 11, model1Id: 10 }, { id: 12, model1Id: 10 }];
+      model.relation1 = [
+        { id: 11, model1Id: 10 },
+        { id: 12, model1Id: 10 }
+      ];
       model.relation2 = { id: 13, model1Id: null };
 
       let modelWithRelationships = Model1.fromJson(model);
@@ -749,7 +755,10 @@ describe('Model', () => {
         {
           id: 10,
           model1Id: 13,
-          relation1: [{ id: 11, model1Id: 10 }, { id: 12, model1Id: 10 }],
+          relation1: [
+            { id: 11, model1Id: 10 },
+            { id: 12, model1Id: 10 }
+          ],
           relation2: { id: 13, model1Id: null }
         },
         { skipParseRelations: true }
@@ -1284,7 +1293,10 @@ describe('Model', () => {
           foo: 112
         },
 
-        rel2: [{ a: 102, b: 12, foo: 114 }, { a: 103, b: 13, foo: 116 }]
+        rel2: [
+          { a: 102, b: 12, foo: 114 },
+          { a: 103, b: 13, foo: 116 }
+        ]
       });
     });
 
@@ -1319,7 +1331,10 @@ describe('Model', () => {
           b: 11
         },
 
-        rel2: [{ a: 102, b: 12 }, { a: 103, b: 13 }]
+        rel2: [
+          { a: 102, b: 12 },
+          { a: 103, b: 13 }
+        ]
       });
     });
 
@@ -1354,7 +1369,10 @@ describe('Model', () => {
           b: 11
         },
 
-        rel2: [{ a: 102, b: 12 }, { a: 103, b: 13 }]
+        rel2: [
+          { a: 102, b: 12 },
+          { a: 103, b: 13 }
+        ]
       });
     });
 
@@ -1393,7 +1411,10 @@ describe('Model', () => {
           bar: 1111
         },
 
-        rel2: [{ a: 102, b: 12, foo: 114, bar: 1224 }, { a: 103, b: 13, foo: 116, bar: 1339 }]
+        rel2: [
+          { a: 102, b: 12, foo: 114, bar: 1224 },
+          { a: 103, b: 13, foo: 116, bar: 1339 }
+        ]
       });
     });
 
@@ -2180,11 +2201,17 @@ describe('Model', () => {
       model = Model1.fromJson({
         id: 1,
         model1Id: 2,
-        relation1: [{ id: 4, model1Id: 1 }, { id: 5, model1Id: 1 }],
+        relation1: [
+          { id: 4, model1Id: 1 },
+          { id: 5, model1Id: 1 }
+        ],
         relation2: {
           id: 2,
           model1Id: 3,
-          relation1: [{ id: 6, model1Id: 2 }, { id: 7, model1Id: 2 }],
+          relation1: [
+            { id: 6, model1Id: 2 },
+            { id: 7, model1Id: 2 }
+          ],
           relation2: {
             id: 3,
             model1Id: null,
@@ -2388,11 +2415,17 @@ describe('Model', () => {
       model = Model1.fromJson({
         id: 1,
         model1Id: 2,
-        relation1: [{ id: 4, model1Id: 1 }, { id: 5, model1Id: 1 }],
+        relation1: [
+          { id: 4, model1Id: 1 },
+          { id: 5, model1Id: 1 }
+        ],
         relation2: {
           id: 2,
           model1Id: 3,
-          relation1: [{ id: 6, model1Id: 2 }, { id: 7, model1Id: 2 }],
+          relation1: [
+            { id: 6, model1Id: 2 },
+            { id: 7, model1Id: 2 }
+          ],
           relation2: {
             id: 3,
             model1Id: null,

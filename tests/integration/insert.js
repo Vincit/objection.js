@@ -1403,13 +1403,11 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model2_prop1: 'text 1', model2_prop2: 6, model1_id: 1 },
-                  { id_col: 2, model2_prop1: 'text 2', model2_prop2: 3, model1_id: 2 },
-                  { id_col: 3, model2_prop1: 'inserted', model2_prop2: null, model1_id: 1 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model2_prop1: 'text 1', model2_prop2: 6, model1_id: 1 },
+                { id_col: 2, model2_prop1: 'text 2', model2_prop2: 3, model1_id: 2 },
+                { id_col: 3, model2_prop1: 'inserted', model2_prop2: null, model1_id: 1 }
+              ]);
             });
         });
 
@@ -1422,13 +1420,11 @@ module.exports = session => {
             })
             .then(rows => {
               expect(rows).to.have.length(3);
-              chai
-                .expect(rows)
-                .containSubset([
-                  { id_col: 1, model2_prop1: 'text 1', model2_prop2: 6, model1_id: 1 },
-                  { id_col: 2, model2_prop1: 'text 2', model2_prop2: 3, model1_id: 2 },
-                  { id_col: 3, model2_prop1: 'inserted', model2_prop2: null, model1_id: 1 }
-                ]);
+              chai.expect(rows).containSubset([
+                { id_col: 1, model2_prop1: 'text 1', model2_prop2: 6, model1_id: 1 },
+                { id_col: 2, model2_prop1: 'text 2', model2_prop2: 3, model1_id: 2 },
+                { id_col: 3, model2_prop1: 'inserted', model2_prop2: null, model1_id: 1 }
+              ]);
             });
         });
 
@@ -1470,14 +1466,12 @@ module.exports = session => {
               })
               .then(rows => {
                 expect(rows).to.have.length(4);
-                chai
-                  .expect(rows)
-                  .containSubset([
-                    { id_col: 1, model2_prop1: 'text 1', model2_prop2: 6, model1_id: 1 },
-                    { id_col: 2, model2_prop1: 'text 2', model2_prop2: 3, model1_id: 2 },
-                    { id_col: 3, model2_prop1: 'inserted 1', model2_prop2: null, model1_id: 1 },
-                    { id_col: 4, model2_prop1: 'inserted 2', model2_prop2: null, model1_id: 1 }
-                  ]);
+                chai.expect(rows).containSubset([
+                  { id_col: 1, model2_prop1: 'text 1', model2_prop2: 6, model1_id: 1 },
+                  { id_col: 2, model2_prop1: 'text 2', model2_prop2: 3, model1_id: 2 },
+                  { id_col: 3, model2_prop1: 'inserted 1', model2_prop2: null, model1_id: 1 },
+                  { id_col: 4, model2_prop1: 'inserted 2', model2_prop2: null, model1_id: 1 }
+                ]);
               });
           });
         }

@@ -373,7 +373,10 @@ describe('ManyToManyRelation', () => {
   describe('find', () => {
     it('should generate a find query', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
+      let expectedResult = [
+        { a: 1, objectiontmpjoin0: 666 },
+        { a: 2, objectiontmpjoin0: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -541,7 +544,10 @@ describe('ManyToManyRelation', () => {
 
     it('explicit selects should override the RelatedModel.*', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
+      let expectedResult = [
+        { a: 1, objectiontmpjoin0: 666 },
+        { a: 2, objectiontmpjoin0: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -581,7 +587,10 @@ describe('ManyToManyRelation', () => {
       createModifiedRelation({ someColumn: 100 });
 
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
+      let expectedResult = [
+        { a: 1, objectiontmpjoin0: 666 },
+        { a: 2, objectiontmpjoin0: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -621,7 +630,10 @@ describe('ManyToManyRelation', () => {
       createModifiedRelation('modifier');
 
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, objectiontmpjoin0: 666 }, { a: 2, objectiontmpjoin0: 666 }];
+      let expectedResult = [
+        { a: 1, objectiontmpjoin0: 666 },
+        { a: 2, objectiontmpjoin0: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -695,7 +707,10 @@ describe('ManyToManyRelation', () => {
           { a: 'str0', id: 3 }
         ]);
 
-        expect(result).to.eql([{ a: 'str1', id: 1, rid: 3 }, { a: 'str2', id: 2, rid: 4 }]);
+        expect(result).to.eql([
+          { a: 'str1', id: 1, rid: 3 },
+          { a: 'str2', id: 2, rid: 4 }
+        ]);
 
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -703,7 +718,12 @@ describe('ManyToManyRelation', () => {
     });
 
     it('should generate an insert query (composite key)', () => {
-      mockKnexQueryResults = [[{ id: 1, cid: 33, did: 44 }, { id: 2, cid: 33, did: 55 }]];
+      mockKnexQueryResults = [
+        [
+          { id: 1, cid: 33, did: 44 },
+          { id: 2, cid: 33, did: 55 }
+        ]
+      ];
 
       let owner = OwnerModel.fromJson({ aid: 11, bid: 22 });
       let related = [
@@ -753,7 +773,10 @@ describe('ManyToManyRelation', () => {
       mockKnexQueryResults = [[1, 2]];
 
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let related = [{ a: 'str1', rid: 3 }, { a: 'str2', rid: 4 }];
+      let related = [
+        { a: 'str1', rid: 3 },
+        { a: 'str2', rid: 4 }
+      ];
 
       let builder = QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {
@@ -780,7 +803,10 @@ describe('ManyToManyRelation', () => {
           { a: 'str2', id: 2, rid: 4 }
         ]);
 
-        expect(result).to.eql([{ a: 'str1', id: 1, rid: 3 }, { a: 'str2', id: 2, rid: 4 }]);
+        expect(result).to.eql([
+          { a: 'str1', id: 1, rid: 3 },
+          { a: 'str2', id: 2, rid: 4 }
+        ]);
 
         expect(result[0]).to.be.a(RelatedModel);
         expect(result[1]).to.be.a(RelatedModel);
@@ -1308,7 +1334,11 @@ describe('ManyToManyRelation', () => {
         .relateOperationFactory(builder => {
           return compositeKeyRelation.relate(builder, RelationOwner.create(owner));
         })
-        .relate([[33, 44], [33, 55], [66, 77]]);
+        .relate([
+          [33, 44],
+          [33, 55],
+          [66, 77]
+        ]);
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);
@@ -1338,7 +1368,11 @@ describe('ManyToManyRelation', () => {
         .relateOperationFactory(builder => {
           return compositeKeyRelation.relate(builder, RelationOwner.create(owner));
         })
-        .relate([{ cid: 33, did: 44 }, { cid: 33, did: 55 }, { cid: 66, did: 77 }]);
+        .relate([
+          { cid: 33, did: 44 },
+          { cid: 33, did: 55 },
+          { cid: 66, did: 77 }
+        ]);
 
       return builder.then(result => {
         expect(executedQueries).to.have.length(1);

@@ -517,7 +517,13 @@ describe('QueryBuilder', () => {
 
     it('should create a where-in query for composite id and array of choices', () => {
       return QueryBuilder.forClass(TestModel)
-        .whereInComposite(['A.a', 'B.b'], [[1, 2], [3, 4]])
+        .whereInComposite(
+          ['A.a', 'B.b'],
+          [
+            [1, 2],
+            [3, 4]
+          ]
+        )
         .then(() => {
           expect(executedQueries).to.eql([
             'select "Model".* from "Model" where ("A"."a", "B"."b") in ((1, 2), (3, 4))'
@@ -2307,7 +2313,12 @@ describe('QueryBuilder', () => {
 
       mockKnexQueryResults = [
         [{ id: 1 }, { id: 2 }],
-        [{ id: 3, m1Id: 1 }, { id: 4, m1Id: 1 }, { id: 5, m1Id: 2 }, { id: 6, m1Id: 2 }],
+        [
+          { id: 3, m1Id: 1 },
+          { id: 4, m1Id: 1 },
+          { id: 5, m1Id: 2 },
+          { id: 6, m1Id: 2 }
+        ],
         [
           { id: 7, m1Id: 3 },
           { id: 8, m1Id: 3 },
@@ -2338,13 +2349,19 @@ describe('QueryBuilder', () => {
                   id: 3,
                   m1Id: 1,
                   ids: [7, 8],
-                  someRel: [{ id: 7, m1Id: 3, ids: [] }, { id: 8, m1Id: 3, ids: [] }]
+                  someRel: [
+                    { id: 7, m1Id: 3, ids: [] },
+                    { id: 8, m1Id: 3, ids: [] }
+                  ]
                 },
                 {
                   id: 4,
                   m1Id: 1,
                   ids: [9, 10],
-                  someRel: [{ id: 9, m1Id: 4, ids: [] }, { id: 10, m1Id: 4, ids: [] }]
+                  someRel: [
+                    { id: 9, m1Id: 4, ids: [] },
+                    { id: 10, m1Id: 4, ids: [] }
+                  ]
                 }
               ]
             },
@@ -2356,13 +2373,19 @@ describe('QueryBuilder', () => {
                   id: 5,
                   m1Id: 2,
                   ids: [11, 12],
-                  someRel: [{ id: 11, m1Id: 5, ids: [] }, { id: 12, m1Id: 5, ids: [] }]
+                  someRel: [
+                    { id: 11, m1Id: 5, ids: [] },
+                    { id: 12, m1Id: 5, ids: [] }
+                  ]
                 },
                 {
                   id: 6,
                   m1Id: 2,
                   ids: [13, 14],
-                  someRel: [{ id: 13, m1Id: 6, ids: [] }, { id: 14, m1Id: 6, ids: [] }]
+                  someRel: [
+                    { id: 13, m1Id: 6, ids: [] },
+                    { id: 14, m1Id: 6, ids: [] }
+                  ]
                 }
               ]
             }

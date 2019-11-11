@@ -181,7 +181,10 @@ module.exports = session => {
 
       it('findByIds should fetch two models by composite ids', () => {
         return A.query()
-          .findByIds([[1, '1'], [2, '2']])
+          .findByIds([
+            [1, '1'],
+            [2, '2']
+          ])
           .then(models => {
             expect(models).to.eql([
               { id1: 1, id2: '1', aval: 'a', bid3: null, bid4: null },
@@ -201,7 +204,14 @@ module.exports = session => {
 
       it('whereInComposite should fetch multiple models by composite id', () => {
         return A.query()
-          .whereInComposite(['id1', 'id2'], [[1, '2'], [2, '3'], [3, '3']])
+          .whereInComposite(
+            ['id1', 'id2'],
+            [
+              [1, '2'],
+              [2, '3'],
+              [3, '3']
+            ]
+          )
           .orderBy(['id1', 'id2'])
           .then(models => {
             expect(models).to.eql([
@@ -214,7 +224,14 @@ module.exports = session => {
 
       it('whereNotInComposite should fetch multiple models by composite id', () => {
         return A.query()
-          .whereNotInComposite(['id1', 'id2'], [[1, '2'], [2, '3'], [3, '3']])
+          .whereNotInComposite(
+            ['id1', 'id2'],
+            [
+              [1, '2'],
+              [2, '3'],
+              [3, '3']
+            ]
+          )
           .orderBy(['id1', 'id2'])
           .then(models => {
             expect(models).to.eql([
@@ -759,7 +776,10 @@ module.exports = session => {
                     aval: 'a7',
                     bid3: null,
                     bid4: null,
-                    ba: [{ bval: 'b1', id3: 1, id4: '1' }, { bval: 'b2', id3: 1, id4: '2' }]
+                    ba: [
+                      { bval: 'b1', id3: 1, id4: '1' },
+                      { bval: 'b2', id3: 1, id4: '2' }
+                    ]
                   },
                   {
                     id1: 11,

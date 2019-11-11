@@ -512,7 +512,13 @@ qb = qb.whereComposite('id', '>', 1);
 qb = qb.whereComposite(['id1', 'id2'], [1, '2']);
 qb = qb.whereComposite(['id1', 'id2'], Person.query());
 qb = qb.whereInComposite('id', [1, 2]);
-qb = qb.whereInComposite(['id1', 'id2'], [[1, '2'], [1, '2']]);
+qb = qb.whereInComposite(
+  ['id1', 'id2'],
+  [
+    [1, '2'],
+    [1, '2']
+  ]
+);
 qb = qb.whereInComposite(['id1', 'id2'], Person.query().select('firstName', 'lastName'));
 
 // Query builder hooks. runBefore() and runAfter() don't immediately affect the result.
@@ -970,7 +976,10 @@ const relQueryResult1: Promise<Animal[]> = Person.relatedQuery('pets').for(1);
 const relQueryResult2: Promise<Animal[]> = Person.relatedQuery('pets').for([1, 2]);
 const relQueryResult3: Promise<Animal[]> = Person.relatedQuery('pets').for('something');
 const relQueryResult4: Promise<Animal[]> = Person.relatedQuery('pets').for(['something', 'eles']);
-const relQueryResult5: Promise<Animal[]> = Person.relatedQuery('pets').for([[1, 2], [3, 4]]);
+const relQueryResult5: Promise<Animal[]> = Person.relatedQuery('pets').for([
+  [1, 2],
+  [3, 4]
+]);
 const relQueryResult6: Promise<Animal[]> = Person.relatedQuery('pets').for(
   Movie.query().select('id')
 );
@@ -1216,10 +1225,7 @@ const plugin2 = ({} as any) as objection.Plugin;
 };
 
 () => {
-  const plugin = objection.compose(
-    plugin1,
-    plugin2
-  );
+  const plugin = objection.compose(plugin1, plugin2);
   const BaseModel = objection.mixin(objection.Model, plugin);
   takesModelClass(BaseModel);
   takesModelSubclass(new BaseModel());
@@ -1265,10 +1271,18 @@ async () => {
     .whereNotNull('interviewDate');
 
   // findByIds with sets of composite key
-  const interviews: Interview[] = await Interview.query().findByIds([[10, 11], [11, 12], [12, 13]]);
+  const interviews: Interview[] = await Interview.query().findByIds([
+    [10, 11],
+    [11, 12],
+    [12, 13]
+  ]);
 
   // findByIds with sets of composite key, chained with other query builder methods
   const interviewsWithAssignedDate: Interview[] = await Interview.query()
-    .findByIds([[10, 11], [11, 12], [12, 13]])
+    .findByIds([
+      [10, 11],
+      [11, 12],
+      [12, 13]
+    ])
     .whereNotNull('interviewDate');
 };

@@ -84,7 +84,10 @@ describe('HasManyRelation', () => {
   describe('find', () => {
     it('should generate a find query', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, ownerId: 666 }, { a: 2, ownerId: 666 }];
+      let expectedResult = [
+        { a: 1, ownerId: 666 },
+        { a: 2, ownerId: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -204,7 +207,10 @@ describe('HasManyRelation', () => {
 
     it('explicit selects should override the RelatedModel.*', () => {
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, ownerId: 666 }, { a: 2, ownerId: 666 }];
+      let expectedResult = [
+        { a: 1, ownerId: 666 },
+        { a: 2, ownerId: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -236,7 +242,10 @@ describe('HasManyRelation', () => {
       createModifiedRelation({ someColumn: 'foo' });
 
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, ownerId: 666 }, { a: 2, ownerId: 666 }];
+      let expectedResult = [
+        { a: 1, ownerId: 666 },
+        { a: 2, ownerId: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -267,7 +276,10 @@ describe('HasManyRelation', () => {
       createModifiedRelation(builder => builder.where('someColumn', 'foo'));
 
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, ownerId: 666 }, { a: 2, ownerId: 666 }];
+      let expectedResult = [
+        { a: 1, ownerId: 666 },
+        { a: 2, ownerId: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -298,7 +310,10 @@ describe('HasManyRelation', () => {
       createModifiedRelation('modifier');
 
       let owner = OwnerModel.fromJson({ oid: 666 });
-      let expectedResult = [{ a: 1, ownerId: 666 }, { a: 2, ownerId: 666 }];
+      let expectedResult = [
+        { a: 1, ownerId: 666 },
+        { a: 2, ownerId: 666 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 

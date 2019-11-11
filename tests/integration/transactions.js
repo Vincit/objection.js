@@ -45,9 +45,13 @@ module.exports = session => {
     });
 
     it('should fail if one of the model classes is not a subclass of Model', done => {
-      transaction(Model1, function() {}, () => {
-        return { a: 1 };
-      })
+      transaction(
+        Model1,
+        function() {},
+        () => {
+          return { a: 1 };
+        }
+      )
         .then(() => {
           done(new Error('should not get here'));
         })

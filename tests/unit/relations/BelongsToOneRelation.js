@@ -107,7 +107,10 @@ describe('BelongsToOneRelation', () => {
     });
 
     it('should generate a find query (composite key)', () => {
-      let expectedResult = [{ id: 1, aid: 11, bid: 22 }, { id: 2, aid: 11, bid: 33 }];
+      let expectedResult = [
+        { id: 1, aid: 11, bid: 22 },
+        { id: 2, aid: 11, bid: 33 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -138,7 +141,10 @@ describe('BelongsToOneRelation', () => {
     });
 
     it('should find for multiple owners', () => {
-      let expectedResult = [{ id: 1, a: 10, rid: 2 }, { id: 2, a: 10, rid: 3 }];
+      let expectedResult = [
+        { id: 1, a: 10, rid: 2 },
+        { id: 2, a: 10, rid: 3 }
+      ];
 
       mockKnexQueryResults = [expectedResult];
 
@@ -421,7 +427,10 @@ describe('BelongsToOneRelation', () => {
       mockKnexQueryResults = [[1]];
 
       let owner = OwnerModel.fromJson({ id: 666 });
-      let related = [{ a: 'str1', rid: 2 }, { a: 'str1', rid: 2 }];
+      let related = [
+        { a: 'str1', rid: 2 },
+        { a: 'str1', rid: 2 }
+      ];
 
       QueryBuilder.forClass(RelatedModel)
         .insertOperationFactory(builder => {

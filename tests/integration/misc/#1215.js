@@ -127,7 +127,10 @@ module.exports = session => {
               { name: 'Marika', parentName: 'Matti' }
             ],
 
-            cousins: [{ name: 'Torsti', parentName: null }, { name: 'Taina', parentName: 'Urpo' }]
+            cousins: [
+              { name: 'Torsti', parentName: null },
+              { name: 'Taina', parentName: 'Urpo' }
+            ]
           });
         });
     });

@@ -247,7 +247,10 @@ module.exports = session => {
 
             expect(inserted.toJSON()).to.eql({
               id: 4,
-              model1Relation2: [{ model1Id: 4, idCol: 100 }, { model1Id: 4, idCol: 101 }]
+              model1Relation2: [
+                { model1Id: 4, idCol: 100 },
+                { model1Id: 4, idCol: 101 }
+              ]
             });
 
             return Model1.query()
