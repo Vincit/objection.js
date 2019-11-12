@@ -138,6 +138,48 @@ class Person extends Model {
 
 Require loops (circular dependencies, circular requires) are a very common problem when defining relations. Whenever a module `A` imports module `B` that immediately (synchronously) imports module `A`, you create a require loop that node.js or objection cannot solve automatically. A require loop usually leads to the other imported value to be an empty object which causes all kinds of problems. Objection attempts to detect these situations and mention the words `require loop` in the thrown error. Objection offers multiple solutions to this problem. See the circular dependency solutions examples in this section. In addition to objection's solutions, you can always organize your code so that such loops are not created.
 
+A way to organize your code in order to avoid require loops is by NOT using default exports, instead of do this:
+```js
+class Animal extends Model {
+   static get tableName() {
+       return 'animals';
+   }
+}
+module.exports = Animal;
+```
+You can do this:
+```js
+class Animal extends Model {
+   static get tableName() {
+       return 'animals';
+   }
+}
+module.exports.Animal = Animal;
+```
+Then you will be able to require the model without any issues:
+```js
+const { Animal } = require('./Animal');
+
+class Person extends Model {
+  static get tableName() {
+    return 'persons';
+  }
+
+  static get relationMappings() {
+    return {
+      pets: {
+        relation: Model.HasManyRelation,
+        modelClass: Animal,
+        join: {
+          from: 'persons.id',
+          to: 'animals.ownerId'
+        }
+      }
+    };
+  }
+}
+```
+
 Solutions to require loops
 
 ```js
