@@ -157,9 +157,9 @@ declare namespace Objection {
   type Identity<T> = (value: T) => T;
   type AnyQueryBuilder = QueryBuilder<any, any>;
   type AnyModelClass = ModelClass<any>;
-  type ModifierFunc<QB extends AnyQueryBuilder> = (qb: QB, ...args: any[]) => void;
+  type ModifierFunction<QB extends AnyQueryBuilder> = (qb: QB, ...args: any[]) => void;
   type Modifier<QB extends AnyQueryBuilder = AnyQueryBuilder> =
-    | ModifierFunc<QB>
+    | ModifierFunction<QB>
     | string
     | string[]
     | Record<string, Expression<PrimitiveValue>>;
@@ -521,9 +521,16 @@ declare namespace Objection {
     (columns: ColumnRef[]): QB;
   }
 
+  interface OrderByDescriptor {
+    column: ColumnRef;
+    order?: OrderByDirection;
+  }
+
+  type ColumnRefOrOrderByDescriptor = ColumnRef | OrderByDescriptor;
+
   interface OrderByMethod<QB extends AnyQueryBuilder> {
     (column: ColumnRef, order?: OrderByDirection): QB;
-    (columns: { column: ColumnRef; order?: OrderByDirection } | ColumnRef[]): QB;
+    (columns: ColumnRefOrOrderByDescriptor[]): QB;
   }
 
   interface OrderByRawMethod<QB extends AnyQueryBuilder> extends RawInterface<QB> {}
@@ -1068,8 +1075,8 @@ declare namespace Objection {
     toString: StringReturningMethod;
     reject: OneArgMethod<any, this>;
     resolve: OneArgMethod<any, this>;
-    transacting: OneArgMethod<knex | Transaction, this>;
-    connection: OneArgMethod<knex | Transaction, this>;
+    transacting: OneArgMethod<TransactionOrKnex, this>;
+    connection: OneArgMethod<TransactionOrKnex, this>;
     timeout: TimeoutMethod<this>;
     clone: IdentityMethod<this>;
     columnInfo: ColumnInfoMethod<this>;
@@ -1155,11 +1162,11 @@ declare namespace Objection {
   }
 
   interface StaticQueryMethod {
-    <M extends Model>(this: ModelClass<M>, trxOrKnex?: Transaction | knex): M['QueryBuilderType'];
+    <M extends Model>(this: ModelClass<M>, trxOrKnex?: TransactionOrKnex): M['QueryBuilderType'];
   }
 
   interface QueryMethod {
-    <M extends Model>(this: M, trxOrKnex?: Transaction | knex): SingleQueryBuilder<
+    <M extends Model>(this: M, trxOrKnex?: TransactionOrKnex): SingleQueryBuilder<
       M['QueryBuilderType']
     >;
   }
@@ -1181,25 +1188,19 @@ declare namespace Objection {
     : never;
 
   interface RelatedQueryMethod<M extends Model> {
-    <K extends keyof M>(relationName: K, trxOrKnex?: Transaction | knex): RelatedQueryBuilder<M[K]>;
+    <K extends keyof M>(relationName: K, trxOrKnex?: TransactionOrKnex): RelatedQueryBuilder<M[K]>;
 
-    <RM extends Model>(
-      relationName: string,
-      trxOrKnex?: Transaction | knex
-    ): RM['QueryBuilderType'];
+    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): RM['QueryBuilderType'];
   }
 
   interface StaticRelatedQueryMethod {
     <M extends Model, K extends keyof M>(
       this: ModelClass<M>,
       relationName: K,
-      trxOrKnex?: Transaction | knex
+      trxOrKnex?: TransactionOrKnex
     ): ArrayRelatedQueryBuilder<M[K]>;
 
-    <RM extends Model>(
-      relationName: string,
-      trxOrKnex?: Transaction | knex
-    ): RM['QueryBuilderType'];
+    <RM extends Model>(relationName: string, trxOrKnex?: TransactionOrKnex): RM['QueryBuilderType'];
   }
 
   // Deprecated
@@ -1207,7 +1208,7 @@ declare namespace Objection {
     (
       expression: RelationExpression<M>,
       modifiers?: Modifiers<M['QueryBuilderType']>,
-      trxOrKnex?: Transaction | knex
+      trxOrKnex?: TransactionOrKnex
     ): SingleQueryBuilder<M['QueryBuilderType']>;
   }
 
@@ -1218,7 +1219,7 @@ declare namespace Objection {
   }
 
   interface FetchGraphOptions {
-    transaction?: Transaction | knex;
+    transaction?: TransactionOrKnex;
   }
 
   // Deprecated
@@ -1228,7 +1229,7 @@ declare namespace Objection {
       modelOrObject: PartialModelObject<M>,
       expression: RelationExpression<M>,
       modifiers?: Modifiers<M['QueryBuilderType']>,
-      trxOrKnex?: Transaction | knex
+      trxOrKnex?: TransactionOrKnex
     ): SingleQueryBuilder<M['QueryBuilderType']>;
 
     <M extends Model>(
@@ -1236,7 +1237,7 @@ declare namespace Objection {
       modelOrObject: PartialModelObject<M>[],
       expression: RelationExpression<M>,
       modifiers?: Modifiers<M['QueryBuilderType']>,
-      trxOrKnex?: Transaction | knex
+      trxOrKnex?: TransactionOrKnex
     ): M['QueryBuilderType'];
   }
 
@@ -1275,7 +1276,27 @@ declare namespace Objection {
     (): any;
   }
 
+  type ArrayQueryBuilderThunk<M extends Model> = () => ArrayQueryBuilder<M['QueryBuilderType']>;
+  type CancelQueryThunk = (result: any) => void;
+
+  export interface StaticHookArguments<M extends Model, R = any> {
+    asFindQuery: ArrayQueryBuilderThunk<M>;
+    cancelQuery: CancelQueryThunk;
+    context: QueryContext;
+    transaction: TransactionOrKnex;
+    relation?: Relation;
+    modelOptions?: ModelOptions;
+    items: Model[];
+    inputItems: M[];
+    result?: R;
+  }
+
+  export interface StaticModelHook {
+    (args: StaticHookArguments<any>): any;
+  }
+
   export type Transaction = knex.Transaction;
+  export type TransactionOrKnex = Transaction | knex;
 
   export interface RelationMappings {
     [relationName: string]: RelationMapping<any>;
@@ -1289,7 +1310,8 @@ declare namespace Objection {
     model: M,
     context: QueryContext
   ) => Promise<void> | void;
-  type RelationMappingColumnRef = string | ReferenceBuilder | string | ReferenceBuilder[];
+  type StringOrReferenceBuilder = string | ReferenceBuilder;
+  type RelationMappingColumnRef = StringOrReferenceBuilder | StringOrReferenceBuilder[];
 
   export interface RelationMapping<M extends Model> {
     relation: RelationType;
@@ -1456,11 +1478,11 @@ declare namespace Objection {
 
   interface TransactionMethod {
     <T>(callback: (trx: Transaction) => Promise<T>): Promise<T>;
-    <T>(trxOrKnex: Transaction | knex, callback: (trx: Transaction) => Promise<T>): Promise<T>;
+    <T>(trxOrKnex: TransactionOrKnex, callback: (trx: Transaction) => Promise<T>): Promise<T>;
   }
 
   interface BindKnexMethod {
-    <M>(this: M, trxOrKnex: Transaction | knex): M;
+    <M>(this: M, trxOrKnex: TransactionOrKnex): M;
   }
 
   interface FromJsonMethod {
@@ -1531,7 +1553,7 @@ declare namespace Objection {
 
     static knex(knex?: knex): knex;
     static knexQuery(): knex.QueryBuilder;
-    static startTransaction(knexOrTransaction?: Transaction | knex): Transaction;
+    static startTransaction(knexOrTransaction?: TransactionOrKnex): Transaction;
     static transaction: TransactionMethod;
 
     static bindKnex: BindKnexMethod;
@@ -1545,6 +1567,15 @@ declare namespace Objection {
     static getRelation(name: string): Relation;
 
     static traverse: StaticTraverseMethod;
+
+    static beforeFind: StaticModelHook;
+    static afterFind: StaticModelHook;
+    static beforeInsert: StaticModelHook;
+    static afterInsert: StaticModelHook;
+    static beforeUpdate: StaticModelHook;
+    static afterUpdate: StaticModelHook;
+    static beforeDelete: StaticModelHook;
+    static afterDelete: StaticModelHook;
 
     $query: QueryMethod;
     $relatedQuery: RelatedQueryMethod<this>;

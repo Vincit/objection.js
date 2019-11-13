@@ -10,7 +10,8 @@ import {
   ref,
   RelationMappings,
   RelationMapping,
-  QueryBuilder
+  QueryBuilder,
+  StaticHookArguments
 } from '../../';
 
 // This file exercises the Objection.js typings.
@@ -69,6 +70,22 @@ class Person extends objection.Model {
       }
     }
   };
+
+  static async beforeFind({
+    asFindQuery,
+    cancelQuery
+  }: StaticHookArguments<Person>): Promise<void> {
+    takesPeople(await asFindQuery());
+    cancelQuery([]);
+  }
+
+  static async afterUpdate({
+    asFindQuery,
+    result
+  }: StaticHookArguments<Person, number>): Promise<void> {
+    takesPeople(await asFindQuery());
+    takesNumber(result!);
+  }
 
   examplePersonMethod = (arg: string) => 1;
 
@@ -158,6 +175,7 @@ const takesPerson = (person: Person) => {
 };
 const takesMaybePerson = (_: Person | undefined) => 1;
 const takesPeople = (_: Person[]) => 1;
+const takesNumber = (_: number) => 1;
 
 async function takesPersonClass(PersonClass: typeof Person) {
   takesPerson(new PersonClass());
