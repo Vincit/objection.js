@@ -297,6 +297,8 @@ Person.query()
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [modifiers](/api/model/static-properties.html#static-modifiers) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-namedfilters)
 :::
 
 An alias for [modifiers](/api/model/static-properties.html#static-modifiers)
@@ -452,6 +454,8 @@ class Person extends Model {
 
 ::: warning
 Deprecated! Will be removed in version 3.0.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-relatedfindquerymutates)
 :::
 
 ```js
@@ -468,6 +472,8 @@ If this config is set to false, calling `foo.$relatedQuery('bar')` doesn't assig
 
 ::: warning
 Deprecated! Will be removed in version 3.0.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-relatedinsertquerymutates)
 :::
 
 ```js
@@ -560,12 +566,16 @@ Defaults to false.
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [withGraphFetched](/api/query-builder/eager-methods.html#withgraphfetched) or [withGraphJoined](/api/query-builder/eager-methods.html#withgraphjoined) explicitly.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-defaulteageralgorithm)
 :::
 
 ## `static` defaultEagerOptions
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use `defaultGraphOptions` instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-properties.md#static-defaulteageroptions)
 :::
 
 ## `static` defaultGraphOptions

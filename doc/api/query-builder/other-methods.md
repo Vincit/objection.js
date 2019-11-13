@@ -356,6 +356,8 @@ Returns true if the query contains any specific select staments, such as:
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [hasWithGraph](#haswithgraph) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#haseager)
 :::
 
 ## hasWithGraph()
@@ -1366,6 +1368,8 @@ Person.query().modify(modifierFunc, 'foo', 1);
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/other-methods.html#modify) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#applymodifier)
 :::
 
 Applies modifiers to the query builder.
@@ -1387,6 +1391,8 @@ Applies modifiers to the query builder.
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [modify](/api/query-builder/other-methods.html#modify) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/other-methods.md#applyfilter)
 :::
 
 An alias for [applyModifier](/api/query-builder/other-methods.html#applymodifier)

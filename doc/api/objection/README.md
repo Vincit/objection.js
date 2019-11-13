@@ -155,6 +155,8 @@ await Person
 
 ::: warning
 Deprecated! Will be removed in 3.0. Use [val](#val) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/tree/v1/doc/api/objection#lit)
 :::
 
 ## val

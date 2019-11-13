@@ -888,6 +888,8 @@ Creates an error thrown when validation fails for a model. You can override this
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [fetchGraph](#static-fetchgraph) instead.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/model/static-methods.md#static-loadrelated)
 :::
 
 ## `static` fetchGraph()

@@ -135,6 +135,8 @@ See the [section about graph inserts](/guide/query-examples.html#graph-inserts).
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowInsert` cleared any old expressions automatically, while `allowGraph` merges them.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#allowinsert)
 :::
 
 ## insertGraphAndFetch()
@@ -145,6 +147,8 @@ Exactly like [insertGraph](/api/query-builder/mutate-methods.html#insertgraph) b
 
 ::: warning
 Deprecated! Will be removed in version 2.0.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#insertwithrelated)
 :::
 
 Alias for [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
@@ -153,6 +157,8 @@ Alias for [insertGraph](/api/query-builder/mutate-methods.html#insertgraph).
 
 ::: warning
 Deprecated! Will be removed in version 2.0.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#insertwithrelatedandfetch)
 :::
 
 Alias for [insertGraphAndFetch](/api/query-builder/mutate-methods.html#insertgraphandfetch).
@@ -447,6 +453,8 @@ It's also really easy to create a server that doesn't work well with multiple us
 
 ::: warning
 Deprecated! Will be removed in version 3.0. Use [allowGraph](/api/query-builder/eager-methods.html#allowgraph) instead. Note that you may need to add [clearAllowGraph](/api/query-builder/eager-methods.html#clearallowgraph) call too. `allowUpsert` cleared any old expressions automatically, while `allowGraph` merges them.
+
+[v1 documentation](https://github.com/Vincit/objection.js/blob/v1/doc/api/query-builder/mutate-methods.md#allowupsert)
 :::
 
 ## upsertGraphAndFetch()
